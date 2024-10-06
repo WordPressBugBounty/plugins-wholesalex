@@ -1078,6 +1078,9 @@ button.wholesalex-btn {
 .wholesalex-bogo-badge-label{
     white-space: nowrap;
 }
+.wsx-combined-bogo-badge{
+    display: flex;
+}
 .wholesalex-bogo-badge-product{
     left: 560px;
     right: auto;  

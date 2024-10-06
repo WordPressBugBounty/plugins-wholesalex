@@ -1292,7 +1292,7 @@ class Functions {
 			foreach ( WC()->cart->get_cart() as $cart_item ) {
 				if($product_id) {
 					if ( ! empty( $cart_item['data'] ) && in_array( $product_id, array( $cart_item['product_id'], $cart_item['variation_id'] ), true ) ) {
-						$__is_parent_rule_apply = apply_filters( 'wholesalex_get_work_combine_variation', false );
+						$__is_parent_rule_apply = apply_filters( 'wholesalex_apply_parent_rule_to_variations', false );  // Add This Filter TO Work Dynamic Rule For Combine Variation Product Like Quantity Base Discount
 						if ( $__is_parent_rule_apply ) {
 							$__quantity += $cart_item['quantity'];
 						} else {

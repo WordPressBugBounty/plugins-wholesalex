@@ -5935,15 +5935,7 @@ class WHOLESALEX_Dynamic_Rules {
 	 * @return void
 	 */
 	public function wholesalex_bogo_single_page_display_sale_badge() {
-		
-			wp_enqueue_script(
-			   'wholesalex_bogo_script', 
-			   WHOLESALEX_URL . '/js/wholesalex-bogo-script.js', 
-			   array('jquery'), 
-			   null, 
-			   true
-		   );
-		   $localized_content = array();
+					   $localized_content = array();
 		   if ( wholesalex()->get_setting( 'bogo_discount_bogo_badge_enable', 'yes' ) === 'yes' && isset( $this->valid_dynamic_rules['buy_x_get_one'] ) && !empty( $this->valid_dynamic_rules['buy_x_get_one'] ) ) {
 				$bogo_badge_dynamic_rule_get_one = $this->valid_dynamic_rules['buy_x_get_one'];
 			   $localized_content['buy_x_get_one'] = $this->wholesalex_bogo_display_markup( $bogo_badge_dynamic_rule_get_one, true );
@@ -5952,7 +5944,7 @@ class WHOLESALEX_Dynamic_Rules {
 				$bogo_badge_dynamic_rule_get_y = $this->valid_dynamic_rules['buy_x_get_y'];
 			   	$localized_content['buy_x_get_y'] = $this->wholesalex_bogo_display_markup( $bogo_badge_dynamic_rule_get_y, true );
 			}
-		   wp_localize_script('wholesalex_bogo_script', 'wholesalex_bogo_single', array('content' => $localized_content));
+		   wp_localize_script('wholesalex', 'wholesalex_bogo_single', array('content' => $localized_content));
 	}
 
 	/**
@@ -7175,7 +7167,7 @@ class WHOLESALEX_Dynamic_Rules {
 					$sale_price = floatval( $rrs );
 				}
 			}
-			$__is_parent_rule_apply = apply_filters( 'wholesalex_get_work_combine_variation', false );
+			$__is_parent_rule_apply = apply_filters( 'wholesalex_apply_parent_rule_to_variations', false ); // Add This Filter TO Work Dynamic Rule For Combine Variation Product Like Quantity Base Discount
 			if ( $product->is_type('variation') && $__is_parent_rule_apply ) {
 				$cart_qty = wholesalex()->cart_count( $parent_id );
 			}else {

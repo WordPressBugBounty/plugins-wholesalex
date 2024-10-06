@@ -718,7 +718,13 @@ class WHOLESALEX_Registration {
 	public function generate_field_for_woo_registration( $field ) {
 		$depends = $this->check_depends( $field );
 		$is_required = isset( $field['required'] ) && $field['required'];
-		
+		//Check to Guest User Shouldn't Be Show In WooCommerce Registration Form
+		if( $field['type'] == 'select' && $field['name'] == 'wholesalex_registration_role' ){
+			$filtered_role_options = array_filter( $field['option'], function( $item ) {
+				return $item['value'] !== 'wholesalex_guest';
+			});
+			$field['option'] = $filtered_role_options;
+		}
 		switch ( $field['type'] ) {
 			case 'text':
 			case 'password':

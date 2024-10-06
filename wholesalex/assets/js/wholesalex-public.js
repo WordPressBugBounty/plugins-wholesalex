@@ -64,13 +64,27 @@
 
 		//Bogo Badge in Single Page
 		if ( typeof wholesalex_bogo_single !== 'undefined' ) {
-			if (wholesalex_bogo_single.content.buy_x_get_one) {
-				$('.woocommerce-product-gallery').prepend(wholesalex_bogo_single.content.buy_x_get_one);
+			const { buy_x_get_one, buy_x_get_y } = wholesalex_bogo_single.content;
+			let markupToPrepend = '';
+		
+			if (buy_x_get_one) {
+				markupToPrepend += buy_x_get_one;
 			}
-			if (wholesalex_bogo_single.content.buy_x_get_y) {
-				$('.woocommerce-product-gallery').prepend(wholesalex_bogo_single.content.buy_x_get_y);
+		
+			if (buy_x_get_y) {
+				markupToPrepend += buy_x_get_y;
+			}
+		
+			// If both are present, wrap in a <div>, otherwise add them directly
+			if (markupToPrepend) {
+				const prependMarkup = (buy_x_get_one && buy_x_get_y) 
+					? `<div class="wsx-combined-bogo-badge">${markupToPrepend}</div>` 
+					: markupToPrepend;
+		
+				$('.woocommerce-product-gallery').prepend(prependMarkup);
 			}
 		}
+		
 
 	});
 	

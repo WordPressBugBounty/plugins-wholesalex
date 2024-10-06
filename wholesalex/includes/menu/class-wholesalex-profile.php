@@ -74,7 +74,7 @@ class WHOLESALEX_Profile {
 					'methods'             => 'POST',
 					'callback'            => array( $this, 'profile_action_callback' ),
 					'permission_callback' => function () {
-						return current_user_can( 'manage_options' );
+						return current_user_can( 'manage_options') || current_user_can( 'edit_users' );
 					},
 					'args'                => array(),
 				),
@@ -114,6 +114,9 @@ class WHOLESALEX_Profile {
 			$__registration_role_id = get_user_meta( $user_id, '__wholesalex_registration_role', true );
 			$__registration_role    = wholesalex()->get_role_name_by_role_id( $__registration_role_id );
 			
+			if ( ! is_array( $__user_settings ) ) {
+				$__user_settings = [];
+			}
 			$response_data = array_merge(
 				$__user_settings,
 				[

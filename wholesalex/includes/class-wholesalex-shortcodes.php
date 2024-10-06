@@ -19,7 +19,6 @@ class WHOLESALEX_Shortcodes {
 	 */
 	private $registrationFormFieldsName = array();
 	public function __construct() {
-		add_shortcode( 'wholesalex_registration', array( $this, 'registration_shortcode' ), 10 );
 		add_action( 'woocommerce_after_checkout_billing_form', array( $this, 'add_custom_fields_on_checkout_page' ) );
 		add_action( 'woocommerce_checkout_process', array( $this, 'validate_custom_checkout_fields' ) );
 		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'add_custom_fields_on_order_meta' ) );
@@ -31,8 +30,11 @@ class WHOLESALEX_Shortcodes {
 		 *
 		 * @since 1.0.1
 		 */
+
+		add_shortcode( 'wholesalex_registration', array( $this, 'registration_shortcode' ), 10 );
 		add_shortcode( 'wholesalex_login_registration', array( $this, 'login_registration_shortcode' ), 10 );
 		add_shortcode( 'wholesalex_login', array( $this, 'login_shortcode' ), 10 );
+		
 		/**
 		 * Filters the list of CSS class names for the current post.
 		 *
@@ -97,7 +99,16 @@ class WHOLESALEX_Shortcodes {
 	}
 
 
-
+	public function check_current_page_is_lost_password() {
+		$current_uri = $_SERVER['REQUEST_URI'];
+		$uri_parts = explode( '/', trim( $current_uri, '/' ));
+		$last_part = end( $uri_parts );
+		if ( $last_part !== 'lost-password' ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	private function isFormRowValid($columns){
 		$status = false;
@@ -448,7 +459,11 @@ class WHOLESALEX_Shortcodes {
 				return;
 			}
 		}
-		return $this->render_registration_shortcode($atts);
+		if ( $this->check_current_page_is_lost_password() ){
+			return $this->render_registration_shortcode($atts);
+		} else {
+			return '';
+		}
 	}
 	/**
 	 * Login And Registration Form
@@ -478,7 +493,11 @@ class WHOLESALEX_Shortcodes {
 				return;
 			}
 		}
-		return $this->render_login_registration_shortcode($atts);
+		if ( $this->check_current_page_is_lost_password() ){
+			return $this->render_login_registration_shortcode( $atts );
+		}else{
+			return '';
+		}
 	}
 
 	/**
@@ -509,7 +528,11 @@ class WHOLESALEX_Shortcodes {
 				return;
 			}
 		}
-		return $this->render_login_shortcode($atts);
+		if ( $this->check_current_page_is_lost_password() ){
+			return $this->render_login_shortcode( $atts );
+		} else {
+			return '';
+		}
 	}
 
 	public function load_form_js() {
@@ -532,7 +555,7 @@ class WHOLESALEX_Shortcodes {
 						foreach( $field['passwordStrength'] as $value ) {
 							$password_condition[] = $value['value'];
 						}
-						$password_message = $field['password_strength_message'];
+						$password_message = isset( $field['password_strength_message'] ) ? $field['password_strength_message'] : '';
 					}
 					if ( isset( $field['conditions'] ) && $field['conditions'] ) {
 						$conditions[ $field['name'] ] = $field['conditions'];

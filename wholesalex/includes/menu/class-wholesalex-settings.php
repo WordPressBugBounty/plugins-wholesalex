@@ -982,6 +982,38 @@ class Settings {
 										),
 									),
 								),
+								'only_total_user_order_count_promo_text' => array(
+									'type'        => 'text',
+									'label'       => __( 'User Order Count', 'wholesalex' ),
+									'placeholder' => __( 'Specify the minimum user order count for checkout', 'wholesalex' ),
+									'help'        => '',
+									'default'     => __( 'Specify the minimum user order count for checkout', 'wholesalex' ),
+									'smart_tags'  => array(
+										'{order_count}' => __( 'User Order Count','wholesalex' ),
+									),
+									'depends_on' => array(
+										array(
+											'key'   => 'show_promotions_on_sp',
+											'value' => 'yes',
+										),
+									),
+								),
+								'only_total_purchase_amount_promo_text' => array(
+									'type'        => 'text',
+									'label'       => __( 'Total Purchase Amount', 'wholesalex' ),
+									'placeholder' => __( 'Specify the minimum total purchase amount for checkout', 'wholesalex' ),
+									'help'        => '',
+									'default'     => __( 'Specify the minimum total purchase amount for checkout', 'wholesalex' ),
+									'smart_tags'  => array(
+										'{total_purchase_amount}' => __( 'Total Purchase Amount','wholesalex' ),
+									),
+									'depends_on' => array(
+										array(
+											'key'   => 'show_promotions_on_sp',
+											'value' => 'yes',
+										),
+									),
+								),
 							)
 						),
 						'min_max_discounts_promo_section' => array(

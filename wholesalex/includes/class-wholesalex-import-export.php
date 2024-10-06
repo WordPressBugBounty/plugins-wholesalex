@@ -300,7 +300,7 @@ class ImportExport {
 		foreach ( $data as $row ) {
 			$rowData = array();
 			foreach ( $exportable_columns as $column ) {
-				$rowData[] = $row[ $column ];
+				$rowData[] = isset( $row[$column] ) ? $row[$column] : '';
 			}
 			$csvData .= implode( ',', $rowData ) . "\n";
 		}

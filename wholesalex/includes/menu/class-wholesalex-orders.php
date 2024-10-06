@@ -17,8 +17,8 @@ class WHOLESALEX_Orders {
 	 * Order Constructor
 	 */
 	public function __construct() {
-		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_order_type_column_on_order_page' ) );
-		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'populate_data_on_order_type_column' ), 10, 2 );
+		add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_order_type_column_on_order_page' ) );
+		add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'populate_data_on_order_type_column' ), 10, 2 );
 
 	}
 
