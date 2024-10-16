@@ -321,6 +321,13 @@ class Functions {
 			foreach ( $discounts as $role_name => $value ) {
 				$base_price_meta_name = $role_name . '_base_price';
 				$sale_price_meta_name = $role_name . '_sale_price';
+				$price_meta_name 	  = $role_name . '_price';
+
+				if ( isset( $value['wholesalex_sale_price'] ) && ! empty( $value['wholesalex_sale_price'] ) ) {
+					update_post_meta( $id, $price_meta_name, $value['wholesalex_sale_price'] );
+				} elseif( ! empty( $value['wholesalex_base_price'] ) ) {
+					update_post_meta( $id, $price_meta_name, $value['wholesalex_base_price'] );
+				}
 
 				// Update Base Price
 				if ( isset( $value['wholesalex_base_price'] ) ) {

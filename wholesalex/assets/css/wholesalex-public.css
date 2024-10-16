@@ -1096,6 +1096,13 @@ button.wholesalex-btn {
     position: absolute;
 }
 
+.wsx-wholesalex-product .wsx-lost-password-form {
+    max-width: 450px;
+    margin-inline: auto;
+}
+.wsx-lost-password-form .wsx-password-reset-btn{
+    width: 100%;
+}
 /* Twenty Twenty-Four Theme Quantity Box Compatibility */
 .wp-block-columns .cart .quantity .input-text{
     width: 90px;

@@ -77,7 +77,7 @@ class WHOLESALEX_Notice {
 	 */
 	public function promotion() {
 		add_action( 'admin_init', array( $this, 'notice_callback' ) );
-		add_action( 'admin_notices', array( $this, 'display_notices' ) );
+		add_action( 'admin_notices', array( $this, 'display_notices' ), 0 );
 	}
 	
 	public function display_notices() {
@@ -92,7 +92,7 @@ class WHOLESALEX_Notice {
 						continue;
 					}
 					if ( isset( $notice['id'], $notice['design_type'] ) ) {
-						echo esc_html( $this->get_notice_content( $notice['id'], $notice['design_type'] ) );
+						echo $this->get_notice_content( $notice['id'], $notice['design_type'] );
 
 						++$displayed_notice_count;
 					}
@@ -326,7 +326,8 @@ class WHOLESALEX_Notice {
 		$activate_date          = get_option( 'wholesalex_installation_date', false );
 		$this->available_notice = array(
 			// Free to Pro
-			'wsx_free_promo_Sizzling_Summer_Sale_20'        => $this->set_new_notice( 'wsx_free_promo_Sizzling_Summer_Sale_20', 'promotion', 'summer_promotion_discount_20', '25-6-2024', '20-7-2024', false, 10, ! wholesalex()->is_pro_active() ),
+			'wsx_free_promo_hwllo_Sale12'        => $this->set_new_notice( 'wsx_free_promo_hwllo_Sale12', 'promotion', 'summer_promotion_new_discount_40', '21-10-2024', '28-10-2024', false, 10, ! wholesalex()->is_pro_active() ),
+			'wsx_free_promo_hwllo_Sale123'       => $this->set_new_notice( 'wsx_free_promo_hwllo_Sale123', 'promotion', 'summer_promotion_new_discount_402', '29-10-2024', '02-11-2024', false, 10, ! wholesalex()->is_pro_active() ),
 		);
 
 		if ( isset( $_GET['wsx-notice-disable'] ) ) {//phpcs:ignore
@@ -353,33 +354,53 @@ class WHOLESALEX_Notice {
 		$close_url = add_query_arg( 'wsx-notice-disable', $key );
 
 		switch ( $design_type ) {
-			case 'summer_promotion_discount_20':
+			case 'summer_promotion_new_discount_40':
 				//
 				// Will Get Free User
 				$icon        = WHOLESALEX_URL . 'assets/img/icon.svg';
 				$url         = 'https://getwholesalex.com/pricing/?utm_source=wholesalex_topbar&utm_medium=special_discount_pro&utm_campaign=wholesalex-DB';
-				$full_access = 'https://getwholesalex.com/pricing/?utm_source=wholesalex_topbar&utm_medium=special_discount_access&utm_campaign=wholesalex-DB';
+				$full_access = 'https://getwholesalex.com';
 
 				ob_start();
 				?>
-				
-				<div class="wsx-notice-wrapper wsx-notice-type-1"> 
+				<div class="wsx-display-block">
+				<div class="wsx-notice-wrapper wsx-notice-type-1 notice"> 
 					<div class="wsx-notice-icon"> <img src="<?php echo esc_url( $icon ); ?>"/>  </div>
 					<div class="wsx-notice-content-wrapper">
-					<div class="wsx-notice-content"> <strong> Sizzling Summer Sale </strong> is LIVE! Beat the heat with up to <strong>60% DISCOUNT</strong> on <strong> WholesaleX Pro! </strong></div>
+					<div class="wsx-notice-content"> <strong> Halloween Sale </strong> is LIVE! Boost Your Wholesale Business with up to <strong>60% OFF </strong> on <strong> WholesaleX </strong></div>
 					<div class="wsx-notice-buttons"> 
 						<a class="wsx-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank"> Upgrade to Pro   </a>
-						<a class="wsx-notice-btn button" href="<?php echo esc_url( $full_access ); ?>" target="_blank">  Give Me Pro Access  </a>
+						<a class="wsx-notice-btn button" href="<?php echo esc_url( $full_access ); ?>" target="_blank">  Explore WholesaleX  </a>
 						<a href="<?php echo esc_url( $close_url ); ?>" class="wsx-notice-dont-save-money">   I Don’t Want To Save Money </a>
 					</div>
 					</div>
 					<a href="<?php echo esc_url( $close_url ); ?>" class="wsx-notice-close"><span class="wsx-notice-close-icon dashicons dashicons-dismiss"> </span></a>
 				</div>
+				</div>
 				<?php
 				return ob_get_clean();
 				// code...
 				break;
-
+				case 'summer_promotion_new_discount_402':
+				$icon        = WHOLESALEX_URL . 'assets/img/halloween_banner_offer.jpg';
+				$url         = 'https://getwholesalex.com/pricing/?utm_source=wholesalex_topbar&utm_medium=special_discount_pro&utm_campaign=wholesalex-DB';
+				ob_start();
+					?>
+					<div class="wsx-display-block">
+					<div class="wsx-notice-wrapper notice">
+                    <div class="wsx-install-body wsx-image-banner">
+                        <a href="<?php echo esc_url( $close_url ); ?>" class="promotional-dismiss-notice">
+                            <?php esc_html_e( 'Dismiss', 'wholesalex' ); ?>
+                        </a>
+                        <a href="<?php echo esc_url( $url ); ?>" target="_blank">
+                            <img class="wsx-halloween-img-banner" src="<?php echo $icon; ?>" alt="Banner">
+                        </a>
+                    </div>
+                </div>
+                </div>
+				<?php
+				return ob_get_clean();
+				break;
 			default:
 				// code...
 				break;

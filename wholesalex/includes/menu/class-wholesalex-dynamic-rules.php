@@ -133,7 +133,6 @@ class WHOLESALEX_Dynamic_Rules {
 		add_filter( 'wopb_after_loop_image', array( $this, 'wopb_wholesalex_bogo_display_sale_badge' ), 10 );
 		add_action( 'woocommerce_before_shop_loop_item_title', array( $this, 'wholesalex_bogo_display_sale_badge' ), 10 );
 		add_action( 'woocommerce_before_single_product', array( $this, 'wholesalex_bogo_single_page_display_sale_badge' ), 10 );
-		//add_action( 'woocommerce_before_single_product_summary', array( $this, 'wholesalex_bogo_single_page_display_sale_badge' ), 10 );
 		add_action('wp_head', array( $this, 'wholesalex_bogo_badge_add_custom_css' ) );
 
 	}
@@ -5799,10 +5798,12 @@ class WHOLESALEX_Dynamic_Rules {
 	 */
 	public function wholesalex_bogo_display_markup_css_generate( $bogo_badge_dynamic_rule ) {
 		foreach ( $bogo_badge_dynamic_rule as $badge_dynamic_rule ) {
-			$badge_roles = $badge_dynamic_rule['rule'];
-			$badge_label_text_color = $badge_roles['_product_badge_text_color'];
-			$badge_style = $badge_roles['_product_badge_styles'];
-			$badge_label_bg_color = $badge_roles['_product_badge_bg_color'];
+			$badge_roles 			= $badge_dynamic_rule['rule'];
+			$badge_label_text_color = isset( $badge_roles['_product_badge_text_color'] ) ? $badge_roles['_product_badge_text_color'] : '';
+			$badge_style 			= isset( $badge_roles['_product_badge_styles'] ) ? $badge_roles['_product_badge_styles'] : '';
+			$badge_label_bg_color 	= isset( $badge_roles['_product_badge_bg_color'] ) ? $badge_roles['_product_badge_bg_color'] : '';
+			$badge_position 		= isset( $badge_roles['_product_badge_position'] ) ? $badge_roles['_product_badge_position'] : 'right'; // Defaulting to 'right' if not set
+	
 			?>
 			<style>
 				<?php if ( $badge_style === 'style_one' || $badge_style === '' || empty( $badge_style )) { ?>
@@ -5822,34 +5823,34 @@ class WHOLESALEX_Dynamic_Rules {
 						left: 0px;
 					}
 					.wholesalex-bogo-badge-<?php echo esc_attr( $badge_dynamic_rule['id'] ); ?> {
-						right: <?php echo $badge_roles['_product_badge_position'] == 'left' ? 'auto' : '0px'; ?>;
-						left: <?php echo $badge_roles['_product_badge_position'] == 'left' ? '0px' : 'auto'; ?>;
-						margin-left: <?php echo $badge_roles['_product_badge_position'] == 'left' ? '14px' : '0'; ?>;
+						right: <?php echo $badge_position == 'left' ? 'auto' : '0px'; ?>;
+						left: <?php  echo $badge_position == 'left' ? '0px' : 'auto'; ?>;
+						margin-left: <?php echo $badge_position == 'left' ? '14px' : '0'; ?>;
 					}
 				<?php } elseif ( $badge_style === 'style_two' ) { ?>
 					.wholesalex-bogo-badge-<?php echo esc_attr( $badge_dynamic_rule['id'] ); ?> {
-						right: <?php echo $badge_roles['_product_badge_position'] == 'left' ? 'auto' : '0px'; ?>;
-						left: <?php echo $badge_roles['_product_badge_position'] == 'left' ? '0px' : 'auto'; ?>;
+						right: <?php echo $badge_position == 'left' ? 'auto' : '0px'; ?>;
+						left: <?php  echo $badge_position == 'left' ? '0px' : 'auto'; ?>;
 						border-radius: 4px;
 					}
 				<?php } elseif ( $badge_style === 'style_three' ) { ?>
 					.wholesalex-bogo-badge-<?php echo esc_attr( $badge_dynamic_rule['id'] ); ?> {
-						right: <?php echo $badge_roles['_product_badge_position'] == 'left' ? 'auto' : '0px'; ?>;
-						left: <?php echo $badge_roles['_product_badge_position'] == 'left' ? '0px' : 'auto'; ?>;
+						right: <?php echo $badge_position == 'left' ? 'auto' : '0px'; ?>;
+						left: <?php  echo $badge_position == 'left' ? '0px' : 'auto'; ?>;
 						border-top-left-radius: 40px;
 						border-bottom-left-radius: 5px;
 					}
 				<?php } elseif ( $badge_style === 'style_four' ) { ?>
 					.wholesalex-bogo-badge-<?php echo esc_attr( $badge_dynamic_rule['id'] ); ?> {
-						right: <?php echo $badge_roles['_product_badge_position'] == 'left' ? 'auto' : '0px'; ?>;
-						left: <?php echo $badge_roles['_product_badge_position'] == 'left' ? '0px' : 'auto'; ?>;
+						right: <?php echo $badge_position == 'left' ? 'auto' : '0px'; ?>;
+						left: <?php  echo $badge_position == 'left' ? '0px' : 'auto'; ?>;
 						border-top-left-radius: 30px;
 						border-bottom-right-radius: 30px;
 					}
 				<?php } elseif ( $badge_style === 'style_five' ) { ?>
 					.wholesalex-bogo-badge-<?php echo esc_attr( $badge_dynamic_rule['id'] ); ?> {
-						right: <?php echo $badge_roles['_product_badge_position'] == 'left' ? 'auto' : '0px'; ?>;
-						left: <?php echo $badge_roles['_product_badge_position'] == 'left' ? '0px' : 'auto'; ?>;
+						right: <?php echo $badge_position == 'left' ? 'auto' : '0px'; ?>;
+						left: <?php  echo $badge_position == 'left' ? '0px' : 'auto'; ?>;
 						border-top-right-radius: 30px;
 						border-bottom-left-radius: 30px;
 					}
@@ -5859,6 +5860,7 @@ class WHOLESALEX_Dynamic_Rules {
 			<?php
 		}
 	}
+	
 	
 
 	/**

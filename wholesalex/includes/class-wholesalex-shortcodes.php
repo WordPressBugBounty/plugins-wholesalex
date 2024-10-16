@@ -34,7 +34,7 @@ class WHOLESALEX_Shortcodes {
 		add_shortcode( 'wholesalex_registration', array( $this, 'registration_shortcode' ), 10 );
 		add_shortcode( 'wholesalex_login_registration', array( $this, 'login_registration_shortcode' ), 10 );
 		add_shortcode( 'wholesalex_login', array( $this, 'login_shortcode' ), 10 );
-		
+		add_action( 'init', array( $this, 'wholesalex_handle_password_reset' ));
 		/**
 		 * Filters the list of CSS class names for the current post.
 		 *
@@ -76,6 +76,100 @@ class WHOLESALEX_Shortcodes {
 			}
         }
 	}
+
+    /**
+	 * Display the forgot password form
+	 *
+	 * @return void
+	 */
+	public function wholesalex_forgot_password_form() {
+		if ( isset($_GET['reset']) && $_GET['reset'] === 'true' ) {
+			echo '<div class="woocommerce-message">' . esc_html__( 'A password reset email has been sent. Please check your inbox.', 'wholesalex' ) . '</div>';
+		}
+	
+		ob_start();
+		?>
+			<form method="post" class="wsx-lost-password-form">
+				<p><?php esc_html_e( 'Lost your password? Please enter your email address. You will receive a link to create a new password via email.', 'wholesalex' ); ?></p>
+				<p>
+					<input type="email" name="user_email" id="user_email" placeholder="<?php esc_attr_e( 'Your email address', 'wholesalex' ); ?>" required>
+				</p>
+				<p>
+					<input type="submit" class="wsx-password-reset-btn" name="wholesalex_reset_password" value="<?php esc_attr_e( 'Reset Password', 'wholesalex' ); ?>">
+				</p>
+			</form>
+		<?php
+		return ob_get_clean();
+	}
+	
+
+    /**
+	 * Handle form submission and trigger password reset email
+	 *
+	 * @return void
+	 */
+    public function wholesalex_handle_password_reset() {
+        if ( isset($_POST['wholesalex_reset_password']) ) {
+            $email = sanitize_email( $_POST['user_email'] );
+
+            if ( empty( $email ) ) {
+                wc_add_notice( 'Please enter a valid email address.', 'error' );
+                return;
+            }
+
+            // Check if user exists
+            $user = get_user_by('email', $email);
+
+            if ( !$user ) {
+                wc_add_notice( 'No user found with this email address.', 'error' );
+                return;
+            }
+
+            // Generate password reset key
+            $key = get_password_reset_key( $user );
+            if ( is_wp_error( $key ) ) {
+                wc_add_notice( $key->get_error_message(), 'error' );
+                return;
+            }
+            $reset_link = network_site_url( "wp-login.php?action=rp&key=$key&login=" . rawurlencode( $user->user_login ), 'login' );
+            $this->wholesalex_send_password_reset_email( $user->user_login, $user->user_email, $reset_link );
+            wp_redirect( add_query_arg( 'reset', 'true', get_permalink() ) );
+            exit;
+        }
+    }
+
+    /**
+	 * Forget Password Email Template
+	 *
+	 * @param [string] $user_login
+	 * @param [string] $user_email
+	 * @param [string] $reset_link
+	 * @return void
+	 */
+	public function wholesalex_send_password_reset_email( $user_login, $user_email, $reset_link ) {
+		$mailer = WC()->mailer();
+		$email_heading = esc_html__( 'Password Reset Request', 'wholesalex' );
+		ob_start();
+		?>
+		<p><?php printf( esc_html__( 'Hi %s,', 'wholesalex' ), esc_html( $user_login ) ); ?></p>
+		<p><?php printf( 
+			esc_html__( 'Someone has requested a new password for the following account on %s:', 'wholesalex' ), 
+			esc_html( get_bloginfo( 'name' ) ) 
+		); ?></p>
+		<p><strong><?php esc_html_e( 'Username:', 'wholesalex' ); ?></strong> <?php echo esc_html( $user_login ); ?></p>
+		<p><?php esc_html_e( 'If you didn’t make this request, just ignore this email. If you’d like to proceed:', 'wholesalex' ); ?></p>
+		<p><a href="<?php echo esc_url( $reset_link ); ?>"><?php esc_html_e( 'Click here to reset your password', 'wholesalex' ); ?></a></p>
+		<p><?php esc_html_e( 'Thanks for reading.', 'wholesalex' ); ?></p>
+		<?php
+		$message = ob_get_clean();
+		$mailer->send(
+			sanitize_email( $user_email ),
+			esc_html__( 'Password Reset Request', 'wholesalex' ),
+			$mailer->wrap_message( $email_heading, $message )
+		);
+	}
+	
+
 	/**
 	 * Enqueue Form Scripts
 	 *
@@ -100,13 +194,11 @@ class WHOLESALEX_Shortcodes {
 
 
 	public function check_current_page_is_lost_password() {
-		$current_uri = $_SERVER['REQUEST_URI'];
-		$uri_parts = explode( '/', trim( $current_uri, '/' ));
-		$last_part = end( $uri_parts );
-		if ( $last_part !== 'lost-password' ) {
-			return true;
-		} else {
+		$current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+		if ( strpos($current_url, 'lost-password') !== false || strpos($current_url, '?reset=true') !== false ) {
 			return false;
+		} else {
+			return true;
 		}
 	}
 
@@ -474,6 +566,11 @@ class WHOLESALEX_Shortcodes {
 	 * @since 1.2.4 _settings_redirect_url_login Field Deafult Settings Param Added
 	 */
 	public function login_registration_shortcode( $atts = array() ) {
+
+		$atts = shortcode_atts(array(
+			'lost_password' => 'false',
+		), $atts, 'wholesalex_login');
+
 		if ( is_user_logged_in() && is_singular() ) {
 			$__form_view_for_logged_in_user = wholesalex()->get_setting( '_settings_show_form_for_logged_in' );
 			$__message_for_logged_in_user   = wholesalex()->get_setting( '_settings_message_for_logged_in_user' );
@@ -496,7 +593,15 @@ class WHOLESALEX_Shortcodes {
 		if ( $this->check_current_page_is_lost_password() ){
 			return $this->render_login_registration_shortcode( $atts );
 		}else{
-			return '';
+			if ( $atts['lost_password'] === 'true' ) {
+				return $this->wholesalex_forgot_password_form();
+			} else {
+				if ( $atts['lost_password'] === 'true' ) {
+					return $this->wholesalex_forgot_password_form();
+				}else{
+					return '';
+				}
+			}
 		}
 	}
 
@@ -531,7 +636,15 @@ class WHOLESALEX_Shortcodes {
 		if ( $this->check_current_page_is_lost_password() ){
 			return $this->render_login_shortcode( $atts );
 		} else {
-			return '';
+			if ( $atts['lost_password'] === 'true' ) {
+				return $this->wholesalex_forgot_password_form();
+			} else {
+				if ( $atts['lost_password'] === 'true' ) {
+					return $this->wholesalex_forgot_password_form();
+				} else {
+					return '';
+				}
+			}
 		}
 	}
 
@@ -3369,81 +3482,90 @@ class WHOLESALEX_Shortcodes {
 	 * @return void
 	 */
 	public function add_custom_fields_on_checkout_page( $checkout ) {
-		$__role 				= wholesalex()->get_current_user_role();
-		$custom_billing_fields 	= isset( $GLOBALS['wholesalex_registration_fields']['billing_fields'] ) ? $GLOBALS['wholesalex_registration_fields']['billing_fields'] : array();
-		$__fields 				= $checkout->get_checkout_fields( 'billing' );
-		$__keys 				= array_keys( $__fields );
-		$__custom_fields 		= array();
-		$__all_exclude_role 	= array();
+		$__role = wholesalex()->get_current_user_role();
 
+		$custom_billing_fields = isset( $GLOBALS['wholesalex_registration_fields']['billing_fields'] ) ? $GLOBALS['wholesalex_registration_fields']['billing_fields'] : array();
+
+		$__fields = $checkout->get_checkout_fields( 'billing' );
+		$__keys   = array_keys( $__fields );
+
+		$__custom_fields = array();
+		$__all_exclude_role = array();
 		if ( is_array( $custom_billing_fields ) ) {
 			foreach ( $custom_billing_fields as $value ) {
-				foreach ( $value['excludeRoles'] as $exclude_role ) {
+				foreach ( $value['excludeRoles'] as $exclude_role){
 					$__all_exclude_role[] = $exclude_role['value'];
 				}
 				if ( isset( $value['excludeRoles'] ) && is_array( $value['excludeRoles'] ) && in_array( $__role, $__all_exclude_role ) ) {
-					continue; // Exclude this field for the current user role
+					continue; // Exclude For this user
 				}
 
 				if ( isset( $value['name'] ) && ! in_array( 'billing_' . $value['name'], $__keys, true ) ) {
 					$__default = '';
+					if ( isset( $value['enableForBillingForm'] ) && $value['enableForBillingForm'] ) {
+						// $__default = isset( $__current_user->$value['name'] ) ? $__current_user->$value['name'] : '';
+					}
 
 					if ( isset( $value['migratedFromOldBuilder'] ) && $value['migratedFromOldBuilder'] && ( ! isset( $value['custom_field'] ) || ! $value['custom_field'] ) ) {
+						// $selected = get_user_meta( $user->ID, $field['name'], true );
 						$__default = get_user_meta( get_current_user_id(), $value['name'], true );
 					}
 					if ( isset( $value['custom_field'] ) && $value['custom_field'] ) {
+						// $selected = get_user_meta( $user->ID, 'wholesalex_cf_' . $field['name'], true );
 						$__default = get_user_meta( get_current_user_id(), 'wholesalex_cf_' . $value['name'], true );
+
 					}
 
 					$__options = array();
 
 					if ( 'select' === $value['type'] || 'radio' === $value['type'] ) {
 						if ( is_array( $value['option'] ) ) {
+
 							foreach ( $value['option'] as $option ) {
 								$__options[ $option['value'] ] = $option['name'];
 							}
 						}
 						woocommerce_form_field(
-							'billing_' . $value['name'], // Prefixed with 'billing_' to avoid conflicts
+							$value['name'],
 							array(
 								'type'        => $value['type'],
 								'class'       => array( 'form-row-wide' ),
 								'label'       => isset( $value['label'] ) ? $value['label'] : '',
 								'placeholder' => isset( $value['placeholder'] ) ? $value['placeholder'] : '',
-								'required'    => isset( $value['isRequiredInBilling'] ) ? $value['isRequiredInBilling'] : false,
+								'required'    => isset( $value['isRequiredInBilling'] ) ? $value['isRequiredInBilling'] : '',
 								'options'     => $__options,
 								'default'     => $__default,
 							),
-							$checkout->get_value( 'billing_' . $value['name'] )
+							$checkout->get_value( $value['name'] )
 						);
 					} else {
-						if ( 'file' !== $value['type'] && 'checkbox' !== $value['type'] ) {
+						if ( 'file' != $value['type'] && 'checkbox' != $value['type'] ) {
 							woocommerce_form_field(
-								'billing_' . $value['name'],
+								$value['name'],
 								array(
 									'type'        => $value['type'],
 									'class'       => array( 'form-row-wide' ),
 									'label'       => isset( $value['label'] ) ? $value['label'] : '',
 									'placeholder' => isset( $value['placeholder'] ) ? $value['placeholder'] : '',
-									'required'    => isset( $value['isRequiredInBilling'] ) ? $value['isRequiredInBilling'] : false,
+									'required'    => isset( $value['isRequiredInBilling'] ) ? $value['isRequiredInBilling'] : '',
 									'default'     => $__default,
 								),
-								$checkout->get_value( 'billing_' . $value['name'] )
+								$checkout->get_value( $value['name'] )
 							);
-						} elseif ( 'checkbox' === $value['type'] ) {
+						} elseif ( 'checkbox' == $value['type'] ) {
 							if ( ! is_array( $__default ) ) {
 								$__default = array();
 							}
 
 							?>
-							<p class="form-row form-row-wide" id="<?php echo esc_attr( 'billing_' . $value['name'] ); ?>">
+							<p class="form-row form-row-wise" id="<?php echo esc_attr( $value['name'] ); ?>"> 
 								<label>
 									<?php echo esc_html( $value['label'] ); ?>
 									<?php
 									if ( isset( $value['isRequiredInBilling'] ) && $value['isRequiredInBilling'] ) {
-										?>
-										<span class="optional"><?php echo esc_html__( 'optional', 'woocommerce' ); ?></span>
-										<?php
+										 ?>
+                                         <span class="optional"><?php echo esc_html__( 'optional', 'woocommerce' ); ?></span>
+                                         <?php
 									}
 									?>
 								</label>
@@ -3452,10 +3574,10 @@ class WHOLESALEX_Shortcodes {
 									foreach ( $value['option'] as $option ) :
 										?>
 										<span>
-											<label class="checkbox" for="<?php echo esc_attr( 'billing_' . $option['value'] ); ?>">
-												<input type="checkbox" class="input-checkbox" name="<?php echo esc_attr( 'billing_' . $option['name'] ); ?>" id="<?php echo esc_attr( 'billing_' . $option['name'] ); ?>" <?php checked( in_array( $option['value'], $__default ), 1, true ); // phpcs:ignore ?>>  <?php echo esc_html( $option['name'] ); ?>
-											</label>
+											<label class="checkbox" for=<?php echo esc_attr( $option['value'] ); ?> >
+                                            <input type="checkbox" class="input-checkbox " name="<?php echo esc_attr($option['name']); ?>" id="<?php echo esc_attr($option['name']); ?>" <?php checked( in_array( $option['value'], $__default ), 1, true ); //phpcs:ignore ?>>  <?php echo esc_html( $option['name'] ); ?> </label>
 										</span>
+
 										<?php
 									endforeach;
 									?>
@@ -3465,12 +3587,16 @@ class WHOLESALEX_Shortcodes {
 						}
 					}
 
-					$__custom_fields[ 'billing_' . $value['name'] ] = $value;
+					$__custom_fields[ $value['name'] ] = $value;
+
 				}
 			}
 		}
 
-		set_transient( 'wholesalex_custom_checkout_fields_' . get_current_user_id(), $__custom_fields );
+		?>
+		<?php
+
+		set_transient( 'wholesalex_custom_chekcout_fields_' . get_current_user_id(), $__custom_fields );
 	}
 
 

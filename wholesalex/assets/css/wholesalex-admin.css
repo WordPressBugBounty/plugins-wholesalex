@@ -1043,8 +1043,13 @@ span.wsx-rule-variation-name {
     position: relative;
     margin-top: 5px;
 }
-.wrap .wsx-notice-wrapper {
+.wsx-display-block{
+    display: flex;
     width: 100%;
+}
+.wrap .wsx-notice-wrapper {
+    width: 99.7%;
+    position: relative;
 }
 
 .wsx-notice-type-1 .wsx-notice-icon img,
@@ -1109,7 +1114,8 @@ a.wsx-notice-close:hover {
 }
 
 .wsx-notice-wrapper.wsx-notice-type-1 {
-    border-left: 3px solid #C9C5C8;
+    border-left: 3px solid #6C6CFF;
+    padding: 6px 0px !important;
 }
 .wsx-notice-wrapper.wsx-notice-type-2, 
 .wsx-notice-wrapper.wsx-notice-type-4,
@@ -1155,6 +1161,118 @@ a.wsx-notice-dont-save-money {
 .wholesalex_backend_body .components-popover.components-dropdown__content.wholesalex-form-builder-dropdown-content .components-popover__content {
     width: 100% !important;
 }
+
+/* Banner Image For Halloween Offer */
+.wsx-install-body {
+	-ms-flex: 1;
+	flex: 1;
+}
+.wsx-install-body.wsx-image-banner{
+    padding-bottom: 0px;
+    padding-top: 3px;
+    padding-left: 3px;
+    padding-right: 3px;
+    
+}
+.wsx-install-body > div {
+	max-width: 450px;
+	margin-bottom: 20px;
+}
+.wsx-install-body h3 {
+	margin: 0;
+	font-size: 20px;
+	margin-bottom: 10px;
+	line-height: 1;
+}
+.wsx-pro-notice .wc-install-btn, .wp-core-ui .wsx-wc-active-btn {
+	display: inline-flex;
+	align-items: center;
+    padding: 3px 20px;
+}
+.wsx-pro-notice.loading .wc-install-btn {
+    opacity: 0.7;
+    pointer-events: none;
+}
+.wsx-pro-notice {
+	position: relative;
+	border-left: 3px solid #FF176B;
+}
+.wsx-pro-notice .wsx-install-body h3 {
+	font-size: 20px;
+	margin-bottom: 5px;
+}
+.wsx-pro-notice .wsx-install-body > div {
+	max-width: 800px;
+	margin-bottom: 0;
+}
+.wsx-pro-notice .button-hero {
+	padding: 8px 14px !important;
+	min-height: inherit !important;
+	line-height: 1 !important;
+	box-shadow: none;
+	border: none;
+	transition: 400ms;
+	background: #46b450;
+}
+.wsx-pro-notice .button-hero:hover,
+.wp-core-ui .wsx-pro-notice .button-hero:active {
+	background: #389e41;
+}
+.wsx-pro-notice .wsx-btn-notice-pro {
+	background: #e5561e;
+	color: #fff;
+}
+.wsx-pro-notice .wsx-btn-notice-pro:hover,
+.wsx-pro-notice .wsx-btn-notice-pro:focus {
+	background: #ce4b18;
+}
+.wsx-pro-notice .button-hero:hover,
+.wsx-pro-notice .button-hero:focus {
+	border: none;
+	box-shadow: none;
+}
+.wsx-pro-notice .promotional-dismiss-notice {
+	background-color: #000000;
+	padding-top: 0px;
+	position: absolute;
+	right: 0;
+	top: 0px;
+	/* padding: 10px 10px 14px; */
+	border-radius: 0 0 0 4px;
+	border: 1px solid;
+	display: inline-block;
+	color: #fff;
+}
+.wsx-install-body .promotional-dismiss-notice {
+	right: 4px;
+	top: 3px;
+	border-radius: unset !important;
+	padding: 2px 8px;
+	text-decoration: none;
+    position: absolute;
+    background-color: #000000;
+    color: #ffffff;
+}
+
+@media (max-width: 784px) {
+    .wsx-install-body .promotional-dismiss-notice {
+        right: 2px;
+        top: 2px;
+        padding: 0px 4px;
+        font-size: 12px;
+    }
+    .media-upload-form div.error, .notice{
+        line-height: 19px !important;
+    }
+}
+.wsx-notice-wrapper{
+	padding: 0px !important;
+}
+
+.wsx-halloween-img-banner {
+	width: 100%;
+}
+			
 
 /* WholesaleX Wordpress Dashboard Widget Start */
 .wholesalex-wp-dashboard {
