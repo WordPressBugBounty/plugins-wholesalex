@@ -354,22 +354,22 @@ class WHOLESALEX_Registration {
 		);
 	}
 
-	public function get_form_preview( $request ) {
-		$role = isset( $request['role'] ) ? sanitize_text_field( $request['role'] ) : '';
-	
-		// Fetch form data
+    public function get_form_preview( $server ) {
+		$post = $server->get_params();
+
+		$role = isset( $post['role'] ) ? sanitize_text_field( $post['role'] ) : '';
+
+		// $form_data = get_option( '__wholesalex_registration_form_v2' );
+
 		$formData = wholesalex()->get_new_form_builder_data();
-	
-		if ( $formData ) {
-			wp_send_json_success(
-				array(
-					'formdata' => $formData,
-					'role'     => $role,
-				)
-			);
-		} else {
-			wp_send_json_error( array( 'message' => 'Failed to retrieve form data' ), 500 );
-		}
+
+		wp_send_json_success(
+			array(
+				'formdata' => wp_json_encode( $formData ),
+				'role'     => $post,
+			)
+		);
+
 	}
 
 	/**
@@ -378,46 +378,34 @@ class WHOLESALEX_Registration {
 	 * @param object $server Server.
 	 * @return mixed
 	 */
-	public function builder_action_callback( $request ) {
-		$post = $request->get_params();
-	
-		// Nonce Validation with Error Response
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
-			wp_send_json_error( array( 'message' => 'Invalid nonce' ), 403 );
+	public function builder_action_callback( $server ) {
+		$post = $server->get_params();
+		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key($post['nonce']), 'wholesalex-registration' ) ) ) {
 			return;
 		}
-	
+
 		$type = isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
-	
+
 		if ( 'post' === $type ) {
+
 			if ( isset( $post['data'] ) ) {
-				// Validate and sanitize the data
-				$data = sanitize_text_field( wp_unslash( $post['data'] ) );
-				if ( ! empty( $data ) ) {
-					update_option( 'wholesalex_registration_form', $data );
-					$GLOBALS['wholesalex_registration_fields'] = wholesalex()->get_form_fields();
-					wp_send_json_success( array( 'message' => 'Form updated successfully' ) );
-				} else {
-					wp_send_json_error( array( 'message' => 'No data provided' ), 400 );
-				}
+				update_option( 'wholesalex_registration_form', sanitize_text_field( wp_unslash( $post['data'] ) ) );
+
+				$GLOBALS['wholesalex_registration_fields'] = wholesalex()->get_form_fields();
+
+				wp_send_json_success();
 			} else {
-				wp_send_json_error( array( 'message' => 'Missing data parameter' ), 400 );
+				wp_send_json_error();
 			}
-		} elseif ('get' === $type ) {
-			$__roles_options = wholesalex()->get_roles('roles_option');
-	
-			if ( $__roles_options ) {
-				wp_send_json_success(
-					array(
-						'roles'     => $__roles_options,
-						'form_data' => array(),
-					)
-				);
-			} else {
-				wp_send_json_error( array( 'message' => 'No roles found' ), 404 );
-			}
-		} else {
-			wp_send_json_error( array( 'message' => 'Invalid action type' ), 400 );
+		} elseif ( 'get' === $type ) {
+			$__roles_options = wholesalex()->get_roles( 'roles_option' );
+
+			wp_send_json_success(
+				array(
+					'roles'     => $__roles_options,
+					'form_data' => array(),
+				)
+			);
 		}
 	}
 

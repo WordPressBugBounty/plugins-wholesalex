@@ -88,55 +88,29 @@ class Settings {
 	 */
 	public function settings_action_callback( $server ) {
 		$post = $server->get_params();
-	
-		// Nonce validation with error handling
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
-			wp_send_json_error( __( 'Invalid nonce, action not allowed.', 'wholesalex' ) );
+		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key($post['nonce']), 'wholesalex-registration' ) ) ) {
 			return;
 		}
-	
+
 		$type = isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
-	
+
 		if ( 'set' === $type ) {
-			// Ensure 'settings' is present in the request
-			if ( ! isset( $post['settings'] ) || ! is_array( $post['settings'] ) ) {
-				wp_send_json_error( __( 'Missing or invalid settings data.', 'wholesalex' ) );
-				return;
-			}
-	
-			// Sanitize the settings
 			$post = wholesalex()->sanitize( $post );
-	
-			if ( isset( $post['settings']['_settings_user_status_option'] ) && 'email_confirmation_require' === $post['settings']['_settings_user_status_option'] ) {
+
+			if ( 'email_confirmation_require' === $post['settings']['_settings_user_status_option'] ) {
 				$__confirmation_email_status = get_option( 'wholesalex_email_verification_email_status' );
-				if ( 'no' === $__confirmation_email_status ) {
-					wp_send_json_error( sprintf(
-							/* translators: %1$s - Plugin Name, %2$s - Plugin Name */
-							__( 'To activate "Email Confirmation," please enable %1$s Email Template from "Dashboard > %2$s > Emails".', 'wholesalex' ),
-							wholesalex()->get_plugin_name(),
-							wholesalex()->get_plugin_name()
-						)
-					 );
-					return;
+				if ( 'no' == $__confirmation_email_status ) { //phpcs:ignore
+					/* translators: %1s - Plugin Name, %2s - Plugin Name,  */
+					wp_send_json_error( sprintf( __( 'To Active "Email Confirmation" Please Enable %1$s Email Template from "Dashboard > %2$s > Emails".', 'wholesalex' ), wholesalex()->get_plugin_name(), wholesalex()->get_plugin_name() ) );
 				}
 			}
-	
-			// Save settings and send success response
 			wholesalex()->set_setting_multiple( $post['settings'] );
-			wp_send_json_success(  __( 'Successfully Saved.', 'wholesalex' )  );
-	
+			wp_send_json_success( __( 'Successfully Saved.', 'wholesalex' ) );
 		} elseif ( 'get' === $type ) {
-			// Retrieve settings
-			$data 			 = array();
+			$data            = array();
 			$data['default'] = $this->get_option_settings();
 			$data['value']   = wholesalex()->get_setting();
-	
-			// Check if data was retrieved successfully
-			if ( empty( $data['value'] ) ) {
-				wp_send_json_error( __( 'Failed to retrieve settings.', 'wholesalex' ) );
-			} else {
-				wp_send_json_success( $data );
-			}
+			wp_send_json_success( $data );
 		}
 	}
 

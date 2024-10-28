@@ -74,7 +74,7 @@ class WholesaleX_New_User_Verification_Email extends WC_Email {
 
 		// Call parent constructor.
 		parent::__construct();
-		$this->recipient = '';
+		// $this->recipient = '';
 		add_action( 'wholesalex_user_email_confirmation_notification', array( $this, 'trigger' ), 10, 3 );
 	}
 

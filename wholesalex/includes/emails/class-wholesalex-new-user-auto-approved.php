@@ -74,7 +74,7 @@ class WholesaleX_New_User_Auto_Approved_Email extends WC_Email {
 
 		// Call parent constructor.
 		parent::__construct();
-		$this->recipient = '';
+		// $this->recipient = '';
 		add_action( 'wholesalex_registration_form_user_status_auto_approve_notification', array( $this, 'trigger' ), 10, 3 );
 	}
 

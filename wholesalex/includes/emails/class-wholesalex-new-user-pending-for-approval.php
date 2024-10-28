@@ -74,7 +74,7 @@ class WholesaleX_New_User_Pending_For_Approval_Email extends WC_Email {
 
 		// Call parent constructor.
 		parent::__construct();
-		$this->recipient = '';
+		// $this->recipient = '';
 		add_action( 'wholesalex_registration_form_user_status_admin_approve_notification', array( $this, 'trigger' ), 10, 3 );
 	}
 

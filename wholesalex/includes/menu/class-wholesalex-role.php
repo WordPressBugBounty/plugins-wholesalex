@@ -87,89 +87,55 @@ class WHOLESALEX_Role {
 	 */
 	public function role_action_callback( $server ) {
 		$post = $server->get_params();
-	
-		// Nonce validation with error handling
 		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key($post['nonce']), 'wholesalex-registration' ) ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid nonce, action not allowed.', 'wholesalex' ) ) );
 			return;
 		}
-	
+
 		$type = isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
-	
+
 		if ( 'post' === $type ) {
-			// Ensure 'id' and 'role' are present
-			if ( ! isset( $post['id'], $post['role'] ) ) {
-				wp_send_json_error( array( 'message' => __( 'Missing required parameters.', 'wholesalex' ) ) );
-				return;
-			}
-	
-			// Sanitize and validate 'id'
-			$_id = sanitize_text_field( $post['id'] );
-			if ( empty( $_id ) || ! is_string( $_id ) ) {
-				wp_send_json_error( array( 'message' => __( 'Invalid role ID.', 'wholesalex' ) ) );
-				return;
-			}
-	
-			// Sanitize and decode 'role', handling json_decode() errors
+
+			$_id   = sanitize_text_field( $post['id'] );
 			$_role = wp_unslash( $post['role'] );
 			$_role = json_decode( $_role, true );
-			if ( json_last_error() !== JSON_ERROR_NONE ) {
-				wp_send_json_error( array( 'message' => __( 'Invalid role data format.', 'wholesalex' ) ) );
-				return;
-			}
-	
-			// Sanitize role data
 			$_role = wholesalex()->sanitize( $_role );
-			if ( empty( $_role ) ) {
-				wp_send_json_error( array( 'message' => __( 'Role data is empty after sanitization.', 'wholesalex' ) ) );
-				return;
-			}
-	
 			$_flag = true;
-	
-			// Check for existing role if 'check' is set
 			if ( isset( $post['check'] ) ) {
 				if ( empty( wholesalex()->get_roles( 'by_id', $_id ) ) ) {
 					$_flag = false;
 				}
 			}
-	
-			// Set roles or return error
-			if ( $_flag ) {
-				wholesalex()->set_roles( $_id, $_role, ( isset( $post['delete'] ) && $post['delete'] ) ? 'delete' : '' );
-				wp_send_json_success( array( 'message' => __( 'Successfully saved.', 'wholesalex' ) ) );
-			} else {
-				wp_send_json_error( array( 'message' => __( 'Before status update, you have to save the role.', 'wholesalex' ) ) );
-			}
-	
+			$_flag && wholesalex()->set_roles( $_id, $_role, ( isset( $post['delete'] ) && $post['delete'] ) ? 'delete' : '' );
+			wp_send_json_success(
+				array(
+					'message' => $_flag ? __( 'Successfully Saved.', 'wholesalex' ) : __( 'Before Status Update, You Have to save role.', 'wholesalex' ),
+				)
+			);
+
 		} elseif ( 'get' === $type ) {
 			$__roles = array_values( wholesalex()->get_roles() );
 			if ( empty( $__roles ) ) {
 				$__roles = array(
 					array(
 						'id'    => 1,
-						'label' => __( 'New Role', 'wholesalex' ),
+						'label' => __('New Role','wholesalex'),
 					),
 				);
 			}
-	
 			$data            = array();
 			$data['default'] = $this->get_role_fields();
 			$data['value']   = $__roles;
-	
 			wp_send_json_success( $data );
-	
 		} elseif ( 'get_users_by_role_id' === $type ) {
-			// Validate role ID before proceeding
 			$_role_id = isset( $post['id'] ) ? sanitize_text_field( $post['id'] ) : '';
-			if ( empty( $_role_id ) ) {
+			if ( ! $_role_id ) {
 				wp_send_json_success( array() );
-				return;
+			} else {
+				$__users_options = $this->get_users_by_role_id( $_role_id );
+
+				wp_send_json_success( $__users_options );
+
 			}
-	
-			// Fetch users by role ID
-			$__users_options = $this->get_users_by_role_id( $_role_id );
-			wp_send_json_success( $__users_options );
 		}
 	}
 

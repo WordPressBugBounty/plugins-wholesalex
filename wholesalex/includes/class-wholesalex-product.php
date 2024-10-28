@@ -1164,59 +1164,29 @@ class WHOLESALEX_Product {
 	 */
 	public function product_action_callback( $server ) {
 		$post = $server->get_params();
-	
-		// Nonce Validation with Error Response
-		if ( ! isset( $post['nonce'] ) || ! wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) {
-			wp_send_json_error( array( 'message' => 'Invalid nonce' ), 403 );
+		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
 			return;
 		}
-	
-		// Sanitize input fields
-		$type 		= isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
-		$post_id 	= isset( $post['postId'] ) ? intval( $post['postId'] ) : 0; // Use intval for ID
-		$is_tab 	= isset( $post['isTab'] ) ? sanitize_text_field( $post['isTab'] ) : '';
-	
-		// Handle 'get' type action
+		$type    = isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
+		$post_id = isset( $post['postId'] ) ? sanitize_text_field( $post['postId'] ) : '';
+		$is_tab  = isset( $post['isTab'] ) ? sanitize_text_field( $post['isTab'] ) : '';
 		if ( 'get' === $type ) {
-			// Ensure $post_id is valid
-			if ( ! $post_id ) {
-				wp_send_json_error( array( 'message' => 'Invalid or missing product ID' ), 400 );
-				return;
-			}
-	
-			// Handle tab vs. field request
+
 			if ( $is_tab ) {
-				$default_settings = self::get_product_settings();
-				$product_settings = wholesalex()->get_single_product_setting( $post_id );
-	
-				// Ensure data is valid before responding
-				if ( empty( $default_settings ) || empty( $product_settings ) ) {
-					wp_send_json_error( array( 'message' => 'Failed to retrieve product settings' ), 500 );
-					return;
-				}
-	
-				wp_send_json_success( array(
-					'default' => $default_settings,
-					'value'   => $product_settings,
-				));
-			} else {
-				$default_fields 	= self::get_product_fields();
-				$product_discount 	= wholesalex()->get_single_product_discount( $post_id );
-	
-				// Ensure data is valid before responding
-				if ( empty( $default_fields ) || empty( $product_discount ) ) {
-					wp_send_json_error( array( 'message' => 'Failed to retrieve product fields or discount' ), 500 );
-					return;
-				}
-	
-				wp_send_json_success( array(
-					'default' => $default_fields,
-					'value'   => $product_discount,
-				));
+				wp_send_json_success(
+					array(
+						'default' => self::get_product_settings(),
+						'value'   => wholesalex()->get_single_product_setting( $post_id ),
+					),
+				);
 			}
-		} else {
-			// Invalid 'type' parameter
-			wp_send_json_error( array( 'message' => 'Invalid action type' ), 400 );
+
+			wp_send_json_success(
+				array(
+					'default' => self::get_product_fields(),
+					'value'   => wholesalex()->get_single_product_discount( $post_id ),
+				)
+			);
 		}
 	}
 

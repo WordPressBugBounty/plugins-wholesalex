@@ -109,17 +109,16 @@ class WHOLESALEX_Email {
 	public function email_template_rest_callback( $server ) {
 		$post = $server->get_params();
 		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key($post['nonce']), 'wholesalex-registration' ) ) ) {
-			wp_send_json_error( array( 'message' => 'Invalid nonce' ), 403 );
 			return;
 		}
-
+	
 		$type = isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
-
+	
 		$response = array(
 			'status' => false,
 			'data'   => array(),
 		);
-
+	
 		switch ( $type ) {
 			case 'get':
 				$response['status'] = true;
@@ -132,7 +131,7 @@ class WHOLESALEX_Email {
 					$template_key_name            = 'woocommerce_' . $template_name . '_settings';
 					$template_settings            = get_option( $template_key_name, array() );
 					$template_settings['enabled'] = $status;
-
+	
 					update_option( $template_key_name, $template_settings );
 					$response['status'] = true;
 					$response['data']   = __( 'Success', 'wholesalex' );
@@ -158,7 +157,7 @@ class WHOLESALEX_Email {
 					if ( isset( $post['template']['email_type'] ) ) {
 						$template_settings['email_type'] = wp_kses_post( $post['template']['email_type'] );
 					}
-
+	
 					update_option( $template_key_name, $template_settings );
 					$response['status'] = true;
 					$response['data']   = __( 'Success', 'wholesalex' );
@@ -166,12 +165,12 @@ class WHOLESALEX_Email {
 				$response['status'] = true;
 				$response['data']   = __( 'Success', 'wholesalex' );
 				break;
-
+	
 			default:
 				// code...
 				break;
 		}
-
+	
 		wp_send_json( $response );
 	}
 

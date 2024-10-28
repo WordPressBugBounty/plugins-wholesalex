@@ -63,6 +63,7 @@ class WHOLESALEX_Category {
 			)
 		);
 	}
+
 	/**
 	 * Get Category actions
 	 *
@@ -71,43 +72,25 @@ class WHOLESALEX_Category {
 	 */
 	public function category_action_callback( $server ) {
 		$post = $server->get_params();
-	
-		// Nonce Validation with Error Response
-		if ( ! isset( $post['nonce'] ) || ! wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) {
-			wp_send_json_error( array( 'message' => 'Invalid nonce' ), 403 );
+		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
 			return;
 		}
-	
-		// Sanitize and Validate input fields
-		$type 	 = isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
-		$term_id = isset( $post['term_id'] ) ? intval( $post['term_id'] ) : 0; // Use intval for term_id
-	
-		// Validate the required term_id parameter
-		if ( ! $term_id ) {
-			wp_send_json_error( array( 'message' => 'Invalid or missing category ID' ), 400 );
-			return;
-		}
-		// Handle 'get' type action
+
+		$type    = isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
+		$term_id = isset( $post['term_id'] ) ? sanitize_text_field( $post['term_id'] ) : '';
+
 		if ( 'get' === $type ) {
-			// Fetch category visibility settings and discount tiers
+
 			$__visibility_settings = wholesalex()->get_category_visibility_settings( $term_id );
-			$__tiers 			   = wholesalex()->get_category_discounts( $term_id );
-	
-			// Ensure data is valid before responding
-			if ( empty( $__visibility_settings ) || empty( $__tiers ) ) {
-				wp_send_json_error( array( 'message' => 'Failed to retrieve category settings or discounts' ), 500 );
-				return;
-			}
-	
-			// Respond with success and the data
-			wp_send_json_success( array(
-				'default'    => $this->get_category_fields(),
-				'tiers'      => $__tiers,
-				'visibility' => $__visibility_settings,
-			));
-		} else {
-			// Invalid 'type' parameter
-			wp_send_json_error( array( 'message' => 'Invalid action type' ), 400 );
+			$__tiers               = wholesalex()->get_category_discounts( $term_id );
+
+			wp_send_json_success(
+				array(
+					'default'    => $this->get_category_fields(),
+					'tiers'      => $__tiers,
+					'visibility' => $__visibility_settings,
+				)
+			);
 		}
 	}
 

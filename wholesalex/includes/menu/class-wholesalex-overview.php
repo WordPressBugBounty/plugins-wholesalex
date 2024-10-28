@@ -282,27 +282,23 @@ class WHOLESALEX_Overview
 
 	public function overview_action_callback( $server ) {
 		$post = $server->get_params();
-	
-		// Nonce Validation with Error Response
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
-			wp_send_json_error( array( 'message' => 'Invalid nonce' ), 403);
+		if (!(isset($post['nonce']) && wp_verify_nonce(sanitize_key($post['nonce']), 'wholesalex-registration'))) {
 			return;
 		}
-	
+
 		$response = array(
 			'status' => false,
 			'data'   => array(),
 		);
-	
-		$type = isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
+
+		$type = isset($post['type']) ? sanitize_text_field($post['type']) : '';
 		if ('post' === $type) {
-			wp_send_json( $response ); // Handle POST requests if needed
+			wp_send_json($response);
 		} elseif ('get' === $type) {
 			$request_for = isset($post['request_for']) ? sanitize_text_field($post['request_for']) : '';
 			$start_date  = isset($post['start_date']) ? sanitize_text_field($post['start_date']) : '';
 			$end_date    = isset($post['end_date']) ? sanitize_text_field($post['end_date']) : '';
 			$period      = isset($post['period']) ? sanitize_text_field($post['period']) : 'day';
-	
 			switch ($request_for) {
 				case 'top_customers':
 					$response['status'] = true;
@@ -333,15 +329,12 @@ class WHOLESALEX_Overview
 					$response['data']   = $this->get_b2b_order_data($start_date, $end_date, $period);
 					break;
 				default:
-					wp_send_json_error( __( 'Invalid request type.', 'wholesalex' ), 400 );
-					return;
+					// code...
+					break;
 			}
-		} else {
-			wp_send_json_error( __( 'Invalid action type.', 'wholesalex' ), 400 );
-			return;
 		}
-	
-		wp_send_json( $response );
+
+		wp_send_json($response);
 	}
 
 	public function my_custom_dashboard_widgets()

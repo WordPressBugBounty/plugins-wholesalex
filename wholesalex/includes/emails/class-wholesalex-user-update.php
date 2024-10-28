@@ -73,7 +73,7 @@ class WholesaleX_User_Profile_Update_Notification_Email extends WC_Email {
 
 		// Call parent constructor.
 		parent::__construct();
-		$this->recipient = '';
+		// $this->recipient = '';
 		add_action( 'wholesalex_user_profile_update_notify_notification', array( $this, 'user_profile_update_notify' ), 10, 2 );
 	}
 

@@ -879,11 +879,10 @@ class WHOLESALEX_Dynamic_Rules {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	public function dynamic_rule_restapi_action( $server ) { 
+	public function dynamic_rule_restapi_action( $server ) {
 		$post = $server->get_params();
 
 		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
-			wp_send_json_error(array('message' => 'Invalid nonce'), 403);
 			return;
 		}
 

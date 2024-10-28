@@ -45,7 +45,7 @@ class WholesaleX_Support {
 		}
 	}
 
-	public function support_page_rest_api() {
+    public function support_page_rest_api() {
 		register_rest_route(
 			'wholesalex/v1',
 			'/support/',
@@ -63,76 +63,54 @@ class WholesaleX_Support {
 	}
 	
 	public function support_action_callback( $server ) {
+	
 		$post = $server->get_params();
-		
-		// Validate nonce
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid request. Please refresh the page and try again.', 'wholesalex' ) ) );
+		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key($post['nonce']), 'wholesalex-registration' ) ) ) {
 			return;
 		}
-	
-		if ( isset( $post['type'] ) ) {
-			switch ( $post['type'] ) {
-				case 'support_data':
-					$user_info = get_userdata( get_current_user_id() );
-					$name = $user_info->first_name . ( $user_info->last_name ? ' ' . $user_info->last_name : '' );
-					return array(
-						'success' => true,
-						'data' => array(
-							'name'  => $name ? $name : $user_info->user_login,
-							'email' => $user_info->user_email
-						)
-					);
-	
-				case 'support_action':
-					// Validate email
-					if ( ! is_email( $post['email'] ) ) {
-						wp_send_json_error( array( 'message' => __( 'Invalid email address.', 'wholesalex' ) ) );
-						return;
-					}
-	
-					// Sanitize input
-					$api_params = array(
-						'user_name'  => sanitize_text_field( $post['name'] ),
-						'user_email' => sanitize_email( $post['email'] ),
-						'subject'    => sanitize_text_field( $post['subject'] ),
-						'desc'       => sanitize_textarea_field( $post['desc'] ),
-					);
-	
-					// Send support request
-					$response = wp_remote_post(
-						'https://wpxpo.com/wp-json/v2/support_mail',
-						array(
-							'method'  => 'POST',
-							'timeout' => 120,
-							'body'    => $api_params
-						)
-					);
-	
-					// Error handling for request
-					if ( is_wp_error( $response ) ) {
-						wp_send_json_error( array( 'message' => __( 'Failed to send support request. Please try again.', 'wholesalex' ) ) );
-						return;
-					}
-	
-					$response_data = json_decode( $response['body'] );
-					$success = ( isset( $response_data->success ) && $response_data->success ) ? true : false;
-	
-					wp_send_json_success( array(
-						'success' => $success,
-						'message' => $success ? __( 'New Support Ticket has been created.', 'wholesalex' ) : __( 'Support ticket could not be created due to some issues.', 'wholesalex' )
-					) );
-					break;
-	
-				default:
-					// Handle unsupported type values
-					wp_send_json_error( array( 'message' => __( 'Invalid request type.', 'wholesalex' ) ) );
-					return;
-			}
-		} else {
-			wp_send_json_error( array( 'message' => __( 'Request type is missing.', 'wholesalex' ) ) );
-			return;
-		}
+        if (isset($post['type'])) {
+            switch ($post['type']) {
+                case 'support_data':
+                    $user_info = get_userdata( get_current_user_id() );
+                    $name = $user_info->first_name . ($user_info->last_name ? ' ' . $user_info->last_name : '');
+                    return array(
+                        'success' => true,
+                        'data' => array(
+                            'name' => $name ? $name : $user_info->user_login,
+                            'email' => $user_info->user_email
+                        )
+                    );
+
+                case 'support_action':
+                    $api_params = array(
+                        'user_name' => sanitize_text_field($post['name']),
+                        'user_email' => sanitize_email($post['email']),
+                        'subject' => sanitize_text_field($post['subject']),
+                        'desc' => sanitize_textarea_field($post['desc']),
+                    );
+                    $response = wp_remote_get(
+                        'https://wpxpo.com/wp-json/v2/support_mail',
+                        array(
+                            'method' => 'POST',
+                            'timeout' => 120,
+                            'body' =>  $api_params
+                        )
+                    );
+                    $response_data = json_decode($response['body']);
+                    $success = ( isset($response_data->success) && $response_data->success ) ? true : false;
+
+                    return array(
+                        'success' => $success,
+                        'message' => $success ? __('New Support Ticket has been Created.', 'wholesalex') : __('New Support Ticket is not Created Due to Some Issues.', 'wholesalex')
+                    );
+                    break;
+
+
+                default:
+                    # code...
+                    break;
+            }
+        }
 	}
 
 	/**
