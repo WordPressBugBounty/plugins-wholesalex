@@ -2,9 +2,9 @@
 Contributors: wpxpo, anik4e, jakirhasan
 Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 7.3
-Stable tag: 1.5.8
+Stable tag: 1.5.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -12,6 +12,12 @@ WholesaleX is the best WooCommerce Wholesale plugin with lots of features includ
 
 == Description ==
 WholesaleX - The Simplest WooCommerce B2B Solution to Start Wholesaling with wholesale prices, discounts, and dynamic pricing.
+
+## WholesaleX Black Friday Deal
+
+🎁 Get **up to 65% Discount** on WholesaleX - Create the perfect B2B Business online this **Black Friday**
+
+👉 <a href="https://getwholesalex.com/?utm_source=wholesalex-org&utm_medium=offer&utm_campaign=bfcm" target="_blank">Grab Now</a>
 
 WholesaleX is the most complete WooCommerce wholesale plugin to create and manage B2B or B2B+B2C hybrid stores in WooCommerce. This Wholesale plugin lets you add simple wholesale pricing or tiered pricing to complex dynamic pricing & wholesale discount rules, all in a simpler way. So that is why it is known as the simplest WooCommerce B2B Solution.
 
@@ -186,6 +192,8 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+= 1.5.9 - 14 November 2024 =
+* Update: WordPress 6.7 Compatibility Added
 
 = 1.5.8 - 28 October 2024 =
 * Fix: All Email Related Issue Resolved

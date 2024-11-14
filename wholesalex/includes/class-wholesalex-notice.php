@@ -326,8 +326,8 @@ class WHOLESALEX_Notice {
 		$activate_date          = get_option( 'wholesalex_installation_date', false );
 		$this->available_notice = array(
 			// Free to Pro
-			'wsx_free_promo_hwllo_Sale12'        => $this->set_new_notice( 'wsx_free_promo_hwllo_Sale12', 'promotion', 'summer_promotion_new_discount_40', '21-10-2024', '28-10-2024', false, 10, ! wholesalex()->is_pro_active() ),
-			'wsx_free_promo_hwllo_Sale123'       => $this->set_new_notice( 'wsx_free_promo_hwllo_Sale123', 'promotion', 'summer_promotion_new_discount_402', '29-10-2024', '02-11-2024', false, 10, ! wholesalex()->is_pro_active() ),
+			'wsx_black_friday_2024'        => $this->set_new_notice( 'wsx_black_friday_2024', 'promotion', 'black_friday', '13-11-2024', '17-11-2024', false, 10, ! wholesalex()->is_pro_active() ),
+			'wsx_black_friday_2024_banner'       => $this->set_new_notice( 'wsx_black_friday_2024_banner', 'promotion', 'black_friday_banner', '18-11-2024', '12-12-2024', false, 10, ! wholesalex()->is_pro_active() ),
 		);
 
 		if ( isset( $_GET['wsx-notice-disable'] ) ) {//phpcs:ignore
@@ -354,7 +354,7 @@ class WHOLESALEX_Notice {
 		$close_url = add_query_arg( 'wsx-notice-disable', $key );
 
 		switch ( $design_type ) {
-			case 'summer_promotion_new_discount_40':
+			case 'black_friday':
 				//
 				// Will Get Free User
 				$icon        = WHOLESALEX_URL . 'assets/img/icon.svg';
@@ -367,7 +367,8 @@ class WHOLESALEX_Notice {
 				<div class="wsx-notice-wrapper wsx-notice-type-1 notice"> 
 					<div class="wsx-notice-icon"> <img src="<?php echo esc_url( $icon ); ?>"/>  </div>
 					<div class="wsx-notice-content-wrapper">
-					<div class="wsx-notice-content"> <strong> Halloween Sale </strong> is LIVE! Boost Your Wholesale Business with up to <strong>60% OFF </strong> on <strong> WholesaleX </strong></div>
+					<div class="wsx-notice-content"> <strong> Black Friday Deal Alert: </strong> WholesaleX on Sale - Enjoy <strong>65% OFF </strong> on this complete B2B WooCommerce Solution
+                    </div>
 					<div class="wsx-notice-buttons"> 
 						<a class="wsx-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank"> Upgrade to Pro   </a>
 						<a class="wsx-notice-btn button" href="<?php echo esc_url( $full_access ); ?>" target="_blank">  Explore WholesaleX  </a>
@@ -381,13 +382,13 @@ class WHOLESALEX_Notice {
 				return ob_get_clean();
 				// code...
 				break;
-				case 'summer_promotion_new_discount_402':
-				$icon        = WHOLESALEX_URL . 'assets/img/halloween_banner_offer.jpg';
-				$url         = 'https://getwholesalex.com/pricing/?utm_source=wholesalex_topbar&utm_medium=special_discount_pro&utm_campaign=wholesalex-DB';
-				ob_start();
-					?>
-					<div class="wsx-display-block">
-					<div class="wsx-notice-wrapper notice">
+                case 'black_friday_banner':
+                $icon        = WHOLESALEX_URL . 'assets/img/black_friday.jpg';
+                $url         = 'https://getwholesalex.com/pricing/?utm_source=wholesalex_topbar&utm_medium=special_discount_pro&utm_campaign=wholesalex-DB';
+                ob_start();
+                    ?>
+                    <div class="wsx-display-block">
+                    <div class="wsx-notice-wrapper notice">
                     <div class="wsx-install-body wsx-image-banner">
                         <a href="<?php echo esc_url( $close_url ); ?>" class="promotional-dismiss-notice">
                             <?php esc_html_e( 'Dismiss', 'wholesalex' ); ?>
@@ -398,8 +399,8 @@ class WHOLESALEX_Notice {
                     </div>
                 </div>
                 </div>
-				<?php
-				return ob_get_clean();
+                <?php
+                return ob_get_clean();
 				break;
 			default:
 				// code...
