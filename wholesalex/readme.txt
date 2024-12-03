@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
 Tested up to: 6.7
 Requires PHP: 7.3
-Stable tag: 1.5.9
+Stable tag: 1.5.10
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -192,6 +192,13 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+= 1.5.10 - 03 December 2024 =
+* New: Dynamic Rules Discounts Are Now Supported in Backend Order Processing.
+* New: Added "Quantity Step" Feature To Minimum Order Quantity Dynamic Rules.
+* Update: Enhanced "Request A Quote" Feature To Dynamically Show Or Hide Prices.
+* Fix: Corrected Issue With The "Select Role" Field Appearing In Registration Form Specific B2B Shortcodes.
+* Fix: Addressed Backend Issue Causing The Registration Form Block Loading.
+
 = 1.5.9 - 14 November 2024 =
 * Update: WordPress 6.7 Compatibility Added
 

@@ -326,8 +326,8 @@ class WHOLESALEX_Notice {
 		$activate_date          = get_option( 'wholesalex_installation_date', false );
 		$this->available_notice = array(
 			// Free to Pro
-			'wsx_black_friday_2024'        => $this->set_new_notice( 'wsx_black_friday_2024', 'promotion', 'black_friday', '13-11-2024', '17-11-2024', false, 10, ! wholesalex()->is_pro_active() ),
-			'wsx_black_friday_2024_banner'       => $this->set_new_notice( 'wsx_black_friday_2024_banner', 'promotion', 'black_friday_banner', '18-11-2024', '12-12-2024', false, 10, ! wholesalex()->is_pro_active() ),
+			'wsx_black_friday_2024_up'        => $this->set_new_notice( 'wsx_black_friday_2024_up', 'promotion', 'black_friday', '13-11-2024', '17-11-2024', false, 10, ! wholesalex()->is_pro_active() ),
+			'wsx_black_friday_2024_banner_up'       => $this->set_new_notice( 'wsx_black_friday_2024_banner_up', 'promotion', 'black_friday_banner', '18-11-2024', '12-12-2024', false, 10, ! wholesalex()->is_pro_active() ),
 		);
 
 		if ( isset( $_GET['wsx-notice-disable'] ) ) {//phpcs:ignore

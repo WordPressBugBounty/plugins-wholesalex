@@ -2040,6 +2040,13 @@ class WHOLESALEX_Dynamic_Rules {
 									'placeholder' => '',
 									'descTooltip'	  => __('The minimum product order limit is disabled on the shop and product pages. Buyers can freely add products to the cart.','wholesalex'),
 								),
+								'_min_order_qty_step' => array(
+									'type'        => 'number',
+									'label'       => __( 'Step', 'wholesalex' ),
+									'default'     => '1',
+									'placeholder' => '',
+									'help'        => '',
+								),
 							),
 						),
 						'conditions'                   => array(
@@ -5878,7 +5885,7 @@ class WHOLESALEX_Dynamic_Rules {
 		foreach ( $bogo_badge_dynamic_rule as $badge_dynamic_rule ){
 			$bogo_badge_type = $badge_dynamic_rule['rule'];
 			$bogo_badge_filter = $badge_dynamic_rule['filter'];
-			$enable_bogo_badge = $bogo_badge_type['_buy_x_get_product_badge_enable'];
+			$enable_bogo_badge = isset( $bogo_badge_type['_buy_x_get_product_badge_enable'] ) ? $bogo_badge_type['_buy_x_get_product_badge_enable'] : '';
 			if ( $enable_bogo_badge == 'yes' ) {
 				$badge_label = $bogo_badge_type['_product_badge_label'];
 				$badge_label_bg_color = $bogo_badge_type['_product_badge_bg_color'];
@@ -6233,7 +6240,6 @@ class WHOLESALEX_Dynamic_Rules {
 				if ( ! ( $product->is_type( 'simple' ) || $product->is_type( 'variation' ) ) ) {
 					return $args;
 				}
-
 				if ( ! empty( $data['min_order_qty'] ) ) {
 					foreach ( $data['min_order_qty'] as $rule ) {
 						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
@@ -6244,8 +6250,9 @@ class WHOLESALEX_Dynamic_Rules {
 							if ( isset($rule['rule']['_min_order_qty_disable']) && $rule['rule']['_min_order_qty_disable'] == 'no' ) { 
 								$args['min_value'] = $rule['rule']['_min_order_qty'];
 							}
-							if ( isset( $rule['rule']['step'] ) && $rule['rule']['step'] ) {
-								$args['step'] = $rule['rule']['step'];
+							//Control Product Quantity Step
+							if ( isset( $rule['rule']['_min_order_qty_step'] ) && $rule['rule']['_min_order_qty_step'] ) {
+								$args['step'] = $rule['rule']['_min_order_qty_step'];
 							}
 						}
 					}

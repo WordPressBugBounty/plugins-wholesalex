@@ -567,9 +567,9 @@ class WHOLESALEX_Shortcodes {
 	 */
 	public function login_registration_shortcode( $atts = array() ) {
 
-		$atts = shortcode_atts(array(
+		$atts = array_merge( array(
 			'lost_password' => 'false',
-		), $atts, 'wholesalex_login');
+		), $atts );
 
 		if ( is_user_logged_in() && is_singular() ) {
 			$__form_view_for_logged_in_user = wholesalex()->get_setting( '_settings_show_form_for_logged_in' );
