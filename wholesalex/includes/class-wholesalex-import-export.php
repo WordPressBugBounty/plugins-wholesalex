@@ -121,7 +121,7 @@ class ImportExport {
 	 * @param string  $search_query Search Query.
 	 * @return array
 	 */
-	public function get_wholesale_users( $user_per_page = -1, $page = 1, $status = '', $search_query = '',$role='' ) {
+	public function get_wholesale_users( $user_per_page = -1, $page = 1, $status = '', $search_query = '',$role='', $user_ids = '' ) {
 		$user_fields = array( 'ID', 'user_login', 'display_name', 'user_email', 'user_registered' );
 		$meta_query = array(
 			'relation'=> 'OR',
@@ -181,6 +181,14 @@ class ImportExport {
 			'fields'      => 'all',
 			'search'      => '*' . $search_query . '*',
 		);
+
+		// If user IDs are passed, add 'include' to filter by those IDs
+		if ( !empty( $user_ids ) ) {
+			$user_ids_array = explode( ',', $user_ids );
+			$user_ids_array = array_map( 'trim', $user_ids_array );
+			$args['include'] = $user_ids_array;
+		}
+	
 		$users = get_users($args);
 		return $users;
 	}
@@ -202,9 +210,10 @@ class ImportExport {
 		$user_status 		= isset($_POST["getFilterStatus"]) ? sanitize_text_field($_POST["getFilterStatus"]) : '';
 		$search_query 		= isset($_POST["getSearchValue"]) ? sanitize_text_field($_POST["getSearchValue"]) : '';
 		$user_role 			= isset($_POST["getFilterRole"]) ? sanitize_text_field($_POST["getFilterRole"]) : '';
-		$selected_user_data = $this->get_wholesale_users( -1, 1, $user_status, $search_query,$user_role );
+		$selectedUserIds 	= isset($_POST["getSelectedUserIds"]) ? sanitize_text_field($_POST["getSelectedUserIds"]) : [];
+		$selected_user_data = $this->get_wholesale_users( -1, 1, $user_status, $search_query,$user_role, $selectedUserIds );
 		$exportable_columns = isset( $_POST['columns'] ) ? json_decode( sanitize_text_field( wp_unslash( $_POST['columns'] ) ), true ) : array();
-
+		
 		$data  = array();
 		$users = $selected_user_data;
 		foreach ( $users as $user ) {

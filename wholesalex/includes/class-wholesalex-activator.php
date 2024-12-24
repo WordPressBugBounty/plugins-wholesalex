@@ -136,7 +136,7 @@ class Activator {
 			if ( ! class_exists( 'woocommerce' ) ) {
 				return;
 			}
-			wp_safe_redirect( admin_url( 'admin.php?page=wholesalex-overview' ) );
+			wp_safe_redirect( admin_url( 'admin.php?page=wholesalex' ) );
 			exit();
 		}
 	}

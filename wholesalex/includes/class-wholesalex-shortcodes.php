@@ -691,7 +691,6 @@ class WHOLESALEX_Shortcodes {
 				const controlRegistrationForm = ()=>{
 					// Check User Role Selection Field
 					let selectedRole = $('#wholesalex_registration_role').val();
-					console.log(selectedRole);
 					if(selectedRole) {
 						let whxCustomFields = $('.wsx-field');
 						whxCustomFields.each(function (i) {

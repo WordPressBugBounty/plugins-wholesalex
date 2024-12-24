@@ -31,6 +31,18 @@
     // Search Users
     $(document).on('paste keyup', '.wsx-search-box', function(e){
         e.preventDefault();
+    
+        const searchBoxValue = $('.wsx-search-box').val().trim();
+        const searchResult = $('.wsx-search-result');
+    
+        if (searchBoxValue) {
+            searchResult.removeClass('wsx-d-none').addClass('wsx-d-block');
+            searchResult.html('<li>Searching...</li>');
+        } else {
+            searchResult.removeClass('wsx-d-block').addClass('wsx-d-none');
+            searchResult.html('');
+        }
+    
         $.ajax({
             url: wholesalex.ajax,
             type: 'POST',
@@ -40,19 +52,30 @@
                 wpnonce: wholesalex.nonce
             },
             success: function(res) {
-                $('.wsx-search-result').html(res.data);
+                if (res.data && res.data.trim() !== '') {
+                    searchResult.html(res.data);
+                } else {
+                    searchResult.html('<li>No matches found</li>');
+                }
             },
             error: function(xhr) {
-                console.log('Error occured.please try again' + xhr.statusText + xhr.responseText );
+                // const errorMessage = `Error occurred: ${xhr.statusText || 'Unknown error'} - ${xhr.responseText || ''}`;
+                // searchResult.html(`<li>${errorMessage}</li>`);
+                console.log(errorMessage);
             },
         });
     });
     $(document).on('click', 'ul.wsx-search-result li', function(e){
         e.preventDefault();
+        
+        $('.wsx-search-content').removeClass('wsx-d-none').addClass('wsx-d-block');
         $('input[name="started_by"]').val( $(this).data('id') );
         $('.wsx-search-box').val('')
         $('.wsx-search-result').html('');
-        $('.wsx-search-label').html( $(this).text() );
+        $('.wsx-search-image').attr('src', $(this).data('image')).show();
+        $('.wsx-search-name').text( $(this).data('name') );
+        $('.wsx-search-email').text( $(this).data('email') );
+        $('.wsx-search-result').removeClass('wsx-d-block').addClass('wsx-d-none');
     });
 
 
@@ -203,3 +226,38 @@ const closeWholesaleXGetProPopUp = () => {
     }
 }
 
+    // Add active class to the current menu item
+    jQuery(document).ready(function ($) {
+        // Add custom class to the top-level menu
+        // $('#toplevel_page_wholesalex > ul').addClass('wsx-top-level-menu');
+        $('#toplevel_page_wholesalex > ul > li').removeClass('current');
+    });
+
+    function updateActiveLink() {
+        const currentUrl = window.location.href;
+        const menuItems = document.querySelectorAll('.wp-submenu a');
+
+        menuItems.forEach(menuItem => {
+            if (menuItem.href === currentUrl) {
+                menuItem.style.fontWeight = '500';
+                menuItem.style.color = '#ffffff';
+                menuItem.style.boxShadow = 'inset 4px 0 0 0 currentColor';
+                // menuItem.classList.add('wsx-font-bold', 'wsx-color-text-reverse');
+            } else {
+                menuItem.style.fontWeight = '';
+                menuItem.style.color = '';
+                menuItem.style.boxShadow = '';
+                // menuItem.classList.remove('wsx-font-bold', 'wsx-color-text-reverse');
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateActiveLink();
+
+        // Listen for hash changes (when the URL changes)
+        window.addEventListener('hashchange', updateActiveLink);
+
+        // Listen for popstate events (when navigating back/forward)
+        window.addEventListener('popstate', updateActiveLink);
+    });

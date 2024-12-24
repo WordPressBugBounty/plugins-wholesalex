@@ -171,10 +171,10 @@ class WholesaleX_Initialization {
 		Scripts::register_fronend_style();
 		wp_enqueue_style( 'wholesalex' );
 		
-		if ( wp_style_is( 'wholesalex', 'enqueued' ) ) {
-			$css = '.wholesalex-price-table table tbody td { background-color: inherit !important; }';
-			wp_add_inline_style( 'wholesalex', $css );
-		}
+		// if ( wp_style_is( 'wholesalex', 'enqueued' ) ) {
+		// 	$css = '.wholesalex-price-table table tbody td { background-color: inherit !important; }';
+		// 	wp_add_inline_style( 'wholesalex', $css );
+		// }
 
 		wp_enqueue_script( 'wholesalex' );
 

@@ -26,7 +26,7 @@ class WHOLESALEX_Registration {
 	 * Registration Constructor
 	 */
 	public function __construct() {
-		add_action( 'admin_menu', array( $this, 'form_builder_add_submenu_page' ) );
+		// add_action( 'admin_menu', array( $this, 'form_builder_add_submenu_page' ) );
 		add_action( 'rest_api_init', array( $this, 'registration_form_builder_restapi_callback' ) );
 		add_filter( 'wp_authenticate_user', array( $this, 'check_status' ), 10, 2 );
 		add_filter( 'wholesalex_registration_form_user_login_option', array( $this, 'user_login_option' ) );
@@ -97,18 +97,18 @@ class WHOLESALEX_Registration {
 	 *
 	 * @return void
 	 */
-	public function form_builder_add_submenu_page() {
-		$slug = apply_filters( 'wholesalex_registration_form_builder_submenu_slug', 'wholesalex-registration' );
-		add_submenu_page(
-			wholesalex()->get_menu_slug(),
-			__( 'Registration Form', 'wholesalex' ),
-			__( 'Registration Form', 'wholesalex' ),
-			apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-			$slug,
-			array( $this, 'output' )
-		);
+	// public function form_builder_add_submenu_page() {
+	// 	$slug = apply_filters( 'wholesalex_registration_form_builder_submenu_slug', 'wholesalex-overview#/registration' );
+	// 	add_submenu_page(
+	// 		wholesalex()->get_menu_slug(),
+	// 		__( 'Registration Form', 'wholesalex' ),
+	// 		__( 'Registration Form', 'wholesalex' ),
+	// 		apply_filters( 'wholesalex_capability_access', 'manage_options' ),
+	// 		$slug,
+	// 		array( $this, 'output' )
+	// 	);
 
-	}
+	// }
 
 	/**
 	 * User Registration Form Output
@@ -116,7 +116,7 @@ class WHOLESALEX_Registration {
 	 * @since 1.0.0
 	 * @access public
 	 */
-	public function output() {
+	public static function output() {
 		/**
 		 * Enqueue Script
 		 *

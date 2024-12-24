@@ -46,7 +46,7 @@ class WHOLESALEX_Setup_Wizard {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'admin_menu', array( $this, 'submenu_page' ) );
+		// add_action( 'admin_menu', array( $this, 'submenu_page' ) );
 		add_action( 'wp_ajax_get_plugin_status', array( $this, 'get_plugin_status' ) );
 		add_action( 'wp_ajax_set_plugin_status', array( $this, 'set_plugin_status' ) );
 
@@ -65,20 +65,20 @@ class WHOLESALEX_Setup_Wizard {
 	 * @since 1.1.0
 	 * @access public
 	 */
-	public function submenu_page() {
-		$slug              = apply_filters( 'wholesalex_setup_wizard_submenu_slug', 'wholesalex-setup-wizard' );
-		$is_wizard_enabled = apply_filters( 'wholesalex_setup_wizard_menu_page_enabled', true );
-		if ( $is_wizard_enabled ) {
-			add_submenu_page(
-				'wholesalex',
-				__( 'Setup Wizard', 'wholesalex' ),
-				__( 'Setup Wizard', 'wholesalex' ),
-				apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-				$slug,
-				array( $this, 'initial_setup_content' )
-			);
-		}
-	}
+	// public function submenu_page() {
+	// 	$slug              = apply_filters( 'wholesalex_setup_wizard_submenu_slug', 'wholesalex-setup-wizard' );
+	// 	$is_wizard_enabled = apply_filters( 'wholesalex_setup_wizard_menu_page_enabled', true );
+	// 	if ( $is_wizard_enabled ) {
+	// 		add_submenu_page(
+	// 			'wholesalex',
+	// 			__( 'Setup Wizard', 'wholesalex' ),
+	// 			__( 'Setup Wizard', 'wholesalex' ),
+	// 			apply_filters( 'wholesalex_capability_access', 'manage_options' ),
+	// 			$slug,
+	// 			array( $this, 'initial_setup_content' )
+	// 		);
+	// 	}
+	// }
 
 	/**
 	 * Addons
@@ -89,7 +89,7 @@ class WHOLESALEX_Setup_Wizard {
 		$config                        = array();
 		$config['wsx_addon_bulkorder'] = array(
 			'name'                => __( 'Bulk Order Form', 'wholesalex' ),
-			'desc'                => __( 'Let buyers order products in bulk using the bulk order form. Customers can access them from their account page or create their own purchase list.', 'wholesalex' ),
+			'desc'                => __( 'It helps the buyers to quickly order a large number of products. They can also add desired products as purchase lists, update the list, and purchase from their “My Account Page”.', 'wholesalex' ),
 			'img'                 => WHOLESALEX_URL . 'assets/img/addons/bulkorder.svg',
 			'docs'                => 'https://getwholesalex.com/docs/wholesalex/add-on/bulk-order/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
 			'live'                => '',
@@ -105,7 +105,7 @@ class WHOLESALEX_Setup_Wizard {
 
 		$config['wsx_addon_subaccount'] = array(
 			'name'                => __( 'Subaccounts ', 'wholesalex' ),
-			'desc'                => __( 'Registered users in the B2B store can create sub accounts - allowing sub account holders to purchase products and maintain the account on behalf of the main account holder.', 'wholesalex' ),
+			'desc'                => __( 'Let your registered users create subaccounts. So the subaccount holders will be able to do permitted tasks on behalf of the main account holder.', 'wholesalex' ),
 			'img'                 => WHOLESALEX_URL . 'assets/img/addons/subaccount.svg',
 			'docs'                => 'https://getwholesalex.com/docs/wholesalex/add-on/subaccounts/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
 			'live'                => '',
@@ -120,7 +120,7 @@ class WHOLESALEX_Setup_Wizard {
 
 		$config['wsx_addon_raq'] = array(
 			'name'                => __( 'Request a Quote', 'wholesalex' ),
-			'desc'                => __( 'Send and receive custom quotes from buyers directly. Users can send custom quote queries from the cart page. Admins can negotiate on the quote directly.', 'wholesalex' ),
+			'desc'                => __( 'Let your buyers request a quote for their desired products. So you can send them custom prices and they can purchase with your given price or negotiate further.', 'wholesalex' ),
 			'img'                 => WHOLESALEX_URL . 'assets/img/addons/raq.svg',
 			'docs'                => 'https://getwholesalex.com/request-a-quote/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
 			'live'                => '',
@@ -136,7 +136,7 @@ class WHOLESALEX_Setup_Wizard {
 
 		$config['wsx_addon_conversation'] = array(
 			'name'                => __( 'Conversations', 'wholesalex' ),
-			'desc'                => __( 'Enable “conversations” with the customer and admin. Users can directly send queries from their account page to the admin directly.', 'wholesalex' ),
+			'desc'                => __( 'Enabling this feature will let your customers send messages to you from their “My Account” Dashboard.', 'wholesalex' ),
 			'img'                 => WHOLESALEX_URL . 'assets/img/addons/conversation.svg',
 			'docs'                => 'https://getwholesalex.com/docs/wholesalex/add-on/conversation/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
 			'live'                => '',
@@ -151,7 +151,8 @@ class WHOLESALEX_Setup_Wizard {
 		$config['wsx_addon_wallet']    = array(
 			'name'                => __( 'WholesaleX Wallet', 'wholesalex' ),
 			/* translators: %s Plugin Name */
-			'desc'                => sprintf( __( 'Use the %s wallet for storewide payments. Purchase products by adding funds to your Wallet from the Wholesale store.', 'wholesalex' ), wholesalex()->get_plugin_name() ),
+			// 'desc'                => sprintf( __( 'Use the %s wallet for storewide payments. Purchase products by adding funds to your Wallet from the Wholesale store.', 'wholesalex' ), wholesalex()->get_plugin_name() ),
+			'desc'                => __( 'Enable and configure it to let your buyers use the store wallet as a payment method.The registered users can add funds to the wallet and use it to purchase from your store.', 'wholesalex' ),
 			'img'                 => WHOLESALEX_URL . 'assets/img/addons/wallet.svg',
 			'docs'                => 'https://getwholesalex.com/docs/wholesalex/add-on/wallet/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
 			'live'                => '',
@@ -166,7 +167,7 @@ class WHOLESALEX_Setup_Wizard {
 
 		$config['wsx_addon_whitelabel'] = array(
 			'name'                => __( 'White Label', 'wholesalex' ),
-			'desc'                => __( 'Brand you Wholesale store using the white label addon. Set the custom plugin name, change the email, registration, roles, and more.', 'wholesalex' ),
+			'desc'                => __( 'Add your own branding while building client’s sites using WholesaleX. You can set the custom plugin name, change the email, registration, roles, and more.', 'wholesalex' ),
 			'img'                 => WHOLESALEX_URL . 'assets/img/addons/whitelabel.svg',
 			'docs'                => 'https://getwholesalex.com/docs/wholesalex/add-on/white-label/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
 			'live'                => '',
@@ -267,7 +268,7 @@ class WHOLESALEX_Setup_Wizard {
 			'is_pro_active'        => wholesalex()->is_pro_active(),
 			'addons'               => $this->get_addons(),
 			'setting_url'          => menu_page_url( 'wholesalex-settings', false ),
-			'dashboard_url'        => menu_page_url( 'wholesalex-overview', false ),
+			'dashboard_url'        => menu_page_url( 'wholesalex', false ),
 		);
 		if ( ! $localize_content['setting_url'] ) {
 			$localize_content['setting_url'] = get_dashboard_url();
@@ -599,7 +600,7 @@ class WHOLESALEX_Setup_Wizard {
 		if ( $woocommer_installed ) {
 			$is_wc_activated = is_plugin_active( 'woocommerce/woocommerce.php' );
 		}
-		$redirect_url = ( $woocommer_installed && $is_wc_activated ) ? admin_url( 'admin.php?page=wholesalex-overview' ) : admin_url( 'plugins.php' );
+		$redirect_url = ( $woocommer_installed && $is_wc_activated ) ? admin_url( 'admin.php?page=wholesalex' ) : admin_url( 'plugins.php' );
 		wp_send_json_success( array( 'redirect' => $redirect_url ) );
 	}
 

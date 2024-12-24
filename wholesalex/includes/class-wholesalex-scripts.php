@@ -31,7 +31,7 @@ class Scripts {
 		'wholesalex_dynamic_rules' => 'wholesalex_dynamic_rules',
 		'wholesalex-registration'  => 'wholesalex_form_builder',
 		'wsx_conversation'         => 'wholesalex_header',
-		'wholesalex-overview'      => 'wholesalex_overview',
+		'wholesalex'               => 'wholesalex_overview',
 		'wholesalex-setup-wizard'  => 'wholesalex_wizard',
 	);
 	/**

@@ -375,7 +375,6 @@ class Deactive {
 							window.location.href = url;
 						},
 						error: function(xhr) {
-							console.log( 'Error occured. Please try again' + xhr.statusText + xhr.responseText );
 						},
 					});
 				});

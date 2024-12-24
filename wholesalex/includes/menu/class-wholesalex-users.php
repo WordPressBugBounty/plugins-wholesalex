@@ -21,8 +21,130 @@ class WHOLESALEX_Users {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		add_action( 'admin_menu', array( $this, 'users_page_submenu' ) );
+		// add_action( 'admin_menu', array( $this, 'users_page_submenu' ) );
 		add_action( 'rest_api_init', array( $this, 'register_users_restapi' ) );
+		add_action( 'rest_api_init', array( $this, 'register_users_filters_restapi' ) );
+		add_action( 'admin_init', array( $this, 'initialize_default_user_filters' ) );
+		add_action( 'rest_api_init', array( $this, 'get_initial_user_filters_data' ) );
+	}
+
+	/**
+	 * Get Initial User Filters Data
+	 *
+	 * @return void
+	 */
+	public function get_initial_user_filters_data(){
+		register_rest_route(
+			'wholesalex/v1',
+			'/get-users-filters',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'get_user_filters' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+
+	/**
+	 * Get User Filters
+	 *
+	 * @param object $request Request
+	 * @return void
+	 */
+	function get_user_filters( $request ) {
+		$filters = get_option('wholesalex_settings', array());
+    	$response = isset($filters['_settings_show_users_filters']) ? $filters['_settings_show_users_filters'] : array();
+    	return new \WP_REST_Response(array('filters' => $response), 200);
+	}
+ 
+	/**
+	 * Initialize Default User Filters
+	 *
+	 * @return void
+	 */
+	public function initialize_default_user_filters() {
+		$default_filters = array(
+			'_settings_show_users_filters' => array(
+				'users_filter_user_id'           => true,
+				'users_filter_username'          => false,
+				'users_filter_full_name'         => true,
+				'users_filter_account_type'      => true,
+				'users_filter_email'             => true,
+				'users_filter_registration_date' => false,
+				'users_filter_wholesalex_role'   => true,
+				'users_filter_wholesalex_status' => true,
+				'users_filter_transaction'       => true,
+				'users_filter_wallet_balance'    => true,
+				'users_filter_action'            => true,
+			),
+		);
+
+		// Get existing filters
+		$existing_filters = get_option('wholesalex_settings', false);
+
+		// If no filters exist, initialize them
+		if (!$existing_filters) {
+			add_option('wholesalex_settings', $default_filters);
+		} else {
+			if (!isset($existing_filters['_settings_show_users_filters'])) {
+				$existing_filters['_settings_show_users_filters'] = $default_filters['_settings_show_users_filters'];
+				update_option('wholesalex_settings', $existing_filters);
+			}
+		}
+	}
+
+	/**
+	 * Register Users Filters RestAPI
+	 *
+	 * @return void
+	 */
+	public function register_users_filters_restapi() {
+		register_rest_route(
+			'wholesalex/v1',
+			'/save-users-filters/',
+			array(
+				array(
+					'methods'             => 'POST',
+					'callback'            => array($this, 'save_user_filters'),
+					'permission_callback' => function () {
+						return current_user_can('manage_options'); // Ensure only admins can use this
+					},
+				),
+			)
+		);
+	}
+
+	/**
+	 * Save User Filters
+	 *
+	 * @param object $request Request
+	 * @return void
+	 */
+	function save_user_filters( $request ) {
+		// Get the filters from the request. We expect a 'filters' key to be passed.
+		$filters = $request->get_param( 'filters' );
+		
+		if ( empty( $filters ) || !is_array( $filters ) ) {
+			return new \WP_REST_Response( array( 'message' => 'Invalid data' ), 400 );
+		}
+
+		// Retrieve the existing settings
+		$existing_settings = get_option( 'wholesalex_settings', array() );
+		
+		if ( !isset( $existing_settings['_settings_show_users_filters'] ) ) {
+			$existing_settings['_settings_show_users_filters'] = array();
+		}
+
+		// Merge the new filters into the existing ones
+		$existing_settings['_settings_show_users_filters'] = array_merge(
+			$existing_settings['_settings_show_users_filters'],
+			$filters
+		);
+
+		// Save updated settings to the database
+		update_option( 'wholesalex_settings', $existing_settings );
+		
+		return new \WP_REST_Response( array( 'message' => 'Filters saved successfully' ), 200 );
 	}
 
 	/**
@@ -30,24 +152,24 @@ class WHOLESALEX_Users {
 	 *
 	 * @return void
 	 */
-	public function users_page_submenu() {
-		$slug = apply_filters( 'wholesalex_users_submenu_slug', 'wholesalex-users' );
-		add_submenu_page(
-			wholesalex()->get_menu_slug(),
-			__( 'Users', 'wholesalex' ),
-			__( 'Users', 'wholesalex' ),
-			apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-			$slug,
-			array( $this, 'users_page_content' )
-		);
-	}
+	// public function users_page_submenu() {
+	// 	$slug = apply_filters( 'wholesalex_users_submenu_slug', 'wholesalex-overview#/users' );
+	// 	add_submenu_page(
+	// 		wholesalex()->get_menu_slug(),
+	// 		__( 'Users', 'wholesalex' ),
+	// 		__( 'Users', 'wholesalex' ),
+	// 		apply_filters( 'wholesalex_capability_access', 'manage_options' ),
+	// 		$slug,
+	// 		array( $this, 'users_page_content' )
+	// 	);
+	// }
 
 	/**
 	 * Users Submenu Page Content
 	 *
 	 * @return void
 	 */
-	public function users_page_content() {
+	public static function users_page_content() {
 		wp_enqueue_script( 'whx_users' );
 		wp_enqueue_script( 'wholesalex_node_vendors' );
 		wp_enqueue_script( 'wholesalex_components' );
@@ -86,56 +208,56 @@ class WHOLESALEX_Users {
 			array(
 				'heading'            => $heading_data,
 				'user_per_page'      => 10,
-				'bulk_actions'       => $this->get_wholesalex_users_bulk_actions(),
+				'bulk_actions'       => self::get_wholesalex_users_bulk_actions(),
 				'statuses'           => wholesalex()->insert_into_array(
 					array( '' => __( 'Select Status', 'wholesalex' ) ),
-					$this->get_user_statuses(),
+					self::get_user_statuses(),
 					0
 				),
 				'exportable_columns' => ImportExport::exportable_user_columns(),
-				'roles' => $this->get_role_options(),
+				'roles' => self::get_role_options(),
 				'i18n' => array(
-					'users' => __('Users','wholesalex'),
-					'edit' => __('Edit','wholesalex'),
-					'active' => __('Active','wholesalex'),
-					'reject' => __('Reject','wholesalex'),
-					'pending' => __('Pending','wholesalex'),
-					'delete' => __('Delete','wholesalex'),
-					'selected_users' => __('Selected Users','wholesalex'),
-					'apply' => __('Apply','wholesalex'),
-					'import' => __('Import','wholesalex'),
-					'export' => __('Export','wholesalex'),
-					'columns' => __('Columns','wholesalex'),
-					'no_users_found' => __('No Users Found!','wholesalex'),
-					'showing' => __('Showing','wholesalex'),
-					'pages' => __('Pages','wholesalex'),
-					'of' => __('of','wholesalex'),
-					'please_select_valid_csv_file' => __('Please Select a valid csv file to process import!','wholesalex'),
-					'please_wait_to_complete_existing_import_request' => __('Please Wait to complete existing import request!','wholesalex'),
-					'error_occured' => __('Error Occured!','wholesalex'),
-					'import_successful' => __('Import Sucessful','wholesalex'),
-					'users_updated' => __('Users Updated','wholesalex'),
-					'users_inserted' => __('Users Inserted','wholesalex'),
-					'users_skipped' => __('Users Skipped','wholesalex'),
-					'download' => __('Download','wholesalex'),
-					'log_for_more_info' => __('Log For More Info','wholesalex'),
-					'close' => __('Close','wholesalex'),
-					'username' => __('Username','wholesalex'),
-					'email' => __('Email','wholesalex'),
-					'upload_csv' => __('Upload CSV','wholesalex'),
-					'you_can_upload_only_csv_file' => __('You can upload only csv file format','wholesalex'),
-					'update_existing_users' => __('Update Existing Users','wholesalex'),
-					'update_existing_users_message' => __('Selecting "Update Existing Users" will only update existing users. No new user will be added.','wholesalex'),
-					'find_existing_user_by' => __('Find Existing Users By:','wholesalex'),
-					'option_to_detect_user' => __("Option to detect user from the uploaded CSV's email or username field.",'wholesalex'),
-					'process_per_iteration' => __("Process Per Iteration",'wholesalex'),
-					'low_process_ppi' => __("Low process per iteration (PPI) increases the import's accuracy and success rate. A (PPI) higher than your server's maximum execution time might fail the import.",'wholesalex'),
-					'import' => __("Import",'wholesalex'),
-					'import_users' => __("Import Users",'wholesalex'),
-					'select_fields_to_export' => __("Select Fields to Export",'wholesalex'),
-					'csv_comma_warning' => __("Warning: If any of the fields contain a comma (,), it might break the CSV file. Ensure the selected column value contains no comma(,).",'wholesalex'),
-					'download_csv' => __("Download CSV",'wholesalex'),
-					'export_users' => __("Export Users",'wholesalex'),
+					'whx_users_users' => __('Users','wholesalex'),
+					'whx_users_edit' => __('Edit','wholesalex'),
+					'whx_users_active' => __('Active','wholesalex'),
+					'whx_users_reject' => __('Reject','wholesalex'),
+					'whx_users_pending' => __('Pending','wholesalex'),
+					'whx_users_delete' => __('Delete','wholesalex'),
+					'whx_users_selected_users' => __('Selected Users','wholesalex'),
+					'whx_users_apply' => __('Apply','wholesalex'),
+					'whx_users_import' => __('Import','wholesalex'),
+					'whx_users_export' => __('Export','wholesalex'),
+					'whx_users_columns' => __('Columns','wholesalex'),
+					'whx_users_no_users_found' => __('No Users Found!','wholesalex'),
+					'whx_users_showing' => __('Showing','wholesalex'),
+					'whx_users_pages' => __('Pages','wholesalex'),
+					'whx_users_of' => __('of','wholesalex'),
+					'whx_users_please_select_valid_csv_file' => __('Please Select a valid csv file to process import!','wholesalex'),
+					'whx_users_please_wait_to_complete_existing_import_request' => __('Please Wait to complete existing import request!','wholesalex'),
+					'whx_users_error_occured' => __('Error Occured!','wholesalex'),
+					'whx_users_import_successful' => __('Import Sucessful','wholesalex'),
+					'whx_users_users_updated' => __('Users Updated','wholesalex'),
+					'whx_users_users_inserted' => __('Users Inserted','wholesalex'),
+					'whx_users_users_skipped' => __('Users Skipped','wholesalex'),
+					'whx_users_download' => __('Download','wholesalex'),
+					'whx_users_log_for_more_info' => __('Log For More Info','wholesalex'),
+					'whx_users_close' => __('Close','wholesalex'),
+					'whx_users_username' => __('Username','wholesalex'),
+					'whx_users_email' => __('Email','wholesalex'),
+					'whx_users_upload_csv' => __('Upload CSV','wholesalex'),
+					'whx_users_you_can_upload_only_csv_file' => __('You can upload only csv file format','wholesalex'),
+					'whx_users_update_existing_users' => __('Update Existing Users','wholesalex'),
+					'whx_users_update_existing_users_message' => __('Selecting "Update Existing Users" will only update existing users. No new user will be added.','wholesalex'),
+					'whx_users_find_existing_user_by' => __('Find Existing Users By:','wholesalex'),
+					'whx_users_option_to_detect_user' => __("Option to detect user from the uploaded CSV's email or username field.",'wholesalex'),
+					'whx_users_process_per_iteration' => __("Process Per Iteration",'wholesalex'),
+					'whx_users_low_process_ppi' => __("Low process per iteration (PPI) increases the import's accuracy and success rate. A (PPI) higher than your server's maximum execution time might fail the import.",'wholesalex'),
+					'whx_users_import' => __("Import",'wholesalex'),
+					'whx_users_import_users' => __("Import Users",'wholesalex'),
+					'whx_users_select_fields_to_export' => __("Select Fields to Export",'wholesalex'),
+					'whx_users_csv_comma_warning' => __("Warning: If any of the fields contain a comma (,), it might break the CSV file. Ensure the selected column value contains no comma(,).",'wholesalex'),
+					'whx_users_download_csv' => __("Download CSV",'wholesalex'),
+					'whx_users_export_users' => __("Export Users",'wholesalex'),
 				)
 			)
 		);
@@ -145,7 +267,7 @@ class WHOLESALEX_Users {
 		<?php
 	}
 
-	public function get_role_options() {
+	public static function get_role_options() {
 		$roles = get_option('_wholesalex_roles',array());
 		$roles_option=array(''=>__('--Select Role--','wholesalex'));
 		foreach ($roles as $role) {
@@ -205,12 +327,13 @@ class WHOLESALEX_Users {
 		switch ( $type ) {
 			case 'get':
 				$page         = isset( $post['page'] ) ? sanitize_text_field( $post['page'] ) : 1;
+				$itemsPerPage = isset($post['itemsPerPage']) ? (int) $post['itemsPerPage'] : 10;
 				$user_status  = isset( $post['status'] ) ? sanitize_text_field( $post['status'] ) : '';
 				$user_role    = isset( $post['role'] ) ? sanitize_text_field( $post['role'] ) : '';
 				$search_query = isset( $post['search'] ) ? sanitize_text_field( $post['search'] ) : '';
 	
 				$response['status'] = true;
-				$response['data']   = $this->get_wholesale_users( 10, $page, $user_status, $search_query, $user_role );
+				$response['data']   = $this->get_wholesale_users( $itemsPerPage, $page, $user_status, $search_query, $user_role );
 				break;
 	
 			case 'update_status':
@@ -283,7 +406,7 @@ class WHOLESALEX_Users {
 	 *
 	 * @return array
 	 */
-	public function get_user_statuses() {
+	public static function get_user_statuses() {
 		$statuses = array(
 			'active'  => 'Active',
 			'pending' => 'Pending',
@@ -301,10 +424,11 @@ class WHOLESALEX_Users {
 	 *
 	 * @return array
 	 */
-	public function get_wholesalex_users_bulk_actions() {
+	public static function get_wholesalex_users_bulk_actions() {
 		
 		$actions = array(
 			'delete'  => 'Delete Users',
+			'export'  => 'Export',
 			'pending' => 'Set Status to Pending',
 			'active'  => 'Set Status to Active',
 			'reject'  => 'Set Status to Reject',
@@ -324,10 +448,10 @@ class WHOLESALEX_Users {
 			if('wholesalex_guest'==$role['id']){
 				continue;
 			}
-			$roles_option['change_role_to_'.$role['id']]= __('Change Role to ','wholesalex').$role['_role_title'];
+			$roles_option['change_role_to_'.$role['id']] = $role['_role_title'];
 		}
 
-		$optionsGroups['roles_action'] = array('label'=>__('Roles','wholesalex'),'options'=> $roles_option);
+		$optionsGroups['roles_action'] = array('label'=>__('Change Role To ','wholesalex'),'options'=> $roles_option);
 
 
 		return $optionsGroups;
@@ -338,7 +462,7 @@ class WHOLESALEX_Users {
 	 *
 	 * @return array
 	 */
-	public function get_wholesalex_users_columns() {
+	public static function get_wholesalex_users_columns() {
 		$columns = array(
 			'user_id'          	=> __( 'ID', 'wholesalex' ),
 			'username'          => __( 'Username', 'wholesalex' ),
@@ -347,6 +471,7 @@ class WHOLESALEX_Users {
 			'registration_date' => __( 'Date', 'wholesalex' ),
 			'wholesalex_role'   => __( 'Role', 'wholesalex' ),
 			'wholesalex_status' => __( 'Status', 'wholesalex' ),
+			'transaction' 		=> __( 'Transaction', 'wholesalex' ),
 		);
 
 		$columns = apply_filters( 'wholesalex_users_columns', $columns );

@@ -329,13 +329,15 @@ class WHOLESALEX_Category {
 							'type'  => 'visibility_section',
 							'attr'  => array(
 								'_hide_for_b2c'      => array(
-									'type'    => 'switch',
+									// 'type'    => 'switch',
+									'type'    => 'slider',
 									'label'   => __( 'Hide product for B2C', 'wholesalex' ),
 									'help'    => '',
 									'default' => 'no',
 								),
 								'_hide_for_visitors' => array(
-									'type'    => 'switch',
+									// 'type'    => 'switch',
+									'type'    => 'slider',
 									'label'   => __( 'Hide product for Visitors', 'wholesalex' ),
 									'help'    => '',
 									'default' => 'no',
@@ -451,14 +453,14 @@ class WHOLESALEX_Category {
 						'_quantity_based_discount'       => array(
 							'wholesalex_start_quantity' => array(
 								'type'        => 'number',
-								'label'       => __( 'Start Qty', 'wholesalex' ),
+								'label'       => __( 'Start Quantity', 'wholesalex' ),
 								'placeholder' => __( '2', 'wholesalex' ),
 								'help'        => '',
 								'default'     => '',
 							),
 							'wholesalex_end_quantity'   => array(
 								'type'        => 'number',
-								'label'       => __( 'End Qty', 'wholesalex' ),
+								'label'       => __( 'End Quantity', 'wholesalex' ),
 								'placeholder' => __( '10', 'wholesalex' ),
 								'help'        => '',
 								'default'     => '',

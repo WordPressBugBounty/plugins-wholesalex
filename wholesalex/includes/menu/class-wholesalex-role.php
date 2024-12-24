@@ -21,7 +21,8 @@ class WHOLESALEX_Role {
 	 * @since v.1.0.0
 	 */
 	public function __construct() {
-		add_action( 'admin_menu', array( $this, 'role_add_submenu_page' ) );
+		// add_action( 'admin_menu', array( $this, 'role_add_submenu_page' ) );
+		add_action( 'rest_api_init', array( $this, 'delete_selected_role_callback' ) );
 		add_action( 'rest_api_init', array( $this, 'save_role_callback' ) );
 		add_filter( 'option_woocommerce_tax_display_shop', array( $this, 'tax_display' ) );
 		add_filter( 'option_woocommerce_tax_display_cart', array( $this, 'tax_display' ) );
@@ -57,6 +58,41 @@ class WHOLESALEX_Role {
 
 	}
 
+	public function delete_selected_role_callback() {
+		register_rest_route(
+			'wholesalex/v1',
+			'/delete_roles/',
+			array(
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'delete_selected_roles' ),
+					'permission_callback' => function () {
+						return current_user_can( 'manage_options' );
+					},
+					'args'                => array(),
+				),
+			)
+		);
+	}
+	
+	function delete_selected_roles(\WP_REST_Request $request) {
+		$roles_to_delete = $request->get_param('roles');
+		if (!is_array($roles_to_delete) || empty($roles_to_delete)) {
+			return new \WP_REST_Response(['success' => false, 'message' => 'Invalid roles'], 400);
+		}
+		$roles_option = get_option('_wholesalex_roles', []);
+		if (empty($roles_option)) {
+			return new \WP_REST_Response(['success' => false, 'message' => 'No roles found'], 400);
+		}
+		foreach ($roles_to_delete as $role_id) {
+			if (isset($roles_option[$role_id])) {
+				unset($roles_option[$role_id]);
+			}
+		}
+		update_option('_wholesalex_roles', $roles_option);
+		return new \WP_REST_Response(['success' => true], 200);
+	}
+	
 	/**
 	 * Save WholesaleX Role Actions
 	 *
@@ -123,7 +159,7 @@ class WHOLESALEX_Role {
 				);
 			}
 			$data            = array();
-			$data['default'] = $this->get_role_fields();
+			$data['default'] = self::get_role_fields();
 			$data['value']   = $__roles;
 			wp_send_json_success( $data );
 		} elseif ( 'get_users_by_role_id' === $type ) {
@@ -144,17 +180,17 @@ class WHOLESALEX_Role {
 	 *
 	 * @return void
 	 */
-	public function role_add_submenu_page() {
-		$slug = apply_filters( 'wholesalex_role_submenu_slug', 'wholesalex_role' );
-		add_submenu_page(
-			wholesalex()->get_menu_slug(),
-			__( 'User Roles', 'wholesalex' ),
-			__( 'User Roles', 'wholesalex' ),
-			apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-			$slug,
-			array( $this, 'role_content_callback' )
-		);
-	}
+	// public function role_add_submenu_page() {
+	// 	$slug = apply_filters( 'wholesalex_role_submenu_slug', 'wholesalex-overview#/user-role' );
+	// 	add_submenu_page(
+	// 		wholesalex()->get_menu_slug(),
+	// 		__( 'User Roles', 'wholesalex' ),
+	// 		__( 'User Roles', 'wholesalex' ),
+	// 		apply_filters( 'wholesalex_capability_access', 'manage_options' ),
+	// 		$slug,
+	// 		array( $this, 'role_content_callback' )
+	// 	);
+	// }
 
 	/**
 	 * WholesaleX Role Sub Menu Page Callback
@@ -162,7 +198,7 @@ class WHOLESALEX_Role {
 	 * @since 1.0.0
 	 * @access public
 	 */
-	public function role_content_callback() {
+	public static function role_content_callback() {
 		/**
 		 * Enqueue Script
 		 *
@@ -183,7 +219,7 @@ class WHOLESALEX_Role {
 				'wholesalex_roles',
 				'whx_roles',
 				array(
-					'fields' => $this->get_role_fields(),
+					'fields' => self::get_role_fields(),
 					'data'   => $__roles,
 					'nonce'  => wp_create_nonce( 'whx-export-roles' ),
 					'i18n' => array(
@@ -242,7 +278,7 @@ class WHOLESALEX_Role {
 	 * @since 1.0.0
 	 * @since 1.0.4 Role Settings Section Added.
 	 */
-	public function get_role_fields() {
+	public static function get_role_fields() {
 		$available_payment_gateways = WC()->payment_gateways->payment_gateways();
 		$payment_gateways           = array();
 		foreach ( $available_payment_gateways as $key => $gateway ) {
@@ -393,13 +429,31 @@ class WHOLESALEX_Role {
 								),
 							),
 						),
-						'regi_form_section'             => array(
+						// 'regi_form_section'             => array(
+						// 	'label' => __( 'Registration Form', 'wholesalex' ),
+						// 	'type'  => 'role_setting',
+						// 	'attr'  => array(
+						// 		'user_status' => array(
+						// 			'type'    => 'radio',
+						// 			'label'   => __( 'Registration Status', 'wholesalex' ),
+						// 			'options' => array(
+						// 				'global_setting' => __( 'Use Global Setting', 'wholesalex' ),
+						// 				'email_confirmation_require' => __( 'Email Confirmation Required', 'wholesalex' ),
+						// 				'auto_approve'  => __( 'Automatically Approve Account', 'wholesalex' ),
+						// 				'admin_approve' => __( 'Admin Approval Required', 'wholesalex' ),
+						// 			),
+						// 			'default' =>'global_setting',
+						// 			'help'    => '',
+						// 		),
+						// 	),
+						// ),
+						'regi_url_form_section'             => array(
 							'label' => __( 'Registration Form', 'wholesalex' ),
 							'type'  => 'role_setting',
 							'attr'  => array(
 								'user_status' => array(
 									'type'    => 'radio',
-									'label'   => __( 'Registration Status', 'wholesalex' ),
+									'label'   => __( 'Registration Approval Method', 'wholesalex' ),
 									'options' => array(
 										'global_setting' => __( 'Use Global Setting', 'wholesalex' ),
 										'email_confirmation_require' => __( 'Email Confirmation Required', 'wholesalex' ),
@@ -449,7 +503,7 @@ class WHOLESALEX_Role {
 							'_id'   => 1,
 							'attr'  => array(
 								'_payment_methods' => array(
-									'type'    => 'checkbox',
+									'type'    => 'slider',
 									'label'   => __( 'Payment Methods', 'wholesalex' ),
 									'options' => $payment_gateways,
 									'default' => array( '' ),
@@ -468,23 +522,31 @@ class WHOLESALEX_Role {
 							'type'  => 'role_setting',
 							'attr'  => array(
 								'_disable_coupon'      => array(
-									'type'    => 'switch',
-									'label'   => __( 'Disable Coupons', 'wholesalex' ),
-									'help'    => 'Disable Coupons For This Role',
-									'desc'    => 'Disable',
+									'type'    => 'slider',
+									'label'   => '',
+									'help'    => '',
+									'options' => ['_disable_coupon'=>__( 'Disable Coupons For This Role', 'wholesalex' )],
+									'desc'    => 'Disable Coupons For This Role',
 									'default' => 'no',
 								),
+							),
+						),
+						'settings_combined_migration_field'             => array(
+							'label' => __( 'Role Setting', 'wholesalex' ),
+							'type'  => 'role_setting',
+							'attr'  => array(
 								'_auto_role_migration' => array(
-									'type'     => 'switch',
-									'label'    => __( 'Enable Auto Role Migration', 'wholesalex' ),
+									'type'     => 'slider',
+									'label'    => '',
 									'help'     => '',
 									'default'  => 'no',
-									'desc'     => 'Enable',
+									'options'  => ['_auto_role_migration' => __( 'Enable Auto Role Migration', 'wholesalex' )],
+									'desc'     => __( 'Enable Auto Role Migration', 'wholesalex' ),
 									'excludes' => apply_filters( 'wholesalex_exclude_auto_role_migration_field', array( 'wholesalex_guest', 'wholesalex_b2c_users' ) ),
 								),
 								'_role_migration_threshold_value' => array(
 									'type'       => 'number',
-									'label'      => __( 'Minimum Purchase Amount to Migrate to This Role', 'wholesalex' ),
+									'label'      => __( 'Minimum Purchase Amount Required to Qualify for This Role', 'wholesalex' ),
 									'depends_on' => array(
 										array(
 											'key'   => '_auto_role_migration',
@@ -727,9 +789,13 @@ class WHOLESALEX_Role {
 		);
 		$user_options = array();
 		foreach ( $users as $user ) {
+			$first_name = get_user_meta( $user->ID, 'first_name', true );
+			$last_name = get_user_meta( $user->ID, 'last_name', true );
+			$full_name = trim( $first_name . ' ' . $last_name );
 			$user_options[] = array(
-				'name'  => $user->user_login,
+				'name'  => $full_name,
 				'value' => 'user_' . $user->ID,
+				'fullName'  => $user->user_login,
 			);
 		}
 		return $user_options;
@@ -745,7 +811,8 @@ class WHOLESALEX_Role {
 	 */
 	public function make_wholesalex_roles_not_editable( $roles ) {
 		foreach ( $roles as $key => $value ) {
-			if ( is_numeric( $key ) ) {
+			// Remove WholesaleX Roles.
+			if ( is_numeric( $key ) || preg_match( '/^wholesalex_/', $key ) ) {
 				unset( $roles[ $key ] );
 			}
 		}

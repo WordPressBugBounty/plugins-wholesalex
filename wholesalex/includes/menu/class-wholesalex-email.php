@@ -16,7 +16,7 @@ class WHOLESALEX_Email {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'admin_menu', array( $this, 'wholesalex_email_submenu_page' ) );
+		// add_action( 'admin_menu', array( $this, 'wholesalex_email_submenu_page' ) );
 		add_action( 'wp_ajax_save_wholesalex_email_settings', array( $this, 'save_wholesalex_email_settings' ) );
         
 		add_action( 'rest_api_init', array( $this, 'register_email_template_restapi' ) );
@@ -632,48 +632,48 @@ class WHOLESALEX_Email {
 	 * @since 1.0.0
 	 * @access public
 	 */
-	public function wholesalex_email_submenu_page() {
-		$slug = apply_filters( 'wholesalex_emails_submenu_slug', 'wholesalex-email' );
-		add_submenu_page(
-			wholesalex()->get_menu_slug(),
-			__( 'Emails', 'wholesalex' ),
-			__( 'Emails', 'wholesalex' ),
-			apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-			$slug,
-			array( $this, 'email_page_content' )
-		);
-	}
+	// public function wholesalex_email_submenu_page() {
+	// 	$slug = apply_filters( 'wholesalex_emails_submenu_slug', 'wholesalex-overview#/emails' );
+	// 	add_submenu_page(
+	// 		wholesalex()->get_menu_slug(),
+	// 		__( 'Emails', 'wholesalex' ),
+	// 		__( 'Emails', 'wholesalex' ),
+	// 		apply_filters( 'wholesalex_capability_access', 'manage_options' ),
+	// 		$slug,
+	// 		array( $this, 'email_page_content' )
+	// 	);
+	// }
 
 	/**
 	 * Email Page Content
 	 *
 	 * @return void
 	 */
-	public function email_page_content() {
+	public static function email_page_content() {
 		wp_enqueue_script( 'whx_email_templates' );
 		wp_enqueue_script( 'wholesalex_node_vendors' );
 		wp_enqueue_script( 'wholesalex_components' );
 		wp_localize_script('whx_email_templates','whx_email_templates',array(
 			'i18n' => array(
-				'admin_email_recipient'=> __('Admin Email Recipient','wholesalex'),
-				'subject'=> __('Subject','wholesalex'),
-				'heading'=> __('Heading','wholesalex'),
-				'additional_content'=> __('Additional Content','wholesalex'),
-				'smart_tag_used'=> __('Smart Tag Used','wholesalex'),
-				'email_type'=> __('Email Type','wholesalex'),
-				'smart_tags'=> __('Smart Tags','wholesalex'),
-				'save_changes'=> __('Save Changes','wholesalex'),
-				'status'=> __('Status','wholesalex'),
-				'email_template'=> __('Email Template','wholesalex'),
-				'content_type'=> __('Content Type','wholesalex'),
-				'action'=> __('Action','wholesalex'),
-				'edit'=> __('Edit','wholesalex'),
-				'unlock'=> __('UNLOCK','wholesalex'),
-				'unlock_full_email_access'=> __('Unlock Full Email Access','wholesalex'),
-				'with_wholesalex_pro'=> __('With WholesaleX Pro','wholesalex'),
-				'upgrade_pro_message'=> __('We are sorry, but only a limited number of emails are available on the free version. Please upgrade to a pro plan to get full access.','wholesalex'),
-				'upgrade_to_pro_btn'=> __('Upgrade to Pro  ➤','wholesalex'),
-				'emails'=> __('Emails','wholesalex'),
+				'whx_email_templates_admin_email_recipient'=> __('Admin Email Recipient','wholesalex'),
+				'whx_email_templates_subject'=> __('Subject','wholesalex'),
+				'whx_email_templates_heading'=> __('Heading','wholesalex'),
+				'whx_email_templates_additional_content'=> __('Additional Content','wholesalex'),
+				'whx_email_templates_smart_tag_used'=> __('Smart Tag Used','wholesalex'),
+				'whx_email_templates_email_type'=> __('Email Type','wholesalex'),
+				'whx_email_templates_smart_tags'=> __('Smart Tags','wholesalex'),
+				'whx_email_templates_save_changes'=> __('Save Changes','wholesalex'),
+				'whx_email_templates_status'=> __('Status','wholesalex'),
+				'whx_email_templates_email_template'=> __('Email Template','wholesalex'),
+				'whx_email_templates_content_type'=> __('Content Type','wholesalex'),
+				'whx_email_templates_action'=> __('Action','wholesalex'),
+				'whx_email_templates_edit'=> __('Edit','wholesalex'),
+				'whx_email_templates_unlock'=> __('UNLOCK','wholesalex'),
+				'whx_email_templates_unlock_full_email_access'=> __('Unlock Full Email Access','wholesalex'),
+				'whx_email_templates_with_wholesalex_pro'=> __('With WholesaleX Pro','wholesalex'),
+				'whx_email_templates_upgrade_pro_message'=> __('We are sorry, but only a limited number of emails are available on the free version. Please upgrade to a pro plan to get full access.','wholesalex'),
+				'whx_email_templates_upgrade_to_pro_btn'=> __('Upgrade to Pro  ➤','wholesalex'),
+				'whx_email_templates_emails'=> __('Emails','wholesalex'),
 			)
 		));
 		?>

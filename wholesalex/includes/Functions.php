@@ -1663,7 +1663,7 @@ class Functions {
 			case 'wholesalex_dynamic_rules':
 			case 'wholesalex-registration':
 			case 'wsx_conversation':
-			case 'wholesalex-overview':
+			case 'wholesalex':
 			case 'wholesalex-setup-wizard':
 			case 'wholesalex-features':
 			case 'wholesalex-help':
@@ -1845,7 +1845,7 @@ class Functions {
 	 * @return string
 	 */
 	public function get_menu_slug() {
-		$menu_slug = apply_filters( 'wholesalex_plugin_menu_slug', 'wholesalex-overview' );
+		$menu_slug = apply_filters( 'wholesalex_plugin_menu_slug', 'wholesalex' );
 		return $menu_slug;
 	}
 
@@ -2592,7 +2592,7 @@ class Functions {
 			exit;
         } else if ( file_exists( WP_PLUGIN_DIR . '/wholesalex-migration-tool/wholesalex-migration-tool.php' ) && ! is_plugin_active( 'wholesalex-migration-tool/wholesalex-migration-tool.php' ) ) {
             activate_plugin( '/wholesalex-migration-tool/wholesalex-migration-tool.php' );
-			wp_redirect( admin_url( 'admin.php?page=wholesalex-overview' ) );
+			wp_redirect( admin_url( 'admin.php?page=wholesalex' ) );
 			exit;
         }
         

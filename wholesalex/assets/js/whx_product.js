@@ -1,1 +1,6035 @@
-(()=>{"use strict";var e,l={9250:(e,l,o)=>{o.d(l,{A:()=>s});var t=o(1594),a=o.n(t),i=(o(8758),o(9575));const s=e=>{let{name:l,value:o,options:s,placeholder:r,customClass:n,onMultiSelectChangeHandler:_,isDisable:d,tooltip:c,isAjax:p,ajaxAction:x,ajaxSearch:h,dependsValue:w}=e;const[u,g]=(0,t.useState)(!1),[m,f]=(0,t.useState)(o),[b,y]=(0,t.useState)([]),[v,k]=(0,t.useState)(""),[E,A]=(0,t.useState)(!1),[z,N]=(0,t.useState)(""),[S,j]=(0,t.useState)([]),C=(0,t.useRef)(),O=e=>{g(!0),N(e.target.value)},$=e=>{C.current.contains(e.target)||g(!1)};(0,t.useEffect)((()=>(document.addEventListener("mousedown",$),()=>document.removeEventListener("mousedown",$))),[]);const T=(0,t.useRef)(null);(0,t.useEffect)((()=>{T.current=new AbortController;const{signal:e}=T.current;!h&&p&&(async e=>{A(!0);let l={type:"get",action:"dynamic_rule_action",nonce:wholesalex.nonce,ajax_action:x};w&&(l.depends=w);try{const o=await wp.apiFetch({path:"/wholesalex/v1/dynamic_rule_action",method:"POST",data:l,signal:e});if(o.status){let e=[];m.length>0&&(e=m.map((e=>e.value)));const l=o?.data?.filter((l=>{const{name:o,value:t}=l;return-1===e.indexOf(t)}));l.sort(((e,l)=>e.name.length-l.name.length)),j(o.data),y(l),A(!1)}else A(!1)}catch(e){if("AbortError"===e.name)return}})(e)}),[]),(0,t.useEffect)((()=>{if(h){T.current=new AbortController;const{signal:e}=T.current;return v.length>=2&&(async e=>{A(!0);let l={type:"get",action:"dynamic_rule_action",nonce:wholesalex.nonce,query:v,ajax_action:x};try{const o=await wp.apiFetch({path:"/wholesalex/v1/dynamic_rule_action",method:"POST",data:l,signal:e});if(o.status){let e=[];m.length>0&&(e=m.map((e=>e.value)));const l=o?.data?.filter((l=>{const{name:o,value:t}=l;return-1===e.indexOf(t)}));l.sort(((e,l)=>e.name.length-l.name.length)),y(l),A(!1)}else A(!1)}catch(e){if("AbortError"===e.name)return}})(e),()=>{T.current&&T.current.abort("Duplicate")}}(()=>{let e=[];m.length>0&&(e=m.map((e=>e.value)));const l=S.filter((l=>{const{name:o,value:t}=l;return o.toLowerCase().includes(v.toLowerCase())&&-1===e.indexOf(t)}));y(l)})()}),[v,k]),(0,t.useEffect)((()=>{if(h){if(z.length>1){const e=setTimeout((()=>k(z)),500);return()=>clearTimeout(e)}}else k(z)}),[z]);const I=e=>{const l=document.createElement("textarea");return l.innerHTML=e,l.value};return a().createElement("div",{className:"wholesalex_multiple_select "+(d?"locked":""),key:`wholesalex_multiselect_${l}`},a().createElement("div",{className:"wholesalex_mulitple_select_inputs"},a().createElement("div",{className:"wholsalex_selected_wrapper"},m.length>0&&m.map(((e,o)=>a().createElement("span",{key:`wholesalex_selected_opt_${l}_${e.value}_${o}`,className:"wholesalex_selected_option"},a().createElement("span",{tabIndex:-1,className:"multiselect-delete dashicons dashicons-no-alt",onClick:()=>(e=>{const o=m.filter((l=>{const{name:o,value:t}=l;return t.toString().toLowerCase()!==e.value.toString().toLowerCase()}));f(o),N(""),_(l,o)})(e)}),a().createElement("span",{className:"multiselect-op-name"},I(e.name))))),a().createElement("div",{className:"wholsalex_option_input_wrapper"},a().createElement("input",{key:`wholesalex_input_${l}`,disabled:!!d,id:l,tabIndex:0,autoComplete:"off",value:z,className:n,placeholder:m.length>0?"":r,onChange:e=>O(e),onClick:e=>O(e)})))),a().createElement("div",{ref:C,key:`wholesalex_${l}`},u&&a().createElement("div",null,!E&&b.length>0&&z.length>1&&u&&a().createElement("ul",{className:"wholesalex_discount_options",key:`wholesalex_opt_${l}`},b.map(((e,o)=>a().createElement("li",{key:`wholesalex_opt_${l}_${e.value}_${o}`,onClick:()=>(e=>{f([...m,e]);const o=b.filter((l=>{const{name:o,value:t}=l;return t.toString().toLowerCase()!==e.value.toString().toLowerCase()}));y(o),N(""),_(l,[...m,e]),g(!1)})(e)},I(e.name))))),!E&&z.length>1&&u&&0===b.length&&a().createElement("ul",{key:`wholesalex_${l}_not_found`,className:"wholesalex_discount_options"},a().createElement("div",null,(0,i.__)("No Data Found! Please try with another keyword.","wholesalex"))),z.length<2&&u&&a().createElement("ul",{key:`wholesalex_${l}_not_found`,className:"wholesalex_discount_options"},a().createElement("div",null,(0,i.__)("Enter 2 or more character to search.","wholesalex"))),E&&u&&a().createElement("ul",{key:`wholesalex_${l}_not_found`,className:"wholesalex_discount_options"},a().createElement("div",null,(0,i.__)("Searching...","wholesalex"))))))}},6905:(e,l,o)=>{o.d(l,{A:()=>_}),o(9575);var t=o(1594),a=o.n(t),i=o(4679),s=o(8903),r=(o(400),o(8423)),n=o(44);const _=e=>{let{id:l,isWCFMVariation:o}=e;const _={_id:Date.now().toString(),_discount_type:"",_discount_amount:"",_min_quantity:"",src:"single_product"},[d,c]=(0,t.useState)({}),[p,x]=(0,t.useState)({loading:!0,currentWindow:"new",ruleWindow:"new",ruleIndex:-1,index:-1,loadingOnSave:!1}),[h,w]=(0,t.useState)({}),u=wholesalex?.is_pro_active,[g,m]=(0,t.useState)(""),[f,b]=(0,t.useState)(!1),y=(()=>{let e="";return l||(e=wholesalex_single_product.is_dokan_dashboard?document.getElementById("dokan-edit-product-id")?.value:document.getElementById("post_ID")?.value||document.getElementById("pro_id")?.value),l||e})();(0,t.useEffect)((()=>{wholesalex_single_product.fields&&w(wholesalex_single_product.fields);let e=Object.keys(wholesalex_single_product.fields),l={};e.map(((e,o)=>{Object.keys(wholesalex_single_product.fields[e].attr).map(((e,o)=>{l[e]={tiers:[{..._}]}}))}));let o={...l,...wholesalex_single_product.discounts[y]};c(o),x({...p,loading:!1})}),[]);const[v,k]=(0,t.useState)({});return a().createElement(a().Fragment,null,p.loading&&a().createElement(i.A,null),!p.loading&&Object.keys(h).map(((e,l)=>Object.keys(h[e].attr).length>0&&a().createElement("div",{key:`wholesalex_product_key_${e}_${l}`,className:"wholesalex-tier__wrapper "+("_b2c_section"===e?"b2c":"")},h[e].label&&a().createElement("div",{key:"wholesalex_b2c_b2b_sep_2",className:"wholesalex-heading__large wholesalex-heading__b2b"},h[e].label),Object.keys(h[e].attr).map(((l,o)=>{if("tiers"===h[e].attr[l].type)return((e,l)=>{let o=99999999999;e.is_pro&&(o=e.pro_data?.value),o||(o=99999999999);let t=d[l].tiers.length>=o&&!u;return a().createElement("section",{key:`wholesalex_${l}`,className:l+" wholesalex_accordian"},a().createElement("div",{className:"wholesalex_accordian__header",onClick:()=>{k({...v,[l]:!v[l]})}},a().createElement("div",{className:"wholesalex_accordian__title",key:"whx_role_header"},e.label),a().createElement("span",{className:v[l]?"dashicons dashicons-arrow-up-alt2 wholesalex_up_arrow_icon wholesalex_icon ":"dashicons dashicons-arrow-down-alt2 wholesalex_down_arrow_icon wholesalex_icon"})),v[l]&&e.attr&&Object.keys(e.attr).map(((o,i)=>{switch(e.attr[o].type){case"tier":return((e,l,o)=>{var t=e._tiers.data;return a().createElement("div",{key:l,className:"wholesalex_tiers"},a().createElement("div",{className:"wholesalex_tiers__container"},d&&d[l]&&d[l].tiers.map(((e,o)=>a().createElement(s.A,{key:`wholesalex_${l}_tier_${o}`,fields:t,tier:d,setTier:c,index:o,tierName:l})))),!o&&"button"===e._tiers.add.type&&((e,l)=>a().createElement("button",{key:`wholesalex_btn_tier_${l}`,className:"wholesalex-btn wholesalex-primary-btn wholesalex-add-tier-btn",onClick:e=>{e.preventDefault();let o={...d};o[l].tiers.push(_),c(o)}},e.label))(e._tiers.add,l),o&&"button"===e._tiers.upgrade_pro.type&&((e,l)=>a().createElement("button",{key:`wholesalex_btn_tier_${l}`,className:"wholesalex-btn wholesalex-upgrade-pro-btn wholesalex-upgrade-tier-btn",onClick:e=>{e.preventDefault(),b(!0)}},e.label,a().createElement("span",{className:"dashicons dashicons-arrow-right-alt2"})))(e._tiers.upgrade_pro,l))})(e.attr[o],l,t);case"prices":return((e,l)=>a().createElement("div",{key:`wholesalex_${l}_separate`},a().createElement("div",{key:`wholesalex_prices_${l}`,className:"wholesalex_role_based_prices_section"},Object.keys(e.attr).map(((o,t)=>"number"===e.attr[o].type&&((e,l,o)=>{const t=d[o]&&d[o][l]?d[o][l]:e.default;return a().createElement(r.A,{className:"wholesalex_single_product_field",label:e.label,type:e.type,name:l,value:t,onChange:e=>{let t={...d},a=t[o];a[l]=e.target.value,t[o]=a,c({...d,...t})}})})(e.attr[o],o,l))))))(e.attr[o],l)}})))})(h[e].attr[l],l)}))))),wholesalex_single_product?.is_wcfm_dashboard&&o&&a().createElement("input",{type:"hidden",className:"wholesalex_rolewise_pricing",id:`wholesalex_wcfm_product_variation_tiers_${l||y}`,value:JSON.stringify(d),name:`wholesalex_wcfm_product_variation_tiers_${l||y}`}),wholesalex_single_product?.is_wcfm_dashboard&&!o&&a().createElement("input",{type:"hidden",className:"wholesalex_rolewise_pricing",id:`wholesalex_wcfm_simple_product_tiers_${l||y}`,value:JSON.stringify(d),name:`wholesalex_wcfm_simple_product_tiers_${l||y}`}),!wholesalex_single_product?.is_wcfm_dashboard&&a().createElement("input",{type:"hidden",className:"wholesalex_rolewise_pricing",id:`wholesalex_single_product_tiers_${l||y}`,value:JSON.stringify(d),name:`wholesalex_single_product_tiers_${l||y}`}),f&&a().createElement(n.A,{renderContent:()=>a().createElement(a().Fragment,null,a().createElement("img",{src:wholesalex.url+"/assets/img/unlock.svg",alt:"Unlock Icon"}),a().createElement("div",{className:"unlock_text"},wholesalex_product.i18n.unlock),a().createElement("div",{className:"unlock_heading"},wholesalex_product.i18n.unlock_heading),a().createElement("div",{className:"desc"},wholesalex_product.i18n.unlock_desc),a().createElement("a",{target:"_blank",className:"wholesalex-btn wholesalex-upgrade-pro-btn wholesalex-btn-lg",href:"https://getwholesalex.com/pricing/?utm_source=wholesalex-menu&utm_medium=email-unlock_features-upgrade_to_pro&utm_campaign=wholesalex-DB"},wholesalex_product.i18n.upgrade_to_pro)),onClose:()=>b(!1)}))}},1246:(e,l,o)=>{o.d(l,{A:()=>c}),o(9575);var t=o(1594),a=o.n(t),i=o(4679),s=o(6794),r=(o(400),o(3699)),n=o(3149),_=o(9039),d=o(44);const c=()=>{const[e,l]=(0,t.useState)({}),[o,c]=(0,t.useState)(!0),[p,x]=(0,t.useState)({}),[h,w]=(0,t.useState)({}),[u,g]=(wholesalex,(0,t.useState)(!1));(0,t.useEffect)((()=>{wholesalex_product_tab.fields&&x(wholesalex_product_tab.fields),wholesalex_product_tab.settings&&l(wholesalex_product_tab.settings),w({...h,loading:!1})}),[]);const m=(o,t)=>{const i=e[t]||o.default||"";return a().createElement(r.A,{className:"wholesalex_single_product_tab_field",label:o.label,options:o.options,value:i,onChange:o=>{l({...e,[t]:o.target.value})},defaultValue:i,help:o.help})},f=(o,t)=>{const i=e[t]?"yes"==e[t]:o.default;let s=wholesalex_single_product?.is_wcfm_dashboard?"wcfm-checkbox":"";return a().createElement(_.A,{className:"wholesalex_single_product_tab_field",name:t,value:i,onChange:o=>{let a;a=o.target.checked?"yes":"no",l({...e,[t]:a})},defaultValue:o.default,desc:o.label,help:o?.help,inputFieldClass:s})},b=(o,t)=>{const i=e[t]?e[t]:o.default;return a().createElement(s.A,{key:t,name:t,value:i,options:o.options,placeholder:o.placeholder,onMultiSelectChangeHandler:(o,t)=>{let a={...e};a[o]=[...t],l({...e,...a})}})};return a().createElement(a().Fragment,null,h.loading&&a().createElement(i.A,null),!h.loading&&a().createElement(a().Fragment,null,Object.keys(p).map(((t,i)=>{return"_product_settings_tab"===t&&(s=p[t].attr,Object.keys(s).map(((t,i)=>{switch(s[t].type){case"choosebox":return((o,t)=>{const i=e[t]?e[t]:o.default;return a().createElement(n.A,{label:o.label,name:t,value:i,onChange:e=>{e.target.value.startsWith("pro_")?g(!0):l({[t]:e.target.value})},defaultValue:o.default,desc:o.desc,help:o?.help,options:o.options})})(s[t],t);case"switch":return f(s[t],t);case"select":return m(s[t],t);case"visibility_section":return((l,t)=>a().createElement("div",{key:t,className:"wholesalex-product-data__visibility-section wholesalex_accordian"},a().createElement("div",{className:"wholesalex_accordian__header",onClick:()=>{c(!o)}},a().createElement("div",{className:"wholesalex_accordian__title wholesalex_visibility_accordian_title",key:`whx_role_header_${t}`},l.label),a().createElement("span",{className:o?"dashicons dashicons-arrow-up-alt2 ":"dashicons dashicons-arrow-down-alt2"})),o&&a().createElement("div",{className:"wholesalex_visibility_options"},a().createElement("div",{className:"wholesalex_visibility_switch_fields"},o&&Object.keys(l.attr).map(((e,o)=>{if("switch"===l.attr[e].type)return f(l.attr[e],e)}))),a().createElement("div",{className:"wholesalex_visibility_select_options"},o&&Object.keys(l.attr).map(((o,t)=>{switch(l.attr[o].type){case"select":return m(l.attr[o],o);case"multiselect":if("b2b_specific"===e._hide_for_b2b_role_n_user&&"_hide_for_roles"===o)return b(l.attr[o],o);if("user_specific"===e._hide_for_b2b_role_n_user&&"_hide_for_users"===o)return b(l.attr[o],o)}}))))))(s[t],t)}})));var s}))),a().createElement("input",{type:"hidden",value:JSON.stringify(e),name:"wholesalex_product_settings"}),u&&a().createElement(d.A,{renderContent:()=>a().createElement(a().Fragment,null,a().createElement("img",{src:wholesalex.url+"/assets/img/unlock.svg",alt:"Unlock Icon"}),a().createElement("div",{className:"unlock_text"},wholesalex_product.i18n.unlock),a().createElement("div",{className:"unlock_heading"},wholesalex_product.i18n.unlock_heading),a().createElement("div",{className:"desc"},wholesalex_product.i18n.unlock_desc),a().createElement("a",{target:"_blank",className:"wholesalex-btn wholesalex-upgrade-pro-btn wholesalex-btn-lg",href:"https://getwholesalex.com/pricing/?utm_source=wholesalex-menu&utm_medium=email-unlock_features-upgrade_to_pro&utm_campaign=wholesalex-DB"},wholesalex_product.i18n.upgrade_to_pro)),onClose:()=>g(!1)}))}},3150:(e,l,o)=>{var t=o(1594),a=o.n(t),i=o(5206),s=o.n(i),r=o(6905),n=o(1246);o(1856),o(1989),o(4280),o(6068),document.addEventListener("DOMContentLoaded",(function(){document.body.contains(document.getElementById("wholesalex_tab_data"))&&s().render(a().createElement(a().StrictMode,null,a().createElement(n.A,null)),document.getElementById("wholesalex_tab_data"));let e=document.getElementsByClassName("_wholesalex_single_product_settings");if(e.length&&s().render(a().createElement(a().StrictMode,null,a().createElement(r.A,null)),e[0]),jQuery("#woocommerce-product-data").on("woocommerce_variations_loaded",(function(l){e=document.getElementsByClassName("_wholesalex_single_product_settings");let o=document.getElementsByClassName("variable_post_id");for(let l=1;l<e.length;l++)s().render(a().createElement(a().StrictMode,null,a().createElement(r.A,{id:o[l-1].value})),e[l])})),wholesalex_single_product?.is_dokan_dashboard&&jQuery(".dokan-product-variation-wrapper").on("dokan_variations_loaded",(function(l){e=document.getElementsByClassName("_wholesalex_single_product_settings");for(let l=1;l<e.length;l++){const o=document.getElementsByName(`variable_post_id[${l-1}]`)?.[0]?.value;s().render(a().createElement(a().StrictMode,null,a().createElement(r.A,{id:o})),e[l])}})),wholesalex_single_product?.is_wcfm_dashboard){e=document.getElementsByClassName("_wholesalex_wcfm_single_product_settings"),e.length&&s().render(a().createElement(a().StrictMode,null,a().createElement(r.A,null)),e[0]),e=document.getElementsByClassName("_wholesalex_wcfm_variable_product_settings");for(let l=0;l<e.length;l++){const o=document.getElementById(`variations_id_${l}`)?.value;s().render(a().createElement(a().StrictMode,null,a().createElement(r.A,{id:o,isWCFMVariation:!0})),e[l])}}wholesalex_product?.roles?.forEach((e=>{jQuery("select.variation_actions").on("wholesalex_product_price_"+e.value+"_base",(function(l){let o,t={};o=window.prompt(woocommerce_admin_meta_boxes_variations.i18n_enter_a_value),null!=o&&(t.value=o,jQuery.ajax({url:woocommerce_admin_meta_boxes_variations.ajax_url,data:{action:"wholesalex_bulk_edit_variations",security:woocommerce_admin_meta_boxes_variations.bulk_edit_variations_nonce,product_id:woocommerce_admin_meta_boxes_variations.post_id,product_type:jQuery("#product-type").val(),bulk_action:"wholesalex_product_price_"+e.value+"_base",data:t},type:"POST",success:function(){location.reload()}}))})),jQuery("select.variation_actions").on("wholesalex_product_price_"+e.value+"_sale",(function(l){let o,t={};o=window.prompt(woocommerce_admin_meta_boxes_variations.i18n_enter_a_value),null!=o&&(t.value=o,jQuery.ajax({url:woocommerce_admin_meta_boxes_variations.ajax_url,data:{action:"wholesalex_bulk_edit_variations",security:woocommerce_admin_meta_boxes_variations.bulk_edit_variations_nonce,product_id:woocommerce_admin_meta_boxes_variations.post_id,product_type:jQuery("#product-type").val(),bulk_action:"wholesalex_product_price_"+e.value+"_sale",data:t},type:"POST",success:function(){location.reload()}}))}))}))}))},1625:(e,l,o)=>{o.d(l,{A:()=>r});var t=o(1601),a=o.n(t),i=o(6314),s=o.n(i)()(a());s.push([e.id,".wholesalex_section_title{font-size:var(--wholesalex-size-18);color:var(--wholesalex-heading-text-color);line-height:22px;font-weight:500}.wholesalex_accordian{border:1px solid var(--wholesalex-border-color);padding:8px 15px;display:flex;flex-direction:column;gap:10px}.wholesalex_accordian .wholesalex_accordian__title{font-size:var(--wholesalex-size-18);color:var(--wholesalex-heading-text-color);line-height:22px;font-weight:500}.wholesalex_accordian .wholesalex_role_based_prices_section{display:grid;grid-template-columns:1fr 1fr;gap:25px}.wholesalex_accordian .wholesalex_accordian__header{display:flex;align-items:center;justify-content:space-between;cursor:pointer}.wholesalex_accordian .wholesalex_down_arrow_icon,.wholesalex_accordian .wholesalex_up_arrow_icon{font-size:20px;line-height:22px;color:#454545}.wholesalex_tiers{display:flex;flex-direction:column;gap:5px}.wholesalex_tiers .wholesalex-add-tier-btn{margin-top:15px;padding:9px 18px 10px 20px;font-size:16px;line-height:22px}.wholesalex_tiers .wholesalex-tier-delete{font-size:var(--wholesalex-size-20);font-weight:normal;color:white;background-color:#d54013;border-radius:2px;padding:10px 13px 9px 14px;line-height:22px}.wholesalex_tiers .wholesalex-tier-delete:hover{cursor:pointer;background-color:#a73411}.wholesalex_tiers .wholesalex_tiers_fields{display:flex;gap:20px;align-items:flex-end}.wholesalex_tiers .wholesalex-tier{display:flex;gap:20px;width:100%}.wholesalex_tiers .tier-field{width:100%}.wholesalex_tiers .wholesalex_tiers__container{display:flex;flex-direction:column;gap:28px}.wholesalex_tiers .wholesalex-tier__wrapper{display:flex;flex-direction:column;gap:10px}.wholesalex_visibility_select_options{border-top:1px solid var(--wholesalex-border-color);padding-top:10px;margin-top:10px;display:flex;flex-direction:column;gap:10px}.settings_section.wholesalex-role-section,.regi_form_section.wholesalex-role-section{display:flex;flex-direction:column;gap:15px}\n",""]);const r=s},3740:(e,l,o)=>{o.d(l,{A:()=>r});var t=o(1601),a=o.n(t),i=o(6314),s=o.n(i)()(a());s.push([e.id,".wholesalex_dynamic_rule__header,.wholesalex_user_role__header{background-color:#56585f;display:flex;align-items:center;justify-content:space-between;font-size:14px;color:white;line-height:25px;padding:11px 15px 10px 20px;height:40px;box-sizing:border-box}.wholesalex_dynamic_rule__header .header__left,.wholesalex_dynamic_rule__header .header__right,.wholesalex_user_role__header .header__left,.wholesalex_user_role__header .header__right{display:flex;gap:10px;align-items:center}.wholesalex_dynamic_rule__header .header__right:hover,.wholesalex_user_role__header .header__right:hover{cursor:pointer}.wholesalex-rule__title-section .wholesalex-rule-0{grid-column:span 8}.wholesalex-rule__title-section .wholesalex-rule-1{grid-column:span 2}.wholesalex-role__title-section .wholesalex-field{grid-column:span 10}.rule_content,.role_content{background-color:#fff;padding:32px 30px;display:flex;flex-direction:column;gap:25px;box-shadow:0 1px 2px 0 rgba(108,108,255,0.2)}.wholesalex_user_role_content .settings_section{display:flex;flex-direction:column;gap:25px}.wholesalex-btn.save_rule,.wholesalex-btn.save_role{background-color:#2fb110;color:white}.wholesalex-btn.save_rule:hover,.wholesalex-btn.save_role:hover{background-color:#22790d}.save_rule,.save,.save_role{background-color:#2fb110;color:white}.save_rule:hover,.save:hover,.save_role:hover{background-color:#22790d}.wholesalex-btn.cancel_rule,.wholesalex-btn.cancel_role{background-color:#c73714;color:white}.wholesalex-btn.cancel_rule:hover,.wholesalex-btn.cancel_role:hover{background-color:#922a10}.cancel_rule,.cancel_role{background-color:#c73714;color:white}.cancel_rule:hover,.cancel_role:hover{background-color:#922a10}.wholesalex-icon{cursor:pointer}.wholesalex-icon.delete-rule:hover{color:red}.wholesalex-icon.duplicate-rule:hover{color:#eeeeee}.accordion-rule{cursor:pointer}.accordion-rule.accordion-rule:hover{color:#eeeeee}.wholesalex-rule__rule-section{display:grid;grid-template-columns:1fr 1fr 1fr;gap:25px}.wholesalex-rule__rule-section .multiselect{border-top:1px solid #dddddd;grid-column:1/-1;padding-top:15px}.wholesalex-rule__manage-discount-section{display:flex;flex-direction:column;gap:20px}@media (max-width: 768px){.wholesalex-section__content{flex-wrap:wrap}}.wholesalex-section__content{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}.rule_content .wholesalex-rule__payment-discount-section .wholesalex_mulitple_select_inputs{height:auto}.rule_content:not(:first-child)>section{background-color:white}.rule_content .wholesalex-rule_cart_discount{grid-template-columns:1fr 1fr 1fr}.wholesalex-tier-add{font-size:var(--wholesalex-size-20);line-height:22px;font-weight:normal;padding:10px 13px 9px 14px;color:white;border-radius:3px;line-height:21px;background-color:var(--wholesalex-primary-color)}.wholesalex-tier-add:hover{cursor:pointer;background-color:var(--wholesalex-primary-hover-color)}.wholesalex-tier-delete{font-size:var(--wholesalex-size-20);font-weight:normal;color:white;background-color:#d54013;border-radius:2px;padding:10px 13px 9px 14px;line-height:22px}.wholesalex-tier-delete:hover{cursor:pointer;background-color:#a73411}.wholesalex-rule_limit .wholesalex-field{justify-content:flex-end}.wholesalex-datepicker{width:80%}.wholesalex-rule__header{display:flex;justify-content:space-between;margin-bottom:20px}.checkbox-options,.radio-options{display:flex;gap:20px;flex-wrap:wrap}.checkbox-options label,.radio-options label{font-size:16px}.wholesalex-role__shipping-section{display:flex;flex-direction:column;gap:15px}.wholesalex-role__shipping-section .shipping-zones{display:flex;flex-direction:column;gap:20px}.wholesalex-field>label,.shipping-section-label{font-size:18px;font-weight:500}.wholesalex-wrapper{padding-top:100px;padding-left:20px;padding-right:40px;padding-bottom:20px}.wholesalex-wrapper td.user.column-user{padding-left:20px}.wholesalex-wrapper th#user{padding-left:10px}.wholesalex_user_roles,.wholesalex_dynamic_rules{display:flex;flex-direction:column;gap:5px}.wholesalex_dynamic_rule__title{font-size:14px;line-height:25px;color:#fff}.wholesalex_delete_icon{font-size:18px;line-height:24px;color:white}.wholesalex_duplicate_icon{font-size:16px;line-height:25px;color:white}.wholesalex_down_arrow_icon,.wholesalex_up_arrow_icon{font-size:16px;line-height:24px;color:white}.wholesalex_dynamic_rule_field{display:flex;gap:6px;flex-direction:column}.wholesalex_dynamic_rule_field input,.wholesalex_dynamic_rule_field select{width:100%;min-width:unset}.wholesalex_dynamic_rule_field .multiselect{border-top:1px solid var(--wholesalex-border-color);grid-column:1/-1;padding-top:20px}.wholesalex_wrapper #_wholesalex_dynamic_rules{text-align:left}.wholesalex_dynamic_rule_field{display:flex;gap:6px;flex-direction:column;width:100%}.wholesalex_slider_field.wholesalex_dynamic_rule_field{flex-direction:row-reverse;align-items:center;justify-content:center;gap:10px;height:40px;width:auto}.wholesalex-role__title-section.wholesalex_user_role__section{display:flex;align-items:flex-end;gap:40px}.wholesalex_user_role_field{display:flex;flex-direction:column;width:100%;gap:12px;color:var(--wholesalex-heading-text-color);font-size:14px}.wholesalex_user_role_field .wholesalex_help_message.wholesalex_switch_field__help{margin-top:10px}.wholesalex_checkbox_field__options{display:flex;align-items:center;gap:50px;font-size:14px;line-height:28px}.wholesalex_user_role_shipping_section{border:1px solid var(--wholesalex-border-color);display:flex;flex-direction:column;gap:12px;padding:5px 10px}.wholesalex_dynamic_rule__section{display:flex;flex-direction:column;gap:25px}.wholesalex_dynamic_rule__title_section{display:flex;align-items:flex-end;gap:30px}.wholesalex_input_field.wholesalex_dynamic_rule_field,.wholesalex_select_field.wholesalex_dynamic_rule_field{width:100%}.wholesalex_slider_field.wholesalex_dynamic_rule_field .wholesalex_field_label{white-space:nowrap}.has_separator{border-top:1px solid var(--wholesalex-border-color);padding-top:12px}.wholesalex_dynamic_rule__fields{display:flex;gap:30px}.wholesalex-section__label,.wholesalex_accordian__title{font-size:var(--wholesalex-size-18);color:var(--wholesalex-heading-text-color);line-height:22px;font-weight:500}.wholesalex_dynamic_rules .wholesalex_accordian{padding:24px 26px 25px 25px;border-radius:2px;border:solid 2px var(--wholesalex-border-color);display:flex;flex-direction:column;gap:20px;cursor:pointer}.wholesalex_tier_field{display:flex;flex-direction:column;gap:5px}.wholesalex_datepicker_field{display:flex;flex-direction:column;gap:10px}.wholesalex_user_role,.wholesalex_dyanmic_rule{cursor:pointer}.wholesalex_user_roles__role_buttongroup,.wholesalex_dynamic_rule__buttongroup{display:flex;gap:15px}.wholesalex_user_roles__role_buttongroup .wholesalex-btn,.wholesalex_dynamic_rule__buttongroup .wholesalex-btn{height:40px;padding:6px 25px 6px;font-size:14px;line-height:25px;color:white}.react-date-picker__inputGroup{box-sizing:border-box;height:38px}.react-date-picker__wrapper{padding:0px 0px 5px 15px;border-radius:2px;border:solid 1px var(--wholesalex-border-color) !important;background-color:#fff;height:40px}.react-date-picker__wrapper input[type=number]{border:none;min-height:unset;padding:0}.wholesalex_import_button,.wholesalex_export_button{display:flex;align-items:center}.wholesalex_dynamic_rules_import_export,.wholesalex_dynamic_roles_import_export{display:flex;gap:15px}progress.woocommerce-importer-progress{height:30px;width:100%}section.wholesalex-importer-done.success-popup-content{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}.import-complete-text.message{font-size:16px;font-weight:bold;color:var(--wholesalex-heading-text-color)}.wholesalex-imported,.wholesalex-updated,.wholesalex-skipped,.wholesalex-failed{font-size:14px;color:var(--wholesalex-body-text-color)}.wholesalex-importer{display:flex;flex-direction:column;gap:20px}\n",""]);const r=s},8588:(e,l,o)=>{o.d(l,{A:()=>r});var t=o(1601),a=o.n(t),i=o(6314),s=o.n(i)()(a());s.push([e.id,'.wholesalex_field__label{font-size:14px;font-weight:500;line-height:28px;text-align:left;color:var(--wholesalex-heading-text-color)}.wholesalex-heading__large{font-size:20px;line-height:22px;color:var(--wholesalex-heading-text-color);font-weight:500}.wholesalex_field_desc{font-size:14px;line-height:28px;color:var(--wholesalex-body-text-color);line-height:28px}.wholesalex_checkbox_field input[type=checkbox],.wholesalex_switch_field input[type=checkbox]{width:22px;height:20px;border-radius:2px;margin:0;position:relative;background-color:white;border:solid 1px #e9e9f0;margin-right:8px}.wholesalex_checkbox_field input[type=checkbox]:checked,.wholesalex_switch_field input[type=checkbox]:checked{background-color:#6c6cff;border:none}.wholesalex_checkbox_field input[type=checkbox]:checked::before,.wholesalex_switch_field input[type=checkbox]:checked::before{left:9px;top:2px;width:5px;height:10px;border:solid white;border-width:0 2px 2px 0;transform:rotate(45deg);border-radius:0;background:none;position:absolute;margin:0;padding:0}.wholesalex_checkbox_field input[type=checkbox]:focus,.wholesalex_switch_field input[type=checkbox]:focus{box-shadow:unset}.wholesalex_input_field input{padding:5px 0px 5px 15px;border-radius:2px;border:solid 1px #e9e9f0;background-color:#fff;width:100%;color:var(--wholesalex-body-text-color)}.wholesalex_input_field input:disabled{opacity:0.7}.wholesalex_radio_field{display:flex;flex-direction:column;text-align:left;gap:20px}.wholesalex_radio_field input[type=radio]{height:22px;border:solid 1px rgba(108,108,255,0.3);width:22px;background-color:white;margin:0;position:relative;margin-right:10px}.wholesalex_radio_field input[type=radio]:checked::before{position:absolute;content:"";border-radius:50%;width:14px;height:14px;background-color:var(--wholesalex-primary-color);left:50%;top:50%;margin-top:-7px;margin-left:-7px}.wholesalex_radio_field input[type=radio]:focus{box-shadow:unset}.wholesalex_radio_field .wholesalex_radio_field__options{display:flex;align-items:center;gap:30px;flex-wrap:wrap}.wholesalex_select_field select{border-radius:2px;border:solid 1px var(--wholesalex-border-color);background-color:#fff;color:var(--wholesalex-body-text-color);font-size:14px;line-height:22px;text-align:left;height:40px}.wholesalex_select_field.wholesalex_tier_field select{height:40px;width:100%}.wholesalex_choosebox_field{display:flex;flex-direction:column;gap:2px;grid-column:span 2}.wholesalex_choosebox_field .dashicons.dashicons-lock{position:absolute;top:5px;right:5px}.wholesalex_choosebox_field__options{display:flex;flex-wrap:wrap;gap:25px;position:relative}.wholesalex_choosebox_field__options>label{max-width:230px;position:relative;display:flex;align-items:center}.wholesalex_choosebox_field__options>label input[type=radio]{position:absolute;opacity:0}.wholesalex_choosebox_field__options>*{padding:10px !important;border:1px solid #eeeeee;border-radius:4px;margin:0px !important}.wholesalex_choosebox_field__options #choosebox-selected{border:1px solid black}.wholesalex_choosebox_field__options span.wholesalex-get-pro-button{position:absolute;bottom:5px;left:43%}.wholesalex_choosebox_field__options .wholesalex_choosebox_get_pro{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);text-transform:capitalize}.wholesalex-badge-style{flex-wrap:nowrap}.wholesalex_choosebox_field__options img{max-width:100%}.wholesalex_color_picker_field__content{display:inline-flex;align-items:center;text-transform:uppercase;padding:0;border:1px solid var(--wholesalex-border-color);gap:15px;padding-right:15px;border-radius:4px;overflow:hidden}.wholesalex_color_picker_field__content input[type=color]{width:44px;height:40px;padding:0;margin:0;border:none;opacity:0;cursor:pointer}.wholesalex_drag_drop_file_upload{display:flex;flex-direction:column;gap:10px}.wholesalex_drag_drop_file_upload__label{font-size:14px;font-weight:500;color:var(--wholesalex-heading-text-color);line-height:28px}input#wholesalex_file_upload{opacity:0;height:0px;width:0px;position:absolute;margin:0;padding:0;top:50%;right:50%}.wholesalex_drag_drop_file_upload__content_wrapper{border-radius:4px;border:dotted 1px var(--wholesalex-border-color);background-color:#fff;min-height:120px;align-items:center;justify-content:center;display:flex;font-weight:500}.wholesalex_cloud_upload_icon{font-size:40px;line-height:28px;width:40px;height:35px;color:#3b414d}.wholesalex_drag_drop_file_upload__content{display:flex;align-items:center;flex-direction:column;justify-content:center;color:var(--wholesalex-body-text-color);font-size:14px;line-height:28px}.wholesalex_file_upload__drag_active{background-color:#e5e5e5 !important}.wholesalex_link_text{color:var(--wholesalex-primary-color)}.wholesalex_slider{position:relative;display:inline-block;width:38px;height:20px;cursor:pointer;border-radius:10px}.wholesalex_slider__input{position:absolute !important;opacity:0 !important;width:0 !important;height:0 !important}.wholesalex_slider__trackpoint{position:absolute;top:50%;left:3px;width:14px;height:14px;background-color:white;border-radius:50%;transform:translateY(-50%);transition:transform 0.3s, background-color 0.3s, opacity 0.3s;transition-delay:0.1s}.wholesalex_slider__enabled{background-color:var(--wholesalex-primary-color);transition:opacity 0.3s}.wholesalex_slider__enabled .wholesalex_slider__trackpoint{transform:translateX(130%) translateY(-50%)}.wholesalex_slider__disabled{background-color:var(--wholesalex-primary-color);opacity:0.25;transition:opacity 0.3s}.wholesalex_slider__disabled .wholesalex_slider__trackpoint{transform:translateX(0%) translateY(-50%)}.wholesalex_slider_field .wholesalex_lock_icon{font-size:13px;line-height:20px;color:var(--wholesalex-primary-color);width:13px;position:absolute;left:21px}.wholesalex_slider_field_content{display:flex;align-items:center;max-width:38px;position:relative}.wholesalex_slider__locked .wholesalex_slider__trackpoint{margin-left:10px;animation:moveLeft 0.3s forwards;animation-delay:0.3s}@keyframes moveLeft{0%{margin-left:0}100%{margin-left:10px}}.wholesalex_search_field__content{display:flex;align-items:center;position:relative}.wholesalex_search_field__content input[type=text]{padding-right:30px}.wholesalex_search_icon{position:absolute;right:10px;font-size:24px;line-height:22px;color:var(--wholesalex-body-text-color)}\n',""]);const r=s},4129:(e,l,o)=>{o.d(l,{A:()=>r});var t=o(1601),a=o.n(t),i=o(6314),s=o.n(i)()(a());s.push([e.id,".wholesalex_multiple_select{position:relative;width:100%;border-color:#8c8f94;box-shadow:none;border-radius:3px;vertical-align:middle}.wholesalex_multiple_select .regular-text{background-color:transparent;max-width:25rem}.wholsalex_option_input_wrapper input{cursor:pointer;width:100%}.wholesalex_mulitple_select_inputs{display:flex;flex-wrap:wrap;box-shadow:none;vertical-align:middle;background-color:white;min-width:unset;border-radius:2px;border:solid 1px var(--wholesalex-border-color);padding:10px}.wholsalex_selected_wrapper{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%}.wholesalex_multiple_select input:focus{outline:none}.wholesalex_multiple_select input{border:none}.wholesalex_selected_option{display:flex;font-size:var(--wholesalex-size-12);width:max-content;align-items:center;border-radius:2px;border:solid 1px var(--wholesalex-border-color)}.wholesalex_selected_option .multiselect-delete{cursor:pointer;transition:400ms}.wholesalex_selected_option:hover .multiselect-delete{color:#e62323}.wholsalex_option_input_wrapper{background-color:transparent;flex-grow:1;width:10%}.multiselect-op-name{color:var(--wholesalex-meta-color);padding-right:3px}.wholesalex_discount_options{position:absolute;background-color:white;width:91%;top:42px;padding:15px;border:solid 1px var(--wholesalex-border-color);border-radius:4px;z-index:99;max-height:10rem;overflow:scroll}.wholesalex_discount_options li{padding:5px 10px;transition:400ms;cursor:pointer;border-radius:2px}.wholesalex_discount_options li:hover{background-color:#1e90ff;color:white}\n",""]);const r=s},3407:(e,l,o)=>{o.d(l,{A:()=>r});var t=o(1601),a=o.n(t),i=o(6314),s=o.n(i)()(a());s.push([e.id,".pro_popup_container{padding:50px 50px 40px 50px;border-radius:4px;box-shadow:0 50px 99px 0 rgba(62,51,51,0.5);background-color:#fff;max-width:520px;text-align:center;position:relative;max-height:90vh;overflow:auto;display:flex;align-items:center;justify-content:center;flex-direction:column;box-sizing:border-box;gap:25px}.wholesalex_get_pro_popup{position:relative;display:flex;gap:10px}.wholesalex_get_pro_popup_wrapper{display:flex;align-items:center;justify-content:center;position:fixed;top:0;left:0;width:100%;height:100%;z-index:999999;background:rgba(0,0,0,0.7);transition:all .15s}.wholesalex_get_pro_popup_wrapper .dashicons.dashicons-no-alt{height:40px;width:40px;background-color:#fff;padding:7px 7px 6px 7px;border-radius:50%;color:#091f36;font-size:26px;box-sizing:border-box;cursor:pointer}.wholesalex_get_pro_popup_wrapper .dashicons.dashicons-no-alt:hover{color:#a51818}\n",""]);const r=s},4931:(e,l,o)=>{o.d(l,{A:()=>r});var t=o(1601),a=o.n(t),i=o(6314),s=o.n(i)()(a());s.push([e.id,"._wholesalex_single_product_settings,._wholesalex_wcfm_single_product_settings,._wholesalex_wcfm_variable_product_settings{display:flex;flex-direction:column;gap:15px;border-top:1px solid #eee;padding-bottom:25px;padding-top:25px;width:100%}._wholesalex_single_product_settings>div,._wholesalex_wcfm_single_product_settings>div,._wholesalex_wcfm_variable_product_settings>div{margin:10px 0px}._wholesalex_single_product_settings .wholesalex-tier__wrapper,._wholesalex_wcfm_single_product_settings .wholesalex-tier__wrapper,._wholesalex_wcfm_variable_product_settings .wholesalex-tier__wrapper{display:flex;flex-direction:column;gap:10px}._wholesalex_single_product_settings .wholesalex-heading__b2b,._wholesalex_wcfm_single_product_settings .wholesalex-heading__b2b,._wholesalex_wcfm_variable_product_settings .wholesalex-heading__b2b{margin-bottom:10px}._wholesalex_single_product_settings .wholesalex_accordian,._wholesalex_wcfm_single_product_settings .wholesalex_accordian,._wholesalex_wcfm_variable_product_settings .wholesalex_accordian{border-width:1px;padding:14px 15px 13px 20px;border:solid 1px #eaeaea;background-color:#fafafa}._wholesalex_single_product_settings .wholesalex_accordian .wholesalex_accordian__title,._wholesalex_wcfm_single_product_settings .wholesalex_accordian .wholesalex_accordian__title,._wholesalex_wcfm_variable_product_settings .wholesalex_accordian .wholesalex_accordian__title{font-size:14px;font-weight:500;line-height:22px}._wholesalex_single_product_settings .wholesalex_down_arrow_icon,._wholesalex_single_product_settings .wholesalex_up_arrow_icon,._wholesalex_wcfm_single_product_settings .wholesalex_down_arrow_icon,._wholesalex_wcfm_single_product_settings .wholesalex_up_arrow_icon,._wholesalex_wcfm_variable_product_settings .wholesalex_down_arrow_icon,._wholesalex_wcfm_variable_product_settings .wholesalex_up_arrow_icon{font-size:16px;line-height:22px;color:var(--wholesalex-heading-text-color)}._wholesalex_single_product_settings .wholesalex-heading__b2b,._wholesalex_wcfm_single_product_settings .wholesalex-heading__b2b,._wholesalex_wcfm_variable_product_settings .wholesalex-heading__b2b{border-top:1px solid var(--wholesalex-border-color);padding-top:25px}._wholesalex_single_product_settings .wholesalex_input_field input,._wholesalex_wcfm_single_product_settings .wholesalex_input_field input,._wholesalex_wcfm_variable_product_settings .wholesalex_input_field input{width:100%}.woocommerce_variable_attributes ._wholesalex_single_product_settings{padding:0;margin:0}#wholesalex_tab_data{padding:20px;display:flex;flex-direction:column;gap:25px}#wholesalex_tab_data select,#wholesalex_tab_data input[type=number]{max-width:240px;height:43px;gap:10px}#wholesalex_tab_data .wholesalex-choosebox{display:flex;flex-direction:column;gap:20px}#wholesalex_tab_data .wholesalex-choosebox .wholesalex-field{align-items:inherit}#wholesalex_tab_data .wholesalex-choosebox-field{gap:10px;position:relative;text-align:center}#wholesalex_tab_data .wholesalex-choosebox-field>label{position:relative;display:flex;align-items:center;justify-content:flex-end}#wholesalex_tab_data .wholesalex_choosebox_get_pro{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%)}#wholesalex_tab_data .wholesalex-separator__b2b_n_b2c{width:100%}#wholesalex_tab_data .wholesalex_discount_options{right:0;top:-20px}#wholesalex_tab_data .wholesalex-field.wholesalex-choosebox-field label{width:auto}.wholesalex_role_based_prices_section{border-bottom:1px solid #ddd;padding-bottom:35px}._wholesalex_single_product_settings div:not(:only-child) .wholesalex-tier__wrapper.b2c{border-bottom:1px solid #ddd;padding-bottom:35px}.wholesalex_switch_field.wholesalex_single_product_tab_field{display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center}#general_product_data ._wholesalex_single_product_settings>div{margin:10px}#wholesalex_tab_data .wholesalex_switch_field__content{display:flex;align-items:center;justify-content:center;width:100%}#wholesalex_tab_data .wholesalex_switch_field__content .wholesalex_switch_field__desc{width:100%;margin:0px}#wholesalex_tab_data .wholesalex_switch_field input[type=checkbox].wcfm-checkbox:checked::before{left:unset;top:unset;width:unset;height:unset;border:unset;border-width:unset;position:unset;transform:unset}\n",""]);const r=s},269:(e,l,o)=>{o.d(l,{A:()=>r});var t=o(1601),a=o.n(t),i=o(6314),s=o.n(i)()(a());s.push([e.id,".wholesalex-choosebox>.wholesalex-settings-wrap{flex-direction:column;gap:20px}.wholesalex_settings_tab_lists{text-align:left;max-width:270px;background-color:rgba(108,108,255,0.05);border-radius:4px;margin:0}.wholesalex_settings_tab_lists li{margin:0}.wholesalex_page_wholesalex-settings.rtl .wholesalex_settings_tab_lists{text-align:right}.wholesalex_page_wholesalex-settings.rtl .wholesalex_settings__fields{text-align:right}.wholesalex_settings_tab_list{padding:20px 25px;border-bottom:1px solid rgba(108,108,255,0.12);cursor:pointer;min-width:270px}.wholesalex_settings_tab_lists .wholesalex_active_tab{color:var(--wholesalex-primary-color);background-color:rgba(108,108,255,0.06)}.wholesalex_settings_tab__title{color:var(--wholesalex-heading-text-color);font-size:var(--wholesalex-size-14);line-height:var(--wholesalex-size-28);font-weight:500}.wholesalex_settings__tab_heading{font-size:20px;line-height:28px;color:var(--wholesalex-heading-text-color);font-weight:bold}.wholesalex_settings__tab_header{background-color:white;padding:20px 40px;text-align:left;border-bottom:1px solid rgba(108,108,255,0.2);display:flex;align-items:center;justify-content:space-between;max-height:28px}.wholesalex_settings_tab{box-shadow:0 1px 2px 0 rgba(108,108,255,0.1);background-color:#fff;width:100%}.wholesalex_settings{display:flex}.wholesalex_settings_field_label,.wholesalex_field__label{font-size:14px;font-weight:500;line-height:28px;text-align:left;color:var(--wholesalex-heading-text-color)}.wholesalex_settings_field_content{font-size:14px;line-height:28px;color:var(--wholesalex-body-text-color)}.wholesalex_settings__tab_content{padding:30px 50px;margin:0}.wholesalex_settings__fields{margin-bottom:45px;text-align:left}.wholesalex_settings__fields .wholesalex_switch_field,.wholesalex_settings__fields .wholesalex_input_field,.wholesalex_settings__fields .wholesalex_textarea_field,.wholesalex_settings__fields .wholesalex_select_field,.wholesalex_settings__fields .wholesalex_draglist_field,.wholesalex_settings__fields .wholesalex_shortcode_field{display:flex;gap:5%}.wholesalex_settings__fields .wholesalex_switch_field__label,.wholesalex_settings__fields .wholesalex_input_field__label,.wholesalex_settings__fields .wholesalex_textarea_field__label,.wholesalex_settings__fields .wholesalex_select_field__label,.wholesalex_settings__fields .wholesalex_draglist_field__label,.wholesalex_settings__fields .wholesalex_shortcode_field__label{width:30%}.wholesalex_settings__fields .wholesalex_switch_field__content,.wholesalex_settings__fields .wholesalex_input_field__content,.wholesalex_settings__fields .wholesalex_textarea_field__content,.wholesalex_settings__fields .wholesalex_select_field__content,.wholesalex_settings__fields .wholesalex_draglist_field__content{width:60%}.wholesalex_settings__fields .wholesalex_tooltip_icon{font-size:20px;line-height:26px;margin-top:1px;color:var(--wholesalex-heading-text-color);cursor:pointer}.wholesalex_settings__fields .wholesalex-tooltip-wrapper{width:19px}.wholesalex_page_wholesalex-settings select{min-width:250px}.wholesalex_field_desc{font-size:14px;color:var(--wholesalex-body-text-color)}.dashicons.wholesalex_not_migrated{color:#CDCFD5;font-size:26px;width:26px}.dashicons.wholesalex_migrated{color:var(--wholesalex-primary-color);font-size:26px;width:26px}.wholesalex_migration_field{display:flex;gap:15px}.wholesalex_migration_field .wholesalex_migration_field__label{font-size:14px;font-weight:500;text-align:left;color:var(--wholesalex-heading-text-color)}.wholesalex_migration_tab__footer{border-top:1px solid var(--wholesalex-border-color);padding:25px;text-align:right}button.wholesalex-btn.wholesalex-migrate-button[disabled]{background-color:#e9e9ea;background-image:unset;color:#858689;cursor:not-allowed}.wholesalex_migration__alert{background-color:var(--wholesalex-warning-button-color) !important;color:white;font-size:14px}.wholesalex_toast_message.wholesalex_migrating_notice{max-width:50%;margin:0 auto;margin-top:15px}.wholesalex_help_message .wholesalex_tooltip_icon{font-size:14px}.wholesalex-smart-tags-wrapper{display:flex;flex-direction:column;gap:5px;font-style:italic;color:var(--wholesalex-body-text-color)}.wholesalex_settings_d_ynamic_rule_section_title{font-size:large}.wholesalex_settings_dynamic_rule_section_fields{border:1px solid var(--wholesalex-border-color);padding-left:15px;padding-top:15px;margin-top:15px}.wholesalex_switch_field.wholesalex_settings_field.wsx-plugin-delete-setting{border:2px solid red;padding:5px;border-radius:8px;background-color:#ff9b9d}.wsx-plugin-delete-setting label.wholesalex_switch_field__desc.wholesalex_field_desc{color:#000000}textarea{width:100%}\n",""]);const r=s},9675:(e,l,o)=>{o.d(l,{A:()=>r});var t=o(1601),a=o.n(t),i=o(6314),s=o.n(i)()(a());s.push([e.id,'.wholesalex-tooltip-wrapper{display:inline-block;position:relative;width:inherit;height:inherit}.wholesalex_tooltip{position:relative}.tooltip-content{width:250px;position:absolute;border-radius:4px;left:-125px;bottom:30px;padding:10px;background-color:black;color:white;font-size:14px;line-height:1.5;z-index:100}.tooltip-content::before{content:" ";left:50%;border:solid transparent;height:0;width:0;position:absolute;pointer-events:none;border-width:6px;margin-left:calc(6px * -1)}.tooltip-content.top::before{top:100%;border-top-color:black}.tooltip-content.right{left:calc(100% + 30px);top:50%;transform:translateX(0) translateY(-50%)}.tooltip-content.right::before{left:calc(6px * -1);top:50%;transform:translateX(0) translateY(-50%);border-right-color:black}.tooltip-content.bottom{bottom:calc(30px * -1)}.tooltip-content.bottom::before{bottom:100%;border-bottom-color:black}.tooltip-content.left{left:auto;right:calc(100% + 30px);top:50%;transform:translateX(0) translateY(-50%)}.tooltip-content.left::before{left:auto;right:calc(6px * -2);top:50%;transform:translateX(0) translateY(-50%);border-left-color:black}.tooltip-icon{width:inherit;height:inherit;font-size:28px}\n',""]);const r=s},6147:(e,l,o)=>{o.d(l,{A:()=>r});var t=o(1601),a=o.n(t),i=o(6314),s=o.n(i)()(a());s.push([e.id,".wholesalex_get_pro_popup img{max-width:103px}.with_premium_text{padding:9px 20px 7px 16px;border-radius:4px;border:dashed 1px #ffa471;color:#091f36;font-size:14px;line-height:26px}.desc{font-size:14px;color:#575a5d;line-height:24px;text-align:center}.unlock_text{font-size:14px;line-height:22px;text-transform:uppercase;color:#f2c736;font-weight:500}.addon_count{color:#091f36;font-size:20px;line-height:22px;font-weight:bold}.unlock_heading{color:#091f36;font-size:20px;line-height:22px;font-weight:bold}\n",""]);const r=s},1856:(e,l,o)=>{var t=o(5072),a=o.n(t),i=o(7825),s=o.n(i),r=o(7659),n=o.n(r),_=o(5056),d=o.n(_),c=o(540),p=o.n(c),x=o(1113),h=o.n(x),w=o(1625),u={};u.styleTagTransform=h(),u.setAttributes=d(),u.insert=n().bind(null,"head"),u.domAPI=s(),u.insertStyleElement=p(),a()(w.A,u),w.A&&w.A.locals&&w.A.locals},1989:(e,l,o)=>{var t=o(5072),a=o.n(t),i=o(7825),s=o.n(i),r=o(7659),n=o.n(r),_=o(5056),d=o.n(_),c=o(540),p=o.n(c),x=o(1113),h=o.n(x),w=o(3740),u={};u.styleTagTransform=h(),u.setAttributes=d(),u.insert=n().bind(null,"head"),u.domAPI=s(),u.insertStyleElement=p(),a()(w.A,u),w.A&&w.A.locals&&w.A.locals},7399:(e,l,o)=>{var t=o(5072),a=o.n(t),i=o(7825),s=o.n(i),r=o(7659),n=o.n(r),_=o(5056),d=o.n(_),c=o(540),p=o.n(c),x=o(1113),h=o.n(x),w=o(8588),u={};u.styleTagTransform=h(),u.setAttributes=d(),u.insert=n().bind(null,"head"),u.domAPI=s(),u.insertStyleElement=p(),a()(w.A,u),w.A&&w.A.locals&&w.A.locals},8758:(e,l,o)=>{var t=o(5072),a=o.n(t),i=o(7825),s=o.n(i),r=o(7659),n=o.n(r),_=o(5056),d=o.n(_),c=o(540),p=o.n(c),x=o(1113),h=o.n(x),w=o(4129),u={};u.styleTagTransform=h(),u.setAttributes=d(),u.insert=n().bind(null,"head"),u.domAPI=s(),u.insertStyleElement=p(),a()(w.A,u),w.A&&w.A.locals&&w.A.locals},5030:(e,l,o)=>{var t=o(5072),a=o.n(t),i=o(7825),s=o.n(i),r=o(7659),n=o.n(r),_=o(5056),d=o.n(_),c=o(540),p=o.n(c),x=o(1113),h=o.n(x),w=o(3407),u={};u.styleTagTransform=h(),u.setAttributes=d(),u.insert=n().bind(null,"head"),u.domAPI=s(),u.insertStyleElement=p(),a()(w.A,u),w.A&&w.A.locals&&w.A.locals},4280:(e,l,o)=>{var t=o(5072),a=o.n(t),i=o(7825),s=o.n(i),r=o(7659),n=o.n(r),_=o(5056),d=o.n(_),c=o(540),p=o.n(c),x=o(1113),h=o.n(x),w=o(4931),u={};u.styleTagTransform=h(),u.setAttributes=d(),u.insert=n().bind(null,"head"),u.domAPI=s(),u.insertStyleElement=p(),a()(w.A,u),w.A&&w.A.locals&&w.A.locals},6068:(e,l,o)=>{var t=o(5072),a=o.n(t),i=o(7825),s=o.n(i),r=o(7659),n=o.n(r),_=o(5056),d=o.n(_),c=o(540),p=o.n(c),x=o(1113),h=o.n(x),w=o(269),u={};u.styleTagTransform=h(),u.setAttributes=d(),u.insert=n().bind(null,"head"),u.domAPI=s(),u.insertStyleElement=p(),a()(w.A,u),w.A&&w.A.locals&&w.A.locals},7296:(e,l,o)=>{var t=o(5072),a=o.n(t),i=o(7825),s=o.n(i),r=o(7659),n=o.n(r),_=o(5056),d=o.n(_),c=o(540),p=o.n(c),x=o(1113),h=o.n(x),w=o(9675),u={};u.styleTagTransform=h(),u.setAttributes=d(),u.insert=n().bind(null,"head"),u.domAPI=s(),u.insertStyleElement=p(),a()(w.A,u),w.A&&w.A.locals&&w.A.locals},4748:(e,l,o)=>{var t=o(5072),a=o.n(t),i=o(7825),s=o.n(i),r=o(7659),n=o.n(r),_=o(5056),d=o.n(_),c=o(540),p=o.n(c),x=o(1113),h=o.n(x),w=o(6147),u={};u.styleTagTransform=h(),u.setAttributes=d(),u.insert=n().bind(null,"head"),u.domAPI=s(),u.insertStyleElement=p(),a()(w.A,u),w.A&&w.A.locals&&w.A.locals},1594:e=>{e.exports=React},5206:e=>{e.exports=ReactDOM}},o={};function t(e){var a=o[e];if(void 0!==a)return a.exports;var i=o[e]={id:e,exports:{}};return l[e].call(i.exports,i,i.exports,t),i.exports}t.m=l,e=[],t.O=(l,o,a,i)=>{if(!o){var s=1/0;for(d=0;d<e.length;d++){o=e[d][0],a=e[d][1],i=e[d][2];for(var r=!0,n=0;n<o.length;n++)(!1&i||s>=i)&&Object.keys(t.O).every((e=>t.O[e](o[n])))?o.splice(n--,1):(r=!1,i<s&&(s=i));if(r){e.splice(d--,1);var _=a();void 0!==_&&(l=_)}}return l}i=i||0;for(var d=e.length;d>0&&e[d-1][2]>i;d--)e[d]=e[d-1];e[d]=[o,a,i]},t.n=e=>{var l=e&&e.__esModule?()=>e.default:()=>e;return t.d(l,{a:l}),l},t.d=(e,l)=>{for(var o in l)t.o(l,o)&&!t.o(e,o)&&Object.defineProperty(e,o,{enumerable:!0,get:l[o]})},t.g=function(){if("object"==typeof globalThis)return globalThis;try{return this||new Function("return this")()}catch(e){if("object"==typeof window)return window}}(),t.o=(e,l)=>Object.prototype.hasOwnProperty.call(e,l),t.r=e=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},t.j=950,(()=>{var e={950:0};t.O.j=l=>0===e[l];var l=(l,o)=>{var a,i,s=o[0],r=o[1],n=o[2],_=0;if(s.some((l=>0!==e[l]))){for(a in r)t.o(r,a)&&(t.m[a]=r[a]);if(n)var d=n(t)}for(l&&l(o);_<s.length;_++)i=s[_],t.o(e,i)&&e[i]&&e[i][0](),e[i]=0;return t.O(d)},o=self.webpackChunkwholesalex=self.webpackChunkwholesalex||[];o.forEach(l.bind(null,0)),o.push=l.bind(null,o.push.bind(o))})(),t.nc=void 0;var a=t.O(void 0,[255,742],(()=>t(3150)));a=t.O(a)})();
+/******/ (() => { // webpackBootstrap
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./node_modules/@tannin/compile/index.js":
+/*!***********************************************!*\
+  !*** ./node_modules/@tannin/compile/index.js ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ compile)
+/* harmony export */ });
+/* harmony import */ var _tannin_postfix__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tannin/postfix */ "./node_modules/@tannin/postfix/index.js");
+/* harmony import */ var _tannin_evaluate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tannin/evaluate */ "./node_modules/@tannin/evaluate/index.js");
+
+
+
+/**
+ * Given a C expression, returns a function which can be called to evaluate its
+ * result.
+ *
+ * @example
+ *
+ * ```js
+ * import compile from '@tannin/compile';
+ *
+ * const evaluate = compile( 'n > 1' );
+ *
+ * evaluate( { n: 2 } );
+ * // ⇒ true
+ * ```
+ *
+ * @param {string} expression C expression.
+ *
+ * @return {(variables?:{[variable:string]:*})=>*} Compiled evaluator.
+ */
+function compile( expression ) {
+	var terms = (0,_tannin_postfix__WEBPACK_IMPORTED_MODULE_0__["default"])( expression );
+
+	return function( variables ) {
+		return (0,_tannin_evaluate__WEBPACK_IMPORTED_MODULE_1__["default"])( terms, variables );
+	};
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@tannin/evaluate/index.js":
+/*!************************************************!*\
+  !*** ./node_modules/@tannin/evaluate/index.js ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ evaluate)
+/* harmony export */ });
+/**
+ * Operator callback functions.
+ *
+ * @type {Object}
+ */
+var OPERATORS = {
+	'!': function( a ) {
+		return ! a;
+	},
+	'*': function( a, b ) {
+		return a * b;
+	},
+	'/': function( a, b ) {
+		return a / b;
+	},
+	'%': function( a, b ) {
+		return a % b;
+	},
+	'+': function( a, b ) {
+		return a + b;
+	},
+	'-': function( a, b ) {
+		return a - b;
+	},
+	'<': function( a, b ) {
+		return a < b;
+	},
+	'<=': function( a, b ) {
+		return a <= b;
+	},
+	'>': function( a, b ) {
+		return a > b;
+	},
+	'>=': function( a, b ) {
+		return a >= b;
+	},
+	'==': function( a, b ) {
+		return a === b;
+	},
+	'!=': function( a, b ) {
+		return a !== b;
+	},
+	'&&': function( a, b ) {
+		return a && b;
+	},
+	'||': function( a, b ) {
+		return a || b;
+	},
+	'?:': function( a, b, c ) {
+		if ( a ) {
+			throw b;
+		}
+
+		return c;
+	},
+};
+
+/**
+ * Given an array of postfix terms and operand variables, returns the result of
+ * the postfix evaluation.
+ *
+ * @example
+ *
+ * ```js
+ * import evaluate from '@tannin/evaluate';
+ *
+ * // 3 + 4 * 5 / 6 ⇒ '3 4 5 * 6 / +'
+ * const terms = [ '3', '4', '5', '*', '6', '/', '+' ];
+ *
+ * evaluate( terms, {} );
+ * // ⇒ 6.333333333333334
+ * ```
+ *
+ * @param {string[]} postfix   Postfix terms.
+ * @param {Object}   variables Operand variables.
+ *
+ * @return {*} Result of evaluation.
+ */
+function evaluate( postfix, variables ) {
+	var stack = [],
+		i, j, args, getOperatorResult, term, value;
+
+	for ( i = 0; i < postfix.length; i++ ) {
+		term = postfix[ i ];
+
+		getOperatorResult = OPERATORS[ term ];
+		if ( getOperatorResult ) {
+			// Pop from stack by number of function arguments.
+			j = getOperatorResult.length;
+			args = Array( j );
+			while ( j-- ) {
+				args[ j ] = stack.pop();
+			}
+
+			try {
+				value = getOperatorResult.apply( null, args );
+			} catch ( earlyReturn ) {
+				return earlyReturn;
+			}
+		} else if ( variables.hasOwnProperty( term ) ) {
+			value = variables[ term ];
+		} else {
+			value = +term;
+		}
+
+		stack.push( value );
+	}
+
+	return stack[ 0 ];
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@tannin/plural-forms/index.js":
+/*!****************************************************!*\
+  !*** ./node_modules/@tannin/plural-forms/index.js ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ pluralForms)
+/* harmony export */ });
+/* harmony import */ var _tannin_compile__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tannin/compile */ "./node_modules/@tannin/compile/index.js");
+
+
+/**
+ * Given a C expression, returns a function which, when called with a value,
+ * evaluates the result with the value assumed to be the "n" variable of the
+ * expression. The result will be coerced to its numeric equivalent.
+ *
+ * @param {string} expression C expression.
+ *
+ * @return {Function} Evaluator function.
+ */
+function pluralForms( expression ) {
+	var evaluate = (0,_tannin_compile__WEBPACK_IMPORTED_MODULE_0__["default"])( expression );
+
+	return function( n ) {
+		return +evaluate( { n: n } );
+	};
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@tannin/postfix/index.js":
+/*!***********************************************!*\
+  !*** ./node_modules/@tannin/postfix/index.js ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ postfix)
+/* harmony export */ });
+var PRECEDENCE, OPENERS, TERMINATORS, PATTERN;
+
+/**
+ * Operator precedence mapping.
+ *
+ * @type {Object}
+ */
+PRECEDENCE = {
+	'(': 9,
+	'!': 8,
+	'*': 7,
+	'/': 7,
+	'%': 7,
+	'+': 6,
+	'-': 6,
+	'<': 5,
+	'<=': 5,
+	'>': 5,
+	'>=': 5,
+	'==': 4,
+	'!=': 4,
+	'&&': 3,
+	'||': 2,
+	'?': 1,
+	'?:': 1,
+};
+
+/**
+ * Characters which signal pair opening, to be terminated by terminators.
+ *
+ * @type {string[]}
+ */
+OPENERS = [ '(', '?' ];
+
+/**
+ * Characters which signal pair termination, the value an array with the
+ * opener as its first member. The second member is an optional operator
+ * replacement to push to the stack.
+ *
+ * @type {string[]}
+ */
+TERMINATORS = {
+	')': [ '(' ],
+	':': [ '?', '?:' ],
+};
+
+/**
+ * Pattern matching operators and openers.
+ *
+ * @type {RegExp}
+ */
+PATTERN = /<=|>=|==|!=|&&|\|\||\?:|\(|!|\*|\/|%|\+|-|<|>|\?|\)|:/;
+
+/**
+ * Given a C expression, returns the equivalent postfix (Reverse Polish)
+ * notation terms as an array.
+ *
+ * If a postfix string is desired, simply `.join( ' ' )` the result.
+ *
+ * @example
+ *
+ * ```js
+ * import postfix from '@tannin/postfix';
+ *
+ * postfix( 'n > 1' );
+ * // ⇒ [ 'n', '1', '>' ]
+ * ```
+ *
+ * @param {string} expression C expression.
+ *
+ * @return {string[]} Postfix terms.
+ */
+function postfix( expression ) {
+	var terms = [],
+		stack = [],
+		match, operator, term, element;
+
+	while ( ( match = expression.match( PATTERN ) ) ) {
+		operator = match[ 0 ];
+
+		// Term is the string preceding the operator match. It may contain
+		// whitespace, and may be empty (if operator is at beginning).
+		term = expression.substr( 0, match.index ).trim();
+		if ( term ) {
+			terms.push( term );
+		}
+
+		while ( ( element = stack.pop() ) ) {
+			if ( TERMINATORS[ operator ] ) {
+				if ( TERMINATORS[ operator ][ 0 ] === element ) {
+					// Substitution works here under assumption that because
+					// the assigned operator will no longer be a terminator, it
+					// will be pushed to the stack during the condition below.
+					operator = TERMINATORS[ operator ][ 1 ] || operator;
+					break;
+				}
+			} else if ( OPENERS.indexOf( element ) >= 0 || PRECEDENCE[ element ] < PRECEDENCE[ operator ] ) {
+				// Push to stack if either an opener or when pop reveals an
+				// element of lower precedence.
+				stack.push( element );
+				break;
+			}
+
+			// For each popped from stack, push to terms.
+			terms.push( element );
+		}
+
+		if ( ! TERMINATORS[ operator ] ) {
+			stack.push( operator );
+		}
+
+		// Slice matched fragment from expression to continue match.
+		expression = expression.substr( match.index + operator.length );
+	}
+
+	// Push remainder of operand, if exists, to terms.
+	expression = expression.trim();
+	if ( expression ) {
+		terms.push( expression );
+	}
+
+	// Pop remaining items from stack into terms.
+	return terms.concat( stack.reverse() );
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createAddHook.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createAddHook.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _validateNamespace_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./validateNamespace.js */ "./node_modules/@wordpress/hooks/build-module/validateNamespace.js");
+/* harmony import */ var _validateHookName_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./validateHookName.js */ "./node_modules/@wordpress/hooks/build-module/validateHookName.js");
+/**
+ * Internal dependencies
+ */
+
+
+
+/**
+ * @callback AddHook
+ *
+ * Adds the hook to the appropriate hooks container.
+ *
+ * @param {string}               hookName      Name of hook to add
+ * @param {string}               namespace     The unique namespace identifying the callback in the form `vendor/plugin/function`.
+ * @param {import('.').Callback} callback      Function to call when the hook is run
+ * @param {number}               [priority=10] Priority of this hook
+ */
+
+/**
+ * Returns a function which, when invoked, will add a hook.
+ *
+ * @param {import('.').Hooks}    hooks    Hooks instance.
+ * @param {import('.').StoreKey} storeKey
+ *
+ * @return {AddHook} Function that adds a new hook.
+ */
+function createAddHook(hooks, storeKey) {
+  return function addHook(hookName, namespace, callback, priority = 10) {
+    const hooksStore = hooks[storeKey];
+    if (!(0,_validateHookName_js__WEBPACK_IMPORTED_MODULE_1__["default"])(hookName)) {
+      return;
+    }
+    if (!(0,_validateNamespace_js__WEBPACK_IMPORTED_MODULE_0__["default"])(namespace)) {
+      return;
+    }
+    if ('function' !== typeof callback) {
+      // eslint-disable-next-line no-console
+      console.error('The hook callback must be a function.');
+      return;
+    }
+
+    // Validate numeric priority
+    if ('number' !== typeof priority) {
+      // eslint-disable-next-line no-console
+      console.error('If specified, the hook priority must be a number.');
+      return;
+    }
+    const handler = {
+      callback,
+      priority,
+      namespace
+    };
+    if (hooksStore[hookName]) {
+      // Find the correct insert index of the new hook.
+      const handlers = hooksStore[hookName].handlers;
+
+      /** @type {number} */
+      let i;
+      for (i = handlers.length; i > 0; i--) {
+        if (priority >= handlers[i - 1].priority) {
+          break;
+        }
+      }
+      if (i === handlers.length) {
+        // If append, operate via direct assignment.
+        handlers[i] = handler;
+      } else {
+        // Otherwise, insert before index via splice.
+        handlers.splice(i, 0, handler);
+      }
+
+      // We may also be currently executing this hook.  If the callback
+      // we're adding would come after the current callback, there's no
+      // problem; otherwise we need to increase the execution index of
+      // any other runs by 1 to account for the added element.
+      hooksStore.__current.forEach(hookInfo => {
+        if (hookInfo.name === hookName && hookInfo.currentIndex >= i) {
+          hookInfo.currentIndex++;
+        }
+      });
+    } else {
+      // This is the first hook of its type.
+      hooksStore[hookName] = {
+        handlers: [handler],
+        runs: 0
+      };
+    }
+    if (hookName !== 'hookAdded') {
+      hooks.doAction('hookAdded', hookName, namespace, callback, priority);
+    }
+  };
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (createAddHook);
+//# sourceMappingURL=createAddHook.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createCurrentHook.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createCurrentHook.js ***!
+  \*************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/**
+ * Returns a function which, when invoked, will return the name of the
+ * currently running hook, or `null` if no hook of the given type is currently
+ * running.
+ *
+ * @param {import('.').Hooks}    hooks    Hooks instance.
+ * @param {import('.').StoreKey} storeKey
+ *
+ * @return {() => string | null} Function that returns the current hook name or null.
+ */
+function createCurrentHook(hooks, storeKey) {
+  return function currentHook() {
+    var _hooksStore$__current;
+    const hooksStore = hooks[storeKey];
+    return (_hooksStore$__current = hooksStore.__current[hooksStore.__current.length - 1]?.name) !== null && _hooksStore$__current !== void 0 ? _hooksStore$__current : null;
+  };
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (createCurrentHook);
+//# sourceMappingURL=createCurrentHook.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createDidHook.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createDidHook.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _validateHookName_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./validateHookName.js */ "./node_modules/@wordpress/hooks/build-module/validateHookName.js");
+/**
+ * Internal dependencies
+ */
+
+
+/**
+ * @callback DidHook
+ *
+ * Returns the number of times an action has been fired.
+ *
+ * @param {string} hookName The hook name to check.
+ *
+ * @return {number | undefined} The number of times the hook has run.
+ */
+
+/**
+ * Returns a function which, when invoked, will return the number of times a
+ * hook has been called.
+ *
+ * @param {import('.').Hooks}    hooks    Hooks instance.
+ * @param {import('.').StoreKey} storeKey
+ *
+ * @return {DidHook} Function that returns a hook's call count.
+ */
+function createDidHook(hooks, storeKey) {
+  return function didHook(hookName) {
+    const hooksStore = hooks[storeKey];
+    if (!(0,_validateHookName_js__WEBPACK_IMPORTED_MODULE_0__["default"])(hookName)) {
+      return;
+    }
+    return hooksStore[hookName] && hooksStore[hookName].runs ? hooksStore[hookName].runs : 0;
+  };
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (createDidHook);
+//# sourceMappingURL=createDidHook.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createDoingHook.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createDoingHook.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/**
+ * @callback DoingHook
+ * Returns whether a hook is currently being executed.
+ *
+ * @param {string} [hookName] The name of the hook to check for.  If
+ *                            omitted, will check for any hook being executed.
+ *
+ * @return {boolean} Whether the hook is being executed.
+ */
+
+/**
+ * Returns a function which, when invoked, will return whether a hook is
+ * currently being executed.
+ *
+ * @param {import('.').Hooks}    hooks    Hooks instance.
+ * @param {import('.').StoreKey} storeKey
+ *
+ * @return {DoingHook} Function that returns whether a hook is currently
+ *                     being executed.
+ */
+function createDoingHook(hooks, storeKey) {
+  return function doingHook(hookName) {
+    const hooksStore = hooks[storeKey];
+
+    // If the hookName was not passed, check for any current hook.
+    if ('undefined' === typeof hookName) {
+      return 'undefined' !== typeof hooksStore.__current[0];
+    }
+
+    // Return the __current hook.
+    return hooksStore.__current[0] ? hookName === hooksStore.__current[0].name : false;
+  };
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (createDoingHook);
+//# sourceMappingURL=createDoingHook.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createHasHook.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createHasHook.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/**
+ * @callback HasHook
+ *
+ * Returns whether any handlers are attached for the given hookName and optional namespace.
+ *
+ * @param {string} hookName    The name of the hook to check for.
+ * @param {string} [namespace] Optional. The unique namespace identifying the callback
+ *                             in the form `vendor/plugin/function`.
+ *
+ * @return {boolean} Whether there are handlers that are attached to the given hook.
+ */
+/**
+ * Returns a function which, when invoked, will return whether any handlers are
+ * attached to a particular hook.
+ *
+ * @param {import('.').Hooks}    hooks    Hooks instance.
+ * @param {import('.').StoreKey} storeKey
+ *
+ * @return {HasHook} Function that returns whether any handlers are
+ *                   attached to a particular hook and optional namespace.
+ */
+function createHasHook(hooks, storeKey) {
+  return function hasHook(hookName, namespace) {
+    const hooksStore = hooks[storeKey];
+
+    // Use the namespace if provided.
+    if ('undefined' !== typeof namespace) {
+      return hookName in hooksStore && hooksStore[hookName].handlers.some(hook => hook.namespace === namespace);
+    }
+    return hookName in hooksStore;
+  };
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (createHasHook);
+//# sourceMappingURL=createHasHook.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createHooks.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createHooks.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   _Hooks: () => (/* binding */ _Hooks),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _createAddHook__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./createAddHook */ "./node_modules/@wordpress/hooks/build-module/createAddHook.js");
+/* harmony import */ var _createRemoveHook__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./createRemoveHook */ "./node_modules/@wordpress/hooks/build-module/createRemoveHook.js");
+/* harmony import */ var _createHasHook__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./createHasHook */ "./node_modules/@wordpress/hooks/build-module/createHasHook.js");
+/* harmony import */ var _createRunHook__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./createRunHook */ "./node_modules/@wordpress/hooks/build-module/createRunHook.js");
+/* harmony import */ var _createCurrentHook__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./createCurrentHook */ "./node_modules/@wordpress/hooks/build-module/createCurrentHook.js");
+/* harmony import */ var _createDoingHook__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./createDoingHook */ "./node_modules/@wordpress/hooks/build-module/createDoingHook.js");
+/* harmony import */ var _createDidHook__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./createDidHook */ "./node_modules/@wordpress/hooks/build-module/createDidHook.js");
+/**
+ * Internal dependencies
+ */
+
+
+
+
+
+
+
+
+/**
+ * Internal class for constructing hooks. Use `createHooks()` function
+ *
+ * Note, it is necessary to expose this class to make its type public.
+ *
+ * @private
+ */
+class _Hooks {
+  constructor() {
+    /** @type {import('.').Store} actions */
+    this.actions = Object.create(null);
+    this.actions.__current = [];
+
+    /** @type {import('.').Store} filters */
+    this.filters = Object.create(null);
+    this.filters.__current = [];
+    this.addAction = (0,_createAddHook__WEBPACK_IMPORTED_MODULE_0__["default"])(this, 'actions');
+    this.addFilter = (0,_createAddHook__WEBPACK_IMPORTED_MODULE_0__["default"])(this, 'filters');
+    this.removeAction = (0,_createRemoveHook__WEBPACK_IMPORTED_MODULE_1__["default"])(this, 'actions');
+    this.removeFilter = (0,_createRemoveHook__WEBPACK_IMPORTED_MODULE_1__["default"])(this, 'filters');
+    this.hasAction = (0,_createHasHook__WEBPACK_IMPORTED_MODULE_2__["default"])(this, 'actions');
+    this.hasFilter = (0,_createHasHook__WEBPACK_IMPORTED_MODULE_2__["default"])(this, 'filters');
+    this.removeAllActions = (0,_createRemoveHook__WEBPACK_IMPORTED_MODULE_1__["default"])(this, 'actions', true);
+    this.removeAllFilters = (0,_createRemoveHook__WEBPACK_IMPORTED_MODULE_1__["default"])(this, 'filters', true);
+    this.doAction = (0,_createRunHook__WEBPACK_IMPORTED_MODULE_3__["default"])(this, 'actions');
+    this.applyFilters = (0,_createRunHook__WEBPACK_IMPORTED_MODULE_3__["default"])(this, 'filters', true);
+    this.currentAction = (0,_createCurrentHook__WEBPACK_IMPORTED_MODULE_4__["default"])(this, 'actions');
+    this.currentFilter = (0,_createCurrentHook__WEBPACK_IMPORTED_MODULE_4__["default"])(this, 'filters');
+    this.doingAction = (0,_createDoingHook__WEBPACK_IMPORTED_MODULE_5__["default"])(this, 'actions');
+    this.doingFilter = (0,_createDoingHook__WEBPACK_IMPORTED_MODULE_5__["default"])(this, 'filters');
+    this.didAction = (0,_createDidHook__WEBPACK_IMPORTED_MODULE_6__["default"])(this, 'actions');
+    this.didFilter = (0,_createDidHook__WEBPACK_IMPORTED_MODULE_6__["default"])(this, 'filters');
+  }
+}
+
+/** @typedef {_Hooks} Hooks */
+
+/**
+ * Returns an instance of the hooks object.
+ *
+ * @return {Hooks} A Hooks instance.
+ */
+function createHooks() {
+  return new _Hooks();
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (createHooks);
+//# sourceMappingURL=createHooks.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createRemoveHook.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createRemoveHook.js ***!
+  \************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _validateNamespace_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./validateNamespace.js */ "./node_modules/@wordpress/hooks/build-module/validateNamespace.js");
+/* harmony import */ var _validateHookName_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./validateHookName.js */ "./node_modules/@wordpress/hooks/build-module/validateHookName.js");
+/**
+ * Internal dependencies
+ */
+
+
+
+/**
+ * @callback RemoveHook
+ * Removes the specified callback (or all callbacks) from the hook with a given hookName
+ * and namespace.
+ *
+ * @param {string} hookName  The name of the hook to modify.
+ * @param {string} namespace The unique namespace identifying the callback in the
+ *                           form `vendor/plugin/function`.
+ *
+ * @return {number | undefined} The number of callbacks removed.
+ */
+
+/**
+ * Returns a function which, when invoked, will remove a specified hook or all
+ * hooks by the given name.
+ *
+ * @param {import('.').Hooks}    hooks             Hooks instance.
+ * @param {import('.').StoreKey} storeKey
+ * @param {boolean}              [removeAll=false] Whether to remove all callbacks for a hookName,
+ *                                                 without regard to namespace. Used to create
+ *                                                 `removeAll*` functions.
+ *
+ * @return {RemoveHook} Function that removes hooks.
+ */
+function createRemoveHook(hooks, storeKey, removeAll = false) {
+  return function removeHook(hookName, namespace) {
+    const hooksStore = hooks[storeKey];
+    if (!(0,_validateHookName_js__WEBPACK_IMPORTED_MODULE_1__["default"])(hookName)) {
+      return;
+    }
+    if (!removeAll && !(0,_validateNamespace_js__WEBPACK_IMPORTED_MODULE_0__["default"])(namespace)) {
+      return;
+    }
+
+    // Bail if no hooks exist by this name.
+    if (!hooksStore[hookName]) {
+      return 0;
+    }
+    let handlersRemoved = 0;
+    if (removeAll) {
+      handlersRemoved = hooksStore[hookName].handlers.length;
+      hooksStore[hookName] = {
+        runs: hooksStore[hookName].runs,
+        handlers: []
+      };
+    } else {
+      // Try to find the specified callback to remove.
+      const handlers = hooksStore[hookName].handlers;
+      for (let i = handlers.length - 1; i >= 0; i--) {
+        if (handlers[i].namespace === namespace) {
+          handlers.splice(i, 1);
+          handlersRemoved++;
+          // This callback may also be part of a hook that is
+          // currently executing.  If the callback we're removing
+          // comes after the current callback, there's no problem;
+          // otherwise we need to decrease the execution index of any
+          // other runs by 1 to account for the removed element.
+          hooksStore.__current.forEach(hookInfo => {
+            if (hookInfo.name === hookName && hookInfo.currentIndex >= i) {
+              hookInfo.currentIndex--;
+            }
+          });
+        }
+      }
+    }
+    if (hookName !== 'hookRemoved') {
+      hooks.doAction('hookRemoved', hookName, namespace);
+    }
+    return handlersRemoved;
+  };
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (createRemoveHook);
+//# sourceMappingURL=createRemoveHook.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createRunHook.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createRunHook.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/**
+ * Returns a function which, when invoked, will execute all callbacks
+ * registered to a hook of the specified type, optionally returning the final
+ * value of the call chain.
+ *
+ * @param {import('.').Hooks}    hooks                  Hooks instance.
+ * @param {import('.').StoreKey} storeKey
+ * @param {boolean}              [returnFirstArg=false] Whether each hook callback is expected to
+ *                                                      return its first argument.
+ *
+ * @return {(hookName:string, ...args: unknown[]) => undefined|unknown} Function that runs hook callbacks.
+ */
+function createRunHook(hooks, storeKey, returnFirstArg = false) {
+  return function runHooks(hookName, ...args) {
+    const hooksStore = hooks[storeKey];
+    if (!hooksStore[hookName]) {
+      hooksStore[hookName] = {
+        handlers: [],
+        runs: 0
+      };
+    }
+    hooksStore[hookName].runs++;
+    const handlers = hooksStore[hookName].handlers;
+
+    // The following code is stripped from production builds.
+    if (true) {
+      // Handle any 'all' hooks registered.
+      if ('hookAdded' !== hookName && hooksStore.all) {
+        handlers.push(...hooksStore.all.handlers);
+      }
+    }
+    if (!handlers || !handlers.length) {
+      return returnFirstArg ? args[0] : undefined;
+    }
+    const hookInfo = {
+      name: hookName,
+      currentIndex: 0
+    };
+    hooksStore.__current.push(hookInfo);
+    while (hookInfo.currentIndex < handlers.length) {
+      const handler = handlers[hookInfo.currentIndex];
+      const result = handler.callback.apply(null, args);
+      if (returnFirstArg) {
+        args[0] = result;
+      }
+      hookInfo.currentIndex++;
+    }
+    hooksStore.__current.pop();
+    if (returnFirstArg) {
+      return args[0];
+    }
+    return undefined;
+  };
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (createRunHook);
+//# sourceMappingURL=createRunHook.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/index.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/index.js ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   actions: () => (/* binding */ actions),
+/* harmony export */   addAction: () => (/* binding */ addAction),
+/* harmony export */   addFilter: () => (/* binding */ addFilter),
+/* harmony export */   applyFilters: () => (/* binding */ applyFilters),
+/* harmony export */   createHooks: () => (/* reexport safe */ _createHooks__WEBPACK_IMPORTED_MODULE_0__["default"]),
+/* harmony export */   currentAction: () => (/* binding */ currentAction),
+/* harmony export */   currentFilter: () => (/* binding */ currentFilter),
+/* harmony export */   defaultHooks: () => (/* binding */ defaultHooks),
+/* harmony export */   didAction: () => (/* binding */ didAction),
+/* harmony export */   didFilter: () => (/* binding */ didFilter),
+/* harmony export */   doAction: () => (/* binding */ doAction),
+/* harmony export */   doingAction: () => (/* binding */ doingAction),
+/* harmony export */   doingFilter: () => (/* binding */ doingFilter),
+/* harmony export */   filters: () => (/* binding */ filters),
+/* harmony export */   hasAction: () => (/* binding */ hasAction),
+/* harmony export */   hasFilter: () => (/* binding */ hasFilter),
+/* harmony export */   removeAction: () => (/* binding */ removeAction),
+/* harmony export */   removeAllActions: () => (/* binding */ removeAllActions),
+/* harmony export */   removeAllFilters: () => (/* binding */ removeAllFilters),
+/* harmony export */   removeFilter: () => (/* binding */ removeFilter)
+/* harmony export */ });
+/* harmony import */ var _createHooks__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./createHooks */ "./node_modules/@wordpress/hooks/build-module/createHooks.js");
+/**
+ * Internal dependencies
+ */
+
+
+/** @typedef {(...args: any[])=>any} Callback */
+
+/**
+ * @typedef Handler
+ * @property {Callback} callback  The callback
+ * @property {string}   namespace The namespace
+ * @property {number}   priority  The namespace
+ */
+
+/**
+ * @typedef Hook
+ * @property {Handler[]} handlers Array of handlers
+ * @property {number}    runs     Run counter
+ */
+
+/**
+ * @typedef Current
+ * @property {string} name         Hook name
+ * @property {number} currentIndex The index
+ */
+
+/**
+ * @typedef {Record<string, Hook> & {__current: Current[]}} Store
+ */
+
+/**
+ * @typedef {'actions' | 'filters'} StoreKey
+ */
+
+/**
+ * @typedef {import('./createHooks').Hooks} Hooks
+ */
+
+const defaultHooks = (0,_createHooks__WEBPACK_IMPORTED_MODULE_0__["default"])();
+const {
+  addAction,
+  addFilter,
+  removeAction,
+  removeFilter,
+  hasAction,
+  hasFilter,
+  removeAllActions,
+  removeAllFilters,
+  doAction,
+  applyFilters,
+  currentAction,
+  currentFilter,
+  doingAction,
+  doingFilter,
+  didAction,
+  didFilter,
+  actions,
+  filters
+} = defaultHooks;
+
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/validateHookName.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/validateHookName.js ***!
+  \************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/**
+ * Validate a hookName string.
+ *
+ * @param {string} hookName The hook name to validate. Should be a non empty string containing
+ *                          only numbers, letters, dashes, periods and underscores. Also,
+ *                          the hook name cannot begin with `__`.
+ *
+ * @return {boolean} Whether the hook name is valid.
+ */
+function validateHookName(hookName) {
+  if ('string' !== typeof hookName || '' === hookName) {
+    // eslint-disable-next-line no-console
+    console.error('The hook name must be a non-empty string.');
+    return false;
+  }
+  if (/^__/.test(hookName)) {
+    // eslint-disable-next-line no-console
+    console.error('The hook name cannot begin with `__`.');
+    return false;
+  }
+  if (!/^[a-zA-Z][a-zA-Z0-9_.-]*$/.test(hookName)) {
+    // eslint-disable-next-line no-console
+    console.error('The hook name can only contain numbers, letters, dashes, periods and underscores.');
+    return false;
+  }
+  return true;
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (validateHookName);
+//# sourceMappingURL=validateHookName.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/validateNamespace.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/validateNamespace.js ***!
+  \*************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/**
+ * Validate a namespace string.
+ *
+ * @param {string} namespace The namespace to validate - should take the form
+ *                           `vendor/plugin/function`.
+ *
+ * @return {boolean} Whether the namespace is valid.
+ */
+function validateNamespace(namespace) {
+  if ('string' !== typeof namespace || '' === namespace) {
+    // eslint-disable-next-line no-console
+    console.error('The namespace must be a non-empty string.');
+    return false;
+  }
+  if (!/^[a-zA-Z][a-zA-Z0-9_.\-\/]*$/.test(namespace)) {
+    // eslint-disable-next-line no-console
+    console.error('The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.');
+    return false;
+  }
+  return true;
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (validateNamespace);
+//# sourceMappingURL=validateNamespace.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/i18n/build-module/create-i18n.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/@wordpress/i18n/build-module/create-i18n.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   createI18n: () => (/* binding */ createI18n)
+/* harmony export */ });
+/* harmony import */ var tannin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tannin */ "./node_modules/tannin/index.js");
+/**
+ * External dependencies
+ */
+
+
+/**
+ * @typedef {Record<string,any>} LocaleData
+ */
+
+/**
+ * Default locale data to use for Tannin domain when not otherwise provided.
+ * Assumes an English plural forms expression.
+ *
+ * @type {LocaleData}
+ */
+const DEFAULT_LOCALE_DATA = {
+  '': {
+    /** @param {number} n */
+    plural_forms(n) {
+      return n === 1 ? 0 : 1;
+    }
+  }
+};
+
+/*
+ * Regular expression that matches i18n hooks like `i18n.gettext`, `i18n.ngettext`,
+ * `i18n.gettext_domain` or `i18n.ngettext_with_context` or `i18n.has_translation`.
+ */
+const I18N_HOOK_REGEXP = /^i18n\.(n?gettext|has_translation)(_|$)/;
+
+/**
+ * @typedef {(domain?: string) => LocaleData} GetLocaleData
+ *
+ * Returns locale data by domain in a
+ * Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ */
+/**
+ * @typedef {(data?: LocaleData, domain?: string) => void} SetLocaleData
+ *
+ * Merges locale data into the Tannin instance by domain. Note that this
+ * function will overwrite the domain configuration. Accepts data in a
+ * Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ */
+/**
+ * @typedef {(data?: LocaleData, domain?: string) => void} AddLocaleData
+ *
+ * Merges locale data into the Tannin instance by domain. Note that this
+ * function will also merge the domain configuration. Accepts data in a
+ * Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ */
+/**
+ * @typedef {(data?: LocaleData, domain?: string) => void} ResetLocaleData
+ *
+ * Resets all current Tannin instance locale data and sets the specified
+ * locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ */
+/** @typedef {() => void} SubscribeCallback */
+/** @typedef {() => void} UnsubscribeCallback */
+/**
+ * @typedef {(callback: SubscribeCallback) => UnsubscribeCallback} Subscribe
+ *
+ * Subscribes to changes of locale data
+ */
+/**
+ * @typedef {(domain?: string) => string} GetFilterDomain
+ * Retrieve the domain to use when calling domain-specific filters.
+ */
+/**
+ * @typedef {(text: string, domain?: string) => string} __
+ *
+ * Retrieve the translation of text.
+ *
+ * @see https://developer.wordpress.org/reference/functions/__/
+ */
+/**
+ * @typedef {(text: string, context: string, domain?: string) => string} _x
+ *
+ * Retrieve translated string with gettext context.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_x/
+ */
+/**
+ * @typedef {(single: string, plural: string, number: number, domain?: string) => string} _n
+ *
+ * Translates and retrieves the singular or plural form based on the supplied
+ * number.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_n/
+ */
+/**
+ * @typedef {(single: string, plural: string, number: number, context: string, domain?: string) => string} _nx
+ *
+ * Translates and retrieves the singular or plural form based on the supplied
+ * number, with gettext context.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_nx/
+ */
+/**
+ * @typedef {() => boolean} IsRtl
+ *
+ * Check if current locale is RTL.
+ *
+ * **RTL (Right To Left)** is a locale property indicating that text is written from right to left.
+ * For example, the `he` locale (for Hebrew) specifies right-to-left. Arabic (ar) is another common
+ * language written RTL. The opposite of RTL, LTR (Left To Right) is used in other languages,
+ * including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`fr`).
+ */
+/**
+ * @typedef {(single: string, context?: string, domain?: string) => boolean} HasTranslation
+ *
+ * Check if there is a translation for a given string in singular form.
+ */
+/** @typedef {import('@wordpress/hooks').Hooks} Hooks */
+
+/**
+ * An i18n instance
+ *
+ * @typedef I18n
+ * @property {GetLocaleData}   getLocaleData   Returns locale data by domain in a Jed-formatted JSON object shape.
+ * @property {SetLocaleData}   setLocaleData   Merges locale data into the Tannin instance by domain. Note that this
+ *                                             function will overwrite the domain configuration. Accepts data in a
+ *                                             Jed-formatted JSON object shape.
+ * @property {AddLocaleData}   addLocaleData   Merges locale data into the Tannin instance by domain. Note that this
+ *                                             function will also merge the domain configuration. Accepts data in a
+ *                                             Jed-formatted JSON object shape.
+ * @property {ResetLocaleData} resetLocaleData Resets all current Tannin instance locale data and sets the specified
+ *                                             locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
+ * @property {Subscribe}       subscribe       Subscribes to changes of Tannin locale data.
+ * @property {__}              __              Retrieve the translation of text.
+ * @property {_x}              _x              Retrieve translated string with gettext context.
+ * @property {_n}              _n              Translates and retrieves the singular or plural form based on the supplied
+ *                                             number.
+ * @property {_nx}             _nx             Translates and retrieves the singular or plural form based on the supplied
+ *                                             number, with gettext context.
+ * @property {IsRtl}           isRTL           Check if current locale is RTL.
+ * @property {HasTranslation}  hasTranslation  Check if there is a translation for a given string.
+ */
+
+/**
+ * Create an i18n instance
+ *
+ * @param {LocaleData} [initialData]   Locale data configuration.
+ * @param {string}     [initialDomain] Domain for which configuration applies.
+ * @param {Hooks}      [hooks]         Hooks implementation.
+ *
+ * @return {I18n} I18n instance.
+ */
+const createI18n = (initialData, initialDomain, hooks) => {
+  /**
+   * The underlying instance of Tannin to which exported functions interface.
+   *
+   * @type {Tannin}
+   */
+  const tannin = new tannin__WEBPACK_IMPORTED_MODULE_0__["default"]({});
+  const listeners = new Set();
+  const notifyListeners = () => {
+    listeners.forEach(listener => listener());
+  };
+
+  /**
+   * Subscribe to changes of locale data.
+   *
+   * @param {SubscribeCallback} callback Subscription callback.
+   * @return {UnsubscribeCallback} Unsubscribe callback.
+   */
+  const subscribe = callback => {
+    listeners.add(callback);
+    return () => listeners.delete(callback);
+  };
+
+  /** @type {GetLocaleData} */
+  const getLocaleData = (domain = 'default') => tannin.data[domain];
+
+  /**
+   * @param {LocaleData} [data]
+   * @param {string}     [domain]
+   */
+  const doSetLocaleData = (data, domain = 'default') => {
+    tannin.data[domain] = {
+      ...tannin.data[domain],
+      ...data
+    };
+
+    // Populate default domain configuration (supported locale date which omits
+    // a plural forms expression).
+    tannin.data[domain][''] = {
+      ...DEFAULT_LOCALE_DATA[''],
+      ...tannin.data[domain]?.['']
+    };
+
+    // Clean up cached plural forms functions cache as it might be updated.
+    delete tannin.pluralForms[domain];
+  };
+
+  /** @type {SetLocaleData} */
+  const setLocaleData = (data, domain) => {
+    doSetLocaleData(data, domain);
+    notifyListeners();
+  };
+
+  /** @type {AddLocaleData} */
+  const addLocaleData = (data, domain = 'default') => {
+    tannin.data[domain] = {
+      ...tannin.data[domain],
+      ...data,
+      // Populate default domain configuration (supported locale date which omits
+      // a plural forms expression).
+      '': {
+        ...DEFAULT_LOCALE_DATA[''],
+        ...tannin.data[domain]?.[''],
+        ...data?.['']
+      }
+    };
+
+    // Clean up cached plural forms functions cache as it might be updated.
+    delete tannin.pluralForms[domain];
+    notifyListeners();
+  };
+
+  /** @type {ResetLocaleData} */
+  const resetLocaleData = (data, domain) => {
+    // Reset all current Tannin locale data.
+    tannin.data = {};
+
+    // Reset cached plural forms functions cache.
+    tannin.pluralForms = {};
+    setLocaleData(data, domain);
+  };
+
+  /**
+   * Wrapper for Tannin's `dcnpgettext`. Populates default locale data if not
+   * otherwise previously assigned.
+   *
+   * @param {string|undefined} domain   Domain to retrieve the translated text.
+   * @param {string|undefined} context  Context information for the translators.
+   * @param {string}           single   Text to translate if non-plural. Used as
+   *                                    fallback return value on a caught error.
+   * @param {string}           [plural] The text to be used if the number is
+   *                                    plural.
+   * @param {number}           [number] The number to compare against to use
+   *                                    either the singular or plural form.
+   *
+   * @return {string} The translated string.
+   */
+  const dcnpgettext = (domain = 'default', context, single, plural, number) => {
+    if (!tannin.data[domain]) {
+      // Use `doSetLocaleData` to set silently, without notifying listeners.
+      doSetLocaleData(undefined, domain);
+    }
+    return tannin.dcnpgettext(domain, context, single, plural, number);
+  };
+
+  /** @type {GetFilterDomain} */
+  const getFilterDomain = (domain = 'default') => domain;
+
+  /** @type {__} */
+  const __ = (text, domain) => {
+    let translation = dcnpgettext(domain, undefined, text);
+    if (!hooks) {
+      return translation;
+    }
+
+    /**
+     * Filters text with its translation.
+     *
+     * @param {string} translation Translated text.
+     * @param {string} text        Text to translate.
+     * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+     */
+    translation = /** @type {string} */
+    /** @type {*} */hooks.applyFilters('i18n.gettext', translation, text, domain);
+    return /** @type {string} */(
+      /** @type {*} */hooks.applyFilters('i18n.gettext_' + getFilterDomain(domain), translation, text, domain)
+    );
+  };
+
+  /** @type {_x} */
+  const _x = (text, context, domain) => {
+    let translation = dcnpgettext(domain, context, text);
+    if (!hooks) {
+      return translation;
+    }
+
+    /**
+     * Filters text with its translation based on context information.
+     *
+     * @param {string} translation Translated text.
+     * @param {string} text        Text to translate.
+     * @param {string} context     Context information for the translators.
+     * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+     */
+    translation = /** @type {string} */
+    /** @type {*} */hooks.applyFilters('i18n.gettext_with_context', translation, text, context, domain);
+    return /** @type {string} */(
+      /** @type {*} */hooks.applyFilters('i18n.gettext_with_context_' + getFilterDomain(domain), translation, text, context, domain)
+    );
+  };
+
+  /** @type {_n} */
+  const _n = (single, plural, number, domain) => {
+    let translation = dcnpgettext(domain, undefined, single, plural, number);
+    if (!hooks) {
+      return translation;
+    }
+
+    /**
+     * Filters the singular or plural form of a string.
+     *
+     * @param {string} translation Translated text.
+     * @param {string} single      The text to be used if the number is singular.
+     * @param {string} plural      The text to be used if the number is plural.
+     * @param {string} number      The number to compare against to use either the singular or plural form.
+     * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+     */
+    translation = /** @type {string} */
+    /** @type {*} */hooks.applyFilters('i18n.ngettext', translation, single, plural, number, domain);
+    return /** @type {string} */(
+      /** @type {*} */hooks.applyFilters('i18n.ngettext_' + getFilterDomain(domain), translation, single, plural, number, domain)
+    );
+  };
+
+  /** @type {_nx} */
+  const _nx = (single, plural, number, context, domain) => {
+    let translation = dcnpgettext(domain, context, single, plural, number);
+    if (!hooks) {
+      return translation;
+    }
+
+    /**
+     * Filters the singular or plural form of a string with gettext context.
+     *
+     * @param {string} translation Translated text.
+     * @param {string} single      The text to be used if the number is singular.
+     * @param {string} plural      The text to be used if the number is plural.
+     * @param {string} number      The number to compare against to use either the singular or plural form.
+     * @param {string} context     Context information for the translators.
+     * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+     */
+    translation = /** @type {string} */
+    /** @type {*} */hooks.applyFilters('i18n.ngettext_with_context', translation, single, plural, number, context, domain);
+    return /** @type {string} */(
+      /** @type {*} */hooks.applyFilters('i18n.ngettext_with_context_' + getFilterDomain(domain), translation, single, plural, number, context, domain)
+    );
+  };
+
+  /** @type {IsRtl} */
+  const isRTL = () => {
+    return 'rtl' === _x('ltr', 'text direction');
+  };
+
+  /** @type {HasTranslation} */
+  const hasTranslation = (single, context, domain) => {
+    const key = context ? context + '\u0004' + single : single;
+    let result = !!tannin.data?.[domain !== null && domain !== void 0 ? domain : 'default']?.[key];
+    if (hooks) {
+      /**
+       * Filters the presence of a translation in the locale data.
+       *
+       * @param {boolean} hasTranslation Whether the translation is present or not..
+       * @param {string}  single         The singular form of the translated text (used as key in locale data)
+       * @param {string}  context        Context information for the translators.
+       * @param {string}  domain         Text domain. Unique identifier for retrieving translated strings.
+       */
+      result = /** @type { boolean } */
+      /** @type {*} */hooks.applyFilters('i18n.has_translation', result, single, context, domain);
+      result = /** @type { boolean } */
+      /** @type {*} */hooks.applyFilters('i18n.has_translation_' + getFilterDomain(domain), result, single, context, domain);
+    }
+    return result;
+  };
+  if (initialData) {
+    setLocaleData(initialData, initialDomain);
+  }
+  if (hooks) {
+    /**
+     * @param {string} hookName
+     */
+    const onHookAddedOrRemoved = hookName => {
+      if (I18N_HOOK_REGEXP.test(hookName)) {
+        notifyListeners();
+      }
+    };
+    hooks.addAction('hookAdded', 'core/i18n', onHookAddedOrRemoved);
+    hooks.addAction('hookRemoved', 'core/i18n', onHookAddedOrRemoved);
+  }
+  return {
+    getLocaleData,
+    setLocaleData,
+    addLocaleData,
+    resetLocaleData,
+    subscribe,
+    __,
+    _x,
+    _n,
+    _nx,
+    isRTL,
+    hasTranslation
+  };
+};
+//# sourceMappingURL=create-i18n.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/i18n/build-module/default-i18n.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/@wordpress/i18n/build-module/default-i18n.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __: () => (/* binding */ __),
+/* harmony export */   _n: () => (/* binding */ _n),
+/* harmony export */   _nx: () => (/* binding */ _nx),
+/* harmony export */   _x: () => (/* binding */ _x),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   getLocaleData: () => (/* binding */ getLocaleData),
+/* harmony export */   hasTranslation: () => (/* binding */ hasTranslation),
+/* harmony export */   isRTL: () => (/* binding */ isRTL),
+/* harmony export */   resetLocaleData: () => (/* binding */ resetLocaleData),
+/* harmony export */   setLocaleData: () => (/* binding */ setLocaleData),
+/* harmony export */   subscribe: () => (/* binding */ subscribe)
+/* harmony export */ });
+/* harmony import */ var _create_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./create-i18n */ "./node_modules/@wordpress/i18n/build-module/create-i18n.js");
+/* harmony import */ var _wordpress_hooks__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/hooks */ "./node_modules/@wordpress/hooks/build-module/index.js");
+/**
+ * Internal dependencies
+ */
+
+
+/**
+ * WordPress dependencies
+ */
+
+const i18n = (0,_create_i18n__WEBPACK_IMPORTED_MODULE_0__.createI18n)(undefined, undefined, _wordpress_hooks__WEBPACK_IMPORTED_MODULE_1__.defaultHooks);
+
+/**
+ * Default, singleton instance of `I18n`.
+ */
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (i18n);
+
+/*
+ * Comments in this file are duplicated from ./i18n due to
+ * https://github.com/WordPress/gutenberg/pull/20318#issuecomment-590837722
+ */
+
+/**
+ * @typedef {import('./create-i18n').LocaleData} LocaleData
+ * @typedef {import('./create-i18n').SubscribeCallback} SubscribeCallback
+ * @typedef {import('./create-i18n').UnsubscribeCallback} UnsubscribeCallback
+ */
+
+/**
+ * Returns locale data by domain in a Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ *
+ * @param {string} [domain] Domain for which to get the data.
+ * @return {LocaleData} Locale data.
+ */
+const getLocaleData = i18n.getLocaleData.bind(i18n);
+
+/**
+ * Merges locale data into the Tannin instance by domain. Accepts data in a
+ * Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ *
+ * @param {LocaleData} [data]   Locale data configuration.
+ * @param {string}     [domain] Domain for which configuration applies.
+ */
+const setLocaleData = i18n.setLocaleData.bind(i18n);
+
+/**
+ * Resets all current Tannin instance locale data and sets the specified
+ * locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ *
+ * @param {LocaleData} [data]   Locale data configuration.
+ * @param {string}     [domain] Domain for which configuration applies.
+ */
+const resetLocaleData = i18n.resetLocaleData.bind(i18n);
+
+/**
+ * Subscribes to changes of locale data
+ *
+ * @param {SubscribeCallback} callback Subscription callback
+ * @return {UnsubscribeCallback} Unsubscribe callback
+ */
+const subscribe = i18n.subscribe.bind(i18n);
+
+/**
+ * Retrieve the translation of text.
+ *
+ * @see https://developer.wordpress.org/reference/functions/__/
+ *
+ * @param {string} text     Text to translate.
+ * @param {string} [domain] Domain to retrieve the translated text.
+ *
+ * @return {string} Translated text.
+ */
+const __ = i18n.__.bind(i18n);
+
+/**
+ * Retrieve translated string with gettext context.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_x/
+ *
+ * @param {string} text     Text to translate.
+ * @param {string} context  Context information for the translators.
+ * @param {string} [domain] Domain to retrieve the translated text.
+ *
+ * @return {string} Translated context string without pipe.
+ */
+const _x = i18n._x.bind(i18n);
+
+/**
+ * Translates and retrieves the singular or plural form based on the supplied
+ * number.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_n/
+ *
+ * @param {string} single   The text to be used if the number is singular.
+ * @param {string} plural   The text to be used if the number is plural.
+ * @param {number} number   The number to compare against to use either the
+ *                          singular or plural form.
+ * @param {string} [domain] Domain to retrieve the translated text.
+ *
+ * @return {string} The translated singular or plural form.
+ */
+const _n = i18n._n.bind(i18n);
+
+/**
+ * Translates and retrieves the singular or plural form based on the supplied
+ * number, with gettext context.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_nx/
+ *
+ * @param {string} single   The text to be used if the number is singular.
+ * @param {string} plural   The text to be used if the number is plural.
+ * @param {number} number   The number to compare against to use either the
+ *                          singular or plural form.
+ * @param {string} context  Context information for the translators.
+ * @param {string} [domain] Domain to retrieve the translated text.
+ *
+ * @return {string} The translated singular or plural form.
+ */
+const _nx = i18n._nx.bind(i18n);
+
+/**
+ * Check if current locale is RTL.
+ *
+ * **RTL (Right To Left)** is a locale property indicating that text is written from right to left.
+ * For example, the `he` locale (for Hebrew) specifies right-to-left. Arabic (ar) is another common
+ * language written RTL. The opposite of RTL, LTR (Left To Right) is used in other languages,
+ * including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`fr`).
+ *
+ * @return {boolean} Whether locale is RTL.
+ */
+const isRTL = i18n.isRTL.bind(i18n);
+
+/**
+ * Check if there is a translation for a given string (in singular form).
+ *
+ * @param {string} single    Singular form of the string to look up.
+ * @param {string} [context] Context information for the translators.
+ * @param {string} [domain]  Domain to retrieve the translated text.
+ * @return {boolean} Whether the translation exists or not.
+ */
+const hasTranslation = i18n.hasTranslation.bind(i18n);
+//# sourceMappingURL=default-i18n.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/i18n/build-module/index.js":
+/*!************************************************************!*\
+  !*** ./node_modules/@wordpress/i18n/build-module/index.js ***!
+  \************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __: () => (/* reexport safe */ _default_i18n__WEBPACK_IMPORTED_MODULE_2__.__),
+/* harmony export */   _n: () => (/* reexport safe */ _default_i18n__WEBPACK_IMPORTED_MODULE_2__._n),
+/* harmony export */   _nx: () => (/* reexport safe */ _default_i18n__WEBPACK_IMPORTED_MODULE_2__._nx),
+/* harmony export */   _x: () => (/* reexport safe */ _default_i18n__WEBPACK_IMPORTED_MODULE_2__._x),
+/* harmony export */   createI18n: () => (/* reexport safe */ _create_i18n__WEBPACK_IMPORTED_MODULE_1__.createI18n),
+/* harmony export */   defaultI18n: () => (/* reexport safe */ _default_i18n__WEBPACK_IMPORTED_MODULE_2__["default"]),
+/* harmony export */   getLocaleData: () => (/* reexport safe */ _default_i18n__WEBPACK_IMPORTED_MODULE_2__.getLocaleData),
+/* harmony export */   hasTranslation: () => (/* reexport safe */ _default_i18n__WEBPACK_IMPORTED_MODULE_2__.hasTranslation),
+/* harmony export */   isRTL: () => (/* reexport safe */ _default_i18n__WEBPACK_IMPORTED_MODULE_2__.isRTL),
+/* harmony export */   resetLocaleData: () => (/* reexport safe */ _default_i18n__WEBPACK_IMPORTED_MODULE_2__.resetLocaleData),
+/* harmony export */   setLocaleData: () => (/* reexport safe */ _default_i18n__WEBPACK_IMPORTED_MODULE_2__.setLocaleData),
+/* harmony export */   sprintf: () => (/* reexport safe */ _sprintf__WEBPACK_IMPORTED_MODULE_0__.sprintf),
+/* harmony export */   subscribe: () => (/* reexport safe */ _default_i18n__WEBPACK_IMPORTED_MODULE_2__.subscribe)
+/* harmony export */ });
+/* harmony import */ var _sprintf__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./sprintf */ "./node_modules/@wordpress/i18n/build-module/sprintf.js");
+/* harmony import */ var _create_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./create-i18n */ "./node_modules/@wordpress/i18n/build-module/create-i18n.js");
+/* harmony import */ var _default_i18n__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./default-i18n */ "./node_modules/@wordpress/i18n/build-module/default-i18n.js");
+
+
+
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/i18n/build-module/sprintf.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/@wordpress/i18n/build-module/sprintf.js ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   sprintf: () => (/* binding */ sprintf)
+/* harmony export */ });
+/* harmony import */ var memize__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! memize */ "./node_modules/memize/dist/index.js");
+/* harmony import */ var sprintf_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! sprintf-js */ "./node_modules/@wordpress/i18n/node_modules/sprintf-js/src/sprintf.js");
+/* harmony import */ var sprintf_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(sprintf_js__WEBPACK_IMPORTED_MODULE_1__);
+/**
+ * External dependencies
+ */
+
+
+
+/**
+ * Log to console, once per message; or more precisely, per referentially equal
+ * argument set. Because Jed throws errors, we log these to the console instead
+ * to avoid crashing the application.
+ *
+ * @param {...*} args Arguments to pass to `console.error`
+ */
+const logErrorOnce = (0,memize__WEBPACK_IMPORTED_MODULE_0__["default"])(console.error); // eslint-disable-line no-console
+
+/**
+ * Returns a formatted string. If an error occurs in applying the format, the
+ * original format string is returned.
+ *
+ * @param {string} format The format of the string to generate.
+ * @param {...*}   args   Arguments to apply to the format.
+ *
+ * @see https://www.npmjs.com/package/sprintf-js
+ *
+ * @return {string} The formatted string.
+ */
+function sprintf(format, ...args) {
+  try {
+    return sprintf_js__WEBPACK_IMPORTED_MODULE_1___default().sprintf(format, ...args);
+  } catch (error) {
+    if (error instanceof Error) {
+      logErrorOnce('sprintf error: \n\n' + error.toString());
+    }
+    return format;
+  }
+}
+//# sourceMappingURL=sprintf.js.map
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/i18n/node_modules/sprintf-js/src/sprintf.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/@wordpress/i18n/node_modules/sprintf-js/src/sprintf.js ***!
+  \*****************************************************************************/
+/***/ ((module, exports, __webpack_require__) => {
+
+var __WEBPACK_AMD_DEFINE_RESULT__;/* global window, exports, define */
+
+!function() {
+    'use strict'
+
+    var re = {
+        not_string: /[^s]/,
+        not_bool: /[^t]/,
+        not_type: /[^T]/,
+        not_primitive: /[^v]/,
+        number: /[diefg]/,
+        numeric_arg: /[bcdiefguxX]/,
+        json: /[j]/,
+        not_json: /[^j]/,
+        text: /^[^\x25]+/,
+        modulo: /^\x25{2}/,
+        placeholder: /^\x25(?:([1-9]\d*)\$|\(([^)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-gijostTuvxX])/,
+        key: /^([a-z_][a-z_\d]*)/i,
+        key_access: /^\.([a-z_][a-z_\d]*)/i,
+        index_access: /^\[(\d+)\]/,
+        sign: /^[+-]/
+    }
+
+    function sprintf(key) {
+        // `arguments` is not an array, but should be fine for this call
+        return sprintf_format(sprintf_parse(key), arguments)
+    }
+
+    function vsprintf(fmt, argv) {
+        return sprintf.apply(null, [fmt].concat(argv || []))
+    }
+
+    function sprintf_format(parse_tree, argv) {
+        var cursor = 1, tree_length = parse_tree.length, arg, output = '', i, k, ph, pad, pad_character, pad_length, is_positive, sign
+        for (i = 0; i < tree_length; i++) {
+            if (typeof parse_tree[i] === 'string') {
+                output += parse_tree[i]
+            }
+            else if (typeof parse_tree[i] === 'object') {
+                ph = parse_tree[i] // convenience purposes only
+                if (ph.keys) { // keyword argument
+                    arg = argv[cursor]
+                    for (k = 0; k < ph.keys.length; k++) {
+                        if (arg == undefined) {
+                            throw new Error(sprintf('[sprintf] Cannot access property "%s" of undefined value "%s"', ph.keys[k], ph.keys[k-1]))
+                        }
+                        arg = arg[ph.keys[k]]
+                    }
+                }
+                else if (ph.param_no) { // positional argument (explicit)
+                    arg = argv[ph.param_no]
+                }
+                else { // positional argument (implicit)
+                    arg = argv[cursor++]
+                }
+
+                if (re.not_type.test(ph.type) && re.not_primitive.test(ph.type) && arg instanceof Function) {
+                    arg = arg()
+                }
+
+                if (re.numeric_arg.test(ph.type) && (typeof arg !== 'number' && isNaN(arg))) {
+                    throw new TypeError(sprintf('[sprintf] expecting number but found %T', arg))
+                }
+
+                if (re.number.test(ph.type)) {
+                    is_positive = arg >= 0
+                }
+
+                switch (ph.type) {
+                    case 'b':
+                        arg = parseInt(arg, 10).toString(2)
+                        break
+                    case 'c':
+                        arg = String.fromCharCode(parseInt(arg, 10))
+                        break
+                    case 'd':
+                    case 'i':
+                        arg = parseInt(arg, 10)
+                        break
+                    case 'j':
+                        arg = JSON.stringify(arg, null, ph.width ? parseInt(ph.width) : 0)
+                        break
+                    case 'e':
+                        arg = ph.precision ? parseFloat(arg).toExponential(ph.precision) : parseFloat(arg).toExponential()
+                        break
+                    case 'f':
+                        arg = ph.precision ? parseFloat(arg).toFixed(ph.precision) : parseFloat(arg)
+                        break
+                    case 'g':
+                        arg = ph.precision ? String(Number(arg.toPrecision(ph.precision))) : parseFloat(arg)
+                        break
+                    case 'o':
+                        arg = (parseInt(arg, 10) >>> 0).toString(8)
+                        break
+                    case 's':
+                        arg = String(arg)
+                        arg = (ph.precision ? arg.substring(0, ph.precision) : arg)
+                        break
+                    case 't':
+                        arg = String(!!arg)
+                        arg = (ph.precision ? arg.substring(0, ph.precision) : arg)
+                        break
+                    case 'T':
+                        arg = Object.prototype.toString.call(arg).slice(8, -1).toLowerCase()
+                        arg = (ph.precision ? arg.substring(0, ph.precision) : arg)
+                        break
+                    case 'u':
+                        arg = parseInt(arg, 10) >>> 0
+                        break
+                    case 'v':
+                        arg = arg.valueOf()
+                        arg = (ph.precision ? arg.substring(0, ph.precision) : arg)
+                        break
+                    case 'x':
+                        arg = (parseInt(arg, 10) >>> 0).toString(16)
+                        break
+                    case 'X':
+                        arg = (parseInt(arg, 10) >>> 0).toString(16).toUpperCase()
+                        break
+                }
+                if (re.json.test(ph.type)) {
+                    output += arg
+                }
+                else {
+                    if (re.number.test(ph.type) && (!is_positive || ph.sign)) {
+                        sign = is_positive ? '+' : '-'
+                        arg = arg.toString().replace(re.sign, '')
+                    }
+                    else {
+                        sign = ''
+                    }
+                    pad_character = ph.pad_char ? ph.pad_char === '0' ? '0' : ph.pad_char.charAt(1) : ' '
+                    pad_length = ph.width - (sign + arg).length
+                    pad = ph.width ? (pad_length > 0 ? pad_character.repeat(pad_length) : '') : ''
+                    output += ph.align ? sign + arg + pad : (pad_character === '0' ? sign + pad + arg : pad + sign + arg)
+                }
+            }
+        }
+        return output
+    }
+
+    var sprintf_cache = Object.create(null)
+
+    function sprintf_parse(fmt) {
+        if (sprintf_cache[fmt]) {
+            return sprintf_cache[fmt]
+        }
+
+        var _fmt = fmt, match, parse_tree = [], arg_names = 0
+        while (_fmt) {
+            if ((match = re.text.exec(_fmt)) !== null) {
+                parse_tree.push(match[0])
+            }
+            else if ((match = re.modulo.exec(_fmt)) !== null) {
+                parse_tree.push('%')
+            }
+            else if ((match = re.placeholder.exec(_fmt)) !== null) {
+                if (match[2]) {
+                    arg_names |= 1
+                    var field_list = [], replacement_field = match[2], field_match = []
+                    if ((field_match = re.key.exec(replacement_field)) !== null) {
+                        field_list.push(field_match[1])
+                        while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
+                            if ((field_match = re.key_access.exec(replacement_field)) !== null) {
+                                field_list.push(field_match[1])
+                            }
+                            else if ((field_match = re.index_access.exec(replacement_field)) !== null) {
+                                field_list.push(field_match[1])
+                            }
+                            else {
+                                throw new SyntaxError('[sprintf] failed to parse named argument key')
+                            }
+                        }
+                    }
+                    else {
+                        throw new SyntaxError('[sprintf] failed to parse named argument key')
+                    }
+                    match[2] = field_list
+                }
+                else {
+                    arg_names |= 2
+                }
+                if (arg_names === 3) {
+                    throw new Error('[sprintf] mixing positional and named placeholders is not (yet) supported')
+                }
+
+                parse_tree.push(
+                    {
+                        placeholder: match[0],
+                        param_no:    match[1],
+                        keys:        match[2],
+                        sign:        match[3],
+                        pad_char:    match[4],
+                        align:       match[5],
+                        width:       match[6],
+                        precision:   match[7],
+                        type:        match[8]
+                    }
+                )
+            }
+            else {
+                throw new SyntaxError('[sprintf] unexpected placeholder')
+            }
+            _fmt = _fmt.substring(match[0].length)
+        }
+        return sprintf_cache[fmt] = parse_tree
+    }
+
+    /**
+     * export to either browser or node.js
+     */
+    /* eslint-disable quote-props */
+    if (true) {
+        exports.sprintf = sprintf
+        exports.vsprintf = vsprintf
+    }
+    if (typeof window !== 'undefined') {
+        window['sprintf'] = sprintf
+        window['vsprintf'] = vsprintf
+
+        if (true) {
+            !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() {
+                return {
+                    'sprintf': sprintf,
+                    'vsprintf': vsprintf
+                }
+            }).call(exports, __webpack_require__, exports, module),
+		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+        }
+    }
+    /* eslint-enable quote-props */
+}(); // eslint-disable-line
+
+
+/***/ }),
+
+/***/ "./reactjs/src/components/Button_New.js":
+/*!**********************************************!*\
+  !*** ./reactjs/src/components/Button_New.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+
+
+const Button_New = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.forwardRef)((_ref, ref) => {
+  let {
+    label = '',
+    padding = '',
+    iconName = '',
+    iconColor = '',
+    iconPosition = 'before',
+    iconGap = '',
+    iconAnimation = '',
+    iconRotation,
+    background = 'transparent',
+    onClick = () => {},
+    customClass = '',
+    disable = false,
+    onlyText = false,
+    color = '',
+    borderColor = '',
+    dataTarget = '',
+    buttonLink = '',
+    sameTab = false,
+    smallButton = false,
+    style
+  } = _ref;
+  const Icon = _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"][iconName] || null;
+  const IconPosition = iconPosition === 'before' || iconPosition === 'right';
+  const [isActive, setIsActive] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const handleClick = e => {
+    e.preventDefault();
+    if (!disable) {
+      const button = e.currentTarget;
+      setIsActive(!isActive);
+      button.style.transform = 'scale(0.95)';
+      setTimeout(() => button.style.transform = 'scale(1)', 150);
+      buttonLink ? sameTab ? window.location.href = buttonLink : window.open(buttonLink, '_blank') : onClick(e);
+    }
+  };
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    ref: ref,
+    className: `${onlyText ? 'wsx-btn-text' : 'wsx-btn'} ${background ? `wsx-bg-${background}` : ''} ${color ? `wsx-color-${color}` : ''} ${Icon ? 'wsx-btn-icon' : ''} ${iconGap ? `wsx-gap-${iconGap}` : ''} ${disable ? 'disable' : ''} ${borderColor ? `wsx-border-default wsx-bc-${borderColor}` : ''} ${smallButton ? 'wsx-btn-sm' : ''} ${customClass}`,
+    style: {
+      padding,
+      ...style
+    },
+    onClick: handleClick,
+    "data-target": dataTarget
+  }, IconPosition && Icon && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-icon ${iconAnimation ? `wsx-anim-${iconAnimation}` : ''} ${iconColor ? `wsx-color-${iconColor}` : ''}`,
+    style: {
+      transition: 'transform var(--transition-md)',
+      transform: iconRotation && isActive ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)'
+    }
+  }, Icon), label, !IconPosition && Icon && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-icon ${iconAnimation ? `wsx-anim-${iconAnimation}` : ''} ${iconColor ? `wsx-color-${iconColor}` : ''}`,
+    style: {
+      transition: 'transform var(--transition-md)',
+      transform: iconRotation && isActive ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)'
+    }
+  }, Icon));
+});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Button_New);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/Choosebox.js":
+/*!*********************************************!*\
+  !*** ./reactjs/src/components/Choosebox.js ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+
+
+
+const Choosebox = props => {
+  let {
+    label,
+    labelClass,
+    labelColor,
+    isLabelSide,
+    type,
+    className = '',
+    name,
+    options,
+    defaultValue,
+    value,
+    setValue,
+    tooltip,
+    tooltipPosition,
+    help,
+    onChange
+  } = props;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-choose-box-field"
+  }, !isLabelSide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-input-label wsx-font-medium ${tooltip ? 'wsx-d-flex' : ''} ${labelColor && `wsx-color-${labelColor}`} ${labelClass}`
+  }, label, "  ", tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
+    content: tooltip,
+    direction: tooltipPosition,
+    spaceLeft: "8px"
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-choose-box-options ${className}`
+  }, Object.keys(options).map((option, k) => {
+    const plan = option.split('_');
+    const _lockField = option.startsWith('pro_');
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
+      htmlFor: option,
+      key: `wsx-choose-box-${k}`,
+      id: value === option ? "choose-box-selected" : "",
+      style: {
+        position: `${_lockField && 'relative'}`
+      }
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+      // disabled={_lockField?true:false}
+      id: option,
+      name: name,
+      type: "radio",
+      value: option,
+      defaultChecked: value === option,
+      onChange: onChange
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+      className: `wsx-choose-box-image ${_lockField ? 'locked' : ''}`,
+      src: options[option],
+      alt: option
+    }), _lockField && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+      className: "wsx-icon",
+      style: {
+        position: 'absolute',
+        top: '6px',
+        right: '6px'
+      }
+    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].lock));
+  })));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Choosebox);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/Input.js":
+/*!*****************************************!*\
+  !*** ./reactjs/src/components/Input.js ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
+
+
+
+
+
+const Input = props => {
+  let {
+    label,
+    labelColor,
+    labelClass,
+    isLabelHide,
+    type = 'text',
+    name,
+    value,
+    required,
+    tooltip,
+    tooltipPosition,
+    help,
+    helpClass,
+    inputClass,
+    className = '',
+    onChange,
+    onClick,
+    onBlur,
+    isDisable,
+    placeholder,
+    id,
+    iconClass,
+    smart_tags,
+    requiredColor
+  } = props;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: `wsx-input-wrapper ${className}`
+  }, !isLabelHide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: `wsx-input-label wsx-font-medium ${tooltip ? 'wsx-d-flex' : ''} ${labelColor && `wsx-color-${labelColor}`} ${labelClass}`
+  }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
+    className: "wsx-required",
+    style: {
+      color: requiredColor || '#fc143f'
+    }
+  }, "*"), tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_2__["default"], {
+    content: tooltip,
+    direction: tooltipPosition,
+    spaceLeft: "8px"
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_3__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: "wsx-input-container"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("input", (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, props, {
+    // ref={ref}
+    // key={`${name}_${Date.now().toString()}`}
+    id: id || name,
+    name: name,
+    type: type,
+    defaultValue: value,
+    onChange: onChange
+    // onClick={onClick}
+    // onBlur={onBlur}
+    ,
+    disabled: isDisable ? true : false,
+    placeholder: placeholder,
+    required: required,
+    className: `wsx-input ${inputClass}`
+  })), iconClass && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
+    className: iconClass
+  }), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: `wsx-input-help wsx-help-message ${helpClass}`
+  }, help), smart_tags && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: "wsx-help-message"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: "wsx-smart-tags-wrapper"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: "wsx-smart-tags-heading"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: "wsx-smart-tags-heading-text"
+  }, wholesalex_overview?.i18n?.smart_tags || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Available Smart Tags:', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: "wsx-smart-tags"
+  }, Object.keys(smart_tags).map(tag => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("code", null, tag, " : ", smart_tags[tag]);
+  }))))));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Input);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/LoadingOverlay.js":
+/*!**************************************************!*\
+  !*** ./reactjs/src/components/LoadingOverlay.js ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+
+const LoadingOverlay = () => {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wholesalex-editor__loading-overlay"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+    className: "wholesalex-editor__loading-overlay__inner",
+    src: wholesalex.url + "assets/img/spinner.gif",
+    alt: "Loading..."
+  }));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LoadingOverlay);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/MultiSelect.js":
+/*!***********************************************!*\
+  !*** ./reactjs/src/components/MultiSelect.js ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
+
+
+
+
+const MultiSelect = _ref => {
+  let {
+    name,
+    value,
+    options,
+    placeholder,
+    customClass,
+    onMultiSelectChangeHandler,
+    isDisable,
+    tooltip,
+    isAjax,
+    requestFor
+  } = _ref;
+  const [showList, setShowList] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [selectedOptions, setSelectedOptions] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(value);
+  const [optionList, setOptionList] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(options);
+  const [searchValue, setSearchValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
+  const myRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  const onSearch = key => {
+    let selectedOptionValues = [];
+    if (selectedOptions.length > 0) {
+      selectedOptionValues = selectedOptions.map(option => option.value);
+    }
+    const searchResult = options.filter(option => {
+      const {
+        name,
+        value
+      } = option;
+      return name.toLowerCase().includes(key.toLowerCase()) && selectedOptionValues.indexOf(value) === -1;
+    });
+    return searchResult;
+  };
+  const onInputChangeHandler = e => {
+    setShowList(false);
+    setSearchValue(e.target.value);
+    setOptionList(onSearch(e.target.value));
+    setShowList(true);
+  };
+  const optionClickHandler = option => {
+    setShowList(false);
+    setSelectedOptions([...selectedOptions, option]);
+    setSearchValue("");
+    setOptionList(onSearch(""));
+    onMultiSelectChangeHandler(name, [...selectedOptions, option]);
+  };
+  const onDeleteOption = indexToBeDeleted => {
+    setShowList(false);
+    const selectedOptionAfterDeleted = selectedOptions.filter((value, index) => {
+      return index !== indexToBeDeleted;
+    });
+    setSelectedOptions(selectedOptionAfterDeleted);
+    setOptionList(onSearch(""));
+    onMultiSelectChangeHandler(name, selectedOptionAfterDeleted);
+    setShowList(true);
+  };
+  const handleClickOutside = e => {
+    if (myRef?.current && !myRef.current.contains(e.target)) {
+      setShowList(false);
+    }
+  };
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    setSelectedOptions(value);
+  }, [value]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    setOptionList(options);
+    onMultiSelectChangeHandler(name, selectedOptions);
+  }, [options]);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-multiselect-wrapper ${isDisable ? 'locked' : ''}`,
+    key: `wsx-multiselect-${name}`
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-multiselect-inputs"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-multiselect-input-wrapper"
+  }, selectedOptions.length > 0 && selectedOptions.map((option, index) => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+      key: `wsx-multiselect-opt-${name}-${option.value}-${index}`,
+      className: "wsx-selected-option"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+      tabIndex: -1,
+      className: "wsx-icon-cross wsx-lh-0",
+      onClick: () => onDeleteOption(index)
+    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].cross), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      content: option.name,
+      position: "top",
+      onlyText: true
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "multiselect-option-name"
+    }, option.name)));
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-multiselect-option-wrapper ${selectedOptions.length && selectedOptions.length != 0 ? '' : 'wsx-w-full'}`
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+    key: `wsx-input-${name}`,
+    disabled: isDisable ? true : false,
+    id: name,
+    tabIndex: 0,
+    autoComplete: "off",
+    value: searchValue,
+    className: `wsx-input ${customClass}`,
+    placeholder: selectedOptions.length > 0 ? "" : placeholder,
+    onChange: e => onInputChangeHandler(e),
+    onClick: e => onInputChangeHandler(e)
+  })))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    ref: myRef,
+    key: `wsx-${name}`
+  }, showList && optionList.length > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-card wsx-multiselect-options wsx-scrollbar",
+    key: `wsx-opt-${name}`
+  }, optionList.map((option, index) => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "wsx-multiselect-option",
+      key: `wsx-opt-${name}-${option.value}-${index}`,
+      onClick: () => optionClickHandler(option)
+    }, option.name);
+  })), showList && optionList.length === 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    key: `wsx-${name}-not-found`,
+    className: "wsx-card wsx-multiselect-options wsx-scrollbar"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-multiselect-option-message"
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('No Data Found!', 'wholesalex')))));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MultiSelect);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/PopupModal.js":
+/*!**********************************************!*\
+  !*** ./reactjs/src/components/PopupModal.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+
+
+
+const PopupModal = _ref => {
+  let {
+    renderContent,
+    onClose,
+    className = '',
+    wrapperClass = ''
+  } = _ref;
+  const [isOpen, setIsOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    setIsOpen(true);
+  }, []);
+  const handleClose = () => {
+    setIsOpen(false);
+    setTimeout(onClose, 300);
+  };
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-modal-wrapper ${className} ${isOpen ? 'open' : 'close'}`
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-popup-content-wrapper ${wrapperClass}`
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-popup-content wsx-scrollbar"
+  }, renderContent()), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-icon-cross",
+    onClick: handleClose
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].cross)));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (PopupModal);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/RadioButtons.js":
+/*!************************************************!*\
+  !*** ./reactjs/src/components/RadioButtons.js ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+
+
+
+const RadioButtons = props => {
+  let {
+    options,
+    label,
+    labelSpace,
+    name,
+    defaultValue,
+    value,
+    onChange,
+    required,
+    isLabelHide,
+    className = '',
+    tooltip,
+    help,
+    helpClass,
+    tooltipPosition,
+    flexView
+  } = props;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-radio-field ${className}`
+  }, !isLabelHide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-input-label ${labelSpace ? `wsx-mb-${labelSpace}` : 'wsx-mb-32'} wsx-font-medium wsx-color-text-medium ${tooltip ? 'wsx-d-flex' : ''}`
+  }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+    className: "wsx-required",
+    style: {
+      color: requiredColor || '#fc143f'
+    }
+  }, "*"), tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
+    content: tooltip,
+    direction: tooltipPosition,
+    spaceLeft: "8px"
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-radio-field-content"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-radio-field-options ${flexView ? 'wsx-radio-flex' : ''}`
+  }, Object.keys(options).map((option, k) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    key: k,
+    className: "wsx-radio-field-option"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+    id: option,
+    name: name,
+    type: "radio",
+    value: option,
+    defaultChecked: option === value,
+    onChange: onChange
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
+    htmlFor: option,
+    className: "wsx-option-desc"
+  }, " ", options[option])))), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-radio-field-help wsx-help-message ${helpClass}`
+  }, help)));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (RadioButtons);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/Select.js":
+/*!******************************************!*\
+  !*** ./reactjs/src/components/Select.js ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+
+
+
+
+const Select = props => {
+  let {
+    options,
+    label,
+    labelClass,
+    labelColor,
+    selectClass,
+    name,
+    defaultValue,
+    value,
+    setValue,
+    tooltip,
+    tooltipPosition,
+    help,
+    onChange,
+    helpClass,
+    className = '',
+    isLabelHide,
+    required,
+    requiredColor,
+    ...rest
+  } = props;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: `wsx-input-wrapper ${className}`
+  }, !isLabelHide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: `wsx-input-label ${tooltip ? 'wsx-d-flex' : ''} ${labelColor && `wsx-color-${labelColor}`} ${labelClass}`
+  }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
+    className: "wsx-required",
+    style: {
+      color: requiredColor || '#fc143f'
+    }
+  }, "*"), tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_2__["default"], {
+    content: tooltip,
+    direction: tooltipPosition,
+    spaceLeft: "8px"
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_3__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: "wsx-select-container"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("select", (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({
+    name: name,
+    value: value,
+    onChange: onChange
+  }, rest, {
+    className: `wsx-select ${selectClass}`
+  }), Object.keys(options).map((option, k) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("option", {
+    value: option
+  }, " ", options[option]))), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    className: `wsx-select-help wsx-help-message ${helpClass}`
+  }, help)));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Select);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/Slider.js":
+/*!******************************************!*\
+  !*** ./reactjs/src/components/Slider.js ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+
+
+
+const Slider = props => {
+  let {
+    label,
+    name,
+    isLabelHide,
+    isLabelSide,
+    labelClass,
+    defaultValue,
+    isDisable,
+    required,
+    value,
+    onChange,
+    help,
+    helpClass,
+    desc,
+    className,
+    isLock,
+    tooltip,
+    tooltipPosition,
+    sliderClass,
+    activeBackground,
+    inputBackground,
+    thumbColor,
+    labelColor,
+    requiredColor,
+    contentClass
+  } = props;
+  if (!name) {
+    name = `wsx-slider-${Date.now().toString()}`;
+  }
+  const [thumbLeft, setThumbLeft] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('2px');
+  const trackRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+
+  // useLayoutEffect(() => {
+  //     if (trackRef.current) {
+  //         const trackWidth = trackRef.current.offsetWidth;
+  //         setThumbLeft(value && value != 'no' ? `${trackWidth / 2 == 20 ? 22 : trackWidth / 2}px` : '2px');
+  //     }
+  // }, [value]);
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-slider-wrapper ${className}`
+  }, !isLabelHide && !isLabelSide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-input-label ${tooltip ? 'wsx-d-flex wsx-item-center' : ''} ${labelColor && `wsx-color-${labelColor}`} ${labelClass}`
+  }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-required",
+    style: {
+      color: requiredColor || '#fc143f'
+    }
+  }, "*"), tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
+    content: tooltip,
+    direction: tooltipPosition,
+    spaceLeft: "8px"
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-slider-content ${contentClass}`
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-d-flex wsx-item-center wsx-gap-8"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
+    htmlFor: name,
+    className: `wsx-slider ${value && value != 'no' && 'active'} ${sliderClass}`
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    ref: trackRef,
+    className: "wsx-slider-track wsx-relative",
+    style: {
+      backgroundColor: value && value != 'no' ? activeBackground || inputBackground || '#6C6CFF' : inputBackground || '#E2E4E9'
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+    name: name,
+    id: name,
+    type: "checkbox",
+    checked: value && value != 'no' ? true : false,
+    onChange: onChange,
+    className: "wsx-slider-input",
+    disabled: isDisable ? true : false
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-slider-thumb",
+    style: {
+      // left: thumbLeft,
+      backgroundColor: thumbColor || '#ffffff'
+    }
+  })), !isLabelHide && isLabelSide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-input-label wsx-mb-0 ${tooltip ? 'wsx-d-flex wsx-item-center' : ''} ${labelColor && `wsx-color-${labelColor}`} ${labelClass}`,
+    style: {
+      marginLeft: '8px'
+    }
+  }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-required",
+    style: {
+      color: requiredColor || '#fc143f'
+    }
+  }, "*"), tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
+    content: tooltip,
+    direction: tooltipPosition,
+    spaceLeft: "8px"
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help))), isLock && (!value || 'no' === value) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+    className: "wsx-lh-0"
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].lock)), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-slider-help wsx-help-message ${helpClass}`
+  }, help)));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Slider);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/Switch.js":
+/*!******************************************!*\
+  !*** ./reactjs/src/components/Switch.js ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+
+
+
+const Switch = props => {
+  let {
+    label,
+    labelClass,
+    name,
+    onChange,
+    defaultValue,
+    isDisable,
+    value,
+    setValue,
+    tooltip,
+    tooltipPosition,
+    help,
+    helpClass,
+    desc,
+    className,
+    required,
+    requiredColor,
+    isLabelHide,
+    inputFieldClass
+  } = props;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-switch-field ${className}`
+  }, !isLabelHide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-input-label ${tooltip ? 'wsx-d-flex' : ''} ${labelClass}`
+  }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+    className: "wsx-required",
+    style: {
+      color: requiredColor || '#fc143f'
+    }
+  }, "*"), tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
+    content: tooltip,
+    direction: tooltipPosition,
+    spaceLeft: "8px"
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-switch-field-wrapper"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
+    className: "wsx-switch-field-desc wsx-d-flex wsx-item-center wsx-w-fit wsx-curser-pointer",
+    htmlFor: name
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-checkbox-option-wrapper",
+    style: {
+      marginRight: '16px'
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+    id: name,
+    name: name,
+    type: "checkbox",
+    defaultChecked: value && value !== 'no' ? true : false,
+    onChange: onChange,
+    disabled: isDisable,
+    className: inputFieldClass ? inputFieldClass : ''
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+    className: "wsx-checkbox-mark"
+  })), desc, " ", props?.descTooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
+    content: props?.descTooltip,
+    direction: tooltipPosition,
+    spaceLeft: "8px"
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help), " "), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-switch-help wsx-help-message ${helpClass}`
+  }, help)));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Switch);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/Tier.js":
+/*!****************************************!*\
+  !*** ./reactjs/src/components/Tier.js ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _pages_dynamic_rules_MultiSelect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../pages/dynamic_rules/MultiSelect */ "./reactjs/src/pages/dynamic_rules/MultiSelect.js");
+/* harmony import */ var _Input__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Input */ "./reactjs/src/components/Input.js");
+/* harmony import */ var _Select__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Select */ "./reactjs/src/components/Select.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
+/* harmony import */ var _Button_New__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Button_New */ "./reactjs/src/components/Button_New.js");
+
+
+
+
+
+
+
+
+const Tier = _ref => {
+  let {
+    fields,
+    tier,
+    setTier,
+    tierName,
+    tierFieldClass = '',
+    index,
+    setPopupStatus,
+    src,
+    labelClass,
+    deleteSpaceLeft = '0px'
+  } = _ref;
+  const inputData = (fieldData, fieldName) => {
+    let flag = tier[tierName] && tier[tierName]['tiers'] && tier[tierName]['tiers'][index] && tier[tierName]['tiers'][index][fieldName];
+    const defValue = flag ? tier[tierName]['tiers'][index][fieldName] : fieldData['default'];
+    const onChangeHandler = e => {
+      let tier_value = e.target.value;
+      if (fieldData['type'] === 'number' && tier_value != '' && tier_value < 0) {
+        tier_value = 1;
+      }
+      let parent = tier[tierName] ? tier[tierName] : {
+        tiers: []
+      };
+      let copy = parent['tiers'];
+      if (!copy[index]) {
+        copy.push({});
+      }
+      copy[index][e.target.getAttribute('data-name')] = tier_value;
+      parent['tiers'] = copy;
+      setTier({
+        ...tier,
+        [tierName]: parent
+      });
+    };
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Input__WEBPACK_IMPORTED_MODULE_2__["default"], {
+      label: index === 0 ? fieldData.label : '',
+      id: `${fieldName}_${index}`,
+      "data-name": fieldName,
+      type: fieldData['type'],
+      name: `${fieldName}_${index}`,
+      value: defValue,
+      placeholder: fieldData.placeholder,
+      onChange: onChangeHandler,
+      inputClass: "wsx-bg-base1",
+      labelClass: labelClass
+    });
+  };
+  const selectData = (fieldData, fieldName) => {
+    let flag = tier[tierName] && tier[tierName]['tiers'] && tier[tierName]['tiers'][index] && tier[tierName]['tiers'][index][fieldName];
+    const defValue = flag ? tier[tierName]['tiers'][index][fieldName] : fieldData['default'];
+    const onChangeHandler = e => {
+      const isLock = e?.target?.value?.startsWith('pro_') ? true : false;
+      if (isLock && setPopupStatus) {
+        setPopupStatus(true);
+      } else {
+        let parent = tier[tierName] ? tier[tierName] : {
+          tiers: []
+        };
+        let copy = parent['tiers'];
+        if (!copy[index]) {
+          copy.push({});
+        }
+        copy[index][e.target.getAttribute('data-name')] = e.target.value;
+        parent['tiers'] = copy;
+        setTier({
+          ...tier,
+          [tierName]: parent
+        });
+      }
+    };
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Select__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      "data-name": fieldName,
+      label: index == 0 ? fieldData.label : '',
+      options: fieldData.options,
+      name: `${fieldName}_${index}`,
+      value: defValue,
+      onChange: onChangeHandler,
+      defaultValue: defValue,
+      labelClass: labelClass,
+      selectClass: "wsx-ellipsis"
+    });
+  };
+  const dependencyCheck = deps => {
+    if (!deps) {
+      return true;
+    }
+    let _temp = tier[tierName] && tier[tierName]['tiers'] && tier[tierName]['tiers'][index] ? tier[tierName]['tiers'][index] : {};
+    let _flag = true;
+    deps.map((dep, i) => {
+      if (_temp[dep['key']] !== dep['value']) {
+        _flag = false;
+      }
+    });
+    return _flag;
+  };
+  const multiselectData = (fieldData, fieldName) => {
+    let flag = tier[tierName] && tier[tierName]['tiers'] && tier[tierName]['tiers'][index] && tier[tierName]['tiers'][index][fieldName];
+    const defValue = flag ? tier[tierName]['tiers'][index][fieldName] : fieldData['default'];
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_pages_dynamic_rules_MultiSelect__WEBPACK_IMPORTED_MODULE_1__["default"], {
+      name: fieldName,
+      value: defValue,
+      options: fieldData['options'],
+      placeholder: fieldData.placeholder,
+      onMultiSelectChangeHandler: (fieldName, selectedValues) => {
+        let parent = tier[tierName] ? tier[tierName] : {
+          tiers: []
+        };
+        let copy = parent['tiers'];
+        if (!copy[index]) {
+          copy.push({});
+        }
+        copy[index][fieldName] = [...selectedValues];
+        parent['tiers'] = copy;
+        setTier({
+          ...tier,
+          [tierName]: parent
+        });
+      },
+      isAjax: fieldData?.is_ajax,
+      ajaxAction: fieldData?.ajax_action,
+      ajaxSearch: fieldData?.ajax_search
+    });
+  };
+  const getTierLastIndex = () => {
+    return tier && tier[tierName] && tier[tierName]['tiers'] && tier[tierName]['tiers'].length != 0 ? tier[tierName]['tiers'].length - 1 : 0;
+  };
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-tiers-fields",
+    key: `wsx-tier-fields-${tierName}-${index}`
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-tier-wrapper"
+  }, Object.keys(fields).map((fieldName, i) => {
+    switch (fields[fieldName]['type']) {
+      case 'number':
+      case 'text':
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+          key: `tier_field_${i}`,
+          className: `tier-field ${tierFieldClass}`
+        }, inputData(fields[fieldName], fieldName));
+      case 'select':
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+          key: `tier_field_${i}`,
+          className: `tier-field ${tierFieldClass}`
+        }, selectData(fields[fieldName], fieldName));
+      case 'multiselect':
+        return dependencyCheck(fields[fieldName]['depends_on']) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+          key: `tier_field_${i}`,
+          className: `tier-field multiselect ${tierFieldClass}`
+        }, multiselectData(fields[fieldName], fieldName));
+      case 'filter':
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+          className: "wsx-filter-group"
+        }, fields[fieldName] && Object.keys(fields[fieldName]).map((filterFieldName, i) => {
+          switch (fields[fieldName][filterFieldName]['type']) {
+            case 'select':
+              return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+                key: `tier_field_${i}`,
+                className: `tier-field ${tierFieldClass}`
+              }, selectData(fields[fieldName][filterFieldName], filterFieldName));
+            case 'multiselect':
+              return dependencyCheck(fields[fieldName][filterFieldName]['depends_on']) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+                key: `tier_field_${i}`,
+                className: `tier-field multiselect ${tierFieldClass}`
+              }, multiselectData(fields[fieldName][filterFieldName], filterFieldName));
+          }
+        }));
+      default:
+        break;
+    }
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Delete', 'wholesalex'),
+    direction: "top",
+    spaceLeft: deleteSpaceLeft
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+    key: `wsx-tier-field-delete-${tierName}_${index}`,
+    className: `wsx-tier-delete ${getTierLastIndex() < 1 ? 'disable' : ''}`,
+    onClick: e => {
+      let parent = {
+        ...tier
+      };
+      let copy = [...parent[tierName]['tiers']];
+      copy = copy.filter((row, r) => {
+        return index != r;
+      });
+      parent[tierName]['tiers'] = copy;
+      setTier(parent);
+    }
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_4__["default"].delete_24))), index == getTierLastIndex() && (tierName === 'quantity_based' || tierName === 'conditions') && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Button_New__WEBPACK_IMPORTED_MODULE_7__["default"], {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Add New Condition', 'wholesalex'),
+    iconName: "plus_20",
+    background: "tertiary",
+    customClass: "wsx-mt-24",
+    onClick: e => {
+      let parent = {
+        ...tier
+      };
+      if (!parent[tierName]) {
+        parent[tierName] = {
+          'tiers': []
+        };
+      }
+      let copy = [...parent[tierName]['tiers']];
+      copy.push({
+        _id: Date.now().toString(),
+        src: src ? src : 'dynamic_rule'
+      });
+      parent[tierName]['tiers'] = copy;
+      setTier(parent);
+    }
+  }));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Tier);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/Tooltip.js":
+/*!*******************************************!*\
+  !*** ./reactjs/src/components/Tooltip.js ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "react-dom");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+
+
+const Tooltip = props => {
+  const [active, setActive] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [position, setPosition] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    top: 0,
+    left: 0
+  });
+  const [adjustedDirection, setAdjustedDirection] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(props.direction || "top");
+  const parentRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const tooltipRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const calculatePosition = () => {
+    if (tooltipRef.current && parentRef.current) {
+      const tooltipRect = tooltipRef.current.getBoundingClientRect();
+      const parentRect = parentRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      let top = parentRect.top + window.scrollY - (tooltipRect.height + 8 || 0);
+      let left = parentRect.left + window.scrollX - ((tooltipRect.width - parentRect.width) / 2 || 0);
+      let newDirection = props.direction || "top";
+      if (newDirection === "top") {
+        top = parentRect.top + window.scrollY - (tooltipRect.height + 8);
+        left = parentRect.left + window.scrollX + (parentRect.width - tooltipRect.width) / 2;
+      } else if (newDirection === "bottom") {
+        top = parentRect.bottom + window.scrollY + 8;
+        left = parentRect.left + window.scrollX + (parentRect.width - tooltipRect.width) / 2;
+      } else if (newDirection === "left") {
+        top = parentRect.top + window.scrollY + (parentRect.height - tooltipRect.height) / 2;
+        left = parentRect.left + window.scrollX - (tooltipRect.width + 8);
+      } else if (newDirection === "right") {
+        top = parentRect.top + window.scrollY + (parentRect.height - tooltipRect.height) / 2;
+        left = parentRect.right + window.scrollX + 8;
+      }
+      if (tooltipRect.bottom + 0 > viewportHeight && newDirection === "bottom") {
+        newDirection = "top";
+        top = parentRect.top + window.scrollY - (tooltipRect.height + 8);
+      } else if (tooltipRect.top < tooltipRect.height + 70 && newDirection === "top") {
+        newDirection = "bottom";
+        top = parentRect.bottom + window.scrollY + 8;
+        if (tooltipRect.width + parentRect.right > viewportWidth) {
+          newDirection = "left";
+          top = parentRect.top + window.scrollY + (parentRect.height - tooltipRect.height) / 2;
+          left = parentRect.left + window.scrollX - (tooltipRect.width + 8);
+        }
+      }
+      if (tooltipRect.width + left + 70 > viewportWidth && newDirection === "right") {
+        if (tooltipRect.left > tooltipRect.width + 8) {
+          newDirection = "left";
+          left = parentRect.left + window.scrollX - (tooltipRect.width + 8);
+        } else if (tooltipRect.top < tooltipRect.height + 70) {
+          newDirection = "bottom";
+          top = parentRect.bottom + window.scrollY + 8;
+          left = parentRect.left + window.scrollX + (parentRect.width - tooltipRect.width) / 2;
+        } else {
+          newDirection = "top";
+          top = parentRect.top + window.scrollY - (tooltipRect.height + 8);
+          left = parentRect.left + window.scrollX + (parentRect.width - tooltipRect.width) / 2;
+        }
+      } else if (parentRect.left < tooltipRect.width + 8 && newDirection === "left") {
+        if (tooltipRect.width + parentRect.right + 70 < viewportWidth) {
+          newDirection = "right";
+          left = parentRect.right + window.scrollX + 8;
+        } else if (tooltipRect.top < tooltipRect.height + 70) {
+          newDirection = "bottom";
+          top = parentRect.bottom + window.scrollY + 8;
+          left = parentRect.left + window.scrollX + (parentRect.width - tooltipRect.width) / 2;
+        } else {
+          newDirection = "top";
+          top = parentRect.top + window.scrollY - (tooltipRect.height + 8);
+          left = parentRect.left + window.scrollX + (parentRect.width - tooltipRect.width) / 2;
+        }
+      }
+      setAdjustedDirection(newDirection);
+      setPosition({
+        top,
+        left
+      });
+    }
+  };
+  const showToolTip = () => {
+    setActive(true);
+  };
+  const hideToolTip = () => {
+    setActive(false);
+  };
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    calculatePosition();
+  }, [active]);
+  const tooltipContent = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    ref: tooltipRef,
+    className: `wsx-tooltip-content wsx-font-regular ${props.tooltipContentClass} ${adjustedDirection}`,
+    style: {
+      position: "absolute",
+      zIndex: active ? 999999 : -999999,
+      top: active ? position.top : 0,
+      left: active ? position.left : 0,
+      visibility: active ? "visible" : "hidden",
+      opacity: active ? 1 : 0,
+      transition: "opacity var(--transition-md) ease-in-out"
+    }
+  }, props.type === "element" ? props.content : props.content.replace(/{.*}/, ""));
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    ref: parentRef,
+    className: `wsx-tooltip ${props.className}`,
+    onMouseEnter: showToolTip,
+    onMouseLeave: hideToolTip,
+    style: {
+      margin: `${props.spaceTop || "0"} ${props.spaceRight || "0"} ${props.spaceBottom || "0"} ${props.spaceLeft || "0"}`
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `${!props.onlyText && `wsx-lh-0 wsx-icon-wrapper ${props.parentColor ? `wsx-color-${props.parentColor}` : 'wsx-color-secondary'}`} wsx-w-fit`
+  }, props.children)), /*#__PURE__*/react_dom__WEBPACK_IMPORTED_MODULE_1___default().createPortal(tooltipContent, document.body));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Tooltip);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/UpgradeProPopUp.js":
+/*!***************************************************!*\
+  !*** ./reactjs/src/components/UpgradeProPopUp.js ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
+/* harmony import */ var _PopupModal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./PopupModal */ "./reactjs/src/components/PopupModal.js");
+/* harmony import */ var _Button_New__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Button_New */ "./reactjs/src/components/Button_New.js");
+
+
+
+
+const UpgradeProPopUp = _ref => {
+  let {
+    heading = '',
+    subheading = '',
+    desc = '',
+    setPopUpStatus,
+    UpgradeUrl = '',
+    addonCount = 6,
+    onClose
+  } = _ref;
+  heading = heading ? heading : '';
+  desc = desc ? desc : '';
+  if (UpgradeUrl == '') {
+    UpgradeUrl = wholesalex?.pro_link;
+  }
+  const popupContent = () => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+      className: "wsx-addon-popup-image",
+      src: wholesalex.url + '/assets/img/unlock.svg',
+      alt: "Unlock Icon"
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "wsx-d-flex wsx-item-center wsx-justify-center wsx-gap-4 wsx-mt-4"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "wsx-title wsx-font-18 wsx-font-medium"
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Unlock', 'wholesalex')), addonCount && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "wsx-title wsx-font-18 wsx-font-medium"
+    }, addonCount, "+ Addons"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "wsx-title wsx-font-18 wsx-font-medium"
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('with', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "wsx-d-flex wsx-item-center wsx-justify-center wsx-gap-4 wsx-mb-16"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "wsx-title wsx-font-18 wsx-font-medium"
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('WholesaleX', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "wsx-title wsx-font-18 wsx-font-medium wsx-color-primary"
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Pro', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Button_New__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      buttonLink: "https://getwholesalex.com/pricing/?utm_source=wholesalex-menu&utm_medium=email-unlock_addon-upgrade_to_pro&utm_campaign=wholesalex-DB",
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Upgrade to Pro', 'wholesalex'),
+      background: "secondary",
+      iconName: "growUp",
+      customClass: "wsx-w-auto wsx-br-lg wsx-justify-center wsx-font-16"
+    }));
+  };
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_PopupModal__WEBPACK_IMPORTED_MODULE_2__["default"], {
+    className: "wsx-pro-modal",
+    renderContent: popupContent,
+    onClose: onClose
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (UpgradeProPopUp);
+
+/***/ }),
+
+/***/ "./reactjs/src/pages/dynamic_rules/MultiSelect.js":
+/*!********************************************************!*\
+  !*** ./reactjs/src/pages/dynamic_rules/MultiSelect.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var _components_Tooltip__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Tooltip */ "./reactjs/src/components/Tooltip.js");
+
+
+
+
+const MultiSelect = _ref => {
+  let {
+    name,
+    value,
+    options,
+    placeholder,
+    customClass,
+    onMultiSelectChangeHandler,
+    isDisable,
+    tooltip,
+    isAjax,
+    ajaxAction,
+    ajaxSearch,
+    dependsValue
+  } = _ref;
+  const [showList, setShowList] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [selectedOptions, setSelectedOptions] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(value);
+  const [optionList, setOptionList] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
+  const [searchValue, setSearchValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
+  const [isSearching, setIsSearching] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [tempSearchValue, setTempSearchValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+  const [allOptions, setAllOptions] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
+  const myRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  const onInputChangeHandler = e => {
+    setShowList(true);
+    setTempSearchValue(e.target.value);
+  };
+  const selectOption = option => {
+    setSelectedOptions([...selectedOptions, option]);
+    const searchResult = optionList.filter(op => {
+      const {
+        name,
+        value
+      } = op;
+      return value.toString().toLowerCase() !== option.value.toString().toLowerCase();
+    });
+    setOptionList(searchResult);
+    setTempSearchValue('');
+    onMultiSelectChangeHandler(name, [...selectedOptions, option]);
+    setShowList(false);
+  };
+  const deleteOption = option => {
+    const selectedOptionAfterDeleted = selectedOptions.filter(op => {
+      const {
+        name,
+        value
+      } = op;
+      return value.toString().toLowerCase() !== option.value.toString().toLowerCase();
+    });
+    setSelectedOptions(selectedOptionAfterDeleted);
+    setTempSearchValue('');
+    onMultiSelectChangeHandler(name, selectedOptionAfterDeleted);
+  };
+  const handleClickOutside = e => {
+    if (!myRef.current.contains(e.target)) {
+      setShowList(false);
+    }
+  };
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+  const performAjaxSearch = async signal => {
+    setIsSearching(true);
+    let attr = {
+      type: 'get',
+      action: 'dynamic_rule_action',
+      nonce: wholesalex.nonce,
+      query: searchValue,
+      ajax_action: ajaxAction
+    };
+    try {
+      const res = await wp.apiFetch({
+        path: '/wholesalex/v1/dynamic_rule_action',
+        method: 'POST',
+        data: attr,
+        signal: signal
+      });
+      if (res.status) {
+        let selectedOptionValues = [];
+        if (selectedOptions.length > 0) {
+          selectedOptionValues = selectedOptions.map(option => option.value);
+        }
+        const searchResult = res?.data?.filter(option => {
+          const {
+            name,
+            value
+          } = option;
+          return selectedOptionValues.indexOf(value) === -1;
+        });
+        searchResult.sort((a, b) => a.name.length - b.name.length);
+        setOptionList(searchResult);
+        setIsSearching(false);
+      } else {
+        setIsSearching(false);
+      }
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        // Request was cancelled
+        return;
+      }
+    }
+  };
+  const getOptions = async signal => {
+    setIsSearching(true);
+    let attr = {
+      type: 'get',
+      action: 'dynamic_rule_action',
+      nonce: wholesalex.nonce,
+      ajax_action: ajaxAction
+    };
+    if (dependsValue) {
+      attr['depends'] = dependsValue;
+    }
+    try {
+      const res = await wp.apiFetch({
+        path: '/wholesalex/v1/dynamic_rule_action',
+        method: 'POST',
+        data: attr,
+        signal: signal
+      });
+      if (res.status) {
+        let selectedOptionValues = [];
+        if (selectedOptions.length > 0) {
+          selectedOptionValues = selectedOptions.map(option => option.value);
+        }
+        const searchResult = res?.data?.filter(option => {
+          const {
+            name,
+            value
+          } = option;
+          return selectedOptionValues.indexOf(value) === -1;
+        });
+        searchResult.sort((a, b) => a.name.length - b.name.length);
+        setAllOptions(res.data);
+        setOptionList(searchResult);
+        setIsSearching(false);
+      } else {
+        setIsSearching(false);
+      }
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        // Request was cancelled
+        return;
+      }
+    }
+  };
+  const performNonAjaxSearch = () => {
+    let selectedOptionValues = [];
+    if (selectedOptions.length > 0) {
+      selectedOptionValues = selectedOptions.map(option => option.value);
+    }
+    const searchResult = allOptions.filter(option => {
+      const {
+        name,
+        value
+      } = option;
+      return name.toLowerCase().includes(searchValue.toLowerCase()) && selectedOptionValues.indexOf(value) === -1;
+    });
+    setOptionList(searchResult);
+  };
+  const abortController = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    abortController.current = new AbortController();
+    const {
+      signal
+    } = abortController.current;
+    if (!ajaxSearch && isAjax) {
+      getOptions(signal);
+    }
+  }, []);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (ajaxSearch) {
+      abortController.current = new AbortController();
+      const {
+        signal
+      } = abortController.current;
+      if (searchValue.length >= 2) {
+        performAjaxSearch(signal);
+      }
+      return () => {
+        if (abortController.current) {
+          abortController.current.abort("Duplicate");
+        }
+      };
+    } else {
+      performNonAjaxSearch();
+    }
+  }, [searchValue, setSearchValue]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (ajaxSearch) {
+      if (tempSearchValue.length > 1) {
+        const delay = setTimeout(() => setSearchValue(tempSearchValue), 500);
+        return () => clearTimeout(delay);
+      }
+    } else {
+      setSearchValue(tempSearchValue);
+    }
+  }, [tempSearchValue]);
+
+  //Remove Product title extra quote from esc_attr 
+  const decodeHtmlEntities = str => {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = str;
+    return textarea.value;
+  };
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-multiselect-wrapper ${isDisable ? 'locked' : ''}`,
+    key: `wsx-multiselect-${name}`
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-multiselect-inputs"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-multiselect-input-wrapper"
+  }, selectedOptions.length > 0 && selectedOptions.map((option, index) => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+      key: `wsx-multiselect-opt-${name}-${option.value}-${index}`,
+      className: "wsx-selected-option"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+      tabIndex: -1,
+      className: "wsx-icon-cross wsx-lh-0",
+      onClick: () => deleteOption(option)
+    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].cross), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_Tooltip__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      content: option.name,
+      position: "top",
+      onlyText: true
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "multiselect-option-name"
+    }, decodeHtmlEntities(option.name))));
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-multiselect-option-wrapper ${selectedOptions.length && selectedOptions.length != 0 ? '' : 'wsx-w-full'}`
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+    key: `wsx-input${name}`,
+    disabled: isDisable ? true : false,
+    id: name,
+    tabIndex: 0,
+    autoComplete: "off",
+    value: tempSearchValue,
+    className: customClass,
+    placeholder: selectedOptions.length > 0 ? "" : placeholder,
+    onChange: e => onInputChangeHandler(e),
+    onClick: e => onInputChangeHandler(e)
+  })))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    ref: myRef,
+    key: `wsx-${name}`
+  }, showList && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, !isSearching && optionList.length > 0 && tempSearchValue.length > 1 && showList && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-card wsx-multiselect-options wsx-scrollbar",
+    key: `wsx-opt-${name}`
+  }, optionList.map((option, index) => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "wsx-multiselect-option",
+      key: `wsx-opt-${name}-${option.value}-${index}`,
+      onClick: () => selectOption(option)
+    }, decodeHtmlEntities(option.name));
+  })), !isSearching && tempSearchValue.length > 1 && showList && optionList.length === 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    key: `wsx-${name}-not-found`,
+    className: "wsx-card wsx-multiselect-options wsx-scrollbar"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-multiselect-option-message"
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('No Data Found! Please try with another keyword.', 'wholesalex'))), tempSearchValue.length < 2 && showList && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    key: `wsx-${name}-not-found`,
+    className: "wsx-card wsx-multiselect-options wsx-scrollbar"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-multiselect-option-message"
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Enter 2 or more characters to search.', 'wholesalex'))), isSearching && showList && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    key: `wsx-${name}-not-found`,
+    className: "wsx-card wsx-multiselect-options wsx-scrollbar"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-multiselect-option-message"
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Searching...', 'wholesalex'))))));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MultiSelect);
+
+/***/ }),
+
+/***/ "./reactjs/src/pages/single_product/Product.js":
+/*!*****************************************************!*\
+  !*** ./reactjs/src/pages/single_product/Product.js ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _components_LoadingOverlay__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/LoadingOverlay */ "./reactjs/src/components/LoadingOverlay.js");
+/* harmony import */ var _components_Tier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Tier */ "./reactjs/src/components/Tier.js");
+/* harmony import */ var _components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/UpgradeProPopUp */ "./reactjs/src/components/UpgradeProPopUp.js");
+/* harmony import */ var _components_Input__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Input */ "./reactjs/src/components/Input.js");
+/* harmony import */ var _components_PopupModal__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/PopupModal */ "./reactjs/src/components/PopupModal.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var _components_Button_New__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/Button_New */ "./reactjs/src/components/Button_New.js");
+
+
+
+
+
+
+
+
+
+const Product = _ref => {
+  let {
+    id,
+    isWCFMVariation
+  } = _ref;
+  const initialTier = {
+    '_id': Date.now().toString(),
+    '_discount_type': '',
+    '_discount_amount': '',
+    '_min_quantity': '',
+    'src': 'single_product'
+  };
+  const [tier, setTier] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
+  const [appState, setAppState] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({
+    loading: true,
+    currentWindow: "new",
+    ruleWindow: "new",
+    ruleIndex: -1,
+    index: -1,
+    loadingOnSave: false
+  });
+  const [fields, setFields] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
+  const _isProActivate = wholesalex?.is_pro_active;
+  const [pricingPlan, setPricingPlan] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)('');
+  const [popUpStatus, setPopUpStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
+  const getPostID = () => {
+    let product_id = '';
+    //Check If request comes from dokan dashboard or not
+    if (!id) {
+      if (wholesalex_single_product.is_dokan_dashboard) {
+        product_id = document.getElementById('dokan-edit-product-id')?.value;
+      } else {
+        // document.getElementById('pro_id')?.value is added to to support wcfm. In wcfm, product id set in pro_id field
+        product_id = document.getElementById('post_ID')?.value || document.getElementById('pro_id')?.value;
+      }
+    }
+    return id ? id : product_id;
+  };
+  const postId = getPostID();
+
+  // Loading Issue Fixed
+
+  (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
+    if (wholesalex_single_product.fields) {
+      setFields(wholesalex_single_product.fields);
+    }
+    let sections = Object.keys(wholesalex_single_product.fields);
+    let initialRoleData = {};
+    sections.map((section, index) => {
+      Object.keys(wholesalex_single_product.fields[section]['attr']).map((role, i) => {
+        initialRoleData[role] = {
+          tiers: [{
+            ...initialTier
+          }]
+        };
+      });
+    });
+    let _temp = {
+      ...initialRoleData,
+      ...wholesalex_single_product.discounts[postId]
+    };
+    setTier(_temp);
+    setAppState({
+      ...appState,
+      loading: false
+    });
+  }, []);
+  const buttonData = (fieldData, tierName) => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button_New__WEBPACK_IMPORTED_MODULE_8__["default"], {
+      label: fieldData['label'],
+      background: "tertiary",
+      onClick: e => {
+        e.preventDefault();
+        let copy = {
+          ...tier
+        };
+        copy[tierName]['tiers'].push(initialTier);
+        setTier(copy);
+      }
+    })
+    // <button
+    //  	key={`wholesalex_btn_tier_${tierName}`}
+    //  	className="wholesalex-btn wholesalex-primary-btn wholesalex-add-tier-btn"
+    // onClick={(e)=>{
+    // 	e.preventDefault();
+    // 	let copy = {...tier};
+    // 	copy[tierName]['tiers'].push(initialTier);
+    // 	setTier(copy);
+    // }}>
+    // 	{fieldData['label']}
+    // </button>
+    ;
+  };
+  const UpgradeButton = (fieldData, tierName) => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button_New__WEBPACK_IMPORTED_MODULE_8__["default"], {
+      label: fieldData['label'],
+      onClick: e => {
+        e.preventDefault();
+        setPopUpStatus(true);
+      },
+      background: "secondary",
+      iconName: "angleRight_24",
+      iconPosition: "after",
+      iconAnimation: "icon-left"
+    })
+    // <button
+    //  	key={`wholesalex_btn_tier_${tierName}`}
+    //  	className="wholesalex-btn wholesalex-upgrade-pro-btn wholesalex-upgrade-tier-btn"
+    // 	onClick={(e)=>{ e.preventDefault(); setPopUpStatus(true);}}>
+    // 	{fieldData['label']}
+    // 	<span className="dashicons dashicons-arrow-right-alt2"></span>
+    // </button>
+    ;
+  };
+  const [tierStatus, setTierStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
+  const tierData = (fieldData, tierName, lockStatus) => {
+    var defaultTier = fieldData['_tiers']['data'];
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      key: tierName,
+      className: "wsx-settings-tiers-wrapper"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-settings-tiers-container"
+    }, tier && tier[tierName] && tier[tierName]['tiers'].map((t, index) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Tier__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      key: `wholesalex_${tierName}_tier_${index}`,
+      fields: defaultTier,
+      tier: tier,
+      setTier: setTier,
+      index: index,
+      tierName: tierName
+    }))), !lockStatus && fieldData['_tiers']['add']['type'] === 'button' && buttonData(fieldData['_tiers']['add'], tierName), lockStatus && fieldData['_tiers']['upgrade_pro']['type'] === 'button' && UpgradeButton(fieldData['_tiers']['upgrade_pro'], tierName));
+  };
+  const inputData = (fieldData, fieldName, tierName) => {
+    let flag = tier[tierName] && tier[tierName][fieldName];
+    const defValue = flag ? tier[tierName][fieldName] : fieldData['default'];
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Input__WEBPACK_IMPORTED_MODULE_5__["default"], {
+      className: "wholesalex_single_product_field",
+      label: fieldData['label'],
+      type: fieldData['type'],
+      name: fieldName,
+      value: defValue,
+      onChange: e => {
+        let parent = {
+          ...tier
+        };
+        let copy = parent[tierName];
+        copy[fieldName] = e.target.value;
+        parent[tierName] = copy;
+        setTier({
+          ...tier,
+          ...parent
+        });
+      }
+    });
+  };
+  const pricesData = (fieldData, tierName) => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      key: `wholesalex_${tierName}_separate`
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      key: `wholesalex_prices_${tierName}`,
+      className: "wsx-role-based-prices-section wsx-column-2 wsx-sm-column-1 wsx-gap-24"
+    }, Object.keys(fieldData['attr']).map((field, index) => fieldData['attr'][field]['type'] === 'number' && inputData(fieldData['attr'][field], field, tierName))));
+  };
+  const tiersData = (fieldsData, section) => {
+    let _limit = 99999999999;
+    const isPro = fieldsData['is_pro'];
+    if (isPro) {
+      _limit = fieldsData['pro_data']?.['value'];
+    }
+    if (!_limit) {
+      _limit = 99999999999;
+    }
+    let isLock = tier[section]['tiers'].length >= _limit && !_isProActivate;
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("section", {
+      key: `wholesalex_${section}`,
+      className: section + ' wsx-accordion-wrapper'
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-accordion-header",
+      onClick: () => {
+        setTierStatus({
+          ...tierStatus,
+          [section]: !tierStatus[section]
+        });
+      }
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-accordion-title",
+      key: `whx_role_header`
+    }, fieldsData['label']), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
+      className: `wsx-icon ${tierStatus[section] ? 'active' : ''}`
+    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_7__["default"].angleDown_24)), tierStatus[section] && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-accordion-body"
+    }, tierStatus[section] && fieldsData['attr'] && Object.keys(fieldsData['attr']).map((fieldData, i) => {
+      switch (fieldsData['attr'][fieldData]['type']) {
+        case 'tier':
+          return tierData(fieldsData['attr'][fieldData], section, isLock);
+        case 'prices':
+          return pricesData(fieldsData['attr'][fieldData], section);
+        default:
+          break;
+      }
+    })));
+  };
+  const proPopupContent = () => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("img", {
+      className: "wsx-addon-popup-image",
+      src: wholesalex.url + '/assets/img/unlock.svg',
+      alt: "Unlock Icon"
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-title wsx-font-18 wsx-font-medium wsx-mt-4"
+    }, wholesalex_product.i18n.unlock_heading, " ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('with', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-d-flex wsx-item-center wsx-justify-center wsx-gap-4 wsx-mb-16"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-title wsx-font-18 wsx-font-medium"
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('WholesaleX', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-title wsx-font-18 wsx-font-medium wsx-color-primary"
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Pro', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button_New__WEBPACK_IMPORTED_MODULE_8__["default"], {
+      buttonLink: "https://getwholesalex.com/pricing/?utm_source=wholesalex-menu&utm_medium=email-unlock_features-upgrade_to_pro&utm_campaign=wholesalex-DB",
+      label: wholesalex_product.i18n.upgrade_to_pro,
+      background: "secondary",
+      iconName: "growUp",
+      customClass: "wsx-w-auto wsx-br-lg wsx-justify-center wsx-font-16"
+    }));
+  };
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_LoadingOverlay__WEBPACK_IMPORTED_MODULE_2__["default"], null), !appState.loading && Object.keys(fields).map((section, c) => Object.keys(fields[section]['attr']).length > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    key: `wholesalex_product_key_${section}_${c}`,
+    className: `wsx-tier-wrapper ${section === '_b2c_section' ? 'b2c' : ''}`
+  }, fields[section]['label'] && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    key: `wholesalex_b2c_b2b_sep_2`,
+    className: "wsx-font-18 wsx-font-bold"
+  }, fields[section]['label']), Object.keys(fields[section]['attr']).map((field, f) => {
+    switch (fields[section]['attr'][field]['type']) {
+      case 'tiers':
+        return tiersData(fields[section]['attr'][field], field);
+      default:
+        break;
+    }
+  }))), wholesalex_single_product?.is_wcfm_dashboard && isWCFMVariation && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("input", {
+    type: "hidden",
+    className: "wholesalex_rolewise_pricing",
+    id: `wholesalex_wcfm_product_variation_tiers_${id ? id : postId}`,
+    value: JSON.stringify(tier),
+    name: `wholesalex_wcfm_product_variation_tiers_${id ? id : postId}`
+  }), wholesalex_single_product?.is_wcfm_dashboard && !isWCFMVariation && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("input", {
+    type: "hidden",
+    className: "wholesalex_rolewise_pricing",
+    id: `wholesalex_wcfm_simple_product_tiers_${id ? id : postId}`,
+    value: JSON.stringify(tier),
+    name: `wholesalex_wcfm_simple_product_tiers_${id ? id : postId}`
+  }), !wholesalex_single_product?.is_wcfm_dashboard && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("input", {
+    type: "hidden",
+    className: "wholesalex_rolewise_pricing",
+    id: `wholesalex_single_product_tiers_${id ? id : postId}`,
+    value: JSON.stringify(tier),
+    name: `wholesalex_single_product_tiers_${id ? id : postId}`
+  }), popUpStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_PopupModal__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    className: "wsx-pro-modal",
+    renderContent: proPopupContent,
+    onClose: () => setPopUpStatus(false)
+  }));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Product);
+
+/***/ }),
+
+/***/ "./reactjs/src/pages/single_product/ProductTab.js":
+/*!********************************************************!*\
+  !*** ./reactjs/src/pages/single_product/ProductTab.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _components_LoadingOverlay__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/LoadingOverlay */ "./reactjs/src/components/LoadingOverlay.js");
+/* harmony import */ var _components_MultiSelect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/MultiSelect */ "./reactjs/src/components/MultiSelect.js");
+/* harmony import */ var _components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/UpgradeProPopUp */ "./reactjs/src/components/UpgradeProPopUp.js");
+/* harmony import */ var _components_Select__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Select */ "./reactjs/src/components/Select.js");
+/* harmony import */ var _components_Choosebox__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/Choosebox */ "./reactjs/src/components/Choosebox.js");
+/* harmony import */ var _components_Switch__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/Switch */ "./reactjs/src/components/Switch.js");
+/* harmony import */ var _components_PopupModal__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/PopupModal */ "./reactjs/src/components/PopupModal.js");
+/* harmony import */ var _components_Slider__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../components/Slider */ "./reactjs/src/components/Slider.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var _components_Button_New__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../components/Button_New */ "./reactjs/src/components/Button_New.js");
+/* harmony import */ var _components_RadioButtons__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../components/RadioButtons */ "./reactjs/src/components/RadioButtons.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+const ProductTab = () => {
+  const [productSettings, setProductSettings] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
+  const [visibilitySectionStatus, setVisibilitySectionStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(true);
+  const [fields, setFields] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
+  const [appState, setAppState] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
+  const _isProActivate = wholesalex?.is_pro_active;
+  const [popUpStatus, setPopUpStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
+  const getPostID = () => {
+    let product_id = '';
+    //Check If request comes from dokan dashboard or not
+    if (!id) {
+      if (wholesalex_single_product.is_dokan_dashboard) {
+        product_id = document.getElementById('dokan-edit-product-id')?.value;
+      } else {
+        product_id = document.getElementById('post_ID')?.value;
+      }
+    }
+    return id ? id : product_id;
+  };
+
+  // Loading Time Issue Fixed.
+
+  (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
+    if (wholesalex_product_tab.fields) {
+      setFields(wholesalex_product_tab.fields);
+    }
+    if (wholesalex_product_tab.settings) {
+      setProductSettings(wholesalex_product_tab.settings);
+    }
+    setAppState({
+      ...appState,
+      loading: false
+    });
+  }, []);
+  const selectData = (fieldData, field) => {
+    const defValue = productSettings[field] || fieldData.default || '';
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Select__WEBPACK_IMPORTED_MODULE_5__["default"]
+    // className="wholesalex_single_product_tab_field"
+    , {
+      label: fieldData.label,
+      options: fieldData.options,
+      value: defValue,
+      onChange: e => {
+        setProductSettings({
+          ...productSettings,
+          [field]: e.target.value
+        });
+      },
+      defaultValue: defValue,
+      help: fieldData.help
+    });
+  };
+  const chooseboxData = (fieldData, field) => {
+    const defValue = productSettings[field] ? productSettings[field] : fieldData.default;
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Choosebox__WEBPACK_IMPORTED_MODULE_6__["default"], {
+      label: fieldData.label,
+      name: field,
+      value: defValue,
+      onChange: e => {
+        const isLock = e.target.value.startsWith('pro_');
+        if (isLock) {
+          setPopUpStatus(true);
+        } else {
+          setProductSettings({
+            [field]: e.target.value
+          });
+        }
+      },
+      defaultValue: fieldData.default,
+      desc: fieldData.desc,
+      help: fieldData?.help,
+      options: fieldData.options
+    });
+  };
+  const switchData = (fieldData, field) => {
+    const defValue = productSettings[field] ? productSettings[field] == 'yes' ? true : false : fieldData.default;
+    let _className = wholesalex_single_product?.is_wcfm_dashboard ? 'wcfm-checkbox' : '';
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Switch__WEBPACK_IMPORTED_MODULE_7__["default"]
+    // className={"wholesalex_single_product_tab_field"}
+    // label={fieldData.label}
+    , {
+      name: field,
+      value: defValue,
+      onChange: e => {
+        let _final;
+        _final = e.target.checked ? 'yes' : 'no';
+        setProductSettings({
+          ...productSettings,
+          [field]: _final
+        });
+      },
+      defaultValue: fieldData.default,
+      desc: fieldData.label,
+      help: fieldData?.help,
+      inputFieldClass: _className
+    });
+  };
+  const getValue = (fieldName, fieldData) => {
+    if (productSettings[fieldName] == undefined) {
+      return fieldData.default;
+    }
+    return productSettings[fieldName];
+  };
+  const settingOnChangeHandler = function (e) {
+    let name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+    let value = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+    const isLock = e.target.value && e.target.value.startsWith('pro_');
+    if (isLock) {
+      setPopUpStatus(true);
+    } else {
+      if (e.target.type === 'checkbox') {
+        setProductSettings({
+          ...productSettings,
+          [e.target.name]: e.target.checked ? 'yes' : 'no'
+        });
+      } else {
+        setProductSettings({
+          ...productSettings,
+          [name ? name : e.target.name]: value ? value : e.target.value
+        });
+      }
+    }
+  };
+  const radioData = (fieldData, field) => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_RadioButtons__WEBPACK_IMPORTED_MODULE_12__["default"], {
+      className: "wsx-mb-32",
+      key: field,
+      label: fieldData.label,
+      options: fieldData.options,
+      name: field,
+      value: getValue(field, fieldData),
+      onChange: settingOnChangeHandler,
+      defaultValue: fieldData.default,
+      labelSpace: "8",
+      flexView: true
+    });
+  };
+  const sliderData = (fieldData, field, customClass) => {
+    const defValue = productSettings[field] ? productSettings[field] == 'yes' ? true : false : fieldData.default;
+    let _className = wholesalex_single_product?.is_wcfm_dashboard ? 'wcfm-checkbox' : '';
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Slider__WEBPACK_IMPORTED_MODULE_9__["default"], {
+      className: `wsx-single-product-settings-slider ${customClass}`,
+      label: fieldData.label,
+      isLabelSide: true,
+      labelClass: "wsx-font-regular",
+      name: field,
+      value: defValue,
+      onChange: e => {
+        let _final;
+        _final = e.target.checked ? 'yes' : 'no';
+        setProductSettings({
+          ...productSettings,
+          [field]: _final
+        });
+      }
+    });
+  };
+  const multiselectData = (fieldData, field) => {
+    const defValue = productSettings[field] ? productSettings[field] : fieldData.default;
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_MultiSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      key: field,
+      name: field,
+      value: defValue,
+      options: fieldData['options'],
+      placeholder: fieldData.placeholder,
+      onMultiSelectChangeHandler: (fieldName, selectedValues) => {
+        let copy = {
+          ...productSettings
+        };
+        copy[fieldName] = [...selectedValues];
+        setProductSettings({
+          ...productSettings,
+          ...copy
+        });
+      }
+    });
+  };
+  const visibilitySectionData = (fieldData, section) => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      key: section,
+      className: "wholesalex-product-data__visibility-section wsx-accordion-wrapper"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-accordion-header",
+      onClick: () => {
+        setVisibilitySectionStatus(!visibilitySectionStatus);
+      }
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-accordion-title",
+      key: `whx_role_header_${section}`
+    }, fieldData['label']), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
+      className: `wsx-icon ${visibilitySectionStatus ? 'active' : ''}`
+    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_10__["default"].angleDown_24)), visibilitySectionStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-accordion-body"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-visibility-slider-fields"
+    }, visibilitySectionStatus && Object.keys(fieldData['attr']).map((field, index) => {
+      switch (fieldData['attr'][field]['type']) {
+        case 'switch':
+          return switchData(fieldData['attr'][field], field);
+        case 'slider':
+          return sliderData(fieldData['attr'][field], field, 'wsx-slider-sm');
+        default:
+          break;
+      }
+    })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-visibility-select-options"
+    }, visibilitySectionStatus && Object.keys(fieldData['attr']).map((field, index) => {
+      switch (fieldData['attr'][field]['type']) {
+        case 'select':
+          return selectData(fieldData['attr'][field], field);
+        case 'multiselect':
+          if (productSettings['_hide_for_b2b_role_n_user'] === 'b2b_specific' && field === '_hide_for_roles') {
+            return multiselectData(fieldData['attr'][field], field);
+          }
+          if (productSettings['_hide_for_b2b_role_n_user'] === 'user_specific' && field === '_hide_for_users') {
+            return multiselectData(fieldData['attr'][field], field);
+          }
+        default:
+          break;
+      }
+    }))));
+  };
+  const tabData = fieldData => {
+    return Object.keys(fieldData).map((field, index) => {
+      switch (fieldData[field]['type']) {
+        case 'choosebox':
+          return chooseboxData(fieldData[field], field);
+        case 'switch':
+          return switchData(fieldData[field], field);
+        case 'radio':
+          return radioData(fieldData[field], field);
+        case 'slider':
+          return sliderData(fieldData[field], field, 'wsx-slider-md wsx-mb-40');
+        case 'select':
+          return selectData(fieldData[field], field);
+        case 'visibility_section':
+          return visibilitySectionData(fieldData[field], field);
+        default:
+          break;
+      }
+    });
+  };
+  const proPopupContent = () => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("img", {
+      className: "wsx-addon-popup-image",
+      src: wholesalex.url + '/assets/img/unlock.svg',
+      alt: "Unlock Icon"
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-title wsx-font-18 wsx-font-medium wsx-mt-4"
+    }, wholesalex_product.i18n.unlock_heading, " ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('with', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-d-flex wsx-item-center wsx-justify-center wsx-gap-4 wsx-mb-16"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-title wsx-font-18 wsx-font-medium"
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('WholesaleX', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+      className: "wsx-title wsx-font-18 wsx-font-medium wsx-color-primary"
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Pro', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button_New__WEBPACK_IMPORTED_MODULE_11__["default"], {
+      buttonLink: "https://getwholesalex.com/pricing/?utm_source=wholesalex-menu&utm_medium=email-unlock_features-upgrade_to_pro&utm_campaign=wholesalex-DB",
+      label: wholesalex_product.i18n.upgrade_to_pro,
+      background: "secondary",
+      iconName: "growUp",
+      customClass: "wsx-w-auto wsx-br-lg wsx-justify-center wsx-font-16"
+    }));
+  };
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_LoadingOverlay__WEBPACK_IMPORTED_MODULE_2__["default"], null), !appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, Object.keys(fields).map((section, c) => section === '_product_settings_tab' && tabData(fields[section]['attr'], section))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("input", {
+    type: "hidden",
+    value: JSON.stringify(productSettings),
+    name: "wholesalex_product_settings"
+  }), popUpStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_PopupModal__WEBPACK_IMPORTED_MODULE_8__["default"], {
+    className: "wsx-pro-modal",
+    renderContent: proPopupContent,
+    onClose: () => setPopUpStatus(false)
+  }));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ProductTab);
+
+/***/ }),
+
+/***/ "./reactjs/src/utils/Icons.js":
+/*!************************************!*\
+  !*** ./reactjs/src/utils/Icons.js ***!
+  \************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+const icons = {};
+icons.growUp = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "24",
+  height: "24",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "m20.2 7.8-7.7 7.7-4-4-5.7 5.7"
+}), /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M15 7h6v6"
+}));
+icons.calendar = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  viewBox: "0 0 20 20",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M2.577 7.837H17.43m-3.728 3.254h.007m-3.705 0h.008m-3.714 0h.008m7.396 3.239h.007m-3.705 0h.008m-3.714 0h.008M13.37 1.667v2.742M6.638 1.667v2.742"
+}), /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M13.532 2.983H6.476C4.029 2.983 2.5 4.346 2.5 6.852v7.541c0 2.546 1.529 3.94 3.976 3.94h7.048c2.455 0 3.976-1.37 3.976-3.877V6.852c.008-2.506-1.513-3.87-3.968-3.87Z",
+  clipRule: "evenodd"
+}));
+icons.information = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("g", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.2",
+  clipPath: "url(#a)"
+}, /*#__PURE__*/React.createElement("path", {
+  d: "M8 14.667A6.667 6.667 0 1 0 8 1.333a6.667 6.667 0 0 0 0 13.334Zm0-4V8m0-2.667h.007"
+})), /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("clipPath", {
+  id: "a"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "none",
+  d: "M0 0h16v16H0z"
+}))));
+icons.checkedMarked = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "10",
+  height: "8",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeWidth: "1.5",
+  d: "m1 4 2.5 2.5L9 1"
+}));
+icons.dummyProfile = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "800",
+  height: "800",
+  fill: "none",
+  viewBox: "0 0 24 24"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "#d4d4da",
+  d: "M12 22.01c5.523 0 10-4.477 10-10s-4.477-10-10-10-10 4.477-10 10 4.477 10 10 10Z"
+}), /*#__PURE__*/React.createElement("path", {
+  fill: "#9e9da7",
+  d: "M12 6.94c-2.07 0-3.75 1.68-3.75 3.75 0 2.03 1.59 3.68 3.7 3.74h.18a3.743 3.743 0 0 0 3.62-3.74c0-2.07-1.68-3.75-3.75-3.75Zm6.78 12.42A9.976 9.976 0 0 1 12 22.01c-2.62 0-5-1.01-6.78-2.65.24-.91.89-1.74 1.84-2.38 2.73-1.82 7.17-1.82 9.88 0 .96.64 1.6 1.47 1.84 2.38Z"
+}));
+icons.profile = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "24",
+  height: "24",
+  fill: "none",
+  viewBox: "0 0 24 24"
+}, /*#__PURE__*/React.createElement("g", {
+  fill: "currentColor"
+}, /*#__PURE__*/React.createElement("path", {
+  d: "M22 12c0-5.51-4.49-10-10-10S2 6.49 2 12c0 2.9 1.25 5.51 3.23 7.34 0 .01 0 .01-.01.02.1.1.22.18.32.27.06.05.11.1.17.14.18.15.38.29.57.43l.2.14c.19.13.39.25.6.36.07.04.15.09.22.13.2.11.41.21.63.3.08.04.16.08.24.11.22.09.44.17.66.24.08.03.16.06.24.08.24.07.48.13.72.19.07.02.14.04.22.05.28.06.56.1.85.13.04 0 .08.01.12.02.34.03.68.05 1.02.05.34 0 .68-.02 1.01-.05.04 0 .08-.01.12-.02.29-.03.57-.07.85-.13.07-.01.14-.04.22-.05.24-.06.49-.11.72-.19.08-.03.16-.06.24-.08.22-.08.45-.15.66-.24.08-.03.16-.07.24-.11.21-.09.42-.19.63-.3.08-.04.15-.09.22-.13.2-.12.4-.23.6-.36.07-.04.13-.09.2-.14.2-.14.39-.28.57-.43.06-.05.11-.1.17-.14.11-.09.22-.18.32-.27 0-.01 0-.01-.01-.02C20.75 17.51 22 14.9 22 12Zm-5.06 4.97c-2.71-1.82-7.15-1.82-9.88 0-.44.29-.8.63-1.1 1A8.48 8.48 0 0 1 3.5 12c0-4.69 3.81-8.5 8.5-8.5 4.69 0 8.5 3.81 8.5 8.5 0 2.32-.94 4.43-2.46 5.97-.29-.37-.66-.71-1.1-1Z"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M12 6.93c-2.07 0-3.75 1.68-3.75 3.75 0 2.03 1.59 3.68 3.7 3.74h.18a3.743 3.743 0 0 0 3.62-3.74c0-2.07-1.68-3.75-3.75-3.75Z"
+})));
+icons.profileUpdate = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "24",
+  height: "24",
+  viewBox: "0 0 436.24 436.239"
+}, /*#__PURE__*/React.createElement("g", {
+  fill: "currentColor"
+}, /*#__PURE__*/React.createElement("path", {
+  d: "M396.64 211.551c-12.75 0-23.084 10.336-23.084 23.084 0 85.708-69.73 155.437-155.439 155.437-85.709 0-155.437-69.729-155.437-155.437S132.41 79.197 218.118 79.197c5.504 0 10.98.293 16.411.862l-13.607 24.446a9.231 9.231 0 0 0 .146 9.232 9.23 9.23 0 0 0 7.922 4.492c.049 0 .098 0 .146-.002l114.146-1.792a9.24 9.24 0 0 0 7.924-4.741 9.236 9.236 0 0 0-.145-9.233L292.443 4.493c-1.695-2.83-4.756-4.563-8.068-4.491a9.236 9.236 0 0 0-7.924 4.742l-17.996 32.332a202.485 202.485 0 0 0-40.335-4.049c-53.851 0-104.479 20.971-142.557 59.049-38.078 38.078-59.049 88.706-59.049 142.558 0 53.851 20.971 104.479 59.049 142.557 38.078 38.078 88.705 59.049 142.556 59.049 53.85 0 104.479-20.971 142.557-59.049s59.051-88.706 59.051-142.558c-.003-12.746-10.339-23.082-23.087-23.082z"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M317.91 333.346c-2.557-6.568-4.311-10.745-4.311-10.745-2.309-5.521-7.861-9.056-13.162-11.229l-35.835-16.498-17.214-14.518-27.662 27.513 9.98 66.722c34.376-2.823 65.282-18.074 88.204-41.245zM135.8 311.37c-5.302 2.175-11.07 5.95-13.162 11.229 0 0-1.754 4.178-4.311 10.745 22.922 23.171 53.828 38.423 88.203 41.243l9.979-66.722-27.661-27.513-17.214 14.518-35.834 16.5zm146.938-122.945c.396-39.734-18.527-63.515-64.621-63.515-46.094 0-65.021 23.779-64.618 63.515.622 57.262 27.969 91.406 64.618 91.406 36.648 0 63.998-34.145 64.621-91.406z"
+})));
+icons.import = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M2.5 12.5v3.333c0 .917.75 1.667 1.667 1.667h11.666a1.666 1.666 0 0 0 1.667-1.667V12.5m-3.333-5L10 11.667 5.833 7.5M10 10.667V2.083"
+}));
+icons.importFile = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "72",
+  height: "72",
+  viewBox: "0 0 72 72",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeWidth: "2.5",
+  d: "M14.996 13.5v45a4.5 4.5 0 0 0 4.5 4.5h33a4.5 4.5 0 0 0 4.5-4.5V19.864a4.5 4.5 0 0 0-1.318-3.182l-6.364-6.364A4.5 4.5 0 0 0 46.132 9H19.496a4.5 4.5 0 0 0-4.5 4.5Z"
+}), /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M41.996 24V9h6l9 9v6h-15Z"
+}), /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeWidth: "2.5",
+  d: "M46.504 42 36.216 52.288a.3.3 0 0 1-.424 0L25.504 42m10.5 10.5V30"
+}));
+icons.drag = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "24",
+  height: "24",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  fillRule: "evenodd",
+  d: "m11.999 2 4.166 5h-3.332v4.167H17V7.833L22 12l-5 4.167v-3.334h-4.167V17h3.332L12 22l-4.167-5h3.334v-4.167H7v3.334L2 12l5-4.167v3.334h4.166V7H7.832l4.167-5Z",
+  clipRule: "evenodd"
+}));
+icons.image = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "72",
+  height: "72",
+  viewBox: "0 0 32 32"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  fillRule: "evenodd",
+  d: "M8 10a2 2 0 1 1 .001-4.001A2 2 0 0 1 8 10Zm0-6a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm22 13.128L24 11l-9.941 10.111L10 17l-8 7.337V4a2 2 0 0 1 2-2h24a2 2 0 0 1 2 2v13.128ZM30 28a2 2 0 0 1-2 2h-5.168l-7.368-7.465L24 13.999l6 6V28ZM4 30a2 2 0 0 1-2-2v-.939l7.945-7.116L20.001 30H4ZM28 0H4a4 4 0 0 0-4 4v24a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4V4a4 4 0 0 0-4-4Z"
+}));
+icons.csv = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "72",
+  height: "72",
+  viewBox: "0 0 400 400"
+}, /*#__PURE__*/React.createElement("g", {
+  fill: "currentColor"
+}, /*#__PURE__*/React.createElement("path", {
+  d: "M325 105h-75a5 5 0 0 1-5-5V25a5 5 0 1 1 10 0v70h70a5 5 0 0 1 0 10Z"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M325 154.83a5 5 0 0 1-5-5v-47.76L247.93 30H100a20 20 0 0 0-20 20v98.17a5 5 0 0 1-10 0V50a30 30 0 0 1 30-30h150a5 5 0 0 1 3.54 1.46l75 75A5 5 0 0 1 330 100v49.83a5 5 0 0 1-5 5ZM300 380H100a30 30 0 0 1-30-30v-75a5 5 0 0 1 10 0v75a20 20 0 0 0 20 20h200a20 20 0 0 0 20-20v-75a5 5 0 0 1 10 0v75a30 30 0 0 1-30 30Z"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M275 280H125a5 5 0 1 1 0-10h150a5 5 0 0 1 0 10Zm-75 50h-75a5 5 0 1 1 0-10h75a5 5 0 0 1 0 10Z"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M325 280H75a30 30 0 0 1-30-30v-76.83a30 30 0 0 1 30-30h.2l250 1.66a30.09 30.09 0 0 1 29.81 30V250A30 30 0 0 1 325 280ZM75 153.17a20 20 0 0 0-20 20V250a20 20 0 0 0 20 20h250a20 20 0 0 0 20-20v-75.17a20.06 20.06 0 0 0-19.88-20l-250-1.66Z"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "m168.48 217.48 8.91 1a20.84 20.84 0 0 1-6.19 13.18q-5.33 5.18-14 5.18-7.31 0-11.86-3.67a23.43 23.43 0 0 1-7-10 37.74 37.74 0 0 1-2.46-13.87q0-12.19 5.78-19.82t15.9-7.64a18.69 18.69 0 0 1 13.2 4.88q5.27 4.88 6.64 14l-8.91.94q-2.46-12.07-10.86-12.07-5.39 0-8.38 5t-3 14.55q0 9.69 3.2 14.63t8.48 4.94a9.3 9.3 0 0 0 7.19-3.32 13.25 13.25 0 0 0 3.36-7.91Zm10.93 5.67 9.34-2q1.68 7.93 12.89 7.93 5.12 0 7.87-2a6.07 6.07 0 0 0 2.75-5 7.09 7.09 0 0 0-1.25-4q-1.25-1.85-5.35-2.91l-10.2-2.66a25.1 25.1 0 0 1-7.73-3.11 12.15 12.15 0 0 1-4-4.9 15.54 15.54 0 0 1-1.5-6.76 14 14 0 0 1 5.31-11.46q5.31-4.32 13.59-4.32a24.86 24.86 0 0 1 12.29 3 13.56 13.56 0 0 1 6.89 8.52l-9.14 2.27q-2.11-6.05-9.84-6.05-4.49 0-6.86 1.88a5.83 5.83 0 0 0-2.36 4.77q0 4.57 7.42 6.41l9.06 2.27q8.24 2.07 11.05 6.11a15.29 15.29 0 0 1 2.81 8.93 14.7 14.7 0 0 1-5.92 12.36q-5.92 4.51-15.33 4.51a28 28 0 0 1-13.89-3.32 16.29 16.29 0 0 1-7.9-10.47Zm70.9 12.85h-9.77l-16.44-53.32h10.16l12.23 40.86L259 182.68h8Z"
+})));
+icons.excel = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "72",
+  height: "72",
+  fill: "none",
+  viewBox: "0 0 24 24"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  fillRule: "evenodd",
+  d: "M9.293 1.293A1 1 0 0 1 10 1h8a3 3 0 0 1 3 3v5a1 1 0 1 1-2 0V4a1 1 0 0 0-1-1h-7v5a1 1 0 0 1-1 1H5v11a1 1 0 0 0 1 1h1a1 1 0 1 1 0 2H6a3 3 0 0 1-3-3V8a1 1 0 0 1 .293-.707l6-6ZM6.414 7H9V4.414L6.414 7ZM19 12a1 1 0 0 1 1 1v6h3a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1Zm-7.186.419a1 1 0 1 0-1.628 1.162l2.085 2.919-2.085 2.919a1 1 0 1 0 1.628 1.162l1.686-2.36 1.686 2.36a1 1 0 1 0 1.628-1.162L14.729 16.5l2.085-2.919a1 1 0 1 0-1.628-1.162l-1.686 2.36-1.686-2.36Z",
+  clipRule: "evenodd"
+}));
+icons.docFile = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "72",
+  height: "72",
+  viewBox: "0 0 512 512"
+}, /*#__PURE__*/React.createElement("path", {
+  fillRule: "evenodd",
+  d: "M100.642 425.75h5.504c13.141 0 22.87-2.155 29.205-6.422 5.547-3.69 9.558-9.365 12.011-17.088 1.813-5.717 2.73-11.797 2.73-18.261 0-6.934-1.045-13.355-3.157-19.264-2.133-5.91-5.013-10.518-8.682-13.846-3.499-3.114-7.488-5.248-11.947-6.357-4.459-1.11-11.179-1.685-20.16-1.685h-5.504v82.922Zm-28.864 22.613V320.235h35.456c15.083 0 27.115 1.45 36.16 4.352 11.819 3.797 20.843 10.837 27.115 21.098 6.272 10.283 9.43 23.168 9.43 38.656 0 15.915-3.158 28.907-9.43 38.976-7.83 12.694-19.926 20.438-36.33 23.147-7.532 1.259-17.174 1.899-28.929 1.899H71.778Zm186.39-107.78c-10.433 0-18.475 4.33-24.15 13.013-5.12 7.85-7.68 17.898-7.68 30.186 0 14.23 3.03 25.28 9.13 33.11 5.718 7.424 13.334 11.114 22.785 11.114 10.368 0 18.453-4.352 24.234-13.12 5.12-7.7 7.68-17.877 7.68-30.549 0-13.93-3.05-24.79-9.13-32.64-5.718-7.403-13.355-11.115-22.87-11.115m.086-22.613c20.138 0 35.562 6.379 46.293 19.179 10.304 12.224 15.445 27.946 15.445 47.19 0 21.034-6.08 37.76-18.24 50.175-10.496 10.73-25.002 16.085-43.498 16.085-20.118 0-35.563-6.378-46.294-19.157-10.304-12.224-15.466-28.203-15.466-47.915 0-20.608 6.101-37.14 18.282-49.557 10.54-10.667 25.046-16 43.478-16m176.27 100.175 8.427 23.061c-7.616 3.691-14.229 6.166-19.904 7.467-5.674 1.28-12.672 1.92-20.97 1.92-12.544 0-22.912-1.792-31.104-5.397-11.478-5.078-20.118-13.056-25.942-23.958-5.248-9.77-7.872-21.717-7.872-35.818 0-23.787 7.254-41.835 21.782-54.059 10.538-8.917 24.448-13.376 41.685-13.376 7.36 0 14.037.661 20.075 2.005 6.016 1.366 12.864 3.755 20.501 7.19l-9.664 21.717c-10.176-5.547-19.947-8.32-29.29-8.32-11.265 0-19.883 3.861-25.857 11.563-6.272 8.085-9.408 18.752-9.408 32.021 0 13.739 3.286 24.49 9.856 32.235C383.41 424.139 392.476 428 404.06 428c5.226 0 10.07-.683 14.464-2.112 4.394-1.408 9.728-3.99 16-7.744M320 42.667H85.333v234.666H128v-192h174.293L384 167.04v110.293h42.667v-128L320 42.667Z"
+}));
+icons.file = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "72",
+  height: "72",
+  fill: "none",
+  viewBox: "0 0 24 24"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "2",
+  d: "M9 17h6m-6-4h6M9 9h1m3-6H8.2c-1.12 0-1.68 0-2.108.218a2 2 0 0 0-.874.874C5 4.52 5 5.08 5 6.2v11.6c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874C6.52 21 7.08 21 8.2 21h7.6c1.12 0 1.68 0 2.108-.218a2 2 0 0 0 .874-.874C19 19.48 19 18.92 19 17.8V9m-6-6 6 6m-6-6v4.4c0 .56 0 .84.109 1.054a1 1 0 0 0 .437.437C13.76 9 14.04 9 14.6 9H19"
+}));
+icons.tick = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.2",
+  d: "M13.334 4 6 11.333 2.667 8"
+}));
+icons.cross = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.2",
+  d: "m12 4-8 8m0-8 8 8"
+}));
+icons.plus_20 = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M10 4.167v11.666M4.167 10h11.666"
+}));
+icons.plus = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "24",
+  height: "24",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M12 5v14m-7-7h14"
+}));
+icons.search = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M9.167 15.833a6.667 6.667 0 1 0 0-13.333 6.667 6.667 0 0 0 0 13.333ZM17.5 17.5l-3.625-3.625"
+}));
+icons.delete = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.2",
+  d: "M12.883 6.312s-.361 4.49-.571 6.381c-.1.904-.659 1.433-1.572 1.45-1.74.031-3.481.033-5.22-.004-.88-.018-1.428-.553-1.526-1.44-.211-1.909-.571-6.387-.571-6.387M13.805 4.16H2.5m9.127 0a1.1 1.1 0 0 1-1.077-.883l-.162-.81a.853.853 0 0 0-.824-.633H6.742a.853.853 0 0 0-.825.632l-.162.811a1.099 1.099 0 0 1-1.077.883"
+}));
+icons.delete_24 = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "24",
+  height: "24",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M19.325 9.468s-.543 6.735-.858 9.572c-.15 1.355-.987 2.15-2.358 2.174-2.61.047-5.221.05-7.83-.005-1.318-.027-2.141-.83-2.288-2.162-.317-2.862-.857-9.579-.857-9.579M20.708 6.24H3.75m13.69 0a1.648 1.648 0 0 1-1.614-1.324L15.583 3.7a1.28 1.28 0 0 0-1.237-.95h-4.233a1.28 1.28 0 0 0-1.237.95l-.243 1.216A1.648 1.648 0 0 1 7.018 6.24"
+}));
+icons.copy = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("g", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.2",
+  clipPath: "url(#a)"
+}, /*#__PURE__*/React.createElement("path", {
+  d: "M13.333 6h-6C6.597 6 6 6.597 6 7.333v6c0 .737.597 1.334 1.333 1.334h6c.737 0 1.334-.597 1.334-1.334v-6c0-.736-.597-1.333-1.334-1.333Z"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M3.333 10h-.666a1.333 1.333 0 0 1-1.333-1.333v-6a1.333 1.333 0 0 1 1.333-1.334h6A1.333 1.333 0 0 1 10 2.667v.666"
+})), /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("clipPath", {
+  id: "a"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "#fff",
+  d: "M0 0h16v16H0z"
+}))));
+icons.edit = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"
+}));
+icons.reset = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "14",
+  height: "14",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.2",
+  d: "M1 1.002v3.6h3.692M1.098 9.144a6.043 6.043 0 0 0 2.646 3.038 6.287 6.287 0 0 0 4.014.752 6.205 6.205 0 0 0 3.612-1.866 5.927 5.927 0 0 0 1.616-3.66 5.89 5.89 0 0 0-1.093-3.84A6.15 6.15 0 0 0 8.574 1.24a6.302 6.302 0 0 0-4.082.215 6.103 6.103 0 0 0-3.043 2.66"
+}));
+icons.clipboard = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "18",
+  height: "18",
+  fill: "none",
+  transform: "rotate(45)",
+  viewBox: "-2.4 -2.4 28.8 28.8"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  fillRule: "evenodd",
+  stroke: "none",
+  d: "M7.263 3.26A2.25 2.25 0 0 1 9.5 1.25h5a2.25 2.25 0 0 1 2.237 2.01c.764.016 1.423.055 1.987.159.758.14 1.403.404 1.928.93.602.601.86 1.36.982 2.26.116.866.116 1.969.116 3.336v6.11c0 1.367 0 2.47-.116 3.337-.122.9-.38 1.658-.982 2.26-.602.602-1.36.86-2.26.982-.867.116-1.97.116-3.337.116h-6.11c-1.367 0-2.47 0-3.337-.116-.9-.122-1.658-.38-2.26-.982-.602-.602-.86-1.36-.981-2.26-.117-.867-.117-1.97-.117-3.337v-6.11c0-1.367 0-2.47.117-3.337.12-.9.38-1.658.981-2.26.525-.525 1.17-.79 1.928-.929.564-.104 1.224-.143 1.987-.159Zm.002 1.5c-.718.016-1.272.052-1.718.134-.566.104-.895.272-1.138.515-.277.277-.457.665-.556 1.4-.101.754-.103 1.756-.103 3.191v6c0 1.435.002 2.436.103 3.192.099.734.28 1.122.556 1.399.277.277.665.457 1.4.556.754.101 1.756.103 3.191.103h6c1.435 0 2.436-.002 3.192-.103.734-.099 1.122-.28 1.399-.556.277-.277.457-.665.556-1.4.101-.755.103-1.756.103-3.191v-6c0-1.435-.002-2.437-.103-3.192-.099-.734-.28-1.122-.556-1.399-.244-.243-.572-.41-1.138-.515-.446-.082-1-.118-1.718-.133A2.25 2.25 0 0 1 14.5 6.75h-5a2.25 2.25 0 0 1-2.235-1.99ZM9.5 2.75a.75.75 0 0 0-.75.75v1c0 .414.336.75.75.75h5a.75.75 0 0 0 .75-.75v-1a.75.75 0 0 0-.75-.75h-5ZM6.25 10.5A.75.75 0 0 1 7 9.75h.5a.75.75 0 0 1 0 1.5H7a.75.75 0 0 1-.75-.75Zm3.5 0a.75.75 0 0 1 .75-.75H17a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75ZM6.25 14a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5H7a.75.75 0 0 1-.75-.75Zm3.5 0a.75.75 0 0 1 .75-.75H17a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75Zm-3.5 3.5a.75.75 0 0 1 .75-.75h.5a.75.75 0 0 1 0 1.5H7a.75.75 0 0 1-.75-.75Zm3.5 0a.75.75 0 0 1 .75-.75H17a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1-.75-.75Z",
+  clipRule: "evenodd"
+}));
+icons.save = /*#__PURE__*/React.createElement("svg", {
+  width: "20",
+  height: "20",
+  viewBox: "0 0 1920 1920",
+  xmlns: "http://www.w3.org/2000/svg"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M790.706 338.824v112.94H395.412c-31.06 0-56.47 25.3-56.47 56.471v744.509c17.73-6.325 36.592-10.391 56.47-10.391h1129.412c19.877 0 38.738 4.066 56.47 10.39V508.236c0-31.171-25.412-56.47-56.47-56.47h-395.295V338.824h395.295c93.402 0 169.411 76.009 169.411 169.411v1242.353c0 93.403-76.01 169.412-169.411 169.412H395.412C302.009 1920 226 1843.99 226 1750.588V508.235c0-93.402 76.01-169.411 169.412-169.411h395.294Zm734.118 1016.47H395.412c-31.06 0-56.47 25.299-56.47 56.47v338.824c0 31.172 25.41 56.47 56.47 56.47h1129.412c31.058 0 56.47-25.298 56.47-56.47v-338.823c0-31.172-25.412-56.47-56.47-56.47ZM1016.622-.023v880.151l246.212-246.325 79.85 79.85-382.532 382.644-382.645-382.644 79.85-79.85L903.68 880.128V-.022h112.941ZM564.824 1468.235c-62.344 0-112.942 50.71-112.942 112.941s50.598 112.942 112.942 112.942c62.343 0 112.94-50.71 112.94-112.942 0-62.23-50.597-112.94-112.94-112.94Z",
+  fillRule: "evenodd"
+}));
+icons.menu = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeMiterlimit: "10",
+  strokeWidth: "2.5",
+  d: "M5 4.167v11.666m5-11.666v11.666m5-11.666v11.666"
+}));
+icons.dot3 = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.2",
+  d: "M8 8.667a.667.667 0 1 0 0-1.334.667.667 0 0 0 0 1.334Zm4.667 0a.667.667 0 1 0 0-1.334.667.667 0 0 0 0 1.334Zm-9.333 0a.667.667 0 1 0 0-1.334.667.667 0 0 0 0 1.334Z"
+}));
+icons.lock = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  viewBox: "0 0 330 330"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M65 330h200c8.284 0 15-6.716 15-15V145c0-8.284-6.716-15-15-15h-15V85c0-46.869-38.131-85-85-85S80 38.131 80 85v45H65c-8.284 0-15 6.716-15 15v170c0 8.284 6.716 15 15 15zm115-95.014V255c0 8.284-6.716 15-15 15s-15-6.716-15-15v-20.014c-6.068-4.565-10-11.824-10-19.986 0-13.785 11.215-25 25-25s25 11.215 25 25c0 8.162-3.932 15.421-10 19.986zM110 85c0-30.327 24.673-55 55-55s55 24.673 55 55v45H110V85z"
+}));
+icons.help = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  viewBox: "0 0 20 20",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  fillRule: "evenodd",
+  d: "M10.001 18.333a8.334 8.334 0 1 0 0-16.667 8.334 8.334 0 0 0 0 16.667ZM8.613 8.148c0-.238.078-.615.288-.906.175-.242.475-.482 1.1-.482.765 0 1.163.405 1.297.81.142.427.021.903-.422 1.198-.73.487-1.268.958-1.552 1.62-.25.584-.25 1.225-.249 1.826v.102h1.853c0-.759.016-1.005.1-1.198.062-.148.218-.371.876-.81a2.866 2.866 0 0 0 1.152-3.323c-.39-1.175-1.505-2.078-3.055-2.078-1.228 0-2.084.533-2.604 1.253a3.51 3.51 0 0 0-.636 1.988h1.852Zm2.314 6.945V13.24H9.074v1.852h1.854Z",
+  clipRule: "evenodd"
+}));
+icons.settings = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none",
+  viewBox: "0 0 24 24"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  d: "m20.073 7.988-.57-.99a1.754 1.754 0 0 0-2.392-.646 1.745 1.745 0 0 1-2.39-.62 1.678 1.678 0 0 1-.236-.84 1.753 1.753 0 0 0-1.753-1.804h-1.15a1.745 1.745 0 0 0-1.745 1.754A1.754 1.754 0 0 1 8.083 6.57a1.678 1.678 0 0 1-.839-.235 1.754 1.754 0 0 0-2.391.646L4.24 7.988a1.754 1.754 0 0 0 .638 2.392 1.754 1.754 0 0 1 0 3.037A1.745 1.745 0 0 0 4.24 15.8l.58.998a1.753 1.753 0 0 0 2.39.68 1.737 1.737 0 0 1 2.383.638c.151.254.232.543.235.839 0 .968.786 1.753 1.754 1.753h1.15c.965 0 1.749-.78 1.753-1.745a1.745 1.745 0 0 1 1.754-1.754c.295.008.583.09.839.235a1.754 1.754 0 0 0 2.391-.637l.604-1.007a1.745 1.745 0 0 0-.637-2.391 1.746 1.746 0 0 1-.638-2.392 1.72 1.72 0 0 1 .638-.637 1.754 1.754 0 0 0 .637-2.383v-.009Z"
+}), /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  d: "M12.16 14.315a2.416 2.416 0 1 0 0-4.833 2.416 2.416 0 0 0 0 4.833Z"
+}));
+icons.doc = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M12.281 2.302H6.737a3.184 3.184 0 0 0-3.195 3.107v8.928a3.19 3.19 0 0 0 3.119 3.259h6.734a3.239 3.239 0 0 0 3.107-3.26V6.699l-4.22-4.396Z",
+  clipRule: "evenodd"
+}), /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M12.063 2.292v2.424c0 1.183.956 2.142 2.14 2.146h2.295m-4.591 5.937h-4.5m2.795-3.127H7.406"
+}));
+icons.play = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeWidth: "1.5",
+  d: "M14.504 8.336a2 2 0 0 1 0 3.328l-6.395 4.263C6.78 16.813 5 15.86 5 14.263V5.737c0-1.597 1.78-2.55 3.11-1.664l6.394 4.263Z"
+}));
+icons.playFill = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M14.92 8.613c.99.66.99 2.114 0 2.774l-7.33 4.886C6.484 17.01 5 16.217 5 14.886V5.114C5 3.783 6.484 2.99 7.591 3.727l7.329 4.886Z"
+}));
+icons.smile = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  viewBox: "0 0 34.25 34.25"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M17.125 0C7.668 0 0 7.667 0 17.125S7.668 34.25 17.125 34.25c9.459 0 17.125-7.667 17.125-17.125S26.584 0 17.125 0zm3.432 10.182a2.234 2.234 0 0 1 2.443.192 2.216 2.216 0 0 1 2.441-.192 2.23 2.23 0 0 1 1.047 2.619c-.355 1.504-2.952 3.173-3.25 3.359a.445.445 0 0 1-.478 0c-.298-.186-2.896-1.855-3.252-3.36a2.234 2.234 0 0 1-.105-.667 2.233 2.233 0 0 1 1.154-1.951zm-11.75 0a2.234 2.234 0 0 1 2.443.192 2.216 2.216 0 0 1 2.441-.192 2.23 2.23 0 0 1 1.048 2.619c-.356 1.504-2.953 3.173-3.25 3.359a.451.451 0 0 1-.48 0c-.297-.186-2.895-1.855-3.252-3.36a2.233 2.233 0 0 1-.104-.667 2.235 2.235 0 0 1 1.154-1.951zm17.556 12.897a11.217 11.217 0 0 1-9.237 4.864 11.215 11.215 0 0 1-9.24-4.865 1.5 1.5 0 1 1 2.471-1.7 8.217 8.217 0 0 0 6.77 3.565 8.22 8.22 0 0 0 6.768-3.565 1.498 1.498 0 1 1 2.468 1.701z"
+}));
+icons.sad = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  viewBox: "0 0 36 36"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M18 2a16 16 0 1 0 16 16A16 16 0 0 0 18 2Zm9 12.28a1.8 1.8 0 1 1-1.8-1.8 1.8 1.8 0 0 1 1.8 1.8Zm-15.55 1.8a1.8 1.8 0 1 1 1.8-1.8 1.8 1.8 0 0 1-1.84 1.8Zm14 7.53a1 1 0 0 1-1.6 1.2 7 7 0 0 0-11.31.13 1 1 0 1 1-1.63-1.16 9 9 0 0 1 14.54-.17Z"
+}), /*#__PURE__*/React.createElement("path", {
+  fill: "none",
+  d: "M0 0h36v36H0z"
+}));
+icons.view = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  viewBox: "0 0 1024 1024"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M512 160c320 0 512 352 512 352S832 864 512 864 0 512 0 512s192-352 512-352zm0 64c-225.28 0-384.128 208.064-436.8 288 52.608 79.872 211.456 288 436.8 288 225.28 0 384.128-208.064 436.8-288-52.608-79.872-211.456-288-436.8-288zm0 64a224 224 0 1 1 0 448 224 224 0 0 1 0-448zm0 64a160.192 160.192 0 0 0-160 160c0 88.192 71.744 160 160 160s160-71.808 160-160-71.744-160-160-160z"
+}));
+icons.download = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none",
+  viewBox: "0 0 24 24"
+}, /*#__PURE__*/React.createElement("g", {
+  stroke: "currentColor",
+  strokeWidth: "1.5"
+}, /*#__PURE__*/React.createElement("path", {
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  d: "M12 7v7m0 0 3-3m-3 3-3-3"
+}), /*#__PURE__*/React.createElement("path", {
+  strokeLinecap: "round",
+  d: "M16 17H8"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2c4.714 0 7.071 0 8.535 1.464C22 4.93 22 7.286 22 12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z"
+})));
+icons.warningMessage = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none",
+  transform: "scale(-1 1)",
+  viewBox: "0 0 24 24"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  fillRule: "evenodd",
+  d: "M4 2h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H6l-4 4V4c0-1.1.9-2 2-2Zm7 3h2v6h-2V5Zm2 8h-2v2h2v-2Z",
+  clipRule: "evenodd"
+}));
+icons.emailFill = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "32",
+  height: "24",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("rect", {
+  width: "32",
+  height: "24",
+  fill: "#6C6CFF",
+  rx: "4"
+}), /*#__PURE__*/React.createElement("path", {
+  stroke: "#E7E7FF",
+  strokeLinecap: "round",
+  strokeWidth: "1.5",
+  d: "m5 5 8.467 6.928a4 4 0 0 0 5.066 0L27 5"
+}));
+icons.registrationCardFill = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "32",
+  height: "24",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("rect", {
+  width: "32",
+  height: "24",
+  fill: "#6C6CFF",
+  rx: "4"
+}), /*#__PURE__*/React.createElement("path", {
+  stroke: "#E7E7FF",
+  strokeLinecap: "round",
+  strokeWidth: "1.5",
+  d: "M18 10h10m-10 4h7M9 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm0 0a5 5 0 0 0-5 5m5-5a5 5 0 0 1 5 5"
+}));
+icons.listCheckMark = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "18",
+  height: "18",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("circle", {
+  cx: "9",
+  cy: "9",
+  r: "9",
+  fill: "#E7E7FF"
+}), /*#__PURE__*/React.createElement("path", {
+  stroke: "#6C6CFF",
+  strokeWidth: "1.5",
+  d: "m4.5 9 3 3 6-6"
+}));
+icons.angleDown = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "m5 7.5 5 5 5-5"
+}));
+icons.angleDown_24 = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "24",
+  height: "24",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "m6 9 6 6 6-6"
+}));
+icons.angleLeft_24 = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "24",
+  height: "24",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "m15 18-6-6 6-6"
+}));
+icons.angleRight_24 = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "24",
+  height: "24",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "m9 18 6-6-6-6"
+}));
+icons.angleLeft = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none",
+  viewBox: "0 0 24 24"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "m15 18-6-6 6-6"
+}));
+icons.angleRight = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none",
+  viewBox: "0 0 24 24"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "m9 18 6-6-6-6"
+}));
+icons.arrowRight = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "16",
+  height: "16",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.2",
+  d: "M2 8h11.333m-4-4.667L14 8l-4.667 4.667"
+}));
+icons.arrowLeft_24 = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "24",
+  height: "24",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M19 12H6m6-7-7 7 7 7"
+}));
+icons.proLock = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "40",
+  height: "40",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  fillRule: "evenodd",
+  d: "M14 13a6 6 0 0 1 12 0v2H14v-2Zm16 2v-2c0-5.523-4.477-10-10-10S10 7.477 10 13v2a4 4 0 0 0-4 4v14a4 4 0 0 0 4 4h20a4 4 0 0 0 4-4V19a4 4 0 0 0-4-4Zm-9.137 10.753a2.455 2.455 0 1 0-1.725 0L17.546 30h4.909l-1.592-4.247Z",
+  clipRule: "evenodd"
+}));
+
+// icons.customerNumber = <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><circle cx="20" cy="20" r="20" fill="#5CADFF"/><path stroke="#fff" strokeWidth="1.5" d="M20 20a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 0a8 8 0 0 0-8 8m8-8a8 8 0 0 1 8 8"/></svg>
+// icons.totalOrder = <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><circle cx="20" cy="20" r="20" fill="#A367F0"/><path stroke="#fff" strokeWidth="1.5" d="M12 26V14a2 2 0 0 1 2-2h8.864a2 2 0 0 1 1.414.586l3.136 3.136A2 2 0 0 1 28 17.136V26a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2Zm4-3h8m-8-3h8m-8-3h6"/></svg>
+// icons.totalSale = <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><circle cx="20" cy="20" r="20" fill="#6C6CFF"/><path stroke="#fff" strokeWidth="1.5" d="M25 16.5a3.5 3.5 0 0 0-3.5-3.5h-3a3.5 3.5 0 1 0 0 7h3a3.5 3.5 0 1 1 0 7h-3a3.5 3.5 0 0 1-3.5-3.5M20 10v20"/></svg>
+// icons.netRevenue = <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><circle cx="20" cy="20" r="20" fill="#52D47F"/><path stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M11 11v18h18"/><path stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="m26.7 16-5.1 5.2-2.8-2.7-3.8 3.8"/></svg>
+// icons.grossSale = <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><circle cx="20" cy="20" r="20" fill="#FEAD01"/><path stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="m28.2 15.8-7.7 7.7-4-4-5.7 5.7"/><path stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M23 15h6v6"/></svg>
+// icons.avgOrderValue = <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><circle cx="20" cy="20" r="20" fill="#94C752"/><path fill="#fff" d="M17.75 22a.75.75 0 0 0-1.5 0h1.5Zm4.5-4a.75.75 0 0 0 1.5 0h-1.5Zm-3 8a.75.75 0 0 0 1.5 0h-1.5Zm1.5-12a.75.75 0 0 0-1.5 0h1.5Zm.25 1.25h-2v1.5h2v-1.5Zm-2 5.5h2v-1.5h-2v1.5Zm2 2.5h-2v1.5h2v-1.5Zm-2 0c-.69 0-1.25-.56-1.25-1.25h-1.5A2.75 2.75 0 0 0 19 24.75v-1.5ZM22.25 22c0 .69-.56 1.25-1.25 1.25v1.5A2.75 2.75 0 0 0 23.75 22h-1.5ZM21 20.75c.69 0 1.25.56 1.25 1.25h1.5A2.75 2.75 0 0 0 21 19.25v1.5ZM16.25 18A2.75 2.75 0 0 0 19 20.75v-1.5c-.69 0-1.25-.56-1.25-1.25h-1.5ZM19 15.25A2.75 2.75 0 0 0 16.25 18h1.5c0-.69.56-1.25 1.25-1.25v-1.5ZM23.75 18A2.75 2.75 0 0 0 21 15.25v1.5c.69 0 1.25.56 1.25 1.25h1.5Zm-3 8v-2h-1.5v2h1.5Zm-1.5-12v2h1.5v-2h-1.5Z"/><circle cx="20" cy="20" r="9" stroke="#fff" strokeWidth="1.5"/></svg>
+
+icons.noData = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "150",
+  height: "168",
+  viewBox: "0 0 288 168",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "#070707",
+  d: "M26.59 129.909V159h-3.408L7.33 136.159h-.285V159H3.523v-29.091h3.409l15.909 22.898h.284v-22.898h3.466Zm15.019 29.546c-1.97 0-3.698-.469-5.185-1.407-1.477-.937-2.632-2.249-3.466-3.934-.823-1.686-1.235-3.656-1.235-5.909 0-2.273.412-4.257 1.235-5.952.834-1.695 1.99-3.012 3.466-3.949 1.487-.938 3.215-1.406 5.185-1.406 1.97 0 3.693.468 5.17 1.406 1.487.937 2.642 2.254 3.466 3.949.834 1.695 1.25 3.679 1.25 5.952 0 2.253-.416 4.223-1.25 5.909-.823 1.685-1.979 2.997-3.465 3.934-1.478.938-3.201 1.407-5.171 1.407Zm0-3.012c1.496 0 2.727-.383 3.693-1.15.966-.767 1.681-1.776 2.145-3.026.464-1.25.696-2.604.696-4.062 0-1.459-.232-2.818-.696-4.077-.464-1.26-1.179-2.278-2.145-3.054-.966-.777-2.197-1.165-3.693-1.165s-2.727.388-3.693 1.165c-.966.776-1.681 1.794-2.145 3.054-.464 1.259-.696 2.618-.696 4.077 0 1.458.232 2.812.696 4.062.464 1.25 1.179 2.259 2.145 3.026.966.767 2.197 1.15 3.693 1.15ZM76.414 159h-8.977v-29.091h9.375c2.822 0 5.237.582 7.244 1.747 2.008 1.156 3.547 2.817 4.617 4.986 1.07 2.159 1.605 4.744 1.605 7.756 0 3.03-.54 5.639-1.62 7.826-1.079 2.178-2.65 3.855-4.715 5.029-2.065 1.165-4.574 1.747-7.529 1.747Zm-5.454-3.125h5.227c2.405 0 4.399-.464 5.98-1.392 1.582-.928 2.76-2.249 3.537-3.963.777-1.714 1.165-3.755 1.165-6.122 0-2.349-.384-4.371-1.15-6.066-.768-1.704-1.913-3.011-3.438-3.92-1.525-.919-3.423-1.378-5.696-1.378H70.96v22.841Zm30.753 3.636c-1.383 0-2.637-.26-3.764-.781-1.127-.53-2.022-1.292-2.685-2.287-.663-1.004-.994-2.216-.994-3.636 0-1.25.246-2.263.739-3.04a5.221 5.221 0 0 1 1.974-1.847 10.387 10.387 0 0 1 2.727-.994 33.4 33.4 0 0 1 3.026-.54c1.325-.17 2.4-.298 3.224-.383.834-.095 1.44-.251 1.818-.469.389-.218.583-.597.583-1.136v-.114c0-1.401-.384-2.49-1.151-3.267-.757-.776-1.908-1.165-3.452-1.165-1.6 0-2.855.351-3.764 1.051-.909.701-1.548 1.449-1.917 2.245l-3.182-1.137c.568-1.325 1.326-2.358 2.273-3.096a8.526 8.526 0 0 1 3.125-1.563 12.968 12.968 0 0 1 3.352-.454c.701 0 1.506.085 2.415.255a7.738 7.738 0 0 1 2.656 1.009c.862.511 1.577 1.283 2.145 2.315.568 1.032.852 2.415.852 4.148V159h-3.352v-2.955h-.171c-.227.474-.606.981-1.136 1.52-.53.54-1.236.999-2.117 1.378-.88.379-1.955.568-3.224.568Zm.511-3.011c1.326 0 2.444-.26 3.353-.781.918-.521 1.609-1.193 2.074-2.017.473-.824.71-1.691.71-2.6v-3.068c-.142.171-.455.327-.938.469-.473.132-1.022.251-1.647.355-.616.095-1.217.18-1.804.256-.578.066-1.047.123-1.407.17-.871.114-1.685.298-2.443.554-.748.246-1.354.62-1.818 1.122-.455.493-.682 1.165-.682 2.017 0 1.165.431 2.046 1.293 2.642.87.587 1.974.881 3.309.881Zm24.656-19.318v2.841h-11.307v-2.841h11.307Zm-8.011-5.227h3.352v20.795c0 .947.137 1.657.412 2.131.284.464.644.776 1.08.937.445.152.913.227 1.406.227.369 0 .672-.018.909-.056l.568-.114.682 3.011a6.681 6.681 0 0 1-.952.256c-.407.095-.923.142-1.548.142a6.75 6.75 0 0 1-2.784-.611 5.517 5.517 0 0 1-2.244-1.861c-.588-.833-.881-1.884-.881-3.153v-21.704Zm19.034 27.556c-1.382 0-2.637-.26-3.764-.781-1.127-.53-2.022-1.292-2.685-2.287-.662-1.004-.994-2.216-.994-3.636 0-1.25.246-2.263.739-3.04a5.216 5.216 0 0 1 1.974-1.847 10.39 10.39 0 0 1 2.727-.994 33.48 33.48 0 0 1 3.026-.54 138.22 138.22 0 0 1 3.224-.383c.834-.095 1.44-.251 1.819-.469.388-.218.582-.597.582-1.136v-.114c0-1.401-.383-2.49-1.151-3.267-.757-.776-1.908-1.165-3.451-1.165-1.601 0-2.855.351-3.764 1.051-.91.701-1.549 1.449-1.918 2.245l-3.182-1.137c.568-1.325 1.326-2.358 2.273-3.096a8.523 8.523 0 0 1 3.125-1.563 12.973 12.973 0 0 1 3.352-.454c.701 0 1.506.085 2.415.255a7.738 7.738 0 0 1 2.656 1.009c.862.511 1.577 1.283 2.145 2.315.568 1.032.852 2.415.852 4.148V159h-3.352v-2.955h-.17c-.228.474-.606.981-1.137 1.52-.53.54-1.236.999-2.116 1.378-.881.379-1.956.568-3.225.568Zm.512-3.011c1.325 0 2.443-.26 3.352-.781.919-.521 1.61-1.193 2.074-2.017.473-.824.71-1.691.71-2.6v-3.068c-.142.171-.454.327-.937.469-.474.132-1.023.251-1.648.355-.616.095-1.217.18-1.804.256-.578.066-1.047.123-1.406.17-.872.114-1.686.298-2.444.554-.748.246-1.354.62-1.818 1.122-.454.493-.682 1.165-.682 2.017 0 1.165.431 2.046 1.293 2.642.871.587 1.974.881 3.31.881Zm26.431 2.5v-29.091h17.444v3.125h-13.921v9.83h12.614v3.125h-12.614V159h-3.523Zm29.845.455c-1.97 0-3.698-.469-5.185-1.407-1.477-.937-2.633-2.249-3.466-3.934-.824-1.686-1.236-3.656-1.236-5.909 0-2.273.412-4.257 1.236-5.952.833-1.695 1.989-3.012 3.466-3.949 1.487-.938 3.215-1.406 5.185-1.406 1.969 0 3.693.468 5.17 1.406 1.487.937 2.642 2.254 3.466 3.949.833 1.695 1.25 3.679 1.25 5.952 0 2.253-.417 4.223-1.25 5.909-.824 1.685-1.979 2.997-3.466 3.934-1.477.938-3.201 1.407-5.17 1.407Zm0-3.012c1.496 0 2.727-.383 3.693-1.15.966-.767 1.681-1.776 2.145-3.026.464-1.25.696-2.604.696-4.062 0-1.459-.232-2.818-.696-4.077-.464-1.26-1.179-2.278-2.145-3.054-.966-.777-2.197-1.165-3.693-1.165-1.497 0-2.728.388-3.694 1.165-.966.776-1.68 1.794-2.145 3.054-.464 1.259-.696 2.618-.696 4.077 0 1.458.232 2.812.696 4.062.465 1.25 1.179 2.259 2.145 3.026.966.767 2.197 1.15 3.694 1.15Zm28.313-6.363v-12.898h3.352V159h-3.352v-3.693h-.227c-.512 1.108-1.307 2.05-2.387 2.827-1.079.767-2.443 1.15-4.09 1.15-1.364 0-2.576-.298-3.637-.895-1.06-.606-1.894-1.515-2.5-2.727-.606-1.222-.909-2.76-.909-4.617v-13.863h3.352v13.636c0 1.591.445 2.86 1.336 3.807.899.947 2.045 1.42 3.437 1.42.833 0 1.681-.213 2.543-.639.871-.426 1.6-1.079 2.187-1.96.597-.881.895-2.003.895-3.366Zm12.405-4.205V159h-3.353v-21.818h3.239v3.409h.284a6.232 6.232 0 0 1 2.33-2.671c1.041-.681 2.386-1.022 4.034-1.022 1.477 0 2.77.303 3.878.909 1.107.596 1.969 1.505 2.585 2.727.615 1.212.923 2.746.923 4.602V159h-3.352v-13.636c0-1.714-.445-3.05-1.335-4.006-.891-.966-2.112-1.449-3.665-1.449-1.07 0-2.027.232-2.87.696-.833.464-1.491 1.141-1.974 2.031-.483.891-.724 1.97-.724 3.239Zm27.844 13.58c-1.818 0-3.423-.46-4.815-1.378-1.392-.928-2.481-2.235-3.267-3.921-.786-1.695-1.179-3.698-1.179-6.008 0-2.292.393-4.281 1.179-5.966.786-1.686 1.88-2.988 3.281-3.906 1.402-.919 3.021-1.378 4.858-1.378 1.421 0 2.543.236 3.367.71.833.464 1.467.994 1.903 1.591.445.587.791 1.07 1.037 1.449h.284v-10.739h3.352V159h-3.238v-3.352h-.398c-.246.397-.597.899-1.051 1.505-.455.597-1.103 1.132-1.946 1.606-.843.464-1.965.696-3.367.696Zm.455-3.012c1.345 0 2.481-.35 3.409-1.051.928-.71 1.634-1.69 2.116-2.94.483-1.26.725-2.713.725-4.361 0-1.629-.237-3.054-.71-4.276-.474-1.231-1.175-2.187-2.103-2.869-.928-.691-2.073-1.037-3.437-1.037-1.421 0-2.604.365-3.551 1.094-.938.72-1.643 1.7-2.117 2.94-.464 1.231-.696 2.614-.696 4.148 0 1.553.237 2.964.711 4.233.482 1.259 1.193 2.263 2.13 3.011.947.739 2.121 1.108 3.523 1.108Zm20.142-26.534-.284 20.909h-3.295l-.284-20.909h3.863Zm-1.932 29.318c-.7 0-1.302-.251-1.803-.753a2.459 2.459 0 0 1-.753-1.804c0-.7.251-1.302.753-1.804a2.461 2.461 0 0 1 1.803-.752c.701 0 1.303.251 1.804.752.502.502.753 1.104.753 1.804 0 .464-.118.891-.355 1.279a2.646 2.646 0 0 1-.923.937 2.431 2.431 0 0 1-1.279.341Z"
+}), /*#__PURE__*/React.createElement("path", {
+  fill: "#FEAD01",
+  d: "M76 24c0-6.627 5.373-12 12-12h31.029a12 12 0 0 0 8.486-3.515l4.97-4.97A12.002 12.002 0 0 1 140.971 0H192c6.627 0 12 5.373 12 12v72c0 6.627-5.373 12-12 12H88c-6.627 0-12-5.373-12-12V24Z"
+}), /*#__PURE__*/React.createElement("ellipse", {
+  cx: "118.223",
+  cy: "36.445",
+  fill: "#070707",
+  rx: "6.222",
+  ry: "9.333"
+}), /*#__PURE__*/React.createElement("ellipse", {
+  cx: "161.778",
+  cy: "36.444",
+  fill: "#070707",
+  rx: "6.222",
+  ry: "9.333"
+}), /*#__PURE__*/React.createElement("path", {
+  stroke: "#070707",
+  strokeWidth: "3.111",
+  d: "M167.306 76.889C164.477 64.419 153.326 55.11 140 55.11c-13.325 0-24.476 9.309-27.306 21.778"
+}));
+icons.activeStatus = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "64",
+  height: "64",
+  fill: "none"
+}, /*#__PURE__*/React.createElement("circle", {
+  cx: "32",
+  cy: "32",
+  r: "32",
+  fill: "#62C45A"
+}), /*#__PURE__*/React.createElement("path", {
+  stroke: "#fff",
+  strokeWidth: "3",
+  d: "m22 33 6 6 14-14"
+}));
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (icons);
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./reactjs/src/assets/scss/Product.scss":
+/*!***************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./reactjs/src/assets/scss/Product.scss ***!
+  \***************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "./node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, ``, "",{"version":3,"sources":[],"names":[],"mappings":"","sourceRoot":""}]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/runtime/api.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
+  \*****************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+*/
+module.exports = function (cssWithMappingToString) {
+  var list = [];
+
+  // return the list of modules as css string
+  list.toString = function toString() {
+    return this.map(function (item) {
+      var content = "";
+      var needLayer = typeof item[5] !== "undefined";
+      if (item[4]) {
+        content += "@supports (".concat(item[4], ") {");
+      }
+      if (item[2]) {
+        content += "@media ".concat(item[2], " {");
+      }
+      if (needLayer) {
+        content += "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {");
+      }
+      content += cssWithMappingToString(item);
+      if (needLayer) {
+        content += "}";
+      }
+      if (item[2]) {
+        content += "}";
+      }
+      if (item[4]) {
+        content += "}";
+      }
+      return content;
+    }).join("");
+  };
+
+  // import a list of modules into the list
+  list.i = function i(modules, media, dedupe, supports, layer) {
+    if (typeof modules === "string") {
+      modules = [[null, modules, undefined]];
+    }
+    var alreadyImportedModules = {};
+    if (dedupe) {
+      for (var k = 0; k < this.length; k++) {
+        var id = this[k][0];
+        if (id != null) {
+          alreadyImportedModules[id] = true;
+        }
+      }
+    }
+    for (var _k = 0; _k < modules.length; _k++) {
+      var item = [].concat(modules[_k]);
+      if (dedupe && alreadyImportedModules[item[0]]) {
+        continue;
+      }
+      if (typeof layer !== "undefined") {
+        if (typeof item[5] === "undefined") {
+          item[5] = layer;
+        } else {
+          item[1] = "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {").concat(item[1], "}");
+          item[5] = layer;
+        }
+      }
+      if (media) {
+        if (!item[2]) {
+          item[2] = media;
+        } else {
+          item[1] = "@media ".concat(item[2], " {").concat(item[1], "}");
+          item[2] = media;
+        }
+      }
+      if (supports) {
+        if (!item[4]) {
+          item[4] = "".concat(supports);
+        } else {
+          item[1] = "@supports (".concat(item[4], ") {").concat(item[1], "}");
+          item[4] = supports;
+        }
+      }
+      list.push(item);
+    }
+  };
+  return list;
+};
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/runtime/sourceMaps.js":
+/*!************************************************************!*\
+  !*** ./node_modules/css-loader/dist/runtime/sourceMaps.js ***!
+  \************************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = function (item) {
+  var content = item[1];
+  var cssMapping = item[3];
+  if (!cssMapping) {
+    return content;
+  }
+  if (typeof btoa === "function") {
+    var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(cssMapping))));
+    var data = "sourceMappingURL=data:application/json;charset=utf-8;base64,".concat(base64);
+    var sourceMapping = "/*# ".concat(data, " */");
+    return [content].concat([sourceMapping]).join("\n");
+  }
+  return [content].join("\n");
+};
+
+/***/ }),
+
+/***/ "./reactjs/src/assets/scss/Product.scss":
+/*!**********************************************!*\
+  !*** ./reactjs/src/assets/scss/Product.scss ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "./node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "./node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "./node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "./node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Product_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./Product.scss */ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./reactjs/src/assets/scss/Product.scss");
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
+
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Product_scss__WEBPACK_IMPORTED_MODULE_6__["default"], options);
+
+
+
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Product_scss__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Product_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Product_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
+  \****************************************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+var stylesInDOM = [];
+function getIndexByIdentifier(identifier) {
+  var result = -1;
+  for (var i = 0; i < stylesInDOM.length; i++) {
+    if (stylesInDOM[i].identifier === identifier) {
+      result = i;
+      break;
+    }
+  }
+  return result;
+}
+function modulesToDom(list, options) {
+  var idCountMap = {};
+  var identifiers = [];
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    var id = options.base ? item[0] + options.base : item[0];
+    var count = idCountMap[id] || 0;
+    var identifier = "".concat(id, " ").concat(count);
+    idCountMap[id] = count + 1;
+    var indexByIdentifier = getIndexByIdentifier(identifier);
+    var obj = {
+      css: item[1],
+      media: item[2],
+      sourceMap: item[3],
+      supports: item[4],
+      layer: item[5]
+    };
+    if (indexByIdentifier !== -1) {
+      stylesInDOM[indexByIdentifier].references++;
+      stylesInDOM[indexByIdentifier].updater(obj);
+    } else {
+      var updater = addElementStyle(obj, options);
+      options.byIndex = i;
+      stylesInDOM.splice(i, 0, {
+        identifier: identifier,
+        updater: updater,
+        references: 1
+      });
+    }
+    identifiers.push(identifier);
+  }
+  return identifiers;
+}
+function addElementStyle(obj, options) {
+  var api = options.domAPI(options);
+  api.update(obj);
+  var updater = function updater(newObj) {
+    if (newObj) {
+      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap && newObj.supports === obj.supports && newObj.layer === obj.layer) {
+        return;
+      }
+      api.update(obj = newObj);
+    } else {
+      api.remove();
+    }
+  };
+  return updater;
+}
+module.exports = function (list, options) {
+  options = options || {};
+  list = list || [];
+  var lastIdentifiers = modulesToDom(list, options);
+  return function update(newList) {
+    newList = newList || [];
+    for (var i = 0; i < lastIdentifiers.length; i++) {
+      var identifier = lastIdentifiers[i];
+      var index = getIndexByIdentifier(identifier);
+      stylesInDOM[index].references--;
+    }
+    var newLastIdentifiers = modulesToDom(newList, options);
+    for (var _i = 0; _i < lastIdentifiers.length; _i++) {
+      var _identifier = lastIdentifiers[_i];
+      var _index = getIndexByIdentifier(_identifier);
+      if (stylesInDOM[_index].references === 0) {
+        stylesInDOM[_index].updater();
+        stylesInDOM.splice(_index, 1);
+      }
+    }
+    lastIdentifiers = newLastIdentifiers;
+  };
+};
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/runtime/insertBySelector.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/style-loader/dist/runtime/insertBySelector.js ***!
+  \********************************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+var memo = {};
+
+/* istanbul ignore next  */
+function getTarget(target) {
+  if (typeof memo[target] === "undefined") {
+    var styleTarget = document.querySelector(target);
+
+    // Special case to return head of iframe instead of iframe itself
+    if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+      try {
+        // This will throw an exception if access to iframe is blocked
+        // due to cross-origin restrictions
+        styleTarget = styleTarget.contentDocument.head;
+      } catch (e) {
+        // istanbul ignore next
+        styleTarget = null;
+      }
+    }
+    memo[target] = styleTarget;
+  }
+  return memo[target];
+}
+
+/* istanbul ignore next  */
+function insertBySelector(insert, style) {
+  var target = getTarget(insert);
+  if (!target) {
+    throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
+  }
+  target.appendChild(style);
+}
+module.exports = insertBySelector;
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/runtime/insertStyleElement.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/style-loader/dist/runtime/insertStyleElement.js ***!
+  \**********************************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+/* istanbul ignore next  */
+function insertStyleElement(options) {
+  var element = document.createElement("style");
+  options.setAttributes(element, options.attributes);
+  options.insert(element, options.options);
+  return element;
+}
+module.exports = insertStyleElement;
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js ***!
+  \**********************************************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+/* istanbul ignore next  */
+function setAttributesWithoutAttributes(styleElement) {
+  var nonce =  true ? __webpack_require__.nc : 0;
+  if (nonce) {
+    styleElement.setAttribute("nonce", nonce);
+  }
+}
+module.exports = setAttributesWithoutAttributes;
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/runtime/styleDomAPI.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/style-loader/dist/runtime/styleDomAPI.js ***!
+  \***************************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+/* istanbul ignore next  */
+function apply(styleElement, options, obj) {
+  var css = "";
+  if (obj.supports) {
+    css += "@supports (".concat(obj.supports, ") {");
+  }
+  if (obj.media) {
+    css += "@media ".concat(obj.media, " {");
+  }
+  var needLayer = typeof obj.layer !== "undefined";
+  if (needLayer) {
+    css += "@layer".concat(obj.layer.length > 0 ? " ".concat(obj.layer) : "", " {");
+  }
+  css += obj.css;
+  if (needLayer) {
+    css += "}";
+  }
+  if (obj.media) {
+    css += "}";
+  }
+  if (obj.supports) {
+    css += "}";
+  }
+  var sourceMap = obj.sourceMap;
+  if (sourceMap && typeof btoa !== "undefined") {
+    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
+  }
+
+  // For old IE
+  /* istanbul ignore if  */
+  options.styleTagTransform(css, styleElement, options.options);
+}
+function removeStyleElement(styleElement) {
+  // istanbul ignore if
+  if (styleElement.parentNode === null) {
+    return false;
+  }
+  styleElement.parentNode.removeChild(styleElement);
+}
+
+/* istanbul ignore next  */
+function domAPI(options) {
+  if (typeof document === "undefined") {
+    return {
+      update: function update() {},
+      remove: function remove() {}
+    };
+  }
+  var styleElement = options.insertStyleElement(options);
+  return {
+    update: function update(obj) {
+      apply(styleElement, options, obj);
+    },
+    remove: function remove() {
+      removeStyleElement(styleElement);
+    }
+  };
+}
+module.exports = domAPI;
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/runtime/styleTagTransform.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/style-loader/dist/runtime/styleTagTransform.js ***!
+  \*********************************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+/* istanbul ignore next  */
+function styleTagTransform(css, styleElement) {
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = css;
+  } else {
+    while (styleElement.firstChild) {
+      styleElement.removeChild(styleElement.firstChild);
+    }
+    styleElement.appendChild(document.createTextNode(css));
+  }
+}
+module.exports = styleTagTransform;
+
+/***/ }),
+
+/***/ "./node_modules/tannin/index.js":
+/*!**************************************!*\
+  !*** ./node_modules/tannin/index.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Tannin)
+/* harmony export */ });
+/* harmony import */ var _tannin_plural_forms__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @tannin/plural-forms */ "./node_modules/@tannin/plural-forms/index.js");
+
+
+/**
+ * Tannin constructor options.
+ *
+ * @typedef {Object} TanninOptions
+ *
+ * @property {string}   [contextDelimiter] Joiner in string lookup with context.
+ * @property {Function} [onMissingKey]     Callback to invoke when key missing.
+ */
+
+/**
+ * Domain metadata.
+ *
+ * @typedef {Object} TanninDomainMetadata
+ *
+ * @property {string}            [domain]       Domain name.
+ * @property {string}            [lang]         Language code.
+ * @property {(string|Function)} [plural_forms] Plural forms expression or
+ *                                              function evaluator.
+ */
+
+/**
+ * Domain translation pair respectively representing the singular and plural
+ * translation.
+ *
+ * @typedef {[string,string]} TanninTranslation
+ */
+
+/**
+ * Locale data domain. The key is used as reference for lookup, the value an
+ * array of two string entries respectively representing the singular and plural
+ * translation.
+ *
+ * @typedef {{[key:string]:TanninDomainMetadata|TanninTranslation,'':TanninDomainMetadata|TanninTranslation}} TanninLocaleDomain
+ */
+
+/**
+ * Jed-formatted locale data.
+ *
+ * @see http://messageformat.github.io/Jed/
+ *
+ * @typedef {{[domain:string]:TanninLocaleDomain}} TanninLocaleData
+ */
+
+/**
+ * Default Tannin constructor options.
+ *
+ * @type {TanninOptions}
+ */
+var DEFAULT_OPTIONS = {
+	contextDelimiter: '\u0004',
+	onMissingKey: null,
+};
+
+/**
+ * Given a specific locale data's config `plural_forms` value, returns the
+ * expression.
+ *
+ * @example
+ *
+ * ```
+ * getPluralExpression( 'nplurals=2; plural=(n != 1);' ) === '(n != 1)'
+ * ```
+ *
+ * @param {string} pf Locale data plural forms.
+ *
+ * @return {string} Plural forms expression.
+ */
+function getPluralExpression( pf ) {
+	var parts, i, part;
+
+	parts = pf.split( ';' );
+
+	for ( i = 0; i < parts.length; i++ ) {
+		part = parts[ i ].trim();
+		if ( part.indexOf( 'plural=' ) === 0 ) {
+			return part.substr( 7 );
+		}
+	}
+}
+
+/**
+ * Tannin constructor.
+ *
+ * @class
+ *
+ * @param {TanninLocaleData} data      Jed-formatted locale data.
+ * @param {TanninOptions}    [options] Tannin options.
+ */
+function Tannin( data, options ) {
+	var key;
+
+	/**
+	 * Jed-formatted locale data.
+	 *
+	 * @name Tannin#data
+	 * @type {TanninLocaleData}
+	 */
+	this.data = data;
+
+	/**
+	 * Plural forms function cache, keyed by plural forms string.
+	 *
+	 * @name Tannin#pluralForms
+	 * @type {Object<string,Function>}
+	 */
+	this.pluralForms = {};
+
+	/**
+	 * Effective options for instance, including defaults.
+	 *
+	 * @name Tannin#options
+	 * @type {TanninOptions}
+	 */
+	this.options = {};
+
+	for ( key in DEFAULT_OPTIONS ) {
+		this.options[ key ] = options !== undefined && key in options
+			? options[ key ]
+			: DEFAULT_OPTIONS[ key ];
+	}
+}
+
+/**
+ * Returns the plural form index for the given domain and value.
+ *
+ * @param {string} domain Domain on which to calculate plural form.
+ * @param {number} n      Value for which plural form is to be calculated.
+ *
+ * @return {number} Plural form index.
+ */
+Tannin.prototype.getPluralForm = function( domain, n ) {
+	var getPluralForm = this.pluralForms[ domain ],
+		config, plural, pf;
+
+	if ( ! getPluralForm ) {
+		config = this.data[ domain ][ '' ];
+
+		pf = (
+			config[ 'Plural-Forms' ] ||
+			config[ 'plural-forms' ] ||
+			// Ignore reason: As known, there's no way to document the empty
+			// string property on a key to guarantee this as metadata.
+			// @ts-ignore
+			config.plural_forms
+		);
+
+		if ( typeof pf !== 'function' ) {
+			plural = getPluralExpression(
+				config[ 'Plural-Forms' ] ||
+				config[ 'plural-forms' ] ||
+				// Ignore reason: As known, there's no way to document the empty
+				// string property on a key to guarantee this as metadata.
+				// @ts-ignore
+				config.plural_forms
+			);
+
+			pf = (0,_tannin_plural_forms__WEBPACK_IMPORTED_MODULE_0__["default"])( plural );
+		}
+
+		getPluralForm = this.pluralForms[ domain ] = pf;
+	}
+
+	return getPluralForm( n );
+};
+
+/**
+ * Translate a string.
+ *
+ * @param {string}      domain   Translation domain.
+ * @param {string|void} context  Context distinguishing terms of the same name.
+ * @param {string}      singular Primary key for translation lookup.
+ * @param {string=}     plural   Fallback value used for non-zero plural
+ *                               form index.
+ * @param {number=}     n        Value to use in calculating plural form.
+ *
+ * @return {string} Translated string.
+ */
+Tannin.prototype.dcnpgettext = function( domain, context, singular, plural, n ) {
+	var index, key, entry;
+
+	if ( n === undefined ) {
+		// Default to singular.
+		index = 0;
+	} else {
+		// Find index by evaluating plural form for value.
+		index = this.getPluralForm( domain, n );
+	}
+
+	key = singular;
+
+	// If provided, context is prepended to key with delimiter.
+	if ( context ) {
+		key = context + this.options.contextDelimiter + singular;
+	}
+
+	entry = this.data[ domain ][ key ];
+
+	// Verify not only that entry exists, but that the intended index is within
+	// range and non-empty.
+	if ( entry && entry[ index ] ) {
+		return entry[ index ];
+	}
+
+	if ( this.options.onMissingKey ) {
+		this.options.onMissingKey( singular, domain );
+	}
+
+	// If entry not found, fall back to singular vs. plural with zero index
+	// representing the singular value.
+	return index === 0 ? singular : plural;
+};
+
+
+/***/ }),
+
+/***/ "react":
+/*!************************!*\
+  !*** external "React" ***!
+  \************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = React;
+
+/***/ }),
+
+/***/ "react-dom":
+/*!***************************!*\
+  !*** external "ReactDOM" ***!
+  \***************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = ReactDOM;
+
+/***/ }),
+
+/***/ "./node_modules/@babel/runtime/helpers/esm/extends.js":
+/*!************************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/esm/extends.js ***!
+  \************************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ _extends)
+/* harmony export */ });
+function _extends() {
+  return _extends = Object.assign ? Object.assign.bind() : function (n) {
+    for (var e = 1; e < arguments.length; e++) {
+      var t = arguments[e];
+      for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
+    }
+    return n;
+  }, _extends.apply(null, arguments);
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/memize/dist/index.js":
+/*!*******************************************!*\
+  !*** ./node_modules/memize/dist/index.js ***!
+  \*******************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ memize)
+/* harmony export */ });
+/**
+ * Memize options object.
+ *
+ * @typedef MemizeOptions
+ *
+ * @property {number} [maxSize] Maximum size of the cache.
+ */
+
+/**
+ * Internal cache entry.
+ *
+ * @typedef MemizeCacheNode
+ *
+ * @property {?MemizeCacheNode|undefined} [prev] Previous node.
+ * @property {?MemizeCacheNode|undefined} [next] Next node.
+ * @property {Array<*>}                   args   Function arguments for cache
+ *                                               entry.
+ * @property {*}                          val    Function result.
+ */
+
+/**
+ * Properties of the enhanced function for controlling cache.
+ *
+ * @typedef MemizeMemoizedFunction
+ *
+ * @property {()=>void} clear Clear the cache.
+ */
+
+/**
+ * Accepts a function to be memoized, and returns a new memoized function, with
+ * optional options.
+ *
+ * @template {(...args: any[]) => any} F
+ *
+ * @param {F}             fn        Function to memoize.
+ * @param {MemizeOptions} [options] Options object.
+ *
+ * @return {((...args: Parameters<F>) => ReturnType<F>) & MemizeMemoizedFunction} Memoized function.
+ */
+function memize(fn, options) {
+	var size = 0;
+
+	/** @type {?MemizeCacheNode|undefined} */
+	var head;
+
+	/** @type {?MemizeCacheNode|undefined} */
+	var tail;
+
+	options = options || {};
+
+	function memoized(/* ...args */) {
+		var node = head,
+			len = arguments.length,
+			args,
+			i;
+
+		searchCache: while (node) {
+			// Perform a shallow equality test to confirm that whether the node
+			// under test is a candidate for the arguments passed. Two arrays
+			// are shallowly equal if their length matches and each entry is
+			// strictly equal between the two sets. Avoid abstracting to a
+			// function which could incur an arguments leaking deoptimization.
+
+			// Check whether node arguments match arguments length
+			if (node.args.length !== arguments.length) {
+				node = node.next;
+				continue;
+			}
+
+			// Check whether node arguments match arguments values
+			for (i = 0; i < len; i++) {
+				if (node.args[i] !== arguments[i]) {
+					node = node.next;
+					continue searchCache;
+				}
+			}
+
+			// At this point we can assume we've found a match
+
+			// Surface matched node to head if not already
+			if (node !== head) {
+				// As tail, shift to previous. Must only shift if not also
+				// head, since if both head and tail, there is no previous.
+				if (node === tail) {
+					tail = node.prev;
+				}
+
+				// Adjust siblings to point to each other. If node was tail,
+				// this also handles new tail's empty `next` assignment.
+				/** @type {MemizeCacheNode} */ (node.prev).next = node.next;
+				if (node.next) {
+					node.next.prev = node.prev;
+				}
+
+				node.next = head;
+				node.prev = null;
+				/** @type {MemizeCacheNode} */ (head).prev = node;
+				head = node;
+			}
+
+			// Return immediately
+			return node.val;
+		}
+
+		// No cached value found. Continue to insertion phase:
+
+		// Create a copy of arguments (avoid leaking deoptimization)
+		args = new Array(len);
+		for (i = 0; i < len; i++) {
+			args[i] = arguments[i];
+		}
+
+		node = {
+			args: args,
+
+			// Generate the result from original function
+			val: fn.apply(null, args),
+		};
+
+		// Don't need to check whether node is already head, since it would
+		// have been returned above already if it was
+
+		// Shift existing head down list
+		if (head) {
+			head.prev = node;
+			node.next = head;
+		} else {
+			// If no head, follows that there's no tail (at initial or reset)
+			tail = node;
+		}
+
+		// Trim tail if we're reached max size and are pending cache insertion
+		if (size === /** @type {MemizeOptions} */ (options).maxSize) {
+			tail = /** @type {MemizeCacheNode} */ (tail).prev;
+			/** @type {MemizeCacheNode} */ (tail).next = null;
+		} else {
+			size++;
+		}
+
+		head = node;
+
+		return node.val;
+	}
+
+	memoized.clear = function () {
+		head = null;
+		tail = null;
+		size = 0;
+	};
+
+	// Ignore reason: There's not a clear solution to create an intersection of
+	// the function with additional properties, where the goal is to retain the
+	// function signature of the incoming argument and add control properties
+	// on the return value.
+
+	// @ts-ignore
+	return memoized;
+}
+
+
+
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			id: moduleId,
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/nonce */
+/******/ 	(() => {
+/******/ 		__webpack_require__.nc = undefined;
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+/*!***************************************************!*\
+  !*** ./reactjs/src/pages/single_product/index.js ***!
+  \***************************************************/
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "react-dom");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _Product__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Product */ "./reactjs/src/pages/single_product/Product.js");
+/* harmony import */ var _ProductTab__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ProductTab */ "./reactjs/src/pages/single_product/ProductTab.js");
+/* harmony import */ var _assets_scss_Product_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../assets/scss/Product.scss */ "./reactjs/src/assets/scss/Product.scss");
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  if (document.body.contains(document.getElementById('wsx_tab_data'))) {
+    react_dom__WEBPACK_IMPORTED_MODULE_1___default().render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_ProductTab__WEBPACK_IMPORTED_MODULE_3__["default"], null)), document.getElementById('wsx_tab_data'));
+  }
+  let elements = document.getElementsByClassName('wsx-single-product-settings-wrapper');
+  if (elements.length) {
+    react_dom__WEBPACK_IMPORTED_MODULE_1___default().render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Product__WEBPACK_IMPORTED_MODULE_2__["default"], null)), elements[0]);
+  }
+  jQuery('#woocommerce-product-data').on('woocommerce_variations_loaded', function (event) {
+    elements = document.getElementsByClassName('wsx-single-product-settings-wrapper');
+    Array.from(elements).forEach(element => {
+      element.classList.add('wsx-single-product-variation-settings');
+    });
+    let ids = document.getElementsByClassName('variable_post_id');
+    for (let i = 1; i < elements.length; i++) {
+      react_dom__WEBPACK_IMPORTED_MODULE_1___default().render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Product__WEBPACK_IMPORTED_MODULE_2__["default"], {
+        id: ids[i - 1].value
+      })), elements[i]);
+    }
+  });
+  if (wholesalex_single_product?.is_dokan_dashboard) {
+    jQuery('.dokan-product-variation-wrapper').on('dokan_variations_loaded', function (event) {
+      elements = document.getElementsByClassName('wsx-single-product-settings-wrapper');
+      for (let i = 1; i < elements.length; i++) {
+        const variationId = document.getElementsByName(`variable_post_id[${i - 1}]`)?.[0]?.value;
+        react_dom__WEBPACK_IMPORTED_MODULE_1___default().render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Product__WEBPACK_IMPORTED_MODULE_2__["default"], {
+          id: variationId
+        })), elements[i]);
+      }
+    });
+  }
+  if (wholesalex_single_product?.is_wcfm_dashboard) {
+    elements = document.getElementsByClassName('_wholesalex_wcfm_single_product_settings');
+    if (elements.length) {
+      react_dom__WEBPACK_IMPORTED_MODULE_1___default().render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Product__WEBPACK_IMPORTED_MODULE_2__["default"], null)), elements[0]);
+    }
+    elements = document.getElementsByClassName('_wholesalex_wcfm_variable_product_settings');
+    for (let i = 0; i < elements.length; i++) {
+      const variationId = document.getElementById(`variations_id_${i}`)?.value;
+      react_dom__WEBPACK_IMPORTED_MODULE_1___default().render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Product__WEBPACK_IMPORTED_MODULE_2__["default"], {
+        id: variationId,
+        isWCFMVariation: true
+      })), elements[i]);
+    }
+  }
+  wholesalex_product?.roles?.forEach(role => {
+    jQuery('select.variation_actions').on('wholesalex_product_price_' + role.value + '_base', function (event) {
+      let data = {};
+      let value;
+      value = window.prompt(woocommerce_admin_meta_boxes_variations.i18n_enter_a_value);
+      if (value != null) {
+        data.value = value;
+      } else {
+        return;
+      }
+      jQuery.ajax({
+        url: woocommerce_admin_meta_boxes_variations.ajax_url,
+        data: {
+          action: 'wholesalex_bulk_edit_variations',
+          security: woocommerce_admin_meta_boxes_variations.bulk_edit_variations_nonce,
+          product_id: woocommerce_admin_meta_boxes_variations.post_id,
+          product_type: jQuery('#product-type').val(),
+          bulk_action: 'wholesalex_product_price_' + role.value + '_base',
+          data: data
+        },
+        type: 'POST',
+        success: function () {
+          location.reload();
+        }
+      });
+    });
+    jQuery('select.variation_actions').on('wholesalex_product_price_' + role.value + '_sale', function (event) {
+      let data = {};
+      let value;
+      value = window.prompt(woocommerce_admin_meta_boxes_variations.i18n_enter_a_value);
+      if (value != null) {
+        data.value = value;
+      } else {
+        return;
+      }
+      jQuery.ajax({
+        url: woocommerce_admin_meta_boxes_variations.ajax_url,
+        data: {
+          action: 'wholesalex_bulk_edit_variations',
+          security: woocommerce_admin_meta_boxes_variations.bulk_edit_variations_nonce,
+          product_id: woocommerce_admin_meta_boxes_variations.post_id,
+          product_type: jQuery('#product-type').val(),
+          bulk_action: 'wholesalex_product_price_' + role.value + '_sale',
+          data: data
+        },
+        type: 'POST',
+        success: function () {
+          location.reload();
+        }
+      });
+    });
+  });
+});
+})();
+
+/******/ })()
+;
+//# sourceMappingURL=whx_product.js.map

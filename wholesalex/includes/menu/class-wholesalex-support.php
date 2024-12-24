@@ -19,7 +19,7 @@ class WholesaleX_Support {
 		/**
 		 * Add Feature Submenu Page
 		 */
-		add_action( 'admin_menu', array( $this, 'wholesalex_support_submenu_page' ) );
+		// add_action( 'admin_menu', array( $this, 'wholesalex_support_submenu_page' ) );
 		add_action( 'rest_api_init', array( $this, 'support_page_rest_api' ) );
 
 	}
@@ -30,20 +30,20 @@ class WholesaleX_Support {
 	 * @since 1.0.0
 	 * @access public
 	 */
-	public function wholesalex_support_submenu_page() {
-		$slug                = apply_filters( 'wholesalex_support_submenu_slug', 'wholesalex-support' );
-		$is_features_enabled = apply_filters( 'wholesalex_support_menu_page_enabled', true );
-		if ( $is_features_enabled ) {
-			add_submenu_page(
-				wholesalex()->get_menu_slug(),
-				__( 'Quick Support', 'wholesalex' ),
-				__( 'Quick Support', 'wholesalex' ),
-				apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-				$slug,
-				array( $this, 'support_page_content' )
-			);
-		}
-	}
+	// public function wholesalex_support_submenu_page() {
+	// 	$slug                = apply_filters( 'wholesalex_support_submenu_slug', 'wholesalex-overview#/quick-support' );
+	// 	$is_features_enabled = apply_filters( 'wholesalex_support_menu_page_enabled', true );
+	// 	if ( $is_features_enabled ) {
+	// 		add_submenu_page(
+	// 			wholesalex()->get_menu_slug(),
+	// 			__( 'Quick Support', 'wholesalex' ),
+	// 			__( 'Quick Support', 'wholesalex' ),
+	// 			apply_filters( 'wholesalex_capability_access', 'manage_options' ),
+	// 			$slug,
+	// 			array( $this, 'support_page_content' )
+	// 		);
+	// 	}
+	// }
 
     public function support_page_rest_api() {
 		register_rest_route(
@@ -118,7 +118,7 @@ class WholesaleX_Support {
 	 *
 	 * @return void
 	 */
-	public function support_page_content() {
+	public static function support_page_content() {
 		wp_enqueue_script( 'whx_support' );
 		wp_enqueue_script( 'wholesalex_node_vendors' );
 		wp_enqueue_script( 'wholesalex_components' );

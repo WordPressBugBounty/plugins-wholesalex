@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
 Tested up to: 6.7
 Requires PHP: 7.3
-Stable tag: 1.5.10
+Stable tag: 2.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -13,11 +13,12 @@ WholesaleX is the best WooCommerce Wholesale plugin with lots of features includ
 == Description ==
 WholesaleX - The Simplest WooCommerce B2B Solution to Start Wholesaling with wholesale prices, discounts, and dynamic pricing.
 
-## WholesaleX Black Friday Deal
+## WholesaleX Holiday Sale!
 
-🎁 Get **up to 65% Discount** on WholesaleX - Create the perfect B2B Business online this **Black Friday**
+🎁 Get **up to 60% Discount** on WholesaleX - Create the perfect B2B Business online this **Holiday**
 
-👉 <a href="https://getwholesalex.com/?utm_source=wholesalex-org&utm_medium=offer&utm_campaign=bfcm" target="_blank">Grab Now</a>
+👉 <a href="https://getwholesalex.com/?utm_source=wholesalex-org&utm_medium=offer&utm_campaign=holiday_org" target="_blank">Grab Now</a>
+
 
 WholesaleX is the most complete WooCommerce wholesale plugin to create and manage B2B or B2B+B2C hybrid stores in WooCommerce. This Wholesale plugin lets you add simple wholesale pricing or tiered pricing to complex dynamic pricing & wholesale discount rules, all in a simpler way. So that is why it is known as the simplest WooCommerce B2B Solution.
 
@@ -192,6 +193,16 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.0.0 - 24 December 2024 =
+* New: Added Last Week Sales Data to the Dashboard.
+* New: Introduced an Individual Addon Settings Popup on the Addon Page.
+* New: User Rules now support Bulk Actions, Pagination, Role Searching, and Optimized.
+* New: Dynamic Rules now include Bulk Actions, Pagination, Sorting (Ascending/Descending), Rule Searching, and Optimized.
+* Improvement: Added functionality to save User Filter Queries in the database.
+* Improvement: Enhanced the Tier Pricing Table Editor with a new UI and additional features.
+* Improvement: Added the WholesaleX Migration Tool as an Addon.
+
 = 1.5.10 - 03 December 2024 =
 * New: Dynamic Rules Discounts Are Now Supported in Backend Order Processing.
 * New: Added "Quantity Step" Feature To Minimum Order Quantity Dynamic Rules.

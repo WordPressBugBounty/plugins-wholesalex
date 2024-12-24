@@ -9,15 +9,15 @@
 
 
 	// Conversation Toggle
-	$(document).on('click', '.wsx-title', function(e) {
+	$(document).on('click', '.wsx-new-conversation', function(e) {
 		e.preventDefault();
         if ($(this).hasClass('active')) {
-			$(this).parent().siblings('.wsx-content').slideUp();
+			$(this).parent().siblings('.wsx-new-conversation-container').slideUp();
 			$(this).removeClass('active');
         } else {
-			$('.wsx-content').slideUp();
-			$('.wsx-title').removeClass('active');
-			$(this).parent().siblings('.wsx-content').slideToggle();
+			$('.wsx-new-conversation-container').slideUp();
+			$('.wsx-new-conversation').removeClass('active');
+			$(this).parent().siblings('.wsx-new-conversation-container').slideToggle();
 			$(this).toggleClass('active');
         }
     });

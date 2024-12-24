@@ -19,6 +19,13 @@ class WHOLESALEX_Product {
 	 * @var array
 	 */
 	public $rule_on_lists = array();
+	/**
+	 * Rule on Lists
+	 *
+	 * @var array
+	 */
+	public $rule_on_products_lists = array();
+	public $rule_on_products_lists_data = array();
 
 	/**
 	 * Product Constructor
@@ -30,7 +37,7 @@ class WHOLESALEX_Product {
 		add_action( 'woocommerce_save_product_variation', array( $this, 'wholesalex_product_meta_save' ) );
 		add_action( 'rest_api_init', array( $this, 'get_product_callback' ) );
 		add_filter( 'woocommerce_product_data_tabs', array( $this, 'product_custom_tab' ) );
-		add_action( 'woocommerce_product_data_panels', array( $this, 'wholesalex_tab_data' ) );
+		add_action( 'woocommerce_product_data_panels', array( $this, 'wsx_tab_data' ) );
 		add_action( 'save_post', array( $this, 'product_settings_data_save' ) );
 		/**
 		 * Use of Pre Get Posts Hook instead of woocommerce_product_query.
@@ -97,7 +104,7 @@ class WHOLESALEX_Product {
 		if('yes' === wholesalex()->get_setting('b2b_stock_management_status','no')) {
 			$this->b2b_stock_management();
 		}
-
+		add_action( 'admin_footer', array( $this, 'render_wsx_product_rule_modal' ) );
 	}
 
 	public function b2b_stock_management() {
@@ -1081,7 +1088,7 @@ class WHOLESALEX_Product {
 		$tabs['wholesalex'] = array(
 			'label'    => wholesalex()->get_plugin_name(),
 			'priority' => 15,
-			'target'   => 'wholesalex_tab_data',
+			'target'   => 'wsx_tab_data',
 			'class'    => array( 'hide_if_grouped' ),
 		);
 
@@ -1093,7 +1100,7 @@ class WHOLESALEX_Product {
 	 *
 	 * @return void
 	 */
-	public function wholesalex_tab_data() {
+	public function wsx_tab_data() {
 		global $post;
 		/**
 		 * Enqueue Script
@@ -1122,7 +1129,7 @@ class WHOLESALEX_Product {
 			),
 		);
 		?>
-		<div class="panel woocommerce_options_panel" id="wholesalex_tab_data"></div>
+		<div class="panel woocommerce_options_panel" id="wsx_tab_data"></div>
 		<?php
 	}
 
@@ -1222,7 +1229,7 @@ class WHOLESALEX_Product {
 			),
 		);
 		?>
-		<div class="_wholesalex_single_product_settings" class="options-group hide_if_external"></div>
+		<div class="wsx-single-product-settings-wrapper"></div>
 		<?php
 	}
 
@@ -1399,21 +1406,46 @@ class WHOLESALEX_Product {
 				'_product_settings_tab' => array(
 					'type' => 'custom_tab',
 					'attr' => array(
-						'_settings_tier_layout_single_product'        => array(
-							'type'    => 'choosebox',
-							'label'   => __( 'Tier Table Layout in Product Single Page', 'wholesalex' ),
-							'options' => apply_filters(
-								'wholesalex_single_product_tier_layout',
-								array(
-									'layout_one'   => WHOLESALEX_URL . '/assets/img/layout_one.png',
-									'layout_two'   => WHOLESALEX_URL . '/assets/img/layout_two.png',
-									'layout_three' => WHOLESALEX_URL . '/assets/img/layout_three.png',
-								)
+						// '_settings_tier_layout_single_product'        => array(
+						// 	'type'    => 'choosebox',
+						// 	'label'   => __( 'Tier Table Layout in Product Single Page', 'wholesalex' ),
+						// 	'options' => apply_filters(
+						// 		'wholesalex_single_product_tier_layout',
+						// 		array(
+						// 			'layout_one'   => WHOLESALEX_URL . '/assets/img/layout_one.png',
+						// 			'layout_two'   => WHOLESALEX_URL . '/assets/img/layout_two.png',
+						// 			'layout_three' => WHOLESALEX_URL . '/assets/img/layout_three.png',
+						// 		)
+						// 	),
+						// 	'default' => wholesalex()->get_setting('_settings_tier_layout'),
+						// ),
+						'_settings_tire_price_product_layout'  => array(
+							'type'    => 'radio',
+							'label'   => __( 'Tier Price Table Style', 'wholesalex' ),
+							'options' => array(
+								'table_style'   => __( 'Table Style', 'wholesalex' ),
+								'classic_style' => __( 'Classic Style', 'wholesalex' ),
 							),
-							'default' => wholesalex()->get_setting('_settings_tier_layout'),
+							'help'    => __( 'Set Individual Product Tier Price Table Style', 'wholesalex' ),
+							'default' => 'table_style',
 						),
+
+						'_settings_vertical_product_style' => array(
+							'type'    => 'slider',
+							'label'   => __( 'Tier Price Table Vertical Style', 'wholesalex' ),
+							'desc'    => __( 'Tier Price Table Vertical Style', 'wholesalex' ),
+							'default' => 'no',
+						),
+						// '_settings_tier_table_radius_product_style' => array(
+						// 	'type'    => 'slider',
+						// 	'label'   => __( 'Tier Price Table Border Radius', 'wholesalex' ),
+						// 	'desc'    => __( 'Tier Price Table Border Radius', 'wholesalex' ),
+						// 	'default' => 'no',
+						// ),
+
 						'_settings_show_tierd_pricing_table' => array(
-							'type'    => 'switch',
+							// 'type'    => 'switch',
+							'type'    => 'slider',
 							'label'   => __( 'Show Tierd Pricing Table', 'wholesalex' ),
 							'help'    => '',
 							'default' => 'yes',
@@ -1443,13 +1475,15 @@ class WHOLESALEX_Product {
 							'type'  => 'visibility_section',
 							'attr'  => array(
 								'_hide_for_b2c'      => array(
-									'type'    => 'switch',
+									// 'type'    => 'switch',
+									'type'    => 'slider',
 									'label'   => __( 'Hide product for B2C', 'wholesalex' ),
 									'help'    => '',
 									'default' => 'no',
 								),
 								'_hide_for_visitors' => array(
-									'type'    => 'switch',
+									// 'type'    => 'switch',
+									'type'    => 'slider',
 									'label'   => __( 'Hide product for Visitors', 'wholesalex' ),
 									'help'    => '',
 									'default' => 'no',
@@ -1672,7 +1706,7 @@ class WHOLESALEX_Product {
 	 */
 	public function add_wholesalex_rule_on_column_on_product_page( $columns ) {
 		/* translators: %s - Plugin Name */
-		$columns['wholesalex_rule_on'] = sprintf( __( 'Enabled %s Rule', 'wholesalex' ), wholesalex()->get_plugin_name() );
+		$columns['wsx_rule_on'] = sprintf( __( '%s Rules', 'wholesalex' ), wholesalex()->get_plugin_name() );
 		return $columns;
 	}
 
@@ -1749,7 +1783,7 @@ class WHOLESALEX_Product {
 	 */
 	public function populate_data_on_wholesalex_rule_on_column( $column, $product_id ) {
 
-		if ( 'wholesalex_rule_on' === $column ) {
+		if ( 'wsx_rule_on' === $column ) {
 
 			$product = wc_get_product( $product_id );
 			// Single Products.
@@ -1757,13 +1791,13 @@ class WHOLESALEX_Product {
 				$childrens = $product->get_children();
 				foreach ( $childrens as $key => $child_id ) {
 					$__discounts = wholesalex()->get_single_product_discount( $child_id );
-					$status      = $this->wholesalex_rule_on( $__discounts, $child_id, 'Single Product' );
+					$status      = $this->wholesalex_rule_on( $__discounts, $child_id, 'Singles' , $product_id );
 				}
 			} else {
 
 				$__discounts = wholesalex()->get_single_product_discount( $product_id );
 
-				$status = $this->wholesalex_rule_on( $__discounts, $product_id, 'Single Product' );
+				$status = $this->wholesalex_rule_on( $__discounts, $product_id, 'Single' );
 			}
 
 			// Profile.
@@ -1794,7 +1828,7 @@ class WHOLESALEX_Product {
 						$__has_discount = true;
 						switch ( $discount['_product_filter'] ) {
 							case 'all_products':
-								$this->rule_on_lists[ $product_id ][] = $this->rule_on_message( sprintf( 'User ID: %s ', $user_id ), 'Profile' );
+								$this->rule_on_message( $product_id, 'Profile' , $user_id );
 								break;
 							case 'products_in_list':
 								if ( ! isset( $discount['products_in_list'] ) ) {
@@ -1802,12 +1836,9 @@ class WHOLESALEX_Product {
 								}
 								foreach ( $discount['products_in_list'] as $list ) {
 									if ( (int) $product_id === (int) $list['value'] ) {
-										$__has_discount = true;
+										$this->rule_on_message( $product_id, 'Profile' , $user_id );
 										break;
 									}
-								}
-								if ( $__has_discount ) {
-									$this->rule_on_lists[ $product_id ][] = $this->rule_on_message( sprintf( 'User ID: %s ', $user_id ), 'Profile' );
 								}
 								break;
 							case 'products_not_in_list':
@@ -1822,7 +1853,7 @@ class WHOLESALEX_Product {
 								}
 								if ( $__flag ) {
 									$__has_discount                       = true;
-									$this->rule_on_lists[ $product_id ][] = $this->rule_on_message( sprintf( 'User ID: %s ', $user_id ), 'Profile' );
+									$this->rule_on_message( $product_id, 'Profile' , $user_id );
 								}
 								break;
 							case 'cat_in_list':
@@ -1831,12 +1862,9 @@ class WHOLESALEX_Product {
 								}
 								foreach ( $discount['cat_in_list'] as $list ) {
 									if (in_array($list['value'], $__cat_ids)) { //phpcs:ignore
-											$__has_discount = true;
+										$this->rule_on_message( $product_id, 'Profile' , $user_id );
 											break;
 									}
-								}
-								if ( $__has_discount ) {
-									$this->rule_on_lists[ $product_id ][] = $this->rule_on_message( sprintf( 'User ID: %s ', $user_id ), 'Profile' );
 								}
 								break;
 							case 'cat_not_in_list':
@@ -1852,7 +1880,7 @@ class WHOLESALEX_Product {
 								if ( $__flag ) {
 									$__has_discount = true;
 									if ( $__has_discount ) {
-										$this->rule_on_lists[ $product_id ][] = $this->rule_on_message( sprintf( 'User ID: %s ', $user_id ), 'Profile' );
+										$this->rule_on_message( $product_id, 'Profile' , $user_id );
 									}
 								}
 								break;
@@ -1863,13 +1891,10 @@ class WHOLESALEX_Product {
 								if ( 'product_variation' === $product->post_type ) {
 									foreach ( $discount['attribute_in_list'] as $list ) {
 										if ( isset( $list['value'] ) && (int) $product_id === (int) $list['value'] ) {
-											$__has_discount = true;
+											$this->rule_on_message( $product_id, 'Profile' , $user_id );
 											break;
 										}
 									}
-								}
-								if ( $__has_discount ) {
-									$this->rule_on_lists[ $product_id ][] = $this->rule_on_message( sprintf( 'User ID: %s ', $user_id ), 'Profile' );
 								}
 								break;
 							case 'attribute_not_in_list':
@@ -1886,7 +1911,7 @@ class WHOLESALEX_Product {
 									if ( $__flag ) {
 										$__has_discount = true;
 										if ( $__has_discount ) {
-											$this->rule_on_lists[ $product_id ][] = $this->rule_on_message( sprintf( 'User ID: %s ', $user_id ), 'Profile' );
+											$this->rule_on_message( $product_id, 'Profile' , $user_id );
 										}
 									}
 								}
@@ -1900,7 +1925,7 @@ class WHOLESALEX_Product {
 
 			foreach ( $__cat_ids as $cat_id ) {
 				$__discounts = wholesalex()->get_category_discounts( $cat_id );
-				$status      = $this->wholesalex_rule_on( $__discounts, $product_id, 'Category' );
+				$status      = $this->wholesalex_rule_on( $__discounts, $product_id, 'Category', $cat_id );
 				if ( $status ) {
 					break;
 				}
@@ -2028,7 +2053,7 @@ class WHOLESALEX_Product {
 				}
 
 				$__rule_type = '';
-
+		
 				switch ( $discount['_rule_type'] ) {
 					case 'product_discount':
 						$__rule_type = 'Product Discount';
@@ -2077,20 +2102,23 @@ class WHOLESALEX_Product {
 					case 'specific_roles':
 						foreach ( $discount['specific_roles'] as $role ) {
 							if ( '' != $__rule_type ) {
-								$this->rule_on_lists[ $product_id ][] = $this->rule_on_message( $role['name'], sprintf( 'Dynamic Rules( %s )', $__rule_type ) );
+								$this->rule_on_message( $product_id, 'dynamic', $role['name'], $__rule_type, $discount['_rule_title'], $discount['id'] );
 							}
 						}
 						break;
 					case 'specific_users':
 						foreach ( $discount['specific_users'] as $user ) {
-							$this->rule_on_lists[ $product_id ][] = $this->rule_on_message( $user['value'], sprintf( 'Dynamic Rules( %s )', $__rule_type ) );
+							$this->rule_on_message( $product_id, 'dynamic', 'user', $__rule_type, $discount['_rule_title'], $discount['id'] );
 						}
 						break;
 					case 'all_roles':
-						$this->rule_on_lists[ $product_id ][] = $this->rule_on_message( 'All Roles', sprintf( 'Dynamic Rules( %s )', $__rule_type ) );
+						$this->rule_on_message( $product_id, 'dynamic', 'All Roles', $__rule_type, $discount['_rule_title'], $discount['id'] );
 						break;
 					case 'all_users':
-						$this->rule_on_lists[ $product_id ][] = $this->rule_on_message( 'All Users', sprintf( 'Dynamic Rules( %s )', $__rule_type ) );
+						$this->rule_on_message( $product_id, 'dynamic', 'All Users', $__rule_type, $discount['_rule_title'], $discount['id'] );
+						break;
+					case 'all':
+						$this->rule_on_message( $product_id, 'dynamic', 'All Users & Guest Users', $__rule_type, $discount['_rule_title'], $discount['id'] );
 						break;
 				}
 			}
@@ -2138,6 +2166,23 @@ class WHOLESALEX_Product {
 					}
 				}
 			}
+			if ( ! empty( $this->rule_on_products_lists ) ) {
+				$Total_repeated_Dynamic_rules = count( $this->rule_on_products_lists[$product_id]['dynamic']);
+				$total_unique_dynamic_rules = isset($this->rule_on_products_lists[$product_id]['dynamic']) ? count(array_unique(array_column($this->rule_on_products_lists[$product_id]['dynamic'], 3))) : 0;
+				$total_rules_apply =  array_sum(array_map('count', array_filter($this->rule_on_products_lists[$product_id], 'is_array')));
+           	 	echo '<div 
+						id="wsx-wholesalex-product-rule-openModalBtn" 
+						class="wsx-product-rule-list" data-product-id="'.$product_id.'">
+						<div> '. ( is_numeric($total_unique_dynamic_rules) ? ($total_rules_apply-$Total_repeated_Dynamic_rules) + $total_unique_dynamic_rules : $total_rules_apply ) .' Rules Applied</div>
+							<div style="line-height:0">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none">
+								<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="m4 6 4 4 4-4"/>
+							</svg>
+						</div>
+					</div>';
+            	$this->rule_on_products_lists_data[] = $this->rule_on_products_lists;
+        	}
+        	$this->rule_on_products_lists = [];
 		}
 
 	}
@@ -2152,9 +2197,8 @@ class WHOLESALEX_Product {
 	 * @return boolean
 	 * @since 1.0.4
 	 */
-	public function wholesalex_rule_on( $__discounts, $product_id, $rule_src ) {
+	public function wholesalex_rule_on( $__discounts, $product_id, $rule_src, $cat_id = '' ) {
 		$has_rule = false;
-
 		foreach ( $__discounts as $role_id => $discount ) {
 
 			$_temp          = $discount;
@@ -2163,19 +2207,65 @@ class WHOLESALEX_Product {
 			if ( ! empty( $_temp['wholesalex_base_price'] ) || ! empty( $_temp['wholesalex_sale_price'] ) || ! empty( $_temp['tiers'] ) ) {
 				$product   = wc_get_product( $product_id );
 				$parent_id = $product->get_parent_id();
-				$suffix    = '';
+				$variation_name    = '';
 				if ( $parent_id ) {
-					$suffix = $product->get_name();
+					$variation_name = $product->get_name();
 				}
-				$_role_name                           = wholesalex()->get_role_name_by_role_id( $role_id );
+				$_role_name = wholesalex()->get_role_name_by_role_id( $role_id );
 				if ( $product && $product->is_type( 'variation' ) ) {
-					$this->rule_on_lists[ $product_id ][] = '<span class="wholesalex_rule_on_list">' . $_role_name . ' -> ' . $rule_src . ' ' . ' <span class="wsx-rule-variation-name"> '. $suffix . '</span> </span>';
+					if ( ((isset( $_temp['wholesalex_base_price'] ) && !empty( $_temp['wholesalex_base_price'] )) || (isset( $_temp['wholesalex_sale_price'] ) && !empty( $_temp['wholesalex_sale_price'] ))) && ( isset( $_temp['tiers'] ) && !empty( $_temp['tiers'] )) ) {
+						if( $rule_src == 'Singles' ) {
+							$this->rule_on_message( $cat_id, $rule_src, $_role_name, 'Product Discount & Quantity Based Discount kk', $product_id, $variation_name );
+						}else{
+							$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Product Discount & Quantity Based Discount', $product_id );
+						}
+					} elseif ( ( (isset( $_temp['wholesalex_base_price'] ) && !empty( $_temp['wholesalex_base_price'] )) || (isset( $_temp['wholesalex_sale_price'] ) && !empty( $_temp['wholesalex_sale_price'] )) ) ) {
+							if( $rule_src == 'Singles' ) {
+								$this->rule_on_message( $cat_id, $rule_src, $_role_name, 'Product Discount kk', $product_id, $variation_name );
+							}else{
+								$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Product Discount', $product_id );
+							}
+					} else {
+						if ( $rule_src == 'Category' ) {
+							$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Quantity Based Discount', $cat_id );
+						}elseif( $rule_src == 'Singles' ) {
+							$this->rule_on_message( $cat_id, $rule_src, $_role_name, 'Quantity Based Discount kk', $product_id, $variation_name );
+						}else{
+							$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Quantity Based Discount', $product_id );
+						}
+					}
 				}else {
-					$this->rule_on_lists[ $product_id ][] = '<span class="wholesalex_rule_on_list">' . $_role_name . ' -> ' . $rule_src . $suffix . '</span>';
+					if ( ((isset( $_temp['wholesalex_base_price'] ) && !empty( $_temp['wholesalex_base_price'] )) || 
+						(isset( $_temp['wholesalex_sale_price'] ) && !empty( $_temp['wholesalex_sale_price'] ))) 
+						&& ( isset( $_temp['tiers'] ) && !empty( $_temp['tiers'] )) ) {
+							if( $rule_src == 'Singles' ) {
+								$this->rule_on_message( $cat_id, $rule_src, $_role_name, 'Product Discount & Quantity Based Discount kk', $product_id, $variation_name );
+							}else{
+								$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Product Discount & Quantity Based Discount', $product_id );
+							}
+					} elseif ( ( (isset( $_temp['wholesalex_base_price'] ) && !empty( $_temp['wholesalex_base_price'] )) || 
+						  (isset( $_temp['wholesalex_sale_price'] ) && !empty( $_temp['wholesalex_sale_price'] )) ) ) {
+						if( $rule_src == 'Singles' ) {
+							$this->rule_on_message( $cat_id, $rule_src, $_role_name, 'Product Discount kk', $product_id, $variation_name );
+						}else{
+							$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Product Discount', $product_id );
+						}
+					} else {
+						if ( $rule_src == 'Category' ) {
+							$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Quantity Based Discount', $cat_id );
+						}elseif($rule_src == 'Category'){
+							$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Quantity Based Discount', $product_id );
+						}elseif( $rule_src == 'Singles' ) {
+							$this->rule_on_message( $cat_id, $rule_src, $_role_name, 'Quantity Based Discount kk', $product_id, $variation_name );
+						}else{
+							$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Quantity Based Discount', $product_id );
+						}
+					}				
 				}
-				$has_rule                             = true;
+				$has_rule = true;
 			}
 		}
+
 		return $has_rule;
 	}
 
@@ -2188,10 +2278,416 @@ class WHOLESALEX_Product {
 	 * @return string
 	 * @since 1.0.4
 	 */
-	public function rule_on_message( $name, $rule_src, $suffix = '' ) {
-		return '<span class="wholesalex_rule_on_list">' . $name . ' -> ' . $rule_src . $suffix . '</span>';
+	public function rule_on_message( $product_id, $type, $rule_src, $rule_type = '', $rule_title = '', $rule_id = '' ) {
+		$product = wc_get_product( $product_id );
+		$product_title = $product->get_name();
+		if (isset($product_title) && !empty($product_title)) {
+			$product_title = $product_title;
+			$this->rule_on_products_lists[$product_id]['product_title'] = $product_title;
+		}
+		
+		if ( $type == 'Profile' ) {
+			$user_info = get_userdata($rule_src);
+			if ($user_info) {
+				$this->rule_on_products_lists[$product_id][$type][] = [$rule_src, $user_info->user_login, 'Quantity Based Discount', $rule_src];
+			}
+		} elseif ($type == 'dynamic') {
+			 $this->rule_on_products_lists[$product_id][$type][] = [$rule_title, $rule_type, $rule_src, (int)$rule_id];
+		}elseif ($type == 'Category') {
+			 $this->rule_on_products_lists[$product_id][$type][] = [$rule_src, $rule_type, $rule_title];
+		}elseif ($type == 'Single') {
+			$this->rule_on_products_lists[$product_id][$type][] = [$rule_src, $rule_type, $rule_title];
+		}elseif ($type == 'Singles') {
+			$this->rule_on_products_lists[$product_id][$type][$rule_title][] = [$rule_src, $rule_type, $rule_title, $rule_id];
+		}
+
+	}
+	/**
+	 * Product Page Popup for Wholesalex
+	 *
+	 * @return void
+	 */
+	public function render_wsx_product_rule_modal() {
+		echo $this->wsx_product_rule_modal();
+		echo $this->wholesalex_product_rule_modal_js();
+	}
+	
+	//HTML Markup
+	public function wsx_product_rule_modal() {
+		ob_start();
+		?>
+		<!-- The Modal -->
+		<div id="wsx-product-rule-myModal" class="wsx-product-rule-modal">
+			<div class="wsx-product-rule-modal-content">
+				<span class="wsx-product-rule-modal-close">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="m12 4-8 8m0-8 8 8"/></svg>
+				</span>
+	
+				<div class="wsx-product-rule-product-title"></div>
+
+				<!-- Menu Tabs -->
+				<div class="wsx-product-rule-menu-container">
+					<div class="wsx-product-rule-menu-title">Rules Source</div>
+					<div class="wsx-product-rule-menu-tabs">
+						<div class="wsx-product-rule-menu-tab wsx-dynamic-count active" data-target="dynamicRules">Dynamic</div>
+						<div class="wsx-product-rule-menu-tab wsx-single-count" data-target="individualProduct">Individual Product</div>
+						<div class="wsx-product-rule-menu-tab wsx-category-count" data-target="category">Category</div>
+						<div class="wsx-product-rule-menu-tab wsx-profile-count" data-target="userProfile">Profile</div>
+					</div>
+				</div>
+
+				<!-- Tab Contents -->
+				<div class="wsx-product-rule-tab-container active wsx-scrollbar" id="dynamicRules">
+					<div class="wsx-product-dynamic-data"></div>
+				</div>
+				
+				<div class="wsx-product-rule-tab-container wsx-scrollbar" id="individualProduct">
+					<div class="wsx-product-individual-data"></div>
+				</div>
+				
+				<div class="wsx-product-rule-tab-container wsx-scrollbar" id="productVariables">
+					<div class="wsx-product-variable-data"></div>
+					<!-- <div class="wsx-product-rule-tab-header wsx-row-item-3">
+						<div class="wsx-product-rule-tab-header-item">Variations</div>
+						<div class="wsx-product-rule-tab-header-item"></div>
+						<div class="wsx-product-rule-tab-header-item">Edit</div>
+					</div>
+					<div class="wsx-product-rule-tab-body">
+						<div class="wsx-product-rule-tab-row wsx-row-item-3">
+							<div class="wsx-product-rule-tab-row-item wsx-ellipsis">a</div>
+							<div class="wsx-product-rule-tab-row-item wsx-ellipsis">a</div>
+							<div class="wsx-product-rule-tab-row-item">a</div>
+						</div>
+					</div> -->
+				</div>
+				
+				<div class="wsx-product-rule-tab-container wsx-scrollbar" id="category">
+					<div class="wsx-product-category-data"></div>
+				</div>
+				
+				<div class="wsx-product-rule-tab-container wsx-scrollbar" id="userProfile">
+					<div class="wsx-product-user-data"></div>
+				</div>
+			</div>
+		</div>
+		<?php
+		return ob_get_clean();
 	}
 
+	public function wholesalex_product_rule_modal_js() {
+		$product_data = $this->rule_on_products_lists_data;
+		?>
+		<script type="text/javascript">
+			jQuery(document).ready(function($){
+				'use strict';
+					$(document).on('click','#wsx-wholesalex-product-rule-openModalBtn', function (e) {
+						const selectedProductId = $(this).data('product-id');
+						const productData = <?php echo json_encode($product_data); ?>;
+						let apply_rules_count = 0;
+						// Loop through the productData array and check if the product ID exists
+						let productInfo = null;
+						for (let i = 0; i < productData.length; i++) {
+							if (productData[i][selectedProductId]) {
+								productInfo = productData[i][selectedProductId];
+								break;
+							}
+						}
+
+						// If productInfo exists, generate lists for "Single", "Profile", "Category", and "dynamic"
+						if (productInfo) {
+							let dynamicHtml = '';
+							let singleHtml = '';
+							let categoryHtml = '';
+							let profileHtml = '';
+							
+							// Function to create list items for each section
+							function generateList( title, dataArray, freq = null ) {
+								// let html = `<h3>${title}</h3><ul>`;
+								let html = '';
+								if( title == 'Dynamic') {
+									html+=`<div class="wsx-product-rule-tab-header wsx-row-item-4">
+												<div class="wsx-product-rule-tab-header-item">Rule Title</div>
+												<div class="wsx-product-rule-tab-header-item">Rule Type</div>
+												<div class="wsx-product-rule-tab-header-item">Applied For</div>
+												<div class="wsx-product-rule-tab-header-item">Edit</div>
+											</div>
+											<div class="wsx-product-rule-menu-wrapper wsx-scrollbar">
+												<div class="wsx-product-rule-tab-body">`;
+								} else if (title == 'Singles') {
+									html+=`<div class="wsx-product-rule-tab-header wsx-row-item-3">
+												<div class="wsx-product-rule-tab-header-item">Variations</div>
+												<div class="wsx-product-rule-tab-header-item"></div>
+												<div class="wsx-product-rule-tab-header-item">Edit</div>
+											</div>
+											<div class="wsx-product-rule-menu-wrapper wsx-scrollbar">
+												<div class="wsx-product-rule-tab-body">`;
+								} else if (title == 'Single') {
+									html+=`<div class="wsx-product-rule-tab-header wsx-row-item-3">
+												<div class="wsx-product-rule-tab-header-item">Roles</div>
+												<div class="wsx-product-rule-tab-header-item">Discount (Rule) Type</div>
+												<div class="wsx-product-rule-tab-header-item">Edit</div>
+											</div>
+											<div class="wsx-product-rule-menu-wrapper wsx-scrollbar">
+												<div class="wsx-product-rule-tab-body">`;
+								} else if (title == 'Category') {
+									html+=`<div class="wsx-product-rule-tab-header wsx-row-item-3">
+												<div class="wsx-product-rule-tab-header-item">Roles</div>
+												<div class="wsx-product-rule-tab-header-item">Discount (Rule) Type</div>
+												<div class="wsx-product-rule-tab-header-item">Edit</div>
+											</div>
+											<div class="wsx-product-rule-menu-wrapper wsx-scrollbar">
+												<div class="wsx-product-rule-tab-body">`;
+								} else {
+									html+=`<div class="wsx-product-rule-tab-header wsx-row-item-4">
+												<div class="wsx-product-rule-tab-header-item">User ID</div>
+												<div class="wsx-product-rule-tab-header-item">User Name</div>
+												<div class="wsx-product-rule-tab-header-item">Discount (Rule) Type</div>
+												<div class="wsx-product-rule-tab-header-item">Edit</div>
+											</div>
+											<div class="wsx-product-rule-menu-wrapper wsx-scrollbar">
+												<div class="wsx-product-rule-tab-body">`;
+								}
+								let currentUrl = window.location.href;
+								let newUrl = currentUrl.replace("?post_type=product", "?page=wholesalex#/dynamic-rules/edit/1726571948750");
+								dataArray.forEach(function(item) {
+									if( title == 'Dynamic') {
+										const role_id = item[3];
+										html +='<div class="wsx-product-rule-tab-row wsx-row-item-4">';
+										item.forEach(function(value, index) {
+											if (index == 3 ) {
+												html += `<a target='_blank' class="wsx-product-rule-tab-row-item wsx-product-rule-edit" href="${currentUrl.replace("?post_type=product", `?page=wholesalex#/dynamic-rules/edit/${value}`)}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`;
+											} else if( index == 2 ) {
+												if( value != 'All Roles' && value != 'All Users' ){
+													if( value == 'user' ) {
+														html += `<div class="wsx-product-rule-tab-row-item">${freq[role_id]} Users</div> `;
+													}else{
+														html += `<div class="wsx-product-rule-tab-row-item">${freq[role_id]} Roles</div> `;
+													}
+												}else{
+													html += `<div class="wsx-product-rule-tab-row-item">${value}</div> `;
+												}
+											} else{
+													html += `<div class="wsx-product-rule-tab-row-item wsx-ellipsis">${value}</div> `;
+												}
+										});
+										html += '</div>';
+									} 
+									else if ( title == 'Singles' ) {
+											
+										let variationId = item[0];
+										let variations = item[1];
+										let firstVariation = variations[0];
+										html += `<div class="wsx-accordion-wrapper wsx-text-space-nowrap wsx-w-fit">`;
+											html += '<div class="wsx-product-rule-tab-row wsx-border-none wsx-bg-gray wsx-row-item-3">';
+												html += `<div class="wsx-product-rule-tab-row-item wsx-ellipsis">${firstVariation[3]}</div>`; // Product Name
+								
+												html+= `<div class="wsx-product-rule-tab-row-item"><div class="wsx-btn-toggle-show"><div class="wsx-btn-toggle-text">Show Rules</div> <div class="wsx-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m6 9 6 6 6-6"/></svg></div></div></div>`;
+
+												// Product ID
+												html += `<a target='_blank' class="wsx-product-rule-tab-row-item wsx-product-rule-edit" href='/wp-admin/post.php?post=${selectedProductId}&action=edit'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`; // Product ID
+											html += '</div>';
+											html += `<div class="wsx-product-rule-container wsx-p-20">`;
+												html+=`<div class="wsx-product-rule-tab-header wsx-row-item-2 wsx-w-auto">
+													<div class="wsx-product-rule-tab-header-item">Roles</div>
+													<div class="wsx-product-rule-tab-header-item">Discount (Rule) Type</div>
+												</div>`;
+												// Loop through all variations for the popup
+												html += `<div class="wsx-product-rule-tab-body">`
+													variations.forEach(function(variation) {
+														html += `<div class="wsx-product-rule-tab-row wsx-row-item-2 wsx-bg-base1 wsx-w-auto"><div class="wsx-role-name wsx-product-rule-tab-row-item wsx-ellipsis">${variation[0]}</div><div class="wsx-product-rule-tab-row-item wsx-role-discount-type">${variation[1]}</div></div>`;
+													});
+												html += `</div>`;
+											html += `</div>`;
+										html += `</div>`;
+									}
+									else if ( title == 'Single' ) {
+										const suffix = (title == 'Single' ? '/wp-admin/post.php?post' : '/wp-admin/term.php?taxonomy=product_cat&tag_ID');
+										const prefix = (title == 'Single' ? 'action=edit' : 'post_type=product');
+										html +='<div class="wsx-product-rule-tab-row wsx-row-item-3">';
+										item.forEach(function(value, index) {
+											if ( index == 2 ) {
+												html += `<a target='_blank' class="wsx-product-rule-tab-row-item wsx-product-rule-edit" href='${suffix}=${value}&${prefix}'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`;
+											}else{
+												html += `<div class="wsx-product-rule-tab-row-item wsx-ellipsis">${value}</div> `;
+											}
+										});
+										html += '</div>';
+									}
+									else if ( title == 'Category' ) {
+										const suffix = (title == 'Single' ? '/wp-admin/post.php?post' : '/wp-admin/term.php?taxonomy=product_cat&tag_ID');
+										const prefix = (title == 'Single' ? 'action=edit' : 'post_type=product');
+										html +='<div class="wsx-product-rule-tab-row wsx-row-item-3">';
+										item.forEach(function(value, index) {
+											if ( index == 2 ) {
+												html += `<a target='_blank' class="wsx-product-rule-tab-row-item wsx-product-rule-edit" href='${suffix}=${value}&${prefix}'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`;
+											}else{
+												html += `<div class="wsx-product-rule-tab-row-item wsx-ellipsis">${value}</div> `;
+											}
+										});
+										html += '</div>';
+									} 
+									else {
+										html +='<div class="wsx-product-rule-tab-row wsx-row-item-4">';
+										item.forEach(function(value, index) {
+											if ( index == 3 ) {
+												html += `<a target='_blank' class="wsx-product-rule-tab-row-item wsx-product-rule-edit" href='/wp-admin/user-edit.php?user_id=${value}'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`;
+											}else{
+												html += `<div class="wsx-product-rule-tab-row-item wsx-ellipsis">${value}</div> `;
+											}
+										});
+										html += '</div>';
+									}
+								});
+								
+								// html += '</ul>';
+								html += '</div>'+
+									'</div>';
+								return html;
+							}
+							
+							// if ( productInfo.Single === undefined ) {
+							// 	$('.wsx-single-count').text('');
+							// } 
+							// else if (productInfo.Singles) {
+							// 	let resultArray = Object.entries(productInfo.Singles).map(([key, value]) => [key, value]);
+							// 	singleHtml = generateList('Singles', resultArray);
+							// 	apply_rules_count += productInfo.Singles.length;
+							// 	$('.wsx-single-count').text(`Individual Product (${productInfo.Singles.length})`);
+							// }
+
+							// if ( productInfo.Single === undefined ) {
+							// 	$('.wsx-single-count').text('');
+							// } 
+							// else if(productInfo.Single) {
+							// 	singleHtml = generateList('Single', productInfo.Single);
+							// 	apply_rules_count += productInfo.Single.length;
+							// 	$('.wsx-single-count').text(`Individual Product (${productInfo.Single.length == 0 ? '0' : productInfo.Single.length})`);
+							// }
+
+							// if ( productInfo.Profile === undefined ) {
+							// 	$('.wsx-profile-count').text('');
+							// } 
+							// else if(productInfo.Profile) {
+							// 	profileHtml = generateList('Profile', productInfo.Profile);
+							// 	apply_rules_count += productInfo.Profile.length;
+							// 	$('.wsx-profile-count').text(`User Profile (${productInfo.Profile.length})`);
+							// }
+
+							// if ( productInfo.Category === undefined ) {
+							// 	$('.wsx-category-count').text('');
+							// } 
+							// else if (productInfo.Category) {
+							// 	categoryHtml = generateList('Category', productInfo.Category);
+							// 	apply_rules_count += productInfo.Category.length;
+							// 	$('.wsx-category-count').text(`Category (${productInfo.Category.length})`);
+							// }
+							const updateCountAndHtml = (type, title, data, isVariableProducr = false) => {
+								
+								if ( data === undefined && isVariableProducr == false ) {
+									$(`.wsx-${type.toLowerCase()}-count`).text(title);
+								}else if (data) {
+									const resultArray = Array.isArray(data) ? data : Object.entries(data).map(([key, value]) => [key, value]);
+									const html = generateList(type, resultArray);
+									apply_rules_count += resultArray.length;
+									$(`.wsx-${ (type === 'Singles' ? 'single' : type.toLowerCase() ) }-count`).text(`${title} (${resultArray.length})`);
+									return html;
+								}
+								// return `<h2>No data available for this product.</h2>`;
+								return `<div class="wsx-text-center"><svg xmlns="http://www.w3.org/2000/svg" width="150" height="168" viewBox="0 0 288 168" fill="none"><path fill="#070707" d="M26.59 129.909V159h-3.408L7.33 136.159h-.285V159H3.523v-29.091h3.409l15.909 22.898h.284v-22.898h3.466Zm15.019 29.546c-1.97 0-3.698-.469-5.185-1.407-1.477-.937-2.632-2.249-3.466-3.934-.823-1.686-1.235-3.656-1.235-5.909 0-2.273.412-4.257 1.235-5.952.834-1.695 1.99-3.012 3.466-3.949 1.487-.938 3.215-1.406 5.185-1.406 1.97 0 3.693.468 5.17 1.406 1.487.937 2.642 2.254 3.466 3.949.834 1.695 1.25 3.679 1.25 5.952 0 2.253-.416 4.223-1.25 5.909-.823 1.685-1.979 2.997-3.465 3.934-1.478.938-3.201 1.407-5.171 1.407Zm0-3.012c1.496 0 2.727-.383 3.693-1.15.966-.767 1.681-1.776 2.145-3.026.464-1.25.696-2.604.696-4.062 0-1.459-.232-2.818-.696-4.077-.464-1.26-1.179-2.278-2.145-3.054-.966-.777-2.197-1.165-3.693-1.165s-2.727.388-3.693 1.165c-.966.776-1.681 1.794-2.145 3.054-.464 1.259-.696 2.618-.696 4.077 0 1.458.232 2.812.696 4.062.464 1.25 1.179 2.259 2.145 3.026.966.767 2.197 1.15 3.693 1.15ZM76.414 159h-8.977v-29.091h9.375c2.822 0 5.237.582 7.244 1.747 2.008 1.156 3.547 2.817 4.617 4.986 1.07 2.159 1.605 4.744 1.605 7.756 0 3.03-.54 5.639-1.62 7.826-1.079 2.178-2.65 3.855-4.715 5.029-2.065 1.165-4.574 1.747-7.529 1.747Zm-5.454-3.125h5.227c2.405 0 4.399-.464 5.98-1.392 1.582-.928 2.76-2.249 3.537-3.963.777-1.714 1.165-3.755 1.165-6.122 0-2.349-.384-4.371-1.15-6.066-.768-1.704-1.913-3.011-3.438-3.92-1.525-.919-3.423-1.378-5.696-1.378H70.96v22.841Zm30.753 3.636c-1.383 0-2.637-.26-3.764-.781-1.127-.53-2.022-1.292-2.685-2.287-.663-1.004-.994-2.216-.994-3.636 0-1.25.246-2.263.739-3.04a5.221 5.221 0 0 1 1.974-1.847 10.387 10.387 0 0 1 2.727-.994 33.4 33.4 0 0 1 3.026-.54c1.325-.17 2.4-.298 3.224-.383.834-.095 1.44-.251 1.818-.469.389-.218.583-.597.583-1.136v-.114c0-1.401-.384-2.49-1.151-3.267-.757-.776-1.908-1.165-3.452-1.165-1.6 0-2.855.351-3.764 1.051-.909.701-1.548 1.449-1.917 2.245l-3.182-1.137c.568-1.325 1.326-2.358 2.273-3.096a8.526 8.526 0 0 1 3.125-1.563 12.968 12.968 0 0 1 3.352-.454c.701 0 1.506.085 2.415.255a7.738 7.738 0 0 1 2.656 1.009c.862.511 1.577 1.283 2.145 2.315.568 1.032.852 2.415.852 4.148V159h-3.352v-2.955h-.171c-.227.474-.606.981-1.136 1.52-.53.54-1.236.999-2.117 1.378-.88.379-1.955.568-3.224.568Zm.511-3.011c1.326 0 2.444-.26 3.353-.781.918-.521 1.609-1.193 2.074-2.017.473-.824.71-1.691.71-2.6v-3.068c-.142.171-.455.327-.938.469-.473.132-1.022.251-1.647.355-.616.095-1.217.18-1.804.256-.578.066-1.047.123-1.407.17-.871.114-1.685.298-2.443.554-.748.246-1.354.62-1.818 1.122-.455.493-.682 1.165-.682 2.017 0 1.165.431 2.046 1.293 2.642.87.587 1.974.881 3.309.881Zm24.656-19.318v2.841h-11.307v-2.841h11.307Zm-8.011-5.227h3.352v20.795c0 .947.137 1.657.412 2.131.284.464.644.776 1.08.937.445.152.913.227 1.406.227.369 0 .672-.018.909-.056l.568-.114.682 3.011a6.681 6.681 0 0 1-.952.256c-.407.095-.923.142-1.548.142a6.75 6.75 0 0 1-2.784-.611 5.517 5.517 0 0 1-2.244-1.861c-.588-.833-.881-1.884-.881-3.153v-21.704Zm19.034 27.556c-1.382 0-2.637-.26-3.764-.781-1.127-.53-2.022-1.292-2.685-2.287-.662-1.004-.994-2.216-.994-3.636 0-1.25.246-2.263.739-3.04a5.216 5.216 0 0 1 1.974-1.847 10.39 10.39 0 0 1 2.727-.994 33.48 33.48 0 0 1 3.026-.54 138.22 138.22 0 0 1 3.224-.383c.834-.095 1.44-.251 1.819-.469.388-.218.582-.597.582-1.136v-.114c0-1.401-.383-2.49-1.151-3.267-.757-.776-1.908-1.165-3.451-1.165-1.601 0-2.855.351-3.764 1.051-.91.701-1.549 1.449-1.918 2.245l-3.182-1.137c.568-1.325 1.326-2.358 2.273-3.096a8.523 8.523 0 0 1 3.125-1.563 12.973 12.973 0 0 1 3.352-.454c.701 0 1.506.085 2.415.255a7.738 7.738 0 0 1 2.656 1.009c.862.511 1.577 1.283 2.145 2.315.568 1.032.852 2.415.852 4.148V159h-3.352v-2.955h-.17c-.228.474-.606.981-1.137 1.52-.53.54-1.236.999-2.116 1.378-.881.379-1.956.568-3.225.568Zm.512-3.011c1.325 0 2.443-.26 3.352-.781.919-.521 1.61-1.193 2.074-2.017.473-.824.71-1.691.71-2.6v-3.068c-.142.171-.454.327-.937.469-.474.132-1.023.251-1.648.355-.616.095-1.217.18-1.804.256-.578.066-1.047.123-1.406.17-.872.114-1.686.298-2.444.554-.748.246-1.354.62-1.818 1.122-.454.493-.682 1.165-.682 2.017 0 1.165.431 2.046 1.293 2.642.871.587 1.974.881 3.31.881Zm26.431 2.5v-29.091h17.444v3.125h-13.921v9.83h12.614v3.125h-12.614V159h-3.523Zm29.845.455c-1.97 0-3.698-.469-5.185-1.407-1.477-.937-2.633-2.249-3.466-3.934-.824-1.686-1.236-3.656-1.236-5.909 0-2.273.412-4.257 1.236-5.952.833-1.695 1.989-3.012 3.466-3.949 1.487-.938 3.215-1.406 5.185-1.406 1.969 0 3.693.468 5.17 1.406 1.487.937 2.642 2.254 3.466 3.949.833 1.695 1.25 3.679 1.25 5.952 0 2.253-.417 4.223-1.25 5.909-.824 1.685-1.979 2.997-3.466 3.934-1.477.938-3.201 1.407-5.17 1.407Zm0-3.012c1.496 0 2.727-.383 3.693-1.15.966-.767 1.681-1.776 2.145-3.026.464-1.25.696-2.604.696-4.062 0-1.459-.232-2.818-.696-4.077-.464-1.26-1.179-2.278-2.145-3.054-.966-.777-2.197-1.165-3.693-1.165-1.497 0-2.728.388-3.694 1.165-.966.776-1.68 1.794-2.145 3.054-.464 1.259-.696 2.618-.696 4.077 0 1.458.232 2.812.696 4.062.465 1.25 1.179 2.259 2.145 3.026.966.767 2.197 1.15 3.694 1.15Zm28.313-6.363v-12.898h3.352V159h-3.352v-3.693h-.227c-.512 1.108-1.307 2.05-2.387 2.827-1.079.767-2.443 1.15-4.09 1.15-1.364 0-2.576-.298-3.637-.895-1.06-.606-1.894-1.515-2.5-2.727-.606-1.222-.909-2.76-.909-4.617v-13.863h3.352v13.636c0 1.591.445 2.86 1.336 3.807.899.947 2.045 1.42 3.437 1.42.833 0 1.681-.213 2.543-.639.871-.426 1.6-1.079 2.187-1.96.597-.881.895-2.003.895-3.366Zm12.405-4.205V159h-3.353v-21.818h3.239v3.409h.284a6.232 6.232 0 0 1 2.33-2.671c1.041-.681 2.386-1.022 4.034-1.022 1.477 0 2.77.303 3.878.909 1.107.596 1.969 1.505 2.585 2.727.615 1.212.923 2.746.923 4.602V159h-3.352v-13.636c0-1.714-.445-3.05-1.335-4.006-.891-.966-2.112-1.449-3.665-1.449-1.07 0-2.027.232-2.87.696-.833.464-1.491 1.141-1.974 2.031-.483.891-.724 1.97-.724 3.239Zm27.844 13.58c-1.818 0-3.423-.46-4.815-1.378-1.392-.928-2.481-2.235-3.267-3.921-.786-1.695-1.179-3.698-1.179-6.008 0-2.292.393-4.281 1.179-5.966.786-1.686 1.88-2.988 3.281-3.906 1.402-.919 3.021-1.378 4.858-1.378 1.421 0 2.543.236 3.367.71.833.464 1.467.994 1.903 1.591.445.587.791 1.07 1.037 1.449h.284v-10.739h3.352V159h-3.238v-3.352h-.398c-.246.397-.597.899-1.051 1.505-.455.597-1.103 1.132-1.946 1.606-.843.464-1.965.696-3.367.696Zm.455-3.012c1.345 0 2.481-.35 3.409-1.051.928-.71 1.634-1.69 2.116-2.94.483-1.26.725-2.713.725-4.361 0-1.629-.237-3.054-.71-4.276-.474-1.231-1.175-2.187-2.103-2.869-.928-.691-2.073-1.037-3.437-1.037-1.421 0-2.604.365-3.551 1.094-.938.72-1.643 1.7-2.117 2.94-.464 1.231-.696 2.614-.696 4.148 0 1.553.237 2.964.711 4.233.482 1.259 1.193 2.263 2.13 3.011.947.739 2.121 1.108 3.523 1.108Zm20.142-26.534-.284 20.909h-3.295l-.284-20.909h3.863Zm-1.932 29.318c-.7 0-1.302-.251-1.803-.753a2.459 2.459 0 0 1-.753-1.804c0-.7.251-1.302.753-1.804a2.461 2.461 0 0 1 1.803-.752c.701 0 1.303.251 1.804.752.502.502.753 1.104.753 1.804 0 .464-.118.891-.355 1.279a2.646 2.646 0 0 1-.923.937 2.431 2.431 0 0 1-1.279.341Z"/><path fill="#FEAD01" d="M76 24c0-6.627 5.373-12 12-12h31.029a12 12 0 0 0 8.486-3.515l4.97-4.97A12.002 12.002 0 0 1 140.971 0H192c6.627 0 12 5.373 12 12v72c0 6.627-5.373 12-12 12H88c-6.627 0-12-5.373-12-12V24Z"/><ellipse cx="118.223" cy="36.445" fill="#070707" rx="6.222" ry="9.333"/><ellipse cx="161.778" cy="36.444" fill="#070707" rx="6.222" ry="9.333"/><path stroke="#070707" stroke-width="3.111" d="M167.306 76.889C164.477 64.419 153.326 55.11 140 55.11c-13.325 0-24.476 9.309-27.306 21.778"/></svg></div>`;
+							};
+
+							if ( productInfo.Singles != undefined ) {
+								singleHtml += updateCountAndHtml('Singles', 'Product Variables', productInfo.Singles);
+							}
+							singleHtml += updateCountAndHtml('Single', 'Individual Product', productInfo.Single, productInfo.Singles != undefined ? true : false);
+							profileHtml = updateCountAndHtml('Profile', 'Profile', productInfo.Profile);
+							categoryHtml = updateCountAndHtml('Category', 'Category', productInfo.Category);
+
+							if ( productInfo.dynamic === undefined ) {
+								$('.wsx-dynamic-count').text('Dynamic');
+							} 
+							else if (productInfo.dynamic) {
+								const idFrequency = {};
+								const uniqueEntries = [];
+								productInfo.dynamic.forEach(function(entry) {
+									const id = entry[3];
+									if (!idFrequency[id]) {
+										idFrequency[id] = 0;
+										uniqueEntries.push(entry);
+									}
+									idFrequency[id]++;
+								});
+								dynamicHtml = generateList('Dynamic', uniqueEntries, idFrequency);
+								let dynamicIds = productInfo.dynamic.map(item => item[3]);
+    							let uniqueIdLength = new Set(dynamicIds).size;
+								$('.wsx-dynamic-count').text(`Dynamic Rules (${ ( !isNaN( uniqueIdLength ) ? uniqueIdLength : productInfo.dynamic.length ) })`);
+								apply_rules_count += ( !isNaN( uniqueIdLength ) ? uniqueIdLength : 0 );
+							}
+
+							//Product Title with Rule Count
+							if (productInfo.product_title) {
+								const title_with_rule = `${productInfo.product_title} <span class="wsx-product-rule-rules-count">(${apply_rules_count} Rules)</span>`
+								$('.wsx-product-rule-product-title').html(title_with_rule);
+							}
+							// Display the generated HTML in their respective containers
+							$('.wsx-product-dynamic-data').html(dynamicHtml);   // For dynamic section
+							$('.wsx-product-individual-data').html(singleHtml); // For individual/single section
+							$('.wsx-product-category-data').html(categoryHtml); // For category section
+							$('.wsx-product-user-data').html(profileHtml);      // For profile/user section
+						} else {
+							// If the product ID does not exist, clear the sections and show a message
+							$('.wsx-product-dynamic-data').html('<span>No data available for this product.</span>');
+						}
+
+						// Show popup on button hover on Variation Products
+						// $('.wsx-wholesalex-show-variation-btn').hover(
+						// 	function() {
+						// 		$(this).siblings('.wsx-wholesalex-variation-popup').show();
+						// 	},
+						// 	function() {
+						// 		$(this).siblings('.wsx-wholesalex-variation-popup').hide();
+						// 	}
+						// );
+						//Show more or show less
+						$('.wsx-btn-toggle-show').on('click', function () {
+							$(this).toggleClass('active');
+							$(this).closest('.wsx-accordion-wrapper').find('.wsx-product-rule-container').toggleClass('active');
+							if ($(this).hasClass('active')) {
+								$(this).find('.wsx-btn-toggle-text').text('Hide Rules');
+							} else {
+								$(this).find('.wsx-btn-toggle-text').text('Show Rules');
+							}
+						});
+
+                		$('#wsx-product-rule-myModal').css('display', 'flex').hide().fadeIn(300);
+					})
+					// Close the modal
+					$('.wsx-product-rule-modal-close').on('click', function() {
+						$('#wsx-product-rule-myModal').css('display', 'none').show().fadeOut(300);
+					});
+            		// Close the modal when clicking outside of the modal content
+            		$(window).on('click', function(event) {
+            		    if ($(event.target).is('#wsx-product-rule-myModal')) {
+            		        $('#wsx-product-rule-myModal').css('display', 'none').show().fadeOut(300);
+            		    }
+            		});
+            		// Switch between tab contents
+            		$('.wsx-product-rule-menu-tab').on('click', function() {
+            		    // Remove active class from all tabs
+            		    $('.wsx-product-rule-menu-tab').removeClass('active');
+            		    // Add active class to clicked tab
+            		    $(this).addClass('active');
+            		    // Hide all tab content
+            		    $('.wsx-product-rule-tab-container').removeClass('active');
+            		    // Show clicked tab's content
+            		    var target = $(this).data('target');
+            		    $('#' + target).addClass('active');
+            		});
+					
+            	});
+		</script>
+		<?php
+	}
 	/**
 	 * Add More Tier Layouts
 	 *

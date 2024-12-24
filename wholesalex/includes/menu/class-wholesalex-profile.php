@@ -202,7 +202,7 @@ class WHOLESALEX_Profile {
 				wp_localize_script('wholesalex_profile','wholesalex_profile',array(
 					'i18n' => array(
 						'no_data_found' => __('No Data Found! Please try with another keyword.','wholesalex'),
-						'enter_more_character' => __('Enter 2 or more character to search.','wholesalex'),
+						'enter_more_character' => __('Enter 2 or more characters to search.','wholesalex'),
 						'searching' => __('Searching...','wholesalex'),
 						'this_user' => __('This User','wholesalex'),
 						'unlock' => __("UNLOCK",'wholesalex'),
@@ -212,7 +212,7 @@ class WHOLESALEX_Profile {
 					)
 				));
 				?>
-				<div id="_wholesalex_edit_profile" class=""></div>
+				<div id="_wholesalex_edit_profile" class="wsx-profile-settings-wrapper"></div>
 				<?php
 			}
 		}
@@ -606,7 +606,7 @@ class WHOLESALEX_Profile {
 		$__has_extra_fields = false;
 		?>
 			<h2 id="wholesalex_extra_information"><?php echo sprintf( esc_html__( '%s Extra Information', 'wholesalex' ), wholesalex()->get_plugin_name() ); //phpcs:ignore ?></h2>
-			<table class="form-table">
+			<table class="wsx-table form-table">
 				<?php
 
 				foreach ($__fields as $field) {
@@ -870,7 +870,8 @@ class WHOLESALEX_Profile {
 							'attr'  => array(
 								'_wholesalex_profile_override_tax_exemption' => array(
 									'type'        => 'select',
-									'label'       => __( 'Tax Exemption', 'wholesalex' ),
+									// 'label'       => __( 'Tax Exemption', 'wholesalex' ),
+									'label'       => __( 'Override Tax Exemption', 'wholesalex' ),
 									'options'     => array(
 										''    => __( 'Select Tax Exeption Status...', 'wholesalex' ),
 										'yes' => __( 'Yes', 'wholesalex' ),
@@ -888,7 +889,7 @@ class WHOLESALEX_Profile {
 							'attr'  => array(
 								'_wholesalex_profile_override_shipping_method' => array(
 									'type'        => 'select',
-									'label'       => __( 'Shipping Options', 'wholesalex' ),
+									'label'       => __( 'Override Shipping Method Options', 'wholesalex' ),
 									'options'     => array(
 										''    => __( 'Select Shipping Option Override Status...', 'wholesalex' ),
 										'yes' => __( 'Yes', 'wholesalex' ),
@@ -966,7 +967,7 @@ class WHOLESALEX_Profile {
 							'attr'  => array(
 								'_wholesalex_profile_override_payment_gateway' => array(
 									'type'        => 'select',
-									'label'       => __( 'Payment Gateway Options', 'wholesalex' ),
+									'label'       => __( 'Override Payment Gateway Options', 'wholesalex' ),
 									'options'     => array(
 										''    => __( 'Override Payment Gateway...', 'wholesalex' ),
 										'yes' => __( 'Yes', 'wholesalex' ),
@@ -1043,110 +1044,113 @@ class WHOLESALEX_Profile {
 															'default'     => '',
 															'label' => __( 'Min Quantity', 'wholesalex' ),
 														),
-														'_product_filter'       => array(
-															'type'    => 'select',
-															'options' => array(
-																''                      => __( 'Choose Filter...', 'wholesalex' ),
-																'all_products'          => __( 'All Products', 'wholesalex' ),
-																'products_in_list'      => __( 'Product in list', 'wholesalex' ),
-																'products_not_in_list'  => __( 'Product not in list', 'wholesalex' ),
-																'cat_in_list'           => __( 'Categories in list', 'wholesalex' ),
-																'cat_not_in_list'       => __( 'Categories not in list', 'wholesalex' ),
-																'attribute_in_list'     => __( 'Attribute in list', 'wholesalex' ),
-																'attribute_not_in_list' => __( 'Attribute not in list', 'wholesalex' ),
-															),
-															'default' => '',
-															'label' => __( 'Product Filter', 'wholesalex' ),
-														),
-														'products_in_list'      => array(
-															'type'        => 'multiselect',
-															'depends_on'  => array(
-																array(
-																	'key'   => '_product_filter',
-																	'value' => 'products_in_list',
+														'_product_select_with_filter' => array(
+															'type'    => 'filter',
+															'_product_filter'       => array(
+																'type'    => 'select',
+																'options' => array(
+																	''                      => __( 'Choose Filter...', 'wholesalex' ),
+																	'all_products'          => __( 'All Products', 'wholesalex' ),
+																	'products_in_list'      => __( 'Product in list', 'wholesalex' ),
+																	'products_not_in_list'  => __( 'Product not in list', 'wholesalex' ),
+																	'cat_in_list'           => __( 'Categories in list', 'wholesalex' ),
+																	'cat_not_in_list'       => __( 'Categories not in list', 'wholesalex' ),
+																	'attribute_in_list'     => __( 'Attribute in list', 'wholesalex' ),
+																	'attribute_not_in_list' => __( 'Attribute not in list', 'wholesalex' ),
 																),
+																'default' => '',
+																'label' => __( 'Product Filter', 'wholesalex' ),
 															),
-															'options'     => array(),
-															'placeholder' => __( 'Choose Products to apply discounts', 'wholesalex' ),
-															'default'     => array(),
-															'is_ajax'     => true,
-															'ajax_action' => 'get_products',
-															'ajax_search' => true,
-														),
-														'products_not_in_list'  => array(
-															'type'        => 'multiselect',
-															'depends_on'  => array(
-																array(
-																	'key'   => '_product_filter',
-																	'value' => 'products_not_in_list',
+															'products_in_list'      => array(
+																'type'        => 'multiselect',
+																'depends_on'  => array(
+																	array(
+																		'key'   => '_product_filter',
+																		'value' => 'products_in_list',
+																	),
 																),
+																'options'     => array(),
+																'placeholder' => __( 'Choose Products to apply discounts', 'wholesalex' ),
+																'default'     => array(),
+																'is_ajax'     => true,
+																'ajax_action' => 'get_products',
+																'ajax_search' => true,
 															),
-															'options'     => array(),
-															'placeholder' => __( 'Choose Products that wont apply discounts', 'wholesalex' ),
-															'default'     => array(),
-															'is_ajax'     => true,
-															'ajax_action' => 'get_products',
-															'ajax_search' => true,
-														),
-														'cat_in_list'           => array(
-															'type'        => 'multiselect',
-															'depends_on'  => array(
-																array(
-																	'key'   => '_product_filter',
-																	'value' => 'cat_in_list',
+															'products_not_in_list'  => array(
+																'type'        => 'multiselect',
+																'depends_on'  => array(
+																	array(
+																		'key'   => '_product_filter',
+																		'value' => 'products_not_in_list',
+																	),
 																),
+																'options'     => array(),
+																'placeholder' => __( 'Choose Products that wont apply discounts', 'wholesalex' ),
+																'default'     => array(),
+																'is_ajax'     => true,
+																'ajax_action' => 'get_products',
+																'ajax_search' => true,
 															),
-															'options'     => array(),
-															'placeholder' => __( 'Choose Categories to apply discounts', 'wholesalex' ),
-															'default'     => array(),
-															'is_ajax'     => true,
-															'ajax_action' => 'get_categories',
-															'ajax_search' => true,
-														),
-														'cat_not_in_list'       => array(
-															'type'        => 'multiselect',
-															'depends_on'  => array(
-																array(
-																	'key'   => '_product_filter',
-																	'value' => 'cat_not_in_list',
+															'cat_in_list'           => array(
+																'type'        => 'multiselect',
+																'depends_on'  => array(
+																	array(
+																		'key'   => '_product_filter',
+																		'value' => 'cat_in_list',
+																	),
 																),
+																'options'     => array(),
+																'placeholder' => __( 'Choose Categories to apply discounts', 'wholesalex' ),
+																'default'     => array(),
+																'is_ajax'     => true,
+																'ajax_action' => 'get_categories',
+																'ajax_search' => true,
 															),
-															'options'     => array(),
-															'placeholder' => __( 'Choose Categories that wont apply discounts', 'wholesalex' ),
-															'default'     => array(),
-															'is_ajax'     => true,
-															'ajax_action' => 'get_categories',
-															'ajax_search' => true,
-														),
-														'attribute_in_list'     => array(
-															'type'        => 'multiselect',
-															'depends_on'  => array(
-																array(
-																	'key'   => '_product_filter',
-																	'value' => 'attribute_in_list',
+															'cat_not_in_list'       => array(
+																'type'        => 'multiselect',
+																'depends_on'  => array(
+																	array(
+																		'key'   => '_product_filter',
+																		'value' => 'cat_not_in_list',
+																	),
 																),
+																'options'     => array(),
+																'placeholder' => __( 'Choose Categories that wont apply discounts', 'wholesalex' ),
+																'default'     => array(),
+																'is_ajax'     => true,
+																'ajax_action' => 'get_categories',
+																'ajax_search' => true,
 															),
-															'options'     => array(),
-															'placeholder' => __( 'Choose Product Variations to apply discounts', 'wholesalex' ),
-															'default'     => array(),
-															'is_ajax'     => true,
-															'ajax_action' => 'get_variation_products',
-															'ajax_search' => true,
-														),
-														'attribute_not_in_list' => array(
-															'type'        => 'multiselect',
-															'depends_on'  => array(
-																array(
-																	'key'   => '_product_filter',
-																	'value' => 'attribute_not_in_list',
+															'attribute_in_list'     => array(
+																'type'        => 'multiselect',
+																'depends_on'  => array(
+																	array(
+																		'key'   => '_product_filter',
+																		'value' => 'attribute_in_list',
+																	),
 																),
+																'options'     => array(),
+																'placeholder' => __( 'Choose Product Variations to apply discounts', 'wholesalex' ),
+																'default'     => array(),
+																'is_ajax'     => true,
+																'ajax_action' => 'get_variation_products',
+																'ajax_search' => true,
 															),
-															'options'     => array(),
-															'placeholder' => __( 'Choose Product Variations that wont apply discounts', 'wholesalex' ),
-															'default'     => array(),
-															'is_ajax'     => true,
-															'ajax_action' => 'get_variation_products',
-															'ajax_search' => true,
+															'attribute_not_in_list' => array(
+																'type'        => 'multiselect',
+																'depends_on'  => array(
+																	array(
+																		'key'   => '_product_filter',
+																		'value' => 'attribute_not_in_list',
+																	),
+																),
+																'options'     => array(),
+																'placeholder' => __( 'Choose Product Variations that wont apply discounts', 'wholesalex' ),
+																'default'     => array(),
+																'is_ajax'     => true,
+																'ajax_action' => 'get_variation_products',
+																'ajax_search' => true,
+															),
 														),
 													),
 													'add'  => array(
