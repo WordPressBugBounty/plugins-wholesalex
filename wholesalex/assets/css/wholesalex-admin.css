@@ -73,6 +73,10 @@ img {
     height: auto;
 }
 
+table.wsx-table {
+    width: 100%;
+}
+
 .wholesalex_backend_body  #wpcontent {
     padding-left: 0;
     background-color: var(--color-base-three);

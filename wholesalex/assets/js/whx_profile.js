@@ -2171,8 +2171,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _assets_img_wsx_loading_gif__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../assets/img/wsx-loading.gif */ "./assets/img/wsx-loading.gif");
-
 
 const LoadingGif = _ref => {
   let {
@@ -2192,7 +2190,7 @@ const LoadingGif = _ref => {
       maxWidth: '100px',
       maxHeight: '100px'
     },
-    src: _assets_img_wsx_loading_gif__WEBPACK_IMPORTED_MODULE_1__,
+    src: `${wholesalex.url}assets/img/wsx-loading.gif`,
     alt: "loading Image"
   })) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-popup-overlay ${customClass}`,
@@ -2205,16 +2203,14 @@ const LoadingGif = _ref => {
       maxWidth: '100px',
       maxHeight: '100px'
     },
-    src: _assets_img_wsx_loading_gif__WEBPACK_IMPORTED_MODULE_1__,
-    alt: "loading Image"
+    src: `${wholesalex.url}assets/img/wsx-loading.gif`
   })) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
     className: `${loaderClass}`,
     style: {
       maxWidth: '100px',
       maxHeight: '100px'
     },
-    src: _assets_img_wsx_loading_gif__WEBPACK_IMPORTED_MODULE_1__,
-    alt: "loading Image"
+    src: `${wholesalex.url}assets/img/wsx-loading.gif`
   });
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LoadingGif);
@@ -4632,6 +4628,22 @@ icons.save = /*#__PURE__*/React.createElement("svg", {
   d: "M790.706 338.824v112.94H395.412c-31.06 0-56.47 25.3-56.47 56.471v744.509c17.73-6.325 36.592-10.391 56.47-10.391h1129.412c19.877 0 38.738 4.066 56.47 10.39V508.236c0-31.171-25.412-56.47-56.47-56.47h-395.295V338.824h395.295c93.402 0 169.411 76.009 169.411 169.411v1242.353c0 93.403-76.01 169.412-169.411 169.412H395.412C302.009 1920 226 1843.99 226 1750.588V508.235c0-93.402 76.01-169.411 169.412-169.411h395.294Zm734.118 1016.47H395.412c-31.06 0-56.47 25.299-56.47 56.47v338.824c0 31.172 25.41 56.47 56.47 56.47h1129.412c31.058 0 56.47-25.298 56.47-56.47v-338.823c0-31.172-25.412-56.47-56.47-56.47ZM1016.622-.023v880.151l246.212-246.325 79.85 79.85-382.532 382.644-382.645-382.644 79.85-79.85L903.68 880.128V-.022h112.941ZM564.824 1468.235c-62.344 0-112.942 50.71-112.942 112.941s50.598 112.942 112.942 112.942c62.343 0 112.94-50.71 112.94-112.942 0-62.23-50.597-112.94-112.94-112.94Z",
   fillRule: "evenodd"
 }));
+icons.preMadeDesign = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none",
+  viewBox: "0 0 20 20"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M18.419 5.769 7.394 1.3a.682.682 0 0 0-.27-.05.697.697 0 0 0-.643.431l-.65 1.613.7.15.6-1.494 8.063 3.263 1.28.518 1.676.681-3.325 8.213-.563 2.744v.362c0 .038 0 .069-.006.106.025-.043.05-.08.069-.13L18.794 6.68a.694.694 0 0 0-.382-.912h.007Z"
+}), /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M16.02 5.381 4.6 3.044a.694.694 0 0 0-.806.531l-.368 1.819h.719l.337-1.663 8.175 1.663 1.5.3 1.706.35-1.6 7.881v3.438L16.544 6.18a.684.684 0 0 0-.53-.806l.006.006Z"
+}), /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M13.588 5.394H1.93a.683.683 0 0 0-.681.681v11.656c0 .375.306.681.681.681h11.656a.683.683 0 0 0 .682-.68V6.074a.683.683 0 0 0-.681-.681ZM9.456 7.68c.738 0 1.338.6 1.338 1.338a1.339 1.339 0 0 1-2.675 0c0-.738.6-1.338 1.337-1.338Zm3.013 9.406H2.85a.354.354 0 0 1-.3-.537l3.5-5.588a.35.35 0 0 1 .594 0l1.981 3.163a.35.35 0 0 0 .594 0l.712-1.137a.35.35 0 0 1 .594 0l2.231 3.562a.35.35 0 0 1-.3.537h.013Z"
+}));
 icons.menu = /*#__PURE__*/React.createElement("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: "20",
@@ -5230,17 +5242,6 @@ Tannin.prototype.dcnpgettext = function( domain, context, singular, plural, n ) 
 
 /***/ }),
 
-/***/ "./assets/img/wsx-loading.gif":
-/*!************************************!*\
-  !*** ./assets/img/wsx-loading.gif ***!
-  \************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-module.exports = __webpack_require__.p + "c7506fbe7be27c3073f1.gif";
-
-/***/ }),
-
 /***/ "react":
 /*!************************!*\
   !*** external "React" ***!
@@ -5513,18 +5514,6 @@ function memize(fn, options) {
 /******/ 		};
 /******/ 	})();
 /******/ 	
-/******/ 	/* webpack/runtime/global */
-/******/ 	(() => {
-/******/ 		__webpack_require__.g = (function() {
-/******/ 			if (typeof globalThis === 'object') return globalThis;
-/******/ 			try {
-/******/ 				return this || new Function('return this')();
-/******/ 			} catch (e) {
-/******/ 				if (typeof window === 'object') return window;
-/******/ 			}
-/******/ 		})();
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
@@ -5539,29 +5528,6 @@ function memize(fn, options) {
 /******/ 			}
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/publicPath */
-/******/ 	(() => {
-/******/ 		var scriptUrl;
-/******/ 		if (__webpack_require__.g.importScripts) scriptUrl = __webpack_require__.g.location + "";
-/******/ 		var document = __webpack_require__.g.document;
-/******/ 		if (!scriptUrl && document) {
-/******/ 			if (document.currentScript && document.currentScript.tagName.toUpperCase() === 'SCRIPT')
-/******/ 				scriptUrl = document.currentScript.src;
-/******/ 			if (!scriptUrl) {
-/******/ 				var scripts = document.getElementsByTagName("script");
-/******/ 				if(scripts.length) {
-/******/ 					var i = scripts.length - 1;
-/******/ 					while (i > -1 && (!scriptUrl || !/^http(s?):/.test(scriptUrl))) scriptUrl = scripts[i--].src;
-/******/ 				}
-/******/ 			}
-/******/ 		}
-/******/ 		// When supporting browsers where an automatic publicPath is not supported you must specify an output.publicPath manually via configuration
-/******/ 		// or pass an empty string ("") and set the __webpack_public_path__ variable from your code to use your own logic.
-/******/ 		if (!scriptUrl) throw new Error("Automatic publicPath is not supported in this browser");
-/******/ 		scriptUrl = scriptUrl.replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/");
-/******/ 		__webpack_require__.p = scriptUrl;
 /******/ 	})();
 /******/ 	
 /************************************************************************/

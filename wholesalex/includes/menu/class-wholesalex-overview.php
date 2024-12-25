@@ -151,7 +151,7 @@ class WHOLESALEX_Overview
 											foreach ($helpLinks as $help) {
 										?>
 												<li class="wsx-list-item">
-													<a href="<?php echo esc_url($help['link']) ?>" class="wsx-list-link wsx-d-flex wsx-item-center wsx-gap-8" target="_blank">
+													<a href="<?php echo esc_url($help['link']) ?>" class="wsx-link wsx-list-link wsx-d-flex wsx-item-center wsx-gap-8" target="_blank">
 														<span class="dashicons <?php echo esc_attr($help['iconClass']) ?> wsx-list-icon"></span>
 														<span class="wsx-list-label"><?php echo esc_html($help['label']) ?></span>
 													</a>
@@ -232,7 +232,7 @@ class WHOLESALEX_Overview
 						<div class="wsx-wrapper-box">
 							<div class="wsx-title wsx-font-28 wsx-mb-16">Migrate Your Data to WholesaleX</div>
 							<div class="wsx-font-20 wsx-lh-normal wsx-mb-48">To ensure a smooth transition and retain all your previous B2B data, you'll need to install our Migration Tool.</div>
-							<a class="wsx-btn wsx-btn-icon wsx-migration-tool-btn" href="<?php echo esc_url(add_query_arg(array('action' => 'wholesalex_migration_tool_install'), admin_url())); ?>">
+							<a class="wsx-link wsx-btn wsx-btn-icon wsx-migration-tool-btn" href="<?php echo esc_url(add_query_arg(array('action' => 'wholesalex_migration_tool_install'), admin_url())); ?>">
 								<span class="wsx-btn-loading-icon wsx-anim-rotation"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.34 17a4.773 4.773 0 0 1 1.458-6.34l.002-.002a4.778 4.778 0 0 1 5.484.094l3.432 2.496a4.778 4.778 0 0 0 5.485.094l.002-.002A4.77 4.77 0 0 0 20.66 7m-3.658 13.66a4.774 4.774 0 0 1-6.34-1.458l-.002-.003a4.778 4.778 0 0 1 .095-5.484l2.495-3.432a4.778 4.778 0 0 0 .094-5.484l-.004-.002A4.772 4.772 0 0 0 7 3.34m12.07 1.59c3.906 3.905 3.906 10.236 0 14.141-3.905 3.906-10.236 3.906-14.141 0-3.905-3.905-3.905-10.236 0-14.141 3.905-3.905 10.236-3.905 14.141 0Z"/></svg></span>
 								<span class="wsx-install-label"><?php echo esc_html_e('Install & Activate WholesaleX Migration Tool', 'wholesalex'); ?></span>
 								<span  class="wsx-icon wsx-anim-icon-left"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M2 8h11.333m-4-4.667L14 8l-4.667 4.667"/></svg></span>
@@ -248,10 +248,10 @@ class WHOLESALEX_Overview
 				<div class="wholesalex-wrapper-box">
 					<div class="wholesalext-migration-title">Migrate Your Data to WholesaleX</div>
 					<p class="wholesalext-migration-description">To ensure a smooth transition and retain all your previous B2B data, you'll need to install our Migration Tool.</p>
-					<a class="wholesalex-install-btn wholesalex-migration-tool-btn" href="<?php echo esc_url(add_query_arg(array('action' => 'wholesalex_migration_tool_install'), admin_url())); ?>"><span class="dashicons dashicons-image-rotate"></span><?php echo esc_html_e('Install & Activate WholesaleX Migration Tool', 'wholesalex'); ?> <span class="wsx-btn-down-arrow-icon">&#8595;</span></a>
+					<a class="wholesalex-install-btn wholesalex-migration-tool-btn" href="<?php /* echo esc_url(add_query_arg(array('action' => 'wholesalex_migration_tool_install'), admin_url())); ?>"><span class="dashicons dashicons-image-rotate"></span><?php echo esc_html_e('Install & Activate WholesaleX Migration Tool', 'wholesalex'); */ ?> <span class="wsx-btn-down-arrow-icon">&#8595;</span></a>
 				</div>
 				<div class="wholesalex-migration-tool-img">
-					<img src="<?php echo esc_url( WHOLESALEX_URL . '/assets/img/migration-image.png' ); ?>" alt="">
+					<img src="<?php /* echo esc_url( WHOLESALEX_URL . '/assets/img/migration-image.png' ); */ ?>" alt="">
 				</div>
 			</div> -->
 		<?php
@@ -470,7 +470,7 @@ class WHOLESALEX_Overview
 			);
 			array_splice($submenus, 3, 0, array($pro_submenu));
 		}
-		if ( wholesalex()->is_pro_active() ) {
+		if ( file_exists( WP_PLUGIN_DIR . '/wholesalex-pro/wholesalex-pro.php' ) ) {
 			$menu_title             = apply_filters( 'wholesalex_addon_conversation_title', __( 'Conversations', 'wholesalex' ) );
 			$status = apply_filters('wholesalex_show_license_page',true);
 			if ( $status && $is_white_label_enabled != 'yes' ) {

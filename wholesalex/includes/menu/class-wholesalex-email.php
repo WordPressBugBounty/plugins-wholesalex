@@ -723,8 +723,8 @@ class WHOLESALEX_Email {
 				wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES ),
 				$domain,
 				$domain,
-				'<a href="https://woocommerce.com">WooCommerce</a>',
-				'<a href="https://woocommerce.com">WooCommerce</a>',
+				'<a class="wsx-link" href="https://woocommerce.com">WooCommerce</a>',
+				'<a class="wsx-link" href="https://woocommerce.com">WooCommerce</a>',
 			),
 			$string
 		);

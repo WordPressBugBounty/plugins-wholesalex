@@ -364,7 +364,7 @@ class Addons {
 			'is_different_plugin' => false,
 			'eligible_price_ids'  => array( '1', '2', '3', '4', '5', '6', '7' ),
 			'moreFeature'         => 'https://getwholesalex.com/conversation/?utm_source=wholesalex-menu&utm_medium=addons-more_features&utm_campaign=wholesalex-DB',
-			'video'               => 'https://www.youtube.com/',
+			'video'               => 'https://www.youtube.com/embed/-g9t44AhSRw?si=LO4EmZX87MaNyFjl',
 			'status'              => wholesalex()->get_setting( 'wsx_addon_conversation' ),
 			'setting_id'          => '#conversation',
 			'lock_status'         => ! ( wholesalex()->is_pro_active() ),
@@ -382,7 +382,7 @@ class Addons {
 			'is_different_plugin' => false,
 			'eligible_price_ids'  => array( '1', '2', '3', '4', '5', '6', '7' ),
 			'moreFeature'         => 'https://getwholesalex.com/wallet/?utm_source=wholesalex-menu&utm_medium=addons-more_features&utm_campaign=wholesalex-DB',
-			'video'               => 'https://www.youtube.com/',
+			'video'               => 'https://www.youtube.com/embed/r4_V2ZW4p4I?si=ZO3-iZaffU8s7Cfw',
 			'status'              => wholesalex()->get_setting( 'wsx_addon_wallet' ),
 			'setting_id'          => '#wallet',
 			'lock_status'         => ! ( wholesalex()->is_pro_active() ),
@@ -433,7 +433,7 @@ class Addons {
 			'download_link'       => 'https://downloads.wordpress.org/plugin/multi-vendor-marketplace-b2b-for-wholesalex-dokan.zip',
 			'video'               => 'https://www.youtube.com/embed/4UatlL2-XXo',
 			// Translators: %s is the name of the required plugin
-			'depends_message'     => sprintf( __('This addon require %s plugin', 'wholesalex'),'<a href="https://wordpress.org/plugins/dokan-lite/" target="_blank">Dokan</a>'),
+			'depends_message'     => sprintf( __('This addon require %s plugin', 'wholesalex'),'<a class"wsx-link" href="https://wordpress.org/plugins/dokan-lite/" target="_blank">Dokan</a>'),
 			'is_dependency_active'=> $this->check_required_plugins( 'dokan' ),
 		);
 
@@ -453,7 +453,7 @@ class Addons {
 			'download_link'       => 'https://downloads.wordpress.org/plugin/wholesalex-wcfm-b2b-multivendor-marketplace.zip',
 			'video'               => 'https://www.youtube.com/embed/2OLOqyvv5rE',
 			// Translators: %s is the name of the required plugin with an HTML link.
-			'depends_message'     => sprintf( __('This addon require %s plugin', 'wholesalex'),'<a href="https://wordpress.org/plugins/wc-frontend-manager/" target="_blank">WCFM – Frontend Manager</a>'),
+			'depends_message'     => sprintf( __('This addon require %s plugin', 'wholesalex'),'<a class"wsx-link" href="https://wordpress.org/plugins/wc-frontend-manager/" target="_blank">WCFM – Frontend Manager</a>'),
 			'is_dependency_active'=> $this->check_required_plugins( 'wcfm' ),
 		);
 		$config['wsx_addon_migration_integration'] = array(
@@ -472,7 +472,7 @@ class Addons {
 			'download_link'       => 'https://downloads.wordpress.org/plugin/wholesalex-migration-tool.zip',
 			'video'               => 'https://www.youtube.com/embed/KVRg10OcfTI',
 			// Translators: %s is the name of the required plugin with an HTML link.
-			// 'depends_message'     => sprintf( __('This addon require %s plugin', 'wholesalex'),'<a href="https://wordpress.org/plugins/wc-frontend-manager/" target="_blank">WCFM – Frontend Manager</a>'),
+			// 'depends_message'     => sprintf( __('This addon require %s plugin', 'wholesalex'),'<a class"wsx-link" href="https://wordpress.org/plugins/wc-frontend-manager/" target="_blank">WCFM – Frontend Manager</a>'),
 			'is_dependency_active'=> $this->check_required_plugins( 'no-setting' ),
 		);
 		return $config;

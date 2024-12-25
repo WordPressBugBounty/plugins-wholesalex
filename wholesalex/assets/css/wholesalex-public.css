@@ -148,7 +148,13 @@
 
 
 /* Default Element Style */
-select, input.wsx-input, input[type=text].wsx-input, textarea {
+a.wsx-link {
+    text-decoration: none;
+}
+table.wsx-table {
+    width: 100%;
+}
+select.wsx-select, input.wsx-input, input[type=text].wsx-input, textarea.wsx-textarea {
     height: auto;
     min-height: 40px;
     /* max-height: fit-content; */
@@ -158,6 +164,7 @@ select.wsx-br-md, input.wsx-br-md, input[type=text].wsx-br-md, textarea.wsx-br-m
     border-radius: var(--border-radius-md);
 }
 .wsx-filter select.wsx-bulk-order-select {
+    border-color: var(--color-border-primary);
     border-width: 0 0 0 1px;
     border-radius: 0;
     width: 100%;
@@ -200,7 +207,7 @@ select.wsx-br-md, input.wsx-br-md, input[type=text].wsx-br-md, textarea.wsx-br-m
     padding-left: 0px;
 }
 
-.wsx-account-table-container table.wsx-table td.wallet_balance {
+.wsx-account-table-container table.wsx-table tbody td.wallet_balance {
     text-align: center;
 }
 
@@ -217,7 +224,7 @@ select.wsx-br-md, input.wsx-br-md, input[type=text].wsx-br-md, textarea.wsx-br-m
     padding: 10px 16px;
 }
 
-.wsx-account-table-container table.wsx-table td {
+.wsx-account-table-container table.wsx-table tbody td {
     border-width: 1px;
     padding: 10px 16px;
 }
@@ -568,6 +575,7 @@ select.wsx-br-md, input.wsx-br-md, input[type=text].wsx-br-md, textarea.wsx-br-m
 .wsx-multiselect-option {
     padding: 6px 20px;
     cursor: pointer;
+    text-align: left;
 }
 .wsx-multiselect-option:hover {
     background-color: var(--color-primary);
@@ -1030,7 +1038,7 @@ input:checked ~ .wsx-checkbox-mark:after {
 }
 .wsx-new-conversation-container input, 
 .wsx-new-conversation-container select, 
-.wsx-new-conversation-container textarea, 
+.wsx-new-conversation-container textarea.wsx-textarea, 
 .wsx-new-conversation-container input[type=text] {
     border-radius: var(--border-radius-md);
     border-color: var(--color-border-tertiary);
@@ -1039,7 +1047,7 @@ input:checked ~ .wsx-checkbox-mark:after {
 }
 .wsx-new-conversation-container input:focus, 
 .wsx-new-conversation-container select:focus, 
-.wsx-new-conversation-container textarea:focus, 
+.wsx-new-conversation-container textarea.wsx-textarea:focus, 
 .wsx-new-conversation-container input[type=text]:focus {
     border: 1px solid var(--color-primary);
     background-color: var(--color-base-one);
@@ -1219,7 +1227,7 @@ a.wsx-quote-item-link:hover {
 .wsx-reply-container {
     border-top: 1px solid var(--color-border-primary);
 }
-.wsx-reply-container textarea {
+.wsx-reply-container textarea.wsx-textarea {
     padding: 6px 10px;
     margin: 0 0 16px;
     outline: none;
@@ -1232,7 +1240,7 @@ a.wsx-quote-item-link:hover {
     height: 100%;
     font-size: 14px;
 }
-.wsx-reply-container textarea:focus {
+.wsx-reply-container textarea.wsx-textarea:focus {
     border: 1px solid var(--color-primary);
     box-shadow: none;
 }

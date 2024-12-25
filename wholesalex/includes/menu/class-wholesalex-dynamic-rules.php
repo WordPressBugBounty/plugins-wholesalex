@@ -2312,7 +2312,7 @@ class WHOLESALEX_Dynamic_Rules {
 		$login_to_view_price_login_url = wholesalex()->get_setting('_settings_login_to_view_price_login_url', get_permalink(get_option('woocommerce_myaccount_page_id')));
 		$redirect_url = esc_url(add_query_arg('redirect', isset($_SERVER['REQUEST_URI']) ? esc_url($_SERVER['REQUEST_URI']) : '', $login_to_view_price_login_url)); //phpcs:ignore
 		if ('yes' === $__view_price_product_list && !is_user_logged_in() && !(is_single())) {
-			$price_html = '<div><a href="' . $redirect_url . '">' . esc_html(wholesalex()->get_language_n_text('_language_login_to_see_prices', __('Login to see prices', 'wholesalex'))) . '</a></div>';
+			$price_html = '<div><a class="wsx-link" href="' . $redirect_url . '">' . esc_html(wholesalex()->get_language_n_text('_language_login_to_see_prices', __('Login to see prices', 'wholesalex'))) . '</a></div>';
 
 			// hide add to cart button also.
 			remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
@@ -2330,7 +2330,7 @@ class WHOLESALEX_Dynamic_Rules {
 		}
 
 		if ('yes' === $__view_price_product_single && !is_user_logged_in() && is_single()) {
-			$price_html = '<div><a href="' . $redirect_url . '">' . esc_html(wholesalex()->get_language_n_text('_language_login_to_see_prices', __('Login to see prices', 'wholesalex'))) . '</a></div>';
+			$price_html = '<div><a class="wsx-link" href="' . $redirect_url . '">' . esc_html(wholesalex()->get_language_n_text('_language_login_to_see_prices', __('Login to see prices', 'wholesalex'))) . '</a></div>';
 
 			remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
 			// hide add to cart button also.
@@ -6524,7 +6524,7 @@ class WHOLESALEX_Dynamic_Rules {
 						$lvp_url = esc_url(add_query_arg('redirect', isset($_SERVER['REQUEST_URI']) ? esc_url($_SERVER['REQUEST_URI']) : '', $lvp_url)); //phpcs:ignore
 	
 						$this->make_product_non_purchasable_and_remove_add_to_cart($product);
-						$price_html = '<div><a href="' . $lvp_url . '">' . esc_html(wholesalex()->get_language_n_text('_language_login_to_see_prices', __('Login to see prices', 'wholesalex'))) . '</a></div>';
+						$price_html = '<div><a class="wsx-link" href="' . $lvp_url . '">' . esc_html(wholesalex()->get_language_n_text('_language_login_to_see_prices', __('Login to see prices', 'wholesalex'))) . '</a></div>';
 
 						return $price_html;
 					}

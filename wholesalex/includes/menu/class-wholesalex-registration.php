@@ -798,7 +798,7 @@ class WHOLESALEX_Registration {
 							<?php
 						}
 						?>
-						<select name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>"  value="<?php echo ( isset( $_POST[ $field['name'] ] ) && !empty($_POST[ $field['name'] ]) ) ? esc_attr( wp_unslash( $_POST[ $field['name'] ] ) ) : ''; ?>" class="<?php echo esc_attr( isset( $field['required'] ) && $field['required'] ? 'wsx-field-required' : '' ); ?>" required="<?php echo esc_attr($is_required) ?>" > <?php // @codingStandardsIgnoreLine ?>
+						<select class="wsx-select" name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>"  value="<?php echo ( isset( $_POST[ $field['name'] ] ) && !empty($_POST[ $field['name'] ]) ) ? esc_attr( wp_unslash( $_POST[ $field['name'] ] ) ) : ''; ?>" class="<?php echo esc_attr( isset( $field['required'] ) && $field['required'] ? 'wsx-field-required' : '' ); ?>" required="<?php echo esc_attr($is_required) ?>" > <?php // @codingStandardsIgnoreLine ?>
 							<?php
 							foreach ( $field['option'] as $option ) {
 								?>
@@ -913,7 +913,7 @@ class WHOLESALEX_Registration {
 							<?php
 						}
 						?>
-						<textarea name="<?php echo esc_attr( $field['name'] ); ?>" class="input-text <?php echo esc_attr( isset( $field['required'] ) && $field['required'] ? 'wsx-field-required' : '' ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>" rows="2" cols="5" > </textarea>
+						<textarea name="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-textarea input-text <?php echo esc_attr( isset( $field['required'] ) && $field['required'] ? 'wsx-field-required' : '' ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>" rows="2" cols="5" > </textarea>
 						<?php
 						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
 							?>

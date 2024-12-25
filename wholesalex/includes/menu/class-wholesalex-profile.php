@@ -420,7 +420,7 @@ class WHOLESALEX_Profile {
 	 * @param String $which Role Filter Position ( top or bottom).
 	 */
 	public function add_role_filter( $which ) {
-		$st      = '<select name="filter_wholesalex_role_%s" style="float:none;"><option value="">%s</option>%s</select>';
+		$st      = '<select class="wsx-select" name="filter_wholesalex_role_%s" style="float:none;"><option value="">%s</option>%s</select>';
 		$options = '';
 		$roles   = wholesalex()->get_roles( 'roles_option' );
 		$status  = isset( $_GET[ 'filter_wholesalex_role_' . $which ] ) ? sanitize_text_field( $_GET[ 'filter_wholesalex_role_' . $which ] ) : ''; // @codingStandardsIgnoreLine.
@@ -498,7 +498,7 @@ class WHOLESALEX_Profile {
 	 * @since 1.0.4
 	 */
 	public function add_status_filter( $which ) {
-		$st             = '<select name="filter_wholesalex_status_%s" style="float:none;"><option value="">%s</option>%s</select>';
+		$st             = '<select class="wsx-select" name="filter_wholesalex_status_%s" style="float:none;"><option value="">%s</option>%s</select>';
 		$options        = '';
 		$status_options = array(
 			'pending'  => __( 'Waiting Approval', 'wholesalex' ),
@@ -656,7 +656,7 @@ class WHOLESALEX_Profile {
 													break;
 												}
 												?>
-													<select name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" class="regular-text" style="width: 25em;">
+													<select class="wsx-select" name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" class="regular-text" style="width: 25em;">
 														<?php
 														if(isset($field['migratedFromOldBuilder']) && $field['migratedFromOldBuilder']  ) {
 															$selected = get_user_meta( $user->ID, $field['name'], true );
@@ -729,7 +729,7 @@ class WHOLESALEX_Profile {
 													$__url = wp_get_attachment_url( $__value );
 													if ( $__url ) {
 														?>
-														<div class="wholesalex_download_file"><a href="<?php echo esc_url_raw( $__url ); ?>"><?php esc_html_e( 'Download File', 'wholesalex' ); ?></a></div>
+														<div class="wholesalex_download_file"><a class="wsx-link" href="<?php echo esc_url_raw( $__url ); ?>"><?php esc_html_e( 'Download File', 'wholesalex' ); ?></a></div>
 														<?php
 													} else {
 														?>
@@ -752,7 +752,7 @@ class WHOLESALEX_Profile {
 													$__value = get_user_meta( $user->ID, 'wholesalex_cf_' . $field['name'], true );
 												}
 												?>
-												<textarea name="<?php echo esc_attr( $field_name); ?>" id="<?php echo esc_attr( $field_name); ?>" value="<?php echo esc_attr( $__value ); ?>"><?php echo esc_attr( $__value ); ?></textarea>
+												<textarea class="wsx-textarea " name="<?php echo esc_attr( $field_name); ?>" id="<?php echo esc_attr( $field_name); ?>" value="<?php echo esc_attr( $__value ); ?>"><?php echo esc_attr( $__value ); ?></textarea>
 												<?php
 												break;
 

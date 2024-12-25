@@ -2,9 +2,9 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
-"Project-Id-Version: WholesaleX 2.0.0\n"
+"Project-Id-Version: WholesaleX 2.0.1\n"
 "Report-Msgid-Bugs-To: https://wpxpo.com/contact/\n"
-"POT-Creation-Date: 2024-12-24 11:50:21+00:00\n"
+"POT-Creation-Date: 2024-12-25 10:37:21+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -3081,7 +3081,6 @@ msgid "WholesaleX Migration Tool"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:237
-#: includes/menu/class-wholesalex-overview.php:251
 msgid "Install & Activate WholesaleX Migration Tool"
 msgstr ""
 
@@ -6314,8 +6313,8 @@ msgstr ""
 #. translators: 1: User Profile URL, 2: Username
 msgctxt "WholesaleX Registration Pending(Admin) Email"
 msgid ""
-"A new user, <a href=\"%1$s\">%2$s</a>, has registered and is awaiting your "
-"approval to access our platform."
+"A new user, <a class=\"wsx-link\" href=\"%1$s\">%2$s</a>, has registered "
+"and is awaiting your approval to access our platform."
 msgstr ""
 
 #: templates/emails/admin-wholesalex-registration-pending.php:16

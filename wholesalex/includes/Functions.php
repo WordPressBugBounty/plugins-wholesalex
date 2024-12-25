@@ -1574,7 +1574,7 @@ class Functions {
 				<div class="wholesalex-popup-desc">
 					<?php echo esc_html( $desc ); ?>
 				</div>
-				<a href="<?php echo esc_url( $url ); ?>" class="wholesalex-btn wholesalex-btn-warning wholesalex-mt25"><?php echo esc_html__( 'Get WholesaleX Pro', 'wholesalex' ); ?></a>
+				<a href="<?php echo esc_url( $url ); ?>" class="wsx-link wholesalex-btn wholesalex-btn-warning wholesalex-mt25"><?php echo esc_html__( 'Get WholesaleX Pro', 'wholesalex' ); ?></a>
 				<button class="wholesalex-popup-close pro-popup" id="wholesalex-close-pro-popup" onclick="closeWholesaleXGetProPopUp()"></button>
 			</div>
 		</div>

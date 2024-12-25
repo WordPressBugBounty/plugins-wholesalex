@@ -145,7 +145,7 @@ class Deactive {
 									<input type="radio" <?php echo ($key == 0 ? 'checked="checked"' : ''); ?> id="<?php echo esc_attr($setting['id']); ?>" name="<?php echo esc_attr(self::$PLUGIN_SLUG); ?>" value="<?php echo esc_attr($setting['text']); ?>">
 									<div class="wholesalex-reason-text"><?php echo esc_html($setting['text']); ?></div>
 									<?php if( isset($setting['input']) && $setting['input'] ) { ?>
-										<textarea placeholder="<?php echo esc_attr($setting['placeholder']); ?>" class="wholesalex-reason-input <?php echo ($key == 0 ? 'wholesalex-active' : ''); ?> <?php echo esc_html($setting['id']); ?>"></textarea>
+										<textarea placeholder="<?php echo esc_attr($setting['placeholder']); ?>" class="wsx-textarea wholesalex-reason-input <?php echo ($key == 0 ? 'wholesalex-active' : ''); ?> <?php echo esc_html($setting['id']); ?>"></textarea>
 									<?php } ?>
 								</label>
 							</li>
@@ -154,8 +154,8 @@ class Deactive {
                 </div>
 
                 <div class="wholesalex-modal-footer">
-                    <a class="wholesalex-modal-submit wholesalex-btn wholesalex-btn-primary" href="#"><?php esc_html_e( "Submit & Deactivate", "wholesalex" ); ?><span class="dashicons dashicons-update rotate"></span></a>
-                    <a class="wholesalex-modal-deactive" href="#"><?php esc_html_e( "Skip & Deactivate", "wholesalex" ); ?></a>
+                    <a class="wsx-link wholesalex-modal-submit wholesalex-btn wholesalex-btn-primary" href="#"><?php esc_html_e( "Submit & Deactivate", "wholesalex" ); ?><span class="dashicons dashicons-update rotate"></span></a>
+                    <a class="wsx-link wholesalex-modal-deactive" href="#"><?php esc_html_e( "Skip & Deactivate", "wholesalex" ); ?></a>
 				</div>
 				
             </div>

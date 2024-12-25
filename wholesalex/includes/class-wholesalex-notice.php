@@ -362,12 +362,12 @@ class WHOLESALEX_Notice {
 					<div class="wsx-notice-content"> <strong> Black Friday Deal Alert: </strong> WholesaleX on Sale - Enjoy <strong>65% OFF </strong> on this complete B2B WooCommerce Solution
                     </div>
 					<div class="wsx-notice-buttons"> 
-						<a class="wsx-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank"> Upgrade to Pro   </a>
-						<a class="wsx-notice-btn button" href="<?php echo esc_url( $full_access ); ?>" target="_blank">  Explore WholesaleX  </a>
-						<a href="<?php echo esc_url( $close_url ); ?>" class="wsx-notice-dont-save-money">   I Don’t Want To Save Money </a>
+						<a class="wsx-link wsx-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank"> Upgrade to Pro   </a>
+						<a class="wsx-link wsx-notice-btn button" href="<?php echo esc_url( $full_access ); ?>" target="_blank">  Explore WholesaleX  </a>
+						<a class="wsx-link wsx-notice-dont-save-money" href="<?php echo esc_url( $close_url ); ?>">   I Don’t Want To Save Money </a>
 					</div>
 					</div>
-					<a href="<?php echo esc_url( $close_url ); ?>" class="wsx-notice-close"><span class="wsx-notice-close-icon dashicons dashicons-dismiss"> </span></a>
+					<a href="<?php echo esc_url( $close_url ); ?>" class="wsx-notice-close"><span class="wsx-link wsx-notice-close-icon dashicons dashicons-dismiss"> </span></a>
 				</div>
 				</div>
 				<?php
@@ -382,10 +382,10 @@ class WHOLESALEX_Notice {
                     <div class="wsx-display-block">
 						<div class="wsx-notice-wrapper notice">
 							<div class="wsx-install-body wsx-image-banner">
-								<a href="<?php echo esc_url( $close_url ); ?>" class="wsx-promotion-dismiss promotional-dismiss-notice">
+								<a href="<?php echo esc_url( $close_url ); ?>" class="wsx-link wsx-promotion-dismiss promotional-dismiss-notice">
 									<?php esc_html_e( 'Dismiss', 'wholesalex' ); ?>
 								</a>
-								<a href="<?php echo esc_url( $url ); ?>" target="_blank">
+								<a class="wsx-link" href="<?php echo esc_url( $url ); ?>" target="_blank">
 									<img class="wsx-halloween-img-banner" src="<?php echo $icon; ?>" alt="Banner">
 								</a>
 							</div>

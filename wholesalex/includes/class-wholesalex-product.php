@@ -2455,7 +2455,7 @@ class WHOLESALEX_Product {
 										html +='<div class="wsx-product-rule-tab-row wsx-row-item-4">';
 										item.forEach(function(value, index) {
 											if (index == 3 ) {
-												html += `<a target='_blank' class="wsx-product-rule-tab-row-item wsx-product-rule-edit" href="${currentUrl.replace("?post_type=product", `?page=wholesalex#/dynamic-rules/edit/${value}`)}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`;
+												html += `<a target='_blank' class="wsx-link wsx-product-rule-tab-row-item wsx-product-rule-edit" href="${currentUrl.replace("?post_type=product", `?page=wholesalex#/dynamic-rules/edit/${value}`)}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`;
 											} else if( index == 2 ) {
 												if( value != 'All Roles' && value != 'All Users' ){
 													if( value == 'user' ) {
@@ -2484,7 +2484,7 @@ class WHOLESALEX_Product {
 												html+= `<div class="wsx-product-rule-tab-row-item"><div class="wsx-btn-toggle-show"><div class="wsx-btn-toggle-text">Show Rules</div> <div class="wsx-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m6 9 6 6 6-6"/></svg></div></div></div>`;
 
 												// Product ID
-												html += `<a target='_blank' class="wsx-product-rule-tab-row-item wsx-product-rule-edit" href='/wp-admin/post.php?post=${selectedProductId}&action=edit'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`; // Product ID
+												html += `<a target='_blank' class="wsx-link wsx-product-rule-tab-row-item wsx-product-rule-edit" href='/wp-admin/post.php?post=${selectedProductId}&action=edit'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`; // Product ID
 											html += '</div>';
 											html += `<div class="wsx-product-rule-container wsx-p-20">`;
 												html+=`<div class="wsx-product-rule-tab-header wsx-row-item-2 wsx-w-auto">
@@ -2506,7 +2506,7 @@ class WHOLESALEX_Product {
 										html +='<div class="wsx-product-rule-tab-row wsx-row-item-3">';
 										item.forEach(function(value, index) {
 											if ( index == 2 ) {
-												html += `<a target='_blank' class="wsx-product-rule-tab-row-item wsx-product-rule-edit" href='${suffix}=${value}&${prefix}'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`;
+												html += `<a target='_blank' class="wsx-link wsx-product-rule-tab-row-item wsx-product-rule-edit" href='${suffix}=${value}&${prefix}'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`;
 											}else{
 												html += `<div class="wsx-product-rule-tab-row-item wsx-ellipsis">${value}</div> `;
 											}
@@ -2519,7 +2519,7 @@ class WHOLESALEX_Product {
 										html +='<div class="wsx-product-rule-tab-row wsx-row-item-3">';
 										item.forEach(function(value, index) {
 											if ( index == 2 ) {
-												html += `<a target='_blank' class="wsx-product-rule-tab-row-item wsx-product-rule-edit" href='${suffix}=${value}&${prefix}'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`;
+												html += `<a target='_blank' class="wsx-link wsx-product-rule-tab-row-item wsx-product-rule-edit" href='${suffix}=${value}&${prefix}'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`;
 											}else{
 												html += `<div class="wsx-product-rule-tab-row-item wsx-ellipsis">${value}</div> `;
 											}
@@ -2530,7 +2530,7 @@ class WHOLESALEX_Product {
 										html +='<div class="wsx-product-rule-tab-row wsx-row-item-4">';
 										item.forEach(function(value, index) {
 											if ( index == 3 ) {
-												html += `<a target='_blank' class="wsx-product-rule-tab-row-item wsx-product-rule-edit" href='/wp-admin/user-edit.php?user_id=${value}'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`;
+												html += `<a target='_blank' class="wsx-link wsx-product-rule-tab-row-item wsx-product-rule-edit" href='/wp-admin/user-edit.php?user_id=${value}'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.333 1.333 12 4l-7.333 7.333H2V8.667l7.333-7.334ZM2 14.667h12"/></svg></a>`;
 											}else{
 												html += `<div class="wsx-product-rule-tab-row-item wsx-ellipsis">${value}</div> `;
 											}

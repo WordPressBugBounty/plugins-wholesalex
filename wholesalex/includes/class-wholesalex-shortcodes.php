@@ -158,7 +158,7 @@ class WHOLESALEX_Shortcodes {
 		); ?></p>
 		<p><strong><?php esc_html_e( 'Username:', 'wholesalex' ); ?></strong> <?php echo esc_html( $user_login ); ?></p>
 		<p><?php esc_html_e( 'If you didn’t make this request, just ignore this email. If you’d like to proceed:', 'wholesalex' ); ?></p>
-		<p><a href="<?php echo esc_url( $reset_link ); ?>"><?php esc_html_e( 'Click here to reset your password', 'wholesalex' ); ?></a></p>
+		<p><a class="wsx-link" href="<?php echo esc_url( $reset_link ); ?>"><?php esc_html_e( 'Click here to reset your password', 'wholesalex' ); ?></a></p>
 		<p><?php esc_html_e( 'Thanks for reading.', 'wholesalex' ); ?></p>
 		<?php
 		$message = ob_get_clean();
@@ -394,7 +394,7 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div class="wsx-reg-form-row ">
 							<div class="wholesalex-registration-form-column left wsx-field woocommerce-LostPassword lost_password"> 
-								<a href="<?php echo esc_url( wp_lostpassword_url() ); ?>"><?php esc_html_e( 'Lost your password?', 'woocommerce' ); ?></a>
+								<a class="wsx-link" href="<?php echo esc_url( wp_lostpassword_url() ); ?>"><?php esc_html_e( 'Lost your password?', 'woocommerce' ); ?></a>
 							</div>
 						</div>
 							
@@ -545,7 +545,7 @@ class WHOLESALEX_Shortcodes {
 				wc_add_notice( $__message_for_logged_in_user, 'error' );
 				wc_print_notices();
 				?>
-					<a href="<?php echo esc_url_raw( wp_logout_url( get_permalink() ) ); ?>"> <?php echo esc_html( wholesalex()->get_language_n_text( '_language_logout_to_see_this_form', __( 'Logout to See this form', 'wholesalex' ) ) ); ?></a>
+					<a class="wsx-link" href="<?php echo esc_url_raw( wp_logout_url( get_permalink() ) ); ?>"> <?php echo esc_html( wholesalex()->get_language_n_text( '_language_logout_to_see_this_form', __( 'Logout to See this form', 'wholesalex' ) ) ); ?></a>
 					</div>
 				<?php
 				return;
@@ -584,7 +584,7 @@ class WHOLESALEX_Shortcodes {
 				wc_add_notice( $__message_for_logged_in_user, 'error' );
 				wc_print_notices();
 				?>
-					<a href="<?php echo esc_url_raw( wp_logout_url( get_permalink() ) ); ?>"> <?php echo esc_html( wholesalex()->get_language_n_text( '_language_logout_to_see_this_form', __( 'Logout to See this form', 'wholesalex' ) ) ); ?></a>
+					<a class="wsx-link" href="<?php echo esc_url_raw( wp_logout_url( get_permalink() ) ); ?>"> <?php echo esc_html( wholesalex()->get_language_n_text( '_language_logout_to_see_this_form', __( 'Logout to See this form', 'wholesalex' ) ) ); ?></a>
 					</div>
 				<?php
 				return;
@@ -627,7 +627,7 @@ class WHOLESALEX_Shortcodes {
 				wc_add_notice( $__message_for_logged_in_user, 'error' );
 				wc_print_notices();
 				?>
-					<a href="<?php echo esc_url_raw( wp_logout_url( get_permalink() ) ); ?>"> <?php echo esc_html( wholesalex()->get_language_n_text( '_language_logout_to_see_this_form', __( 'Logout to See this form', 'wholesalex' ) ) ); ?></a>
+					<a class="wsx-link" href="<?php echo esc_url_raw( wp_logout_url( get_permalink() ) ); ?>"> <?php echo esc_html( wholesalex()->get_language_n_text( '_language_logout_to_see_this_form', __( 'Logout to See this form', 'wholesalex' ) ) ); ?></a>
 					</div>
 				<?php
 				return;
@@ -1521,7 +1521,7 @@ class WHOLESALEX_Shortcodes {
 						function( $match ) use (  $term_link, &$found) {
 							if (!$found) {
 								$found = true;
-								return '<a href="' . $term_link . '">' . $match[1] . '</a>';
+								return '<a class="wsx-link" href="' . $term_link . '">' . $match[1] . '</a>';
 							}
 							return $match[0];
 						},
@@ -1659,7 +1659,7 @@ class WHOLESALEX_Shortcodes {
 							}
 							?>
 							
-							<select name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
+							<select class="wsx-select" name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<option value="<?php echo esc_attr( $option['value'] ); ?>"><?php echo esc_html( $option['name'] ); ?></option>
 								<?php endforeach; ?>
@@ -1941,7 +1941,7 @@ class WHOLESALEX_Shortcodes {
 								}
 							?>
 							
-							<textarea id="<?php echo esc_attr( $field['name'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>"></textarea>
+							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>"></textarea>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -2022,7 +2022,7 @@ class WHOLESALEX_Shortcodes {
 					case 'textarea':
 						?>
 						<div class="wsx-form-field wsx-outline-focus wsx-form-textarea">
-							<textarea id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>"></textarea>
+							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>"></textarea>
 							<div class='wsx-form-label wsx-clone-label'><?php echo esc_html( $field['label'] ); ?> <?php 
                              if(isset( $field['required'] ) && $field['required']) {
                                                   ?>  
@@ -2093,7 +2093,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus wsx-form-select">
-							<select name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
+							<select class="wsx-select" name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<option value="<?php echo esc_attr( $option['value'] ); ?>"><?php echo esc_html( $option['name'] ); ?></option>
 								<?php endforeach; ?>
@@ -2268,7 +2268,7 @@ class WHOLESALEX_Shortcodes {
 					case 'textarea':
 						?>
 						<div class="wsx-form-field wsx-outline-focus wsx-form-textarea">
-							<textarea id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea"  name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"></textarea>
+							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea"  name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"></textarea>
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 								<label class="wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php 
                                      if(isset( $field['required'] ) && $field['required']) {
@@ -2329,7 +2329,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus">
-							<select name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
+							<select class="wsx-select" name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<option value="<?php echo esc_attr( $option['value'] ); ?>"><?php echo esc_html( $option['name'] ); ?></option>
 								<?php endforeach; ?>
@@ -2503,7 +2503,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus wsx-form-textarea">
-							<textarea id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea"  name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"></textarea>
+							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea"  name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"></textarea>
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 								<label class="wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php 
                                      if(isset( $field['required'] ) && $field['required']) {
@@ -2566,7 +2566,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus">
-							<select name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
+							<select class="wsx-select" name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<option value="<?php echo esc_attr( $option['value'] ); ?>"><?php echo esc_html( $option['name'] ); ?></option>
 								<?php endforeach; ?>
@@ -2756,7 +2756,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus wsx-form-textarea">
-							<textarea id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo esc_attr($field['label']); echo isset( $field['required'] ) && $field['required'] ? '*' : '';  ?>"></textarea>
+							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo esc_attr($field['label']); echo isset( $field['required'] ) && $field['required'] ? '*' : '';  ?>"></textarea>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -2830,7 +2830,7 @@ class WHOLESALEX_Shortcodes {
 						?>
 						
 						<div class="wsx-form-field wsx-outline-focus wsx-form-select">
-							<select name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
+							<select class="wsx-select" name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<option value="<?php echo esc_attr( $option['value'] ); ?>"><?php echo esc_html( $option['name'] ); ?></option>
 								<?php endforeach; ?>
@@ -3003,7 +3003,7 @@ class WHOLESALEX_Shortcodes {
 					case 'textarea':
 						?>
 						<div class="wsx-form-field wsx-outline-focus wsx-form-textarea wsx-formBuilder-input-width">
-							<textarea id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder=" "></textarea>
+							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder=" "></textarea>
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 								<label class="wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php 
                                      if(isset( $field['required'] ) && $field['required']) {
@@ -3068,7 +3068,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus wsx-form-select wsx-formBuilder-input-width">
-							<select name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
+							<select class="wsx-select" name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<option value="<?php echo esc_attr( $option['value'] ); ?>"><?php echo esc_html( $option['name'] ); ?></option>
 								<?php endforeach; ?>
@@ -3221,7 +3221,7 @@ class WHOLESALEX_Shortcodes {
                                                 <?php 
                                                 }  ?></label>
 								<?php endif; ?>
-								<select name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
+								<select class="wsx-select" name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
 								<?php foreach ( $field['option'] as $option ) : ?>
 										<option value="<?php echo esc_attr( $option['value'] ); ?>"><?php echo esc_html( $option['name'] ); ?></option>
 									<?php endforeach; ?>
@@ -3451,7 +3451,7 @@ class WHOLESALEX_Shortcodes {
                                                 <?php 
                                                 }  ?></label>
 								<?php endif; ?>
-								<textarea id="<?php echo esc_attr( $field['name'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="Write Message..."></textarea>
+								<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="Write Message..."></textarea>
 							</div>
 							<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 								<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
