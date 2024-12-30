@@ -2108,6 +2108,7 @@ const Choosebox = props => {
     const plan = option.split('_');
     const _lockField = option.startsWith('pro_');
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
+      className: "wsx-label ",
       htmlFor: option,
       key: `wsx-choose-box-${k}`,
       id: value === option ? "choose-box-selected" : "",
@@ -2529,7 +2530,7 @@ const RadioButtons = props => {
     onChange: onChange
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
     htmlFor: option,
-    className: "wsx-option-desc"
+    className: "wsx-label wsx-option-desc"
   }, " ", options[option])))), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-radio-field-help wsx-help-message ${helpClass}`
   }, help)));
@@ -2538,10 +2539,10 @@ const RadioButtons = props => {
 
 /***/ }),
 
-/***/ "./reactjs/src/components/Select.js":
-/*!******************************************!*\
-  !*** ./reactjs/src/components/Select.js ***!
-  \******************************************/
+/***/ "./reactjs/src/components/Select_New.js":
+/*!**********************************************!*\
+  !*** ./reactjs/src/components/Select_New.js ***!
+  \**********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -2549,65 +2550,183 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
-/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom */ "react-dom");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_2__);
 
 
 
-
-const Select = props => {
+function Select_New(_ref) {
   let {
-    options,
-    label,
-    labelClass,
-    labelColor,
-    selectClass,
-    name,
-    defaultValue,
-    value,
-    setValue,
-    tooltip,
-    tooltipPosition,
-    help,
+    id = '',
+    value = '',
+    noValue = false,
+    label = '',
+    labelClass = '',
+    inputPadding = '',
+    iconName = '',
+    iconPosition = 'after',
+    iconColor = '',
+    iconGap = '8px',
+    iconRotation = 'full',
     onChange,
-    helpClass,
-    className = '',
-    isLabelHide,
-    required,
-    requiredColor,
-    ...rest
-  } = props;
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-    className: `wsx-input-wrapper ${className}`
-  }, !isLabelHide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-    className: `wsx-input-label ${tooltip ? 'wsx-d-flex' : ''} ${labelColor && `wsx-color-${labelColor}`} ${labelClass}`
-  }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
-    className: "wsx-required",
-    style: {
-      color: requiredColor || '#fc143f'
+    wrapperClass = '',
+    customClass = '',
+    inputBackground = 'transparent',
+    inputColor = 'text-light',
+    borderNone = false,
+    borderColor = 'border-primary',
+    borderRadius = 'md',
+    containerBackground = 'base1',
+    containerBorderRadius = 'md',
+    containerBorderColor = 'base2',
+    containerBorder = true,
+    containerPadding = '4',
+    minWidth = '',
+    maxWidth = '',
+    direction = 'ltr',
+    textAlign = '',
+    options = [],
+    optionBorderBottom = false,
+    optionBorderRadius = 'sm',
+    optionBorderColor = 'border-light',
+    optionCustomClass = '',
+    selectedOptionClass = '',
+    selectionText = 'Select an option'
+  } = _ref;
+  const position = iconPosition === 'before' || iconPosition === 'left';
+  const Icon = iconName && _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"][iconName] ? _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"][iconName] : null;
+  const [isDropdownOpen, setIsDropdownOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [selectedOption, setSelectedOption] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(value || selectionText);
+  const [dropdownPosition, setDropdownPosition] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    width: 0,
+    top: 0,
+    left: 0,
+    isAbove: false,
+    isRight: false
+  });
+  const dropdownRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const contentRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const inputRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  !textAlign && (direction == 'ltr' ? textAlign = 'left' : textAlign = 'right');
+  const handleOutsideClick = e => {
+    if (dropdownRef.current && (dropdownRef.current.contains(e.target) || contentRef.current && contentRef.current.contains(e.target))) {
+      return;
     }
-  }, "*"), tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_2__["default"], {
-    content: tooltip,
-    direction: tooltipPosition,
-    spaceLeft: "8px"
-  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_3__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-    className: "wsx-select-container"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("select", (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({
-    name: name,
-    value: value,
-    onChange: onChange
-  }, rest, {
-    className: `wsx-select ${selectClass}`
-  }), Object.keys(options).map((option, k) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("option", {
-    value: option
-  }, " ", options[option]))), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-    className: `wsx-select-help wsx-help-message ${helpClass}`
-  }, help)));
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Select);
+    setIsDropdownOpen(false);
+  };
+  const toggleDropdown = () => {
+    if (!isDropdownOpen) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      setTimeout(() => {
+        const contentHeight = contentRef.current ? contentRef.current.getBoundingClientRect().height : 0;
+        const contentWidth = contentRef.current ? contentRef.current.getBoundingClientRect().width : 0;
+        const isAbove = rect.top - contentHeight > 0 ? rect.bottom + contentHeight > viewportHeight : false;
+        const isRight = rect.left - contentWidth > 0 ? rect.left + contentWidth > viewportWidth : false;
+        setDropdownPosition({
+          width: rect.width,
+          top: isAbove ? rect.top + window.scrollY - contentHeight - 1 : rect.bottom + window.scrollY + 1,
+          left: isRight ? rect.right + window.scrollX - contentWidth : rect.left + window.scrollX,
+          isAbove,
+          isRight
+        });
+      }, 0);
+    }
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+  const handleOptionSelect = optionValue => {
+    const selected = options.find(option => option.value == optionValue);
+    setSelectedOption(selected ? selected.label : selectionText);
+    setIsDropdownOpen(false);
+    if (onChange) {
+      onChange({
+        target: {
+          value: optionValue,
+          id
+        }
+      });
+    }
+  };
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    value = value ? value : 'default';
+    const selected = options.find(option => option.value == value);
+    setSelectedOption(selected ? selected.label : selectionText);
+  }, [value]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    } else {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [isDropdownOpen]);
+  const dropdownContent = isDropdownOpen && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-option-container wsx-scrollbar wsx-p-${containerPadding} wsx-bg-${containerBackground} wsx-br-${containerBorderRadius} ${containerBorder ? `wsx-border-default wsx-bc-${containerBorderColor}` : ''}`,
+    ref: contentRef,
+    style: {
+      zIndex: isDropdownOpen ? 999999 : -999999,
+      visibility: isDropdownOpen ? "visible" : "hidden",
+      opacity: isDropdownOpen ? 1 : 0,
+      top: isDropdownOpen ? `${dropdownPosition.top}px` : 0,
+      left: isDropdownOpen ? `${dropdownPosition.left}px` : 0,
+      width: `${dropdownPosition.width - 10}px`
+    }
+  }, options.map(option => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    key: option.value,
+    className: `wsx-option-item ${optionBorderBottom ? 'wsx-border-bottom' : ''} wsx-br-${optionBorderRadius} wsx-bc-${optionBorderColor} ${option.value != 'default' && option.label === selectedOption ? 'active' : ''} ${optionCustomClass}`,
+    onClick: () => handleOptionSelect(option.value)
+  }, option.label)));
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-select-wrapper ${wrapperClass} ${noValue ? 'wsx-d-flex wsx-item-center wsx-gap-8' : ''}`,
+    ref: inputRef
+  }, label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-input-label wsx-font-medium ${labelClass} ${noValue ? 'wsx-mb-0' : ''}`,
+    style: {
+      paddingLeft: noValue && '16px'
+    }
+  }, label), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-input-inner-wrapper  ${!noValue && (borderNone ? '' : `wsx-border-default wsx-bc-${borderColor}`)} wsx-bg-${inputBackground} wsx-color-${inputColor} wsx-br-${borderRadius}`,
+    ref: dropdownRef,
+    style: {
+      minWidth: minWidth,
+      maxWidth: maxWidth
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-select ${customClass}`,
+    onClick: toggleDropdown,
+    style: {
+      textAlign: textAlign,
+      direction: direction,
+      padding: !noValue && (inputPadding ? inputPadding : '10px 16px'),
+      gap: !noValue && iconGap
+    }
+  }, position && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-icon`,
+    style: {
+      transition: 'transform var(--transition-md)',
+      transform: isDropdownOpen ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)',
+      color: iconColor ? iconColor : 'unset',
+      paddingLeft: noValue && '0px'
+    }
+  }, Icon ? Icon : _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"].angleDown), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-select-value wsx-ellipsis ${selectedOptionClass}`
+  }, !noValue && selectedOption), !position && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-icon`,
+    style: {
+      transition: 'transform var(--transition-md)',
+      transform: isDropdownOpen ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)',
+      color: iconColor ? iconColor : 'unset',
+      paddingLeft: noValue && '0px'
+    }
+  }, Icon ? Icon : _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"].angleDown)), /*#__PURE__*/react_dom__WEBPACK_IMPORTED_MODULE_2___default().createPortal(dropdownContent, document.body)));
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Select_New);
 
 /***/ }),
 
@@ -2688,7 +2807,7 @@ const Slider = props => {
     className: "wsx-d-flex wsx-item-center wsx-gap-8"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
     htmlFor: name,
-    className: `wsx-slider ${value && value != 'no' && 'active'} ${sliderClass}`
+    className: `wsx-label wsx-slider ${value && value != 'no' && 'active'} ${sliderClass}`
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     ref: trackRef,
     className: "wsx-slider-track wsx-relative",
@@ -2788,7 +2907,7 @@ const Switch = props => {
   }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-switch-field-wrapper"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
-    className: "wsx-switch-field-desc wsx-d-flex wsx-item-center wsx-w-fit wsx-curser-pointer",
+    className: "wsx-label wsx-switch-field-desc wsx-d-flex wsx-item-center wsx-w-fit wsx-curser-pointer",
     htmlFor: name
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-checkbox-option-wrapper",
@@ -2832,11 +2951,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _pages_dynamic_rules_MultiSelect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../pages/dynamic_rules/MultiSelect */ "./reactjs/src/pages/dynamic_rules/MultiSelect.js");
 /* harmony import */ var _Input__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Input */ "./reactjs/src/components/Input.js");
-/* harmony import */ var _Select__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Select */ "./reactjs/src/components/Select.js");
-/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
-/* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
-/* harmony import */ var _Button_New__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Button_New */ "./reactjs/src/components/Button_New.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
+/* harmony import */ var _Button_New__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Button_New */ "./reactjs/src/components/Button_New.js");
+/* harmony import */ var _Select_New__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Select_New */ "./reactjs/src/components/Select_New.js");
 
 
 
@@ -2916,16 +3035,34 @@ const Tier = _ref => {
         });
       }
     };
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Select__WEBPACK_IMPORTED_MODULE_3__["default"], {
+    const getOptionsArray = options => {
+      return Object.keys(options).map(option => ({
+        value: option,
+        label: options[option]
+      }));
+    };
+
+    //    return <Select
+    //         data-name={fieldName}
+    //         label={index==0?fieldData.label:''}
+    //         options={fieldData.options}
+    //         name={`${fieldName}_${index}`}
+    //         value={defValue}
+    //         onChange={onChangeHandler}
+    //         defaultValue={defValue}
+    //         labelClass={labelClass}
+    //         selectClass='wsx-ellipsis'
+    //     />
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Select_New__WEBPACK_IMPORTED_MODULE_7__["default"], {
       "data-name": fieldName,
-      label: index == 0 ? fieldData.label : '',
-      options: fieldData.options,
       name: `${fieldName}_${index}`,
+      label: index == 0 ? fieldData.label : '',
+      labelClass: labelClass,
+      options: getOptionsArray(fieldData.options),
       value: defValue,
       onChange: onChangeHandler,
-      defaultValue: defValue,
-      labelClass: labelClass,
-      selectClass: "wsx-ellipsis"
+      inputBackground: "base1"
+      // minWidth="205px"
     });
   };
   const dependencyCheck = deps => {
@@ -3015,8 +3152,8 @@ const Tier = _ref => {
       default:
         break;
     }
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_5__["default"], {
-    content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Delete', 'wholesalex'),
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_4__["default"], {
+    content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('Delete', 'wholesalex'),
     direction: "top",
     spaceLeft: deleteSpaceLeft
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
@@ -3033,8 +3170,8 @@ const Tier = _ref => {
       parent[tierName]['tiers'] = copy;
       setTier(parent);
     }
-  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_4__["default"].delete_24))), index == getTierLastIndex() && (tierName === 'quantity_based' || tierName === 'conditions') && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Button_New__WEBPACK_IMPORTED_MODULE_7__["default"], {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Add New Condition', 'wholesalex'),
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_3__["default"].delete_24))), index == getTierLastIndex() && (tierName === 'quantity_based' || tierName === 'conditions') && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Button_New__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('Add New Condition', 'wholesalex'),
     iconName: "plus_20",
     background: "tertiary",
     customClass: "wsx-mt-24",
@@ -3868,16 +4005,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _components_LoadingOverlay__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/LoadingOverlay */ "./reactjs/src/components/LoadingOverlay.js");
 /* harmony import */ var _components_MultiSelect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/MultiSelect */ "./reactjs/src/components/MultiSelect.js");
-/* harmony import */ var _components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/UpgradeProPopUp */ "./reactjs/src/components/UpgradeProPopUp.js");
-/* harmony import */ var _components_Select__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Select */ "./reactjs/src/components/Select.js");
-/* harmony import */ var _components_Choosebox__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/Choosebox */ "./reactjs/src/components/Choosebox.js");
-/* harmony import */ var _components_Switch__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/Switch */ "./reactjs/src/components/Switch.js");
-/* harmony import */ var _components_PopupModal__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/PopupModal */ "./reactjs/src/components/PopupModal.js");
-/* harmony import */ var _components_Slider__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../components/Slider */ "./reactjs/src/components/Slider.js");
-/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
-/* harmony import */ var _components_Button_New__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../components/Button_New */ "./reactjs/src/components/Button_New.js");
-/* harmony import */ var _components_RadioButtons__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../components/RadioButtons */ "./reactjs/src/components/RadioButtons.js");
-
+/* harmony import */ var _components_Choosebox__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/Choosebox */ "./reactjs/src/components/Choosebox.js");
+/* harmony import */ var _components_Switch__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Switch */ "./reactjs/src/components/Switch.js");
+/* harmony import */ var _components_PopupModal__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/PopupModal */ "./reactjs/src/components/PopupModal.js");
+/* harmony import */ var _components_Slider__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/Slider */ "./reactjs/src/components/Slider.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var _components_Button_New__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../components/Button_New */ "./reactjs/src/components/Button_New.js");
+/* harmony import */ var _components_RadioButtons__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../components/RadioButtons */ "./reactjs/src/components/RadioButtons.js");
+/* harmony import */ var _components_Select_New__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../components/Select_New */ "./reactjs/src/components/Select_New.js");
 
 
 
@@ -3899,7 +4034,6 @@ const ProductTab = () => {
   const [popUpStatus, setPopUpStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
   const getPostID = () => {
     let product_id = '';
-    //Check If request comes from dokan dashboard or not
     if (!id) {
       if (wholesalex_single_product.is_dokan_dashboard) {
         product_id = document.getElementById('dokan-edit-product-id')?.value;
@@ -3909,9 +4043,6 @@ const ProductTab = () => {
     }
     return id ? id : product_id;
   };
-
-  // Loading Time Issue Fixed.
-
   (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
     if (wholesalex_product_tab.fields) {
       setFields(wholesalex_product_tab.fields);
@@ -3924,13 +4055,28 @@ const ProductTab = () => {
       loading: false
     });
   }, []);
+  const getOptionsArray = options => {
+    return Object.keys(options).map(option => ({
+      value: option,
+      label: options[option]
+    }));
+  };
   const selectData = (fieldData, field) => {
     const defValue = productSettings[field] || fieldData.default || '';
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Select__WEBPACK_IMPORTED_MODULE_5__["default"]
-    // className="wholesalex_single_product_tab_field"
-    , {
+    // return <Select
+    //     // className="wholesalex_single_product_tab_field"
+    //     label={fieldData.label}
+    //     options={fieldData.options}
+    //     value={defValue}
+    //     onChange={(e) => {
+    //         setProductSettings({ ...productSettings, [field]: e.target.value })
+    //     }}
+    //     defaultValue={defValue}
+    //     help={fieldData.help}
+    // />
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Select_New__WEBPACK_IMPORTED_MODULE_11__["default"], {
       label: fieldData.label,
-      options: fieldData.options,
+      options: getOptionsArray(fieldData.options),
       value: defValue,
       onChange: e => {
         setProductSettings({
@@ -3938,13 +4084,17 @@ const ProductTab = () => {
           [field]: e.target.value
         });
       },
-      defaultValue: defValue,
-      help: fieldData.help
+      help: fieldData.help,
+      inputBackground: "base1"
+      // minWidth="205px"
+      ,
+      wrapperClass: "wsx-column-2 wsx-gap-8 wsx-item-center wsx-text-space-nowrap wsx-basis-50",
+      labelClass: "wsx-mb-0"
     });
   };
   const chooseboxData = (fieldData, field) => {
     const defValue = productSettings[field] ? productSettings[field] : fieldData.default;
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Choosebox__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Choosebox__WEBPACK_IMPORTED_MODULE_4__["default"], {
       label: fieldData.label,
       name: field,
       value: defValue,
@@ -3967,10 +4117,7 @@ const ProductTab = () => {
   const switchData = (fieldData, field) => {
     const defValue = productSettings[field] ? productSettings[field] == 'yes' ? true : false : fieldData.default;
     let _className = wholesalex_single_product?.is_wcfm_dashboard ? 'wcfm-checkbox' : '';
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Switch__WEBPACK_IMPORTED_MODULE_7__["default"]
-    // className={"wholesalex_single_product_tab_field"}
-    // label={fieldData.label}
-    , {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Switch__WEBPACK_IMPORTED_MODULE_5__["default"], {
       name: field,
       value: defValue,
       onChange: e => {
@@ -4014,7 +4161,7 @@ const ProductTab = () => {
     }
   };
   const radioData = (fieldData, field) => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_RadioButtons__WEBPACK_IMPORTED_MODULE_12__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_RadioButtons__WEBPACK_IMPORTED_MODULE_10__["default"], {
       className: "wsx-mb-32",
       key: field,
       label: fieldData.label,
@@ -4030,7 +4177,7 @@ const ProductTab = () => {
   const sliderData = (fieldData, field, customClass) => {
     const defValue = productSettings[field] ? productSettings[field] == 'yes' ? true : false : fieldData.default;
     let _className = wholesalex_single_product?.is_wcfm_dashboard ? 'wcfm-checkbox' : '';
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Slider__WEBPACK_IMPORTED_MODULE_9__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Slider__WEBPACK_IMPORTED_MODULE_7__["default"], {
       className: `wsx-single-product-settings-slider ${customClass}`,
       label: fieldData.label,
       isLabelSide: true,
@@ -4081,7 +4228,7 @@ const ProductTab = () => {
       key: `whx_role_header_${section}`
     }, fieldData['label']), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
       className: `wsx-icon ${visibilitySectionStatus ? 'active' : ''}`
-    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_10__["default"].angleDown_24)), visibilitySectionStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_8__["default"].angleDown_24)), visibilitySectionStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-accordion-body"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-visibility-slider-fields"
@@ -4145,7 +4292,7 @@ const ProductTab = () => {
       className: "wsx-title wsx-font-18 wsx-font-medium"
     }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('WholesaleX', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-title wsx-font-18 wsx-font-medium wsx-color-primary"
-    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Pro', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button_New__WEBPACK_IMPORTED_MODULE_11__["default"], {
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Pro', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button_New__WEBPACK_IMPORTED_MODULE_9__["default"], {
       buttonLink: "https://getwholesalex.com/pricing/?utm_source=wholesalex-menu&utm_medium=email-unlock_features-upgrade_to_pro&utm_campaign=wholesalex-DB",
       label: wholesalex_product.i18n.upgrade_to_pro,
       background: "secondary",
@@ -4157,7 +4304,7 @@ const ProductTab = () => {
     type: "hidden",
     value: JSON.stringify(productSettings),
     name: "wholesalex_product_settings"
-  }), popUpStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_PopupModal__WEBPACK_IMPORTED_MODULE_8__["default"], {
+  }), popUpStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_PopupModal__WEBPACK_IMPORTED_MODULE_6__["default"], {
     className: "wsx-pro-modal",
     renderContent: proPopupContent,
     onClose: () => setPopUpStatus(false)

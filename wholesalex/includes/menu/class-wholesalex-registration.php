@@ -725,7 +725,7 @@ class WHOLESALEX_Registration {
 						<?php
 						if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
 							?>
-							<label for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
+							<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
                              <?php 
                              if(isset( $field['required'] ) && $field['required'] ) {
                                 ?>
@@ -757,7 +757,7 @@ class WHOLESALEX_Registration {
 						<?php
 						if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
 							?>
-							<label for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
+							<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
                              <?php 
                                 if(isset( $field['required'] ) && $field['required'] ) {
                                     ?>
@@ -787,7 +787,7 @@ class WHOLESALEX_Registration {
 						<?php
 						if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
 							?>
-							<label for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
+							<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
                              <?php 
                              if(isset( $field['required'] ) && $field['required'] ) {
                                 ?>
@@ -825,7 +825,7 @@ class WHOLESALEX_Registration {
 					<?php
 					if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
 						?>
-						<label for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
+						<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
                          <?php 
                          if(isset( $field['required'] ) && $field['required'] ) {
                             ?>
@@ -864,7 +864,7 @@ class WHOLESALEX_Registration {
 					<?php
 					if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
 						?>
-						<label for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
+						<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
                          <?php
                           if(isset( $field['required'] ) && $field['required'] ) {
                             ?>
@@ -902,7 +902,7 @@ class WHOLESALEX_Registration {
 						<?php
 						if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
 							?>
-							<label for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
+							<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
                              <?php
                               if(isset( $field['required'] ) && $field['required'] ) {
                                 ?>

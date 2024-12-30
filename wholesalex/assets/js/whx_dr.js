@@ -2366,7 +2366,7 @@ const Dropdown = props => {
       left: status ? `${contentPosition.left}px` : 0
     }
   }, renderContent());
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-dropdown ${!noIcon && 'wsx-d-flex wsx-item-center'} wsx-gap-${iconGap} ${className} ${status && 'active'}`,
     ref: dropdownRef,
     onClick: e => {
@@ -2387,7 +2387,7 @@ const Dropdown = props => {
       transition: 'transform var(--transition-md)',
       transform: status ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)'
     }
-  }, Icon ? Icon : _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].angleDown), /*#__PURE__*/react_dom__WEBPACK_IMPORTED_MODULE_3___default().createPortal(dropdownContent, document.body));
+  }, Icon ? Icon : _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].angleDown)), /*#__PURE__*/react_dom__WEBPACK_IMPORTED_MODULE_3___default().createPortal(dropdownContent, document.body));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Dropdown);
 
@@ -2410,386 +2410,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _contexts_RouterContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../contexts/RouterContext */ "./reactjs/src/contexts/RouterContext.js");
 /* harmony import */ var _Button_New__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Button_New */ "./reactjs/src/components/Button_New.js");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
-// import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
-// import Dropdown from "./Dropdown";
-// import { Link } from "../contexts/RouterContext";
-// import Button_New from "./Button_New";
-// import { __ } from '@wordpress/i18n';
-
-// const Header = ({ title, isFrontend }) => {
-
-// 	const menuRef = useRef(null);
-// 	const linkRefs = useRef([]);
-// 	const [exceedingIndex, setExceedingIndex] = useState(0);
-
-// 	useLayoutEffect(() => {
-// 		// let firstLoading = true;
-// 		let tempIndex = -1;
-//         const calculateWidths = (firstLoading = false) => {
-// 			let totalLinkWidth = 0;
-// 			if (menuRef.current) {
-// 				const menuWidth = menuRef.current.offsetWidth;
-// 				if(linkRefs.current) {
-// 					for( let index = 0; index < linkRefs.current.length; index++ ) {
-// 						const linkRef = linkRefs.current[index];
-// 						if (linkRef) {
-// 							totalLinkWidth += (linkRef.offsetWidth + 40);
-// 							if (tempIndex == -1 && totalLinkWidth > menuWidth || tempIndex != -1  && totalLinkWidth + 64 > menuWidth) {
-// 								tempIndex = index;
-// 								setExceedingIndex(Math.max(index - 1, 1));
-// 								break;
-// 								// if ( firstLoading && totalLinkWidth + 114 > menuWidth) {;
-// 								// 	tempIndex = index;
-// 								// 	setExceedingIndex(Math.max(index - 1, 1));
-// 								// 	break;
-// 								// } 
-// 								// else if ( !firstLoading && totalLinkWidth + 62.33 > menuWidth) {
-// 								// 	tempIndex = index;
-// 								// 	setExceedingIndex(Math.max(index - 1, 1));
-// 								// 	break;
-// 								// }
-// 							} 
-// 							else {
-// 								if (index + 1 == linkRefs.current.length -1) {
-// 									tempIndex = -1;
-// 									setExceedingIndex(0);
-// 								}
-// 								// setExceedingIndex(Math.max(index, 1));
-// 							}
-// 							// else if(tempIndex != -1  && totalLinkWidth + 64 > menuWidth ) {
-// 							// 	tempIndex = index;
-// 							// 	setExceedingIndex(Math.max(index - 1, 1));
-// 							// 	break;
-// 							// }
-
-// 							// if (tempIndex == -1 && totalLinkWidth + 114 > menuWidth) {
-// 							// 	tempIndex = index;
-// 							// 	setExceedingIndex(Math.max(index - 1, 1));
-// 							// 	break;
-// 							// } 
-
-// 							// else if(tempIndex != -1 && totalLinkWidth + 72.33  <= menuWidth) {
-// 							// 	tempIndex = -1;
-// 							// } else if (tempIndex != -1 && totalLinkWidth + 72.33  > menuWidth) {
-// 							// 	tempIndex = index;
-// 							// 	setExceedingIndex(Math.max(index - 1, 0));
-// 							// }
-// 						}
-// 					}
-// 					// if (firstLoading && totalLinkWidth + 114 <= menuWidth) {
-// 					// 	tempIndex = -1;
-// 					// 	// setExceedingIndex(0);
-// 					// } else if (!firstLoading && totalLinkWidth + 62.33 <= menuWidth) {
-// 					// 	tempIndex = -1;
-// 					// 	// setExceedingIndex(0);
-// 					// }
-// 				}
-// 			}
-// 			// if (tempIndex !== exceedingIndex) {
-// 			// 	setExceedingIndex(tempIndex !== -1 ? Math.max(tempIndex - 1, 1) : -1);
-// 			// }
-// 		};
-
-//         // const handleCalculation = () => {
-// 		// 	setTimeout(() => {
-// 		// 		calculateWidths();
-// 		// 	}, 0);
-// 		// };
-
-// 		// document.fonts.ready.then(handleCalculation);
-
-// 		calculateWidths(true);
-
-//         window.addEventListener("resize", calculateWidths);
-// 		// window.dispatchEvent(new Event("resize"));
-//         return () => window.removeEventListener("resize", calculateWidths);
-
-// 		// const resizeObserver = new ResizeObserver(() => {
-// 		// 	calculateWidths();
-// 		// });
-
-// 		// if (menuRef.current) {
-// 		// 	resizeObserver.observe(menuRef.current);
-// 		// }
-
-// 		// return () => {
-// 		// 	resizeObserver.disconnect();
-// 		// };
-
-// 		// // Debounce calculations to avoid frequent updates
-// 		// let resizeTimeout;
-// 		// const debouncedCalculateWidths = () => {
-// 		// 	clearTimeout(resizeTimeout);
-// 		// 	resizeTimeout = setTimeout(() => calculateWidths(), 100);
-// 		// };
-
-// 		// // Use ResizeObserver for efficient DOM updates
-// 		// const resizeObserver = new ResizeObserver(debouncedCalculateWidths);
-
-// 		// if (menuRef.current) {
-// 		// 	resizeObserver.observe(menuRef.current);
-// 		// }
-
-// 		// // Initial calculation after fonts and styles are applied
-// 		// calculateWidths();
-
-// 		// return () => {
-// 		// 	clearTimeout(resizeTimeout); // Clean up timeout
-// 		// 	resizeObserver.disconnect(); // Disconnect observer
-// 		// };
-
-//     }, []);
-
-// 	useLayoutEffect(() => {
-// 		let tempIndex = -1;
-// 		const calculateWidths = () => {
-// 			let totalLinkWidth = 0;
-// 			const menu = document.querySelector(".wsx-menu");
-// 			const links = document.querySelectorAll(".wsx-nav-link");
-
-// 			if (menu && links.length) {
-// 				const menuWidth = menu.offsetWidth;
-
-// 				links.forEach((link, index) => {
-// 					totalLinkWidth += link.offsetWidth + 40;
-// 					if (
-// 						(tempIndex === -1 && totalLinkWidth > menuWidth) 
-// 						// ||
-// 						// (tempIndex !== -1 && totalLinkWidth + 64 > menuWidth)
-// 					) {
-// 						tempIndex = index;
-// 						// setExceedingIndex(Math.max(index - 1, 1));
-// 					}
-// 					else if (tempIndex !== -1 && totalLinkWidth + 64 > menuWidth) {
-// 						tempIndex = index;
-// 						// setExceedingIndex(Math.max(index - 1, 1));
-// 					}
-// 					else {
-// 						// tempIndex = -1;
-// 						// setExceedingIndex(Math.max(index, 1));
-// 					}
-// 				});
-// 			}
-// 		};
-
-// 		calculateWidths(true);
-
-// 		window.addEventListener("resize", calculateWidths);
-// 		return () => window.removeEventListener("resize", calculateWidths);
-// 	}, []);
-
-// 	const menuItems = [
-// 		{ to: '/', label: 'Dashboard' },
-// 		{ to: '/dynamic-rules', label: 'Dynamic Rules' },
-// 		{ to: '/user-role', label: 'User Roles' },
-// 		// { to: '/registration', label: 'Registration' },
-// 		// { to: '/conversation', label: 'Conversation' },
-// 		{ to: '/addons', label: 'Addons' },
-// 		{ to: '/users', label: 'Users' },
-// 		{ to: '/emails', label: 'Emails' },
-// 		{ to: '/settings', label: 'Settings' },
-// 		// { to: '/features', label: 'Features' },
-// 		// { to: '/license', label: 'License' },
-// 		{ to: '/quick-support', label: 'Support' },
-// 	];
-
-// 	const [showHelpPopUp, setShowHelpPopUp] = useState(false);
-// 	const helpLinks = [
-// 		{'iconClass':'dashicons-phone', 'label':'Get Supports','link':'https://getwholesalex.com/contact/?utm_source=wholesalex-menu&utm_medium=features_page-support&utm_campaign=wholesalex-DB'},
-// 		{'iconClass':'dashicons-book', 'label':'Getting Started Guide','link':'https://getwholesalex.com/docs/wholesalex/getting-started/?utm_source=wholesalex-menu&utm_medium=features_page-guide&utm_campaign=wholesalex-DB'},
-// 		{'iconClass':'dashicons-facebook-alt', 'label':'Join Community','link':'https://www.facebook.com/groups/wholesalexcommunity'},
-// 		{'iconClass':'dashicons-book', 'label':'Feature Request','link':'https://getwholesalex.com/roadmap/?utm_source=wholesalex-menu&utm_medium=features_page-feature_request&utm_campaign=wholesalex-DB'},
-// 		{'iconClass':'dashicons-youtube', 'label':'Youtube Tutorials','link':'https://www.youtube.com/@WholesaleX'},
-// 		{'iconClass':'dashicons-book', 'label':'Documentation','link':'https://getwholesalex.com/documentation/?utm_source=wholesalex-menu&utm_medium=features_page-documentation&utm_campaign=wholesalex-DB'},
-// 		{'iconClass':'dashicons-edit', 'label':'What’s New','link':'https://getwholesalex.com/roadmap/?utm_source=wholesalex-menu&utm_medium=features_page-what’s_new&utm_campaign=wholesalex-DB'},
-// 	];
-
-// 	const ref = useRef(null);
-
-// 	const sleep =async (ms) =>{
-// 		return new Promise((resolve) => setTimeout(resolve, ms));
-// 	}
-
-// 	const popupHanlder = (e) => {
-// 		if (showHelpPopUp) {
-// 			const style = ref?.current?.style;
-// 			if (!style) return;
-// 			sleep(200).then(() => {
-// 				style.transition = "all 0.3s";
-// 				style.transform = "translateY(-50%)";
-// 				style.opacity = "0";
-// 				sleep(200).then(() => {
-// 					setShowHelpPopUp(false);
-// 				});
-// 			});
-// 		} else {
-// 			setShowHelpPopUp(true);
-// 		}
-// 	}
-
-//     const renderHelpDropdownContent = () => {
-//         return (
-//              <ul className="wsx-list wsx-d-flex wsx-flex-column wsx-gap-16">
-//                 {helpLinks.map((help)=>{
-//                     return (
-//                         <li className="wsx-list-item">
-//                             <a href={help.link} className="wsx-list-link wsx-d-flex wsx-item-center wsx-gap-8" target='_blank'>
-// 								<span
-// 									className={`dashicons ${help.iconClass} wsx-list-icon`}
-// 								></span>
-//                                 <span className="wsx-list-label">
-//                                     {help.label}
-//                                 </span>
-//                             </a>
-//                         </li>
-//         			);
-//                 })}
-//             </ul>
-//         );
-//     }
-
-// 	const headerDropdownContent = () => {
-// 		return (
-// 			<div className="wsx-height-full wsx-width-70v wsx-width-360" onClick={(e)=> e.stopPropagation()}>
-// 				<div className="wsx-logo wsx-justify-end">
-// 					<img src={wholesalex?.logo_url} className="wsx-logo" />
-// 					{!isFrontend && <span className="wsx-version">{`v${wholesalex.current_version}`}</span> }
-// 				</div>
-// 				<div className="wsx-menu wsx-flex-column wsx-flex-nowrap wsx-gap-24 wsx-mt-48 wsx-scrollbar">
-// 					{menuItems.map((item, index) => (
-// 						<Link navLink={true} key={index} to={item.to}>{item.label}</Link>
-// 					))}
-// 				</div>
-// 			</div>
-// 		);
-// 	};
-
-//     return (
-// 		<div className="wsx-header-wrapper">
-// 			<div style={{position:'absolute',left:'40%',top: '3%',fontSize: '32px', fontWeight: '900',color: '#0a36dc'}}>{exceedingIndex}</div>
-// 			<div className="wsx-header">
-// 				<div className="wsx-logo wsx-lg-d-none">
-// 					<img src={wholesalex?.logo_url} className="wsx-logo" />
-// 					{!isFrontend && <span className="wsx-version">{`v${wholesalex.current_version}`}</span> }
-// 				</div>
-
-// 				<div className="wsx-d-none wsx-lg-d-block wsx-icon" style={{width: '40px',marginLeft: '-15px'}}>
-// 					<Dropdown 
-// 						iconClass='wsx-hamburger-icon'
-// 						contentClass = 'wsx-header-side-menu'
-// 						iconName='menu'
-// 						iconRotation='half'
-// 						iconColor='tertiary'
-// 						renderContent={headerDropdownContent}
-// 					/>
-// 				</div>
-
-// 				<div className="wsx-header-content wsx-lg-justify-end">
-// 					<div className="wsx-menu wsx-lg-d-none" ref={menuRef}>
-// 						{/* {exceedingIndex !== 0 && exceedingIndex !== -1 ?
-// 							<> */}
-// 								{exceedingIndex != 0 && 
-// 									<>
-// 										{/* {exceedingIndex == 0 && setExceedingIndex(menuItems.length - 1)} */}
-// 										{/* {menuItems.slice(0, exceedingIndex).map((item, index) => {
-// 											return <Link ref={(el) => (linkRefs.current[index] = el)} navLink={true} key={index} to={item.to}>{item.label}</Link>
-// 										})} */}
-// 										{/* <Dropdown
-// 											title={__('More', 'wholesalex')}
-// 											contentClass="wsx-down-4 wsx-pt-12 wsx-pb-12"
-// 											renderContent={() => (
-// 												<div className="wsx-d-flex wsx-flex-column wsx-gap-12">
-// 													{menuItems.slice(exceedingIndex).map((item, index) => {
-// 														return <Link ref={(el) => (linkRefs.current[index] = el)} navLink={true} key={index} to={item.to}>{item.label}</Link>
-// 													})} */}
-// 													{/* {menuItems.map((item, index) => {
-// 														const menuIndex = exceedingIndex + index;
-// 														return <Link ref={(el) => (linkRefs.current[menuIndex] = el)} navLink={true} key={index} to={item.to}>{item.label}</Link>
-// 													})} */}
-// 												{/* </div>
-// 											)}
-// 										/> */}
-
-// 										{/* <Dropdown
-// 											title={__('More', 'wholesalex')}
-// 											contentClass="wsx-down-4 wsx-pt-12 wsx-pb-12"
-// 											renderContent={() => (
-// 												<div className="wsx-d-flex wsx-flex-column wsx-gap-12">
-// 													{menuItems.slice(exceedingIndex).map((item, index) => {
-// 														return <Link ref={(el) => (linkRefs.current[exceedingIndex + index] = el)} navLink={true} key={index} to={item.to}>{item.label}</Link>
-// 														})}
-// 												</div>
-// 											)}
-// 										/> */}
-
-// 										{menuItems.slice(0, exceedingIndex).map((item, index) => {
-// 											return <Link navLink={true} key={index} to={item.to}>{item.label}</Link>
-// 										})}
-// 										<Dropdown
-// 											title={__('More', 'wholesalex')}
-// 											contentClass="wsx-down-4 wsx-pt-12 wsx-pb-12"
-// 											renderContent={() => (
-// 												<div className="wsx-d-flex wsx-flex-column wsx-gap-12">
-// 													{menuItems.slice(exceedingIndex).map((item, index) => {
-// 														return <Link navLink={true} key={index} to={item.to}>{item.label}</Link>
-// 														})}
-// 												</div>
-// 											)}
-// 										/>
-// 										{menuItems.map((item, index) => (
-// 											<Link ref={(el) => (linkRefs.current[index] = el)} isHidden={true} to={item.to}></Link>
-// 										))}
-
-// 										{/* <Dropdown
-// 											title={__('More', 'wholesalex')}
-// 											contentClass="wsx-down-4 wsx-pt-12 wsx-pb-12"
-// 											renderContent={() => (
-// 												<div className="wsx-d-flex wsx-flex-column wsx-gap-12">
-// 													{menuItems.slice(exceedingIndex).map((item, index) => {
-// 														const originalIndex = exceedingIndex + index; // Calculate the original index
-
-// 														return (
-// 															<Link
-// 																ref={(el) => (linkRefs.current[originalIndex] = el)} // Use the original index
-// 																navLink={true}
-// 																key={originalIndex}
-// 																to={item.to}
-// 															>
-// 																{item.label}
-// 															</Link>
-// 														);
-// 													})}
-// 												</div>
-// 											)}
-// 										/> */}
-// 									</>
-// 								}
-// 								{exceedingIndex == 0 && 
-// 									menuItems.map((item, index) => (
-// 										<Link ref={(el) => (linkRefs.current[index] = el)} navLink={true} key={index} to={item.to}>{item.label}</Link>
-// 									))
-// 								}
-
-// 							{/* </>
-// 						: 
-// 							menuItems.map((item, index) => (
-// 								<Link ref={(el) => (linkRefs.current[index] = el)} navLink={true} key={index} to={item.to}>{item.label}</Link>
-// 							))
-// 						} */}
-// 					</div>
-
-// 					<div className="wsx-btn-group">
-// 						{!wholesalex?.is_pro_active && <Button_New label="Upgrade to Pro" iconName="growUp" background="secondary" customClass="wsx-text-space-nowrap" />}
-// 						{!isFrontend && <Dropdown iconName='help' iconRotation='none' iconColor='tertiary' renderContent={renderHelpDropdownContent} contentClass='wsx-down-4 wsx-right'/> }
-// 					</div>
-// 				</div>
-// 			</div>
-// 		</div>
-//     );
-// }
-
-// export default Header;
-
 
 
 
@@ -2855,10 +2475,8 @@ const Header = _ref => {
   }, {
     to: '/settings',
     label: 'Settings'
-  }, {
-    to: '/quick-support',
-    label: 'Quick Support'
   }
+  // { to: '/quick-support', label: 'Quick Support' },
   // { to: '/conversation', label: 'Conversation' },
   // { to: '/features', label: 'Features' },
   // { to: '/license', label: 'License' },
@@ -2900,7 +2518,7 @@ const Header = _ref => {
         className: "wsx-list-item"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("a", {
         href: help.link,
-        className: "wsx-list-link wsx-d-flex wsx-item-center wsx-gap-8",
+        className: "wsx-link wsx-list-link wsx-d-flex wsx-item-center wsx-gap-8",
         target: "_blank"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
         className: `dashicons ${help.iconClass} wsx-list-icon`
@@ -2988,7 +2606,8 @@ const Header = _ref => {
     label: "Upgrade to Pro",
     iconName: "growUp",
     background: "secondary",
-    customClass: "wsx-text-space-nowrap"
+    customClass: "wsx-text-space-nowrap",
+    buttonLink: "https://getwholesalex.com/pricing/?utm_source=wholesalex-menu&utm_medium=email-unlock_addon-upgrade_to_pro&utm_campaign=wholesalex-DB"
   }), !isFrontend && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Dropdown__WEBPACK_IMPORTED_MODULE_1__["default"], {
     iconName: "help",
     iconRotation: "none",
@@ -3098,6 +2717,65 @@ const Input = props => {
   }))))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Input);
+
+/***/ }),
+
+/***/ "./reactjs/src/components/LoadingGif.js":
+/*!**********************************************!*\
+  !*** ./reactjs/src/components/LoadingGif.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+
+const LoadingGif = _ref => {
+  let {
+    overlay = true,
+    insideContainer = false,
+    customClass,
+    loaderClass
+  } = _ref;
+  return overlay ? insideContainer ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-absolute wsx-z-99999 wsx-top wsx-bottom wsx-left wsx-right wsx-d-flex wsx-item-center wsx-justify-center",
+    style: {
+      backgroundColor: 'rgb(255 255 255 / 88%)'
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+    className: `wsx-absolute wsx-z-99999 wsx-top-20p ${loaderClass}`,
+    style: {
+      maxWidth: '100px',
+      maxHeight: '100px'
+    },
+    src: `${wholesalex.url}assets/img/wsx-loading.gif`,
+    alt: "loading Image"
+  })) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-popup-overlay ${customClass}`,
+    style: {
+      backgroundColor: 'rgb(255 255 255 / 88%)'
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+    className: `${loaderClass}`,
+    style: {
+      maxWidth: '100px',
+      maxHeight: '100px'
+    },
+    src: `${wholesalex.url}assets/img/wsx-loading.gif`
+  })) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+    className: `${loaderClass}`,
+    style: {
+      maxWidth: '100px',
+      maxHeight: '100px'
+    },
+    src: `${wholesalex.url}assets/img/wsx-loading.gif`
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LoadingGif);
 
 /***/ }),
 
@@ -3273,7 +2951,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _OutsideClick__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OutsideClick */ "./reactjs/src/components/OutsideClick.js");
 /* harmony import */ var _assets_scss_OverlayWindow_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../assets/scss/OverlayWindow.scss */ "./reactjs/src/assets/scss/OverlayWindow.scss");
-/* harmony import */ var _Button_New__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Button_New */ "./reactjs/src/components/Button_New.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
 
 
 
@@ -3288,44 +2966,28 @@ const OverlayWindow = _ref => {
   (0,_OutsideClick__WEBPACK_IMPORTED_MODULE_1__["default"])(windowRef, () => {
     onClose();
   });
-  return (
-    /*#__PURE__*/
-    // <div className='wsx-overlay-right-window-wrapper' >
-    //     <div className={`wsx-overlay-edit`} ref={windowRef}>
-    //         <div className="wsx-overlay-header">
-    //             <div className="wsx-overlay-label">{heading}</div>
-    //             <span className="dashicons dashicons-no-alt wholesalex_cross_icon wholesalex_icon" onClick={onClose}></span>
-    //         </div>
-    //         <div className="wsx-overlay-content">
-    //             {content()}
-    //         </div>
-    //     </div>
-    // </div>
-    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wsx-side-modal-wrapper"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wsx-side-modal-container",
-      ref: windowRef
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wsx-side-menu-body"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wsx-side-menu-header"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
-      className: "wsx-font-medium wsx-font-16 wsx-color-text-medium"
-    }, heading), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Button_New__WEBPACK_IMPORTED_MODULE_3__["default"]
-    // label={fields["_save"]?.label}
-    , {
-      onClick: onClose
-      // background="positive"
-      // customClass="wsx-font-14"
-      ,
-      iconName: "cross",
-      color: "tertiary",
-      customClass: "wsx-icon-cross"
-    })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wsx-side-menu-content wsx-scrollbar"
-    }, content()))))
-  );
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-side-modal-wrapper"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-side-modal-container",
+    ref: windowRef,
+    style: {
+      opacity: 0,
+      transform: 'translateX(50%)',
+      transition: 'all var(--transition-md) ease-in-out'
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-side-menu-body"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-side-menu-header"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+    className: "wsx-font-medium wsx-font-16 wsx-color-text-medium"
+  }, heading), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-icon-cross wsx-color-text-dark",
+    onClick: onClose
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_3__["default"].cross)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-side-menu-content wsx-scrollbar"
+  }, content()))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (OverlayWindow);
 
@@ -3371,8 +3033,6 @@ function Pagination(_ref) {
     length,
     pageSize
   });
-
-  // update pageSize when perPage changes
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     setPageSize(Number(perPage));
   }, [perPage, setPageSize]);
@@ -3395,16 +3055,7 @@ function Pagination(_ref) {
     label: page,
     onClick: () => goTo(page),
     customClass: currentPage == page ? 'active' : ''
-  })
-  // <button className="wsx-pagination-number-btn" onClick={() => goTo(page)} key={i}
-  //     style={{
-  //         background: currentPage === page ? "#070707" : "none",
-  //         color: currentPage === page ? "white" : "black"
-  //     }}
-  // >
-  //     <span className="wsx-pagination-btn-text">{page}</span>
-  // </button>
-  ), /*#__PURE__*/React.createElement(_Button_New__WEBPACK_IMPORTED_MODULE_2__["default"], {
+  })), /*#__PURE__*/React.createElement(_Button_New__WEBPACK_IMPORTED_MODULE_2__["default"], {
     iconName: "angleRight_24",
     borderColor: "tertiary",
     iconColor: "tertiary",
@@ -3415,7 +3066,7 @@ function Pagination(_ref) {
   }, /*#__PURE__*/React.createElement("span", {
     className: "wsx-color-text-light"
   }, "Show Result:"), /*#__PURE__*/React.createElement("select", {
-    className: "wsx-pagination-option-list",
+    className: "wsx-pagination-option-list wsx-select",
     value: pageSize,
     onChange: e => setPerPage(e.target.value)
   }, [10, 20, 50, 100].map(pageSize => /*#__PURE__*/React.createElement("option", {
@@ -3520,6 +3171,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom */ "react-dom");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_2__);
 
 
 
@@ -3546,34 +3199,60 @@ function Select_New(_ref) {
     borderRadius = 'md',
     containerBackground = 'base1',
     containerBorderRadius = 'md',
-    containerBorderColor = 'border-primary',
+    containerBorderColor = 'base2',
     containerBorder = true,
-    optionBorderBottom = true,
-    optionBorderColor = 'border-light',
-    optionCustomClass = '',
-    selectedOptionClass = '',
+    containerPadding = '4',
     minWidth = '',
+    maxWidth = '',
     direction = 'ltr',
     textAlign = '',
     options = [],
+    optionBorderBottom = false,
+    optionBorderRadius = 'sm',
+    optionBorderColor = 'border-light',
+    optionCustomClass = '',
+    selectedOptionClass = '',
     selectionText = 'Select an option'
   } = _ref;
   const position = iconPosition === 'before' || iconPosition === 'left';
   const Icon = iconName && _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"][iconName] ? _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"][iconName] : null;
   const [isDropdownOpen, setIsDropdownOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [selectedOption, setSelectedOption] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(value || selectionText);
-  const [dropdownPosition, setDropdownPosition] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('bottom');
+  const [dropdownPosition, setDropdownPosition] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    width: 0,
+    top: 0,
+    left: 0,
+    isAbove: false,
+    isRight: false
+  });
   const dropdownRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const contentRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const inputRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  !textAlign && direction == 'ltr' ? textAlign = 'left' : textAlign = 'right';
+  !textAlign && (direction == 'ltr' ? textAlign = 'left' : textAlign = 'right');
   const handleOutsideClick = e => {
-    if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-      setIsDropdownOpen(false);
+    if (dropdownRef.current && (dropdownRef.current.contains(e.target) || contentRef.current && contentRef.current.contains(e.target))) {
+      return;
     }
+    setIsDropdownOpen(false);
   };
   const toggleDropdown = () => {
     if (!isDropdownOpen) {
-      calculateDropdownPosition();
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      setTimeout(() => {
+        const contentHeight = contentRef.current ? contentRef.current.getBoundingClientRect().height : 0;
+        const contentWidth = contentRef.current ? contentRef.current.getBoundingClientRect().width : 0;
+        const isAbove = rect.top - contentHeight > 0 ? rect.bottom + contentHeight > viewportHeight : false;
+        const isRight = rect.left - contentWidth > 0 ? rect.left + contentWidth > viewportWidth : false;
+        setDropdownPosition({
+          width: rect.width,
+          top: isAbove ? rect.top + window.scrollY - contentHeight - 1 : rect.bottom + window.scrollY + 1,
+          left: isRight ? rect.right + window.scrollX - contentWidth : rect.left + window.scrollX,
+          isAbove,
+          isRight
+        });
+      }, 0);
     }
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -3595,44 +3274,9 @@ function Select_New(_ref) {
     const selected = options.find(option => option.value == value);
     setSelectedOption(selected ? selected.label : selectionText);
   }, [value]);
-  const calculateDropdownPosition = () => {
-    if (dropdownRef.current && inputRef.current) {
-      const dropdownRect = dropdownRef.current.getBoundingClientRect();
-      const inputRect = inputRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const spaceBelow = viewportHeight - inputRect.bottom;
-      const spaceAbove = inputRect.top;
-      if (spaceBelow < dropdownRect.height && spaceAbove > dropdownRect.height) {
-        setDropdownPosition('bottom');
-      } else {
-        setDropdownPosition('top');
-      }
-    }
-  };
-  const measureOptionWidth = () => {
-    const optionElements = document.querySelectorAll('.wsx-option');
-    optionElements.forEach(option => {
-      const width = option.getBoundingClientRect().width;
-    });
-  };
-  setTimeout(measureOptionWidth, 0);
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    measureOptionWidth();
-  }, []);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (isDropdownOpen) {
       document.addEventListener('mousedown', handleOutsideClick);
-      const optionElements = inputRef.current.querySelectorAll('.wsx-option');
-      let maxWidth = 0;
-
-      // optionElements.forEach(option => {
-      //     const width = option.getBoundingClientRect().width;
-      //     maxWidth = Math.max(maxWidth, width);
-      // });
-
-      // if (inputRef.current) {
-      //     inputRef.current.style.width = `${maxWidth}px`;
-      // }
     } else {
       document.removeEventListener('mousedown', handleOutsideClick);
     }
@@ -3640,11 +3284,24 @@ function Select_New(_ref) {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [isDropdownOpen]);
+  const dropdownContent = isDropdownOpen && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-option-container wsx-scrollbar wsx-p-${containerPadding} wsx-bg-${containerBackground} wsx-br-${containerBorderRadius} ${containerBorder ? `wsx-border-default wsx-bc-${containerBorderColor}` : ''}`,
+    ref: contentRef,
+    style: {
+      zIndex: isDropdownOpen ? 999999 : -999999,
+      visibility: isDropdownOpen ? "visible" : "hidden",
+      opacity: isDropdownOpen ? 1 : 0,
+      top: isDropdownOpen ? `${dropdownPosition.top}px` : 0,
+      left: isDropdownOpen ? `${dropdownPosition.left}px` : 0,
+      width: `${dropdownPosition.width - 10}px`
+    }
+  }, options.map(option => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    key: option.value,
+    className: `wsx-option-item ${optionBorderBottom ? 'wsx-border-bottom' : ''} wsx-br-${optionBorderRadius} wsx-bc-${optionBorderColor} ${option.value != 'default' && option.label === selectedOption ? 'active' : ''} ${optionCustomClass}`,
+    onClick: () => handleOptionSelect(option.value)
+  }, option.label)));
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-select-wrapper ${wrapperClass} ${noValue ? 'wsx-d-flex wsx-item-center wsx-gap-8' : ''}`,
-    style: {
-      minWidth: minWidth
-    },
     ref: inputRef
   }, label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-input-label wsx-font-medium ${labelClass} ${noValue ? 'wsx-mb-0' : ''}`,
@@ -3653,7 +3310,11 @@ function Select_New(_ref) {
     }
   }, label), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-input-inner-wrapper  ${!noValue && (borderNone ? '' : `wsx-border-default wsx-bc-${borderColor}`)} wsx-bg-${inputBackground} wsx-color-${inputColor} wsx-br-${borderRadius}`,
-    ref: dropdownRef
+    ref: dropdownRef,
+    style: {
+      minWidth: minWidth,
+      maxWidth: maxWidth
+    }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-select ${customClass}`,
     onClick: toggleDropdown,
@@ -3672,7 +3333,7 @@ function Select_New(_ref) {
       paddingLeft: noValue && '0px'
     }
   }, Icon ? Icon : _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"].angleDown), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: `wsx-select-value ${selectedOptionClass}`
+    className: `wsx-select-value wsx-ellipsis ${selectedOptionClass}`
   }, !noValue && selectedOption), !position && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-icon`,
     style: {
@@ -3681,16 +3342,7 @@ function Select_New(_ref) {
       color: iconColor ? iconColor : 'unset',
       paddingLeft: noValue && '0px'
     }
-  }, Icon ? Icon : _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"].angleDown)), isDropdownOpen && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: `wsx-option-container wsx-scrollbar wsx-bg-${containerBackground} wsx-br-${containerBorderRadius} ${containerBorder ? `wsx-border-default wsx-bc-${containerBorderColor}` : ''}`,
-    style: {
-      [dropdownPosition]: 'calc(100% + 4px)'
-    }
-  }, options.map(option => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    key: option.value,
-    className: `wsx-option-item ${optionBorderBottom ? 'wsx-border-bottom' : ''} wsx-bc-${optionBorderColor} ${option.value != 'default' && option.label === selectedOption ? 'active' : ''} ${optionCustomClass}`,
-    onClick: () => handleOptionSelect(option.value)
-  }, option.label)))));
+  }, Icon ? Icon : _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"].angleDown)), /*#__PURE__*/react_dom__WEBPACK_IMPORTED_MODULE_2___default().createPortal(dropdownContent, document.body)));
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Select_New);
 
@@ -3773,7 +3425,7 @@ const Slider = props => {
     className: "wsx-d-flex wsx-item-center wsx-gap-8"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
     htmlFor: name,
-    className: `wsx-slider ${value && value != 'no' && 'active'} ${sliderClass}`
+    className: `wsx-label wsx-slider ${value && value != 'no' && 'active'} ${sliderClass}`
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     ref: trackRef,
     className: "wsx-slider-track wsx-relative",
@@ -3873,7 +3525,7 @@ const Switch = props => {
   }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-switch-field-wrapper"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
-    className: "wsx-switch-field-desc wsx-d-flex wsx-item-center wsx-w-fit wsx-curser-pointer",
+    className: "wsx-label wsx-switch-field-desc wsx-d-flex wsx-item-center wsx-w-fit wsx-curser-pointer",
     htmlFor: name
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-checkbox-option-wrapper",
@@ -4158,7 +3810,7 @@ const Tooltip = props => {
   }, props.type === "element" ? props.content : props.content.replace(/{.*}/, ""));
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     ref: parentRef,
-    className: "wsx-tooltip",
+    className: `wsx-tooltip ${props.className}`,
     onMouseEnter: showToolTip,
     onMouseLeave: hideToolTip,
     style: {
@@ -4326,7 +3978,8 @@ const DataProvider = _ref => {
     children
   } = _ref;
   const [contextDataRule, setContextDataRule] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
-    newRules: wholesalex_overview.whx_dr_rule
+    newRules: wholesalex_overview.whx_dr_rule,
+    savedRule: wholesalex_overview.whx_dr_rule
   });
   const [contextDataRole, setContextDataRole] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
     newRoles: wholesalex_overview.whx_roles_data
@@ -4443,7 +4096,7 @@ const Link = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.forwardRef)((_re
     ref: ref,
     "data-ref": ref,
     href: `#${to}`,
-    className: `${navLink ? 'wsx-nav-link' : ''} ${className ? className : ''} ${isActive(to, currentHash) ? 'active' : ''}`,
+    className: `wsx-link ${navLink ? 'wsx-nav-link' : ''} ${className ? className : ''} ${isActive(to, currentHash) ? 'active' : ''}`,
     onClick: handleClick,
     style: {
       visibility: `${isHidden && 'hidden'}`,
@@ -4514,1369 +4167,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Tooltip__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../components/Tooltip */ "./reactjs/src/components/Tooltip.js");
 /* harmony import */ var _components_Alert__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../components/Alert */ "./reactjs/src/components/Alert.js");
 /* harmony import */ var _components_Select_New__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../../components/Select_New */ "./reactjs/src/components/Select_New.js");
-// import React, { createRef, Fragment, useContext, useEffect, useRef, useState } from "react";
-// import { __ } from "@wordpress/i18n";
-// import Slider from "../../components/Slider";
-// import Modal from "../../components/Modal";
-// import Toast from "../../components/Toast";
-// import { ToastContext } from "../../context/toastContent";
-// import Import from "./Import";
-// import { Link, useNavigate } from "../../contexts/RouterContext";
-// import { DataContext } from "../../contexts/DataProvider";
-// import Search from "../../components/Search";
-// import Pagination from "../../components/Pagination";
-
-// import Button_New from "../../components/Button_New";
-// import Input_New from "../../components/Input_New";
-// import TabContainer_New from "../../components/TabContainer_New";
-// import Icons from "../../utils/Icons";
-// import Tooltip from "../../components/Tooltip";
-// import Alert from "../../components/Alert";
-// import Select_New from "../../components/Select_New";
-
-// const DynamicRules = (props) => {
-
-// 	const [fields, setFields] = useState(wholesalex_overview.whx_dr_fields);
-// 	const [appState, setAppState] = useState({
-// 		loading: false,
-// 		currentWindow: "new",
-// 		index: -1,
-// 		loadingOnSave: {},
-// 	});
-
-// 	const [ruleStatus, setRuleStatus] = useState({});
-// 	const [modalStatus, setModalStatus] = useState(false);
-
-// 	const [rules, setRules] = useState(wholesalex_overview.whx_dr_rule);
-// 	const [overlayWindow, setOverlayWindow] = useState({ status: false, type: '' });
-
-// 	const { state, dispatch } = useContext(ToastContext);
-// 	const { contextDataRule, setContextDataRule, contextData, setContextData } = useContext(DataContext);
-// 	const { savedRule } = contextDataRule;
-// 	const { globalCurrentPage } = contextData;
-
-// 	const initialTab = 'latest';
-// 	const [selectedTab, setSelectedTab] = useState(initialTab);
-// 	const [alert, setAlert] = useState(false);
-
-// 	// const onTabSelect = (e) => {
-
-// 	// 	setSelectedTab(e);
-// 	// 	if (e == 'latest') {
-// 	// 		alert('short the list to latest');
-// 	// 	}else {
-// 	// 		alert('short the list to oldest');
-// 	// 	}
-
-// 	// }
-
-// 	//Bulk Action State
-// 	const [selectedRows, setSelectedRows] = useState([]);
-// 	const [bulkAction, setBulkAction] = useState('');
-
-// 	const navigate = useNavigate();
-
-// 	//Set Pagination For Dynamic Rules
-// 	const [pageSize, setPageSize] = useState(10); // Default page size
-// 	const [currentPage, setCurrentPage] = useState(0); // Current page index
-// 	const [paginatedRoles, setPaginatedRoles] = useState([]);
-
-// 	//State for Searching Dynamic Rules Item Bse on Title
-// 	const [searchQuery, setSearchQuery] = useState('');
-// 	const [filteredRules, setFilteredRules] = useState(rules);
-// 	const [isAscending, setIsAscending] = useState(true);
-
-// 	useEffect(() => {
-// 		let filtered = rules;
-// 		// Check if the search query is at least 3 characters long
-// 		if (searchQuery.length >= 3) {
-// 			filtered = rules.filter(rule =>
-// 				rule._rule_title.toLowerCase().includes(searchQuery.toLowerCase())
-// 			);
-// 		}
-// 		if (!isAscending) {
-// 			filtered = [...filtered].reverse();
-// 		}
-// 		setFilteredRules(filtered);
-// 	}, [searchQuery, isAscending, rules]);
-
-// 	// Toggle The Sort Order
-// 	const handleSortToggle = () => {
-// 		setIsAscending(!isAscending);
-// 	};
-// 	const handleAlertClose = () => setAlert(false);
-// 	useEffect(() => {
-// 		const startPage = currentPage * pageSize;
-// 		const endPage = startPage + pageSize;
-// 		setPaginatedRoles(filteredRules.slice(startPage, endPage));
-// 	}, [filteredRules, currentPage, pageSize]);
-
-// 	const handleGotoPage = (pageIndex) => {
-// 		setCurrentPage(pageIndex);
-// 	};
-
-// 	useEffect(() => {
-// 		if (savedRule && savedRule.length >= rules.length) {
-// 			setRules(savedRule);
-// 		} else {
-// 			setRules(rules);
-// 		}
-// 	}, [savedRule, rules]);
-
-// 	const fetchData = async (type = 'get', index = '', _rule = '', _key = '') => {
-
-// 		let attr = {
-// 			type: type,
-// 			action: 'dynamic_rule_action',
-// 			nonce: wholesalex.nonce,
-// 			isFrontend: props?.isFrontend
-// 		}
-
-// 		const rulesBeforeSave = [...rules];
-
-// 		let readyToSave = true;
-// 		if (_key != 'delete' && type == 'post') {
-// 			let ruleToBeSave = { ..._rule };
-// 			ruleToBeSave['limit'] = {
-// 				_usage_limit: (ruleToBeSave?.['limit']?.['_usage_limit']) ? ruleToBeSave['limit']['_usage_limit'] : '',
-// 				_start_date: (ruleToBeSave?.['limit']?.['_start_date']) ? ruleToBeSave['limit']['_start_date'] : '',
-// 				_end_date: (ruleToBeSave?.['limit']?.['_end_date']) ? ruleToBeSave['limit']['_end_date'] : '',
-// 			};
-
-// 			if (empty(ruleToBeSave['_rule_type']) || (ruleToBeSave['_rule_type'] != 'restrict_checkout' && ruleToBeSave['_rule_type'] != 'restrict_product_visibility' && ruleToBeSave['_rule_type'] != 'hidden_price' && ruleToBeSave['_rule_type'] != 'non_purchasable' && empty(ruleToBeSave[ruleToBeSave['_rule_type']]))) {
-// 				readyToSave = false;
-// 			}
-// 			if (empty(ruleToBeSave['_rule_for'])) {
-// 				readyToSave = false;
-// 			}
-// 			if (!(ruleToBeSave['_rule_for'] === 'all_users' || ruleToBeSave['_rule_for'] === 'all' || ruleToBeSave['_rule_for'] === 'all_roles') && empty(ruleToBeSave[ruleToBeSave['_rule_for']])) {
-// 				readyToSave = false;
-// 			}
-// 			if (empty(ruleToBeSave['_product_filter']) || (ruleToBeSave['_product_filter'] !== 'all_products' && empty(ruleToBeSave[ruleToBeSave['_product_filter']]))) {
-// 				readyToSave = false;
-// 			}
-
-// 			if (!readyToSave) {
-// 				// Rule is Empty!
-// 				// Throw an Error Message to fillup all fields.
-// 				setTimeout(() => {
-
-// 					dispatch({
-// 						type: "ADD_MESSAGE",
-// 						payload: {
-// 							id: Date.now().toString(),
-// 							type: 'error',
-// 							message: wholesalex_overview.i18n.whx_dr_please_fill_all_fields,
-// 						},
-// 					});
-// 					let parent = [...rules];
-// 					parent[index] = { ...parent[index], ['_rule_status']: false };
-// 					setRules(parent);
-// 				}, 700);
-// 				return;
-
-// 			}
-// 		}
-
-// 		switch (_rule['_rule_type']) {
-// 			// case 'buy_x_get_y':
-// 			// 	const min_purchase_count = _rule['buy_x_get_y']['_minimum_purchase_count'];
-// 			// 	const free_item_count = _rule['buy_x_get_y']['_free_item_count'];
-// 			// 	if(!(min_purchase_count && free_item_count && min_purchase_count>free_item_count)) {
-// 			// 		setToastMessages({
-// 			// 			status: 'error',
-// 			// 			messages: ['Minimum Product Quantity Should Greater then Free Product Quantity.'],
-// 			// 			state: true
-// 			// 		});
-// 			// 		return;
-// 			// 	}
-
-// 			// break;
-// 			case 'buy_x_get_one':
-// 				const min_purchase_count = _rule['buy_x_get_one']['_minimum_purchase_count'];
-// 				if (!(min_purchase_count && min_purchase_count > 1)) {
-// 					dispatch({
-// 						type: "ADD_MESSAGE",
-// 						payload: {
-// 							id: Date.now().toString(),
-// 							type: 'error',
-// 							message: wholesalex_overview.i18n.whx_dr_minimum_product_quantity_should_greater_then_free_product_qty,
-// 						},
-// 					});
-// 					return;
-// 				}
-
-// 			default:
-// 				break;
-// 		}
-
-// 		let requestFor = 'fetch';
-// 		switch (_key) {
-// 			case '_rule_status':
-// 				attr['check'] = _key;
-// 				break;
-// 			case 'delete':
-// 				attr['delete'] = true;
-// 				break;
-// 		}
-
-// 		const ruleId = _rule['id'];
-// 		if (_rule !== '' && type === 'post' && readyToSave) {
-
-// 			attr['id'] = ruleId;
-// 			attr['rule'] = JSON.stringify(_rule);
-
-// 			let _state = { ...appState };
-// 			_state['loadingOnSave'][ruleId] = true;
-// 			setAppState({ ...appState, ..._state });
-// 			requestFor = 'save_rule';
-// 		}
-// 		wp.apiFetch({
-// 			path: '/wholesalex/v1/dynamic_rule_action',
-// 			method: 'POST',
-// 			data: attr
-// 		}).then(res => {
-// 			if (type === 'post') {
-// 				if (ruleId != '') {
-// 					let _state = { ...appState };
-// 					_state['loadingOnSave'][ruleId] = false;
-// 					setAppState({ ...appState, ..._state });
-// 				}
-// 			}
-// 			if (res.success) {
-// 				if (type === 'get') {
-// 					setFields(res.data.default);
-// 					setAppState({
-// 						...appState,
-// 						loading: false,
-// 					});
-// 					setRules(res.data.value);
-// 				} else {
-// 					if (requestFor === 'save_rule') {
-// 						let parent = [...rules];
-// 						parent[index] = { ...parent[index], ..._rule };
-// 						setRules(parent);
-// 					}
-// 					if (attr['delete']) {
-// 						let parent = [...rulesBeforeSave];
-// 						parent = parent.filter((row, r) => {
-// 							return index != r;
-// 						});
-// 						setRules(parent);
-// 						if (globalCurrentPage > 1) {
-// 							setContextData(prevContext => ({
-// 								...prevContext,
-// 								globalCurrentPage: prevContext.globalCurrentPage - 1
-// 							}));
-// 						}
-// 						setContextDataRule((prevData) => {
-// 							const updatedRules = prevData.newRules.filter(rule => rule.id !== ruleId);
-// 							return { ...prevData, newRules: updatedRules };
-// 						});
-
-// 					}
-
-// 					dispatch({
-// 						type: "ADD_MESSAGE",
-// 						payload: {
-// 							id: Date.now().toString(),
-// 							type: 'success',
-// 							message: res.data.message,
-// 						},
-// 					});
-
-// 				}
-// 			} else {
-// 				setRules([...rulesBeforeSave]);
-// 				dispatch({
-// 					type: "ADD_MESSAGE",
-// 					payload: {
-// 						id: Date.now().toString(),
-// 						type: 'error',
-// 						message: res.data.message,
-// 					},
-// 				});
-// 			}
-// 		})
-// 	};
-// 	const fetchSaveDuplicateRule = async (dupRule) => {
-// 		// Prepare request attributes for saving rule
-// 		const attr = {
-// 			type: 'post',
-// 			action: 'dynamic_rule_action',
-// 			nonce: wholesalex.nonce,
-// 			id: dupRule.id,
-// 			rule: JSON.stringify(dupRule),
-// 			isFrontend: props?.isFrontend,
-// 		};
-
-// 		try {
-// 			// Send the request to save the rule
-// 			const response = await wp.apiFetch({
-// 				path: '/wholesalex/v1/dynamic_rule_action',
-// 				method: 'POST',
-// 				data: attr,
-// 			});
-
-// 			if (response.success) {
-// 				// Return success response
-// 				dispatch({
-// 					type: "ADD_MESSAGE",
-// 					payload: {
-// 						id: Date.now().toString(),
-// 						type: 'success',
-// 						message: response.data.message,
-// 					},
-// 				});
-// 				return { success: true, data: dupRule };
-// 			} else {
-// 				// Return failure response
-// 				dispatch({
-// 					type: "ADD_MESSAGE",
-// 					payload: {
-// 						id: Date.now().toString(),
-// 						type: 'error',
-// 						message: response.data.message,
-// 					},
-// 				});
-// 				return { success: false };
-// 			}
-// 		} catch (error) {
-// 			// Handle general errors and return failure
-// 			dispatch({
-// 				type: "ADD_MESSAGE",
-// 				payload: {
-// 					id: Date.now().toString(),
-// 					type: 'error',
-// 					message: 'Error saving duplicated rule',
-// 				},
-// 			});
-// 			return { success: false };
-// 		}
-// 	};
-
-// 	const empty = (ele) => {
-// 		if (ele === '' || ele == {} || ele === undefined) {
-// 			return true;
-// 		}
-// 		return false;
-// 	}
-
-// 	useEffect(() => {
-// 		const newRules = rules;
-// 		setContextDataRule(prevData => ({
-// 			...prevData, ...prevData, newRules
-// 		}));
-// 	}, [rules]);
-
-// 	const buttonHandler = (type) => {
-// 		switch (type) {
-// 			case 'create':
-// 				let copy = [...rules];
-// 				let _new_rule = {
-// 					id: Date.now().toString(),
-// 					label: wholesalex_overview.i18n.whx_dr_rule_title,
-// 				};
-// 				copy.push(_new_rule);
-// 				setRules(copy);
-// 				navigate(`/dynamic-rules/edit/${Date.now().toString()}`);
-
-// 				setContextData(prevContext => ({
-// 					...prevContext,
-// 					globalNewDynamicRules: Array.isArray(prevContext.globalNewDynamicRules)
-// 						? [...prevContext.globalNewDynamicRules, _new_rule]
-// 						: [_new_rule], // Fallback if it's not an array
-// 				}));
-
-// 				break;
-// 			default:
-// 				break;
-// 		}
-// 	}
-
-// 	// const buttonData = (fieldsData, field) => {
-
-// 	// 	return (
-// 	// 		<button key={field} className={`wholesalex-btn wholesalex-primary-btn wholesalex-btn-xlg`}
-// 	// 		onClick={(e)=>{
-// 	// 			e.preventDefault();
-// 	// 			buttonHandler(field);
-// 	// 		}}
-// 	// 		> 
-// 	// 			{fieldsData['label']}
-// 	// 		</button>
-// 	// 	);
-
-// 	// }
-
-// 	const buttonsData = (fieldsData, field) => {
-// 		return (
-// 			// <div key={field} className="wholesalex-rule__header">
-// 			<div key={field} className="wsx-justify-wrapper wsx-mb-40">
-// 				<Button_New
-// 					onClick={(e) => {
-// 						e.preventDefault();
-// 						buttonHandler('create');
-// 					}}
-// 					label={wholesalex_overview.i18n.whx_dr_create_dynamic_rule}
-// 					background="primary"
-// 					iconName="plus"
-// 				/>
-// 				{/* <button className={`wholesalex-btn wholesalex-primary-btn wholesalex-btn-xlg`}
-// 					onClick={(e)=>{
-// 						e.preventDefault();
-// 						buttonHandler('create');
-// 					}}> 
-// 					{wholesalex_overview.i18n.whx_dr_create_dynamic_rule}
-// 				</button> */}
-// 				{wholesalex?.is_admin_interface && <div class="wsx-btn-group wsx-gap-8">
-// 					<Button_New
-// 						label={wholesalex_overview.i18n.whx_support_doc}
-// 						iconName="doc"
-// 						background="base1"
-// 						buttonLink='https://getwholesalex.com/documentation/'
-// 					/>
-// 					<Button_New
-// 						label={wholesalex_overview.i18n.whx_support_tutorial}
-// 						iconName="play"
-// 						background="base1"
-// 						buttonLink='https://www.youtube.com/watch?v=Wme7rtG6dXc&list=PLgcWNgnvK8Cwtaq_TwzYDb2M8jBuYIivy&ab_channel=WholesaleX'
-// 					/>
-// 				</div>}
-// 				{/* {wholesalex?.is_admin_interface && <div class="wholesalex_dynamic_rules_import_export">
-// 					<a class="wholesalex-btn wholesalex-extra-btn wholesalex-lists-btn wholesalex_import_button" onClick={onImportClick}>
-// 						<span class="dashicons dashicons-download wholesalex_icon wholesalex_import_icon"></span>
-// 						<span class="wholesalex_button_text">{wholesalex_overview.i18n.whx_dr_import}</span>
-// 					</a>
-// 					<a class="wholesalex-btn wholesalex-secondary-btn wholesalex-lists-btn wholesalex_export_button" href={getExportUrl()}>
-// 						<span class="dashicons dashicons-upload wholesalex_icon wholesalex_export_icon"></span>
-// 						<span class="wholesalex_button_text">{wholesalex_overview.i18n.whx_dr_export}</span>
-// 					</a>
-// 				</div>} */}
-// 			</div>
-// 		);
-// 	}
-// 	const ruleRef = useRef([]);
-// 	const ruleStatusRef = useRef([]);
-// 	ruleRef.current = rules.map((element, i) => ruleRef.current[i] ?? createRef());
-// 	ruleStatusRef.current = rules.map((element, i) => ruleStatusRef.current[i] ?? createRef());
-
-// 	const toogleRuleContent = (e, index, rule) => {
-// 		e.stopPropagation();
-// 		if (e.target === ruleRef.current[index].current || e.target === ruleStatusRef.current[index].current) {
-// 			const previousStatus = ruleStatus[rule.id] ? true : false;
-// 			setRuleStatus({ ...ruleStatus, [rule.id]: !previousStatus });
-// 		}
-// 	}
-// 	const deleteRule = (e, index) => {
-// 		e.stopPropagation();
-// 		setModalStatus({ status: true, index: index });
-// 	}
-// 	const duplicateRule = async (e, index) => {
-
-// 		e.stopPropagation();
-// 		let copy = [...rules];
-// 		let dupRule = { ...copy[index] };
-// 		let _rule_title = dupRule['_rule_title'];
-// 		if (!_rule_title) {
-// 			_rule_title = wholesalex_overview.i18n.whx_dr_untitled;
-// 		}
-
-// 		switch (dupRule['_rule_type']) {
-// 			case 'quantity_based':
-// 				if (dupRule['quantity_based']['tiers']) {
-// 					let tiers = dupRule['quantity_based']['tiers'];
-// 					dupRule['quantity_based']['tiers'] = tiers.map((tier, i) => {
-// 						tier['_id'] = Date.now().toString();
-// 						return tier;
-// 					});
-// 				}
-// 				break;
-
-// 			default:
-// 				break;
-// 		}
-
-// 		dupRule.id = Date.now().toString();
-// 		dupRule['_rule_title'] = wholesalex_overview.i18n.whx_dr_duplicate_of + _rule_title;
-// 		dupRule['_rule_status'] = false;
-
-// 		const result = await fetchSaveDuplicateRule(dupRule);
-
-// 		if (result.success) {
-// 			// If saving the rule was successful, update the rules state
-// 			copy.splice(index + 1, 0, dupRule);
-// 			setRules(copy);
-// 		}
-
-// 	}
-
-// 	const deleteModal = (index, rule) => {
-// 		return (
-// 			modalStatus && modalStatus.index === index && <Modal smallModal={true} title={rule['_rule_title'] ? rule['_rule_title'] : __('Untitled Rule', 'wholesalex')} status={modalStatus} setStatus={setModalStatus} onDelete={() => {
-// 				setModalStatus(false);
-// 				fetchData('post', index, rules[index], 'delete');
-// 			}} />
-// 		);
-// 	}
-
-// 	const getExportUrl = () => {
-// 		const url = new URL(window.location.href);
-// 		const add_params = {
-// 			'nonce': wholesalex_overview?.whx_dr_nonce,
-// 			'action': 'export-dynamic-rule-csv',
-// 			'exported_ids': selectedRows.join(',')
-// 		};
-
-// 		const params = new URLSearchParams(url.search);
-// 		if (params.has('nonce')) {
-// 			params.delete('nonce');
-// 		}
-// 		if (params.has('action')) {
-// 			params.delete('action');
-// 		}
-
-// 		const new_params = new URLSearchParams([
-// 			...Array.from(params.entries()),
-// 			...Object.entries(add_params),
-// 		]).toString();
-// 		const new_url = `${url.pathname}?${new_params}`;
-// 		return new_url;
-// 	}
-
-// 	// Handle row selection (single or all rows)
-// 	const handleRowSelection = (rowId) => {
-// 		setSelectedRows((prevSelected) =>
-// 			prevSelected.includes(rowId) ? prevSelected.filter((id) => id !== rowId) : [...prevSelected, rowId]
-// 		);
-// 	};
-
-// 	// Handle selecting all rows
-// 	const handleSelectAll = () => {
-// 		if (selectedRows.length === rules.length) {
-// 			setSelectedRows([]);
-// 		} else {
-// 			const rulesIds = rules.map((rule, index) => rule.id);
-// 			setSelectedRows(rulesIds);
-// 		}
-// 	};
-
-// 	// Handle bulk action selection
-// 	const handleBulkActionChange = (e) => {
-// 		setBulkAction(e.target.value);
-// 	};
-
-// 	// Handle applying bulk action		
-// 	const handleApplyBulkAction = () => {
-// 		if (!bulkAction || bulkAction == 'default' || selectedRows.length === 0) {
-// 			// alert('Please select rows and a bulk action');
-// 			setAlert(true);
-// 			return;
-// 		}
-// 		// Clone the current state
-// 		let updatedFilteredRules = [...filteredRules];
-
-// 		switch (bulkAction) {
-// 			case 'enable':
-// 				selectedRows.forEach(id => {
-// 					const index = updatedFilteredRules.findIndex(role => role.id === id);
-// 					if (index !== -1) {
-// 						updatedFilteredRules[index]._rule_status = 1;
-// 					}
-// 				});
-// 				break;
-
-// 			case 'disable':
-// 				selectedRows.forEach(id => {
-// 					const index = updatedFilteredRules.findIndex(role => role.id === id);
-// 					if (index !== -1) {
-// 						updatedFilteredRules[index]._rule_status = 0;
-// 					}
-// 				});
-// 				break;
-
-// 			case 'delete':
-// 				// Optimistically update the front-end by removing selected rules
-// 				updatedFilteredRules = updatedFilteredRules.filter(rule => !selectedRows.includes(rule.id));
-
-// 				// Update the state with the optimistically deleted rules
-// 				setFilteredRules(updatedFilteredRules);
-// 				setRules(updatedFilteredRules);
-// 				// Immediately update the paginated roles as well
-// 				updatePaginatedRoles(updatedFilteredRules);
-// 				if (globalCurrentPage > 1) {
-// 					setContextData(prevContext => ({
-// 						...prevContext,
-// 						globalCurrentPage: prevContext.globalCurrentPage - 1
-// 					}));
-// 				}
-
-// 				break;
-
-// 			case 'export':
-// 				window.location.href = getExportUrl();
-// 				break;
-
-// 			// Add any other bulk actions...
-// 		}
-
-// 		// Perform the API call in the background
-// 		wp.apiFetch({
-// 			path: '/wholesalex/v1/dynamic_bulk_action',
-// 			method: 'POST',
-// 			data: { ruleIds: selectedRows, action: bulkAction }
-// 		})
-// 			.then(response => {
-// 				dispatch({
-// 					type: "ADD_MESSAGE",
-// 					payload: {
-// 						id: Date.now().toString(),
-// 						type: 'success',
-// 						message: response.message,
-// 					},
-// 				});
-
-// 				// After successful deletion, check if the page is empty
-// 				updatePaginatedRolesAfterDelete(updatedFilteredRules);
-// 			})
-// 			.catch(error => {
-// 				// Rollback changes if API call fails
-// 				setFilteredRules(filteredBeforeDelete);
-// 				setPaginatedRoles(filteredBeforeDelete.slice(currentPage * pageSize, (currentPage + 1) * pageSize));
-
-// 				dispatch({
-// 					type: "ADD_MESSAGE",
-// 					payload: {
-// 						id: Date.now().toString(),
-// 						type: 'error',
-// 						message: 'Failed to delete rules, please try again.',
-// 					},
-// 				});
-// 			});
-
-// 		setSelectedRows([]);
-// 	};
-
-// 	// Update paginated roles
-// 	const updatePaginatedRoles = (updatedFilteredRules) => {
-// 		const start = currentPage * pageSize;
-// 		const end = start + pageSize;
-// 		setPaginatedRoles(updatedFilteredRules.slice(start, end));
-// 	};
-
-// 	// Update pagination after delete if the page is empty
-// 	const updatePaginatedRolesAfterDelete = (updatedFilteredRules) => {
-// 		const start = currentPage * pageSize;
-// 		const end = start + pageSize;
-// 		const updatedPaginatedRoles = updatedFilteredRules.slice(start, end);
-
-// 		if (updatedPaginatedRoles.length === 0 && currentPage > 0) {
-// 			// If the current page is empty and there's a previous page, go back
-// 			setCurrentPage(currentPage - 1);
-// 		} else {
-// 			setPaginatedRoles(updatedPaginatedRoles);
-// 		}
-// 	};
-
-// 	//To Check Which Rule is Applied In Each Dynamic Rules
-// 	const getAppliedForRule = (type, userData) => {
-// 		const typeMessages = {
-// 			all: 'All Registered & Guest Users...',
-// 			all_users: 'All Registered Users',
-// 			all_roles: 'All Registered Roles',
-// 		};
-
-// 		if (typeMessages[type]) {
-// 			return <div className="wsx-ellipsis">{typeMessages[type]}</div>;
-// 		}
-
-// 		if (type === 'specific_users' || type === 'specific_roles') {
-// 			const entity = type === 'specific_users' ? 'Users' : 'Roles';
-// 			return (
-// 				<div className="wsx-d-flex wsx-item-center wsx-gap-8">
-// 					<div className="wsx-d-flex wsx-item-center">
-// 						{userData && userData.map((user, index) => {
-// 							// user.image = 'http://testing-wowrevenue.local/wp-content/uploads/2024/09/monitor-5.jpg'
-// 							return (
-// 								index < 4 &&
-// 								(user.image ?
-// 									<img className="wsx-profile-list" style={{ marginLeft: `${index == 0 ? 0 : -12}px`, border: `${index == 0 && 'none'}` }} src={user.image} alt={`${user.name} image`} />
-// 									:
-// 									<div className="wsx-profile-list" style={{ marginLeft: `${index == 0 ? 0 : -12}px`, border: `${index == 0 && 'none'}` }}>{`${user.name.slice(0, 2)}`}</div>)
-// 							);
-// 						})}
-// 					</div>
-// 					{userData.length === 1 && <div className="wsx-ellipsis"> {`${userData[0].name}`}</div>}
-// 					{userData.length !== 1 && userData.length < 5 && <div> {`${userData.length} ${entity}`}</div>}
-// 					{userData.length > 4 && <div> {`+${userData.length} ${entity}`}</div>}
-// 					{
-// 						// userData && userData.length === 1 
-// 						// ? 
-// 						// userData[0].name 
-// 						// : 
-// 						// `${userData.length} ${entity}`
-// 					}
-// 				</div>
-// 			);
-// 		}
-
-// 		return null;
-// 	}
-
-// 	//Get Filter Product or Categories and Variation To Display in Each Rule
-// 	const getProductFilter = (type, filterData) => {
-// 		// const filterTypes = {
-// 		//   all_products: 'All Products',
-// 		//   products_in_list: `${filterData?.length || 0} Products`,
-// 		//   products_not_in_list: `${filterData?.length || 0} Products`,
-// 		//   cat_in_list: `${filterData?.length || 0} Categories`,
-// 		//   cat_not_in_list: `${filterData?.length || 0} Categories`,
-// 		//   attribute_in_list: `${filterData?.length || 0} Variations`,
-// 		//   attribute_not_in_list: `${filterData?.length || 0} Variations`
-// 		// };
-
-// 		// return filterTypes[type] || null;
-
-// 		const filterTypes = {
-// 			all_products: 'All Products',
-// 			products_in_list: `Products`,
-// 			products_not_in_list: `Products`,
-// 			cat_in_list: `Categories`,
-// 			cat_not_in_list: `Categories`,
-// 			attribute_in_list: `Variations`,
-// 			attribute_not_in_list: `Variations`
-// 		};
-
-// 		if (type == 'all_products') {
-// 			return <div className="wsx-ellipsis">{filterTypes[type]}</div>
-// 		}
-
-// 		const entity = filterTypes[type];
-// 		return (
-// 			<div className="wsx-d-flex wsx-item-center wsx-gap-8">
-// 				<div className="wsx-d-flex wsx-item-center">
-// 					{filterData && filterData.map((filter, index) => {
-// 						// filter.image = 'http://testing-wowrevenue.local/wp-content/uploads/2024/09/monitor-5.jpg'
-// 						return (
-// 							index < 4 &&
-// 							(filter.image ?
-// 								<img className="wsx-profile-list" style={{ marginLeft: `${index == 0 ? 0 : -12}px`, border: `${index == 0 && 'none'}` }} src={filter.image} alt={`${filter.name} image`} />
-// 								:
-// 								<div className="wsx-profile-list" style={{ marginLeft: `${index == 0 ? 0 : -12}px`, border: `${index == 0 && 'none'}` }}>{`${filter.name.slice(0, 2)}`}</div>)
-// 						);
-// 					})}
-// 				</div>
-// 				{filterData.length === 1 && <div className="wsx-ellipsis"> {`${filterData[0].name}`}</div>}
-// 				{filterData.length !== 1 && filterData.length < 5 && <div> {`${filterData.length} ${entity}`}</div>}
-// 				{filterData.length > 4 && <div> {`+${filterData.length} ${entity}`}</div>}
-// 			</div>
-// 		);
-// 	};
-
-// 	//To Check Condition Which Rule in Applied In Each Rule
-// 	const getFilterData = (rule) => {
-// 		return rule.products_in_list?.length ? rule.products_in_list
-// 			: rule.products_not_in_list?.length ? rule.products_not_in_list
-// 				: rule.cat_in_list?.length ? rule.cat_in_list
-// 					: rule.cat_not_in_list?.length ? rule.cat_not_in_list
-// 						: rule.attribute_in_list?.length ? rule.attribute_in_list
-// 							: rule.attribute_not_in_list?.length ? rule.attribute_not_in_list
-// 								: '';
-// 	};
-
-// 	//To Check Condition Which Filter in Applied In Each Rule
-// 	const getUserFilterData = (rule) => {
-// 		return rule.specific_users?.length ? rule.specific_users
-// 			: rule.specific_roles?.length ? rule.specific_roles
-// 				: '';
-// 	};
-
-// 	//To display Dynamic Rules Name in Each Rule
-// 	const getRuleTypeName = (key) => {
-// 		const dynamicRulesName = {
-// 			product_discount: 'Product Discount',
-// 			cart_discount: 'Cart Discount',
-// 			payment_discount: 'Payment Method Discount',
-// 			payment_order_qty: 'Required Quantity for Payment Method',
-// 			buy_x_get_one: 'BOGO Discounts (Buy X Get One Free)',
-// 			shipping_rule: 'Shipping Rule',
-// 			min_order_qty: 'Minimum Order Quantity',
-// 			tax_rule: 'Tax Rule',
-// 			restrict_checkout: 'Checkout Restriction',
-// 			quantity_based: 'Quantity Based Discount',
-// 			extra_charge: 'Extra Charge',
-// 			buy_x_get_y: 'Buy X Get Y Free',
-// 			max_order_qty: 'Maximum Order Quantity',
-// 			restrict_product_visibility: 'Restrict Product Visibility',
-// 			hidden_price: 'Hidden Price',
-// 			non_purchasable: 'Non Purchasable',
-// 		};
-// 		return dynamicRulesName[key] || 'Key not found';
-// 	};
-
-// 	const dynamicRulesHeader = [
-// 		{ title: 'Rule Title', withCheckbox: true, minWidth: '280px' },
-// 		{ title: 'Status' },
-// 		{ title: 'Rule Type' },
-// 		{ title: 'Applied For' },
-// 		{ title: 'Product Filter' },
-// 		{ title: 'Action' },
-// 	];
-
-// 	// const dynamicRuleList = [
-// 	// 	{
-// 	// 		content: 'name',
-// 	// 		minWidth: '280px',
-// 	// 	},
-// 	// 	{
-// 	// 		content: 'name',
-// 	// 	},
-// 	// ];
-// 	const dynamicRuleList = paginatedRoles.map((rule, index) => {
-// 		return [
-// 			{
-// 				content: rule['_rule_title'],
-// 				withCheckbox: true,
-// 				minWidth: '280px',
-// 			},
-// 			{
-// 				content: 'radio-slider',
-// 				checkState: rule['_rule_status'] == '1',
-// 			},
-// 			{
-// 				content: getRuleTypeName(rule['_rule_type']),
-// 			},
-// 			{
-// 				content: getAppliedForRule(rule._rule_for, getUserFilterData(rule)),
-// 			},
-// 			{
-// 				content: getProductFilter(rule._product_filter, getFilterData(rule)),
-// 			},
-// 			{
-// 				content: 'action',
-// 			},
-// 		]
-// 	});
-// 	// const dynamicRuleList2 = [
-// 	// 	paginatedRoles.map((rule, index) =>{
-// 	// 		const ruleState = rule['_rule_status'] == '1' ? true : false;
-// 	// 		return (
-// 	// 			<div style={{gridTemplateColumns: 'repeat(6, 1fr)', gap: '40px', display: 'grid', alignItems: 'center'}}>
-// 	// 				<div className="wsx-d-flex wsx-item-center wsx-gap-16" style={{minWidth: '280px'}}><Input_New type="checkbox" inputBackground="#ffffff" activeBackground='#070707' borderColor='#070707' onChange={()=>'hello'}/>{rule['_rule_title']}</div>
-// 	// 				<Input_New type="radio-slider" checkState={ruleState} />
-// 	// 				<div>{getRuleTypeName(rule['_rule_type'])}</div>
-// 	// 				<div>{getAppliedForRule(rule._rule_for, getUserFilterData(rule))}</div>
-// 	// 				<div>{getProductFilter(rule._product_filter, getFilterData(rule))}</div>
-// 	// 				<div className="wsx-btn-group wsx-gap-8">
-// 	// 					<span className="wsx-btn-action">{Icons.delete}</span>
-// 	// 					<span className="wsx-btn-action">{Icons.copy}</span>
-// 	// 					<span className="wsx-btn-action">{Icons.edit}</span>
-// 	// 				</div>
-// 	// 			</div>
-// 	// 		)
-// 	// 	})
-// 	// ];
-
-// 	const optionsData = [
-// 		{ value: 'default', label: 'Select Bulk Action' },
-// 		{ value: 'enable', label: 'Enable' },
-// 		{ value: 'disable', label: 'Disable' },
-// 		{ value: 'delete', label: 'Delete' },
-// 		{ value: 'export', label: 'Export' },
-// 	];
-
-// 	const ruleData = (rulesData, section) => {
-// 		return (
-// 			<>
-// 				<div className="wsx-justify-wrapper wsx-slg-justify-wrapper wsx-gap-12 wsx-mb-24">
-// 					<div className="wsx-d-flex wsx-item-center wsx-gap-48">
-// 						<div className="wsx-d-flex wsx-gap-8 wsx-item-center">
-// 							<Select_New
-// 								options={optionsData}
-// 								iconColor="#070707"
-// 								onChange={handleBulkActionChange}
-// 								inputBackground="#ffffff"
-// 								borderColor="#DCDCEE"
-// 								inputPadding="9px 16px"
-// 								minWidth="182px"
-// 							/>
-// 							<Button_New
-// 								label={wholesalex_overview.i18n.whx_users_apply}
-// 								onClick={handleApplyBulkAction}
-// 								background='base2'
-// 								borderColor='primary'
-// 								color='primary'
-// 								customClass='wsx-font-14'
-// 								padding='11px 20px'
-// 							/>
-// 						</div>
-// 						<TabContainer_New
-// 							tabItems={[
-// 								{
-// 									name: "latest",
-// 									title: wholesalex_overview.i18n.whx_dr_latest,
-// 								},
-// 								{
-// 									name: "oldest",
-// 									title: wholesalex_overview.i18n.whx_dr_oldest,
-// 								}
-// 							]}
-// 							initialTabItem={initialTab}
-// 							customClass='wsx-m-0'
-// 							onTabSelect={handleSortToggle}
-// 						/>
-// 					</div>
-
-// 					<div className="wsx-d-flex wsx-item-center wsx-gap-8">
-// 						<Button_New
-// 							label={wholesalex_overview.i18n.whx_dr_import}
-// 							// padding='8px 20px'
-// 							background='base2'
-// 							iconName='import'
-// 							onClick={onImportClick}
-// 							customClass='wsx-font-regular'
-// 						/>
-
-// 						<Search
-// 							inputClass='wsx-input-wrapper-with-icon'
-// 							type="text"
-// 							name={"wsx-lists-search-user"}
-// 							value={searchQuery}
-// 							onChange={(e) => setSearchQuery(e.target.value)}
-// 							iconName='search'
-// 							iconColor='#070707'
-// 							background='transparent'
-// 							borderColor='#868393'
-// 							maxHeight='38px'
-// 							placeholder='Search Rule'
-// 						/>
-// 					</div>
-// 				</div>
-// 				{/* Bulk Action start */}
-// 				{/* <div>
-// 					<select value={bulkAction} onChange={handleBulkActionChange}>
-// 						<option value="">Select Bulk Action</option>
-// 						<option value="enable">Enable</option>
-// 						<option value="disable">Disable</option>
-// 						<option value="delete">Delete</option>
-// 						<option value="export">Export</option>
-// 					</select>
-// 					<button onClick={handleApplyBulkAction}>Apply</button>
-// 				</div> */}
-// 				<Toast
-// 					delay={3000}
-// 					position='top_right'
-// 				/>
-
-// 				{/* Toggle sort button */}
-
-// 				{/* <div>
-// 					<button onClick={handleSortToggle}>
-// 						{isAscending ? 'Asc' : 'Dsc'}
-// 					</button>
-// 				</div> */}
-
-// 				{/* Bulk Action end */}
-
-// 				{/* <Table_New headerItems={dynamicRulesHeader} tableItems={dynamicRuleList} customClass='wsx-bg-base2 wsx-br-lg' gap="40px"/> */}
-
-// 				{/* {dynamicRuleList2} */}
-// 				<div className="wsx-row-wrapper">
-// 					<div className="wsx-row-container wsx-scrollbar">
-
-// 						<div className="wsx-rules-header">
-// 							<div className='wsx-rule-checkbox-with-title'>
-// 								<label class="wsx-checkbox-container">
-// 									<input type="checkbox" checked={selectedRows.length === rules.length} onChange={handleSelectAll} />
-// 									<span class="wsx-checkbox-mark"></span>
-// 								</label>
-// 								Rule Title
-// 							</div>
-// 							{/* <Input_New type="checkbox" inputBackground="#ffffff" activeBackground='#070707' borderColor='#070707' onChecked={selectedRows.length === rules.length} onChange={handleSelectAll}/>Rule Title</span> */}
-// 							<div className="wsx-rule-status">Status</div>
-// 							<div className="wsx-rule-types">Rule Type</div>
-// 							<div className="wsx-rule-applied-users">Applied For</div>
-// 							<div className="wsx-rule-product-filter">Product Filter</div>
-// 							<div className="wsx-rule-actions wsx-text-end">Action</div>
-// 						</div>
-
-// 						{paginatedRoles.map((rule, index) => {
-// 							const actualIndex = currentPage * pageSize + index;
-// 							const ruleState = rule['_rule_status'] == '1' ? true : false;
-
-// 							return (
-// 								// <div key={`${section}_${actualIndex}`} id={`dynamic_rule_${rule.id}`} className="wsx-rules-row">
-// 								// 	<div className="wsx-rule-checkbox-with-title wsx-rule-item" style={{minWidth: '280px'}}>
-// 								// 		<Input_New type="checkbox" inputBackground="#ffffff" activeBackground='#070707' borderColor='#070707' onChecked={selectedRows.includes(rule.id)} onChange={() => handleRowSelection(rule.id)}/>
-// 								// 		{/* <input type="checkbox" checked={selectedRows.includes(rule.id)} onChange={() => handleRowSelection(rule.id)} /> */}
-// 								// 		<span className="wsx-ellipsis">{(rule['created_from']==='dokan_vendor_dashboard' || rule['created_from']==='vendor_dashboard' )?<span className="wholesalex_rule__dokan wholesalex_rule__vendor">{wholesalex_overview.i18n.whx_dr_vendor}{rule['created_by']}: </span>: ''}{rule['_rule_title'] ? rule['_rule_title'] :wholesalex_overview.i18n.whx_dr_untitled_rule}</span>
-// 								// 	</div>
-
-// 								// 	<Slider 
-// 								// 		className="wsx-rule-status wsx-rule-item" 
-// 								// 		name={`${rule.id}-rule-status-slider`} 
-// 								// 		value={rule['_rule_status'] ? true : false} 
-// 								// 		onChange={(e) => {
-// 								// 			e.stopPropagation();
-// 								// 			let parent = [...rules];
-// 								// 			let copy = {...rule};
-// 								// 			copy['_rule_status'] = e.target.checked;
-// 								// 			parent[actualIndex] = copy;
-// 								// 			setRules([...parent]);
-// 								// 			fetchData('post',actualIndex,copy,'_rule_status');
-// 								// 		}}
-// 								// 	/>
-
-// 								// 	<div className="wsx-rule-types wsx-rule-item" style={{minWidth: '224px'}}><span className="wsx-ellipsis">{ getRuleTypeName( rule['_rule_type'] ) }</span></div>
-// 								// 	<div className="wsx-rule-applied-users wsx-rule-item" style={{minWidth: '240px'}}><span className="wsx-ellipsis">{ getAppliedForRule(rule._rule_for, getUserFilterData( rule ) ) }</span></div>
-// 								// 	<div className="wsx-rule-product-filter wsx-rule-item" style={{minWidth: '154px'}}><span className="wsx-ellipsis">{ getProductFilter( rule._product_filter, getFilterData( rule ) ) }</span></div>
-
-// 								// 	<div className="wsx-rule-actions wsx-btn-group wsx-gap-8">
-// 								// 		<Tooltip content={wholesalex_overview.i18n.whx_users_delete}>
-// 								// 			<span className="wsx-btn-action" onClick={(e)=> {deleteRule(e,actualIndex)}}>
-// 								// 				{Icons.delete}
-// 								// 			</span>
-// 								// 		</Tooltip>
-// 								// 		<Tooltip content={wholesalex_overview.i18n.whx_dr_duplicate_this}>
-// 								// 			<span className="wsx-btn-action" onClick={(e)=>{duplicateRule(e,actualIndex)}}>
-// 								// 				{Icons.copy}
-// 								// 			</span>
-// 								// 		</Tooltip>
-// 								// 		<Tooltip content={wholesalex_overview.i18n.whx_users_edit}>
-// 								// 			<Link className='wsx-lh-0' to={`/dynamic-rules/edit/${rule.id}`}>
-// 								// 				<span className="wsx-btn-action">
-// 								// 					{Icons.edit}
-// 								// 				</span>
-// 								// 			</Link>
-// 								// 		</Tooltip>
-// 								// 	</div>
-
-// 								// 	{/* <div className="wsx-wholesalex-dynamic-rule-wrapper">
-
-// 								// 		<div className="wsx-wholesalex-dynamic-rule-list">
-// 								// 			<div className="wsx-rule-checkbox-with=title">
-// 								// 				<input type="checkbox" checked={selectedRows.includes(rule.id)} onChange={() => handleRowSelection(rule.id)} />
-// 								// 				<span>{(rule['created_from']==='dokan_vendor_dashboard' || rule['created_from']==='vendor_dashboard' )?<span className="wholesalex_rule__dokan wholesalex_rule__vendor">{wholesalex_overview.i18n.whx_dr_vendor}{rule['created_by']}: </span>: ''}{rule['_rule_title'] ? rule['_rule_title'] :wholesalex_overview.i18n.whx_dr_untitled_rule}</span>
-// 								// 			</div>
-// 								// 			<div className="wsx-rule-status">
-// 								// 				<div className="wsx-wholesalex_dynamic_rule__status">
-// 								// 					<Slider className="wsx-wholesalex_dynamic_rule_field" name={`${rule.id}_rule_status_slider`} value={rule['_rule_status'] ? true : false} onChange={(e) => {
-// 								// 							e.stopPropagation();
-// 								// 							let parent = [...rules];
-// 								// 							let copy = {...rule};
-// 								// 							copy['_rule_status'] = e.target.checked;
-// 								// 							parent[actualIndex] = copy;
-// 								// 							setRules([...parent]);
-// 								// 							fetchData('post',actualIndex,copy,'_rule_status');
-// 								// 						}}/>
-// 								// 				</div>
-// 								// 			</div>
-// 								// 			<div className="wsx-rule-types">{ getRuleTypeName( rule['_rule_type'] ) }</div>
-// 								// 			<div className="wsx-rule-applied-users">{ getAppliedForRule(rule._rule_for, getUserFilterData( rule ) ) }</div>
-// 								// 			<div className="wsx-rule-product-filter">{ getProductFilter( rule._product_filter, getFilterData( rule ) ) }</div>
-// 								// 			<div className="wsx-rule-actions">
-// 								// 				<span className="wsx-dynamic-action-icon" onClick={(e)=> {deleteRule(e,actualIndex)}}>
-// 								// 					<img src={`${wholesalex.url}assets/img/wsx-delete-icon.png`}/>
-// 								// 				</span>
-// 								// 				<span className="wsx-dynamic-action-icon" onClick={(e)=>{duplicateRule(e,actualIndex)}}>
-// 								// 					<img src={`${wholesalex.url}assets/img/wsx-copy-icon.png`}/>
-// 								// 				</span>
-// 								// 				<span className="wsx-dynamic-action-icon">
-// 								// 				<Link to={`/dynamic-rules/edit/${rule.id}`}>
-// 								// 					<img ref={ruleRef.current[actualIndex]} className="wholesalex_dynamic_rule__header" src={`${wholesalex.url}assets/img/wsx-edit-icon.png`}/>
-// 								// 				</Link>
-// 								// 				</span>
-// 								// 			</div>
-// 								// 		</div>
-// 								// 	</div> */}
-
-// 								// 	{deleteModal(actualIndex,rule)}
-
-// 								// </div>
-// 								<div key={`${section}_${actualIndex}`} id={`dynamic_rule_${rule.id}`} className="wsx-rules-row">
-// 									<div className="wsx-rule-checkbox-with-title wsx-rule-item">
-// 										<label class="wsx-checkbox-container">
-// 											<input type="checkbox" checked={selectedRows.includes(rule.id)} onChange={() => handleRowSelection(rule.id)} />
-// 											<span class="wsx-checkbox-mark"></span>
-// 										</label>
-// 										{/* <Input_New type="checkbox" inputBackground="#ffffff" activeBackground='#070707' borderColor='#070707' onChecked={selectedRows.includes(rule.id)} onChange={() => handleRowSelection(rule.id)}/> */}
-// 										{/* <input type="checkbox" checked={selectedRows.includes(rule.id)} onChange={() => handleRowSelection(rule.id)} /> */}
-// 										<span className="wsx-ellipsis">{(rule['created_from'] === 'dokan_vendor_dashboard' || rule['created_from'] === 'vendor_dashboard') ? <span className="wholesalex_rule__dokan wholesalex_rule__vendor">{wholesalex_overview.i18n.whx_dr_vendor}{rule['created_by']}: </span> : ''}{rule['_rule_title'] ? rule['_rule_title'] : wholesalex_overview.i18n.whx_dr_untitled_rule}</span>
-// 									</div>
-
-// 									<Slider
-// 										className="wsx-rule-status wsx-rule-item"
-// 										name={`${rule.id}-rule-status-slider`}
-// 										value={rule['_rule_status'] ? true : false}
-// 										onChange={(e) => {
-// 											e.stopPropagation();
-// 											let parent = [...rules];
-// 											let copy = { ...rule };
-// 											copy['_rule_status'] = e.target.checked;
-// 											parent[actualIndex] = copy;
-// 											setRules([...parent]);
-// 											fetchData('post', actualIndex, copy, '_rule_status');
-// 										}}
-// 									/>
-
-// 									<div className="wsx-rule-types wsx-rule-item"><span className="wsx-ellipsis">{getRuleTypeName(rule['_rule_type'])}</span></div>
-// 									{/* <div className="wsx-rule-applied-users wsx-rule-item"><span className="wsx-ellipsis">{ getAppliedForRule(rule._rule_for, getUserFilterData( rule ) ) }</span></div> */}
-// 									<div className="wsx-rule-applied-users wsx-rule-item">{getAppliedForRule(rule._rule_for, getUserFilterData(rule))}</div>
-// 									{/* <div className="wsx-rule-product-filter wsx-rule-item"><span className="wsx-ellipsis">{ getProductFilter( rule._product_filter, getFilterData( rule ) ) }</span></div> */}
-// 									<div className="wsx-rule-product-filter wsx-rule-item">{getProductFilter(rule._product_filter, getFilterData(rule))}</div>
-
-// 									<div className="wsx-rule-actions wsx-btn-group wsx-gap-8 wsx-justify-end">
-// 										<Tooltip content={wholesalex_overview.i18n.whx_users_delete} direction="top">
-// 											<span className="wsx-btn-action" onClick={(e) => { deleteRule(e, actualIndex) }}>
-// 												{Icons.delete}
-// 											</span>
-// 										</Tooltip>
-// 										<Tooltip content={wholesalex_overview.i18n.whx_dr_duplicate_this} direction="top">
-// 											<span className="wsx-btn-action" onClick={(e) => { duplicateRule(e, actualIndex) }}>
-// 												{Icons.copy}
-// 											</span>
-// 										</Tooltip>
-// 										<Tooltip content={wholesalex_overview.i18n.whx_users_edit}>
-// 											<Link className='wsx-lh-0' to={`/dynamic-rules/edit/${rule.id}`}>
-// 												<span className="wsx-btn-action">
-// 													{Icons.edit}
-// 												</span>
-// 											</Link>
-// 										</Tooltip>
-// 									</div>
-
-// 									{/* <div className="wsx-wholesalex-dynamic-rule-wrapper">
-
-// 										<div className="wsx-wholesalex-dynamic-rule-list">
-// 											<div className="wsx-rule-checkbox-with=title">
-// 												<input type="checkbox" checked={selectedRows.includes(rule.id)} onChange={() => handleRowSelection(rule.id)} />
-// 												<span>{(rule['created_from']==='dokan_vendor_dashboard' || rule['created_from']==='vendor_dashboard' )?<span className="wholesalex_rule__dokan wholesalex_rule__vendor">{wholesalex_overview.i18n.whx_dr_vendor}{rule['created_by']}: </span>: ''}{rule['_rule_title'] ? rule['_rule_title'] :wholesalex_overview.i18n.whx_dr_untitled_rule}</span>
-// 											</div>
-// 											<div className="wsx-rule-status">
-// 												<div className="wsx-wholesalex_dynamic_rule__status">
-// 													<Slider className="wsx-wholesalex_dynamic_rule_field" name={`${rule.id}_rule_status_slider`} value={rule['_rule_status'] ? true : false} onChange={(e) => {
-// 															e.stopPropagation();
-// 															let parent = [...rules];
-// 															let copy = {...rule};
-// 															copy['_rule_status'] = e.target.checked;
-// 															parent[actualIndex] = copy;
-// 															setRules([...parent]);
-// 															fetchData('post',actualIndex,copy,'_rule_status');
-// 														}}/>
-// 												</div>
-// 											</div>
-// 											<div className="wsx-rule-types">{ getRuleTypeName( rule['_rule_type'] ) }</div>
-// 											<div className="wsx-rule-applied-users">{ getAppliedForRule(rule._rule_for, getUserFilterData( rule ) ) }</div>
-// 											<div className="wsx-rule-product-filter">{ getProductFilter( rule._product_filter, getFilterData( rule ) ) }</div>
-// 											<div className="wsx-rule-actions">
-// 												<span className="wsx-dynamic-action-icon" onClick={(e)=> {deleteRule(e,actualIndex)}}>
-// 													<img src={`${wholesalex.url}assets/img/wsx-delete-icon.png`}/>
-// 												</span>
-// 												<span className="wsx-dynamic-action-icon" onClick={(e)=>{duplicateRule(e,actualIndex)}}>
-// 													<img src={`${wholesalex.url}assets/img/wsx-copy-icon.png`}/>
-// 												</span>
-// 												<span className="wsx-dynamic-action-icon">
-// 												<Link to={`/dynamic-rules/edit/${rule.id}`}>
-// 													<img ref={ruleRef.current[actualIndex]} className="wholesalex_dynamic_rule__header" src={`${wholesalex.url}assets/img/wsx-edit-icon.png`}/>
-// 												</Link>
-// 												</span>
-// 											</div>
-// 										</div>
-// 									</div> */}
-
-// 									{deleteModal(actualIndex, rule)}
-
-// 								</div>
-// 								// <div key={`${section}_${actualIndex}`} id={`dynamic_rule_${rule.id}`} className="wsx-rules-row">
-// 								// 	<div className="wsx-rule-checkbox-with-title wsx-rule-item">
-// 								// 		<Input_New type="checkbox" inputBackground="#ffffff" activeBackground='#070707' borderColor='#070707' onChecked={selectedRows.includes(rule.id)} onChange={() => handleRowSelection(rule.id)}/>
-// 								// 		{/* <input type="checkbox" checked={selectedRows.includes(rule.id)} onChange={() => handleRowSelection(rule.id)} /> */}
-// 								// 		<span className="wsx-ellipsis">{(rule['created_from']==='dokan_vendor_dashboard' || rule['created_from']==='vendor_dashboard' )?<span className="wholesalex_rule__dokan wholesalex_rule__vendor">{wholesalex_overview.i18n.whx_dr_vendor}{rule['created_by']}: </span>: ''}{rule['_rule_title'] ? rule['_rule_title'] :wholesalex_overview.i18n.whx_dr_untitled_rule}</span>
-// 								// 	</div>
-
-// 								// 	<Slider 
-// 								// 		className="wsx-rule-status wsx-rule-item" 
-// 								// 		name={`${rule.id}-rule-status-slider`} 
-// 								// 		value={rule['_rule_status'] ? true : false} 
-// 								// 		onChange={(e) => {
-// 								// 			e.stopPropagation();
-// 								// 			let parent = [...rules];
-// 								// 			let copy = {...rule};
-// 								// 			copy['_rule_status'] = e.target.checked;
-// 								// 			parent[actualIndex] = copy;
-// 								// 			setRules([...parent]);
-// 								// 			fetchData('post',actualIndex,copy,'_rule_status');
-// 								// 		}}
-// 								// 	/>
-
-// 								// 	<div className="wsx-rule-types wsx-rule-item"><span className="wsx-ellipsis">{ getRuleTypeName( rule['_rule_type'] ) }</span></div>
-// 								// 	<div className="wsx-rule-applied-users wsx-rule-item"><span className="wsx-ellipsis">{ getAppliedForRule(rule._rule_for, getUserFilterData( rule ) ) }</span></div>
-// 								// 	<div className="wsx-rule-product-filter wsx-rule-item"><span className="wsx-ellipsis">{ getProductFilter( rule._product_filter, getFilterData( rule ) ) }</span></div>
-
-// 								// 	<div className="wsx-rule-actions wsx-btn-group wsx-gap-8">
-// 								// 		<Tooltip content={wholesalex_overview.i18n.whx_users_delete}>
-// 								// 			<span className="wsx-btn-action" onClick={(e)=> {deleteRule(e,actualIndex)}}>
-// 								// 				{Icons.delete}
-// 								// 			</span>
-// 								// 		</Tooltip>
-// 								// 		<Tooltip content={wholesalex_overview.i18n.whx_dr_duplicate_this}>
-// 								// 			<span className="wsx-btn-action" onClick={(e)=>{duplicateRule(e,actualIndex)}}>
-// 								// 				{Icons.copy}
-// 								// 			</span>
-// 								// 		</Tooltip>
-// 								// 		<Tooltip content={wholesalex_overview.i18n.whx_users_edit}>
-// 								// 			<Link className='wsx-lh-0' to={`/dynamic-rules/edit/${rule.id}`}>
-// 								// 				<span className="wsx-btn-action">
-// 								// 					{Icons.edit}
-// 								// 				</span>
-// 								// 			</Link>
-// 								// 		</Tooltip>
-// 								// 	</div>
-
-// 								// 	{/* <div className="wsx-wholesalex-dynamic-rule-wrapper">
-
-// 								// 		<div className="wsx-wholesalex-dynamic-rule-list">
-// 								// 			<div className="wsx-rule-checkbox-with=title">
-// 								// 				<input type="checkbox" checked={selectedRows.includes(rule.id)} onChange={() => handleRowSelection(rule.id)} />
-// 								// 				<span>{(rule['created_from']==='dokan_vendor_dashboard' || rule['created_from']==='vendor_dashboard' )?<span className="wholesalex_rule__dokan wholesalex_rule__vendor">{wholesalex_overview.i18n.whx_dr_vendor}{rule['created_by']}: </span>: ''}{rule['_rule_title'] ? rule['_rule_title'] :wholesalex_overview.i18n.whx_dr_untitled_rule}</span>
-// 								// 			</div>
-// 								// 			<div className="wsx-rule-status">
-// 								// 				<div className="wsx-wholesalex_dynamic_rule__status">
-// 								// 					<Slider className="wsx-wholesalex_dynamic_rule_field" name={`${rule.id}_rule_status_slider`} value={rule['_rule_status'] ? true : false} onChange={(e) => {
-// 								// 							e.stopPropagation();
-// 								// 							let parent = [...rules];
-// 								// 							let copy = {...rule};
-// 								// 							copy['_rule_status'] = e.target.checked;
-// 								// 							parent[actualIndex] = copy;
-// 								// 							setRules([...parent]);
-// 								// 							fetchData('post',actualIndex,copy,'_rule_status');
-// 								// 						}}/>
-// 								// 				</div>
-// 								// 			</div>
-// 								// 			<div className="wsx-rule-types">{ getRuleTypeName( rule['_rule_type'] ) }</div>
-// 								// 			<div className="wsx-rule-applied-users">{ getAppliedForRule(rule._rule_for, getUserFilterData( rule ) ) }</div>
-// 								// 			<div className="wsx-rule-product-filter">{ getProductFilter( rule._product_filter, getFilterData( rule ) ) }</div>
-// 								// 			<div className="wsx-rule-actions">
-// 								// 				<span className="wsx-dynamic-action-icon" onClick={(e)=> {deleteRule(e,actualIndex)}}>
-// 								// 					<img src={`${wholesalex.url}assets/img/wsx-delete-icon.png`}/>
-// 								// 				</span>
-// 								// 				<span className="wsx-dynamic-action-icon" onClick={(e)=>{duplicateRule(e,actualIndex)}}>
-// 								// 					<img src={`${wholesalex.url}assets/img/wsx-copy-icon.png`}/>
-// 								// 				</span>
-// 								// 				<span className="wsx-dynamic-action-icon">
-// 								// 				<Link to={`/dynamic-rules/edit/${rule.id}`}>
-// 								// 					<img ref={ruleRef.current[actualIndex]} className="wholesalex_dynamic_rule__header" src={`${wholesalex.url}assets/img/wsx-edit-icon.png`}/>
-// 								// 				</Link>
-// 								// 				</span>
-// 								// 			</div>
-// 								// 		</div>
-// 								// 	</div> */}
-
-// 								// 	{deleteModal(actualIndex,rule)}
-
-// 								// </div>
-// 							);
-// 						})}
-// 					</div>
-// 					{ rules.length > pageSize && <Pagination
-// 						gotoPage={handleGotoPage}
-// 						length={filteredRules.length}
-// 						pageSize={pageSize}
-// 						setPageSize={setPageSize}
-// 					/>}
-
-// 				</div>
-// 				{
-// 					alert && <Alert
-// 						title="Please Select Rule for Bulk Action!"
-// 						description="Please select rule item to perform bulk action."
-// 						onClose={handleAlertClose}
-// 					/>
-// 				}
-// 			</>
-// 		);
-// 	}
-
-// 	const ref = useRef(null);
-
-// 	const sleep = async (ms) => {
-// 		return new Promise((resolve) => setTimeout(resolve, ms));
-// 	}
-
-// 	const toogleOverlayWindow = (e, type) => {
-// 		if (overlayWindow.status) {
-// 			const style = ref?.current?.style;
-// 			if (!style) return;
-// 			sleep(200).then(() => {
-// 				style.transition = "all 0.3s ease-in-out";
-// 				style.transform = "translateX(50%)";
-// 				style.opacity = "0";
-
-// 				sleep(300).then(() => {
-// 					setOverlayWindow({ ...overlayWindow, status: false });
-// 				});
-
-// 			});
-// 		} else {
-// 			setOverlayWindow({ ...overlayWindow, type: type, status: true });
-// 		}
-// 	}
-
-// 	const onImportClick = (e) => {
-// 		toogleOverlayWindow(e, 'import');
-// 	}
-
-// 	const renderOverlayWindow = () => {
-// 		if (!overlayWindow.status) {
-// 			return;
-// 		}
-// 		return (
-// 			<>{overlayWindow.type == 'import' && <Import toogleOverlayWindow={toogleOverlayWindow} overlayWindowStatus={overlayWindow.status} windowRef={ref} setRules={setRules} />} </>
-// 		);
-// 	}
-// 	return (
-// 		<Fragment>
-// 			<div className="wsx-wrapper">
-// 				<div className="wsx-container">
-// 					{!appState.loading && (
-// 						Object.keys(fields).map((sections, index) => {
-// 							switch (fields[sections]['type']) {
-// 								case 'buttons':
-// 									return buttonsData(fields[sections], sections);
-// 								case 'rule':
-// 									return ruleData(fields[sections], sections);
-// 								default:
-// 									break;
-// 							}
-// 						}
-// 						)
-// 					)}
-// 					{/* {!appState.loading && (
-// 						<div className="wholesalex-rule__content wholesalex_dynamic_rules">
-
-// 							{Object.keys(fields).map((sections,index) => 
-// 								{
-// 									switch (fields[sections]['type']) {
-// 										case 'buttons':
-// 											return buttonsData(fields[sections],sections);
-// 										case 'rule':											
-// 											return ruleData(fields[sections], sections);
-// 										default:
-// 											break;
-// 									}
-// 								}
-// 							)}
-// 						</div>
-// 					)} */}
-// 					{renderOverlayWindow()}
-// 				</div>
-// 			</div>
-// 		</Fragment>
-// 	);
-// }
-
-// export default DynamicRules;
-
 
 
 
@@ -5902,17 +4192,6 @@ const DynamicRules = props => {
     index: -1,
     loadingOnSave: {}
   });
-  const [ruleStatus, setRuleStatus] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({});
-  const [modalStatus, setModalStatus] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  const [rules, setRules] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(wholesalex_overview.whx_dr_rule);
-  const [overlayWindow, setOverlayWindow] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
-    status: false,
-    type: ''
-  });
-  const {
-    state,
-    dispatch
-  } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(_context_toastContent__WEBPACK_IMPORTED_MODULE_5__.ToastContext);
   const {
     contextDataRule,
     setContextDataRule,
@@ -5925,6 +4204,17 @@ const DynamicRules = props => {
   const {
     globalCurrentPage
   } = contextData;
+  const [ruleStatus, setRuleStatus] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({});
+  const [modalStatus, setModalStatus] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [rules, setRules] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(savedRule ? savedRule : wholesalex_overview.whx_dr_rule);
+  const [overlayWindow, setOverlayWindow] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+    status: false,
+    type: ''
+  });
+  const {
+    state,
+    dispatch
+  } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(_context_toastContent__WEBPACK_IMPORTED_MODULE_5__.ToastContext);
   const initialTab = 'latest';
   const [alert, setAlert] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [isAlertVisible, setIsAlertVisible] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
@@ -6093,6 +4383,11 @@ const DynamicRules = props => {
               ...parent[index],
               ..._rule
             };
+            setContextDataRule(prevData => ({
+              ...prevData,
+              ...prevData,
+              savedRule: parent
+            }));
             setRules(parent);
           }
           if (attr['delete']) {
@@ -6111,7 +4406,7 @@ const DynamicRules = props => {
               const updatedRules = prevData.newRules.filter(rule => rule.id !== ruleId);
               return {
                 ...prevData,
-                newRules: updatedRules
+                savedRule: updatedRules
               };
             });
           }
@@ -6470,7 +4765,10 @@ const DynamicRules = props => {
           }
         }, `${user.name.slice(0, 2)}`));
       })), userData.length === 1 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-        className: "wsx-ellipsis"
+        className: "wsx-ellipsis",
+        style: {
+          maxWidth: '10rem'
+        }
       }, " ", `${userData[0].name}`), userData.length !== 1 && userData.length < 5 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, " ", `${userData.length} ${entity}`), userData.length > 4 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, " ", `+${userData.length} ${entity}`));
     }
     return null;
@@ -6628,28 +4926,28 @@ const DynamicRules = props => {
         maxHeight: '370px'
       }
     }, _utils_Icons__WEBPACK_IMPORTED_MODULE_13__["default"].noData) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wsx-rules-header"
+      className: "wsx-rules-header wsx-color-tertiary wsx-font-medium"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-rule-checkbox-with-title"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
-      className: "wsx-checkbox-option-wrapper"
+      className: "wsx-label wsx-checkbox-option-wrapper"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
       type: "checkbox",
       checked: selectedRows.length === rules.length,
       onChange: handleSelectAll
     }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
       className: "wsx-checkbox-mark"
-    })), "Rule Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    })), (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Rule Title', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-rule-status"
-    }, "Status"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Status', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-rule-types"
-    }, "Rule Type"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Rule Type', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-rule-applied-users"
-    }, "Applied For"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Applied For', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-rule-product-filter"
-    }, "Product Filter"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Product Filter', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-rule-actions wsx-text-end"
-    }, "Action")), console.log(paginatedRoles), paginatedRoles.map((rule, index) => {
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Action', 'wholesalex'))), paginatedRoles.map((rule, index) => {
       const actualIndex = currentPage * pageSize + index;
       const ruleState = rule['_rule_status'] == '1' ? true : false;
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -6659,7 +4957,7 @@ const DynamicRules = props => {
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
         className: "wsx-rule-checkbox-with-title wsx-rule-item"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
-        className: "wsx-checkbox-option-wrapper"
+        className: "wsx-label wsx-checkbox-option-wrapper"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
         type: "checkbox",
         checked: selectedRows.includes(rule.id),
@@ -6746,7 +5044,7 @@ const DynamicRules = props => {
       const style = ref?.current?.style;
       if (!style) return;
       sleep(200).then(() => {
-        style.transition = "all 0.3s ease-in-out";
+        style.transition = "all var(--transition-md) ease-in-out";
         style.transform = "translateX(50%)";
         style.opacity = "0";
         sleep(300).then(() => {
@@ -6762,6 +5060,13 @@ const DynamicRules = props => {
         type: type,
         status: true
       });
+      setTimeout(() => {
+        const style = ref?.current?.style;
+        if (!style) return;
+        style.transition = "all var(--transition-md) ease-in-out";
+        style.transform = "translateX(0%)";
+        style.opacity = "1";
+      }, 10);
     }
   };
   const onImportClick = e => {
@@ -6818,6 +5123,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
 /* harmony import */ var _components_Slider__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/Slider */ "./reactjs/src/components/Slider.js");
 /* harmony import */ var _components_Button_New__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/Button_New */ "./reactjs/src/components/Button_New.js");
+/* harmony import */ var _components_LoadingGif__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../components/LoadingGif */ "./reactjs/src/components/LoadingGif.js");
+
 
 
 
@@ -6844,6 +5151,7 @@ const Import = _ref => {
   const [importData, setImportData] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({});
   const mappingFormRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const uploadFile = () => {
+    setLoader(true);
     const formData = new FormData();
     formData.append('import', selectedFile);
     formData.append('action', 'wholesalex_dynamic_rule_import_upload_file');
@@ -6866,18 +5174,17 @@ const Import = _ref => {
       } else {
         window.alert("Error Occured!");
       }
+      setLoader(false);
     });
   };
   const runImporter = e => {
     e.preventDefault();
     const formData = new FormData(mappingFormRef.current);
-
-    // formData.append('import', selectedFile);
+    formData.append('import', selectedFile);
     formData.append('action', 'wholesalex_dynamic_rule_run_importer');
     formData.append('file', importData.file);
     formData.append('nonce', wholesalex.nonce);
-    // formData.append('update_existing', isUpdateExisting ? 'yes' : 'no');
-
+    formData.append('update_existing', isUpdateExisting ? 'yes' : 'no');
     fetch(wholesalex.ajax, {
       method: 'POST',
       body: formData
@@ -6894,7 +5201,7 @@ const Import = _ref => {
       className: "column_mapping  wholesalex-importer"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "column_mapping__heading"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("h2", null, wholesalex_overview.i18n.whx_dr_map_csv_fields_to_dynamic_rules), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", null, wholesalex_overview.i18n.whx_dr_select_field_from_csv_msg)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("form", {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("h2", null, wholesalex_overview.i18n.whx_dr_map_csv_fields_to_dynamic_rules), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, wholesalex_overview.i18n.whx_dr_select_field_from_csv_msg)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("form", {
       ref: mappingFormRef,
       className: "wc-progress-from-content woocommerce-importer",
       onSubmit: e => {
@@ -6903,7 +5210,7 @@ const Import = _ref => {
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("section", {
       className: "wholesalex-importer-mapping-table-wrapper wc-importer-mapping-table-wrappe"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("table", {
-      className: "widefat wc-importer-mapping-table"
+      className: "wsx-table widefat wc-importer-mapping-table"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("th", null, wholesalex_overview.i18n.whx_dr_column_name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("th", null, wholesalex_overview.i18n.whx_dr_map_to_field))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("tbody", null, importData['headers'] && importData['headers'].map((header, idx) => {
       const mappedValue = importData['mapped_items'][idx];
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("td", {
@@ -6915,6 +5222,7 @@ const Import = _ref => {
         name: `map_from[ ${idx}]`,
         value: header
       }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("select", {
+        className: "wsx-select",
         name: `map_to[ ${idx}]`
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("option", {
         value: ""
@@ -6924,19 +5232,20 @@ const Import = _ref => {
           selected: mappedValue === key
         }, importData['mapping_options'][key]);
       }))));
-    }))))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
-      className: "wholesalex-btn wholesalex-primary-btn  wholesalex-btn-lg",
-      onClick: runImporter
-    }, wholesalex_overview.i18n.whx_dr_run_the_importer));
+    }))))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_Button_New__WEBPACK_IMPORTED_MODULE_8__["default"], {
+      label: wholesalex_overview.i18n.whx_dr_run_the_importer,
+      onClick: runImporter,
+      customClass: "wsx-mt-32",
+      background: "tertiary",
+      smallButton: true
+    }));
   };
   const progress = () => {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wholesalex_importer__importing  wholesalex-importer"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("header", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("h2", null, wholesalex_overview.i18n.whx_dr_importing), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", null, wholesalex_overview.i18n.whx_dr_your_dynamic_rules_are_now_being_importing, ".")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("section", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("progress", {
-      className: "woocommerce-importer-progress wholesalex_import_progress",
-      max: "100",
-      value: progressValue
-    })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_LoadingSpinner__WEBPACK_IMPORTED_MODULE_5__["default"], null));
+      className: "wholesalex_importer__importing  wholesalex-importer wsx-relative"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("header", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("h2", null, wholesalex_overview.i18n.whx_dr_importing), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, wholesalex_overview.i18n.whx_dr_your_dynamic_rules_are_now_being_importing, ".")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_LoadingGif__WEBPACK_IMPORTED_MODULE_9__["default"], {
+      insideContainer: true
+    }));
   };
   const uploadForm = () => {
     // return (
@@ -6962,8 +5271,10 @@ const Import = _ref => {
     // 	</div>
     // );
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wsx-d-flex wsx-flex-column wsx-gap-20"
-    }, loader && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_LoadingSpinner__WEBPACK_IMPORTED_MODULE_5__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_DragDropFileUpload__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      className: "wsx-d-flex wsx-flex-column wsx-gap-20 wsx-relative"
+    }, loader && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_LoadingGif__WEBPACK_IMPORTED_MODULE_9__["default"], {
+      insideContainer: true
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_DragDropFileUpload__WEBPACK_IMPORTED_MODULE_3__["default"], {
       name: 'import',
       label: wholesalex_overview.i18n.whx_dr_upload_csv,
       help: wholesalex_overview.i18n.whx_dr_you_can_upload_only_csv_file_format,
@@ -7060,7 +5371,7 @@ const Import = _ref => {
   };
   const progressComplete = () => {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wholesalex-progress-form-content  wholesalex-importer"
+      className: "wholesalex-progress-form-content  wholesalex-importer "
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("section", {
       className: "wholesalex-importer-done success-popup-content"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
@@ -7082,20 +5393,37 @@ const Import = _ref => {
     }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "import-complete-text message"
     }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Import Complete!', 'wholesalex')), importData.imported > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wholesalex-imported"
+      className: "wholesalex-imported wsx-font-18 wsx-font-medium",
+      style: {
+        color: 'var(--color-positive)'
+      }
     }, importData.imported, wholesalex_overview.i18n.whx_dr_dynamic_rule_imported), importData.updated > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wholesalex-updated"
+      className: "wholesalex-updated wsx-mt-8",
+      style: {
+        color: 'var(--color-lime)'
+      }
     }, importData.updated, wholesalex_overview.i18n.whx_dr_dynamic_rule_updated), importData.skipped > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wholesalex-skipped"
+      className: "wholesalex-skipped wsx-mt-8",
+      style: {
+        color: 'var(--color-negative)'
+      }
     }, importData.skipped, wholesalex_overview.i18n.whx_dr_dynamic_rule_skipped), importData.failed > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wholesalex-failed"
-    }, importData.failed, wholesalex_overview.i18n.whx_dr_dynamic_rule_failed), importData?.errors && importData?.errors?.length > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
-      className: "wholesalex-btn wholesalex-primary-btn wholesalex-btn-md",
-      onClick: () => setViewErrorLog(!viewErrorLog)
-    }, wholesalex_overview.i18n.whx_dr_view_error_logs)), viewErrorLog && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("section", {
-      className: "wholesalex-importer-log"
+      className: "wholesalex-failed wsx-mt-8",
+      style: {
+        color: 'var(--color-text-body)'
+      }
+    }, importData.failed, wholesalex_overview.i18n.whx_dr_dynamic_rule_failed), importData?.errors && importData?.errors?.length > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_Button_New__WEBPACK_IMPORTED_MODULE_8__["default"], {
+      label: wholesalex_overview.i18n.whx_dr_view_error_logs,
+      onClick: () => setViewErrorLog(!viewErrorLog),
+      smallButton: true,
+      customClass: "wsx-mt-16",
+      background: "secondary"
+    })
+    // <button className="wholesalex-btn wholesalex-primary-btn wholesalex-btn-md" onClick={() => setViewErrorLog(!viewErrorLog)}>{wholesalex_overview.i18n.whx_dr_view_error_logs}</button>
+    ), viewErrorLog && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("section", {
+      className: "wholesalex-importer-log wsx-mt-20"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("table", {
-      className: "widefat wholesalex-importer-log-table"
+      className: "wsx-table widefat wholesalex-importer-log-table"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("th", null, wholesalex_overview.i18n.whx_dr_dynamic_rule), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("th", null, wholesalex_overview.i18n.whx_dr_reason_for_failure)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("tbody", null, importData.errors && importData.errors.map(err => {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("tr", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("th", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("code", null, err['id'])), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("td", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("code", null, err['message'])));
     })))));
@@ -7486,6 +5814,22 @@ icons.save = /*#__PURE__*/React.createElement("svg", {
   d: "M790.706 338.824v112.94H395.412c-31.06 0-56.47 25.3-56.47 56.471v744.509c17.73-6.325 36.592-10.391 56.47-10.391h1129.412c19.877 0 38.738 4.066 56.47 10.39V508.236c0-31.171-25.412-56.47-56.47-56.47h-395.295V338.824h395.295c93.402 0 169.411 76.009 169.411 169.411v1242.353c0 93.403-76.01 169.412-169.411 169.412H395.412C302.009 1920 226 1843.99 226 1750.588V508.235c0-93.402 76.01-169.411 169.412-169.411h395.294Zm734.118 1016.47H395.412c-31.06 0-56.47 25.299-56.47 56.47v338.824c0 31.172 25.41 56.47 56.47 56.47h1129.412c31.058 0 56.47-25.298 56.47-56.47v-338.823c0-31.172-25.412-56.47-56.47-56.47ZM1016.622-.023v880.151l246.212-246.325 79.85 79.85-382.532 382.644-382.645-382.644 79.85-79.85L903.68 880.128V-.022h112.941ZM564.824 1468.235c-62.344 0-112.942 50.71-112.942 112.941s50.598 112.942 112.942 112.942c62.343 0 112.94-50.71 112.94-112.942 0-62.23-50.597-112.94-112.94-112.94Z",
   fillRule: "evenodd"
 }));
+icons.preMadeDesign = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none",
+  viewBox: "0 0 20 20"
+}, /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M18.419 5.769 7.394 1.3a.682.682 0 0 0-.27-.05.697.697 0 0 0-.643.431l-.65 1.613.7.15.6-1.494 8.063 3.263 1.28.518 1.676.681-3.325 8.213-.563 2.744v.362c0 .038 0 .069-.006.106.025-.043.05-.08.069-.13L18.794 6.68a.694.694 0 0 0-.382-.912h.007Z"
+}), /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M16.02 5.381 4.6 3.044a.694.694 0 0 0-.806.531l-.368 1.819h.719l.337-1.663 8.175 1.663 1.5.3 1.706.35-1.6 7.881v3.438L16.544 6.18a.684.684 0 0 0-.53-.806l.006.006Z"
+}), /*#__PURE__*/React.createElement("path", {
+  fill: "currentColor",
+  d: "M13.588 5.394H1.93a.683.683 0 0 0-.681.681v11.656c0 .375.306.681.681.681h11.656a.683.683 0 0 0 .682-.68V6.074a.683.683 0 0 0-.681-.681ZM9.456 7.68c.738 0 1.338.6 1.338 1.338a1.339 1.339 0 0 1-2.675 0c0-.738.6-1.338 1.337-1.338Zm3.013 9.406H2.85a.354.354 0 0 1-.3-.537l3.5-5.588a.35.35 0 0 1 .594 0l1.981 3.163a.35.35 0 0 0 .594 0l.712-1.137a.35.35 0 0 1 .594 0l2.231 3.562a.35.35 0 0 1-.3.537h.013Z"
+}));
 icons.menu = /*#__PURE__*/React.createElement("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: "20",
@@ -7870,15 +6214,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/getUrl.js */ "./node_modules/css-loader/dist/runtime/getUrl.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2__);
 // Imports
 
 
-
-var ___CSS_LOADER_URL_IMPORT_0___ = new URL(/* asset import */ __webpack_require__(/*! ../../../../assets/img/angle-down-16.svg */ "./assets/img/angle-down-16.svg"), __webpack_require__.b);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-var ___CSS_LOADER_URL_REPLACEMENT_0___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(___CSS_LOADER_URL_IMPORT_0___);
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `/* Variables */
 /* Default Style */
@@ -7910,8 +6249,7 @@ input[type=number],
 input[type=email],
 input[type=url],
 input[type=password],
-textarea,
-.wp-core-ui select {
+textarea {
   outline: none;
   border: 1px solid #E2E4E9;
   border-radius: 8px;
@@ -7928,8 +6266,7 @@ textarea,
   input[type=email]:focus,
   input[type=url]:focus,
   input[type=password]:focus,
-  textarea:focus,
-  .wp-core-ui select:focus {
+  textarea:focus {
     outline: none;
     box-shadow: none;
     border-color: #6C6CFF; }
@@ -7939,16 +6276,8 @@ textarea,
   input[type=email].wsx-bg-base1,
   input[type=url].wsx-bg-base1,
   input[type=password].wsx-bg-base1,
-  textarea.wsx-bg-base1,
-  .wp-core-ui select.wsx-bg-base1 {
+  textarea.wsx-bg-base1 {
     background-color: #ffffff; }
-
-.wp-core-ui select {
-  position: relative;
-  max-width: unset;
-  background: transparent url(${___CSS_LOADER_URL_REPLACEMENT_0___}) no-repeat right 14px top 55%;
-  background-size: 16px 16px;
-  padding: 0 32px 0 8px; }
 
 textarea {
   padding: 10px 8px; }
@@ -8152,10 +6481,10 @@ code, kbd {
   border-bottom: 1px solid #D5D5FA; }
 
 .wsx-side-menu-content {
-  padding: 50px 40px 100px;
+  padding: 20px 40px 100px;
   display: flex;
   flex-direction: column;
-  gap: 40px; }
+  gap: 32px; }
 
 /* Component Style */
 .wsx-drag-drop-file-upload-container {
@@ -8514,26 +6843,6 @@ code, kbd {
       background-color: #FEAD01;
       color: #ffffff; }
 
-.wsx-option-container {
-  position: absolute;
-  left: 0;
-  z-index: 10;
-  min-width: max-content;
-  width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  max-height: 60vh;
-  box-shadow: 0 2px 4px 0 rgba(78, 46, 206, 0.16); }
-
-.wsx-option-item {
-  padding: 8px;
-  cursor: pointer; }
-  .wsx-option-item:last-child {
-    border-bottom: 0; }
-  .wsx-option-item:hover, .wsx-option-item.active {
-    background-color: #6C6CFF;
-    color: #ffffff; }
-
 .wsx-selected-field-wrapper {
   width: 100%; }
   .wsx-selected-field-wrapper.wsx-multiple-field {
@@ -8713,38 +7022,6 @@ input[type=color].wsx-color-picker-input {
   .wsx-drag-item-value {
     max-width: 160px; }
 
-.wsx-pagination-wrapper {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  white-space: nowrap; }
-  .wsx-pagination-wrapper .wsx-btn {
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0; }
-    .wsx-pagination-wrapper .wsx-btn:hover {
-      background-color: #070707; }
-      .wsx-pagination-wrapper .wsx-btn:hover span {
-        color: #ffffff; }
-
-select.wsx-pagination-option-list {
-  background-color: #ffffff;
-  border: 1px solid #DCDCEE;
-  padding: 1px 36px 1px 12px;
-  border-radius: 8px;
-  color: #343A46;
-  min-height: 31px;
-  padding-top: 4px; }
-  select.wsx-pagination-option-list:focus {
-    outline: none;
-    box-shadow: none;
-    border-color: #DCDCEE;
-    color: #6C6CFF; }
-
 .wsx-toast-wrapper {
   position: fixed;
   z-index: 99999;
@@ -8869,9 +7146,18 @@ KM Start
     border-bottom: 0; }
   .wsx-side-modal-container .wsx-side-menu-content {
     overflow: auto;
-    height: 100vh; }
+    height: 70vh; }
     .wsx-side-modal-container .wsx-side-menu-content .wsx-flex-column:last-child {
       padding-bottom: 220px; }
+    .wsx-side-modal-container .wsx-side-menu-content table.wsx-table {
+      border-radius: 8px;
+      border-color: #E2E4E9;
+      overflow: hidden; }
+      .wsx-side-modal-container .wsx-side-menu-content table.wsx-table th {
+        border-color: #E2E4E9;
+        background-color: #6C6CFF;
+        color: #ffffff;
+        font-weight: 500; }
 
 .wsx-video-modal .wsx-popup-content-wrapper {
   max-width: 1120px;
@@ -9224,7 +7510,8 @@ KM End
     font-weight: 500;
     background-color: #E7E7FF; }
     .wsx-lists-table-header th {
-      background-color: #E7E7FF; }
+      background-color: #E7E7FF;
+      font-weight: 500; }
   .wsx-lists-table-column {
     padding: 20px 0;
     text-align: start;
@@ -9246,8 +7533,7 @@ KM End
       .wsx-lists-table-column-action .wsx-btn, .wsx-lists-table-column-action .wsx-3dot-wrapper {
         margin-left: auto; }
     .wsx-lists-table-column .wsx-ellipsis {
-      max-width: 12rem;
-      width: 90%; }
+      max-width: 12rem; }
     .wsx-lists-table-column a {
       color: #6C6CFF;
       text-decoration: underline; }
@@ -9316,7 +7602,9 @@ KM End
   padding: 12px 20px; }
 
 .wsx-roles-wrapper .wsx-rules-header, .wsx-roles-wrapper .wsx-rules-row {
-  grid-template-columns: 3fr repeat(2, 2fr) 1fr; }
+  grid-template-columns: 3fr 2fr 1fr; }
+  .wsx-roles-wrapper .wsx-rules-header.active, .wsx-roles-wrapper .wsx-rules-row.active {
+    grid-template-columns: 3fr repeat(2, 2fr) 1fr; }
 
 .wsx-rule-item {
   height: 100%;
@@ -9411,17 +7699,20 @@ KM End
 .wsx-shrink-0 {
   flex-shrink: 0; }
 
-.wsx-f-basis-50 {
+.wsx-basis-50 {
   flex-basis: 50%; }
 
-.wsx-f-basis-20 {
+.wsx-basis-20 {
   flex-basis: 20%; }
 
-.wsx-f-basis-17 {
+.wsx-basis-17 {
   flex-basis: 17%; }
 
-.wsx-f-basis-4 {
+.wsx-basis-4 {
   flex-basis: 4%; }
+
+.wsx-bg-text-medium {
+  background-color: #343A46; }
 
 .wsx-shadow-none {
   box-shadow: none; }
@@ -9726,7 +8017,7 @@ KM End
     padding-bottom: 32px; }
   .wsx-sm-pb-20 {
     padding-bottom: 20px; } }
-`, "",{"version":3,"sources":["webpack://./reactjs/src/assets/scss/Common.scss"],"names":[],"mappings":"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","sourcesContent":["/* Variables */\r\n// color_variables\r\n$color-primary: #6C6CFF;\r\n$color-secondary: #FEAD01;\r\n$color-tertiary: #070707;\r\n$color-light: #868C98;\r\n\r\n$color-negative: #FF2F54;\r\n$color-positive: #62C55A;\r\n$color-blue-dark: #0A0D14;\r\n$color-sky: #5CADFF;\r\n$color-orchid: #A367F0;\r\n$color-mint : #52D47F;\r\n$color-lime: #94C752;\r\n$color-pink: #ff176b;\r\n$color-indigo: #292461;\r\n$color-gray: #F6F8FA;\r\n\r\n$color-base-one: #ffffff;\r\n$color-base-two: #E7E7FF;\r\n$color-base-three: #F4F4FF;\r\n\r\n$color-text-dark: #07050b;\r\n$color-text-medium: #343A46;\r\n$color-text-light: #6B677A;\r\n$color-text-reverse: #ffffff;\r\n$color-text-body: #87858d;\r\n\r\n$color-border-primary: #E2E4E9;\r\n$color-border-secondary: #DCDCEE;\r\n$color-border-tertiary: #D5D5FA;\r\n$color-border-light: #eeeeee;\r\n\r\n$color-shadow-primary: rgba(78, 46, 206, 0.16);\r\n$color-shadow-dark: rgba(78, 46, 206, 0.161);\r\n$color-shadow-tertiary: rgba(7, 7, 7, 0.5);\r\n\r\n// border_variables\r\n$border-radius-xl: 16px;\r\n$border-radius-lg: 12px;\r\n$border-radius-md: 8px;\r\n$border-radius-sm: 4px;\r\n\r\n// button_variables\r\n$btn-font-size: 16px;\r\n$btn-font-weight: 500;\r\n$btn-line-height: 1.429em;\r\n$btn-vertical-padding: 10px;\r\n$btn-horizontal-padding: 20px;\r\n\r\n// animation_variables\r\n$transition-md: 0.3s;\r\n\r\n// typography_variables\r\n$body-font-family: 'Inter', sans-serif;\r\n$btn-font-family: 'Inter', sans-serif;\r\n\r\n$font-weight-bold: 600;\r\n$font-weight-medium: 500;\r\n$font-weight-regular: 400;\r\n\r\n\r\n@function hex-to-rgba($hex, $opacity) {\r\n    $red: red($hex);\r\n    $green: green($hex);\r\n    $blue: blue($hex);\r\n    @return rgba($red, $green, $blue, $opacity);\r\n}\r\n\r\n\r\n/* Default Style */\r\nbody {\r\n    font-family: $body-font-family;\r\n    font-size: 14px;\r\n    line-height: 1.42857em;\r\n    color: $color-text-body;\r\n}\r\n\r\na {\r\n    text-decoration: none;\r\n    color: initial;\r\n    &:hover {\r\n        color: $color-primary;\r\n    }\r\n    &:focus {\r\n        box-shadow: none;\r\n        outline: none;\r\n        color: initial;\r\n    }\r\n    &.wsx-color-primary:hover {\r\n        color: $color-secondary;\r\n    }\r\n}\r\nimg {\r\n    max-width: 100%;\r\n    height: auto;\r\n}\r\n\r\n\r\ninput,\r\ninput[type=text], \r\ninput[type=number], \r\ninput[type=email],\r\ninput[type=url],\r\ninput[type=password],\r\ntextarea, \r\n.wp-core-ui select {\r\n    outline: none;\r\n    border: 1px solid $color-border-primary;\r\n    border-radius: $border-radius-md;\r\n    box-shadow: none;\r\n    background-color: transparent;\r\n    width: 100%;\r\n    min-height: 40px;\r\n    height: 100%;\r\n    margin: 0;\r\n    padding: 0 8px;\r\n    &:focus {\r\n        outline: none;\r\n        box-shadow: none;\r\n        border-color: $color-primary;\r\n    }\r\n    &.wsx-bg-base1 {\r\n        background-color: $color-base-one;\r\n    }\r\n}\r\n.wp-core-ui select {\r\n    position: relative;\r\n    max-width: unset;\r\n    background: transparent url('../../../../assets/img/angle-down-16.svg') no-repeat right 14px top 55%;\r\n    background-size: 16px 16px;\r\n    padding: 0 32px 0 8px;\r\n}\r\ntextarea {\r\n    padding: 10px 8px;\r\n}\r\n\r\ncode, kbd {\r\n    padding: 1px 6px 2px;\r\n    background-color: $color-border-primary;\r\n    font-size: 12px;\r\n    line-height: 1.334em;\r\n    font-style: italic;\r\n    color: $color-text-medium;\r\n    margin-top: 4px;\r\n    display: block;\r\n    width: fit-content;\r\n}\r\n\r\n/* Dashboard Style */\r\n.wsx-dashboard {\r\n    display: flex;\r\n    gap: 48px;\r\n    .wsx-container-left {\r\n        flex-basis: 76%;\r\n    }\r\n    .wsx-container-right {\r\n        flex-basis: 24%;\r\n    }\r\n    &-header {\r\n        position: relative;\r\n    }\r\n}\r\n\r\n/* License Style */\r\n.wsx-upgrade-license-wrapper {\r\n    display: flex;\r\n    gap: 20px;\r\n    align-items: start;\r\n    text-align: start;\r\n    margin-top: 32px;\r\n}\r\n\r\n/* Settings Style */\r\n.wsx-settings {\r\n    &-item {\r\n        .wsx-accordion-body {\r\n            display: flex;\r\n            flex-direction: column;\r\n            gap: 30px;\r\n        }\r\n        input {\r\n            padding: 0px 16px;\r\n        }\r\n        textarea {\r\n            padding: 10px 16px;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-design_two {\r\n    .wsx-column-1fr-2fr {\r\n        display: block;\r\n    }\r\n}\r\n.wsx-design_three {\r\n    display: grid;\r\n    gap: 32px;\r\n    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));\r\n}\r\n\r\n/* Support Style */\r\n.wsx-support-form {\r\n    input, textarea {\r\n        padding: 10px 16px;\r\n    }\r\n}\r\n\r\n/* Addon Style */\r\n.wsx-addon-card-container {\r\n    width: 100%;\r\n    box-sizing: border-box;\r\n    position: relative;\r\n    background-color: $color-base-one;\r\n    box-shadow: 0px 2px 4px 0px $color-shadow-primary;\r\n    border-radius: $border-radius-lg;\r\n    \r\n    .wsx-addon-card-body {\r\n        padding: 32px 32px 90px 32px;\r\n        position: relative;\r\n    }\r\n\r\n    .wsx-addon-card-header {\r\n        img {\r\n            max-width: 48px;\r\n        }\r\n    }\r\n\r\n    .wsx-addon-card-footer {\r\n        padding: 16px 32px;\r\n        display: flex;\r\n        gap: 10px;\r\n        align-items: center;\r\n        justify-content: space-between;\r\n        border-top: 1px solid $color-border-primary;\r\n        position: absolute;\r\n        left: 0;\r\n        right: 0;\r\n        bottom: 0;\r\n        background-color: $color-base-one;\r\n        border-radius: 0 0 $border-radius-lg $border-radius-lg;\r\n    }\r\n}\r\n.wsx-pro-active-card {\r\n    border-radius: $border-radius-lg;\r\n    box-shadow: 0 1px 2px 0 $color-shadow-primary;\r\n    background-color: $color-base-one;\r\n    padding: 32px;\r\n    display: flex;\r\n    flex-wrap: wrap;\r\n    gap: 40px;\r\n    width: 90%;\r\n    max-width: 1300px;\r\n    margin: 0 auto;\r\n    &-content {\r\n        width: 34vw;\r\n        @media (max-width: 1132px) {\r\n            width: 100%;\r\n        }\r\n    }\r\n    img {\r\n        max-width: 450px;\r\n    }\r\n    @media (max-width: 1132px) {\r\n        text-align: center;\r\n        .wsx-list {\r\n            width: fit-content;\r\n        }\r\n        .wsx-btn, .wsx-list, img {\r\n            margin-left: auto;\r\n            margin-right: auto;\r\n        }\r\n    }\r\n}\r\n\r\n\r\n// Sales Card Style\r\n.wsx-sales-card {\r\n\r\n    .wsx-growth-wrapper {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 8px;\r\n        padding: 2px 6px;\r\n        border-radius: 2px;\r\n        &.wsx-color {\r\n            &-sky {\r\n                background-color: hex-to-rgba($color-sky, 0.1); \r\n            }\r\n            &-orchid {\r\n                background-color: hex-to-rgba($color-orchid, 0.1); \r\n            }\r\n            &-primary {\r\n                background-color: hex-to-rgba($color-primary, 0.1); \r\n            }\r\n            &-mint {\r\n                background-color: hex-to-rgba($color-mint, 0.1); \r\n            }\r\n            &-secondary {\r\n                background-color: hex-to-rgba($color-secondary, 0.1); \r\n            }\r\n            &-lime {\r\n                background-color: hex-to-rgba($color-lime, 0.1); \r\n            }\r\n        }\r\n    }\r\n    .wsx-sales-growth {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 8px;\r\n        margin-top: 12px;\r\n    }\r\n}\r\n\r\n// Chart Style\r\n.wsx-chart {\r\n    &-wrapper {\r\n        .wsx-card {\r\n            padding: 24px 24px 32px;\r\n        }\r\n    }\r\n    &-header {\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: space-between;\r\n        gap: 10px;\r\n        padding: 0 8px;\r\n        margin-bottom: 28px;\r\n    }\r\n    margin-left: -8px;\r\n    .recharts-cartesian-axis-ticks {\r\n        text {\r\n            transform: translateX(-8px);\r\n        }\r\n        tspan {\r\n            font-size: 12px;\r\n            line-height: 16px;\r\n            stroke: $color-text-medium;\r\n            stroke-width: 0.3;\r\n        }\r\n    }\r\n    .recharts-xAxis .recharts-cartesian-axis-ticks {\r\n        text {\r\n            transform: translateY(16px);\r\n        }\r\n        tspan {\r\n            stroke: $color-text-light;\r\n            stroke-width: 0.2;\r\n        }\r\n    }\r\n    .recharts-cartesian-axis, .recharts-cartesian-grid-horizontal {\r\n        line {\r\n            stroke: $color-border-primary;\r\n            stroke-dasharray: 0;\r\n        }\r\n    }\r\n}\r\n\r\n\r\n/* Side Menu Style  */\r\n.wsx-side-menu {\r\n    &-wrapper {\r\n        display: flex;\r\n        align-items: stretch;\r\n        border-radius: $border-radius-lg;\r\n        box-shadow: 0 2px 4px 0 $color-shadow-primary;\r\n        overflow: hidden;\r\n        white-space: nowrap;\r\n    }\r\n    &-list {\r\n        background-color: $color-base-two;\r\n        max-width: 232px;\r\n        width: 100%;\r\n    }\r\n    &-body {\r\n        background-color: $color-base-one;\r\n        width: 100%;\r\n    }\r\n    &-item {\r\n        cursor: pointer;\r\n        padding: 24px 32px;\r\n        color: $color-tertiary;\r\n        font-weight: $font-weight-medium;\r\n        border-bottom: 1px solid $color-border-tertiary;\r\n        &:hover, &.active {\r\n            background-color: $color-primary;\r\n            color: $color-text-reverse;\r\n        }\r\n        &:last-child {\r\n            margin-bottom: 100px;\r\n        }\r\n    }\r\n    &-header {\r\n        display: flex;\r\n        gap: 10px;\r\n        align-items: center;\r\n        justify-content: space-between;\r\n        padding: 16px 40px;\r\n        border-bottom: 1px solid $color-border-tertiary;\r\n    }\r\n    &-content {\r\n        padding: 50px 40px 100px;\r\n        display: flex;\r\n        flex-direction: column;\r\n        gap: 40px;\r\n    }\r\n}\r\n\r\n\r\n/* Component Style */\r\n// Drag and Drop Style\r\n.wsx-drag-drop-file {\r\n    &-upload-container {\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: center;\r\n        flex-direction: column;\r\n        gap: 4px;\r\n        border: 2px dashed $color-primary;\r\n        border-radius: $border-radius-lg;\r\n        background-color: $color-base-three;\r\n        width: auto;\r\n        max-width: 95%;\r\n        height: auto;\r\n        min-height: 195px;\r\n        padding: 16px 20px 20px;\r\n        cursor: pointer;\r\n        transition: all $transition-md;\r\n        &:hover, &.active {\r\n            background-color: $color-base-two;\r\n            .wsx-icon {\r\n                color: $color-primary;\r\n            }\r\n        }\r\n    }\r\n    &-details {\r\n        background-color: $color-gray;\r\n        border-radius: $border-radius-lg;\r\n        padding: 16px;\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: space-between;\r\n        gap: 10px;\r\n        border: 1px solid $color-border-primary;\r\n    }\r\n} \r\n\r\n\r\n// FontSize Style\r\n.wsx-font {\r\n    &-container {\r\n        display: flex;\r\n        align-items: center;\r\n        border: 1px solid $color-text-light;\r\n        border-radius: $border-radius-md;\r\n        overflow: hidden;\r\n    }\r\n    &-value {\r\n        width: 48px;\r\n        text-align: center;\r\n        font-size: 14px;\r\n        line-height: 20px;\r\n        background-color: $color-base-one;\r\n        color: $color-text-light;\r\n    }\r\n}\r\n\r\n\r\n// Custom Sales Chart Style\r\n.wsx-chart-wrapper {\r\n    margin-bottom: 40px;\r\n}\r\n\r\n.wsx-sales-chart-container {\r\n    width: 100%;\r\n}\r\n  \r\n.wsx-sales-chart-header {\r\n    align-items: center;\r\n    gap: 10px;\r\n    margin-bottom: 12px;\r\n    white-space: nowrap;\r\n    display: grid;\r\n    grid-template-columns: 1fr 2fr;\r\n}\r\n\r\n.wsx-sales-chart-legend {\r\n    display: flex;\r\n    flex-wrap: wrap;\r\n    align-items: center;\r\n    justify-content: end;\r\n    gap: 16px;\r\n}\r\n\r\n.wsx-sales-chart-wrapper {\r\n    position: relative;\r\n    width: 100%;\r\n}\r\n\r\n.wsx-sales-chart-canvas {\r\n    cursor: pointer;\r\n    border: 1px solid $color-base-two;\r\n}\r\n\r\n.wsx-sales-chart-tooltip {\r\n    position: absolute;\r\n    z-index: 10;\r\n    background-color: $color-base-one;\r\n    border: 1px solid $color-border-primary;\r\n    border-radius: $border-radius-md;\r\n    box-shadow: 0 16px 32px -16px hex-to-rgba($color-text-light, 0.1);\r\n    transform: translate(-50%, -100%);\r\n    pointer-events: none;\r\n    overflow: hidden;\r\n}\r\n\r\n.wsx-sales-chart-tooltip-date {\r\n    font-size: 12px;\r\n    color: $color-text-medium;\r\n    padding: 8px;\r\n    background-color: $color-gray;\r\n    border-bottom: 1px solid $color-border-primary;\r\n}\r\n\r\n.wsx-sales-chart-tooltip-content {\r\n    display: flex;\r\n    flex-direction: column;\r\n    gap: 8px;\r\n    padding: 12px;\r\n    background-color: $color-base-one;\r\n}\r\n\r\n.wsx-sales-chart-tooltip-item {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: space-between;\r\n    gap: 8px;\r\n    font-size: 14px;\r\n}\r\n\r\n.wsx-sales-chart-tooltip-dot {\r\n    width: 12px;\r\n    height: 12px;\r\n    border-radius: 50%;\r\n    flex-shrink: 0;\r\n}\r\n\r\n.wsx-sales-chart-tooltip-label {\r\n    font-size: 12px;\r\n    color: $color-text-light;\r\n}\r\n\r\n.wsx-sales-chart-tooltip-value {\r\n    font-weight: $font-weight-medium;\r\n    font-size: 12px;\r\n    color: $color-text-dark;\r\n}\r\n\r\n// Calendar Style \r\n.wsx-date-picker {\r\n    &-container {\r\n        width: 100%;\r\n        .react-date-picker__wrapper {\r\n            border: 1px solid $color-border-primary;\r\n            border-radius: $border-radius-md;\r\n            background-color: $color-base-one;\r\n            padding: 3.5px 16px;\r\n            input {\r\n                &[type=number] {\r\n                    border: none;\r\n                    min-height: 20px;\r\n                    border-radius: 0;\r\n                    padding: 0 4px;\r\n                    &:focus {\r\n                        border: none;\r\n                    }\r\n                }\r\n                &[type=date] {\r\n                    min-height: 20px;\r\n                }\r\n            }\r\n        }\r\n\r\n        input {\r\n            &[type=\"text\"], &:focus[type=\"text\"] {\r\n                min-width: auto;\r\n                line-height: 16px;\r\n                padding: 0 4px;\r\n                &.wsx-input {\r\n                    &-month {\r\n                        width: 34px;\r\n                        &:not(:placeholder-shown) {\r\n                            width: 24px;\r\n                        }\r\n                    }\r\n                    &-day {\r\n                        width: 26px;\r\n                    }\r\n                    &-year {\r\n                        width: 120px;\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n    &-wrapper {\r\n        justify-content: space-between;\r\n        padding: 0 8px;\r\n        .wsx-icon {\r\n            padding: 4px;\r\n            &.wsx-btn-action {\r\n                background-color: transparent;\r\n                &:hover {\r\n                    background-color: transparent;\r\n                }\r\n            }\r\n        }\r\n    }\r\n    &-calendar {\r\n        box-shadow: 0px 1px 10px 3px $color-shadow-dark;\r\n        .wsx-days {\r\n            row-gap: 0;\r\n        }\r\n        .wsx-day {\r\n            border-radius: 50%;\r\n            padding: 12px;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-date-range {\r\n    &-width-selector {\r\n        position: absolute;\r\n        top: calc(100% + 8px);\r\n        right: 0;\r\n        z-index: 9;\r\n        width: 844px;\r\n        max-width: 92%;\r\n        display: none;\r\n        justify-content: end;\r\n        @media (max-width: 617px) {\r\n            left: 0;     \r\n            margin: 0 auto;       \r\n        }\r\n    }\r\n    &-wrapper {\r\n        // position: absolute;\r\n        // top: calc(100% + 8px);\r\n        // right: 0;\r\n        // z-index: 9;\r\n        width: max-content;\r\n        max-width: 82%;\r\n        padding: 20px;\r\n        margin-bottom: 0;\r\n        // display: none;\r\n        @media (max-width: 617px) {\r\n            margin: 0 auto;\r\n        }\r\n        .screen-reader-text {\r\n            display: none;\r\n        }\r\n        .woocommerce-segmented-selection__container {\r\n            width: max-content;\r\n            background-color: $color-gray;\r\n            gap: 8px;\r\n            padding: 16px;\r\n            border-radius: $border-radius-md;\r\n            border: none;\r\n        }\r\n        .woocommerce-segmented-selection__item {\r\n            position: relative;\r\n            cursor: pointer;\r\n            border: none !important;\r\n            input {\r\n                position: absolute;\r\n                visibility: hidden;\r\n            }\r\n        }\r\n        .woocommerce-segmented-selection__input:active+label .woocommerce-segmented-selection__label {\r\n            background-color: $color-gray;\r\n        }\r\n        .woocommerce-segmented-selection__input:checked+label {\r\n            .woocommerce-segmented-selection__label {\r\n                background-color: $color-tertiary;\r\n                color: $color-text-reverse;\r\n                &::before {\r\n                    content: none;\r\n                }\r\n            }\r\n        }\r\n        .woocommerce-segmented-selection__label {\r\n            cursor: pointer;\r\n            padding: 10px 27px;\r\n            height: auto;\r\n            text-align: center;\r\n            border-radius: $border-radius-md;\r\n            background-color: $color-base-one;\r\n            color: $color-text-light;\r\n            font-size: 12px;\r\n            line-height: 1.34em;\r\n            font-weight: $font-weight-medium;\r\n            &::before {\r\n                content: none;\r\n            }\r\n        }\r\n    }\r\n    &-title {\r\n        font-weight: $font-weight-medium;\r\n        text-align: center;\r\n        // margin-bottom: 20px;\r\n    }\r\n}\r\n\r\n.active .wsx-date-range-width-selector {\r\n    display: flex;\r\n}\r\n\r\n.wsx-calendar {\r\n    &-range-wrapper {\r\n        border: 1px solid $color-tertiary;\r\n        border-radius: $border-radius-md;\r\n    }\r\n    &-header {\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: center;\r\n        padding: 12px 32px;\r\n        border-bottom: 1px solid $color-border-primary;\r\n    }\r\n    &-title {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 12px;\r\n        svg {\r\n            color: $color-blue-dark;\r\n        }\r\n    }\r\n    &-value {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 20px;\r\n        .wsx-input-wrapper-with-icon .wsx-icon {\r\n            padding: 6px;\r\n            svg {\r\n                width: 16px;\r\n                height: 16px;\r\n            }\r\n        }\r\n        input, .wsx-date-input-wrapper {\r\n            max-width: 140px;\r\n            min-height: auto;\r\n        }\r\n        @media (max-width: 756px) {\r\n            flex-direction: column;\r\n            gap: 12px;\r\n            width: fit-content;\r\n            align-items: end;\r\n        }\r\n    }\r\n    &-container {\r\n        display: flex;\r\n    }\r\n    padding: 16px 0px 12px;\r\n    margin: 0 16px;\r\n    border-top: 1px solid $color-border-primary;\r\n}\r\n.wsx-control-wrapper {\r\n    display: flex;\r\n    align-items: center;\r\n    gap: 10px;\r\n    padding: 16px 0;\r\n    margin: 0 16px;\r\n    .wsx-month {\r\n        width: 100%;\r\n        text-align: center;\r\n        font-size: 18px;\r\n        line-height: 1.4em;\r\n        font-weight: $font-weight-medium;\r\n        @media (max-width: 480px) {\r\n            font-size: 18px;\r\n        }\r\n    }\r\n    .wsx-calendar-controller {\r\n        cursor: pointer;\r\n        &:hover {\r\n            color: $color-primary;\r\n        }\r\n    }\r\n}\r\n.wsx-days-of-week,\r\n.wsx-days {\r\n    display: grid;\r\n    grid-template-columns: repeat(7, 1fr);\r\n    row-gap: 10px;\r\n}\r\n.wsx-day {\r\n    &-name {\r\n        text-align: center;\r\n        font-size: 12px;\r\n        line-height: 1.34em;\r\n        font-weight: $font-weight-medium;\r\n        text-transform: uppercase;\r\n        margin-bottom: 16px;\r\n        padding: 2px 8px;\r\n        @media (max-width: 480px) {\r\n            padding: 2px 4px;\r\n        }\r\n    }\r\n    // padding: 10px 14px;\r\n    padding: 6px 10px;\r\n    text-align: center;\r\n    font-size: 14px;\r\n    line-height: 1.34em;\r\n    color: $color-blue-dark;\r\n    @media (max-width: 480px) {\r\n        padding: 4px 6px;\r\n        font-size: 16px;\r\n    }\r\n    &.active {\r\n        cursor: pointer;\r\n        &:hover {\r\n            background-color: $color-base-three;\r\n            color: $color-text-medium;\r\n        }\r\n    }\r\n    &.in-range, &.hovered-range {\r\n        background-color: $color-base-two;\r\n        &:hover {\r\n            background-color: $color-base-two;\r\n        }\r\n    }\r\n    &.start, &.end {\r\n        background-color: $color-primary;\r\n        color: $color-text-reverse;\r\n        &:hover {\r\n            background-color: $color-primary;\r\n            color: $color-text-reverse;\r\n        }\r\n    }\r\n    &.start {\r\n        border-radius: 8px 0 0 8px;\r\n        &.end {\r\n            border-radius: 8px;\r\n        }\r\n    }\r\n    &.end {\r\n        border-radius: 0 8px 8px 0;\r\n    }\r\n\r\n    &.selected {\r\n        background-color: $color-primary;\r\n        color: $color-text-reverse;\r\n        &:hover {\r\n            background-color: $color-primary;\r\n            color: $color-text-reverse;\r\n        }\r\n    }\r\n    &.today {\r\n        background-color: $color-secondary;\r\n        color: $color-text-reverse;\r\n        &:hover {\r\n            background-color: $color-secondary;\r\n            color: $color-text-reverse;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-option {\r\n    &-container {\r\n        position: absolute;\r\n        left: 0;\r\n        z-index: 10;\r\n        min-width: max-content;\r\n        width: 100%;\r\n        overflow-x: hidden;\r\n        overflow-y: auto;\r\n        max-height: 60vh;\r\n        box-shadow: 0 2px 4px 0 $color-shadow-primary;\r\n    }\r\n    &-item {\r\n        padding: 8px;\r\n        cursor: pointer;\r\n        &:last-child {\r\n            border-bottom: 0;\r\n        }\r\n        &:hover, &.active {\r\n            background-color: $color-primary;\r\n            color: $color-text-reverse;\r\n        }\r\n    }\r\n}\r\n\r\n// Multiselect Style\r\n.wsx-selected-field-wrapper {\r\n    width: 100%;\r\n    &.wsx-multiple-field {\r\n        width: 50%;\r\n    }\r\n}\r\n\r\n// Button Style\r\n.wsx-btn {\r\n    &-group {\r\n        display: flex;\r\n        align-items: center;\r\n        &.wsx-center {\r\n            justify-content: center;\r\n            margin: 0 auto;\r\n        }\r\n    }\r\n    opacity: 1;\r\n\r\n    .wsx-icon {\r\n        &.wsx-color {\r\n            &-primary {\r\n                color: $color-primary;\r\n                &:hover {\r\n                    color: $color-secondary;\r\n                }\r\n            }\r\n            &-secondary {\r\n                color: $color-secondary;\r\n                &:hover {\r\n                    color: $color-primary;\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    &-rescale {\r\n        background-color: $color-base-two;\r\n        border: none;\r\n        color: $color-text-medium;\r\n        width: 32px;\r\n        height: 32px;\r\n        font-size: 18px;\r\n        font-weight: $font-weight-bold;\r\n        cursor: pointer;\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: center;\r\n        line-height: 0;\r\n        &-left {\r\n            border-right: 1px solid $color-text-light;\r\n        }\r\n        &-right {\r\n            border-left: 1px solid $color-text-light;\r\n        }\r\n        &:hover {\r\n            background-color: $color-tertiary;\r\n            color: $color-text-reverse;\r\n        }\r\n    }\r\n\r\n    &.wsx-color {\r\n        &-primary {\r\n            color: $color-primary;\r\n        }\r\n        &-text-medium {\r\n            color: $color-text-medium;\r\n        }\r\n        &-text-light {\r\n            color: $color-text-light;\r\n        }\r\n        &-text-reverse {\r\n            color: $color-text-reverse;\r\n        }\r\n        &-blue-dark {\r\n            color: $color-blue-dark;\r\n        }\r\n    }\r\n\r\n    &.wsx-bg {\r\n        &-primary, &-negative {\r\n            &:hover, &.active {\r\n                background-color: $color-secondary;\r\n                border-color: $color-secondary;\r\n            }\r\n        }\r\n        &-secondary {\r\n            color: $color-tertiary;\r\n            &:hover, &.active {\r\n                background-color: $color-primary;\r\n                color: $color-text-reverse;\r\n                border-color: $color-primary;\r\n            }\r\n        }\r\n        &-tertiary, &-positive {\r\n            &:hover, &.active {\r\n                background-color: $color-primary;\r\n                border-color: $color-primary;\r\n            }\r\n        }\r\n    }\r\n\r\n    &.disable {\r\n        cursor: not-allowed;\r\n        opacity: 0.4;\r\n        pointer-events: none;\r\n    }\r\n\r\n    &-action {\r\n        background-color: $color-base-three;\r\n        border-radius: $border-radius-md;\r\n        padding: 8px;\r\n        color: $color-tertiary;\r\n        line-height: 0;\r\n        transition: all $transition-md;\r\n        display: inline-flex; \r\n        align-items: center; \r\n        box-sizing: border-box;\r\n        cursor: pointer;\r\n        &:hover {\r\n            color: $color-primary;\r\n            background-color: $color-base-two;\r\n        }\r\n    }\r\n}\r\n\r\n// Color Picker Style\r\n.wsx-color-picker {\r\n    &-container {\r\n        border-radius: $border-radius-sm;\r\n        border: 1px solid $color-border-primary;\r\n        width: fit-content;\r\n        min-width: 140px;\r\n        overflow: hidden;\r\n        background-color: $color-base-one;\r\n    }\r\n    &-label {\r\n        padding: 10px 16px;\r\n        color: $color-text-medium;\r\n        text-transform: uppercase;\r\n    }\r\n}\r\ninput[type=color].wsx-color-picker-input {\r\n    outline: 0;\r\n    box-shadow: none;\r\n    padding: 0;\r\n    width: 40px;\r\n    height: 40px;\r\n    border-radius: 0;\r\n    border: 0;\r\n    border-right: 1px solid $color-border-primary;\r\n    &::-webkit-color-swatch-wrapper {\r\n        padding: 0;\r\n    }\r\n    &::-webkit-color-swatch {\r\n        border: none;\r\n    }\r\n}\r\n\r\n// Alert Modal Popup\r\n.wsx-alert {\r\n    &-popup-overlay {\r\n        position: fixed;\r\n        top: 0;\r\n        left: 0;\r\n        width: 100%;\r\n        height: 100%;\r\n        background-color: $color-shadow-primary;\r\n        display: flex;\r\n        justify-content: center;\r\n        align-items: center;\r\n        z-index: 9999;\r\n    }\r\n    &-popup {\r\n        background-color: $color-base-one;\r\n        border-radius: $border-radius-lg;\r\n        width: 90%;\r\n        max-width: 400px;\r\n        padding: 16px;\r\n        box-shadow: 0 4px 8px $color-shadow-primary;\r\n        text-align: center;\r\n        border: 1px solid $color-border-primary;\r\n    }\r\n    &-header {\r\n        display: flex;\r\n        justify-content: space-between;\r\n        align-items: center;\r\n        margin-bottom: 15px;\r\n        border-bottom: 1px solid $color-border-primary;\r\n        padding-bottom: 12px;\r\n    }\r\n    &-title-wrapper {\r\n        font-weight: $font-weight-medium;\r\n        color: $color-tertiary;\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 8px;\r\n    }\r\n    &-body {\r\n        margin-bottom: 20px;\r\n        font-size: 12px;\r\n        line-height: 16px;\r\n        text-align: left;\r\n        color: $color-text-medium;\r\n    }\r\n    &-footer {\r\n        display: flex;\r\n        justify-content: flex-end;\r\n        align-items: center;\r\n        gap: 12px;\r\n    }\r\n}\r\n \r\n\r\n.wsx-drag {\r\n    &-item {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 12px;\r\n        width: 100%;\r\n        max-height: 50px;\r\n        box-sizing: border-box;\r\n        padding: 8px 16px;\r\n        margin-bottom: 8px;\r\n        border-radius: 8px;\r\n        border: 1px solid $color-border-primary;\r\n        background-color: $color-base-one;\r\n        cursor: move;\r\n        &:last-child {\r\n            margin-bottom: 0;\r\n        }\r\n        &:hover {\r\n            border-color: $color-primary;\r\n        }\r\n        &-value {\r\n            max-width: 160px;\r\n        }\r\n    }\r\n}\r\n\r\n// Pagination Style\r\n.wsx-pagination-wrapper {\r\n    width: 100%;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: space-between;\r\n    white-space: nowrap;\r\n    .wsx-btn {\r\n        width: 30px;\r\n        height: 30px;\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: center;\r\n        padding: 0;\r\n        &:hover {\r\n            background-color: $color-tertiary;\r\n            span {\r\n                color: $color-text-reverse;\r\n            }\r\n        }\r\n    }\r\n}\r\nselect.wsx-pagination-option-list {\r\n    background-color: $color-base-one;\r\n    border: 1px solid $color-border-secondary;\r\n    padding: 1px 36px 1px 12px;\r\n    border-radius: $border-radius-md;\r\n    color: $color-text-medium;\r\n    min-height: 31px;\r\n    padding-top: 4px;\r\n    &:focus {\r\n        outline: none;\r\n        box-shadow: none;\r\n        border-color: $color-border-secondary;\r\n        color: $color-primary;\r\n    }\r\n}\r\n\r\n// Toast Message Style \r\n.wsx-toast {\r\n    &-wrapper {\r\n        position: fixed;\r\n        z-index: 99999;\r\n        top: 110px;\r\n        right: 15px;\r\n    }\r\n    &-message-wrapper {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 32px;\r\n        padding: 12px;\r\n        border-radius: 12px;\r\n        color: $color-text-reverse;\r\n        box-shadow: 0 0 12px 0 $color-shadow-tertiary;\r\n    }\r\n    &-close {\r\n        cursor: pointer;\r\n        &:hover {\r\n            color: $color-tertiary;\r\n        }\r\n    }\r\n}\r\n\r\n\r\n// ShortCode Style\r\n.wsx-shortcode-field-content {\r\n    padding: 4px;\r\n    background-color: $color-base-two;\r\n    border-radius: $border-radius-md;\r\n    border: 1px solid $color-border-tertiary;\r\n    display: flex;\r\n    align-items: center;\r\n    gap: 32px;\r\n    width: fit-content;\r\n    .wsx-icon-wrapper {\r\n        padding: 4px;\r\n        color: $color-text-reverse;\r\n        border-radius: $border-radius-sm;\r\n        background-color: $color-primary;\r\n        &:hover {\r\n            background-color: $color-secondary;\r\n        }\r\n    }\r\n    &:hover {\r\n        background-color: $color-base-three;\r\n    }\r\n}\r\n.wsx-get-shortcode-text {\r\n    color: $color-text-medium;\r\n    padding-left: 12px;\r\n}\r\n.wsx-shortcode {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: space-between;\r\n    gap: 8px;\r\n    width: 100%;\r\n    border: 1px solid $color-border-light;\r\n    border-radius: $border-radius-sm;\r\n    padding: 0 12px;\r\n    input, input:focus {\r\n        border: none;\r\n        box-shadow: none;\r\n        outline: none;\r\n        min-height: 28px;\r\n        padding: 0;\r\n    }\r\n    &-container {\r\n        height: 60vh;\r\n        overflow: auto;\r\n    }\r\n    &-item {\r\n        padding: 20px 0;\r\n        border-top: 1px solid $color-border-primary;\r\n        min-width: 860px;\r\n        grid-template-columns: 1fr 1fr 2fr;\r\n        &:last-child {\r\n            border-bottom: 1px solid $color-border-primary;\r\n        }\r\n    }\r\n    &-wrapper {\r\n        .wsx-title {\r\n            border-bottom: 1px solid $color-border-primary;\r\n        }\r\n    }\r\n    .wsx-ellipsis {\r\n        max-width: 20rem;\r\n    }\r\n}\r\n\r\n/* ========\r\nKM Start\r\n======== */\r\n\r\n// PopUp Style\r\n.wsx-popup-overlay .wsx-lists-table {\r\n    &-wrapper {\r\n        overflow: auto;\r\n        max-height: 60vh;\r\n    }\r\n    &-body {\r\n        tr {\r\n            border: 0;\r\n            td {\r\n                border-bottom: 1px solid $color-border-primary;\r\n                &:first-child {\r\n                    padding-left: 31px;\r\n                    border-left: 1px solid $color-border-primary;\r\n                }\r\n                &:last-child {\r\n                    padding-right: 31px;\r\n                    border-right: 1px solid $color-border-primary;\r\n                }\r\n            }\r\n            &:last-child {\r\n                td {\r\n                    &:first-child {\r\n                        display: block;\r\n                        border-radius: 0 0 0 $border-radius-lg;\r\n                    }\r\n                    &:last-child {\r\n                        display: block;\r\n                        border-radius: 0 0 $border-radius-lg 0;\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n.wsx-transaction-popup .wsx-card {\r\n    padding: 46px 56px;\r\n}\r\n.wsx-side-modal {\r\n    &-wrapper {\r\n        position: fixed;\r\n        top: 32px;\r\n        left: 0;\r\n        bottom: 0;\r\n        right: 0;\r\n        display: flex;\r\n        justify-content: flex-end;\r\n        z-index: 9999;\r\n        background-color: hex-to-rgba($color-tertiary, 0.6);\r\n        @media (max-width: 782px) {\r\n            top: 46px;\r\n        }\r\n    }\r\n    &-container {\r\n        width: 90%;\r\n        height: 100%;\r\n        max-width: 890px;\r\n        background-color: $color-base-one;\r\n        .wsx-side-menu-header {\r\n            background-color: $color-base-three;\r\n            border-bottom: 0;\r\n        }\r\n        .wsx-side-menu-content {\r\n            overflow: auto;\r\n            height: 100vh;\r\n            .wsx-flex-column:last-child {\r\n                padding-bottom: 220px;\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-video-modal {\r\n    .wsx-popup-content-wrapper {\r\n        max-width: 1120px;\r\n        max-height: 630px;\r\n        padding: 8px;\r\n        @media (max-width: 768px) {\r\n            width: 90%;\r\n            height: auto;\r\n        }\r\n    }\r\n    .wsx-icon-cross {\r\n        color: $color-text-reverse;\r\n        border: none;\r\n        right: -14px;\r\n        top: -14px;\r\n        padding: 5px;\r\n        background: $color-tertiary;\r\n        &:hover {\r\n            background-color: $color-negative;\r\n        }\r\n    }\r\n}\r\n\r\n\r\n/*\r\n\r\nFeatures Page Style Start\r\n\r\n*/\r\n.wsx-features-heading {\r\n    text-align: center;\r\n    margin-bottom: 48px;\r\n\r\n    .wsx-heading-text {\r\n        font-size: 24px;\r\n        font-weight: 600;\r\n        line-height: 32px;\r\n        margin-bottom: 16px;\r\n\r\n        .wsx-text-highlight {\r\n            color: $color-primary;\r\n        }\r\n    }\r\n    .wsx-sub-heading-text {\r\n        font-size: 14px;\r\n        font-weight: 400;\r\n        line-height: 20px;\r\n        color: $color-text-medium;\r\n    }\r\n}\r\n\r\n\r\n.wsx-features-section {\r\n    background-color: $color-base-two;\r\n    border-radius: 12px;\r\n    margin-top: 80px;\r\n}\r\n.wsx-feature-container {\r\n    padding: 48px 80px;\r\n}\r\n/*\r\n\r\nFeatures Page Style End\r\n\r\n\r\n\r\n*/\r\n// dynamic rules setting accordion style start\r\n.wsx-badge-style {\r\n    gap: 16px;\r\n    label#choose-box-selected {\r\n        border-color: $color-tertiary;\r\n    }\r\n    .choose-box-selected {\r\n        padding: 13px 16px;\r\n    }\r\n    .wsx-choose-box-image {\r\n        max-height: 22px;\r\n    }\r\n}\r\n\r\n.wsx-accordion-body.wsx-close {\r\n    display: none;\r\n    max-height: 0;\r\n    overflow: hidden;\r\n    transition: max-height 3s ease-in-out;\r\n}\r\n\r\n// dynamic rules setting accordion style end\r\n\r\n/* ========\r\nKM End\r\n======== */\r\n\r\n\r\n/* Common Style */\r\n.wsx-preview {\r\n    &-container {\r\n        border: 2px solid $color-border-primary;\r\n        border-radius: $border-radius-md;\r\n        width: 32vw;\r\n        max-width: 611px;\r\n    }\r\n    &-header {\r\n        padding: 12px;\r\n        text-align: center;\r\n        background-color: $color-border-primary;\r\n    }\r\n    &-body {\r\n        padding: 16px 20px 24px;\r\n    }\r\n}\r\n\r\n.wsx-profile-list {\r\n    width: 24px;\r\n    height: 24px;\r\n    color: $color-text-reverse;\r\n    background-color: $color-light;\r\n    border: 1px solid $color-base-one;\r\n    border-radius: 50%;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    font-size: 12px;\r\n    font-weight: $font-weight-medium;\r\n    text-transform: uppercase;\r\n}\r\n\r\n.wsx-hr-line {\r\n    width: 100%;\r\n    height: 1px;\r\n    background-color: $color-border-primary;\r\n}\r\n\r\n.wsx-item-divider-wrapper > {\r\n    div, span {\r\n        border-bottom: 1px solid $color-border-primary;\r\n        padding-bottom: 20px;\r\n        margin-bottom: 20px;\r\n        &:last-child {\r\n            border-bottom: 0;\r\n            padding-bottom: 0;\r\n            margin-bottom: 0;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-curser-pointer {\r\n    cursor: pointer;\r\n}\r\n\r\n.wsx-depends-message {\r\n    margin-top: 8px;\r\n    color: $color-secondary;\r\n    font-size: 14px;\r\n    a {\r\n        color: $color-primary;\r\n        font-weight: $font-weight-bold;\r\n        &:hover, &:focus, &:visited {\r\n            color: $color-positive;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-3dot {\r\n    &-wrapper {\r\n        width: 32px;\r\n        height: 32px;\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: center;\r\n        border-radius: $border-radius-md;\r\n        background-color: $color-base-three;\r\n        cursor: pointer;\r\n        transition: all $transition-md;\r\n        position: relative;\r\n        z-index: 0;\r\n        &:hover, &.active {\r\n            background-color: $color-primary;\r\n            color: $color-text-reverse;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-notification-icon {\r\n    width: 12px;\r\n    height: 12px;\r\n    border-radius: 50%;\r\n    background-color: $color-pink;\r\n    position: absolute;\r\n    top: -5px;\r\n    right: -5px;\r\n}\r\n\r\n.wsx-dashboard-counter {\r\n    width: 12px;\r\n    height: 12px;\r\n    border-radius: 50%;\r\n    background-color: $color-pink;\r\n    position: absolute;\r\n    top: -5px;\r\n    right: -5px;\r\n}\r\n\r\n.wsx-note-wrapper {\r\n    width: fit-content;\r\n    padding: 10px 16px;\r\n    border-radius: $border-radius-md;\r\n    background-color: $color-base-three;\r\n}\r\n\r\n.wsx-help-message {\r\n    font-size: 12px;\r\n    line-height: 1.334em;\r\n    color: $color-text-body;\r\n    font-style: italic;\r\n    margin-top: 6px;\r\n    white-space: normal;\r\n}\r\n\r\n// Accordion Style\r\n.wsx-accordion {\r\n    &-wrapper {\r\n        background-color: $color-gray;\r\n        border-radius: $border-radius-md;\r\n        border: 1px solid $color-border-primary;\r\n        input, select {\r\n            background-color: $color-base-one;\r\n        }\r\n        .wsx-input-label {\r\n            color: $color-text-medium;\r\n        }\r\n        &-dynamic {\r\n            display: grid;\r\n            gap: 24px;\r\n            .wsx-switch-field-wrapper, .wsx-slider-wrapper {\r\n                display: flex;\r\n                align-items: center;\r\n                max-height: 40px;\r\n                height: 100%;\r\n                @media (max-width: 768px) {\r\n                    display: block;\r\n                }\r\n            }\r\n        }\r\n    }\r\n    &-header {\r\n        .wsx-icon {\r\n            color: $color-tertiary;\r\n            svg {\r\n                transition: all $transition-md;\r\n            }\r\n            &.active svg {\r\n                transform: rotate(180deg);\r\n            }\r\n        }\r\n    }\r\n    &-title {\r\n        font-size: 16px;\r\n        line-height: 24px;\r\n        font-weight: 500;\r\n        color: $color-text-medium;\r\n    }\r\n    &-body {\r\n        padding: 32px 24px;\r\n        border-top: 1px solid $color-border-primary;\r\n    }\r\n}\r\n\r\n.wsx-tiers-fields {\r\n    margin-bottom: 8px;\r\n}\r\n.wsx-tier {\r\n    &-wrapper, &-header {\r\n        display: grid;\r\n        grid-template-columns: repeat(4, 1fr) 40px;\r\n        gap: 24px;\r\n        align-items: end;\r\n        &2 {\r\n            grid-template-columns: repeat(3, 1fr) 40px;\r\n        }\r\n    }\r\n    &-wrapper {\r\n        margin-bottom: 16px;\r\n    }\r\n    &-header {\r\n        &-item {\r\n            padding-left: 4px;\r\n            color: $color-text-medium;\r\n        }\r\n    }\r\n    &-design-settings {\r\n        padding-right: 20px;\r\n        border-right: 1px solid $color-tertiary;\r\n        display: flex;\r\n        flex-direction: column;\r\n        gap: 32px;\r\n    }\r\n}\r\n.wsx-condition-container .wsx-tier {\r\n    &-wrapper, &-header {\r\n        grid-template-columns: repeat(3, 1fr) 40px;\r\n    }\r\n}\r\n\r\n// User Roles Style\r\n.wsx-edit-role-wrapper {\r\n    color: $color-text-medium;\r\n    &.wsx-card {\r\n        padding: 32px;\r\n    }\r\n    .wsx-edit-role-container {\r\n        display: flex;\r\n        flex-direction: column;\r\n        gap: 40px;\r\n    }\r\n    .wsx-radio-field-label {\r\n        margin-bottom: 20px;\r\n    }\r\n    input, .wsx-multiselect-wrapper {\r\n        background-color: $color-base-one;\r\n    }\r\n}\r\n.wsx-role {\r\n    &-title-wrapper {\r\n        margin-bottom: -16px;\r\n    }\r\n    &-credit-wrapper {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 32px;\r\n        .wsx-input-wrapper {\r\n            width: 100%;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-regi_form_section {\r\n    padding: 20px 24px;\r\n    background-color: $color-gray;\r\n    border-radius: $border-radius-md;\r\n    border: 1px solid $color-border-primary;\r\n}\r\n.wsx-user-role-url-fields {\r\n    gap: 32px;\r\n    display: flex;\r\n    flex-wrap: wrap;\r\n    align-items: center;\r\n    padding: 20px 24px;\r\n    background-color: $color-gray;\r\n    border-radius: $border-radius-md;\r\n    border: 1px solid $color-border-primary;\r\n    .wsx-user-role-radio-field {\r\n        width: 100%;\r\n        flex-grow: 2;\r\n    }\r\n    .wsx-input-wrapper {\r\n        width: 48%;\r\n        flex-grow: 1;\r\n    }\r\n}\r\n.wsx-slider-line-container {\r\n    display: flex;\r\n    align-items: center;\r\n    gap: 40px;\r\n    flex-wrap: wrap;\r\n}\r\n\r\n// Shipping Zone Style \r\n.wsx-shipping-zone {\r\n    &-row {\r\n        gap: 40px;\r\n        display: flex;\r\n        padding: 16px 24px;\r\n        align-items: center;\r\n        border-top: 1px solid $color-border-primary;\r\n    }\r\n    &-title {\r\n        color: $color-text-medium;\r\n        min-width: 100px;\r\n        width: 18.575%;\r\n    }\r\n}\r\n\r\n\r\n// Table Style\r\n.wsx-table {\r\n    &-wrapper {\r\n        overflow: hidden;\r\n        border-radius: $border-radius-md;\r\n        box-shadow: 0 2px 4px 0 $color-shadow-primary;\r\n    }\r\n    &-container {\r\n        background-color: $color-base-one;\r\n        padding: 32px;\r\n        overflow: auto;\r\n        white-space: nowrap;\r\n    }\r\n    &-body {\r\n        color: $color-text-light;\r\n        .wsx-ellipsis {\r\n            max-width: 12rem;\r\n            display: block;\r\n        }\r\n    }\r\n    &-header, &-row {\r\n        display: grid;\r\n        padding-bottom: 32px;\r\n        width: 100%;\r\n        border-bottom: 1px solid $color-border-primary; \r\n    }\r\n    &-header {\r\n        font-weight: $font-weight-medium;\r\n        color: $color-text-medium;\r\n    }\r\n    &-row {\r\n        padding: 20px 0;\r\n        align-items: center;\r\n    }\r\n}\r\n.wsx-lists-table {\r\n    &-wrapper {\r\n        overflow-x: auto;\r\n    }\r\n    width: 100%;\r\n    overflow-y: auto;\r\n    border-spacing: 0;\r\n    border-collapse: collapse;\r\n    border-radius: $border-radius-lg;\r\n    background-color: $color-base-one;\r\n    box-shadow: 0 0px 4px 0 $color-shadow-primary;\r\n    &-header {\r\n        color: $color-text-medium;\r\n        font-weight: $font-weight-medium;\r\n        background-color: $color-base-two;\r\n        th {\r\n            background-color: $color-base-two;\r\n        }\r\n    }\r\n    &-column {\r\n        padding: 20px 0;\r\n        text-align: start;\r\n        min-width: 110px;\r\n        &:first-child {\r\n            padding-left: 32px;\r\n            border-radius: $border-radius-lg 0 0 0;\r\n        }\r\n        &:last-child {\r\n            padding-right: 32px;\r\n            border-radius: 0 $border-radius-lg 0 0;\r\n        }\r\n        &-user_id {\r\n            min-width: unset;\r\n            padding-left: 16px;\r\n            padding-right: 10px;\r\n        }\r\n        &-action {\r\n            text-align: end;\r\n            min-width: unset;\r\n            width: 32px;\r\n            .wsx-btn, .wsx-3dot-wrapper {\r\n                margin-left: auto;\r\n            }\r\n        }\r\n        .wsx-ellipsis {\r\n            max-width: 12rem;\r\n            width: 90%;\r\n        }\r\n        a {\r\n            color: $color-primary;\r\n            text-decoration: underline;\r\n            &:hover {\r\n                color: orchid;\r\n            }\r\n        }\r\n    }\r\n    &-body {\r\n        tr {\r\n            border-bottom: 1px solid $color-border-primary;\r\n            &:last-child {\r\n                border-bottom: 0;\r\n            }\r\n            &.wsx-lists-empty td {\r\n                border-radius: 0 0 $border-radius-lg $border-radius-lg;\r\n                text-align: center;\r\n            }\r\n        }\r\n        td {\r\n            background-color: $color-base-one;\r\n            &:first-child {\r\n                border-radius: 0 0 0 $border-radius-lg;\r\n            }\r\n            &:last-child {\r\n                border-radius: 0 0 $border-radius-lg 0;\r\n            }\r\n        }\r\n    }\r\n}\r\n.wsx-checkbox-column {\r\n    width: 20px;\r\n    min-width: unset;\r\n}\r\n\r\n\r\n\r\n\r\n// Rules Container\r\n.wsx-row {\r\n    &-actions-list {\r\n        padding: 8px 16px;\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 8px;\r\n        border-radius: $border-radius-md;\r\n        color: $color-text-light;\r\n        white-space: nowrap;\r\n        cursor: pointer;\r\n        &:hover {\r\n            background-color: $color-base-three;\r\n            color: $color-text-dark;\r\n        } \r\n    }\r\n    &-wrapper {\r\n        background-color: $color-base-two;\r\n        border-radius: $border-radius-lg;\r\n        padding: 20px 24px 88px;\r\n    }\r\n    &-container {\r\n        display: flex;\r\n        flex-direction: column;\r\n        gap: 12px;\r\n        overflow-y: auto;\r\n        margin-bottom: 48px;\r\n    }\r\n}\r\n\r\n.wsx-rules {\r\n    &-header, &-row {\r\n        display: grid;\r\n        grid-template-columns: 3fr .7fr repeat(3, 2fr) 1fr;\r\n        gap: 20px;\r\n        align-items: center;\r\n        width: 96.44%;\r\n        min-width: fit-content;\r\n    }\r\n    &-header {\r\n        padding: 10px 20px;\r\n        > div {\r\n            padding-right: 10px;\r\n            white-space: nowrap;\r\n        }\r\n    }\r\n    &-row {\r\n        background-color: $color-base-one;\r\n        border-radius: $border-radius-lg;\r\n        padding: 12px 20px;\r\n    }\r\n}\r\n.wsx-roles-wrapper {\r\n    .wsx-rules {\r\n        &-header, &-row {\r\n            grid-template-columns: 3fr repeat(2, 2fr) 1fr;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-rule {\r\n    &-item {\r\n        height: 100%;\r\n        max-height: 36px;\r\n        min-width: 156px;\r\n        padding: 2px 0;\r\n        padding-right: 10px;\r\n        border-right: 1px solid $color-border-secondary;\r\n        display: flex;\r\n        align-items: center;\r\n        color: $color-text-light;\r\n    }\r\n    &-checkbox-with-title {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 16px;\r\n        color: $color-tertiary;\r\n    }\r\n    &-status {\r\n        max-width: 76px;\r\n        min-width: unset;\r\n    }\r\n}\r\n\r\n\r\n.wsx-user-image {\r\n    max-width: 44px;\r\n    max-height: 44px;\r\n    border-radius: 50%;\r\n}\r\n\r\n\r\n// User List Style\r\n.wsx-user-list-wrapper {\r\n    .wsx-input-wrapper {\r\n        max-width: 250px;\r\n        background-color: $color-base-one;\r\n        width: 100%;\r\n        border-radius: $border-radius-md;\r\n    }\r\n}\r\n.wsx-user-select-container {\r\n    .wsx-input-wrapper {\r\n        max-width: 164px;\r\n        width: max-content;\r\n    }\r\n}\r\n.wsx-dropdown-actions-list {\r\n    margin-bottom: 20px;\r\n    &:last-child, &:only-child {\r\n        margin-bottom: 0;\r\n    }\r\n}\r\n\r\n// Email List Style\r\n.wsx-email-lists {\r\n    .wsx-lists-table-column {\r\n        &-email_type {\r\n            text-transform: capitalize;\r\n        }\r\n        .wsx-ellipsis {\r\n            max-width: 20rem;\r\n            width: 60%;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-row-gap {\r\n    &-48 {\r\n        row-gap: 48px;\r\n    }\r\n    &-40 {\r\n        row-gap: 40px;\r\n    }\r\n    &-32 {\r\n        row-gap: 32px;\r\n    }\r\n    &-30 {\r\n        row-gap: 30px;\r\n    }\r\n    &-24 {\r\n        row-gap: 24px;\r\n    }\r\n    &-20 {\r\n        row-gap: 20px;\r\n    }\r\n    &-16 {\r\n        row-gap: 16px;\r\n    }\r\n    &-12 {\r\n        row-gap: 12px;\r\n    }\r\n    &-8 {\r\n        row-gap: 8px;\r\n    }\r\n    &-6 {\r\n        row-gap: 6px;\r\n    }\r\n    &-4 {\r\n        row-gap: 4px;\r\n    }\r\n}\r\n\r\n.wsx-grow {\r\n    &-3 {\r\n        flex-grow: 3;\r\n    }\r\n    &-2 {\r\n        flex-grow: 2;\r\n    }\r\n    &-1 {\r\n        flex-grow: 1;\r\n    }\r\n}\r\n\r\n.wsx-shrink-0 {\r\n    flex-shrink: 0;\r\n}\r\n\r\n.wsx-f-basis {\r\n    &-50 {\r\n        flex-basis: 50%;\r\n    }\r\n    &-20 {\r\n        flex-basis: 20%;\r\n    }\r\n    &-17 {\r\n        flex-basis: 17%;\r\n    }\r\n    &-4 {\r\n        flex-basis: 4%;\r\n    }\r\n}\r\n\r\n\r\n// Shadow Style\r\n.wsx-shadow-none {\r\n    box-shadow: none;\r\n}\r\n\r\n\r\n/* Responsive style */\r\n@media (max-width: 1300px) {\r\n    .wsx-dashboard {\r\n        flex-wrap: wrap;\r\n        .wsx-container-left, .wsx-container-right {\r\n            flex-basis: 100%;\r\n        }\r\n    }\r\n    .wsx-rules-header > div {\r\n        min-width: 144px;\r\n        &.wsx-rule-checkbox-with-title {\r\n            min-width: 156px;\r\n        }\r\n        &.wsx-rule-status {\r\n            min-width: unset;\r\n        }\r\n    }\r\n}\r\n@media (max-width: 1200px) {\r\n    .wsx-rules-header > div {\r\n        min-width: 156px;\r\n    }    \r\n\r\n    .wsx-tier-design-settings {\r\n        border-right: 0;\r\n        padding-right: 0;\r\n        padding-bottom: 20px;\r\n        border-bottom: 1px solid $color-tertiary;\r\n    }\r\n    .wsx-settings-design-container {\r\n        flex-direction: column;\r\n    }\r\n    .wsx-preview-container {\r\n        width: 52vw;\r\n    }\r\n}\r\n\r\n@media (max-width: 991px) {\r\n    .wsx-chart-header {\r\n        flex-wrap: wrap;\r\n        white-space: nowrap;\r\n    }\r\n}\r\n\r\n@media (max-width: 836px) {\r\n    .wsx-side-menu {\r\n        &-wrapper {\r\n            display: block;\r\n        }\r\n        &-list {\r\n            display: flex;\r\n            overflow-y: hidden;\r\n            overflow-x: auto;\r\n            max-width: unset;\r\n        }\r\n        &-item {\r\n            padding: 16px 24px;\r\n            border-bottom: 0;\r\n            border-right: 1px solid $color-border-tertiary;\r\n            &:last-child {\r\n                border: 0;\r\n                margin: 0;\r\n            }\r\n        }\r\n        &-header {\r\n            padding: 14px 16px;\r\n        }\r\n        &-body {\r\n            .wsx-title {\r\n                font-size: 16px;\r\n            }\r\n            .wsx-btn {\r\n                padding: 8px 12px;\r\n                font-size: 13px;\r\n            }\r\n        }\r\n    }\r\n    \r\n    .wsx-lists-table-body tr.wsx-lists-empty td {\r\n        text-align: start;\r\n    }\r\n\r\n    .wsx-preview-container {\r\n        width: 74vw;\r\n    }\r\n\r\n    .wsx-slg {\r\n        &-justify-wrapper {\r\n            display: flex;\r\n            align-items: center;\r\n            flex-wrap: wrap;\r\n            gap: 20px;\r\n            justify-content: center;\r\n        }\r\n\r\n        &-flex {\r\n            &-wrap {\r\n                flex-wrap: wrap;\r\n            }\r\n        }\r\n\r\n        &-center-hz {\r\n            margin-left: auto;\r\n            margin-right: auto;\r\n        }\r\n\r\n        &-w {\r\n            &-full {\r\n                width: 100%;\r\n            }\r\n            &-half {\r\n                width: 50%;\r\n            }\r\n            &-fit {\r\n                width: fit-content;\r\n            }\r\n        }\r\n\r\n        &-p {\r\n            &-32 {\r\n                padding: 32px;\r\n            }\r\n            &-24 {\r\n                padding: 24px;\r\n            }\r\n            &-16 {\r\n                padding: 16px;\r\n            }\r\n            &-10 {\r\n                padding: 10px;\r\n            }\r\n            &-4 {\r\n                padding: 4px;\r\n            }\r\n            &-0 {\r\n                padding: 0px;\r\n            }\r\n            &t {\r\n                &-48 {\r\n                    padding-top: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-top: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-top: 20px;\r\n                }\r\n            }\r\n            &b {\r\n                &-48 {\r\n                    padding-bottom: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-bottom: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-bottom: 20px;\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@media (max-width: 768px) {\r\n    .wsx-chart-header div {\r\n        flex-wrap: wrap;\r\n        gap: 10px;\r\n    }\r\n\r\n    .wsx-tier {\r\n        &-wrapper, &-header {\r\n            grid-template-columns: repeat(4, 1fr);\r\n            gap: 12px;\r\n        }\r\n    }\r\n\r\n    .wsx-md {\r\n        &-d {\r\n            &-block {\r\n                display: block;\r\n            }\r\n            &-flex {\r\n                display: flex;\r\n            }\r\n            &-none {\r\n                display: none;\r\n            }\r\n        }\r\n        &-flex {\r\n            &-column {\r\n                flex-direction: column;\r\n            }\r\n            &-column-reverse {\r\n                flex-direction: column-reverse;\r\n            }\r\n            &-reverse {\r\n                flex-direction: row-reverse;\r\n            }\r\n        }\r\n        &-column {\r\n            &-1,\r\n            &-2,\r\n            &-3 {\r\n                display: grid;\r\n            }\r\n            &-3 {\r\n                grid-template-columns: repeat(3, 1fr);\r\n            }\r\n            &-2 {\r\n                grid-template-columns: repeat(2, 1fr);\r\n            }\r\n            &-1 {\r\n                grid-template-columns: 1fr;\r\n            }\r\n        }\r\n        &-gap {\r\n            &-48 {\r\n                gap: 48px;\r\n            }\r\n            &-40 {\r\n                gap: 40px;\r\n            }\r\n            &-32 {\r\n                gap: 32px;\r\n            }\r\n            &-30 {\r\n                gap: 30px;\r\n            }\r\n            &-24 {\r\n                gap: 24px;\r\n            }\r\n            &-20 {\r\n                gap: 20px;\r\n            }\r\n            &-16 {\r\n                gap: 16px;\r\n            }\r\n            &-12 {\r\n                gap: 12px;\r\n            }\r\n            &-8 {\r\n                gap: 8px;\r\n            }\r\n            &-6 {\r\n                gap: 6px;\r\n            }\r\n            &-4 {\r\n                gap: 4px;\r\n            }\r\n        }\r\n        &-important-gap-16 {\r\n            gap: 16px !important;\r\n        }\r\n\r\n        &-w {\r\n            &-full {\r\n                width: 100%;\r\n            }\r\n            &-half {\r\n                width: 50%;\r\n            }\r\n            &-fit {\r\n                width: fit-content;\r\n            }\r\n        }\r\n\r\n        &-p {\r\n            &-32 {\r\n                padding: 32px;\r\n            }\r\n            &-24 {\r\n                padding: 24px;\r\n            }\r\n            &-16 {\r\n                padding: 16px;\r\n            }\r\n            &-10 {\r\n                padding: 10px;\r\n            }\r\n            &-4 {\r\n                padding: 4px;\r\n            }\r\n            &-0 {\r\n                padding: 0px;\r\n            }\r\n            &t {\r\n                &-48 {\r\n                    padding-top: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-top: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-top: 20px;\r\n                }\r\n            }\r\n            &b {\r\n                &-48 {\r\n                    padding-bottom: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-bottom: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-bottom: 20px;\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n@media (max-width: 638px) {\r\n    .wsx-justify-wrapper {\r\n        flex-wrap: wrap;\r\n        gap: 20px;\r\n        justify-content: center;\r\n    }\r\n\r\n    .wsx-smd {\r\n        &-gap {\r\n            &-48 {\r\n                gap: 48px;\r\n            }\r\n            &-40 {\r\n                gap: 40px;\r\n            }\r\n            &-32 {\r\n                gap: 32px;\r\n            }\r\n            &-30 {\r\n                gap: 30px;\r\n            }\r\n            &-24 {\r\n                gap: 24px;\r\n            }\r\n            &-20 {\r\n                gap: 20px;\r\n            }\r\n            &-16 {\r\n                gap: 16px;\r\n            }\r\n            &-12 {\r\n                gap: 12px;\r\n            }\r\n            &-8 {\r\n                gap: 8px;\r\n            }\r\n            &-6 {\r\n                gap: 6px;\r\n            }\r\n            &-4 {\r\n                gap: 4px;\r\n            }\r\n        }\r\n        &-important-gap-16 {\r\n            gap: 16px !important;\r\n        }\r\n\r\n\r\n        &-p {\r\n            &-32 {\r\n                padding: 32px;\r\n            }\r\n            &-24 {\r\n                padding: 24px;\r\n            }\r\n            &-16 {\r\n                padding: 16px;\r\n            }\r\n            &-10 {\r\n                padding: 10px;\r\n            }\r\n            &-4 {\r\n                padding: 4px;\r\n            }\r\n            &-0 {\r\n                padding: 0px;\r\n            }\r\n            &t {\r\n                &-48 {\r\n                    padding-top: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-top: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-top: 20px;\r\n                }\r\n            }\r\n            &b {\r\n                &-48 {\r\n                    padding-bottom: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-bottom: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-bottom: 20px;\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n@media (max-width: 576px) {\r\n    .wsx-sales-chart-legend {\r\n        flex-direction: column;\r\n        align-items: start;\r\n        margin-left: auto;\r\n    }\r\n\r\n    .wsx-condition-container .wsx-tier {\r\n        &-wrapper {\r\n            grid-template-columns: 1fr;\r\n        }\r\n    }\r\n\r\n    .wsx-sm {\r\n        &-gap {\r\n            &-48 {\r\n                gap: 48px;\r\n            }\r\n            &-40 {\r\n                gap: 40px;\r\n            }\r\n            &-32 {\r\n                gap: 32px;\r\n            }\r\n            &-30 {\r\n                gap: 30px;\r\n            }\r\n            &-24 {\r\n                gap: 24px;\r\n            }\r\n            &-20 {\r\n                gap: 20px;\r\n            }\r\n            &-16 {\r\n                gap: 16px;\r\n            }\r\n            &-12 {\r\n                gap: 12px;\r\n            }\r\n            &-8 {\r\n                gap: 8px;\r\n            }\r\n            &-6 {\r\n                gap: 6px;\r\n            }\r\n            &-4 {\r\n                gap: 4px;\r\n            }\r\n        }\r\n        &-important-gap-16 {\r\n            gap: 16px !important;\r\n        }\r\n\r\n        &-flex {\r\n            &-column {\r\n                flex-direction: column;\r\n            }\r\n            &-column-reverse {\r\n                flex-direction: column-reverse;\r\n            }\r\n            &-reverse {\r\n                flex-direction: row-reverse;\r\n            }\r\n        }\r\n\r\n        &-m {\r\n            &-0 {\r\n                margin: 0;\r\n            }\r\n            &t {\r\n                &-0 {\r\n                    margin-top: 0;\r\n                }\r\n            }\r\n        }\r\n\r\n        &-p {\r\n            &-32 {\r\n                padding: 32px;\r\n            }\r\n            &-24 {\r\n                padding: 24px;\r\n            }\r\n            &-16 {\r\n                padding: 16px;\r\n            }\r\n            &-10 {\r\n                padding: 10px;\r\n            }\r\n            &-4 {\r\n                padding: 4px;\r\n            }\r\n            &-0 {\r\n                padding: 0px;\r\n            }\r\n            &t {\r\n                &-48 {\r\n                    padding-top: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-top: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-top: 20px;\r\n                }\r\n            }\r\n            &b {\r\n                &-48 {\r\n                    padding-bottom: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-bottom: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-bottom: 20px;\r\n                }\r\n            }\r\n        }\r\n    }\r\n}"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./reactjs/src/assets/scss/Common.scss"],"names":[],"mappings":"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","sourcesContent":["/* Variables */\r\n// color_variables\r\n$color-primary: #6C6CFF;\r\n$color-secondary: #FEAD01;\r\n$color-tertiary: #070707;\r\n$color-light: #868C98;\r\n\r\n$color-negative: #FF2F54;\r\n$color-positive: #62C55A;\r\n$color-blue-dark: #0A0D14;\r\n$color-sky: #5CADFF;\r\n$color-orchid: #A367F0;\r\n$color-mint : #52D47F;\r\n$color-lime: #94C752;\r\n$color-pink: #ff176b;\r\n$color-indigo: #292461;\r\n$color-gray: #F6F8FA;\r\n\r\n$color-base-one: #ffffff;\r\n$color-base-two: #E7E7FF;\r\n$color-base-three: #F4F4FF;\r\n\r\n$color-text-dark: #07050b;\r\n$color-text-medium: #343A46;\r\n$color-text-light: #6B677A;\r\n$color-text-reverse: #ffffff;\r\n$color-text-body: #87858d;\r\n\r\n$color-border-primary: #E2E4E9;\r\n$color-border-secondary: #DCDCEE;\r\n$color-border-tertiary: #D5D5FA;\r\n$color-border-light: #eeeeee;\r\n\r\n$color-shadow-primary: rgba(78, 46, 206, 0.16);\r\n$color-shadow-dark: rgba(78, 46, 206, 0.161);\r\n$color-shadow-tertiary: rgba(7, 7, 7, 0.5);\r\n\r\n// border_variables\r\n$border-radius-xl: 16px;\r\n$border-radius-lg: 12px;\r\n$border-radius-md: 8px;\r\n$border-radius-sm: 4px;\r\n\r\n// button_variables\r\n$btn-font-size: 16px;\r\n$btn-font-weight: 500;\r\n$btn-line-height: 1.429em;\r\n$btn-vertical-padding: 10px;\r\n$btn-horizontal-padding: 20px;\r\n\r\n// animation_variables\r\n$transition-md: 0.3s;\r\n\r\n// typography_variables\r\n$body-font-family: 'Inter', sans-serif;\r\n$btn-font-family: 'Inter', sans-serif;\r\n\r\n$font-weight-bold: 600;\r\n$font-weight-medium: 500;\r\n$font-weight-regular: 400;\r\n\r\n\r\n@function hex-to-rgba($hex, $opacity) {\r\n    $red: red($hex);\r\n    $green: green($hex);\r\n    $blue: blue($hex);\r\n    @return rgba($red, $green, $blue, $opacity);\r\n}\r\n\r\n\r\n/* Default Style */\r\nbody {\r\n    font-family: $body-font-family;\r\n    font-size: 14px;\r\n    line-height: 1.42857em;\r\n    color: $color-text-body;\r\n}\r\n\r\na {\r\n    text-decoration: none;\r\n    color: initial;\r\n    &:hover {\r\n        color: $color-primary;\r\n    }\r\n    &:focus {\r\n        box-shadow: none;\r\n        outline: none;\r\n        color: initial;\r\n    }\r\n    &.wsx-color-primary:hover {\r\n        color: $color-secondary;\r\n    }\r\n}\r\nimg {\r\n    max-width: 100%;\r\n    height: auto;\r\n}\r\n\r\n\r\ninput,\r\ninput[type=text], \r\ninput[type=number], \r\ninput[type=email],\r\ninput[type=url],\r\ninput[type=password],\r\ntextarea {\r\n    outline: none;\r\n    border: 1px solid $color-border-primary;\r\n    border-radius: $border-radius-md;\r\n    box-shadow: none;\r\n    background-color: transparent;\r\n    width: 100%;\r\n    min-height: 40px;\r\n    height: 100%;\r\n    margin: 0;\r\n    padding: 0 8px;\r\n    &:focus {\r\n        outline: none;\r\n        box-shadow: none;\r\n        border-color: $color-primary;\r\n    }\r\n    &.wsx-bg-base1 {\r\n        background-color: $color-base-one;\r\n    }\r\n}\r\n\r\ntextarea {\r\n    padding: 10px 8px;\r\n}\r\n\r\ncode, kbd {\r\n    padding: 1px 6px 2px;\r\n    background-color: $color-border-primary;\r\n    font-size: 12px;\r\n    line-height: 1.334em;\r\n    font-style: italic;\r\n    color: $color-text-medium;\r\n    margin-top: 4px;\r\n    display: block;\r\n    width: fit-content;\r\n}\r\n\r\n/* Dashboard Style */\r\n.wsx-dashboard {\r\n    display: flex;\r\n    gap: 48px;\r\n    .wsx-container-left {\r\n        flex-basis: 76%;\r\n    }\r\n    .wsx-container-right {\r\n        flex-basis: 24%;\r\n    }\r\n    &-header {\r\n        position: relative;\r\n    }\r\n}\r\n\r\n/* License Style */\r\n.wsx-upgrade-license-wrapper {\r\n    display: flex;\r\n    gap: 20px;\r\n    align-items: start;\r\n    text-align: start;\r\n    margin-top: 32px;\r\n}\r\n\r\n/* Settings Style */\r\n.wsx-settings {\r\n    &-item {\r\n        .wsx-accordion-body {\r\n            display: flex;\r\n            flex-direction: column;\r\n            gap: 30px;\r\n        }\r\n        input {\r\n            padding: 0px 16px;\r\n        }\r\n        textarea {\r\n            padding: 10px 16px;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-design_two {\r\n    .wsx-column-1fr-2fr {\r\n        display: block;\r\n    }\r\n}\r\n.wsx-design_three {\r\n    display: grid;\r\n    gap: 32px;\r\n    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));\r\n}\r\n\r\n/* Support Style */\r\n.wsx-support-form {\r\n    input, textarea {\r\n        padding: 10px 16px;\r\n    }\r\n}\r\n\r\n/* Addon Style */\r\n.wsx-addon-card-container {\r\n    width: 100%;\r\n    box-sizing: border-box;\r\n    position: relative;\r\n    background-color: $color-base-one;\r\n    box-shadow: 0px 2px 4px 0px $color-shadow-primary;\r\n    border-radius: $border-radius-lg;\r\n    \r\n    .wsx-addon-card-body {\r\n        padding: 32px 32px 90px 32px;\r\n        position: relative;\r\n    }\r\n\r\n    .wsx-addon-card-header {\r\n        img {\r\n            max-width: 48px;\r\n        }\r\n    }\r\n\r\n    .wsx-addon-card-footer {\r\n        padding: 16px 32px;\r\n        display: flex;\r\n        gap: 10px;\r\n        align-items: center;\r\n        justify-content: space-between;\r\n        border-top: 1px solid $color-border-primary;\r\n        position: absolute;\r\n        left: 0;\r\n        right: 0;\r\n        bottom: 0;\r\n        background-color: $color-base-one;\r\n        border-radius: 0 0 $border-radius-lg $border-radius-lg;\r\n    }\r\n}\r\n.wsx-pro-active-card {\r\n    border-radius: $border-radius-lg;\r\n    box-shadow: 0 1px 2px 0 $color-shadow-primary;\r\n    background-color: $color-base-one;\r\n    padding: 32px;\r\n    display: flex;\r\n    flex-wrap: wrap;\r\n    gap: 40px;\r\n    width: 90%;\r\n    max-width: 1300px;\r\n    margin: 0 auto;\r\n    &-content {\r\n        width: 34vw;\r\n        @media (max-width: 1132px) {\r\n            width: 100%;\r\n        }\r\n    }\r\n    img {\r\n        max-width: 450px;\r\n    }\r\n    @media (max-width: 1132px) {\r\n        text-align: center;\r\n        .wsx-list {\r\n            width: fit-content;\r\n        }\r\n        .wsx-btn, .wsx-list, img {\r\n            margin-left: auto;\r\n            margin-right: auto;\r\n        }\r\n    }\r\n}\r\n\r\n\r\n// Sales Card Style\r\n.wsx-sales-card {\r\n\r\n    .wsx-growth-wrapper {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 8px;\r\n        padding: 2px 6px;\r\n        border-radius: 2px;\r\n        &.wsx-color {\r\n            &-sky {\r\n                background-color: hex-to-rgba($color-sky, 0.1); \r\n            }\r\n            &-orchid {\r\n                background-color: hex-to-rgba($color-orchid, 0.1); \r\n            }\r\n            &-primary {\r\n                background-color: hex-to-rgba($color-primary, 0.1); \r\n            }\r\n            &-mint {\r\n                background-color: hex-to-rgba($color-mint, 0.1); \r\n            }\r\n            &-secondary {\r\n                background-color: hex-to-rgba($color-secondary, 0.1); \r\n            }\r\n            &-lime {\r\n                background-color: hex-to-rgba($color-lime, 0.1); \r\n            }\r\n        }\r\n    }\r\n    .wsx-sales-growth {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 8px;\r\n        margin-top: 12px;\r\n    }\r\n}\r\n\r\n// Chart Style\r\n.wsx-chart {\r\n    &-wrapper {\r\n        .wsx-card {\r\n            padding: 24px 24px 32px;\r\n        }\r\n    }\r\n    &-header {\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: space-between;\r\n        gap: 10px;\r\n        padding: 0 8px;\r\n        margin-bottom: 28px;\r\n    }\r\n    margin-left: -8px;\r\n    .recharts-cartesian-axis-ticks {\r\n        text {\r\n            transform: translateX(-8px);\r\n        }\r\n        tspan {\r\n            font-size: 12px;\r\n            line-height: 16px;\r\n            stroke: $color-text-medium;\r\n            stroke-width: 0.3;\r\n        }\r\n    }\r\n    .recharts-xAxis .recharts-cartesian-axis-ticks {\r\n        text {\r\n            transform: translateY(16px);\r\n        }\r\n        tspan {\r\n            stroke: $color-text-light;\r\n            stroke-width: 0.2;\r\n        }\r\n    }\r\n    .recharts-cartesian-axis, .recharts-cartesian-grid-horizontal {\r\n        line {\r\n            stroke: $color-border-primary;\r\n            stroke-dasharray: 0;\r\n        }\r\n    }\r\n}\r\n\r\n\r\n/* Side Menu Style  */\r\n.wsx-side-menu {\r\n    &-wrapper {\r\n        display: flex;\r\n        align-items: stretch;\r\n        border-radius: $border-radius-lg;\r\n        box-shadow: 0 2px 4px 0 $color-shadow-primary;\r\n        overflow: hidden;\r\n        white-space: nowrap;\r\n    }\r\n    &-list {\r\n        background-color: $color-base-two;\r\n        max-width: 232px;\r\n        width: 100%;\r\n    }\r\n    &-body {\r\n        background-color: $color-base-one;\r\n        width: 100%;\r\n    }\r\n    &-item {\r\n        cursor: pointer;\r\n        padding: 24px 32px;\r\n        color: $color-tertiary;\r\n        font-weight: $font-weight-medium;\r\n        border-bottom: 1px solid $color-border-tertiary;\r\n        &:hover, &.active {\r\n            background-color: $color-primary;\r\n            color: $color-text-reverse;\r\n        }\r\n        &:last-child {\r\n            margin-bottom: 100px;\r\n        }\r\n    }\r\n    &-header {\r\n        display: flex;\r\n        gap: 10px;\r\n        align-items: center;\r\n        justify-content: space-between;\r\n        padding: 16px 40px;\r\n        border-bottom: 1px solid $color-border-tertiary;\r\n    }\r\n    &-content {\r\n        padding: 20px 40px 100px;\r\n        display: flex;\r\n        flex-direction: column;\r\n        gap: 32px;\r\n    }\r\n}\r\n\r\n\r\n/* Component Style */\r\n// Drag and Drop Style\r\n.wsx-drag-drop-file {\r\n    &-upload-container {\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: center;\r\n        flex-direction: column;\r\n        gap: 4px;\r\n        border: 2px dashed $color-primary;\r\n        border-radius: $border-radius-lg;\r\n        background-color: $color-base-three;\r\n        width: auto;\r\n        max-width: 95%;\r\n        height: auto;\r\n        min-height: 195px;\r\n        padding: 16px 20px 20px;\r\n        cursor: pointer;\r\n        transition: all $transition-md;\r\n        &:hover, &.active {\r\n            background-color: $color-base-two;\r\n            .wsx-icon {\r\n                color: $color-primary;\r\n            }\r\n        }\r\n    }\r\n    &-details {\r\n        background-color: $color-gray;\r\n        border-radius: $border-radius-lg;\r\n        padding: 16px;\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: space-between;\r\n        gap: 10px;\r\n        border: 1px solid $color-border-primary;\r\n    }\r\n} \r\n\r\n\r\n// FontSize Style\r\n.wsx-font {\r\n    &-container {\r\n        display: flex;\r\n        align-items: center;\r\n        border: 1px solid $color-text-light;\r\n        border-radius: $border-radius-md;\r\n        overflow: hidden;\r\n    }\r\n    &-value {\r\n        width: 48px;\r\n        text-align: center;\r\n        font-size: 14px;\r\n        line-height: 20px;\r\n        background-color: $color-base-one;\r\n        color: $color-text-light;\r\n    }\r\n}\r\n\r\n\r\n// Custom Sales Chart Style\r\n.wsx-chart-wrapper {\r\n    margin-bottom: 40px;\r\n}\r\n\r\n.wsx-sales-chart-container {\r\n    width: 100%;\r\n}\r\n  \r\n.wsx-sales-chart-header {\r\n    align-items: center;\r\n    gap: 10px;\r\n    margin-bottom: 12px;\r\n    white-space: nowrap;\r\n    display: grid;\r\n    grid-template-columns: 1fr 2fr;\r\n}\r\n\r\n.wsx-sales-chart-legend {\r\n    display: flex;\r\n    flex-wrap: wrap;\r\n    align-items: center;\r\n    justify-content: end;\r\n    gap: 16px;\r\n}\r\n\r\n.wsx-sales-chart-wrapper {\r\n    position: relative;\r\n    width: 100%;\r\n}\r\n\r\n.wsx-sales-chart-canvas {\r\n    cursor: pointer;\r\n    border: 1px solid $color-base-two;\r\n}\r\n\r\n.wsx-sales-chart-tooltip {\r\n    position: absolute;\r\n    z-index: 10;\r\n    background-color: $color-base-one;\r\n    border: 1px solid $color-border-primary;\r\n    border-radius: $border-radius-md;\r\n    box-shadow: 0 16px 32px -16px hex-to-rgba($color-text-light, 0.1);\r\n    transform: translate(-50%, -100%);\r\n    pointer-events: none;\r\n    overflow: hidden;\r\n}\r\n\r\n.wsx-sales-chart-tooltip-date {\r\n    font-size: 12px;\r\n    color: $color-text-medium;\r\n    padding: 8px;\r\n    background-color: $color-gray;\r\n    border-bottom: 1px solid $color-border-primary;\r\n}\r\n\r\n.wsx-sales-chart-tooltip-content {\r\n    display: flex;\r\n    flex-direction: column;\r\n    gap: 8px;\r\n    padding: 12px;\r\n    background-color: $color-base-one;\r\n}\r\n\r\n.wsx-sales-chart-tooltip-item {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: space-between;\r\n    gap: 8px;\r\n    font-size: 14px;\r\n}\r\n\r\n.wsx-sales-chart-tooltip-dot {\r\n    width: 12px;\r\n    height: 12px;\r\n    border-radius: 50%;\r\n    flex-shrink: 0;\r\n}\r\n\r\n.wsx-sales-chart-tooltip-label {\r\n    font-size: 12px;\r\n    color: $color-text-light;\r\n}\r\n\r\n.wsx-sales-chart-tooltip-value {\r\n    font-weight: $font-weight-medium;\r\n    font-size: 12px;\r\n    color: $color-text-dark;\r\n}\r\n\r\n// Calendar Style \r\n.wsx-date-picker {\r\n    &-container {\r\n        width: 100%;\r\n        .react-date-picker__wrapper {\r\n            border: 1px solid $color-border-primary;\r\n            border-radius: $border-radius-md;\r\n            background-color: $color-base-one;\r\n            padding: 3.5px 16px;\r\n            input {\r\n                &[type=number] {\r\n                    border: none;\r\n                    min-height: 20px;\r\n                    border-radius: 0;\r\n                    padding: 0 4px;\r\n                    &:focus {\r\n                        border: none;\r\n                    }\r\n                }\r\n                &[type=date] {\r\n                    min-height: 20px;\r\n                }\r\n            }\r\n        }\r\n\r\n        input {\r\n            &[type=\"text\"], &:focus[type=\"text\"] {\r\n                min-width: auto;\r\n                line-height: 16px;\r\n                padding: 0 4px;\r\n                &.wsx-input {\r\n                    &-month {\r\n                        width: 34px;\r\n                        &:not(:placeholder-shown) {\r\n                            width: 24px;\r\n                        }\r\n                    }\r\n                    &-day {\r\n                        width: 26px;\r\n                    }\r\n                    &-year {\r\n                        width: 120px;\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n    &-wrapper {\r\n        justify-content: space-between;\r\n        padding: 0 8px;\r\n        .wsx-icon {\r\n            padding: 4px;\r\n            &.wsx-btn-action {\r\n                background-color: transparent;\r\n                &:hover {\r\n                    background-color: transparent;\r\n                }\r\n            }\r\n        }\r\n    }\r\n    &-calendar {\r\n        box-shadow: 0px 1px 10px 3px $color-shadow-dark;\r\n        .wsx-days {\r\n            row-gap: 0;\r\n        }\r\n        .wsx-day {\r\n            border-radius: 50%;\r\n            padding: 12px;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-date-range {\r\n    &-width-selector {\r\n        position: absolute;\r\n        top: calc(100% + 8px);\r\n        right: 0;\r\n        z-index: 9;\r\n        width: 844px;\r\n        max-width: 92%;\r\n        display: none;\r\n        justify-content: end;\r\n        @media (max-width: 617px) {\r\n            left: 0;     \r\n            margin: 0 auto;       \r\n        }\r\n    }\r\n    &-wrapper {\r\n        // position: absolute;\r\n        // top: calc(100% + 8px);\r\n        // right: 0;\r\n        // z-index: 9;\r\n        width: max-content;\r\n        max-width: 82%;\r\n        padding: 20px;\r\n        margin-bottom: 0;\r\n        // display: none;\r\n        @media (max-width: 617px) {\r\n            margin: 0 auto;\r\n        }\r\n        .screen-reader-text {\r\n            display: none;\r\n        }\r\n        .woocommerce-segmented-selection__container {\r\n            width: max-content;\r\n            background-color: $color-gray;\r\n            gap: 8px;\r\n            padding: 16px;\r\n            border-radius: $border-radius-md;\r\n            border: none;\r\n        }\r\n        .woocommerce-segmented-selection__item {\r\n            position: relative;\r\n            cursor: pointer;\r\n            border: none !important;\r\n            input {\r\n                position: absolute;\r\n                visibility: hidden;\r\n            }\r\n        }\r\n        .woocommerce-segmented-selection__input:active+label .woocommerce-segmented-selection__label {\r\n            background-color: $color-gray;\r\n        }\r\n        .woocommerce-segmented-selection__input:checked+label {\r\n            .woocommerce-segmented-selection__label {\r\n                background-color: $color-tertiary;\r\n                color: $color-text-reverse;\r\n                &::before {\r\n                    content: none;\r\n                }\r\n            }\r\n        }\r\n        .woocommerce-segmented-selection__label {\r\n            cursor: pointer;\r\n            padding: 10px 27px;\r\n            height: auto;\r\n            text-align: center;\r\n            border-radius: $border-radius-md;\r\n            background-color: $color-base-one;\r\n            color: $color-text-light;\r\n            font-size: 12px;\r\n            line-height: 1.34em;\r\n            font-weight: $font-weight-medium;\r\n            &::before {\r\n                content: none;\r\n            }\r\n        }\r\n    }\r\n    &-title {\r\n        font-weight: $font-weight-medium;\r\n        text-align: center;\r\n        // margin-bottom: 20px;\r\n    }\r\n}\r\n\r\n.active .wsx-date-range-width-selector {\r\n    display: flex;\r\n}\r\n\r\n.wsx-calendar {\r\n    &-range-wrapper {\r\n        border: 1px solid $color-tertiary;\r\n        border-radius: $border-radius-md;\r\n    }\r\n    &-header {\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: center;\r\n        padding: 12px 32px;\r\n        border-bottom: 1px solid $color-border-primary;\r\n    }\r\n    &-title {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 12px;\r\n        svg {\r\n            color: $color-blue-dark;\r\n        }\r\n    }\r\n    &-value {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 20px;\r\n        .wsx-input-wrapper-with-icon .wsx-icon {\r\n            padding: 6px;\r\n            svg {\r\n                width: 16px;\r\n                height: 16px;\r\n            }\r\n        }\r\n        input, .wsx-date-input-wrapper {\r\n            max-width: 140px;\r\n            min-height: auto;\r\n        }\r\n        @media (max-width: 756px) {\r\n            flex-direction: column;\r\n            gap: 12px;\r\n            width: fit-content;\r\n            align-items: end;\r\n        }\r\n    }\r\n    &-container {\r\n        display: flex;\r\n    }\r\n    padding: 16px 0px 12px;\r\n    margin: 0 16px;\r\n    border-top: 1px solid $color-border-primary;\r\n}\r\n.wsx-control-wrapper {\r\n    display: flex;\r\n    align-items: center;\r\n    gap: 10px;\r\n    padding: 16px 0;\r\n    margin: 0 16px;\r\n    .wsx-month {\r\n        width: 100%;\r\n        text-align: center;\r\n        font-size: 18px;\r\n        line-height: 1.4em;\r\n        font-weight: $font-weight-medium;\r\n        @media (max-width: 480px) {\r\n            font-size: 18px;\r\n        }\r\n    }\r\n    .wsx-calendar-controller {\r\n        cursor: pointer;\r\n        &:hover {\r\n            color: $color-primary;\r\n        }\r\n    }\r\n}\r\n.wsx-days-of-week,\r\n.wsx-days {\r\n    display: grid;\r\n    grid-template-columns: repeat(7, 1fr);\r\n    row-gap: 10px;\r\n}\r\n.wsx-day {\r\n    &-name {\r\n        text-align: center;\r\n        font-size: 12px;\r\n        line-height: 1.34em;\r\n        font-weight: $font-weight-medium;\r\n        text-transform: uppercase;\r\n        margin-bottom: 16px;\r\n        padding: 2px 8px;\r\n        @media (max-width: 480px) {\r\n            padding: 2px 4px;\r\n        }\r\n    }\r\n    // padding: 10px 14px;\r\n    padding: 6px 10px;\r\n    text-align: center;\r\n    font-size: 14px;\r\n    line-height: 1.34em;\r\n    color: $color-blue-dark;\r\n    @media (max-width: 480px) {\r\n        padding: 4px 6px;\r\n        font-size: 16px;\r\n    }\r\n    &.active {\r\n        cursor: pointer;\r\n        &:hover {\r\n            background-color: $color-base-three;\r\n            color: $color-text-medium;\r\n        }\r\n    }\r\n    &.in-range, &.hovered-range {\r\n        background-color: $color-base-two;\r\n        &:hover {\r\n            background-color: $color-base-two;\r\n        }\r\n    }\r\n    &.start, &.end {\r\n        background-color: $color-primary;\r\n        color: $color-text-reverse;\r\n        &:hover {\r\n            background-color: $color-primary;\r\n            color: $color-text-reverse;\r\n        }\r\n    }\r\n    &.start {\r\n        border-radius: 8px 0 0 8px;\r\n        &.end {\r\n            border-radius: 8px;\r\n        }\r\n    }\r\n    &.end {\r\n        border-radius: 0 8px 8px 0;\r\n    }\r\n\r\n    &.selected {\r\n        background-color: $color-primary;\r\n        color: $color-text-reverse;\r\n        &:hover {\r\n            background-color: $color-primary;\r\n            color: $color-text-reverse;\r\n        }\r\n    }\r\n    &.today {\r\n        background-color: $color-secondary;\r\n        color: $color-text-reverse;\r\n        &:hover {\r\n            background-color: $color-secondary;\r\n            color: $color-text-reverse;\r\n        }\r\n    }\r\n}\r\n\r\n// Multiselect Style\r\n.wsx-selected-field-wrapper {\r\n    width: 100%;\r\n    &.wsx-multiple-field {\r\n        width: 50%;\r\n    }\r\n}\r\n\r\n// Button Style\r\n.wsx-btn {\r\n    &-group {\r\n        display: flex;\r\n        align-items: center;\r\n        &.wsx-center {\r\n            justify-content: center;\r\n            margin: 0 auto;\r\n        }\r\n    }\r\n    opacity: 1;\r\n\r\n    .wsx-icon {\r\n        &.wsx-color {\r\n            &-primary {\r\n                color: $color-primary;\r\n                &:hover {\r\n                    color: $color-secondary;\r\n                }\r\n            }\r\n            &-secondary {\r\n                color: $color-secondary;\r\n                &:hover {\r\n                    color: $color-primary;\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    &-rescale {\r\n        background-color: $color-base-two;\r\n        border: none;\r\n        color: $color-text-medium;\r\n        width: 32px;\r\n        height: 32px;\r\n        font-size: 18px;\r\n        font-weight: $font-weight-bold;\r\n        cursor: pointer;\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: center;\r\n        line-height: 0;\r\n        &-left {\r\n            border-right: 1px solid $color-text-light;\r\n        }\r\n        &-right {\r\n            border-left: 1px solid $color-text-light;\r\n        }\r\n        &:hover {\r\n            background-color: $color-tertiary;\r\n            color: $color-text-reverse;\r\n        }\r\n    }\r\n\r\n    &.wsx-color {\r\n        &-primary {\r\n            color: $color-primary;\r\n        }\r\n        &-text-medium {\r\n            color: $color-text-medium;\r\n        }\r\n        &-text-light {\r\n            color: $color-text-light;\r\n        }\r\n        &-text-reverse {\r\n            color: $color-text-reverse;\r\n        }\r\n        &-blue-dark {\r\n            color: $color-blue-dark;\r\n        }\r\n    }\r\n\r\n    &.wsx-bg {\r\n        &-primary, &-negative {\r\n            &:hover, &.active {\r\n                background-color: $color-secondary;\r\n                border-color: $color-secondary;\r\n            }\r\n        }\r\n        &-secondary {\r\n            color: $color-tertiary;\r\n            &:hover, &.active {\r\n                background-color: $color-primary;\r\n                color: $color-text-reverse;\r\n                border-color: $color-primary;\r\n            }\r\n        }\r\n        &-tertiary, &-positive {\r\n            &:hover, &.active {\r\n                background-color: $color-primary;\r\n                border-color: $color-primary;\r\n            }\r\n        }\r\n    }\r\n\r\n    &.disable {\r\n        cursor: not-allowed;\r\n        opacity: 0.4;\r\n        pointer-events: none;\r\n    }\r\n\r\n    &-action {\r\n        background-color: $color-base-three;\r\n        border-radius: $border-radius-md;\r\n        padding: 8px;\r\n        color: $color-tertiary;\r\n        line-height: 0;\r\n        transition: all $transition-md;\r\n        display: inline-flex; \r\n        align-items: center; \r\n        box-sizing: border-box;\r\n        cursor: pointer;\r\n        &:hover {\r\n            color: $color-primary;\r\n            background-color: $color-base-two;\r\n        }\r\n    }\r\n}\r\n\r\n// Color Picker Style\r\n.wsx-color-picker {\r\n    &-container {\r\n        border-radius: $border-radius-sm;\r\n        border: 1px solid $color-border-primary;\r\n        width: fit-content;\r\n        min-width: 140px;\r\n        overflow: hidden;\r\n        background-color: $color-base-one;\r\n    }\r\n    &-label {\r\n        padding: 10px 16px;\r\n        color: $color-text-medium;\r\n        text-transform: uppercase;\r\n    }\r\n}\r\ninput[type=color].wsx-color-picker-input {\r\n    outline: 0;\r\n    box-shadow: none;\r\n    padding: 0;\r\n    width: 40px;\r\n    height: 40px;\r\n    border-radius: 0;\r\n    border: 0;\r\n    border-right: 1px solid $color-border-primary;\r\n    &::-webkit-color-swatch-wrapper {\r\n        padding: 0;\r\n    }\r\n    &::-webkit-color-swatch {\r\n        border: none;\r\n    }\r\n}\r\n\r\n// Alert Modal Popup\r\n.wsx-alert {\r\n    &-popup-overlay {\r\n        position: fixed;\r\n        top: 0;\r\n        left: 0;\r\n        width: 100%;\r\n        height: 100%;\r\n        background-color: $color-shadow-primary;\r\n        display: flex;\r\n        justify-content: center;\r\n        align-items: center;\r\n        z-index: 9999;\r\n    }\r\n    &-popup {\r\n        background-color: $color-base-one;\r\n        border-radius: $border-radius-lg;\r\n        width: 90%;\r\n        max-width: 400px;\r\n        padding: 16px;\r\n        box-shadow: 0 4px 8px $color-shadow-primary;\r\n        text-align: center;\r\n        border: 1px solid $color-border-primary;\r\n    }\r\n    &-header {\r\n        display: flex;\r\n        justify-content: space-between;\r\n        align-items: center;\r\n        margin-bottom: 15px;\r\n        border-bottom: 1px solid $color-border-primary;\r\n        padding-bottom: 12px;\r\n    }\r\n    &-title-wrapper {\r\n        font-weight: $font-weight-medium;\r\n        color: $color-tertiary;\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 8px;\r\n    }\r\n    &-body {\r\n        margin-bottom: 20px;\r\n        font-size: 12px;\r\n        line-height: 16px;\r\n        text-align: left;\r\n        color: $color-text-medium;\r\n    }\r\n    &-footer {\r\n        display: flex;\r\n        justify-content: flex-end;\r\n        align-items: center;\r\n        gap: 12px;\r\n    }\r\n}\r\n \r\n\r\n.wsx-drag {\r\n    &-item {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 12px;\r\n        width: 100%;\r\n        max-height: 50px;\r\n        box-sizing: border-box;\r\n        padding: 8px 16px;\r\n        margin-bottom: 8px;\r\n        border-radius: 8px;\r\n        border: 1px solid $color-border-primary;\r\n        background-color: $color-base-one;\r\n        cursor: move;\r\n        &:last-child {\r\n            margin-bottom: 0;\r\n        }\r\n        &:hover {\r\n            border-color: $color-primary;\r\n        }\r\n        &-value {\r\n            max-width: 160px;\r\n        }\r\n    }\r\n}\r\n\r\n// Toast Message Style \r\n.wsx-toast {\r\n    &-wrapper {\r\n        position: fixed;\r\n        z-index: 99999;\r\n        top: 110px;\r\n        right: 15px;\r\n    }\r\n    &-message-wrapper {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 32px;\r\n        padding: 12px;\r\n        border-radius: 12px;\r\n        color: $color-text-reverse;\r\n        box-shadow: 0 0 12px 0 $color-shadow-tertiary;\r\n    }\r\n    &-close {\r\n        cursor: pointer;\r\n        &:hover {\r\n            color: $color-tertiary;\r\n        }\r\n    }\r\n}\r\n\r\n\r\n// ShortCode Style\r\n.wsx-shortcode-field-content {\r\n    padding: 4px;\r\n    background-color: $color-base-two;\r\n    border-radius: $border-radius-md;\r\n    border: 1px solid $color-border-tertiary;\r\n    display: flex;\r\n    align-items: center;\r\n    gap: 32px;\r\n    width: fit-content;\r\n    .wsx-icon-wrapper {\r\n        padding: 4px;\r\n        color: $color-text-reverse;\r\n        border-radius: $border-radius-sm;\r\n        background-color: $color-primary;\r\n        &:hover {\r\n            background-color: $color-secondary;\r\n        }\r\n    }\r\n    &:hover {\r\n        background-color: $color-base-three;\r\n    }\r\n}\r\n.wsx-get-shortcode-text {\r\n    color: $color-text-medium;\r\n    padding-left: 12px;\r\n}\r\n.wsx-shortcode {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: space-between;\r\n    gap: 8px;\r\n    width: 100%;\r\n    border: 1px solid $color-border-light;\r\n    border-radius: $border-radius-sm;\r\n    padding: 0 12px;\r\n    input, input:focus {\r\n        border: none;\r\n        box-shadow: none;\r\n        outline: none;\r\n        min-height: 28px;\r\n        padding: 0;\r\n    }\r\n    &-container {\r\n        height: 60vh;\r\n        overflow: auto;\r\n    }\r\n    &-item {\r\n        padding: 20px 0;\r\n        border-top: 1px solid $color-border-primary;\r\n        min-width: 860px;\r\n        grid-template-columns: 1fr 1fr 2fr;\r\n        &:last-child {\r\n            border-bottom: 1px solid $color-border-primary;\r\n        }\r\n    }\r\n    &-wrapper {\r\n        .wsx-title {\r\n            border-bottom: 1px solid $color-border-primary;\r\n        }\r\n    }\r\n    .wsx-ellipsis {\r\n        max-width: 20rem;\r\n    }\r\n}\r\n\r\n/* ========\r\nKM Start\r\n======== */\r\n\r\n// PopUp Style\r\n.wsx-popup-overlay .wsx-lists-table {\r\n    &-wrapper {\r\n        overflow: auto;\r\n        max-height: 60vh;\r\n    }\r\n    &-body {\r\n        tr {\r\n            border: 0;\r\n            td {\r\n                border-bottom: 1px solid $color-border-primary;\r\n                &:first-child {\r\n                    padding-left: 31px;\r\n                    border-left: 1px solid $color-border-primary;\r\n                }\r\n                &:last-child {\r\n                    padding-right: 31px;\r\n                    border-right: 1px solid $color-border-primary;\r\n                }\r\n            }\r\n            &:last-child {\r\n                td {\r\n                    &:first-child {\r\n                        display: block;\r\n                        border-radius: 0 0 0 $border-radius-lg;\r\n                    }\r\n                    &:last-child {\r\n                        display: block;\r\n                        border-radius: 0 0 $border-radius-lg 0;\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n.wsx-transaction-popup .wsx-card {\r\n    padding: 46px 56px;\r\n}\r\n.wsx-side-modal {\r\n    &-wrapper {\r\n        position: fixed;\r\n        top: 32px;\r\n        left: 0;\r\n        bottom: 0;\r\n        right: 0;\r\n        display: flex;\r\n        justify-content: flex-end;\r\n        z-index: 9999;\r\n        background-color: hex-to-rgba($color-tertiary, 0.6);\r\n        @media (max-width: 782px) {\r\n            top: 46px;\r\n        }\r\n    }\r\n    &-container {\r\n        width: 90%;\r\n        height: 100%;\r\n        max-width: 890px;\r\n        background-color: $color-base-one;\r\n        .wsx-side-menu-header {\r\n            background-color: $color-base-three;\r\n            border-bottom: 0;\r\n        }\r\n        .wsx-side-menu-content {\r\n            overflow: auto;\r\n            height: 70vh;\r\n            .wsx-flex-column:last-child {\r\n                padding-bottom: 220px;\r\n            }\r\n            table.wsx-table {\r\n                border-radius: $border-radius-md;\r\n                border-color: $color-border-primary;\r\n                overflow: hidden;\r\n                th {\r\n                    border-color: $color-border-primary;\r\n                    background-color: $color-primary;\r\n                    color: $color-text-reverse;\r\n                    font-weight: $font-weight-medium;\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-video-modal {\r\n    .wsx-popup-content-wrapper {\r\n        max-width: 1120px;\r\n        max-height: 630px;\r\n        padding: 8px;\r\n        @media (max-width: 768px) {\r\n            width: 90%;\r\n            height: auto;\r\n        }\r\n    }\r\n    .wsx-icon-cross {\r\n        color: $color-text-reverse;\r\n        border: none;\r\n        right: -14px;\r\n        top: -14px;\r\n        padding: 5px;\r\n        background: $color-tertiary;\r\n        &:hover {\r\n            background-color: $color-negative;\r\n        }\r\n    }\r\n}\r\n\r\n\r\n/*\r\n\r\nFeatures Page Style Start\r\n\r\n*/\r\n.wsx-features-heading {\r\n    text-align: center;\r\n    margin-bottom: 48px;\r\n\r\n    .wsx-heading-text {\r\n        font-size: 24px;\r\n        font-weight: 600;\r\n        line-height: 32px;\r\n        margin-bottom: 16px;\r\n\r\n        .wsx-text-highlight {\r\n            color: $color-primary;\r\n        }\r\n    }\r\n    .wsx-sub-heading-text {\r\n        font-size: 14px;\r\n        font-weight: 400;\r\n        line-height: 20px;\r\n        color: $color-text-medium;\r\n    }\r\n}\r\n\r\n\r\n.wsx-features-section {\r\n    background-color: $color-base-two;\r\n    border-radius: 12px;\r\n    margin-top: 80px;\r\n}\r\n.wsx-feature-container {\r\n    padding: 48px 80px;\r\n}\r\n/*\r\n\r\nFeatures Page Style End\r\n\r\n\r\n\r\n*/\r\n// dynamic rules setting accordion style start\r\n.wsx-badge-style {\r\n    gap: 16px;\r\n    label#choose-box-selected {\r\n        border-color: $color-tertiary;\r\n    }\r\n    .choose-box-selected {\r\n        padding: 13px 16px;\r\n    }\r\n    .wsx-choose-box-image {\r\n        max-height: 22px;\r\n    }\r\n}\r\n\r\n.wsx-accordion-body.wsx-close {\r\n    display: none;\r\n    max-height: 0;\r\n    overflow: hidden;\r\n    transition: max-height 3s ease-in-out;\r\n}\r\n\r\n// dynamic rules setting accordion style end\r\n\r\n/* ========\r\nKM End\r\n======== */\r\n\r\n\r\n/* Common Style */\r\n.wsx-preview {\r\n    &-container {\r\n        border: 2px solid $color-border-primary;\r\n        border-radius: $border-radius-md;\r\n        width: 32vw;\r\n        max-width: 611px;\r\n    }\r\n    &-header {\r\n        padding: 12px;\r\n        text-align: center;\r\n        background-color: $color-border-primary;\r\n    }\r\n    &-body {\r\n        padding: 16px 20px 24px;\r\n    }\r\n}\r\n\r\n.wsx-profile-list {\r\n    width: 24px;\r\n    height: 24px;\r\n    color: $color-text-reverse;\r\n    background-color: $color-light;\r\n    border: 1px solid $color-base-one;\r\n    border-radius: 50%;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    font-size: 12px;\r\n    font-weight: $font-weight-medium;\r\n    text-transform: uppercase;\r\n}\r\n\r\n.wsx-hr-line {\r\n    width: 100%;\r\n    height: 1px;\r\n    background-color: $color-border-primary;\r\n}\r\n\r\n.wsx-item-divider-wrapper > {\r\n    div, span {\r\n        border-bottom: 1px solid $color-border-primary;\r\n        padding-bottom: 20px;\r\n        margin-bottom: 20px;\r\n        &:last-child {\r\n            border-bottom: 0;\r\n            padding-bottom: 0;\r\n            margin-bottom: 0;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-curser-pointer {\r\n    cursor: pointer;\r\n}\r\n\r\n.wsx-depends-message {\r\n    margin-top: 8px;\r\n    color: $color-secondary;\r\n    font-size: 14px;\r\n    a {\r\n        color: $color-primary;\r\n        font-weight: $font-weight-bold;\r\n        &:hover, &:focus, &:visited {\r\n            color: $color-positive;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-3dot {\r\n    &-wrapper {\r\n        width: 32px;\r\n        height: 32px;\r\n        display: flex;\r\n        align-items: center;\r\n        justify-content: center;\r\n        border-radius: $border-radius-md;\r\n        background-color: $color-base-three;\r\n        cursor: pointer;\r\n        transition: all $transition-md;\r\n        position: relative;\r\n        z-index: 0;\r\n        &:hover, &.active {\r\n            background-color: $color-primary;\r\n            color: $color-text-reverse;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-notification-icon {\r\n    width: 12px;\r\n    height: 12px;\r\n    border-radius: 50%;\r\n    background-color: $color-pink;\r\n    position: absolute;\r\n    top: -5px;\r\n    right: -5px;\r\n}\r\n\r\n.wsx-dashboard-counter {\r\n    width: 12px;\r\n    height: 12px;\r\n    border-radius: 50%;\r\n    background-color: $color-pink;\r\n    position: absolute;\r\n    top: -5px;\r\n    right: -5px;\r\n}\r\n\r\n.wsx-note-wrapper {\r\n    width: fit-content;\r\n    padding: 10px 16px;\r\n    border-radius: $border-radius-md;\r\n    background-color: $color-base-three;\r\n}\r\n\r\n.wsx-help-message {\r\n    font-size: 12px;\r\n    line-height: 1.334em;\r\n    color: $color-text-body;\r\n    font-style: italic;\r\n    margin-top: 6px;\r\n    white-space: normal;\r\n}\r\n\r\n// Accordion Style\r\n.wsx-accordion {\r\n    &-wrapper {\r\n        background-color: $color-gray;\r\n        border-radius: $border-radius-md;\r\n        border: 1px solid $color-border-primary;\r\n        input, select {\r\n            background-color: $color-base-one;\r\n        }\r\n        .wsx-input-label {\r\n            color: $color-text-medium;\r\n        }\r\n        &-dynamic {\r\n            display: grid;\r\n            gap: 24px;\r\n            .wsx-switch-field-wrapper, .wsx-slider-wrapper {\r\n                display: flex;\r\n                align-items: center;\r\n                max-height: 40px;\r\n                height: 100%;\r\n                @media (max-width: 768px) {\r\n                    display: block;\r\n                }\r\n            }\r\n        }\r\n    }\r\n    &-header {\r\n        .wsx-icon {\r\n            color: $color-tertiary;\r\n            svg {\r\n                transition: all $transition-md;\r\n            }\r\n            &.active svg {\r\n                transform: rotate(180deg);\r\n            }\r\n        }\r\n    }\r\n    &-title {\r\n        font-size: 16px;\r\n        line-height: 24px;\r\n        font-weight: 500;\r\n        color: $color-text-medium;\r\n    }\r\n    &-body {\r\n        padding: 32px 24px;\r\n        border-top: 1px solid $color-border-primary;\r\n    }\r\n}\r\n\r\n.wsx-tiers-fields {\r\n    margin-bottom: 8px;\r\n}\r\n.wsx-tier {\r\n    &-wrapper, &-header {\r\n        display: grid;\r\n        grid-template-columns: repeat(4, 1fr) 40px;\r\n        gap: 24px;\r\n        align-items: end;\r\n        &2 {\r\n            grid-template-columns: repeat(3, 1fr) 40px;\r\n        }\r\n    }\r\n    &-wrapper {\r\n        margin-bottom: 16px;\r\n    }\r\n    &-header {\r\n        &-item {\r\n            padding-left: 4px;\r\n            color: $color-text-medium;\r\n        }\r\n    }\r\n    &-design-settings {\r\n        padding-right: 20px;\r\n        border-right: 1px solid $color-tertiary;\r\n        display: flex;\r\n        flex-direction: column;\r\n        gap: 32px;\r\n    }\r\n}\r\n.wsx-condition-container .wsx-tier {\r\n    &-wrapper, &-header {\r\n        grid-template-columns: repeat(3, 1fr) 40px;\r\n    }\r\n}\r\n\r\n// User Roles Style\r\n.wsx-edit-role-wrapper {\r\n    color: $color-text-medium;\r\n    &.wsx-card {\r\n        padding: 32px;\r\n    }\r\n    .wsx-edit-role-container {\r\n        display: flex;\r\n        flex-direction: column;\r\n        gap: 40px;\r\n    }\r\n    .wsx-radio-field-label {\r\n        margin-bottom: 20px;\r\n    }\r\n    input, .wsx-multiselect-wrapper {\r\n        background-color: $color-base-one;\r\n    }\r\n}\r\n.wsx-role {\r\n    &-title-wrapper {\r\n        margin-bottom: -16px;\r\n    }\r\n    &-credit-wrapper {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 32px;\r\n        .wsx-input-wrapper {\r\n            width: 100%;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-regi_form_section {\r\n    padding: 20px 24px;\r\n    background-color: $color-gray;\r\n    border-radius: $border-radius-md;\r\n    border: 1px solid $color-border-primary;\r\n}\r\n.wsx-user-role-url-fields {\r\n    gap: 32px;\r\n    display: flex;\r\n    flex-wrap: wrap;\r\n    align-items: center;\r\n    padding: 20px 24px;\r\n    background-color: $color-gray;\r\n    border-radius: $border-radius-md;\r\n    border: 1px solid $color-border-primary;\r\n    .wsx-user-role-radio-field {\r\n        width: 100%;\r\n        flex-grow: 2;\r\n    }\r\n    .wsx-input-wrapper {\r\n        width: 48%;\r\n        flex-grow: 1;\r\n    }\r\n}\r\n.wsx-slider-line-container {\r\n    display: flex;\r\n    align-items: center;\r\n    gap: 40px;\r\n    flex-wrap: wrap;\r\n}\r\n\r\n// Shipping Zone Style \r\n.wsx-shipping-zone {\r\n    &-row {\r\n        gap: 40px;\r\n        display: flex;\r\n        padding: 16px 24px;\r\n        align-items: center;\r\n        border-top: 1px solid $color-border-primary;\r\n    }\r\n    &-title {\r\n        color: $color-text-medium;\r\n        min-width: 100px;\r\n        width: 18.575%;\r\n    }\r\n}\r\n\r\n\r\n// Table Style\r\n.wsx-table {\r\n    &-wrapper {\r\n        overflow: hidden;\r\n        border-radius: $border-radius-md;\r\n        box-shadow: 0 2px 4px 0 $color-shadow-primary;\r\n    }\r\n    &-container {\r\n        background-color: $color-base-one;\r\n        padding: 32px;\r\n        overflow: auto;\r\n        white-space: nowrap;\r\n    }\r\n    &-body {\r\n        color: $color-text-light;\r\n        .wsx-ellipsis {\r\n            max-width: 12rem;\r\n            display: block;\r\n        }\r\n    }\r\n    &-header, &-row {\r\n        display: grid;\r\n        padding-bottom: 32px;\r\n        width: 100%;\r\n        border-bottom: 1px solid $color-border-primary; \r\n    }\r\n    &-header {\r\n        font-weight: $font-weight-medium;\r\n        color: $color-text-medium;\r\n    }\r\n    &-row {\r\n        padding: 20px 0;\r\n        align-items: center;\r\n    }\r\n}\r\n.wsx-lists-table {\r\n    &-wrapper {\r\n        overflow-x: auto;\r\n    }\r\n    width: 100%;\r\n    overflow-y: auto;\r\n    border-spacing: 0;\r\n    border-collapse: collapse;\r\n    border-radius: $border-radius-lg;\r\n    background-color: $color-base-one;\r\n    box-shadow: 0 0px 4px 0 $color-shadow-primary;\r\n    &-header {\r\n        color: $color-text-medium;\r\n        font-weight: $font-weight-medium;\r\n        background-color: $color-base-two;\r\n        th {\r\n            background-color: $color-base-two;\r\n            font-weight: $font-weight-medium;\r\n        }\r\n    }\r\n    &-column {\r\n        padding: 20px 0;\r\n        text-align: start;\r\n        min-width: 110px;\r\n        &:first-child {\r\n            padding-left: 32px;\r\n            border-radius: $border-radius-lg 0 0 0;\r\n        }\r\n        &:last-child {\r\n            padding-right: 32px;\r\n            border-radius: 0 $border-radius-lg 0 0;\r\n        }\r\n        &-user_id {\r\n            min-width: unset;\r\n            padding-left: 16px;\r\n            padding-right: 10px;\r\n        }\r\n        &-action {\r\n            text-align: end;\r\n            min-width: unset;\r\n            width: 32px;\r\n            .wsx-btn, .wsx-3dot-wrapper {\r\n                margin-left: auto;\r\n            }\r\n        }\r\n        .wsx-ellipsis {\r\n            max-width: 12rem;\r\n        }\r\n        a {\r\n            color: $color-primary;\r\n            text-decoration: underline;\r\n            &:hover {\r\n                color: orchid;\r\n            }\r\n        }\r\n    }\r\n    &-body {\r\n        tr {\r\n            border-bottom: 1px solid $color-border-primary;\r\n            &:last-child {\r\n                border-bottom: 0;\r\n            }\r\n            &.wsx-lists-empty td {\r\n                border-radius: 0 0 $border-radius-lg $border-radius-lg;\r\n                text-align: center;\r\n            }\r\n        }\r\n        td {\r\n            background-color: $color-base-one;\r\n            &:first-child {\r\n                border-radius: 0 0 0 $border-radius-lg;\r\n            }\r\n            &:last-child {\r\n                border-radius: 0 0 $border-radius-lg 0;\r\n            }\r\n        }\r\n    }\r\n}\r\n.wsx-checkbox-column {\r\n    width: 20px;\r\n    min-width: unset;\r\n}\r\n\r\n\r\n\r\n\r\n// Rules Container\r\n.wsx-row {\r\n    &-actions-list {\r\n        padding: 8px 16px;\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 8px;\r\n        border-radius: $border-radius-md;\r\n        color: $color-text-light;\r\n        white-space: nowrap;\r\n        cursor: pointer;\r\n        &:hover {\r\n            background-color: $color-base-three;\r\n            color: $color-text-dark;\r\n        } \r\n    }\r\n    &-wrapper {\r\n        background-color: $color-base-two;\r\n        border-radius: $border-radius-lg;\r\n        padding: 20px 24px 88px;\r\n    }\r\n    &-container {\r\n        display: flex;\r\n        flex-direction: column;\r\n        gap: 12px;\r\n        overflow-y: auto;\r\n        margin-bottom: 48px;\r\n    }\r\n}\r\n\r\n.wsx-rules {\r\n    &-header, &-row {\r\n        display: grid;\r\n        grid-template-columns: 3fr .7fr repeat(3, 2fr) 1fr;\r\n        gap: 20px;\r\n        align-items: center;\r\n        width: 96.44%;\r\n        min-width: fit-content;\r\n    }\r\n    &-header {\r\n        padding: 10px 20px;\r\n        > div {\r\n            padding-right: 10px;\r\n            white-space: nowrap;\r\n        }\r\n    }\r\n    &-row {\r\n        background-color: $color-base-one;\r\n        border-radius: $border-radius-lg;\r\n        padding: 12px 20px;\r\n    }\r\n}\r\n.wsx-roles-wrapper {\r\n    .wsx-rules {\r\n        &-header, &-row {\r\n            &.active {\r\n                grid-template-columns: 3fr repeat(2, 2fr) 1fr;\r\n            }\r\n            grid-template-columns: 3fr 2fr 1fr;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-rule {\r\n    &-item {\r\n        height: 100%;\r\n        max-height: 36px;\r\n        min-width: 156px;\r\n        padding: 2px 0;\r\n        padding-right: 10px;\r\n        border-right: 1px solid $color-border-secondary;\r\n        display: flex;\r\n        align-items: center;\r\n        color: $color-text-light;\r\n    }\r\n    &-checkbox-with-title {\r\n        display: flex;\r\n        align-items: center;\r\n        gap: 16px;\r\n        color: $color-tertiary;\r\n    }\r\n    &-status {\r\n        max-width: 76px;\r\n        min-width: unset;\r\n    }\r\n}\r\n\r\n\r\n.wsx-user-image {\r\n    max-width: 44px;\r\n    max-height: 44px;\r\n    border-radius: 50%;\r\n}\r\n\r\n\r\n// User List Style\r\n.wsx-user-list-wrapper {\r\n    .wsx-input-wrapper {\r\n        max-width: 250px;\r\n        background-color: $color-base-one;\r\n        width: 100%;\r\n        border-radius: $border-radius-md;\r\n    }\r\n}\r\n.wsx-user-select-container {\r\n    .wsx-input-wrapper {\r\n        max-width: 164px;\r\n        width: max-content;\r\n    }\r\n}\r\n.wsx-dropdown-actions-list {\r\n    margin-bottom: 20px;\r\n    &:last-child, &:only-child {\r\n        margin-bottom: 0;\r\n    }\r\n}\r\n\r\n// Email List Style\r\n.wsx-email-lists {\r\n    .wsx-lists-table-column {\r\n        &-email_type {\r\n            text-transform: capitalize;\r\n        }\r\n        .wsx-ellipsis {\r\n            max-width: 20rem;\r\n            width: 60%;\r\n        }\r\n    }\r\n}\r\n\r\n.wsx-row-gap {\r\n    &-48 {\r\n        row-gap: 48px;\r\n    }\r\n    &-40 {\r\n        row-gap: 40px;\r\n    }\r\n    &-32 {\r\n        row-gap: 32px;\r\n    }\r\n    &-30 {\r\n        row-gap: 30px;\r\n    }\r\n    &-24 {\r\n        row-gap: 24px;\r\n    }\r\n    &-20 {\r\n        row-gap: 20px;\r\n    }\r\n    &-16 {\r\n        row-gap: 16px;\r\n    }\r\n    &-12 {\r\n        row-gap: 12px;\r\n    }\r\n    &-8 {\r\n        row-gap: 8px;\r\n    }\r\n    &-6 {\r\n        row-gap: 6px;\r\n    }\r\n    &-4 {\r\n        row-gap: 4px;\r\n    }\r\n}\r\n\r\n.wsx-grow {\r\n    &-3 {\r\n        flex-grow: 3;\r\n    }\r\n    &-2 {\r\n        flex-grow: 2;\r\n    }\r\n    &-1 {\r\n        flex-grow: 1;\r\n    }\r\n}\r\n\r\n.wsx-shrink-0 {\r\n    flex-shrink: 0;\r\n}\r\n\r\n.wsx-basis {\r\n    &-50 {\r\n        flex-basis: 50%;\r\n    }\r\n    &-20 {\r\n        flex-basis: 20%;\r\n    }\r\n    &-17 {\r\n        flex-basis: 17%;\r\n    }\r\n    &-4 {\r\n        flex-basis: 4%;\r\n    }\r\n}\r\n\r\n.wsx-bg-text-medium {\r\n    background-color: $color-text-medium;\r\n}\r\n\r\n\r\n// Shadow Style\r\n.wsx-shadow-none {\r\n    box-shadow: none;\r\n}\r\n\r\n\r\n/* Responsive style */\r\n@media (max-width: 1300px) {\r\n    .wsx-dashboard {\r\n        flex-wrap: wrap;\r\n        .wsx-container-left, .wsx-container-right {\r\n            flex-basis: 100%;\r\n        }\r\n    }\r\n    .wsx-rules-header > div {\r\n        min-width: 144px;\r\n        &.wsx-rule-checkbox-with-title {\r\n            min-width: 156px;\r\n        }\r\n        &.wsx-rule-status {\r\n            min-width: unset;\r\n        }\r\n    }\r\n}\r\n@media (max-width: 1200px) {\r\n    .wsx-rules-header > div {\r\n        min-width: 156px;\r\n    }    \r\n\r\n    .wsx-tier-design-settings {\r\n        border-right: 0;\r\n        padding-right: 0;\r\n        padding-bottom: 20px;\r\n        border-bottom: 1px solid $color-tertiary;\r\n    }\r\n    .wsx-settings-design-container {\r\n        flex-direction: column;\r\n    }\r\n    .wsx-preview-container {\r\n        width: 52vw;\r\n    }\r\n}\r\n\r\n@media (max-width: 991px) {\r\n    .wsx-chart-header {\r\n        flex-wrap: wrap;\r\n        white-space: nowrap;\r\n    }\r\n}\r\n\r\n@media (max-width: 836px) {\r\n    .wsx-side-menu {\r\n        &-wrapper {\r\n            display: block;\r\n        }\r\n        &-list {\r\n            display: flex;\r\n            overflow-y: hidden;\r\n            overflow-x: auto;\r\n            max-width: unset;\r\n        }\r\n        &-item {\r\n            padding: 16px 24px;\r\n            border-bottom: 0;\r\n            border-right: 1px solid $color-border-tertiary;\r\n            &:last-child {\r\n                border: 0;\r\n                margin: 0;\r\n            }\r\n        }\r\n        &-header {\r\n            padding: 14px 16px;\r\n        }\r\n        &-body {\r\n            .wsx-title {\r\n                font-size: 16px;\r\n            }\r\n            .wsx-btn {\r\n                padding: 8px 12px;\r\n                font-size: 13px;\r\n            }\r\n        }\r\n    }\r\n    \r\n    .wsx-lists-table-body tr.wsx-lists-empty td {\r\n        text-align: start;\r\n    }\r\n\r\n    .wsx-preview-container {\r\n        width: 74vw;\r\n    }\r\n\r\n    .wsx-slg {\r\n        &-justify-wrapper {\r\n            display: flex;\r\n            align-items: center;\r\n            flex-wrap: wrap;\r\n            gap: 20px;\r\n            justify-content: center;\r\n        }\r\n\r\n        &-flex {\r\n            &-wrap {\r\n                flex-wrap: wrap;\r\n            }\r\n        }\r\n\r\n        &-center-hz {\r\n            margin-left: auto;\r\n            margin-right: auto;\r\n        }\r\n\r\n        &-w {\r\n            &-full {\r\n                width: 100%;\r\n            }\r\n            &-half {\r\n                width: 50%;\r\n            }\r\n            &-fit {\r\n                width: fit-content;\r\n            }\r\n        }\r\n\r\n        &-p {\r\n            &-32 {\r\n                padding: 32px;\r\n            }\r\n            &-24 {\r\n                padding: 24px;\r\n            }\r\n            &-16 {\r\n                padding: 16px;\r\n            }\r\n            &-10 {\r\n                padding: 10px;\r\n            }\r\n            &-4 {\r\n                padding: 4px;\r\n            }\r\n            &-0 {\r\n                padding: 0px;\r\n            }\r\n            &t {\r\n                &-48 {\r\n                    padding-top: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-top: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-top: 20px;\r\n                }\r\n            }\r\n            &b {\r\n                &-48 {\r\n                    padding-bottom: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-bottom: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-bottom: 20px;\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@media (max-width: 768px) {\r\n    .wsx-chart-header div {\r\n        flex-wrap: wrap;\r\n        gap: 10px;\r\n    }\r\n\r\n    .wsx-tier {\r\n        &-wrapper, &-header {\r\n            grid-template-columns: repeat(4, 1fr);\r\n            gap: 12px;\r\n        }\r\n    }\r\n\r\n    .wsx-md {\r\n        &-d {\r\n            &-block {\r\n                display: block;\r\n            }\r\n            &-flex {\r\n                display: flex;\r\n            }\r\n            &-none {\r\n                display: none;\r\n            }\r\n        }\r\n        &-flex {\r\n            &-column {\r\n                flex-direction: column;\r\n            }\r\n            &-column-reverse {\r\n                flex-direction: column-reverse;\r\n            }\r\n            &-reverse {\r\n                flex-direction: row-reverse;\r\n            }\r\n        }\r\n        &-column {\r\n            &-1,\r\n            &-2,\r\n            &-3 {\r\n                display: grid;\r\n            }\r\n            &-3 {\r\n                grid-template-columns: repeat(3, 1fr);\r\n            }\r\n            &-2 {\r\n                grid-template-columns: repeat(2, 1fr);\r\n            }\r\n            &-1 {\r\n                grid-template-columns: 1fr;\r\n            }\r\n        }\r\n        &-gap {\r\n            &-48 {\r\n                gap: 48px;\r\n            }\r\n            &-40 {\r\n                gap: 40px;\r\n            }\r\n            &-32 {\r\n                gap: 32px;\r\n            }\r\n            &-30 {\r\n                gap: 30px;\r\n            }\r\n            &-24 {\r\n                gap: 24px;\r\n            }\r\n            &-20 {\r\n                gap: 20px;\r\n            }\r\n            &-16 {\r\n                gap: 16px;\r\n            }\r\n            &-12 {\r\n                gap: 12px;\r\n            }\r\n            &-8 {\r\n                gap: 8px;\r\n            }\r\n            &-6 {\r\n                gap: 6px;\r\n            }\r\n            &-4 {\r\n                gap: 4px;\r\n            }\r\n        }\r\n        &-important-gap-16 {\r\n            gap: 16px !important;\r\n        }\r\n\r\n        &-w {\r\n            &-full {\r\n                width: 100%;\r\n            }\r\n            &-half {\r\n                width: 50%;\r\n            }\r\n            &-fit {\r\n                width: fit-content;\r\n            }\r\n        }\r\n\r\n        &-p {\r\n            &-32 {\r\n                padding: 32px;\r\n            }\r\n            &-24 {\r\n                padding: 24px;\r\n            }\r\n            &-16 {\r\n                padding: 16px;\r\n            }\r\n            &-10 {\r\n                padding: 10px;\r\n            }\r\n            &-4 {\r\n                padding: 4px;\r\n            }\r\n            &-0 {\r\n                padding: 0px;\r\n            }\r\n            &t {\r\n                &-48 {\r\n                    padding-top: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-top: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-top: 20px;\r\n                }\r\n            }\r\n            &b {\r\n                &-48 {\r\n                    padding-bottom: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-bottom: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-bottom: 20px;\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n@media (max-width: 638px) {\r\n    .wsx-justify-wrapper {\r\n        flex-wrap: wrap;\r\n        gap: 20px;\r\n        justify-content: center;\r\n    }\r\n\r\n    .wsx-smd {\r\n        &-gap {\r\n            &-48 {\r\n                gap: 48px;\r\n            }\r\n            &-40 {\r\n                gap: 40px;\r\n            }\r\n            &-32 {\r\n                gap: 32px;\r\n            }\r\n            &-30 {\r\n                gap: 30px;\r\n            }\r\n            &-24 {\r\n                gap: 24px;\r\n            }\r\n            &-20 {\r\n                gap: 20px;\r\n            }\r\n            &-16 {\r\n                gap: 16px;\r\n            }\r\n            &-12 {\r\n                gap: 12px;\r\n            }\r\n            &-8 {\r\n                gap: 8px;\r\n            }\r\n            &-6 {\r\n                gap: 6px;\r\n            }\r\n            &-4 {\r\n                gap: 4px;\r\n            }\r\n        }\r\n        &-important-gap-16 {\r\n            gap: 16px !important;\r\n        }\r\n\r\n\r\n        &-p {\r\n            &-32 {\r\n                padding: 32px;\r\n            }\r\n            &-24 {\r\n                padding: 24px;\r\n            }\r\n            &-16 {\r\n                padding: 16px;\r\n            }\r\n            &-10 {\r\n                padding: 10px;\r\n            }\r\n            &-4 {\r\n                padding: 4px;\r\n            }\r\n            &-0 {\r\n                padding: 0px;\r\n            }\r\n            &t {\r\n                &-48 {\r\n                    padding-top: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-top: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-top: 20px;\r\n                }\r\n            }\r\n            &b {\r\n                &-48 {\r\n                    padding-bottom: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-bottom: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-bottom: 20px;\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n@media (max-width: 576px) {\r\n    .wsx-sales-chart-legend {\r\n        flex-direction: column;\r\n        align-items: start;\r\n        margin-left: auto;\r\n    }\r\n\r\n    .wsx-condition-container .wsx-tier {\r\n        &-wrapper {\r\n            grid-template-columns: 1fr;\r\n        }\r\n    }\r\n\r\n    .wsx-sm {\r\n        &-gap {\r\n            &-48 {\r\n                gap: 48px;\r\n            }\r\n            &-40 {\r\n                gap: 40px;\r\n            }\r\n            &-32 {\r\n                gap: 32px;\r\n            }\r\n            &-30 {\r\n                gap: 30px;\r\n            }\r\n            &-24 {\r\n                gap: 24px;\r\n            }\r\n            &-20 {\r\n                gap: 20px;\r\n            }\r\n            &-16 {\r\n                gap: 16px;\r\n            }\r\n            &-12 {\r\n                gap: 12px;\r\n            }\r\n            &-8 {\r\n                gap: 8px;\r\n            }\r\n            &-6 {\r\n                gap: 6px;\r\n            }\r\n            &-4 {\r\n                gap: 4px;\r\n            }\r\n        }\r\n        &-important-gap-16 {\r\n            gap: 16px !important;\r\n        }\r\n\r\n        &-flex {\r\n            &-column {\r\n                flex-direction: column;\r\n            }\r\n            &-column-reverse {\r\n                flex-direction: column-reverse;\r\n            }\r\n            &-reverse {\r\n                flex-direction: row-reverse;\r\n            }\r\n        }\r\n\r\n        &-m {\r\n            &-0 {\r\n                margin: 0;\r\n            }\r\n            &t {\r\n                &-0 {\r\n                    margin-top: 0;\r\n                }\r\n            }\r\n        }\r\n\r\n        &-p {\r\n            &-32 {\r\n                padding: 32px;\r\n            }\r\n            &-24 {\r\n                padding: 24px;\r\n            }\r\n            &-16 {\r\n                padding: 16px;\r\n            }\r\n            &-10 {\r\n                padding: 10px;\r\n            }\r\n            &-4 {\r\n                padding: 4px;\r\n            }\r\n            &-0 {\r\n                padding: 0px;\r\n            }\r\n            &t {\r\n                &-48 {\r\n                    padding-top: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-top: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-top: 20px;\r\n                }\r\n            }\r\n            &b {\r\n                &-48 {\r\n                    padding-bottom: 48px;\r\n                }\r\n                &-32 {\r\n                    padding-bottom: 32px;\r\n                }\r\n                &-20 {\r\n                    padding-bottom: 20px;\r\n                }\r\n            }\r\n        }\r\n    }\r\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -9926,42 +8217,6 @@ module.exports = function (cssWithMappingToString) {
     }
   };
   return list;
-};
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/runtime/getUrl.js":
-/*!********************************************************!*\
-  !*** ./node_modules/css-loader/dist/runtime/getUrl.js ***!
-  \********************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-module.exports = function (url, options) {
-  if (!options) {
-    options = {};
-  }
-  if (!url) {
-    return url;
-  }
-  url = String(url.__esModule ? url.default : url);
-
-  // If url is already wrapped in quotes, remove them
-  if (/^['"].*['"]$/.test(url)) {
-    url = url.slice(1, -1);
-  }
-  if (options.hash) {
-    url += options.hash;
-  }
-
-  // Should url be wrapped?
-  // See https://drafts.csswg.org/css-values-3/#urls
-  if (/["'() \t\n]|(%20)/.test(url) || options.needQuotes) {
-    return "\"".concat(url.replace(/"/g, '\\"').replace(/\n/g, "\\n"), "\"");
-  }
-  return url;
 };
 
 /***/ }),
@@ -10601,17 +8856,6 @@ Tannin.prototype.dcnpgettext = function( domain, context, singular, plural, n ) 
 	return index === 0 ? singular : plural;
 };
 
-
-/***/ }),
-
-/***/ "./assets/img/angle-down-16.svg":
-/*!**************************************!*\
-  !*** ./assets/img/angle-down-16.svg ***!
-  \**************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-module.exports = __webpack_require__.p + "704fefddbc64ba8b712d.svg";
 
 /***/ }),
 
@@ -12169,9 +10413,6 @@ function memize(fn, options) {
 /******/ 		return module.exports;
 /******/ 	}
 /******/ 	
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = __webpack_modules__;
-/******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
 /******/ 	(() => {
@@ -12197,18 +10438,6 @@ function memize(fn, options) {
 /******/ 		};
 /******/ 	})();
 /******/ 	
-/******/ 	/* webpack/runtime/global */
-/******/ 	(() => {
-/******/ 		__webpack_require__.g = (function() {
-/******/ 			if (typeof globalThis === 'object') return globalThis;
-/******/ 			try {
-/******/ 				return this || new Function('return this')();
-/******/ 			} catch (e) {
-/******/ 				if (typeof window === 'object') return window;
-/******/ 			}
-/******/ 		})();
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
@@ -12223,55 +10452,6 @@ function memize(fn, options) {
 /******/ 			}
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/publicPath */
-/******/ 	(() => {
-/******/ 		var scriptUrl;
-/******/ 		if (__webpack_require__.g.importScripts) scriptUrl = __webpack_require__.g.location + "";
-/******/ 		var document = __webpack_require__.g.document;
-/******/ 		if (!scriptUrl && document) {
-/******/ 			if (document.currentScript && document.currentScript.tagName.toUpperCase() === 'SCRIPT')
-/******/ 				scriptUrl = document.currentScript.src;
-/******/ 			if (!scriptUrl) {
-/******/ 				var scripts = document.getElementsByTagName("script");
-/******/ 				if(scripts.length) {
-/******/ 					var i = scripts.length - 1;
-/******/ 					while (i > -1 && (!scriptUrl || !/^http(s?):/.test(scriptUrl))) scriptUrl = scripts[i--].src;
-/******/ 				}
-/******/ 			}
-/******/ 		}
-/******/ 		// When supporting browsers where an automatic publicPath is not supported you must specify an output.publicPath manually via configuration
-/******/ 		// or pass an empty string ("") and set the __webpack_public_path__ variable from your code to use your own logic.
-/******/ 		if (!scriptUrl) throw new Error("Automatic publicPath is not supported in this browser");
-/******/ 		scriptUrl = scriptUrl.replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/");
-/******/ 		__webpack_require__.p = scriptUrl;
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/jsonp chunk loading */
-/******/ 	(() => {
-/******/ 		__webpack_require__.b = document.baseURI || self.location.href;
-/******/ 		
-/******/ 		// object to store loaded and loading chunks
-/******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
-/******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
-/******/ 		var installedChunks = {
-/******/ 			"whx_dr": 0
-/******/ 		};
-/******/ 		
-/******/ 		// no chunk on demand loading
-/******/ 		
-/******/ 		// no prefetching
-/******/ 		
-/******/ 		// no preloaded
-/******/ 		
-/******/ 		// no HMR
-/******/ 		
-/******/ 		// no HMR manifest
-/******/ 		
-/******/ 		// no on chunks loaded
-/******/ 		
-/******/ 		// no jsonp function
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/nonce */
@@ -12305,33 +10485,6 @@ __webpack_require__.r(__webpack_exports__);
 
 const DynamicRulesView = () => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_DynamicRules__WEBPACK_IMPORTED_MODULE_2__["default"], null));
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DynamicRulesView);
-
-// document.addEventListener("DOMContentLoaded", function () {
-//     if (document.body.contains(document.getElementById("_wholesalex_dynamic_rules"))) {
-//         ReactDOM.render(
-//             <React.StrictMode>
-//                 <ToastContextProvider>
-//                     <Header title={whx_dr.i18n.dynamic_rules}/>
-//                     <DynamicRules />
-//                 </ToastContextProvider>
-//             </React.StrictMode>,
-//             document.getElementById("_wholesalex_dynamic_rules")
-//         );
-//     }
-// });
-// document.addEventListener("DOMContentLoaded", function () {
-//     if (document.body.contains(document.getElementById("_wholesalex_dynamic_rules_frontend"))) {
-//         ReactDOM.render(
-//             <React.StrictMode>
-//                 <ToastContextProvider>
-//                     <Header title={whx_dr.i18n.dynamic_rules} isFrontend={true}/>
-//                     <DynamicRules isFrontend={true} />
-//                 </ToastContextProvider>
-//             </React.StrictMode>,
-//             document.getElementById("_wholesalex_dynamic_rules_frontend")
-//         );
-//     }
-// });
 })();
 
 /******/ })()

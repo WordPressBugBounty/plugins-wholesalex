@@ -141,7 +141,7 @@ class Deactive {
                     <ul class="wholesalex-modal-input">
 						<?php foreach ($this->get_settings() as $key => $setting) { ?>
 							<li>
-								<label>
+								<label class="wsx-label">
 									<input type="radio" <?php echo ($key == 0 ? 'checked="checked"' : ''); ?> id="<?php echo esc_attr($setting['id']); ?>" name="<?php echo esc_attr(self::$PLUGIN_SLUG); ?>" value="<?php echo esc_attr($setting['text']); ?>">
 									<div class="wholesalex-reason-text"><?php echo esc_html($setting['text']); ?></div>
 									<?php if( isset($setting['input']) && $setting['input'] ) { ?>

@@ -2166,9 +2166,9 @@ class WHOLESALEX_Product {
 					}
 				}
 			}
-			if ( ! empty( $this->rule_on_products_lists ) ) {
-				$Total_repeated_Dynamic_rules = count( $this->rule_on_products_lists[$product_id]['dynamic']);
-				$total_unique_dynamic_rules = isset($this->rule_on_products_lists[$product_id]['dynamic']) ? count(array_unique(array_column($this->rule_on_products_lists[$product_id]['dynamic'], 3))) : 0;
+			if ( is_array($this->rule_on_products_lists) && ! empty( $this->rule_on_products_lists ) ) {
+				$Total_repeated_Dynamic_rules = isset($this->rule_on_products_lists[$product_id]['dynamic']) && is_array($this->rule_on_products_lists[$product_id]['dynamic'])? count( $this->rule_on_products_lists[$product_id]['dynamic']):0;
+				$total_unique_dynamic_rules = isset($this->rule_on_products_lists[$product_id]['dynamic']) && is_array($this->rule_on_products_lists[$product_id]['dynamic']) ? count(array_unique(array_column($this->rule_on_products_lists[$product_id]['dynamic'], 3))) : 0;
 				$total_rules_apply =  array_sum(array_map('count', array_filter($this->rule_on_products_lists[$product_id], 'is_array')));
            	 	echo '<div 
 						id="wsx-wholesalex-product-rule-openModalBtn" 

@@ -6539,6 +6539,21 @@ class WHOLESALEX_Dynamic_Rules {
 					$sp = wc_get_price_to_display($product, array('price' => $sp));
 				}
 
+				// Check if product has custom price set by WooCommerce Product Addons plugin Compatibility
+				$is_woo_custom_price = get_post_meta($product->get_id(), '_product_addons', true);
+				if ( wholesalex()->is_plugin_installed_and_activated('woocommerce-product-addons/woocommerce-product-addons.php') && $sp || $rp && is_array( $is_woo_custom_price ) && !empty( $is_woo_custom_price ) ) {
+					add_filter(
+						'woocommerce_available_variation',
+						function ($data, $variation) use ($rp, $sp) {
+							// Set display price based on $sp or $rp
+							$data['display_price'] = !empty($sp) ? $sp : $rp;
+							return $data;
+						},
+						10,
+						2
+					);
+				}
+				
 				if (!($product->is_type('variable') || $product->is_type('grouped'))) {
 					$is_wholesale_price_applied = wholesalex()->get_wholesalex_wholesale_prices($product->get_id()) ? true : false;
 					$price_html = $this->format_sale_price($rp, $sp, $is_wholesale_price_applied) . $product->get_price_suffix();
@@ -6624,11 +6639,27 @@ class WHOLESALEX_Dynamic_Rules {
 			return;
 		}
 
+		$woo_custom_price = 0;
 		foreach ($cart->get_cart() as $cart_item) {
 			$product = $cart_item['data'];
+
+			// Check if product has custom price set by WooCommerce Product Addons plugin Compatibility
+			if ( wholesalex()->is_plugin_installed_and_activated('woocommerce-product-addons/woocommerce-product-addons.php') && isset($cart_item['addons']) && is_array($cart_item['addons'])) {
+				foreach ($cart_item['addons'] as $addon) {
+					if (isset($addon['price'])) {
+						$woo_custom_price = $addon['price'];
+					}
+				}
+			}
+
 			if (!$product->is_type('simple')) {
 				$price = $product->is_on_sale() ? $product->get_sale_price() : $product->get_regular_price();
-				$product->set_price(max(0, $this->price_after_currency_changed($price)));
+				$is_woo_custom_price = get_post_meta($product->get_parent_id(), '_product_addons', true);
+				if( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 && is_array( $is_woo_custom_price ) && !empty( $is_woo_custom_price ) ){
+					$product->set_price( max( 0, $this->price_after_currency_changed( $price ) ) + $woo_custom_price );
+				}else{
+					$product->set_price( max( 0, $this->price_after_currency_changed( $price ) ) );
+				}
 			}
 		}
 	}

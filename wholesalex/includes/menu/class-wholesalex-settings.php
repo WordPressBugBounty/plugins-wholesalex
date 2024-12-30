@@ -226,7 +226,7 @@ class Settings {
 						// 'default' => '',
 						// ),
 						'_settings_quantity_based_discount_priority' => array(
-							'type'    => 'DragList',
+							'type'    => 'dragList',
 							'label'   => __( 'Pricing / Discount Priority', 'wholesalex' ),
 							'desc'    => __( 'Set the priority to declare which will be applied if discounts are assigned in multiple ways.', 'wholesalex' ),
 							// 'is_pro'  => true,
@@ -1467,7 +1467,7 @@ class Settings {
 							'default'     => __( 'Buy More, Save More', 'wholesalex' ),
 						),
 						'_settings_tier_table_columns_priority' => array(
-							'type'    => 'DragListEdit',
+							'type'    => 'dragListEdit',
 							'label'   => __( 'Choose and Navigate Table Items', 'wholesalex' ),
 							'desc'    => __( 'Choose and Navigate Table Items', 'wholesalex' ),
 							// 'is_pro'  => true,

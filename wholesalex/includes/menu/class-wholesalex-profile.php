@@ -644,7 +644,7 @@ class WHOLESALEX_Profile {
 
 								<tr>
 									<th>
-										<label for="<?php echo esc_attr( $field_name ); ?>"><?php echo esc_html( $field['title'] ); ?></label>
+										<label class="wsx-label" for="<?php echo esc_attr( $field_name ); ?>"><?php echo esc_html( $field['title'] ); ?></label>
 									</th>
 									<td>
 										<?php
@@ -689,7 +689,7 @@ class WHOLESALEX_Profile {
 													<div>
 														<input type="checkbox" name="<?php echo esc_attr( $field_name ) . '[]'; ?>" id="<?php echo esc_attr( $option['value'] ); ?>" value=<?php echo esc_attr( $option['value'] ); ?> class="regular-text" <?php checked( in_array( $option['value'], $__selected_values ), 1, true ); //phpcs:ignore ?> />
 
-														<label for=<?php echo esc_attr( $option['value'] ); ?> > <?php echo esc_html( $option['name'] ); ?>  </label>
+														<label class="wsx-label" for=<?php echo esc_attr( $option['value'] ); ?> > <?php echo esc_html( $option['name'] ); ?>  </label>
 													</div>
 
 													<?php
@@ -711,7 +711,7 @@ class WHOLESALEX_Profile {
 													<div>
 														<input type="radio" name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $option['value'] ); ?>" value=<?php echo esc_attr( $option['value'] ); ?> class="regular-text" <?php checked( $__selected_value === $option['value'], 1, true ); ?> />
 
-														<label for=<?php echo esc_attr( $option['value'] ); ?> > <?php echo esc_html( $option['name'] ); ?>  </label>
+														<label class="wsx-label" for=<?php echo esc_attr( $option['value'] ); ?> > <?php echo esc_html( $option['name'] ); ?>  </label>
 													</div>
 
 													<?php

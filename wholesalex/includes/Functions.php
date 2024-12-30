@@ -2598,4 +2598,19 @@ class Functions {
         
     }
 
+	/**
+	 * Check if a plugin is installed and activated.
+	 *
+	 * @param string $plugin_path The relative path to the plugin file (e.g., 'woocommerce/woocommerce.php').
+	 * @return bool True if the plugin is installed and activated, false otherwise.
+	 */
+	function is_plugin_installed_and_activated($plugin_path) {
+		// Check if the plugin is installed and activated
+		if ( file_exists(WP_PLUGIN_DIR . '/' . $plugin_path) && is_plugin_active($plugin_path) ) {
+			return true;
+		}
+
+		return false;
+	}
+
 }

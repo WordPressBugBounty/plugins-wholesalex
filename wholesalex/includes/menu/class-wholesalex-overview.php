@@ -631,12 +631,12 @@ class WHOLESALEX_Overview
 					<div class="wsx-title-wrap">
 						<div class="wsx-font-14 wsx-font-medium"><?php echo esc_attr( $card[2] ); ?></div>
 						<!-- <div class="wsx-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" clip-path="url(#informtion)"><path d="M8 14.667A6.667 6.667 0 1 0 8 1.333a6.667 6.667 0 0 0 0 13.334Zm0-4V8m0-2.667h.007"/></g><defs><clipPath id="informtion"><path fill="none" d="M0 0h16v16H0z"/></clipPath></defs></svg></div> -->
-						<div class="wsx-tooltip wsx-tooltip-global">
+						<!-- <div class="wsx-tooltip wsx-tooltip-global">
 							<div className="wsx-lh-0 wsx-w-fit wsx-icon-wrapper wsx-color-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" clip-path="url(#informtion)"><path d="M8 14.667A6.667 6.667 0 1 0 8 1.333a6.667 6.667 0 0 0 0 13.334Zm0-4V8m0-2.667h.007"/></g><defs><clipPath id="informtion"><path fill="none" d="M0 0h16v16H0z"/></clipPath></defs></svg></div>
 							<div class="wsx-tooltip-content wsx-font-regular top wsx-text-center">
 								Tooltip information for this icon.
 							</div>
-						</div>
+						</div> -->
 					</div>
 					<div class="wsx-d-flex wsx-item-center wsx-gap-12">
 						<img class="wsx-icon" src="<?php echo esc_attr( $card[1] ); ?>">
@@ -1239,7 +1239,7 @@ class WHOLESALEX_Overview
 							'whx_roles_untitled_role'                       	=> __('Untitled Role','wholesalex'),
 							'whx_roles_delete_this_role'                    	=> __('Delete','wholesalex'),
 							'whx_roles_edit_this_role'                      	=> __('Edit','wholesalex'),
-							'whx_roles_duplicate_role'                      	=> __('Duplicate.','wholesalex'),
+							'whx_roles_duplicate_role'                      	=> __('Duplicate','wholesalex'),
 							'whx_roles_untitled'                            	=> __('Untitled','wholesalex'),
 							'whx_roles_duplicate_of'                        	=> __('Duplicate of ','wholesalex'),
 							'whx_roles_show_hide_role_details'              	=> __('Show/Hide Role Details.','wholesalex'),
@@ -1288,10 +1288,10 @@ class WHOLESALEX_Overview
 							'whx_dr_export'															=> __('Export','wholesalex'),
 							'whx_dr_untitled'														=> __('Untitled','wholesalex'),
 							'whx_dr_duplicate_of'													=> __('Duplicate of ','wholesalex'),
-							'whx_dr_delete_this_rule'												=> __('Delete this Rule.','wholesalex'),
-							'whx_dr_delete_condition'												=> __('Delete Condition.','wholesalex'),
+							'whx_dr_delete_this_rule'												=> __('Delete this Rule','wholesalex'),
+							'whx_dr_delete_condition'												=> __('Delete Condition','wholesalex'),
 							'whx_dr_duplicate_this'													=> __('Duplicate','wholesalex'),
-							'whx_dr_duplicate_this_rule'											=> __('Duplicate this Rule.','wholesalex'),
+							'whx_dr_duplicate_this_rule'											=> __('Duplicate this Rule','wholesalex'),
 							'whx_dr_show_hide_rule_details'											=> __('Show/Hide Rule Details.','wholesalex'),
 							'whx_dr_vendor'															=> __('Vendor #','wholesalex'),
 							'whx_dr_untitled_rule'													=> __('Untitled	Rule','wholesalex'),
