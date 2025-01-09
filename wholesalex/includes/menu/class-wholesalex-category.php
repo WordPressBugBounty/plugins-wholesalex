@@ -136,7 +136,7 @@ class WHOLESALEX_Category {
 				'discounts'           => wholesalex()->get_category_discounts(),
 				'i18n' => array(
 					'unlock' => __("UNLOCK",'wholesalex'),
-					'unlock_heading' => __("Unlock All Features",'wholesalex'),
+					'unlock_heading' => __("Unlock All Features with",'wholesalex'),
 					'unlock_desc' => __("We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.",'wholesalex'),
 					'upgrade_to_pro' => __("Upgrade to Pro  ➤",'wholesalex'),
 				)
@@ -164,7 +164,7 @@ class WHOLESALEX_Category {
 				'discounts'           => array($term->term_id=>wholesalex()->get_category_discounts($term->term_id)),
 				'i18n' => array(
 					'unlock' => __("UNLOCK",'wholesalex'),
-					'unlock_heading' => __("Unlock All Features",'wholesalex'),
+					'unlock_heading' => __("Unlock All Features with",'wholesalex'),
 					'unlock_desc' => __("We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.",'wholesalex'),
 					'upgrade_to_pro' => __("Upgrade to Pro  ➤",'wholesalex'),
 				)

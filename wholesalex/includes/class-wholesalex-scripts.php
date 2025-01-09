@@ -59,12 +59,6 @@ class Scripts {
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'wholesalex_dynamic_rules' => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_dr.js',
-					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
 				'wholesalex_overview'      => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_overview.js',
 					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors', 'wc-components', 'wp-components', 'wp-element','lodash', 'moment','wc-date' ),
@@ -83,42 +77,6 @@ class Scripts {
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'wholesalex_form_builder'  => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_regi_builder.js',
-					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors','wp-components' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_form'          => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_regi_form.js',
-					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_roles'         => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_roles.js',
-					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_settings'      => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_settings.js',
-					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors'),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_wizard'        => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/wholesalex_wizard.js',
-					'deps'      => array( 'wp-i18n', 'wp-api-fetch', 'wholesalex','react', 'react-dom' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_header'        => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_header.js',
-					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wholesalex_node_vendors', 'wholesalex_components' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
 				'wholesalex-builder'       => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/wholesalex_wallet.js',
 					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch' ),
@@ -131,48 +89,6 @@ class Scripts {
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'whx_user_import_export'               => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_user_import_export.js',
-					'deps'      => array('react', 'react-dom','wp-polyfill', 'wp-api-fetch'),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'whx_features'               => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_features.js',
-					'deps'      => array('react', 'react-dom'),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'whx_help_center'               => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_help_center.js',
-					'deps'      => array('react', 'react-dom'),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'whx_support'               => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_support.js',
-					'deps'      => array('react', 'react-dom','wp-polyfill', 'wp-api-fetch'),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'whx_addons'               => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_addons.js',
-					'deps'      => array('react', 'react-dom','wp-polyfill', 'wp-api-fetch'),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'whx_email_templates'               => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_email_templates.js',
-					'deps'      => array('react', 'react-dom','wp-polyfill', 'wp-api-fetch'),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'whx_users'               => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_users.js',
-					'deps'      => array('react', 'react-dom','wp-polyfill', 'wp-api-fetch'),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				)
 			)
 		);
 		foreach ( $register_scripts as $handle => $args ) {
@@ -206,12 +122,6 @@ class Scripts {
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'wholesalex_dynamic_rules' => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_dr.js',
-					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
 				'wholesalex_overview'      => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_overview.js',
 					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors' ),
@@ -227,42 +137,6 @@ class Scripts {
 				'wholesalex_profile'       => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_profile.js',
 					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_form_builder'  => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_regi_builder.js',
-					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_form'          => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_regi_form.js',
-					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_roles'         => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_roles.js',
-					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_settings'      => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_settings.js',
-					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wp-api-fetch', 'wholesalex_components', 'wholesalex_node_vendors' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_wizard'        => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/wholesalex_wizard.js',
-					'deps'      => array( 'wp-i18n', 'wp-api-fetch', 'wholesalex','react', 'react-dom' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_header'        => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_header.js',
-					'deps'      => array( 'react', 'react-dom', 'wp-i18n', 'wp-polyfill', 'wholesalex_node_vendors', 'wholesalex_components' ),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),

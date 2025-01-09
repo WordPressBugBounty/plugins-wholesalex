@@ -114,26 +114,6 @@ class Settings {
 		}
 	}
 
-
-	/**
-	 * Settings Menu callback
-	 *
-	 * @return void
-	 */
-	// public function settings_submenu_page_callback() {
-	// 	$slug = apply_filters( 'wholesalex_settings_submenu_slug', 'wholesalex-overview#/settings' );
-	// 	$title = sprintf('<span class="wholesalex-submenu-title__settings">%s</span>',__('Settings','wholesalex'));
-	// 	add_submenu_page(
-	// 		wholesalex()->get_menu_slug(),
-	// 		__( 'Settings', 'wholesalex' ),
-	// 		$title,
-	// 		apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-	// 		$slug,
-	// 		array( $this, 'settings_html_callback' )
-	// 	);
-	// }
-
-
 	/**
 	 * Settings Sub Menu Page Callback
 	 *
@@ -208,23 +188,6 @@ class Settings {
 							// 'help_popup' => true,
 							// 'popup_gif_link' => 'https://plugins.svn.wordpress.org/wholesalex/assets/Screenshot-1.jpg',
 						),
-						// '_settings_show_table'             => array(
-						// 	'type'    => 'switch',
-						// 	'label'   => __( 'Show Tiered Pricing Table', 'wholesalex' ),
-						// 	'desc'    => __( 'Product Single Page', 'wholesalex' ),
-						// 	'default' => 'yes',
-						// 	'tooltip' => 'Enabling this option will display the pricing tier table on the single product pages.',
-						// 	'doc'     => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
-						// 	// 'help_popup' => true,
-						// 	// 'popup_gif_link' => 'https://plugins.svn.wordpress.org/wholesalex/assets/Screenshot-1.jpg',
-						// ),
-						// '_settings_pricing_table'        => array(
-						// 'type'    => 'switch',
-						// 'label'   => __( 'Merge Tierd Pricing Table', 'wholesalex' ),
-						// 'desc'    => __( 'Merge All Tiers', 'wholesalex' ),
-						// 'help'    => __( 'By default, It will display the table which is currently applied. If you enable this option, It will display a merged table of all tiers.', 'wholesalex' ),
-						// 'default' => '',
-						// ),
 						'_settings_quantity_based_discount_priority' => array(
 							'type'    => 'dragList',
 							'label'   => __( 'Pricing / Discount Priority', 'wholesalex' ),
@@ -384,16 +347,6 @@ class Settings {
 							// 'tooltip' => 'Enter URL to make this whitelist on private store',
 							// 'doc' => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
 						),
-						// '_settings_access_delete_wholesalex_plugin_data' => array(
-						// 	'type'    => 'switch',
-						// 	'class'	  => 'wsx-plugin-delete-setting',
-						// 	'label'   => __( 'Delete Plugin Data Permanently', 'wholesalex' ),
-						// 	'desc'    => __( 'Check the box if you want to permanently delete the WholesaleX plugin data from the database', 'wholesalex' ),
-						// 	'help'    => '',
-						// 	'default' => 'no',
-						// 	// 'tooltip' => 'Enabling this option will display the pricing tier table on the single product pages. {Check out the documentation} to learn more about the pricing tiers.',
-						// 	// 'doc' => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
-						// ),
 					),
 				),
 				'registration_n_login' => array(
@@ -521,22 +474,6 @@ class Settings {
 							// 'doc_link' => 'https://getwholesalex.com/pricing/?utm_source=wholesalex_plugin&utm_medium=support&utm_campaign=wholesalex-DB',
 
 						),
-						// '_settings_display_price_cart_checkout' => array(
-						// 	'type'    => 'radio',
-						// 	'label'   => __( 'Display Prices in Cart and Checkout Page', 'wholesalex' ),
-						// 	'options' => array(
-						// 		'woocommerce_default_tax' => __( 'Use WooCommerce default', 'wholesalex' ),
-						// 		'incl'                    => __( 'Including Tax', 'wholesalex' ),
-						// 		'excl'                    => __( 'Excluding Tax', 'wholesalex' ),
-						// 	),
-						// 	'help'    => __( 'Display prices including or excluding taxes on the cart and checkout pages.', 'wholesalex' ),
-						// 	'default' => 'woocommerce_default_tax',
-						// 	'tooltip' => 'Decide and select whether the product prices on the cart and checkout pages will be with or without taxes.',
-						// 	'doc'     => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
-						// 	// 'tooltip' => __('Display prices including or excluding taxes on the cart and checkout pages.','wholesalex'),
-						// 	// 'doc_link' => 'https://getwholesalex.com/pricing/?utm_source=wholesalex_plugin&utm_medium=support&utm_campaign=wholesalex-DB',
-
-						// ),
 						'_settings_price_product_list_page' => array(
 							'type'        => 'radio',
 							'label'       => __( 'Wholesale Price On Product Listing Page', 'wholesalex' ),
@@ -1483,33 +1420,9 @@ class Settings {
 								array( 'label'=> 'Price_Per_Unit', 'value'=> 'Price Per Unit', 'status' => 'yes' ),
 								// array( 'label'=> 'Savings_Per_Unit', 'value'=> 'Savings Per Unit', 'status' => 'yes' ),
 							 ),
-							// 'default' => array( 
-							// 	array( 'label'=> 'Quantity_Range', 'status' => 'yes' ),
-							// 	array( 'label'=> 'Discount', 'status' => 'yes' ),
-							// 	array( 'label'=> 'Price_Per_Unit', 'status' => 'yes' ),
-							// 	array( 'label'=> 'Savings_Per_Unit', 'status' => 'yes' ),
-							//  ),
-							// 'default' => array( 'Quantity_Range', 'Discount', 'Price_Per_Unit', 'Savings_Per_Unit' ),
 							'tooltip' => 'Decide and select which pricing will be applicable if the prices are set in multiple ways.',
 							'doc'     => '',
 						),
-
-						// '_settings_tier_price_show_discount'                 => array(
-						// 	'type'    => 'radio',
-						// 	'label'   => __( 'Show Discount as', 'wholesalex' ),
-						// 	'options' => array(
-						// 		'fixed'      => __( 'Fixed Price', 'wholesalex' ),
-						// 		'percentage' => __( 'Percentage', 'wholesalex' ),
-						// 		'amount'     => __( 'Amount', 'wholesalex' ),
-						// 	),
-						// 	'default' => 'fixed',
-						// 	/* translators: %s - Plugin Name */
-						// 	// 'tooltip' => sprintf( __( 'Choose which type of store you want to create & manage with %s.', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-						// 	// 'doc'     => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
-						// 	// 'help_popup' => true,
-						// 	// 'popup_gif_link' => 'https://plugins.svn.wordpress.org/wholesalex/assets/Screenshot-1.jpg',
-						// ),
-						
 						'_settings_tier_font_size'    => array(
 							'type'    => 'fontSize',
 							'label'   => __( 'Font Size', 'wholesalex' ),

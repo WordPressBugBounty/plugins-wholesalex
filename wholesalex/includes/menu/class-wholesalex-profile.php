@@ -687,7 +687,7 @@ class WHOLESALEX_Profile {
 												foreach ( $field['option'] as $option ) :
 													?>
 													<div>
-														<input type="checkbox" name="<?php echo esc_attr( $field_name ) . '[]'; ?>" id="<?php echo esc_attr( $option['value'] ); ?>" value=<?php echo esc_attr( $option['value'] ); ?> class="regular-text" <?php checked( in_array( $option['value'], $__selected_values ), 1, true ); //phpcs:ignore ?> />
+														<input class="wsx-checkbox" type="checkbox" name="<?php echo esc_attr( $field_name ) . '[]'; ?>" id="<?php echo esc_attr( $option['value'] ); ?>" value=<?php echo esc_attr( $option['value'] ); ?> class="regular-text" <?php checked( in_array( $option['value'], $__selected_values ), 1, true ); //phpcs:ignore ?> />
 
 														<label class="wsx-label" for=<?php echo esc_attr( $option['value'] ); ?> > <?php echo esc_html( $option['name'] ); ?>  </label>
 													</div>
@@ -709,7 +709,7 @@ class WHOLESALEX_Profile {
 												foreach ( $field['option'] as $option ) :
 													?>
 													<div>
-														<input type="radio" name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $option['value'] ); ?>" value=<?php echo esc_attr( $option['value'] ); ?> class="regular-text" <?php checked( $__selected_value === $option['value'], 1, true ); ?> />
+														<input class="wsx-radio" type="radio" name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $option['value'] ); ?>" value=<?php echo esc_attr( $option['value'] ); ?> class="regular-text" <?php checked( $__selected_value === $option['value'], 1, true ); ?> />
 
 														<label class="wsx-label" for=<?php echo esc_attr( $option['value'] ); ?> > <?php echo esc_html( $option['name'] ); ?>  </label>
 													</div>
@@ -733,12 +733,12 @@ class WHOLESALEX_Profile {
 														<?php
 													} else {
 														?>
-													<input type='text' class="wholesalex_download_file_not_exist" readonly value="<?php esc_html_e( 'The file does not exist.', 'wholesalex' ); ?>"/>
+													<input type='text' class="wsx-input wholesalex_download_file_not_exist" readonly value="<?php esc_html_e( 'The file does not exist.', 'wholesalex' ); ?>"/>
 														<?php
 													}
 												} else {
 													?>
-													<input type='text' class="wholesalex_download_file_not_exist" readonly value="<?php esc_html_e( 'The file does not exist.', 'wholesalex' ); ?>"/>
+													<input type='text' class="wsx-input wholesalex_download_file_not_exist" readonly value="<?php esc_html_e( 'The file does not exist.', 'wholesalex' ); ?>"/>
 													<?php
 												}
 												?>
@@ -765,7 +765,7 @@ class WHOLESALEX_Profile {
 												}
 												
 												?>
-												<input type=<?php echo esc_attr( $field['type'] ); ?> name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" value="<?php echo esc_attr( $__value ); ?>" class="regular-text" />
+												<input type=<?php echo esc_attr( $field['type'] ); ?> name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" value="<?php echo esc_attr( $__value ); ?>" class="wsx-input regular-text" />
 												<?php
 												break;
 										}

@@ -448,31 +448,6 @@ class WHOLESALEX_Notice {
 				background-color: #29298c !important;
 			}
 
-			/* .wholesalex-content-notice .content-notice-dissmiss {
-				position: absolute;
-				top: 0;
-				right: 0;
-				color: white;
-				background-color: black;
-				padding: 5px;
-				font-size: 12px;
-				line-height: 1;
-				border-bottom-left-radius: 5px;
-			} */
-
-			/* .whx-new-dismiss{
-				position: absolute;
-				top: 0;
-				right: 0;
-				color: white;
-				background-color: black;
-				padding: 4px 5px 5px;
-				font-size: 12px;
-				line-height: 1;
-				border-bottom-left-radius: 3px;
-				text-decoration: none;
-			} */
-
 			.wholesalex-content-notice .content-notice-dissmiss {
 				position: absolute;
 				top: 0;

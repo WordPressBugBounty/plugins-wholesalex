@@ -70,35 +70,12 @@ class WHOLESALEX_Overview
 			}
 		}
 		$this->is_migration_tool_active = $status;
-		// if ($status) {
-		// 	add_action('admin_menu', array($this, 'migration_tool_submenu_page_callback'));
-		// }
 	}
-	/**
-	 * Migration Tools Menu callback
-	 *
-	 * @return void
-	 */
-	// public function migration_tool_submenu_page_callback()
-	// {
-	// 	//$slug = apply_filters( 'wholesalex_migration_submenu_slug', 'wholesalex-migration' );
-	// 	$slug = apply_filters('wholesalex_support_submenu_slug', 'wholesalex-migration');
-	// 	add_submenu_page(
-	// 		wholesalex()->get_menu_slug(),
-	// 		__('Migration Tool', 'wholesalex'),
-	// 		__('Migration Tool', 'wholesalex'),
-	// 		'manage_options',
-	// 		$slug,
-	// 		array($this, 'migration_tools_content'),
-	// 		11
-	// 	);
-	// }
 
 	public function migration_tools_content()
 	{
 		if (method_exists('\WholesaleXMigrationTool', 'migration_tools_content') && is_plugin_active('wholesalex-migration-tool/wholesalex-migration-tool.php')) {
 			\WholesaleXMigrationTool::migration_tools_content();
-			//wholesalex-migration-tool/wholesalex-migration-tool.php
 		} else {
 			$this->wholesalex_migration_tool_notice_js();
 ?>
@@ -128,7 +105,6 @@ class WHOLESALEX_Overview
 								</div>
 							<?php endif; ?>
 							<div class="wsx-dropdown">
-								<!-- <div class="dashicons dashicons-editor-help wholesalex_icon wsx-header-action"></div> -->
 								<div class="wsx-icon wsx-color-tertiary wsx-header-action">
 									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
 										<path fill="currentColor" fill-rule="evenodd"
@@ -167,65 +143,6 @@ class WHOLESALEX_Overview
 				</div>
 			</div>
 
-
-			<!-- <div class="wholesalex_header_wrapper">
-				<div class="wholesalex_header">
-					<div class="wholesalex_header__left">
-						<img src="<?php echo esc_url( WHOLESALEX_URL . '/assets/img/logo-option.svg' ); ?>" class="wholesalex_logo">
-						<span class="wholesalex_version"><?php echo esc_html( 'v' . WHOLESALEX_VER ) ?></span>
-						<span class="dashicons dashicons-arrow-right-alt2 wholesalex_right_arrow_icon wholesalex_icon"></span>
-						<span class="wholesalex_header__title"> <?php echo esc_html( __('WholesaleX Migration Tool', 'wholesalex') ) ?> </span>
-					</div>
-					<div class="wholesalex_header__right">
-						<div class="wholesalex_dropdown ">
-							<div class="wholesalex_dropdown__label dashicons dashicons-editor-help wholesalex_header_help_icon wholesalex_icon wholesalex_header_action"></div>
-							<div class="wholesalex_popup_menu__wrapper wholesalex_dropdown_content__wrapper wholesalex-modal-menu-wrapper">
-								<div class="wholesalex_popup_menu wholesalex_dropdown_content">
-									<ul class="wholesalex_help_popup__links">
-										<li class="wholesalex_help_popup__list">
-											<span class="dashicons dashicons-phone wholesalex_icon"></span>
-											<a href="https://getwholesalex.com/contact/?utm_source=wholesalex-menu&amp;utm_medium=features_page-support&amp;utm_campaign=wholesalex-DB" class="wholesalex_help_popup__link" target="_blank">
-												<span class="wholesalex_help_popup__link_label">Get Supports</span>
-											</a>
-										</li>
-										<li class="wholesalex_help_popup__list">
-											<span class="dashicons dashicons-book wholesalex_icon"></span>
-											<a href="https://getwholesalex.com/docs/wholesalex/getting-started/?utm_source=wholesalex-menu&amp;utm_medium=features_page-guide&amp;utm_campaign=wholesalex-DB" class="wholesalex_help_popup__link" target="_blank">
-												<span class="wholesalex_help_popup__link_label">Getting Started Guide</span>
-											</a>
-										</li>
-										<li class="wholesalex_help_popup__list">
-											<span class="dashicons dashicons-facebook-alt wholesalex_icon"></span>
-											<a href="https://www.facebook.com/groups/wholesalexcommunity" class="wholesalex_help_popup__link" target="_blank">
-												<span class="wholesalex_help_popup__link_label">Join Community</span></a>
-										</li>
-										<li class="wholesalex_help_popup__list"><span class="dashicons dashicons-book wholesalex_icon"></span>
-											<a href="https://getwholesalex.com/roadmap/?utm_source=wholesalex-menu&amp;utm_medium=features_page-feature_request&amp;utm_campaign=wholesalex-DB" class="wholesalex_help_popup__link" target="_blank">
-												<span class="wholesalex_help_popup__link_label">Feature Request</span>
-											</a>
-										</li>
-										<li class="wholesalex_help_popup__list"><span class="dashicons dashicons-youtube wholesalex_icon"></span>
-											<a href="https://www.youtube.com/@WholesaleX" class="wholesalex_help_popup__link" target="_blank">
-												<span class="wholesalex_help_popup__link_label">Youtube Tutorials</span></a>
-										</li>
-										<li class="wholesalex_help_popup__list"><span class="dashicons dashicons-book wholesalex_icon"></span>
-											<a href="https://getwholesalex.com/documentation/?utm_source=wholesalex-menu&amp;utm_medium=features_page-documentation&amp;utm_campaign=wholesalex-DB" class="wholesalex_help_popup__link" target="_blank">
-												<span class="wholesalex_help_popup__link_label">Documentation</span>
-											</a>
-										</li>
-										<li class="wholesalex_help_popup__list"><span class="dashicons dashicons-edit wholesalex_icon"></span>
-											<a href="https://getwholesalex.com/roadmap/?utm_source=wholesalex-menu&amp;utm_medium=features_page-what’s_new&amp;utm_campaign=wholesalex-DB" class="wholesalex_help_popup__link" target="_blank">
-												<span class="wholesalex_help_popup__link_label">What’s New</span>
-											</a>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div> -->
-
 			<div class="wsx-wrapper">
 				<div class="wsx-container">
 					<div class="wsx-card wsx-migration-card wc-install wsx-lg-p-32 wsx-gap-100 wsx-d-flex wsx-item-center wsx-lg-flex-column wsx-xl-gap-48 wsx-lg-text-center">
@@ -244,16 +161,6 @@ class WHOLESALEX_Overview
 					</div>
 				</div>
 			</div>
-			<!-- <div class="wc-install wholesalex-migration-tool-required">
-				<div class="wholesalex-wrapper-box">
-					<div class="wholesalext-migration-title">Migrate Your Data to WholesaleX</div>
-					<p class="wholesalext-migration-description">To ensure a smooth transition and retain all your previous B2B data, you'll need to install our Migration Tool.</p>
-					<a class="wholesalex-install-btn wholesalex-migration-tool-btn" href="<?php /* echo esc_url(add_query_arg(array('action' => 'wholesalex_migration_tool_install'), admin_url())); ?>"><span class="dashicons dashicons-image-rotate"></span><?php echo esc_html_e('Install & Activate WholesaleX Migration Tool', 'wholesalex'); */ ?> <span class="wsx-btn-down-arrow-icon">&#8595;</span></a>
-				</div>
-				<div class="wholesalex-migration-tool-img">
-					<img src="<?php /* echo esc_url( WHOLESALEX_URL . '/assets/img/migration-image.png' ); */ ?>" alt="">
-				</div>
-			</div> -->
 		<?php
 		}
 	}
@@ -281,7 +188,6 @@ class WHOLESALEX_Overview
 						},
 						success: function(data) {
 							$('#installation-msg').html(data);
-							// $that.parents('.wc-install').remove();
 							$('.wsx-install-label').text('Installing & Activating...');
 							$('.wsx-icon').css('display', 'none');
 						},
@@ -410,22 +316,6 @@ class WHOLESALEX_Overview
 				'callback'   => array( $this, 'render_submenu_page' ),
 				'identifier' => 'settings',
 			),
-			// array(
-			// 	'title'      => __( 'Features', 'wholesalex' ),
-			// 	'menu_title' => __( 'Features', 'wholesalex' ),
-			// 	'capability' => $manage_options_cap,
-			// 	'slug'       => '/features',
-			// 	'callback'   => array( $this, 'render_submenu_page' ),
-			// 	'identifier' => 'features',
-			// ),
-			// array(
-			// 	'title'      => __( 'Quick Support', 'wholesalex' ),
-			// 	'menu_title' => __( 'Quick Support', 'wholesalex' ),
-			// 	'capability' => $manage_options_cap,
-			// 	'slug'       => '/quick-support',
-			// 	'callback'   => array( $this, 'render_submenu_page' ),
-			// 	'identifier' => 'quick-support',
-			// ),
 		);
 
 			if ( $is_white_label_enabled != 'yes' ) {
@@ -591,11 +481,10 @@ class WHOLESALEX_Overview
 		wp_send_json($response);
 	}
 
-	public function my_custom_dashboard_widgets()
-	{
+	public function my_custom_dashboard_widgets() {
 		wp_add_dashboard_widget(
 			'custom_help_widget',          // Widget slug
-			'WholesaleX - Last Month Insights',               // Title
+			sprintf( '%s - Last Month Insights', wholesalex()->get_plugin_name() ),              // Title
 			array($this, 'wholesalex_wp_dashboard_callback') // Display function
 		);
 	}
@@ -630,29 +519,11 @@ class WHOLESALEX_Overview
 				<div class="wsx-card wsx-p-16 wsx-dashboard-sale-summary-card-<?php echo esc_attr( $card[0] ); ?>">
 					<div class="wsx-title-wrap">
 						<div class="wsx-font-14 wsx-font-medium"><?php echo esc_attr( $card[2] ); ?></div>
-						<!-- <div class="wsx-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" clip-path="url(#informtion)"><path d="M8 14.667A6.667 6.667 0 1 0 8 1.333a6.667 6.667 0 0 0 0 13.334Zm0-4V8m0-2.667h.007"/></g><defs><clipPath id="informtion"><path fill="none" d="M0 0h16v16H0z"/></clipPath></defs></svg></div> -->
-						<!-- <div class="wsx-tooltip wsx-tooltip-global">
-							<div className="wsx-lh-0 wsx-w-fit wsx-icon-wrapper wsx-color-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" clip-path="url(#informtion)"><path d="M8 14.667A6.667 6.667 0 1 0 8 1.333a6.667 6.667 0 0 0 0 13.334Zm0-4V8m0-2.667h.007"/></g><defs><clipPath id="informtion"><path fill="none" d="M0 0h16v16H0z"/></clipPath></defs></svg></div>
-							<div class="wsx-tooltip-content wsx-font-regular top wsx-text-center">
-								Tooltip information for this icon.
-							</div>
-						</div> -->
 					</div>
 					<div class="wsx-d-flex wsx-item-center wsx-gap-12">
 						<img class="wsx-icon" src="<?php echo esc_attr( $card[1] ); ?>">
 						<div class="wsx-title wsx-color-text-dark"><?php echo $card[3] ; ?></div>
 					</div>
-					<!-- <div class="wholesalex_dashboard_sale_summary_card__content">
-						<div class="wholesalex_dashboard_sale_summary_card__title"><?php echo esc_attr( $card[2] ); ?></div>
-					</div>
-					<div class="wholesalex_dashboard_sale_summary_card__image">
-						<?php if ($is_img) { ?>
-							<img class="wholesalex_sale_summary_card_icon" src="<?php echo esc_attr( $card[1] ); ?>">
-						<?php } else { ?>
-							<span class="dashicons <?php echo esc_attr( $card[1] ); ?> wholesalex_sale_summary_card_icon"></span>
-						<?php } ?>
-						<div class="wholesalex_dashboard_sale_summary_card__count"><?php echo $card[3] ; ?></div>
-					</div> -->
 				</div>
 			<?php } ?>
 		</div>
@@ -821,6 +692,25 @@ class WHOLESALEX_Overview
 				'wholesalex_overview_localize_data',
 					array(
 						/**
+						 * Wizard Translation Start
+						 */
+						'wsx_wizard_url'                        => WHOLESALEX_URL,
+						'wsx_wizard_nonce'                      => wp_create_nonce( 'wholesalex-setup-wizard' ) ?: menu_page_url('wholesalex-settings', false),
+						'wsx_wizard_ajax'                       => admin_url( 'admin-ajax.php' ),
+						'wsx_wizard_plugin_install_nonce'       => wp_create_nonce( 'updates' ),
+						'wsx_wizard_is_pro_active'              => wholesalex()->is_pro_active(),
+						'wsx_wizard_addons'                     => $this->get_addons(),
+						'wsx_wizard_setting_url'                => menu_page_url('wholesalex-settings', false) ?: get_dashboard_url(),
+						'wsx_wizard_dashboard_url'              => menu_page_url('wholesalex', false) ?: get_dashboard_url(),
+						'wsx_wizard_site_name'                  => get_bloginfo('name'),
+						'wsx_wizard___wholesalex_initial_setup' => get_option('__wholesalex_initial_setup', false),
+						'wsx_wizard_woocommer_installed'        => file_exists(WP_PLUGIN_DIR . '/woocommerce/woocommerce.php'),
+						'wsx_wizard_productx_installed'         => file_exists(WP_PLUGIN_DIR . '/product-blocks/product-blocks.php'),
+						  /**
+						 * Wizard Translation Stop
+						 */
+
+						/**
 						 * Conversation Translation Start
 						 */
 						'top_customer_heading'         => $this->prepare_as_heading_data($this->get_top_customers_columns()),
@@ -839,6 +729,14 @@ class WHOLESALEX_Overview
 						'setting_url' 				   => menu_page_url( $setting_slug, false ),
 						/**
 						 * Addon Translation Stop
+						 */
+
+						/**
+						 * RTL Support start
+						 */
+						'is_rtl_support'      				   => is_rtl(),
+						/**
+						 * RTL Support stop
 						 */
 
 						/**
@@ -1053,7 +951,7 @@ class WHOLESALEX_Overview
 							'whx_email_templates_action'				   => __('Action','wholesalex'),
 							'whx_email_templates_edit'					   => __('Edit','wholesalex'),
 							'whx_email_templates_unlock'				   => __('UNLOCK','wholesalex'),
-							'whx_email_templates_unlock_full_email_access' => __('Unlock Full Email	Access','wholesalex'),
+							'whx_email_templates_unlock_full_email_access' => __('Unlock Full Email	Access with','wholesalex'),
 							'whx_email_templates_with_wholesalex_pro'	   => __('With WholesaleX Pro','wholesalex'),
 							'whx_email_templates_upgrade_pro_message'	   => __('We are sorry,	but	only a limited number of emails	are	available on the free version. Please upgrade to a pro plan	to get full	access.','wholesalex'),
 							'whx_email_templates_upgrade_to_pro_btn'	   => __('Upgrade to Pro  ➤','wholesalex'),
@@ -1195,7 +1093,7 @@ class WHOLESALEX_Overview
 							 'whx_form_builder_role' 								=> __('Role.','wholesalex'),
 							 //pro popup
 							 'whx_form_builder_unlock' 								=> __("UNLOCK",'wholesalex'),
-							 'whx_form_builder_unlock_heading' 						=> __("Unlock All Features",'wholesalex'),
+							 'whx_form_builder_unlock_heading' 						=> __("Unlock all Features with",'wholesalex'),
 							 'whx_form_builder_unlock_desc' 						=> __("We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.",'wholesalex'),
 							 'whx_form_builder_upgrade_to_pro' 						=> __("Upgrade to Pro  ➤",'wholesalex'),
 							/**
@@ -1444,40 +1342,7 @@ class WHOLESALEX_Overview
 		);
 
 		wp_set_script_translations('wholesalex_overview', 'wholesalex', WHOLESALEX_PATH . 'languages/');
-
-		//wizerd
-		wp_enqueue_script('wholesalex_wizard');
 		wp_enqueue_style('wholesalex');
-		$localize_content = array(
-			'url'                  			=> WHOLESALEX_URL,
-			'nonce'                			=> wp_create_nonce('wholesalex-setup-wizard'),
-			'ajax'                 			=> admin_url('admin-ajax.php'),
-			'plugin_install_nonce' 			=> wp_create_nonce('updates'),
-			'is_pro_active'        			=> wholesalex()->is_pro_active(),
-			'setting_url'          			=> menu_page_url('wholesalex-settings', false),
-			'dashboard_url'        			=> menu_page_url('wholesalex', false),
-			'site_name'            			=> get_bloginfo('name'),
-			'__wholesalex_initial_setup'   	=> get_option('__wholesalex_initial_setup', false),
-			'woocommer_installed'   		=> file_exists(WP_PLUGIN_DIR . '/woocommerce/woocommerce.php'),
-			'productx_installed'   			=> file_exists(WP_PLUGIN_DIR . '/product-blocks/product-blocks.php'),
-		);
-		if (!$localize_content['setting_url']) {
-			$localize_content['setting_url'] = get_dashboard_url();
-		}
-		if (!$localize_content['dashboard_url']) {
-			$localize_content['dashboard_url'] = get_dashboard_url();
-		}
-		if (!$localize_content['site_name']) {
-			$localize_content['site_name'] = get_bloginfo('name');
-		}
-		if (!$localize_content['__wholesalex_initial_setup']) {
-			$localize_content['__wholesalex_initial_setup'] = get_option('__wholesalex_initial_setup', false);
-		}
-		wp_localize_script(
-			'wholesalex_wizard',
-			'wholesalex_wizard',
-			$localize_content
-		);
 	?>
 		<div id="wholesalex-overview"></div>
 	<?php	

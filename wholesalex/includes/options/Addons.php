@@ -32,25 +32,6 @@ class Addons {
 	}
 
 	/**
-	 * Addons Page Submenu
-	 *
-	 * @return void
-	 */
-	// public function submenu_page() {
-	// 	$slug = apply_filters( 'wholesalex_addons_submenu_slug', 'wholesalex-overview#/addons' );
-	// 	$title = sprintf('<span class="wholesalex-submenu-title__addons">%s</span>',__('Addons','wholesalex'));
-	// 	add_submenu_page(
-	// 		wholesalex()->get_menu_slug(),
-	// 		__( 'Addons', 'wholesalex' ),
-	// 		$title,
-	// 		apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-	// 		$slug,
-	// 		array( $this, 'addons_page_content' ),
-	// 		7
-	// 	);
-	// }
-
-	/**
 	 * Register addon restapi route
 	 *
 	 * @return void
@@ -338,20 +319,21 @@ class Addons {
 		);
 
 		$config['wsx_addon_raq'] = array(
-			'name'                => __( 'Request a Quote', 'wholesalex' ),
-			'desc'                => __( 'Let your buyers request a quote for their desired products. So you can send them custom prices and they can purchase with your given price or negotiate further.', 'wholesalex' ),
-			'img'                 => WHOLESALEX_URL . 'assets/img/addons/raq.svg',
-			'docs'                => 'https://getwholesalex.com/request-a-quote/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
-			'live'                => '',
-			'is_pro'              => true,
-			'is_different_plugin' => false,
-			'depends_on'          => apply_filters( 'wholesalex_addon_raq_depends_on', array( 'wsx_addon_conversation' => __( 'Conversation', 'wholesalex' ) ) ),
-			'eligible_price_ids'  => array( '1', '2', '3', '4', '5', '6', '7' ),
-			'moreFeature'         => 'https://getwholesalex.com/request-a-quote/?utm_source=wholesalex-menu&utm_medium=addons-more_features&utm_campaign=wholesalex-DB',
-			'video'               => 'https://www.youtube.com/embed/jOIdNj18OEI',
-			'status'              => wholesalex()->get_setting( 'wsx_addon_raq' ),
-			'setting_id'          => '#conversation',
-			'lock_status'         => ! ( wholesalex()->is_pro_active() ),
+			'name'                   => __( 'Request a Quote', 'wholesalex' ),
+			'desc'                   => __( 'Let your buyers request a quote for their desired products. So you can send them custom prices and they can purchase with your given price or negotiate further.', 'wholesalex' ),
+			'img'                    => WHOLESALEX_URL . 'assets/img/addons/raq.svg',
+			'docs'                   => 'https://getwholesalex.com/request-a-quote/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
+			'live'                   => '',
+			'is_pro'                 => true,
+			'is_different_plugin'    => false,
+			'depends_on'             => apply_filters( 'wholesalex_addon_raq_depends_on', array( 'wsx_addon_conversation' => __( 'Conversation', 'wholesalex' ) ) ),
+			'eligible_price_ids'     => array( '1', '2', '3', '4', '5', '6', '7' ),
+			'moreFeature'            => 'https://getwholesalex.com/request-a-quote/?utm_source=wholesalex-menu&utm_medium=addons-more_features&utm_campaign=wholesalex-DB',
+			'video'                  => 'https://www.youtube.com/embed/jOIdNj18OEI',
+			'status'                 => wholesalex()->get_setting( 'wsx_addon_raq' ),
+			'setting_id'             => '#conversation',
+			'lock_status'            => ! ( wholesalex()->is_pro_active() ),
+			'is_conversation_active' => wholesalex()->get_setting( 'wsx_addon_conversation' ),
 		);
 
 		$config['wsx_addon_conversation'] = array(

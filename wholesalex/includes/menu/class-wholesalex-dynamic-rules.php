@@ -830,23 +830,6 @@ class WHOLESALEX_Dynamic_Rules {
 			return $sale_price;
 		}
 	}
-	/**
-	 * WholesaleX Dynamic Rule Submenu Page
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 */
-	// public function wholesalex_dynamic_rules_submenu_page() {
-	// 	$slug = apply_filters( 'wholesalex_dynamic_rules_submenu_slug', 'wholesalex-overview#/dynamic-rules' );
-	// 	add_submenu_page(
-	// 		wholesalex()->get_menu_slug(),
-	// 		__( 'Dynamic Rules', 'wholesalex' ),
-	// 		__( 'Dynamic Rules', 'wholesalex' ),
-	// 		apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-	// 		$slug,
-	// 		array( $this, 'wholesalex_dynamic_rules_content' )
-	// 	);
-	// }
 
 	/**
 	 * Dynamic Rules Bulk Action Rest Api
@@ -909,6 +892,15 @@ class WHOLESALEX_Dynamic_Rules {
 					}
 				}
 				$dynamic_message = 'delete';
+				break;
+
+			case 'export':
+				foreach ($ruleIds as $ruleId) {
+					if (isset($rules[$ruleId])) {
+						unset($rules[$ruleId]);
+					}
+				}
+				$dynamic_message = 'export';
 				break;
 
 			default:
@@ -6099,9 +6091,11 @@ class WHOLESALEX_Dynamic_Rules {
 			'woocommerce_quantity_input_args',
 			function ($args, $product) use ($data) {
 
-				if (!($product->is_type('simple') || $product->is_type('variation'))) {
-					return $args;
-				}
+				// Quantity Step Control for Variable Product to comment this Condition
+				// if (!($product->is_type('simple') || $product->is_type('variation'))) {
+				// 	return $args;
+				// }
+				
 				if (!empty($data['min_order_qty'])) {
 					foreach ($data['min_order_qty'] as $rule) {
 						if (isset($rule['conditions']) && !self::check_rule_conditions($rule['conditions'])) {
@@ -6652,12 +6646,36 @@ class WHOLESALEX_Dynamic_Rules {
 				}
 			}
 
-			if (!$product->is_type('simple')) {
+			if ( !$product->is_type('simple') ) {
 				$price = $product->is_on_sale() ? $product->get_sale_price() : $product->get_regular_price();
-				$is_woo_custom_price = get_post_meta($product->get_parent_id(), '_product_addons', true);
-				if( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 && is_array( $is_woo_custom_price ) && !empty( $is_woo_custom_price ) ){
+				// Check if product has custom price set by WooCommerce Product Addons plugin Compatibility
+				$is_woo_custom_price      = floatval(get_post_meta($product->get_parent_id(), '_product_addons', true));
+				$regular_price            = floatval($product->get_regular_price());
+				$sale_price               = floatval($product->get_sale_price());
+				$id                       = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+				$_sale_price              = floatval(get_post_meta($id, '_sale_price', true));
+				$regular_price            = floatval(get_post_meta($id, '_regular_price', true)) + $woo_custom_price;
+				$get_discount             = abs($sale_price - $regular_price) / $regular_price;
+				$discouned_price          = number_format($get_discount, 2, '.', '');
+				$__current_role_id        = wholesalex()->get_current_user_role();
+				$is_sale_price_modified   = $sale_price - $woo_custom_price === $_sale_price;
+				$is_user_role_price_apply = false;
+				if (isset($__current_role_id)) {
+					$_user_role_base_price    = floatval(get_post_meta($id, $__current_role_id . '_base_price', true));
+					$_user_role_sale_price    = floatval(get_post_meta($id, $__current_role_id . '_sale_price', true));
+					$is_user_role_price_apply = (!empty($_user_role_base_price) || !empty($_user_role_sale_price)) ? true : false;
+				}
+				$calculate_totlal_price = ($regular_price - $woo_custom_price) * (1 - $discouned_price);
+				if( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 && is_array( $is_woo_custom_price ) && !empty( $is_woo_custom_price ) && $is_user_role_price_apply ) {
+					// Set the Price with user role price
 					$product->set_price( max( 0, $this->price_after_currency_changed( $price ) ) + $woo_custom_price );
-				}else{
+				}
+				elseif( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 && is_array( $is_woo_custom_price ) && !empty( $is_woo_custom_price ) && !$is_sale_price_modified ) {
+					// Set the Price without user role price
+					$product->set_price( max( 0, $this->price_after_currency_changed( $calculate_totlal_price ) ) + $woo_custom_price );
+				}
+				else{
+					// Set the Default Price
 					$product->set_price( max( 0, $this->price_after_currency_changed( $price ) ) );
 				}
 			}

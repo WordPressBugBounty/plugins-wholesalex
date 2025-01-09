@@ -144,7 +144,8 @@
       flex-direction: column;
       gap: 25px; }
     .wholesalex-form-wrapper .wholesalex-login-form .wholesalex-login-form-title {
-      margin-bottom: 30px !important; }
+      margin-bottom: 30px !important;
+      width: auto; }
   .wholesalex-form-wrapper .wsx-login-fields input {
     caret-color: var(--wsx-login-input-color); }
     .wholesalex-form-wrapper .wsx-login-fields input::placeholder {
@@ -353,8 +354,7 @@ body .wholesalex-form-wrapper .wsx-file-outline .wsx-clone-label {
   appearance: unset !important;
   display: flex !important;
   justify-content: center;
-  align-items: center;
-  margin-top: 6px !important; }
+  align-items: center; }
   .wsx-form-checkbox .wholesalex-field-wrap > input:checked::before {
     content: " \2714" !important;
     width: 16px !important;
@@ -399,7 +399,7 @@ body .wholesalex-form-wrapper .wsx-file-outline .wsx-clone-label {
 .wsx-form-field.wsx-form-checkbox .wholesalex-field-wrap {
   display: flex !important;
   justify-content: flex-start;
-  align-items: flex-start; }
+  align-items: center; }
 
 .wsx-form-field.wsx-form-checkbox .wholesalex-field-wrap, .wsx-form-field.wsx-field-radio .wholesalex-field-wrap {
   gap: 8px; }

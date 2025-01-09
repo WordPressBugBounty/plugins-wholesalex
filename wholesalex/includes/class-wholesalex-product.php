@@ -1112,7 +1112,7 @@ class WHOLESALEX_Product {
 			'roles'=>wholesalex()->get_roles('b2b_roles_option'),
 			'i18n' => array(
 				'unlock' => __("UNLOCK",'wholesalex'),
-				'unlock_heading' => __("Unlock All Features",'wholesalex'),
+				'unlock_heading' => __("Unlock All Features with",'wholesalex'),
 				'unlock_desc' => __("We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.",'wholesalex'),
 				'upgrade_to_pro' => __("Upgrade to Pro  ➤",'wholesalex'),
 			)
@@ -1406,19 +1406,6 @@ class WHOLESALEX_Product {
 				'_product_settings_tab' => array(
 					'type' => 'custom_tab',
 					'attr' => array(
-						// '_settings_tier_layout_single_product'        => array(
-						// 	'type'    => 'choosebox',
-						// 	'label'   => __( 'Tier Table Layout in Product Single Page', 'wholesalex' ),
-						// 	'options' => apply_filters(
-						// 		'wholesalex_single_product_tier_layout',
-						// 		array(
-						// 			'layout_one'   => WHOLESALEX_URL . '/assets/img/layout_one.png',
-						// 			'layout_two'   => WHOLESALEX_URL . '/assets/img/layout_two.png',
-						// 			'layout_three' => WHOLESALEX_URL . '/assets/img/layout_three.png',
-						// 		)
-						// 	),
-						// 	'default' => wholesalex()->get_setting('_settings_tier_layout'),
-						// ),
 						'_settings_tire_price_product_layout'  => array(
 							'type'    => 'radio',
 							'label'   => __( 'Tier Price Table Style', 'wholesalex' ),
@@ -1436,12 +1423,6 @@ class WHOLESALEX_Product {
 							'desc'    => __( 'Tier Price Table Vertical Style', 'wholesalex' ),
 							'default' => 'no',
 						),
-						// '_settings_tier_table_radius_product_style' => array(
-						// 	'type'    => 'slider',
-						// 	'label'   => __( 'Tier Price Table Border Radius', 'wholesalex' ),
-						// 	'desc'    => __( 'Tier Price Table Border Radius', 'wholesalex' ),
-						// 	'default' => 'no',
-						// ),
 
 						'_settings_show_tierd_pricing_table' => array(
 							// 'type'    => 'switch',
@@ -1450,26 +1431,6 @@ class WHOLESALEX_Product {
 							'help'    => '',
 							'default' => 'yes',
 						),
-						// '_settings_override_tax_extemption' => array(
-						// 'type'    => 'select',
-						// 'label'   => __( 'Override Tax Extemption', 'wholesalex' ),
-						// 'options' => array(
-						// 'enable'  => __( 'Enable', 'wholesalex' ),
-						// 'disable' => __( 'Disable', 'wholesalex' ),
-						// ),
-						// 'help'    => '',
-						// 'default' => 'disable',
-						// ),
-						// '_settings_override_shipping_role' => array(
-						// 'type'    => 'select',
-						// 'label'   => __( 'Override Shipping Role', 'wholesalex' ),
-						// 'options' => array(
-						// 'enable'  => __( 'Enable', 'wholesalex' ),
-						// 'disable' => __( 'Disable', 'wholesalex' ),
-						// ),
-						// 'help'    => '',
-						// 'default' => 'disable',
-						// ),
 						'_settings_product_visibility' => array(
 							'label' => __( 'Visibility', 'wholesalex' ),
 							'type'  => 'visibility_section',
@@ -2347,18 +2308,6 @@ class WHOLESALEX_Product {
 				
 				<div class="wsx-product-rule-tab-container wsx-scrollbar" id="productVariables">
 					<div class="wsx-product-variable-data"></div>
-					<!-- <div class="wsx-product-rule-tab-header wsx-row-item-3">
-						<div class="wsx-product-rule-tab-header-item">Variations</div>
-						<div class="wsx-product-rule-tab-header-item"></div>
-						<div class="wsx-product-rule-tab-header-item">Edit</div>
-					</div>
-					<div class="wsx-product-rule-tab-body">
-						<div class="wsx-product-rule-tab-row wsx-row-item-3">
-							<div class="wsx-product-rule-tab-row-item wsx-ellipsis">a</div>
-							<div class="wsx-product-rule-tab-row-item wsx-ellipsis">a</div>
-							<div class="wsx-product-rule-tab-row-item">a</div>
-						</div>
-					</div> -->
 				</div>
 				
 				<div class="wsx-product-rule-tab-container wsx-scrollbar" id="category">
@@ -2544,43 +2493,6 @@ class WHOLESALEX_Product {
 									'</div>';
 								return html;
 							}
-							
-							// if ( productInfo.Single === undefined ) {
-							// 	$('.wsx-single-count').text('');
-							// } 
-							// else if (productInfo.Singles) {
-							// 	let resultArray = Object.entries(productInfo.Singles).map(([key, value]) => [key, value]);
-							// 	singleHtml = generateList('Singles', resultArray);
-							// 	apply_rules_count += productInfo.Singles.length;
-							// 	$('.wsx-single-count').text(`Individual Product (${productInfo.Singles.length})`);
-							// }
-
-							// if ( productInfo.Single === undefined ) {
-							// 	$('.wsx-single-count').text('');
-							// } 
-							// else if(productInfo.Single) {
-							// 	singleHtml = generateList('Single', productInfo.Single);
-							// 	apply_rules_count += productInfo.Single.length;
-							// 	$('.wsx-single-count').text(`Individual Product (${productInfo.Single.length == 0 ? '0' : productInfo.Single.length})`);
-							// }
-
-							// if ( productInfo.Profile === undefined ) {
-							// 	$('.wsx-profile-count').text('');
-							// } 
-							// else if(productInfo.Profile) {
-							// 	profileHtml = generateList('Profile', productInfo.Profile);
-							// 	apply_rules_count += productInfo.Profile.length;
-							// 	$('.wsx-profile-count').text(`User Profile (${productInfo.Profile.length})`);
-							// }
-
-							// if ( productInfo.Category === undefined ) {
-							// 	$('.wsx-category-count').text('');
-							// } 
-							// else if (productInfo.Category) {
-							// 	categoryHtml = generateList('Category', productInfo.Category);
-							// 	apply_rules_count += productInfo.Category.length;
-							// 	$('.wsx-category-count').text(`Category (${productInfo.Category.length})`);
-							// }
 							const updateCountAndHtml = (type, title, data, isVariableProducr = false) => {
 								
 								if ( data === undefined && isVariableProducr == false ) {
@@ -2592,7 +2504,6 @@ class WHOLESALEX_Product {
 									$(`.wsx-${ (type === 'Singles' ? 'single' : type.toLowerCase() ) }-count`).text(`${title} (${resultArray.length})`);
 									return html;
 								}
-								// return `<h2>No data available for this product.</h2>`;
 								return `<div class="wsx-text-center"><svg xmlns="http://www.w3.org/2000/svg" width="150" height="168" viewBox="0 0 288 168" fill="none"><path fill="#070707" d="M26.59 129.909V159h-3.408L7.33 136.159h-.285V159H3.523v-29.091h3.409l15.909 22.898h.284v-22.898h3.466Zm15.019 29.546c-1.97 0-3.698-.469-5.185-1.407-1.477-.937-2.632-2.249-3.466-3.934-.823-1.686-1.235-3.656-1.235-5.909 0-2.273.412-4.257 1.235-5.952.834-1.695 1.99-3.012 3.466-3.949 1.487-.938 3.215-1.406 5.185-1.406 1.97 0 3.693.468 5.17 1.406 1.487.937 2.642 2.254 3.466 3.949.834 1.695 1.25 3.679 1.25 5.952 0 2.253-.416 4.223-1.25 5.909-.823 1.685-1.979 2.997-3.465 3.934-1.478.938-3.201 1.407-5.171 1.407Zm0-3.012c1.496 0 2.727-.383 3.693-1.15.966-.767 1.681-1.776 2.145-3.026.464-1.25.696-2.604.696-4.062 0-1.459-.232-2.818-.696-4.077-.464-1.26-1.179-2.278-2.145-3.054-.966-.777-2.197-1.165-3.693-1.165s-2.727.388-3.693 1.165c-.966.776-1.681 1.794-2.145 3.054-.464 1.259-.696 2.618-.696 4.077 0 1.458.232 2.812.696 4.062.464 1.25 1.179 2.259 2.145 3.026.966.767 2.197 1.15 3.693 1.15ZM76.414 159h-8.977v-29.091h9.375c2.822 0 5.237.582 7.244 1.747 2.008 1.156 3.547 2.817 4.617 4.986 1.07 2.159 1.605 4.744 1.605 7.756 0 3.03-.54 5.639-1.62 7.826-1.079 2.178-2.65 3.855-4.715 5.029-2.065 1.165-4.574 1.747-7.529 1.747Zm-5.454-3.125h5.227c2.405 0 4.399-.464 5.98-1.392 1.582-.928 2.76-2.249 3.537-3.963.777-1.714 1.165-3.755 1.165-6.122 0-2.349-.384-4.371-1.15-6.066-.768-1.704-1.913-3.011-3.438-3.92-1.525-.919-3.423-1.378-5.696-1.378H70.96v22.841Zm30.753 3.636c-1.383 0-2.637-.26-3.764-.781-1.127-.53-2.022-1.292-2.685-2.287-.663-1.004-.994-2.216-.994-3.636 0-1.25.246-2.263.739-3.04a5.221 5.221 0 0 1 1.974-1.847 10.387 10.387 0 0 1 2.727-.994 33.4 33.4 0 0 1 3.026-.54c1.325-.17 2.4-.298 3.224-.383.834-.095 1.44-.251 1.818-.469.389-.218.583-.597.583-1.136v-.114c0-1.401-.384-2.49-1.151-3.267-.757-.776-1.908-1.165-3.452-1.165-1.6 0-2.855.351-3.764 1.051-.909.701-1.548 1.449-1.917 2.245l-3.182-1.137c.568-1.325 1.326-2.358 2.273-3.096a8.526 8.526 0 0 1 3.125-1.563 12.968 12.968 0 0 1 3.352-.454c.701 0 1.506.085 2.415.255a7.738 7.738 0 0 1 2.656 1.009c.862.511 1.577 1.283 2.145 2.315.568 1.032.852 2.415.852 4.148V159h-3.352v-2.955h-.171c-.227.474-.606.981-1.136 1.52-.53.54-1.236.999-2.117 1.378-.88.379-1.955.568-3.224.568Zm.511-3.011c1.326 0 2.444-.26 3.353-.781.918-.521 1.609-1.193 2.074-2.017.473-.824.71-1.691.71-2.6v-3.068c-.142.171-.455.327-.938.469-.473.132-1.022.251-1.647.355-.616.095-1.217.18-1.804.256-.578.066-1.047.123-1.407.17-.871.114-1.685.298-2.443.554-.748.246-1.354.62-1.818 1.122-.455.493-.682 1.165-.682 2.017 0 1.165.431 2.046 1.293 2.642.87.587 1.974.881 3.309.881Zm24.656-19.318v2.841h-11.307v-2.841h11.307Zm-8.011-5.227h3.352v20.795c0 .947.137 1.657.412 2.131.284.464.644.776 1.08.937.445.152.913.227 1.406.227.369 0 .672-.018.909-.056l.568-.114.682 3.011a6.681 6.681 0 0 1-.952.256c-.407.095-.923.142-1.548.142a6.75 6.75 0 0 1-2.784-.611 5.517 5.517 0 0 1-2.244-1.861c-.588-.833-.881-1.884-.881-3.153v-21.704Zm19.034 27.556c-1.382 0-2.637-.26-3.764-.781-1.127-.53-2.022-1.292-2.685-2.287-.662-1.004-.994-2.216-.994-3.636 0-1.25.246-2.263.739-3.04a5.216 5.216 0 0 1 1.974-1.847 10.39 10.39 0 0 1 2.727-.994 33.48 33.48 0 0 1 3.026-.54 138.22 138.22 0 0 1 3.224-.383c.834-.095 1.44-.251 1.819-.469.388-.218.582-.597.582-1.136v-.114c0-1.401-.383-2.49-1.151-3.267-.757-.776-1.908-1.165-3.451-1.165-1.601 0-2.855.351-3.764 1.051-.91.701-1.549 1.449-1.918 2.245l-3.182-1.137c.568-1.325 1.326-2.358 2.273-3.096a8.523 8.523 0 0 1 3.125-1.563 12.973 12.973 0 0 1 3.352-.454c.701 0 1.506.085 2.415.255a7.738 7.738 0 0 1 2.656 1.009c.862.511 1.577 1.283 2.145 2.315.568 1.032.852 2.415.852 4.148V159h-3.352v-2.955h-.17c-.228.474-.606.981-1.137 1.52-.53.54-1.236.999-2.116 1.378-.881.379-1.956.568-3.225.568Zm.512-3.011c1.325 0 2.443-.26 3.352-.781.919-.521 1.61-1.193 2.074-2.017.473-.824.71-1.691.71-2.6v-3.068c-.142.171-.454.327-.937.469-.474.132-1.023.251-1.648.355-.616.095-1.217.18-1.804.256-.578.066-1.047.123-1.406.17-.872.114-1.686.298-2.444.554-.748.246-1.354.62-1.818 1.122-.454.493-.682 1.165-.682 2.017 0 1.165.431 2.046 1.293 2.642.871.587 1.974.881 3.31.881Zm26.431 2.5v-29.091h17.444v3.125h-13.921v9.83h12.614v3.125h-12.614V159h-3.523Zm29.845.455c-1.97 0-3.698-.469-5.185-1.407-1.477-.937-2.633-2.249-3.466-3.934-.824-1.686-1.236-3.656-1.236-5.909 0-2.273.412-4.257 1.236-5.952.833-1.695 1.989-3.012 3.466-3.949 1.487-.938 3.215-1.406 5.185-1.406 1.969 0 3.693.468 5.17 1.406 1.487.937 2.642 2.254 3.466 3.949.833 1.695 1.25 3.679 1.25 5.952 0 2.253-.417 4.223-1.25 5.909-.824 1.685-1.979 2.997-3.466 3.934-1.477.938-3.201 1.407-5.17 1.407Zm0-3.012c1.496 0 2.727-.383 3.693-1.15.966-.767 1.681-1.776 2.145-3.026.464-1.25.696-2.604.696-4.062 0-1.459-.232-2.818-.696-4.077-.464-1.26-1.179-2.278-2.145-3.054-.966-.777-2.197-1.165-3.693-1.165-1.497 0-2.728.388-3.694 1.165-.966.776-1.68 1.794-2.145 3.054-.464 1.259-.696 2.618-.696 4.077 0 1.458.232 2.812.696 4.062.465 1.25 1.179 2.259 2.145 3.026.966.767 2.197 1.15 3.694 1.15Zm28.313-6.363v-12.898h3.352V159h-3.352v-3.693h-.227c-.512 1.108-1.307 2.05-2.387 2.827-1.079.767-2.443 1.15-4.09 1.15-1.364 0-2.576-.298-3.637-.895-1.06-.606-1.894-1.515-2.5-2.727-.606-1.222-.909-2.76-.909-4.617v-13.863h3.352v13.636c0 1.591.445 2.86 1.336 3.807.899.947 2.045 1.42 3.437 1.42.833 0 1.681-.213 2.543-.639.871-.426 1.6-1.079 2.187-1.96.597-.881.895-2.003.895-3.366Zm12.405-4.205V159h-3.353v-21.818h3.239v3.409h.284a6.232 6.232 0 0 1 2.33-2.671c1.041-.681 2.386-1.022 4.034-1.022 1.477 0 2.77.303 3.878.909 1.107.596 1.969 1.505 2.585 2.727.615 1.212.923 2.746.923 4.602V159h-3.352v-13.636c0-1.714-.445-3.05-1.335-4.006-.891-.966-2.112-1.449-3.665-1.449-1.07 0-2.027.232-2.87.696-.833.464-1.491 1.141-1.974 2.031-.483.891-.724 1.97-.724 3.239Zm27.844 13.58c-1.818 0-3.423-.46-4.815-1.378-1.392-.928-2.481-2.235-3.267-3.921-.786-1.695-1.179-3.698-1.179-6.008 0-2.292.393-4.281 1.179-5.966.786-1.686 1.88-2.988 3.281-3.906 1.402-.919 3.021-1.378 4.858-1.378 1.421 0 2.543.236 3.367.71.833.464 1.467.994 1.903 1.591.445.587.791 1.07 1.037 1.449h.284v-10.739h3.352V159h-3.238v-3.352h-.398c-.246.397-.597.899-1.051 1.505-.455.597-1.103 1.132-1.946 1.606-.843.464-1.965.696-3.367.696Zm.455-3.012c1.345 0 2.481-.35 3.409-1.051.928-.71 1.634-1.69 2.116-2.94.483-1.26.725-2.713.725-4.361 0-1.629-.237-3.054-.71-4.276-.474-1.231-1.175-2.187-2.103-2.869-.928-.691-2.073-1.037-3.437-1.037-1.421 0-2.604.365-3.551 1.094-.938.72-1.643 1.7-2.117 2.94-.464 1.231-.696 2.614-.696 4.148 0 1.553.237 2.964.711 4.233.482 1.259 1.193 2.263 2.13 3.011.947.739 2.121 1.108 3.523 1.108Zm20.142-26.534-.284 20.909h-3.295l-.284-20.909h3.863Zm-1.932 29.318c-.7 0-1.302-.251-1.803-.753a2.459 2.459 0 0 1-.753-1.804c0-.7.251-1.302.753-1.804a2.461 2.461 0 0 1 1.803-.752c.701 0 1.303.251 1.804.752.502.502.753 1.104.753 1.804 0 .464-.118.891-.355 1.279a2.646 2.646 0 0 1-.923.937 2.431 2.431 0 0 1-1.279.341Z"/><path fill="#FEAD01" d="M76 24c0-6.627 5.373-12 12-12h31.029a12 12 0 0 0 8.486-3.515l4.97-4.97A12.002 12.002 0 0 1 140.971 0H192c6.627 0 12 5.373 12 12v72c0 6.627-5.373 12-12 12H88c-6.627 0-12-5.373-12-12V24Z"/><ellipse cx="118.223" cy="36.445" fill="#070707" rx="6.222" ry="9.333"/><ellipse cx="161.778" cy="36.444" fill="#070707" rx="6.222" ry="9.333"/><path stroke="#070707" stroke-width="3.111" d="M167.306 76.889C164.477 64.419 153.326 55.11 140 55.11c-13.325 0-24.476 9.309-27.306 21.778"/></svg></div>`;
 							};
 
@@ -2638,16 +2549,6 @@ class WHOLESALEX_Product {
 							// If the product ID does not exist, clear the sections and show a message
 							$('.wsx-product-dynamic-data').html('<span>No data available for this product.</span>');
 						}
-
-						// Show popup on button hover on Variation Products
-						// $('.wsx-wholesalex-show-variation-btn').hover(
-						// 	function() {
-						// 		$(this).siblings('.wsx-wholesalex-variation-popup').show();
-						// 	},
-						// 	function() {
-						// 		$(this).siblings('.wsx-wholesalex-variation-popup').hide();
-						// 	}
-						// );
 						//Show more or show less
 						$('.wsx-btn-toggle-show').on('click', function () {
 							$(this).toggleClass('active');

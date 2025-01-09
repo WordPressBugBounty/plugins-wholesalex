@@ -148,23 +148,6 @@ class WHOLESALEX_Users {
 	}
 
 	/**
-	 * Users Page Submenu
-	 *
-	 * @return void
-	 */
-	// public function users_page_submenu() {
-	// 	$slug = apply_filters( 'wholesalex_users_submenu_slug', 'wholesalex-overview#/users' );
-	// 	add_submenu_page(
-	// 		wholesalex()->get_menu_slug(),
-	// 		__( 'Users', 'wholesalex' ),
-	// 		__( 'Users', 'wholesalex' ),
-	// 		apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-	// 		$slug,
-	// 		array( $this, 'users_page_content' )
-	// 	);
-	// }
-
-	/**
 	 * Users Submenu Page Content
 	 *
 	 * @return void

@@ -93,24 +93,6 @@ class WHOLESALEX_Registration {
 	}
 
 	/**
-	 * Role Menu callback
-	 *
-	 * @return void
-	 */
-	// public function form_builder_add_submenu_page() {
-	// 	$slug = apply_filters( 'wholesalex_registration_form_builder_submenu_slug', 'wholesalex-overview#/registration' );
-	// 	add_submenu_page(
-	// 		wholesalex()->get_menu_slug(),
-	// 		__( 'Registration Form', 'wholesalex' ),
-	// 		__( 'Registration Form', 'wholesalex' ),
-	// 		apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-	// 		$slug,
-	// 		array( $this, 'output' )
-	// 	);
-
-	// }
-
-	/**
 	 * User Registration Form Output
 	 *
 	 * @since 1.0.0
@@ -737,7 +719,7 @@ class WHOLESALEX_Registration {
 							<?php
 						}
 						?>
-						<input type="<?php echo esc_attr($field['type']);?>" class="woocommerce-Input woocommerce-Input--text input-text <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( isset($_POST[$field['name']]) && ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>" required="<?php echo esc_attr($is_required) ?>"/><?php // @codingStandardsIgnoreLine ?>
+						<input type="<?php echo esc_attr($field['type']);?>" class="wsx-input woocommerce-Input woocommerce-Input--text input-text <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( isset($_POST[$field['name']]) && ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>" required="<?php echo esc_attr($is_required) ?>"/><?php // @codingStandardsIgnoreLine ?>
 						<span class="wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>"> </span>
 						<?php
 						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
@@ -768,7 +750,7 @@ class WHOLESALEX_Registration {
 							<?php
 						}
 						?>
-						<input type="<?php echo esc_attr($field['type']);?>" class="woocommerce-Input  <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>" required="<?php echo esc_attr($is_required) ?>"/><?php // @codingStandardsIgnoreLine ?>
+						<input type="<?php echo esc_attr($field['type']);?>" class="wsx-input woocommerce-Input  <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>" required="<?php echo esc_attr($is_required) ?>"/><?php // @codingStandardsIgnoreLine ?>
 						<span class="wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>"> </span>
 						<?php
 						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
@@ -840,7 +822,7 @@ class WHOLESALEX_Registration {
 					<?php
 					foreach ( $field['option'] as $option ) {
 						?>
-								<input type="radio" class="woocommerce-form__input" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" id="<?php echo esc_attr( $option['value'] ); ?>" />
+								<input type="radio" class="wsx-radio woocommerce-form__input" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" id="<?php echo esc_attr( $option['value'] ); ?>" />
 								<span><?php echo esc_html( $option['name'] ); ?></span>
 							<?php
 					}
@@ -879,7 +861,7 @@ class WHOLESALEX_Registration {
 					<?php
 					foreach ( $field['option'] as $option ) {
 						?>
-								<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" id="<?php echo esc_attr( $option['value'] ); ?>" />
+								<input type="checkbox" class="wsx-checkbox woocommerce-form__input woocommerce-form__input-checkbox" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" id="<?php echo esc_attr( $option['value'] ); ?>" />
 								<span><?php echo esc_html( $option['name'] ); ?></span>
 							<?php
 					}

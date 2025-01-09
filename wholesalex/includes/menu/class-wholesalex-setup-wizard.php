@@ -60,27 +60,6 @@ class WHOLESALEX_Setup_Wizard {
 	}
 
 	/**
-	 * WholesaleX Setup Wizard Add Submenu Page
-	 *
-	 * @since 1.1.0
-	 * @access public
-	 */
-	// public function submenu_page() {
-	// 	$slug              = apply_filters( 'wholesalex_setup_wizard_submenu_slug', 'wholesalex-setup-wizard' );
-	// 	$is_wizard_enabled = apply_filters( 'wholesalex_setup_wizard_menu_page_enabled', true );
-	// 	if ( $is_wizard_enabled ) {
-	// 		add_submenu_page(
-	// 			'wholesalex',
-	// 			__( 'Setup Wizard', 'wholesalex' ),
-	// 			__( 'Setup Wizard', 'wholesalex' ),
-	// 			apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-	// 			$slug,
-	// 			array( $this, 'initial_setup_content' )
-	// 		);
-	// 	}
-	// }
-
-	/**
 	 * Addons
 	 *
 	 * @return array

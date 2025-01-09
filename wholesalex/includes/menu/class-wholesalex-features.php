@@ -23,27 +23,6 @@ class WholesaleX_Features {
 	}
 
 	/**
-	 * WholesaleX Email Add Submenu Page
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 */
-	// public function wholesalex_features_submenu_page() {
-	// 	$slug                = apply_filters( 'wholesalex_features_submenu_slug', 'wholesalex-overview#/features' );
-	// 	$is_features_enabled = apply_filters( 'wholesalex_features_menu_page_enabled', true );
-	// 	if ( $is_features_enabled ) {
-	// 		add_submenu_page(
-	// 			wholesalex()->get_menu_slug(),
-	// 			__( 'Features', 'wholesalex' ),
-	// 			__( 'Features', 'wholesalex' ),
-	// 			apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-	// 			$slug,
-	// 			array( $this, 'feature_page_content' )
-	// 		);
-	// 	}
-	// }
-
-	/**
 	 * Feature Page Content
 	 *
 	 * @return void

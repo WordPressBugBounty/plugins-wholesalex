@@ -1979,10 +1979,10 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/* global window, exports, define */
 
 /***/ }),
 
-/***/ "./reactjs/src/components/Button_New.js":
-/*!**********************************************!*\
-  !*** ./reactjs/src/components/Button_New.js ***!
-  \**********************************************/
+/***/ "./reactjs/src/components/Button.js":
+/*!******************************************!*\
+  !*** ./reactjs/src/components/Button.js ***!
+  \******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -1995,11 +1995,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
 
 
-const Button_New = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.forwardRef)((_ref, ref) => {
+const Button = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.forwardRef)((_ref, ref) => {
   let {
     label = '',
     padding = '',
     iconName = '',
+    iconClass = '',
     iconColor = '',
     iconPosition = 'before',
     iconGap = '',
@@ -2041,20 +2042,20 @@ const Button_New = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.forwardRef
     onClick: handleClick,
     "data-target": dataTarget
   }, IconPosition && Icon && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: `wsx-icon ${iconAnimation ? `wsx-anim-${iconAnimation}` : ''} ${iconColor ? `wsx-color-${iconColor}` : ''}`,
+    className: `wsx-icon ${iconAnimation ? `wsx-anim-${iconAnimation}` : ''} ${iconColor ? `wsx-color-${iconColor}` : ''} ${iconClass ? iconClass : ''}`,
     style: {
       transition: 'transform var(--transition-md)',
       transform: iconRotation && isActive ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)'
     }
   }, Icon), label, !IconPosition && Icon && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: `wsx-icon ${iconAnimation ? `wsx-anim-${iconAnimation}` : ''} ${iconColor ? `wsx-color-${iconColor}` : ''}`,
+    className: `wsx-icon ${iconAnimation ? `wsx-anim-${iconAnimation}` : ''} ${iconColor ? `wsx-color-${iconColor}` : ''} ${iconClass ? iconClass : ''}`,
     style: {
       transition: 'transform var(--transition-md)',
       transform: iconRotation && isActive ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)'
     }
   }, Icon));
 });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Button_New);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Button);
 
 /***/ }),
 
@@ -2117,6 +2118,7 @@ const Choosebox = props => {
       }
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
       // disabled={_lockField?true:false}
+      className: "wsx-input",
       id: option,
       name: name,
       type: "radio",
@@ -2241,10 +2243,10 @@ const Input = props => {
 
 /***/ }),
 
-/***/ "./reactjs/src/components/LoadingOverlay.js":
-/*!**************************************************!*\
-  !*** ./reactjs/src/components/LoadingOverlay.js ***!
-  \**************************************************/
+/***/ "./reactjs/src/components/LoadingGif.js":
+/*!**********************************************!*\
+  !*** ./reactjs/src/components/LoadingGif.js ***!
+  \**********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -2255,16 +2257,48 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 
-const LoadingOverlay = () => {
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "wholesalex-editor__loading-overlay"
+const LoadingGif = _ref => {
+  let {
+    overlay = true,
+    insideContainer = false,
+    customClass,
+    loaderClass
+  } = _ref;
+  return overlay ? insideContainer ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "wsx-absolute wsx-z-999 wsx-top wsx-bottom wsx-left wsx-right wsx-d-flex wsx-item-center wsx-justify-center",
+    style: {
+      backgroundColor: 'rgb(255 255 255 / 88%)'
+    }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
-    className: "wholesalex-editor__loading-overlay__inner",
-    src: wholesalex.url + "assets/img/spinner.gif",
-    alt: "Loading..."
-  }));
+    className: `wsx-absolute wsx-z-99999 wsx-top-20p ${loaderClass}`,
+    style: {
+      maxWidth: '100px',
+      maxHeight: '100px'
+    },
+    src: `${wholesalex.url}assets/img/wsx-loading.gif`,
+    alt: "loading Image"
+  })) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: `wsx-popup-overlay ${customClass}`,
+    style: {
+      backgroundColor: 'rgb(255 255 255 / 88%)'
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+    className: `${loaderClass}`,
+    style: {
+      maxWidth: '100px',
+      maxHeight: '100px'
+    },
+    src: `${wholesalex.url}assets/img/wsx-loading.gif`
+  })) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+    className: `${loaderClass}`,
+    style: {
+      maxWidth: '100px',
+      maxHeight: '100px'
+    },
+    src: `${wholesalex.url}assets/img/wsx-loading.gif`
+  });
 };
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LoadingOverlay);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LoadingGif);
 
 /***/ }),
 
@@ -2457,7 +2491,7 @@ const PopupModal = _ref => {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-popup-content wsx-scrollbar"
   }, renderContent()), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "wsx-icon-cross",
+    className: "wsx-modal-close wsx-icon-cross",
     onClick: handleClose
   }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].cross)));
 };
@@ -2527,7 +2561,8 @@ const RadioButtons = props => {
     type: "radio",
     value: option,
     defaultChecked: option === value,
-    onChange: onChange
+    onChange: onChange,
+    className: "wsx-radio"
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
     htmlFor: option,
     className: "wsx-label wsx-option-desc"
@@ -2539,10 +2574,10 @@ const RadioButtons = props => {
 
 /***/ }),
 
-/***/ "./reactjs/src/components/Select_New.js":
-/*!**********************************************!*\
-  !*** ./reactjs/src/components/Select_New.js ***!
-  \**********************************************/
+/***/ "./reactjs/src/components/Select.js":
+/*!******************************************!*\
+  !*** ./reactjs/src/components/Select.js ***!
+  \******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -2558,7 +2593,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function Select_New(_ref) {
+function Select(_ref) {
   let {
     id = '',
     value = '',
@@ -2639,9 +2674,7 @@ function Select_New(_ref) {
     setIsDropdownOpen(!isDropdownOpen);
   };
   const handleOptionSelect = optionValue => {
-    const selected = options.find(option => option.value == optionValue);
-    setSelectedOption(selected ? selected.label : selectionText);
-    setIsDropdownOpen(false);
+    const isLock = optionValue?.startsWith('pro_');
     if (onChange) {
       onChange({
         target: {
@@ -2650,6 +2683,13 @@ function Select_New(_ref) {
         }
       });
     }
+    if (isLock) {
+      setIsDropdownOpen(false);
+      return;
+    }
+    const selected = options.find(option => option.value == optionValue);
+    setSelectedOption(selected ? selected.label : selectionText);
+    setIsDropdownOpen(false);
   };
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     value = value ? value : 'default';
@@ -2666,7 +2706,7 @@ function Select_New(_ref) {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [isDropdownOpen]);
-  const dropdownContent = isDropdownOpen && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+  const dropdownContent = isDropdownOpen && !noValue && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-option-container wsx-scrollbar wsx-p-${containerPadding} wsx-bg-${containerBackground} wsx-br-${containerBorderRadius} ${containerBorder ? `wsx-border-default wsx-bc-${containerBorderColor}` : ''}`,
     ref: contentRef,
     style: {
@@ -2686,10 +2726,7 @@ function Select_New(_ref) {
     className: `wsx-select-wrapper ${wrapperClass} ${noValue ? 'wsx-d-flex wsx-item-center wsx-gap-8' : ''}`,
     ref: inputRef
   }, label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: `wsx-input-label wsx-font-medium ${labelClass} ${noValue ? 'wsx-mb-0' : ''}`,
-    style: {
-      paddingLeft: noValue && '16px'
-    }
+    className: `wsx-input-label wsx-font-medium ${labelClass} ${noValue ? 'wsx-mb-0 wsx-no-value' : ''}`
   }, label), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-input-inner-wrapper  ${!noValue && (borderNone ? '' : `wsx-border-default wsx-bc-${borderColor}`)} wsx-bg-${inputBackground} wsx-color-${inputColor} wsx-br-${borderRadius}`,
     ref: dropdownRef,
@@ -2711,8 +2748,7 @@ function Select_New(_ref) {
     style: {
       transition: 'transform var(--transition-md)',
       transform: isDropdownOpen ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)',
-      color: iconColor ? iconColor : 'unset',
-      paddingLeft: noValue && '0px'
+      color: iconColor ? iconColor : 'unset'
     }
   }, Icon ? Icon : _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"].angleDown), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-select-value wsx-ellipsis ${selectedOptionClass}`
@@ -2721,12 +2757,11 @@ function Select_New(_ref) {
     style: {
       transition: 'transform var(--transition-md)',
       transform: isDropdownOpen ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)',
-      color: iconColor ? iconColor : 'unset',
-      paddingLeft: noValue && '0px'
+      color: iconColor ? iconColor : 'unset'
     }
   }, Icon ? Icon : _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"].angleDown)), /*#__PURE__*/react_dom__WEBPACK_IMPORTED_MODULE_2___default().createPortal(dropdownContent, document.body)));
 }
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Select_New);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Select);
 
 /***/ }),
 
@@ -2755,14 +2790,12 @@ const Slider = props => {
     isLabelHide,
     isLabelSide,
     labelClass,
-    defaultValue,
     isDisable,
     required,
     value,
     onChange,
     help,
     helpClass,
-    desc,
     className,
     isLock,
     tooltip,
@@ -2778,16 +2811,7 @@ const Slider = props => {
   if (!name) {
     name = `wsx-slider-${Date.now().toString()}`;
   }
-  const [thumbLeft, setThumbLeft] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('2px');
   const trackRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-
-  // useLayoutEffect(() => {
-  //     if (trackRef.current) {
-  //         const trackWidth = trackRef.current.offsetWidth;
-  //         setThumbLeft(value && value != 'no' ? `${trackWidth / 2 == 20 ? 22 : trackWidth / 2}px` : '2px');
-  //     }
-  // }, [value]);
-
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-slider-wrapper ${className}`
   }, !isLabelHide && !isLabelSide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -2800,7 +2824,8 @@ const Slider = props => {
   }, "*"), tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
     content: tooltip,
     direction: tooltipPosition,
-    spaceLeft: "8px"
+    spaceLeft: "8px",
+    className: "wsx-rtl-tooltip-left"
   }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-slider-content ${contentClass}`
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -2825,14 +2850,10 @@ const Slider = props => {
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-slider-thumb",
     style: {
-      // left: thumbLeft,
       backgroundColor: thumbColor || '#ffffff'
     }
   })), !isLabelHide && isLabelSide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: `wsx-input-label wsx-mb-0 ${tooltip ? 'wsx-d-flex wsx-item-center' : ''} ${labelColor && `wsx-color-${labelColor}`} ${labelClass}`,
-    style: {
-      marginLeft: '8px'
-    }
+    className: `wsx-input-label wsx-mb-0 ${tooltip ? 'wsx-d-flex wsx-item-center' : ''} ${labelColor && `wsx-color-${labelColor}`} ${labelClass}`
   }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-required",
     style: {
@@ -2841,7 +2862,8 @@ const Slider = props => {
   }, "*"), tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
     content: tooltip,
     direction: tooltipPosition,
-    spaceLeft: "8px"
+    spaceLeft: "8px",
+    className: "wsx-rtl-tooltip-left"
   }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help))), isLock && (!value || 'no' === value) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
     className: "wsx-lh-0"
   }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].lock)), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -2903,17 +2925,15 @@ const Switch = props => {
   }, "*"), tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
     content: tooltip,
     direction: tooltipPosition,
-    spaceLeft: "8px"
+    spaceLeft: "8px",
+    className: "wsx-rtl-tooltip-left"
   }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-switch-field-wrapper"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
     className: "wsx-label wsx-switch-field-desc wsx-d-flex wsx-item-center wsx-w-fit wsx-curser-pointer",
     htmlFor: name
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "wsx-checkbox-option-wrapper",
-    style: {
-      marginRight: '16px'
-    }
+    className: "wsx-checkbox-option-wrapper"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
     id: name,
     name: name,
@@ -2927,7 +2947,8 @@ const Switch = props => {
   })), desc, " ", props?.descTooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
     content: props?.descTooltip,
     direction: tooltipPosition,
-    spaceLeft: "8px"
+    spaceLeft: "8px",
+    className: "wsx-rtl-tooltip-left"
   }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help), " "), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: `wsx-switch-help wsx-help-message ${helpClass}`
   }, help)));
@@ -2954,8 +2975,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
 /* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
-/* harmony import */ var _Button_New__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Button_New */ "./reactjs/src/components/Button_New.js");
-/* harmony import */ var _Select_New__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Select_New */ "./reactjs/src/components/Select_New.js");
+/* harmony import */ var _Button__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Button */ "./reactjs/src/components/Button.js");
+/* harmony import */ var _Select__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Select */ "./reactjs/src/components/Select.js");
+/* harmony import */ var _assets_scss_Tier_scss__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../assets/scss/Tier.scss */ "./reactjs/src/assets/scss/Tier.scss");
+
 
 
 
@@ -2975,7 +2998,7 @@ const Tier = _ref => {
     setPopupStatus,
     src,
     labelClass,
-    deleteSpaceLeft = '0px'
+    deleteSpaceLeft = 'auto'
   } = _ref;
   const inputData = (fieldData, fieldName) => {
     let flag = tier[tierName] && tier[tierName]['tiers'] && tier[tierName]['tiers'][index] && tier[tierName]['tiers'][index][fieldName];
@@ -3027,7 +3050,7 @@ const Tier = _ref => {
         if (!copy[index]) {
           copy.push({});
         }
-        copy[index][e.target.getAttribute('data-name')] = e.target.value;
+        copy[index][fieldName] = e.target.value;
         parent['tiers'] = copy;
         setTier({
           ...tier,
@@ -3041,20 +3064,7 @@ const Tier = _ref => {
         label: options[option]
       }));
     };
-
-    //    return <Select
-    //         data-name={fieldName}
-    //         label={index==0?fieldData.label:''}
-    //         options={fieldData.options}
-    //         name={`${fieldName}_${index}`}
-    //         value={defValue}
-    //         onChange={onChangeHandler}
-    //         defaultValue={defValue}
-    //         labelClass={labelClass}
-    //         selectClass='wsx-ellipsis'
-    //     />
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Select_New__WEBPACK_IMPORTED_MODULE_7__["default"], {
-      "data-name": fieldName,
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Select__WEBPACK_IMPORTED_MODULE_7__["default"], {
       name: `${fieldName}_${index}`,
       label: index == 0 ? fieldData.label : '',
       labelClass: labelClass,
@@ -3062,7 +3072,6 @@ const Tier = _ref => {
       value: defValue,
       onChange: onChangeHandler,
       inputBackground: "base1"
-      // minWidth="205px"
     });
   };
   const dependencyCheck = deps => {
@@ -3155,7 +3164,8 @@ const Tier = _ref => {
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_4__["default"], {
     content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('Delete', 'wholesalex'),
     direction: "top",
-    spaceLeft: deleteSpaceLeft
+    spaceLeft: deleteSpaceLeft,
+    className: "wsx-rtl-left"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
     key: `wsx-tier-field-delete-${tierName}_${index}`,
     className: `wsx-tier-delete ${getTierLastIndex() < 1 ? 'disable' : ''}`,
@@ -3170,7 +3180,7 @@ const Tier = _ref => {
       parent[tierName]['tiers'] = copy;
       setTier(parent);
     }
-  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_3__["default"].delete_24))), index == getTierLastIndex() && (tierName === 'quantity_based' || tierName === 'conditions') && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Button_New__WEBPACK_IMPORTED_MODULE_6__["default"], {
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_3__["default"].delete_24))), index == getTierLastIndex() && (tierName === 'quantity_based' || tierName === 'conditions') && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Button__WEBPACK_IMPORTED_MODULE_6__["default"], {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('Add New Condition', 'wholesalex'),
     iconName: "plus_20",
     background: "tertiary",
@@ -3345,7 +3355,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
 /* harmony import */ var _PopupModal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./PopupModal */ "./reactjs/src/components/PopupModal.js");
-/* harmony import */ var _Button_New__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Button_New */ "./reactjs/src/components/Button_New.js");
+/* harmony import */ var _Button__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Button */ "./reactjs/src/components/Button.js");
 
 
 
@@ -3357,7 +3367,8 @@ const UpgradeProPopUp = _ref => {
     desc = '',
     setPopUpStatus,
     UpgradeUrl = '',
-    addonCount = 6,
+    addonCount = '',
+    title = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Unlock', 'wholesalex'),
     onClose
   } = _ref;
   heading = heading ? heading : '';
@@ -3374,17 +3385,15 @@ const UpgradeProPopUp = _ref => {
       className: "wsx-d-flex wsx-item-center wsx-justify-center wsx-gap-4 wsx-mt-4"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-title wsx-font-18 wsx-font-medium"
-    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Unlock', 'wholesalex')), addonCount && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    }, title), addonCount && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-title wsx-font-18 wsx-font-medium"
-    }, addonCount, "+ Addons"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "wsx-title wsx-font-18 wsx-font-medium"
-    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('with', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    }, addonCount, "+ ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Addons with', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-d-flex wsx-item-center wsx-justify-center wsx-gap-4 wsx-mb-16"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-title wsx-font-18 wsx-font-medium"
     }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('WholesaleX', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-title wsx-font-18 wsx-font-medium wsx-color-primary"
-    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Pro', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Button_New__WEBPACK_IMPORTED_MODULE_3__["default"], {
+    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Pro', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Button__WEBPACK_IMPORTED_MODULE_3__["default"], {
       buttonLink: "https://getwholesalex.com/pricing/?utm_source=wholesalex-menu&utm_medium=email-unlock_addon-upgrade_to_pro&utm_campaign=wholesalex-DB",
       label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Upgrade to Pro', 'wholesalex'),
       background: "secondary",
@@ -3659,7 +3668,7 @@ const MultiSelect = _ref => {
     tabIndex: 0,
     autoComplete: "off",
     value: tempSearchValue,
-    className: customClass,
+    className: `wsx-input ${customClass}`,
     placeholder: selectedOptions.length > 0 ? "" : placeholder,
     onChange: e => onInputChangeHandler(e),
     onClick: e => onInputChangeHandler(e)
@@ -3680,7 +3689,7 @@ const MultiSelect = _ref => {
     className: "wsx-card wsx-multiselect-options wsx-scrollbar"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-multiselect-option-message"
-  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('No Data Found! Please try with another keyword.', 'wholesalex'))), tempSearchValue.length < 2 && showList && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('No Data Found! Please try with another keyword.', 'wholesalex'))), !isSearching && tempSearchValue.length < 2 && showList && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     key: `wsx-${name}-not-found`,
     className: "wsx-card wsx-multiselect-options wsx-scrollbar"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -3710,14 +3719,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _components_LoadingOverlay__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/LoadingOverlay */ "./reactjs/src/components/LoadingOverlay.js");
-/* harmony import */ var _components_Tier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Tier */ "./reactjs/src/components/Tier.js");
-/* harmony import */ var _components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/UpgradeProPopUp */ "./reactjs/src/components/UpgradeProPopUp.js");
-/* harmony import */ var _components_Input__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Input */ "./reactjs/src/components/Input.js");
-/* harmony import */ var _components_PopupModal__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/PopupModal */ "./reactjs/src/components/PopupModal.js");
-/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
-/* harmony import */ var _components_Button_New__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/Button_New */ "./reactjs/src/components/Button_New.js");
-
+/* harmony import */ var _components_Tier__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/Tier */ "./reactjs/src/components/Tier.js");
+/* harmony import */ var _components_Input__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Input */ "./reactjs/src/components/Input.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var _components_Button__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Button */ "./reactjs/src/components/Button.js");
+/* harmony import */ var _components_LoadingGif__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/LoadingGif */ "./reactjs/src/components/LoadingGif.js");
+/* harmony import */ var _components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/UpgradeProPopUp */ "./reactjs/src/components/UpgradeProPopUp.js");
 
 
 
@@ -3749,7 +3756,6 @@ const Product = _ref => {
   });
   const [fields, setFields] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
   const _isProActivate = wholesalex?.is_pro_active;
-  const [pricingPlan, setPricingPlan] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)('');
   const [popUpStatus, setPopUpStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
   const getPostID = () => {
     let product_id = '';
@@ -3765,9 +3771,6 @@ const Product = _ref => {
     return id ? id : product_id;
   };
   const postId = getPostID();
-
-  // Loading Issue Fixed
-
   (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
     if (wholesalex_single_product.fields) {
       setFields(wholesalex_single_product.fields);
@@ -3794,7 +3797,7 @@ const Product = _ref => {
     });
   }, []);
   const buttonData = (fieldData, tierName) => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button_New__WEBPACK_IMPORTED_MODULE_8__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button__WEBPACK_IMPORTED_MODULE_5__["default"], {
       label: fieldData['label'],
       background: "tertiary",
       onClick: e => {
@@ -3805,22 +3808,10 @@ const Product = _ref => {
         copy[tierName]['tiers'].push(initialTier);
         setTier(copy);
       }
-    })
-    // <button
-    //  	key={`wholesalex_btn_tier_${tierName}`}
-    //  	className="wholesalex-btn wholesalex-primary-btn wholesalex-add-tier-btn"
-    // onClick={(e)=>{
-    // 	e.preventDefault();
-    // 	let copy = {...tier};
-    // 	copy[tierName]['tiers'].push(initialTier);
-    // 	setTier(copy);
-    // }}>
-    // 	{fieldData['label']}
-    // </button>
-    ;
+    });
   };
   const UpgradeButton = (fieldData, tierName) => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button_New__WEBPACK_IMPORTED_MODULE_8__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button__WEBPACK_IMPORTED_MODULE_5__["default"], {
       label: fieldData['label'],
       onClick: e => {
         e.preventDefault();
@@ -3830,15 +3821,7 @@ const Product = _ref => {
       iconName: "angleRight_24",
       iconPosition: "after",
       iconAnimation: "icon-left"
-    })
-    // <button
-    //  	key={`wholesalex_btn_tier_${tierName}`}
-    //  	className="wholesalex-btn wholesalex-upgrade-pro-btn wholesalex-upgrade-tier-btn"
-    // 	onClick={(e)=>{ e.preventDefault(); setPopUpStatus(true);}}>
-    // 	{fieldData['label']}
-    // 	<span className="dashicons dashicons-arrow-right-alt2"></span>
-    // </button>
-    ;
+    });
   };
   const [tierStatus, setTierStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
   const tierData = (fieldData, tierName, lockStatus) => {
@@ -3848,7 +3831,7 @@ const Product = _ref => {
       className: "wsx-settings-tiers-wrapper"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-settings-tiers-container"
-    }, tier && tier[tierName] && tier[tierName]['tiers'].map((t, index) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Tier__WEBPACK_IMPORTED_MODULE_3__["default"], {
+    }, tier && tier[tierName] && tier[tierName]['tiers'].map((t, index) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Tier__WEBPACK_IMPORTED_MODULE_2__["default"], {
       key: `wholesalex_${tierName}_tier_${index}`,
       fields: defaultTier,
       tier: tier,
@@ -3860,7 +3843,7 @@ const Product = _ref => {
   const inputData = (fieldData, fieldName, tierName) => {
     let flag = tier[tierName] && tier[tierName][fieldName];
     const defValue = flag ? tier[tierName][fieldName] : fieldData['default'];
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Input__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Input__WEBPACK_IMPORTED_MODULE_3__["default"], {
       className: "wholesalex_single_product_field",
       label: fieldData['label'],
       type: fieldData['type'],
@@ -3914,7 +3897,7 @@ const Product = _ref => {
       key: `whx_role_header`
     }, fieldsData['label']), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
       className: `wsx-icon ${tierStatus[section] ? 'active' : ''}`
-    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_7__["default"].angleDown_24)), tierStatus[section] && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_4__["default"].angleDown_24)), tierStatus[section] && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-accordion-body"
     }, tierStatus[section] && fieldsData['attr'] && Object.keys(fieldsData['attr']).map((fieldData, i) => {
       switch (fieldsData['attr'][fieldData]['type']) {
@@ -3927,28 +3910,7 @@ const Product = _ref => {
       }
     })));
   };
-  const proPopupContent = () => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("img", {
-      className: "wsx-addon-popup-image",
-      src: wholesalex.url + '/assets/img/unlock.svg',
-      alt: "Unlock Icon"
-    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-      className: "wsx-title wsx-font-18 wsx-font-medium wsx-mt-4"
-    }, wholesalex_product.i18n.unlock_heading, " ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('with', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-      className: "wsx-d-flex wsx-item-center wsx-justify-center wsx-gap-4 wsx-mb-16"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-      className: "wsx-title wsx-font-18 wsx-font-medium"
-    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('WholesaleX', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-      className: "wsx-title wsx-font-18 wsx-font-medium wsx-color-primary"
-    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Pro', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button_New__WEBPACK_IMPORTED_MODULE_8__["default"], {
-      buttonLink: "https://getwholesalex.com/pricing/?utm_source=wholesalex-menu&utm_medium=email-unlock_features-upgrade_to_pro&utm_campaign=wholesalex-DB",
-      label: wholesalex_product.i18n.upgrade_to_pro,
-      background: "secondary",
-      iconName: "growUp",
-      customClass: "wsx-w-auto wsx-br-lg wsx-justify-center wsx-font-16"
-    }));
-  };
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_LoadingOverlay__WEBPACK_IMPORTED_MODULE_2__["default"], null), !appState.loading && Object.keys(fields).map((section, c) => Object.keys(fields[section]['attr']).length > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_LoadingGif__WEBPACK_IMPORTED_MODULE_6__["default"], null), !appState.loading && Object.keys(fields).map((section, c) => Object.keys(fields[section]['attr']).length > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     key: `wholesalex_product_key_${section}_${c}`,
     className: `wsx-tier-wrapper ${section === '_b2c_section' ? 'b2c' : ''}`
   }, fields[section]['label'] && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
@@ -3979,9 +3941,8 @@ const Product = _ref => {
     id: `wholesalex_single_product_tiers_${id ? id : postId}`,
     value: JSON.stringify(tier),
     name: `wholesalex_single_product_tiers_${id ? id : postId}`
-  }), popUpStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_PopupModal__WEBPACK_IMPORTED_MODULE_6__["default"], {
-    className: "wsx-pro-modal",
-    renderContent: proPopupContent,
+  }), popUpStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_7__["default"], {
+    title: wholesalex_product.i18n.unlock_heading,
     onClose: () => setPopUpStatus(false)
   }));
 };
@@ -4003,17 +3964,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _components_LoadingOverlay__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/LoadingOverlay */ "./reactjs/src/components/LoadingOverlay.js");
-/* harmony import */ var _components_MultiSelect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/MultiSelect */ "./reactjs/src/components/MultiSelect.js");
-/* harmony import */ var _components_Choosebox__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/Choosebox */ "./reactjs/src/components/Choosebox.js");
-/* harmony import */ var _components_Switch__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Switch */ "./reactjs/src/components/Switch.js");
-/* harmony import */ var _components_PopupModal__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/PopupModal */ "./reactjs/src/components/PopupModal.js");
-/* harmony import */ var _components_Slider__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/Slider */ "./reactjs/src/components/Slider.js");
-/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
-/* harmony import */ var _components_Button_New__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../components/Button_New */ "./reactjs/src/components/Button_New.js");
-/* harmony import */ var _components_RadioButtons__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../components/RadioButtons */ "./reactjs/src/components/RadioButtons.js");
-/* harmony import */ var _components_Select_New__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../components/Select_New */ "./reactjs/src/components/Select_New.js");
-
+/* harmony import */ var _components_MultiSelect__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/MultiSelect */ "./reactjs/src/components/MultiSelect.js");
+/* harmony import */ var _components_Choosebox__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Choosebox */ "./reactjs/src/components/Choosebox.js");
+/* harmony import */ var _components_Switch__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/Switch */ "./reactjs/src/components/Switch.js");
+/* harmony import */ var _components_Slider__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Slider */ "./reactjs/src/components/Slider.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var _components_RadioButtons__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/RadioButtons */ "./reactjs/src/components/RadioButtons.js");
+/* harmony import */ var _components_Select__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/Select */ "./reactjs/src/components/Select.js");
+/* harmony import */ var _components_LoadingGif__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../components/LoadingGif */ "./reactjs/src/components/LoadingGif.js");
+/* harmony import */ var _components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../components/UpgradeProPopUp */ "./reactjs/src/components/UpgradeProPopUp.js");
 
 
 
@@ -4030,19 +3989,7 @@ const ProductTab = () => {
   const [visibilitySectionStatus, setVisibilitySectionStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(true);
   const [fields, setFields] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
   const [appState, setAppState] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
-  const _isProActivate = wholesalex?.is_pro_active;
   const [popUpStatus, setPopUpStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
-  const getPostID = () => {
-    let product_id = '';
-    if (!id) {
-      if (wholesalex_single_product.is_dokan_dashboard) {
-        product_id = document.getElementById('dokan-edit-product-id')?.value;
-      } else {
-        product_id = document.getElementById('post_ID')?.value;
-      }
-    }
-    return id ? id : product_id;
-  };
   (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
     if (wholesalex_product_tab.fields) {
       setFields(wholesalex_product_tab.fields);
@@ -4063,18 +4010,7 @@ const ProductTab = () => {
   };
   const selectData = (fieldData, field) => {
     const defValue = productSettings[field] || fieldData.default || '';
-    // return <Select
-    //     // className="wholesalex_single_product_tab_field"
-    //     label={fieldData.label}
-    //     options={fieldData.options}
-    //     value={defValue}
-    //     onChange={(e) => {
-    //         setProductSettings({ ...productSettings, [field]: e.target.value })
-    //     }}
-    //     defaultValue={defValue}
-    //     help={fieldData.help}
-    // />
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Select_New__WEBPACK_IMPORTED_MODULE_11__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Select__WEBPACK_IMPORTED_MODULE_8__["default"], {
       label: fieldData.label,
       options: getOptionsArray(fieldData.options),
       value: defValue,
@@ -4085,16 +4021,14 @@ const ProductTab = () => {
         });
       },
       help: fieldData.help,
-      inputBackground: "base1"
-      // minWidth="205px"
-      ,
+      inputBackground: "base1",
       wrapperClass: "wsx-column-2 wsx-gap-8 wsx-item-center wsx-text-space-nowrap wsx-basis-50",
       labelClass: "wsx-mb-0"
     });
   };
   const chooseboxData = (fieldData, field) => {
     const defValue = productSettings[field] ? productSettings[field] : fieldData.default;
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Choosebox__WEBPACK_IMPORTED_MODULE_4__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Choosebox__WEBPACK_IMPORTED_MODULE_3__["default"], {
       label: fieldData.label,
       name: field,
       value: defValue,
@@ -4117,7 +4051,7 @@ const ProductTab = () => {
   const switchData = (fieldData, field) => {
     const defValue = productSettings[field] ? productSettings[field] == 'yes' ? true : false : fieldData.default;
     let _className = wholesalex_single_product?.is_wcfm_dashboard ? 'wcfm-checkbox' : '';
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Switch__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Switch__WEBPACK_IMPORTED_MODULE_4__["default"], {
       name: field,
       value: defValue,
       onChange: e => {
@@ -4161,7 +4095,7 @@ const ProductTab = () => {
     }
   };
   const radioData = (fieldData, field) => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_RadioButtons__WEBPACK_IMPORTED_MODULE_10__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_RadioButtons__WEBPACK_IMPORTED_MODULE_7__["default"], {
       className: "wsx-mb-32",
       key: field,
       label: fieldData.label,
@@ -4176,8 +4110,7 @@ const ProductTab = () => {
   };
   const sliderData = (fieldData, field, customClass) => {
     const defValue = productSettings[field] ? productSettings[field] == 'yes' ? true : false : fieldData.default;
-    let _className = wholesalex_single_product?.is_wcfm_dashboard ? 'wcfm-checkbox' : '';
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Slider__WEBPACK_IMPORTED_MODULE_7__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Slider__WEBPACK_IMPORTED_MODULE_5__["default"], {
       className: `wsx-single-product-settings-slider ${customClass}`,
       label: fieldData.label,
       isLabelSide: true,
@@ -4196,7 +4129,7 @@ const ProductTab = () => {
   };
   const multiselectData = (fieldData, field) => {
     const defValue = productSettings[field] ? productSettings[field] : fieldData.default;
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_MultiSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_MultiSelect__WEBPACK_IMPORTED_MODULE_2__["default"], {
       key: field,
       name: field,
       value: defValue,
@@ -4228,7 +4161,7 @@ const ProductTab = () => {
       key: `whx_role_header_${section}`
     }, fieldData['label']), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
       className: `wsx-icon ${visibilitySectionStatus ? 'active' : ''}`
-    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_8__["default"].angleDown_24)), visibilitySectionStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_6__["default"].angleDown_24)), visibilitySectionStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-accordion-body"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-visibility-slider-fields"
@@ -4279,34 +4212,12 @@ const ProductTab = () => {
       }
     });
   };
-  const proPopupContent = () => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("img", {
-      className: "wsx-addon-popup-image",
-      src: wholesalex.url + '/assets/img/unlock.svg',
-      alt: "Unlock Icon"
-    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-      className: "wsx-title wsx-font-18 wsx-font-medium wsx-mt-4"
-    }, wholesalex_product.i18n.unlock_heading, " ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('with', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-      className: "wsx-d-flex wsx-item-center wsx-justify-center wsx-gap-4 wsx-mb-16"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-      className: "wsx-title wsx-font-18 wsx-font-medium"
-    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('WholesaleX', 'wholesalex')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-      className: "wsx-title wsx-font-18 wsx-font-medium wsx-color-primary"
-    }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Pro', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button_New__WEBPACK_IMPORTED_MODULE_9__["default"], {
-      buttonLink: "https://getwholesalex.com/pricing/?utm_source=wholesalex-menu&utm_medium=email-unlock_features-upgrade_to_pro&utm_campaign=wholesalex-DB",
-      label: wholesalex_product.i18n.upgrade_to_pro,
-      background: "secondary",
-      iconName: "growUp",
-      customClass: "wsx-w-auto wsx-br-lg wsx-justify-center wsx-font-16"
-    }));
-  };
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_LoadingOverlay__WEBPACK_IMPORTED_MODULE_2__["default"], null), !appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, Object.keys(fields).map((section, c) => section === '_product_settings_tab' && tabData(fields[section]['attr'], section))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("input", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_LoadingGif__WEBPACK_IMPORTED_MODULE_9__["default"], null), !appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, Object.keys(fields).map((section, c) => section === '_product_settings_tab' && tabData(fields[section]['attr'], section))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("input", {
     type: "hidden",
     value: JSON.stringify(productSettings),
     name: "wholesalex_product_settings"
-  }), popUpStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_PopupModal__WEBPACK_IMPORTED_MODULE_6__["default"], {
-    className: "wsx-pro-modal",
-    renderContent: proPopupContent,
+  }), popUpStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_10__["default"], {
+    title: wholesalex_product.i18n.unlock_heading,
     onClose: () => setPopUpStatus(false)
   }));
 };
@@ -4583,6 +4494,19 @@ icons.plus = /*#__PURE__*/React.createElement("svg", {
   strokeLinejoin: "round",
   strokeWidth: "1.5",
   d: "M12 5v14m-7-7h14"
+}));
+icons.minus = /*#__PURE__*/React.createElement("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "20",
+  height: "20",
+  fill: "none",
+  viewBox: "0 0 24 24"
+}, /*#__PURE__*/React.createElement("path", {
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  strokeWidth: "1.5",
+  d: "M6 12h12"
 }));
 icons.search = /*#__PURE__*/React.createElement("svg", {
   xmlns: "http://www.w3.org/2000/svg",
@@ -5018,14 +4942,6 @@ icons.proLock = /*#__PURE__*/React.createElement("svg", {
   d: "M14 13a6 6 0 0 1 12 0v2H14v-2Zm16 2v-2c0-5.523-4.477-10-10-10S10 7.477 10 13v2a4 4 0 0 0-4 4v14a4 4 0 0 0 4 4h20a4 4 0 0 0 4-4V19a4 4 0 0 0-4-4Zm-9.137 10.753a2.455 2.455 0 1 0-1.725 0L17.546 30h4.909l-1.592-4.247Z",
   clipRule: "evenodd"
 }));
-
-// icons.customerNumber = <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><circle cx="20" cy="20" r="20" fill="#5CADFF"/><path stroke="#fff" strokeWidth="1.5" d="M20 20a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 0a8 8 0 0 0-8 8m8-8a8 8 0 0 1 8 8"/></svg>
-// icons.totalOrder = <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><circle cx="20" cy="20" r="20" fill="#A367F0"/><path stroke="#fff" strokeWidth="1.5" d="M12 26V14a2 2 0 0 1 2-2h8.864a2 2 0 0 1 1.414.586l3.136 3.136A2 2 0 0 1 28 17.136V26a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2Zm4-3h8m-8-3h8m-8-3h6"/></svg>
-// icons.totalSale = <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><circle cx="20" cy="20" r="20" fill="#6C6CFF"/><path stroke="#fff" strokeWidth="1.5" d="M25 16.5a3.5 3.5 0 0 0-3.5-3.5h-3a3.5 3.5 0 1 0 0 7h3a3.5 3.5 0 1 1 0 7h-3a3.5 3.5 0 0 1-3.5-3.5M20 10v20"/></svg>
-// icons.netRevenue = <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><circle cx="20" cy="20" r="20" fill="#52D47F"/><path stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M11 11v18h18"/><path stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="m26.7 16-5.1 5.2-2.8-2.7-3.8 3.8"/></svg>
-// icons.grossSale = <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><circle cx="20" cy="20" r="20" fill="#FEAD01"/><path stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="m28.2 15.8-7.7 7.7-4-4-5.7 5.7"/><path stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M23 15h6v6"/></svg>
-// icons.avgOrderValue = <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none"><circle cx="20" cy="20" r="20" fill="#94C752"/><path fill="#fff" d="M17.75 22a.75.75 0 0 0-1.5 0h1.5Zm4.5-4a.75.75 0 0 0 1.5 0h-1.5Zm-3 8a.75.75 0 0 0 1.5 0h-1.5Zm1.5-12a.75.75 0 0 0-1.5 0h1.5Zm.25 1.25h-2v1.5h2v-1.5Zm-2 5.5h2v-1.5h-2v1.5Zm2 2.5h-2v1.5h2v-1.5Zm-2 0c-.69 0-1.25-.56-1.25-1.25h-1.5A2.75 2.75 0 0 0 19 24.75v-1.5ZM22.25 22c0 .69-.56 1.25-1.25 1.25v1.5A2.75 2.75 0 0 0 23.75 22h-1.5ZM21 20.75c.69 0 1.25.56 1.25 1.25h1.5A2.75 2.75 0 0 0 21 19.25v1.5ZM16.25 18A2.75 2.75 0 0 0 19 20.75v-1.5c-.69 0-1.25-.56-1.25-1.25h-1.5ZM19 15.25A2.75 2.75 0 0 0 16.25 18h1.5c0-.69.56-1.25 1.25-1.25v-1.5ZM23.75 18A2.75 2.75 0 0 0 21 15.25v1.5c.69 0 1.25.56 1.25 1.25h1.5Zm-3 8v-2h-1.5v2h1.5Zm-1.5-12v2h1.5v-2h-1.5Z"/><circle cx="20" cy="20" r="9" stroke="#fff" strokeWidth="1.5"/></svg>
-
 icons.noData = /*#__PURE__*/React.createElement("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   width: "150",
@@ -5074,10 +4990,10 @@ icons.activeStatus = /*#__PURE__*/React.createElement("svg", {
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./reactjs/src/assets/scss/Product.scss":
-/*!***************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./reactjs/src/assets/scss/Product.scss ***!
-  \***************************************************************************************************************************/
+/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./reactjs/src/assets/scss/Tier.scss":
+/*!************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./reactjs/src/assets/scss/Tier.scss ***!
+  \************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -5094,7 +5010,36 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ``, "",{"version":3,"sources":[],"names":[],"mappings":"","sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, `.wsx-tiers-fields {
+  margin-bottom: 8px; }
+
+.wsx-tier-wrapper, .wsx-tier-header {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) 40px;
+  gap: 24px;
+  align-items: end; }
+  .wsx-tier-wrapper2, .wsx-tier-header2 {
+    grid-template-columns: repeat(3, 1fr) 40px; }
+
+.wsx-tier-wrapper {
+  margin-bottom: 16px; }
+
+.wsx-tier-header-item {
+  padding-left: 4px;
+  color: var(--color-text-medium); }
+
+.wsx-condition-container .wsx-tier-wrapper, .wsx-condition-container .wsx-tier-header {
+  grid-template-columns: repeat(3, 1fr) 40px; }
+
+@media (max-width: 768px) {
+  .wsx-tier-wrapper, .wsx-tier-header {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px; } }
+
+@media (max-width: 576px) {
+  .wsx-condition-container .wsx-tier-wrapper {
+    grid-template-columns: 1fr; } }
+`, "",{"version":3,"sources":["webpack://./reactjs/src/assets/scss/Tier.scss"],"names":[],"mappings":"AAAA;EACI,kBAAkB,EAAA;;AAGlB;EACI,aAAa;EACb,0CAA0C;EAC1C,SAAS;EACT,gBAAgB,EAAA;EAChB;IACI,0CAA0C,EAAA;;AAGlD;EACI,mBAAmB,EAAA;;AAGnB;EACI,iBAAiB;EACjB,+BAA+B,EAAA;;AAI3C;EAEQ,0CAA0C,EAAA;;AAGlD;EAEQ;IACI,qCAAqC;IACrC,SAAS,EAAA,EACZ;;AAGT;EACI;IAEQ,0BAA0B,EAAA,EAC7B","sourcesContent":[".wsx-tiers-fields {\r\n    margin-bottom: 8px;\r\n}\r\n.wsx-tier {\r\n    &-wrapper, &-header {\r\n        display: grid;\r\n        grid-template-columns: repeat(4, 1fr) 40px;\r\n        gap: 24px;\r\n        align-items: end;\r\n        &2 {\r\n            grid-template-columns: repeat(3, 1fr) 40px;\r\n        }\r\n    }\r\n    &-wrapper {\r\n        margin-bottom: 16px;\r\n    }\r\n    &-header {\r\n        &-item {\r\n            padding-left: 4px;\r\n            color: var(--color-text-medium);\r\n        }\r\n    }\r\n}\r\n.wsx-condition-container .wsx-tier {\r\n    &-wrapper, &-header {\r\n        grid-template-columns: repeat(3, 1fr) 40px;\r\n    }\r\n}\r\n@media (max-width: 768px) {\r\n    .wsx-tier {\r\n        &-wrapper, &-header {\r\n            grid-template-columns: repeat(4, 1fr);\r\n            gap: 12px;\r\n        }\r\n    }\r\n}\r\n@media (max-width: 576px) {\r\n    .wsx-condition-container .wsx-tier {\r\n        &-wrapper {\r\n            grid-template-columns: 1fr;\r\n        }\r\n    }\r\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -5222,10 +5167,10 @@ module.exports = function (item) {
 
 /***/ }),
 
-/***/ "./reactjs/src/assets/scss/Product.scss":
-/*!**********************************************!*\
-  !*** ./reactjs/src/assets/scss/Product.scss ***!
-  \**********************************************/
+/***/ "./reactjs/src/assets/scss/Tier.scss":
+/*!*******************************************!*\
+  !*** ./reactjs/src/assets/scss/Tier.scss ***!
+  \*******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -5245,7 +5190,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "./node_modules/style-loader/dist/runtime/styleTagTransform.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Product_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./Product.scss */ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./reactjs/src/assets/scss/Product.scss");
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Tier_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js!../../../../node_modules/sass-loader/dist/cjs.js!./Tier.scss */ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./reactjs/src/assets/scss/Tier.scss");
 
       
       
@@ -5267,12 +5212,12 @@ options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWi
 options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
 options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Product_scss__WEBPACK_IMPORTED_MODULE_6__["default"], options);
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Tier_scss__WEBPACK_IMPORTED_MODULE_6__["default"], options);
 
 
 
 
-       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Product_scss__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Product_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Product_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Tier_scss__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Tier_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_sass_loader_dist_cjs_js_Tier_scss__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
 
 
 /***/ }),
@@ -6087,8 +6032,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _Product__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Product */ "./reactjs/src/pages/single_product/Product.js");
 /* harmony import */ var _ProductTab__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ProductTab */ "./reactjs/src/pages/single_product/ProductTab.js");
-/* harmony import */ var _assets_scss_Product_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../assets/scss/Product.scss */ "./reactjs/src/assets/scss/Product.scss");
-
 
 
 

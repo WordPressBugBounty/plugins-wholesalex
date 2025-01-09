@@ -28,6 +28,7 @@
     --color-base-one: #ffffff;
     --color-base-two: #E7E7FF;
     --color-base-three: #F4F4FF;
+    --color-base-four: #F8F8F8;
 
     --color-text-dark: #07050b;
     --color-text-medium: #343A46;
@@ -148,6 +149,12 @@
 
 
 /* Default Style */
+p.price,
+.wc-block-components-product-price {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
 a.wsx-link {
     text-decoration: none;
 }
@@ -170,7 +177,8 @@ table.wsx-table {
     background-size: 16px 16px;
     padding: 0 32px 0 8px;
 }
-.wp-core-ui select.wsx-select:focus {
+.wp-core-ui select.wsx-select:focus,
+select.wsx-select:focus, input.wsx-input:focus, input:is([type=url],[type=tel],[type=text],[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]):focus.wsx-input, textarea.wsx-textarea:focus {
     outline: none;
     box-shadow: none;
     border-color: var(--color-primary);
@@ -178,13 +186,24 @@ table.wsx-table {
 .wp-core-ui select.wsx-bg-base1 {
     background-color: var(--color-base-one);
 }
-select.wsx-select, input.wsx-input, input[type=text].wsx-input, textarea.wsx-textarea {
+select.wsx-select, input.wsx-input, input:is([type=url],[type=tel],[type=text],[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]).wsx-input, textarea.wsx-textarea,
+.wholesalex-field select.wsx-select, .wholesalex-field input.wsx-input, .wholesalex-field input:is([type=url],[type=tel],[type=text],[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]).wsx-input, .wholesalex-field textarea.wsx-textarea {
     height: auto;
     min-height: 40px;
-    /* max-height: fit-content; */
     border: 1px solid var(--color-border-primary);
+    border-radius: var(--border-radius-md);
 }
-select.wsx-br-md, input.wsx-br-md, input[type=text].wsx-br-md, textarea.wsx-br-md {
+.wsx-select,
+select.wsx-select {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 20px;
+    cursor: pointer;
+    width: fill-available;
+    width: -webkit-fill-available;
+}
+select.wsx-br-md, input.wsx-br-md, input:is([type=url],[type=tel],[type=text],[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]).wsx-br-md, textarea.wsx-br-md {
     border-radius: var(--border-radius-md);
 }
 .wsx-filter select.wsx-bulk-order-select {
@@ -192,6 +211,39 @@ select.wsx-br-md, input.wsx-br-md, input[type=text].wsx-br-md, textarea.wsx-br-m
     border-width: 0 0 0 1px;
     border-radius: 0;
     width: 100%;
+}
+.wsx-option-container {
+    min-width: max-content;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 60vh;
+    box-shadow: 0 2px 4px 0 var(--color-shadow-primary);
+    background-color: var(--color-base-one);
+    position: absolute;
+    transition: opacity var(--transition-md) ease-in-out;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.wsx-option-item {
+    padding: 7px 8px;
+    cursor: pointer;
+    color: var(--color-text-light);
+}
+.wsx-option-item-container {
+    padding: 0px 8px;
+    color: var(--color-text-body);
+}
+.wsx-option-item-container .wsx-option-item {
+    padding-left: 16px;
+}
+.wsx-option-item:last-child {
+    border-bottom: 0;
+}
+.wsx-option-item:hover,
+.wsx-option-item.active  {
+    background-color: var(--color-base-three);
+    color: var(--color-text-medium);
 }
 
 .wsx-input-label {
@@ -201,8 +253,15 @@ select.wsx-br-md, input.wsx-br-md, input[type=text].wsx-br-md, textarea.wsx-br-m
     color: var(--color-text-medium);
 }
 
-.woocommerce-MyAccount-content {
+.wholesalex-field label.wsx-label {
+    margin-bottom: 8px;
+}
+
+.woocommerce-account .woocommerce-MyAccount-content {
     width: 60%;
+}
+.woocommerce-account .large-9.col .woocommerce-MyAccount-content {
+    width: 100%;
 }
 
 /* Sub account Style */
@@ -210,6 +269,7 @@ select.wsx-br-md, input.wsx-br-md, input[type=text].wsx-br-md, textarea.wsx-br-m
     width: 32px;
     height: 32px;
     border-radius: 50%;
+    max-width: unset;
 }
 
 
@@ -400,6 +460,10 @@ select.wsx-pagination-option-list:focus {
 .wsx-modal-close {
     color: var(--color-text-medium);
     cursor: pointer;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    line-height: 0;
+    padding: 3px;
 }
 .wsx-modal-close:hover {
     color: var(--color-negative);
@@ -466,9 +530,6 @@ select.wsx-pagination-option-list:focus {
     overflow-y: auto;
 }
 .wsx-popup-content-wrapper .wsx-icon-cross {
-    border: 1px solid currentColor;
-    border-radius: 50%;
-    padding: 3px;
     position: absolute;
     right: 16px;
     top: 16px;
@@ -635,18 +696,20 @@ select.wsx-pagination-option-list:focus {
     width: 100%;
 }
 .wsx-multiselect-wrapper input,
-.wsx-multiselect-wrapper input[type=text],
-.wsx-multiselect-wrapper input[type=text]:focus,
+.wsx-multiselect-wrapper input:is([type=url],[type=tel],[type=text],[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]),
+.wsx-multiselect-wrapper input:is([type=url],[type=tel],[type=text],[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]):focus,
 .wsx-multiselect-wrapper input.wsx-input,
-.wsx-multiselect-wrapper input[type=text].wsx-input,
-.wsx-multiselect-wrapper input[type=text].wsx-input:focus {
+.wsx-multiselect-wrapper input[type=number].wsx-input,
+.wsx-multiselect-wrapper input[type=number].wsx-input:focus,
+.wsx-multiselect-wrapper input:is([type=url],[type=tel],[type=text],[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]).wsx-input,
+.wsx-multiselect-wrapper input:is([type=url],[type=tel],[type=text],[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]).wsx-input:focus {
     border: none;
     box-shadow: none;
     outline: none;
     min-width: 100px;
     min-height: unset;
     height: 30px;
-    padding: 0 6px;
+    padding: 0 0 0 10px;
 }
 .wsx-multiselect-option-wrapper {
     width: fit-content;
@@ -682,7 +745,7 @@ select.wsx-pagination-option-list:focus {
     gap: 4px;
     align-items: center;
     flex-wrap: wrap;
-    padding: 5px 10px;
+    padding: 5px 0 5px 10px;
 }
 .wsx-multiselect-option-message {
     padding: 6px 20px;
@@ -712,7 +775,7 @@ select.wsx-pagination-option-list:focus {
     color: var(--color-text-light);
     overflow: hidden;
 }
-.wsx-search-wrapper input:is([type=url],[type=tel],[type=text],[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]) {
+.wsx-search-wrapper input:is([type=url],[type=tel],:is([type=url],[type=tel],[type=text],[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]),[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]) {
     border: 0;
     min-height: auto;
     height: 38px;
@@ -777,12 +840,24 @@ input:checked ~ .wsx-checkbox-mark {
 input:checked ~ .wsx-checkbox-mark:after {
     display: block;
 }
+.wsx-checkbox-md {
+    height: 16px;
+    width: 16px;
+}
+.wsx-checkbox-sm {
+    height: 12px;
+    width: 12px;
+}
 
 /* Button Style */
 .wsx-btn-group {
     display: flex;
     align-items: center;
     gap: 16px;
+}
+.wsx-btn-group.wsx-center {
+    justify-content: center;
+    margin: 0 auto;
 }
 .wsx-btn {
     width: fit-content;
@@ -937,7 +1012,7 @@ input:checked ~ .wsx-checkbox-mark:after {
 }
 .wsx-btn-wallet {
     width: 100%;
-    min-width: 318px;
+    min-width: 254px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -966,6 +1041,7 @@ input:checked ~ .wsx-checkbox-mark:after {
     color: var(--color-text-reverse);
     background-color: var(--color-tertiary);
     padding: var(--btn-vertical-padding) var(--btn-horizontal-padding);
+    min-width: 260px;
 }
 .wsx-btn-wallet.wallet_submit_btn:hover {
     background-color: var(--color-primary);
@@ -1055,6 +1131,7 @@ input:checked ~ .wsx-checkbox-mark:after {
     position: absolute;
     width: fit-content;
     max-width: 250px;
+    height: fit-content;
     border-radius: var(--border-radius-sm);
     padding: 6px 12px;
     background-color: var(--color-indigo);
@@ -1117,13 +1194,13 @@ input:checked ~ .wsx-checkbox-mark:after {
     border: 1px solid var(--color-border-secondary);
     border-radius: var(--border-radius-lg);
 }
-.wsx-wallet-add-balance input[type=number] {
-    min-width: 320px;
+.wsx-wallet-add-balance input[type=number].wsx-input {
+    min-width: 260px;
     border-color: var(--color-text-light);
     background-color: var(--color-base-one);
     border-radius: var(--border-radius-md);
 }
-.wsx-wallet-add-balance input[type=number]:focus {
+.wsx-wallet-add-balance input[type=number].wsx-input:focus {
     background-color: var(--color-base-one);
 }
 
@@ -1135,7 +1212,7 @@ input:checked ~ .wsx-checkbox-mark:after {
 .wsx-new-conversation-container input, 
 .wsx-new-conversation-container select.wsx-select, 
 .wsx-new-conversation-container textarea.wsx-textarea, 
-.wsx-new-conversation-container input[type=text] {
+.wsx-new-conversation-container input:is([type=url],[type=tel],[type=text],[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]) {
     border-radius: var(--border-radius-md);
     border-color: var(--color-border-tertiary);
     background-color: var(--color-base-one);
@@ -1144,9 +1221,8 @@ input:checked ~ .wsx-checkbox-mark:after {
 .wsx-new-conversation-container input:focus, 
 .wsx-new-conversation-container select.wsx-select:focus, 
 .wsx-new-conversation-container textarea.wsx-textarea:focus, 
-.wsx-new-conversation-container input[type=text]:focus {
+.wsx-new-conversation-container input:is([type=url],[type=tel],[type=text],[type=time],[type=date],[type=datetime],[type=datetime-local],[type=email],[type=number],[type=search],[type=password]):focus {
     border: 1px solid var(--color-primary);
-    background-color: var(--color-base-one);
 }
 .wsx-conversation-form {
     display: flex;
@@ -1230,7 +1306,7 @@ input:checked ~ .wsx-checkbox-mark:after {
 .wsx-message {
     width: fit-content;
     max-width: 36vw;
-    padding: 16px 24px;
+    padding: 12px 20px;
     line-height: 1.15em;
 }
 
@@ -1561,6 +1637,9 @@ label.wsx-slider {
 .wsx-bg-base3 {
     background-color: var(--color-base-three);
 }
+.wsx-bg-base4 {
+    background-color: var(--color-base-four);
+}
 
 .wsx-bg-promotion {
     background-color: var(--color-promotion-bg);
@@ -1886,8 +1965,14 @@ label.wsx-slider {
     height: 100vh;
 } 
 
+.wsx-text-start {
+    text-align: start;
+}
 .wsx-text-center {
     text-align: center;
+}
+.wsx-text-end {
+    text-align: end;
 }
 
 .wsx-font-bold {
@@ -2016,7 +2101,6 @@ label.wsx-slider {
     margin-top: 4px;
 }
 
-
 .wsx-p-32 {
     padding: 32px;
 }
@@ -2045,6 +2129,10 @@ label.wsx-slider {
     padding: 0px;
 }
 
+.wsx-plr-40 {
+    padding-left: 40px;
+    padding-right: 40px;
+}
 .wsx-plr-24 {
     padding-left: 24px;
     padding-right: 24px;
@@ -2142,8 +2230,6 @@ label.wsx-slider {
     padding-bottom: 4px;
 }
 
-
-
 /* Responsive Style */
 @media (max-width: 991px) {
     .wsx-lg-column-1,
@@ -2167,13 +2253,11 @@ label.wsx-slider {
     }
 }
 @media (max-width: 689px) {
-    .woocommerce-MyAccount-content {
+    .woocommerce-account .woocommerce-MyAccount-content {
         width: 100%;
     }
-    
 }
 @media (max-width: 490px) {
-
     .wsx-message {
          max-width: 46vw;
      }

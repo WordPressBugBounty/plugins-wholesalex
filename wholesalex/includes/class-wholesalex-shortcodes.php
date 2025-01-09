@@ -92,10 +92,10 @@ class WHOLESALEX_Shortcodes {
 			<form method="post" class="wsx-lost-password-form">
 				<p><?php esc_html_e( 'Lost your password? Please enter your email address. You will receive a link to create a new password via email.', 'wholesalex' ); ?></p>
 				<p>
-					<input type="email" name="user_email" id="user_email" placeholder="<?php esc_attr_e( 'Your email address', 'wholesalex' ); ?>" required>
+					<input class="wsx-input" type="email" name="user_email" id="user_email" placeholder="<?php esc_attr_e( 'Your email address', 'wholesalex' ); ?>" required>
 				</p>
 				<p>
-					<input type="submit" class="wsx-password-reset-btn" name="wholesalex_reset_password" value="<?php esc_attr_e( 'Reset Password', 'wholesalex' ); ?>">
+					<input type="submit" class="wsx-input wsx-password-reset-btn" name="wholesalex_reset_password" value="<?php esc_attr_e( 'Reset Password', 'wholesalex' ); ?>">
 				</p>
 			</form>
 		<?php
@@ -1556,7 +1556,7 @@ class WHOLESALEX_Shortcodes {
 			?>
 			<div class="wsx-field-content">
 				<div class="wholesalex-field-wrap">
-					<input type="checkbox" id="<?php echo esc_attr( $field['name'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $field['name'] ); ?>" />
+					<input type="checkbox" class="input-checkbox" id="<?php echo esc_attr( $field['name'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $field['name'] ); ?>" />
 					<label class="wsx-label wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo wp_kses_post( $term_link_markup ); ?></label>
 				</div>
 			</div>
@@ -1620,7 +1620,7 @@ class WHOLESALEX_Shortcodes {
 							}
 							?>
 							
-							<input id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
+							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
 						</div>
 						
 						<?php
@@ -1705,7 +1705,7 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<div class="wholesalex-field-wrap">
-										<input type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<label class="wsx-label wsx-label" for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 									</div>
 								<?php endforeach; ?>
@@ -1751,7 +1751,7 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<div class="wholesalex-field-wrap">
-										<input type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-radio" type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<label class="wsx-label wsx-label" for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 									</div>
 								<?php endforeach; ?>
@@ -1790,7 +1790,7 @@ class WHOLESALEX_Shortcodes {
 							?>
 							
 							<label class="wsx-label wsx-field-content">
-								<input type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
+								<input class="wsx-input" type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
 								<div class="wsx-file-label" for="<?php echo esc_attr( $field['name'] ); ?>">
 									<span>
 										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -1835,7 +1835,7 @@ class WHOLESALEX_Shortcodes {
 							
 							?>
 							
-							<input id="<?php echo esc_attr( $field['name'] ); ?>" type='tel' name="<?php echo esc_attr( $field['name'] ); ?>"   placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
+							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type='tel' name="<?php echo esc_attr( $field['name'] ); ?>"   placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
 						</div>
 						<?php
 						if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) :
@@ -1872,7 +1872,7 @@ class WHOLESALEX_Shortcodes {
 								<?php
 							}
 							?>
-							<input id="<?php echo esc_attr( $field['name'] ); ?>" type='url' name="<?php echo esc_attr( $field['name'] ); ?>"   placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
+							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type='url' name="<?php echo esc_attr( $field['name'] ); ?>"   placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -1907,7 +1907,7 @@ class WHOLESALEX_Shortcodes {
 							
 							?>
 							
-							<input id="<?php echo esc_attr( $field['name'] ); ?>" type='password' name="<?php echo esc_attr( $field['name'] ); ?>"  minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>"  placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
+							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type='password' name="<?php echo esc_attr( $field['name'] ); ?>"  minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>"  placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -1964,7 +1964,7 @@ class WHOLESALEX_Shortcodes {
 					case 'tel':
 						?>
 						<div class="wsx-form-field wsx-outline-focus">
-							<input id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
+							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
 							<div class='wsx-form-label wsx-clone-label'><?php echo esc_html( $field['label'] ); ?> <?php 
                              if(isset( $field['required'] ) && $field['required']) {
                                                   ?>  
@@ -1992,7 +1992,7 @@ class WHOLESALEX_Shortcodes {
 					case 'password':
 						?>
 						<div class="wsx-form-field wsx-outline-focus">
-							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
+							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-input wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
 							<div class='wsx-form-label wsx-clone-label'><?php echo esc_html( $field['label'] ); ?> <?php 
                              if(isset( $field['required'] ) && $field['required']) {
                                                   ?>  
@@ -2051,7 +2051,7 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div class="wsx-form-field wsx-form-file wsx-file-outline">
 							<label class="wsx-label wsx-field-content" for="<?php echo esc_attr( $field['name'] ); ?>">
-								<input type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
+								<input class="wsx-input" type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
 									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 										<div class="wsx-form-label wsx-clone-label"><?php echo esc_html( $field['label'] ); ?> <?php 
                                              if(isset( $field['required'] ) && $field['required']) {
@@ -2146,7 +2146,7 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<label class="wsx-label wholesalex-field-wrap" for="<?php echo esc_attr( $field['name'] ); ?>">
-										<input type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input type="checkbox" class="wsx-checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<div><?php echo esc_html( $option['name'] ); ?></div>
 									</label>
 								<?php endforeach; ?>
@@ -2188,7 +2188,7 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<div class="wholesalex-field-wrap">
-										<input type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-radio" type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<label class="wsx-label" for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 									</div>
 								<?php endforeach; ?>
@@ -2220,7 +2220,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus">
-							<input id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>" />
+							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>" />
 							<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
 								<?php echo esc_html( $field['label'] ); ?> <?php 
                                  if(isset( $field['required'] ) && $field['required']) {
@@ -2244,7 +2244,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<label class="wsx-label wsx-form-field wsx-outline-focus" for="<?php echo esc_attr( $field['name'] ); ?>">
-							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
+							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-input wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 								<div  class="wsx-form-label">
 									<?php echo esc_html( $field['label'] ); ?> <?php 
@@ -2303,7 +2303,7 @@ class WHOLESALEX_Shortcodes {
 							<?php endif; ?>
 						</label>
 							<label class="wsx-label wsx-field-content" for="<?php echo esc_attr( $field['name'] ); ?>">
-								<input type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
+								<input class="wsx-input" type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
 								<div class="wsx-file-label" for="<?php echo esc_attr( $field['name'] ); ?>">
 									<span>
 										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -2377,7 +2377,7 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<label class="wsx-label wholesalex-field-wrap" for="<?php echo esc_attr( $field['name'] ); ?>">
-										<input type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<label class="wsx-label" for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 									</label>
 								<?php endforeach; ?>
@@ -2422,7 +2422,7 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<div class="wholesalex-field-wrap">
-										<input type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-radio" type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<label class="wsx-label" for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 									</div>
 								<?php endforeach; ?>
@@ -2453,7 +2453,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus">
-							<input id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>" />
+							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>" />
 							<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
 								<?php echo esc_html( $field['label'] ); ?> <?php 
                                  if(isset( $field['required'] ) && $field['required']) {
@@ -2477,7 +2477,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<label class="wsx-label wsx-form-field wsx-outline-focus" for="<?php echo esc_attr( $field['name'] ); ?>">
-							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
+							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-input wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 								<div  class="wsx-form-label">
 									<?php echo esc_html( $field['label'] ); ?> <?php 
@@ -2540,7 +2540,7 @@ class WHOLESALEX_Shortcodes {
 									</div>
 							<?php endif; ?>
 							<label class="wsx-label wsx-field-content" for="<?php echo esc_attr( $field['name'] ); ?>">
-								<input type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
+								<input class="wsx-input" type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
 								<div class="wsx-file-label" for="<?php echo esc_attr( $field['name'] ); ?>">
 									<span>
 										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -2615,7 +2615,7 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<label class="wsx-label wholesalex-field-wrap" for="<?php echo esc_attr( $field['name'] ); ?>">
-										<input type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<div for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></div>
 									</label>
 								<?php endforeach; ?>
@@ -2660,7 +2660,7 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<div class="wholesalex-field-wrap">
-										<input type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-radio" type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<div for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></div>
 									</div>
 								<?php endforeach; ?>
@@ -2690,7 +2690,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus">
-							<input id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo esc_attr($field['label']); echo isset( $field['required'] ) && $field['required'] ? '*' : '';  ?>"  />
+							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo esc_attr($field['label']); echo isset( $field['required'] ) && $field['required'] ? '*' : '';  ?>"  />
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?>  </span>
@@ -2724,7 +2724,7 @@ class WHOLESALEX_Shortcodes {
 							}
 						?>
 						<div class="wsx-form-field wsx-outline-focus wsx-form-date">
-							<input id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  />
+							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  />
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -2740,7 +2740,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus">
-							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo esc_attr($field['label']); echo isset( $field['required'] ) && $field['required'] ? '*' : '';  ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
+							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-input wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo esc_attr($field['label']); echo isset( $field['required'] ) && $field['required'] ? '*' : '';  ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -2784,7 +2784,7 @@ class WHOLESALEX_Shortcodes {
 								</div>
 							<?php endif; ?>
 							<label class="wsx-label wsx-field-content" for="<?php echo esc_attr( $field['name'] ); ?>">
-								<input type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
+								<input class="wsx-input" type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
 								<div class="wsx-file-label" for="<?php echo esc_attr( $field['name'] ); ?>">
 									<span>
 										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -2871,7 +2871,7 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<label class="wsx-label wholesalex-field-wrap" for="<?php echo esc_attr( $field['name'] ); ?>">
-										<input type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<div for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></div>
 									</label>
 								<?php endforeach; ?>
@@ -2917,7 +2917,7 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<div class="wholesalex-field-wrap">
-										<input type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-radio" type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<label class="wsx-label" for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 									</div>
 								<?php endforeach; ?>
@@ -2946,7 +2946,7 @@ class WHOLESALEX_Shortcodes {
 					case 'tel':
 						?>
 						<div class="wsx-form-field wsx-outline-focus wsx-formBuilder-input-width">
-							<input id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" placeholder=" " />
+							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" placeholder=" " />
 							<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
 								<?php echo esc_html( $field['label'] ); ?> <?php 
                                  if(isset( $field['required'] ) && $field['required']) {
@@ -2974,7 +2974,7 @@ class WHOLESALEX_Shortcodes {
 					case 'password':
 						?>
 						<div class="wsx-form-field wsx-outline-focus wsx-formBuilder-input-width">
-							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-form-field__input"  id="<?php echo esc_attr( $field['name'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" placeholder=" " />
+							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-input wsx-form-field__input"  id="<?php echo esc_attr( $field['name'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" placeholder=" " />
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 								<label  class="wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php 
                                      if(isset( $field['required'] ) && $field['required']) {
@@ -3027,7 +3027,7 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div class="wsx-form-field wsx-form-file wsx-file-outline">
 							<label class="wsx-label wsx-field-content" for="<?php echo esc_attr( $field['name'] ); ?>">
-								<input type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
+								<input class="wsx-input" type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
 									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 										<div class="wsx-form-label wsx-clone-label"><?php echo esc_html( $field['label'] ); ?> <?php 
                                              if(isset( $field['required'] ) && $field['required']) {
@@ -3118,7 +3118,7 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<label class="wsx-label wholesalex-field-wrap" for="<?php echo esc_attr( $field['name'] ); ?>">
-										<input type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<div for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></div>
 									</label>
 								<?php endforeach; ?>
@@ -3160,7 +3160,7 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<div class="wholesalex-field-wrap">
-										<input type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-radio" type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<label class="wsx-label" for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 									</div>
 								<?php endforeach; ?>
@@ -3199,7 +3199,7 @@ class WHOLESALEX_Shortcodes {
                                                 }  ?>
 									</div>
 								<?php endif; ?>
-								<input id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>" />
+								<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>" />
 							</label>
 							<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 								<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -3259,7 +3259,7 @@ class WHOLESALEX_Shortcodes {
 								<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 										<div class="wholesalex-field-wrap">
-											<input type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $option['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+											<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $option['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
 											<label class="wsx-label" for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 										</div>
 									<?php endforeach; ?>
@@ -3306,7 +3306,7 @@ class WHOLESALEX_Shortcodes {
 								<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 										<div class="wholesalex-field-wrap">
-											<input type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
+											<input class="wsx-radio" type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
 											<label class="wsx-label" for="<?php echo esc_attr( $option['value'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 										</div>
 									<?php endforeach; ?>
@@ -3326,7 +3326,7 @@ class WHOLESALEX_Shortcodes {
 							<!-- wsx-form-field--focused -->
 							<div class="wsx-form-field wsx-form-file">
 								<label class="wsx-label wsx-field-content">
-									<input type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
+									<input class="wsx-input" type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
 									<div class="wsx-file-label" for="<?php echo esc_attr( $field['name'] ); ?>">
 									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 											<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php echo isset( $field['required'] ) ? '<span aria-label="required">*</span>' : ''; ?></div>
@@ -3373,7 +3373,7 @@ class WHOLESALEX_Shortcodes {
 										<?php
 									}
 								?>
-								<input id="<?php echo esc_attr( $field['name'] ); ?>" type='tel' name="<?php echo esc_attr( $field['name'] ); ?>"   />
+								<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type='tel' name="<?php echo esc_attr( $field['name'] ); ?>"   />
 							</div>
 							<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 								<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -3399,7 +3399,7 @@ class WHOLESALEX_Shortcodes {
 									<?php endif; ?>
 								
 								</div>
-								<input id="<?php echo esc_attr( $field['name'] ); ?>" type='url' name="<?php echo esc_attr( $field['name'] ); ?>"  />
+								<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type='url' name="<?php echo esc_attr( $field['name'] ); ?>"  />
 							<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 									<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
 								<?php endif; ?>
@@ -3426,7 +3426,7 @@ class WHOLESALEX_Shortcodes {
                                                 <?php 
                                                 }  ?></label>
 								<?php endif; ?>
-								<input id="<?php echo esc_attr( $field['name'] ); ?>" type='password' name="<?php echo esc_attr( $field['name'] ); ?>"  minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>"  placeholder="Type Password" />
+								<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type='password' name="<?php echo esc_attr( $field['name'] ); ?>"  minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>"  placeholder="Type Password" />
 							</div>
 							<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 								<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -3574,7 +3574,7 @@ class WHOLESALEX_Shortcodes {
 										?>
 										<span>
 											<label class="wsx-label checkbox" for=<?php echo esc_attr( $option['value'] ); ?> >
-                                            <input type="checkbox" class="input-checkbox " name="<?php echo esc_attr($option['name']); ?>" id="<?php echo esc_attr($option['name']); ?>" <?php checked( in_array( $option['value'], $__default ), 1, true ); //phpcs:ignore ?>>  <?php echo esc_html( $option['name'] ); ?> </label>
+                                            <input type="checkbox" class="input-checkbox" name="<?php echo esc_attr($option['name']); ?>" id="<?php echo esc_attr($option['name']); ?>" <?php checked( in_array( $option['value'], $__default ), 1, true ); //phpcs:ignore ?>>  <?php echo esc_html( $option['name'] ); ?> </label>
 										</span>
 
 										<?php

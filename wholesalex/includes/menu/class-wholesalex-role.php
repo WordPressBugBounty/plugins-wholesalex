@@ -176,23 +176,6 @@ class WHOLESALEX_Role {
 	}
 
 	/**
-	 * Role Menu callback
-	 *
-	 * @return void
-	 */
-	// public function role_add_submenu_page() {
-	// 	$slug = apply_filters( 'wholesalex_role_submenu_slug', 'wholesalex-overview#/user-role' );
-	// 	add_submenu_page(
-	// 		wholesalex()->get_menu_slug(),
-	// 		__( 'User Roles', 'wholesalex' ),
-	// 		__( 'User Roles', 'wholesalex' ),
-	// 		apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-	// 		$slug,
-	// 		array( $this, 'role_content_callback' )
-	// 	);
-	// }
-
-	/**
 	 * WholesaleX Role Sub Menu Page Callback
 	 *
 	 * @since 1.0.0
@@ -429,24 +412,6 @@ class WHOLESALEX_Role {
 								),
 							),
 						),
-						// 'regi_form_section'             => array(
-						// 	'label' => __( 'Registration Form', 'wholesalex' ),
-						// 	'type'  => 'role_setting',
-						// 	'attr'  => array(
-						// 		'user_status' => array(
-						// 			'type'    => 'radio',
-						// 			'label'   => __( 'Registration Status', 'wholesalex' ),
-						// 			'options' => array(
-						// 				'global_setting' => __( 'Use Global Setting', 'wholesalex' ),
-						// 				'email_confirmation_require' => __( 'Email Confirmation Required', 'wholesalex' ),
-						// 				'auto_approve'  => __( 'Automatically Approve Account', 'wholesalex' ),
-						// 				'admin_approve' => __( 'Admin Approval Required', 'wholesalex' ),
-						// 			),
-						// 			'default' =>'global_setting',
-						// 			'help'    => '',
-						// 		),
-						// 	),
-						// ),
 						'regi_url_form_section'             => array(
 							'label' => __( 'Registration Form', 'wholesalex' ),
 							'type'  => 'role_setting',
@@ -789,13 +754,14 @@ class WHOLESALEX_Role {
 		);
 		$user_options = array();
 		foreach ( $users as $user ) {
-			$first_name = get_user_meta( $user->ID, 'first_name', true );
-			$last_name = get_user_meta( $user->ID, 'last_name', true );
-			$full_name = trim( $first_name . ' ' . $last_name );
+			$full_name = $user->display_name;
+			if ( empty( $full_name ) ) {
+				$full_name = $user->user_login;
+			}
 			$user_options[] = array(
 				'name'  => $full_name,
 				'value' => 'user_' . $user->ID,
-				'fullName'  => $user->user_login,
+				'fullName'  => $full_name,
 			);
 		}
 		return $user_options;

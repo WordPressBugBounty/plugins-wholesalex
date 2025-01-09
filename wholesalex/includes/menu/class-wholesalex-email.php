@@ -625,25 +625,6 @@ class WHOLESALEX_Email {
 
 	}
 
-
-	/**
-	 * WholesaleX Email Add Submenu Page
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 */
-	// public function wholesalex_email_submenu_page() {
-	// 	$slug = apply_filters( 'wholesalex_emails_submenu_slug', 'wholesalex-overview#/emails' );
-	// 	add_submenu_page(
-	// 		wholesalex()->get_menu_slug(),
-	// 		__( 'Emails', 'wholesalex' ),
-	// 		__( 'Emails', 'wholesalex' ),
-	// 		apply_filters( 'wholesalex_capability_access', 'manage_options' ),
-	// 		$slug,
-	// 		array( $this, 'email_page_content' )
-	// 	);
-	// }
-
 	/**
 	 * Email Page Content
 	 *
@@ -669,7 +650,7 @@ class WHOLESALEX_Email {
 				'whx_email_templates_action'=> __('Action','wholesalex'),
 				'whx_email_templates_edit'=> __('Edit','wholesalex'),
 				'whx_email_templates_unlock'=> __('UNLOCK','wholesalex'),
-				'whx_email_templates_unlock_full_email_access'=> __('Unlock Full Email Access','wholesalex'),
+				'whx_email_templates_unlock_full_email_access'=> __('Unlock Full Email Access with','wholesalex'),
 				'whx_email_templates_with_wholesalex_pro'=> __('With WholesaleX Pro','wholesalex'),
 				'whx_email_templates_upgrade_pro_message'=> __('We are sorry, but only a limited number of emails are available on the free version. Please upgrade to a pro plan to get full access.','wholesalex'),
 				'whx_email_templates_upgrade_to_pro_btn'=> __('Upgrade to Pro  ➤','wholesalex'),

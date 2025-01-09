@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
 Tested up to: 6.7
 Requires PHP: 7.3
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -12,12 +12,6 @@ WholesaleX is the best WooCommerce Wholesale plugin with lots of features includ
 
 == Description ==
 WholesaleX - The Simplest WooCommerce B2B Solution to Start Wholesaling with wholesale prices, discounts, and dynamic pricing.
-
-## WholesaleX Holiday Sale!
-
-🎁 Get **up to 60% Discount** on WholesaleX - Create the perfect B2B Business online this **Holiday**
-
-👉 <a href="https://getwholesalex.com/?utm_source=wholesalex-org&utm_medium=offer&utm_campaign=holiday_org" target="_blank">Grab Now</a>
 
 
 WholesaleX is the most complete WooCommerce wholesale plugin to create and manage B2B or B2B+B2C hybrid stores in WooCommerce. This Wholesale plugin lets you add simple wholesale pricing or tiered pricing to complex dynamic pricing & wholesale discount rules, all in a simpler way. So that is why it is known as the simplest WooCommerce B2B Solution.
@@ -193,6 +187,16 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.0.3 - 09 January 2024 =
+* Improvement: Custom Price 'Product Add-Ons for WooCommerce' Plugin Compatibility in Variable Product
+* Improvement: RTL Design Support With New UI Design.
+* Update: Access to Edit B2C and Guest User Role Title.
+* Update: Add Hook to Modify Request Quote Message Content.
+* Fix: Resolved the Saving Issue of Discount Price.
+* Fix: Resolved the Maximum and Minimum Quantity Step in Variable Product.
+
+* Fix: Resolved the Saving Issue of Discount Price.
 
 = 2.0.2 - 30 December 2024 =
 * Fix: Resolved the issue of the product popup button not displaying correctly on the product page.
