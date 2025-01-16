@@ -991,7 +991,7 @@ input:checked ~ .wsx-checkbox-mark:after {
 
 .wsx-side-modal-wrapper .wsx-icon-cross,
 .wsx-popup-content-wrapper .wsx-icon-cross {
-    position: absolute;
+    position: absolute !important;
     right: 16px;
     top: 16px;
     line-height: 0;
@@ -1767,6 +1767,7 @@ label.wsx-slider {
 }
 .wsx-slider-content .wsx-input-label {
     margin-left: 8px;
+    margin-bottom: 0;
 }
 .wsx-slider-input {
     position: absolute;

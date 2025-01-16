@@ -2656,15 +2656,34 @@ const Tier = _ref => {
         label: options[option]
       }));
     };
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Select__WEBPACK_IMPORTED_MODULE_7__["default"], {
-      name: `${fieldName}_${index}`,
-      label: index == 0 ? fieldData.label : '',
-      labelClass: labelClass,
-      options: getOptionsArray(fieldData.options),
-      value: defValue,
-      onChange: onChangeHandler,
-      inputBackground: "base1"
-    });
+    return (
+      /*#__PURE__*/
+      //    <Select
+      //         name={`${fieldName}_${index}`}
+      //         label={index==0?fieldData.label:''}
+      //         labelClass={labelClass}
+      //         options={getOptionsArray(fieldData.options)}
+      //         value={defValue}
+      //         onChange={onChangeHandler}
+      //         inputBackground='base1'
+      //     />
+      react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+        className: "wsx-tier-price-table-wrapper"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+        className: "wsx-input-label wsx-font-medium"
+      }, index == 0 ? fieldData.label : ''), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("select", {
+        name: `${fieldName}_${index}`,
+        value: defValue,
+        onChange: onChangeHandler,
+        className: "wsx-tier-table-select",
+        style: {
+          background: 'base1'
+        }
+      }, getOptionsArray(fieldData.options).map((option, idx) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("option", {
+        key: idx,
+        value: option.value
+      }, option.label))))
+    );
   };
   const dependencyCheck = deps => {
     if (!deps) {
@@ -2709,6 +2728,25 @@ const Tier = _ref => {
   };
   const getTierLastIndex = () => {
     return tier && tier[tierName] && tier[tierName]['tiers'] && tier[tierName]['tiers'].length != 0 ? tier[tierName]['tiers'].length - 1 : 0;
+  };
+  const handleDeleteCondition = () => {
+    let parent = {
+      ...tier
+    };
+    let copy = [...parent[tierName]['tiers']];
+    if (copy.length == 1) {
+      parent[tierName]['tiers'][0]._conditions_for = '';
+      parent[tierName]['tiers'][0]._conditions_operator = '';
+      parent[tierName]['tiers'][0]._conditions_value = '';
+      parent[tierName]['tiers'] = copy;
+      setTier(parent);
+      return;
+    }
+    copy = copy.filter((row, r) => {
+      return index != r;
+    });
+    parent[tierName]['tiers'] = copy;
+    setTier(parent);
   };
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-tiers-fields",
@@ -2760,18 +2798,8 @@ const Tier = _ref => {
     className: "wsx-rtl-left"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
     key: `wsx-tier-field-delete-${tierName}_${index}`,
-    className: `wsx-tier-delete ${getTierLastIndex() < 1 ? 'disable' : ''}`,
-    onClick: e => {
-      let parent = {
-        ...tier
-      };
-      let copy = [...parent[tierName]['tiers']];
-      copy = copy.filter((row, r) => {
-        return index != r;
-      });
-      parent[tierName]['tiers'] = copy;
-      setTier(parent);
-    }
+    className: `wsx-tier-delete`,
+    onClick: handleDeleteCondition
   }, _utils_Icons__WEBPACK_IMPORTED_MODULE_3__["default"].delete_24))), index == getTierLastIndex() && (tierName === 'quantity_based' || tierName === 'conditions') && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Button__WEBPACK_IMPORTED_MODULE_6__["default"], {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('Add New Condition', 'wholesalex'),
     iconName: "plus_20",
@@ -4873,6 +4901,28 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.wsx-tiers-fields {
 .wsx-condition-container .wsx-tier-wrapper, .wsx-condition-container .wsx-tier-header {
   grid-template-columns: repeat(3, 1fr) 40px; }
 
+.wsx-single-product-settings-wrapper .wsx-tier-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) 40px;
+  gap: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-primary); }
+
+.wsx-single-product-settings-wrapper > .wsx-tier-wrapper {
+  grid-template-columns: 1fr; }
+
+.wsx-tier-price-table-wrapper select.wsx-tier-table-select {
+  width: 100%;
+  border-radius: 8px;
+  height: 40px; }
+
+.wsx-form-setting .wsx-tier-price-table-wrapper select.wsx-tier-table-select {
+  width: fit-content !important;
+  border-radius: 8px; }
+
+.wsx-form-setting .wsx-tier-wrapper, .wsx-tier-header {
+  grid-template-columns: repeat(3, 1fr) 40px; }
+
 @media (max-width: 768px) {
   .wsx-tier-wrapper, .wsx-tier-header {
     grid-template-columns: repeat(4, 1fr);
@@ -4881,7 +4931,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.wsx-tiers-fields {
 @media (max-width: 576px) {
   .wsx-condition-container .wsx-tier-wrapper {
     grid-template-columns: 1fr; } }
-`, "",{"version":3,"sources":["webpack://./reactjs/src/assets/scss/Tier.scss"],"names":[],"mappings":"AAAA;EACI,kBAAkB,EAAA;;AAGlB;EACI,aAAa;EACb,0CAA0C;EAC1C,SAAS;EACT,gBAAgB,EAAA;EAChB;IACI,0CAA0C,EAAA;;AAGlD;EACI,mBAAmB,EAAA;;AAGnB;EACI,iBAAiB;EACjB,+BAA+B,EAAA;;AAI3C;EAEQ,0CAA0C,EAAA;;AAGlD;EAEQ;IACI,qCAAqC;IACrC,SAAS,EAAA,EACZ;;AAGT;EACI;IAEQ,0BAA0B,EAAA,EAC7B","sourcesContent":[".wsx-tiers-fields {\r\n    margin-bottom: 8px;\r\n}\r\n.wsx-tier {\r\n    &-wrapper, &-header {\r\n        display: grid;\r\n        grid-template-columns: repeat(4, 1fr) 40px;\r\n        gap: 24px;\r\n        align-items: end;\r\n        &2 {\r\n            grid-template-columns: repeat(3, 1fr) 40px;\r\n        }\r\n    }\r\n    &-wrapper {\r\n        margin-bottom: 16px;\r\n    }\r\n    &-header {\r\n        &-item {\r\n            padding-left: 4px;\r\n            color: var(--color-text-medium);\r\n        }\r\n    }\r\n}\r\n.wsx-condition-container .wsx-tier {\r\n    &-wrapper, &-header {\r\n        grid-template-columns: repeat(3, 1fr) 40px;\r\n    }\r\n}\r\n@media (max-width: 768px) {\r\n    .wsx-tier {\r\n        &-wrapper, &-header {\r\n            grid-template-columns: repeat(4, 1fr);\r\n            gap: 12px;\r\n        }\r\n    }\r\n}\r\n@media (max-width: 576px) {\r\n    .wsx-condition-container .wsx-tier {\r\n        &-wrapper {\r\n            grid-template-columns: 1fr;\r\n        }\r\n    }\r\n}"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./reactjs/src/assets/scss/Tier.scss"],"names":[],"mappings":"AAAA;EACI,kBAAkB,EAAA;;AAGlB;EACI,aAAa;EACb,0CAA0C;EAC1C,SAAS;EACT,gBAAgB,EAAA;EAChB;IACI,0CAA0C,EAAA;;AAGlD;EACI,mBAAmB,EAAA;;AAGnB;EACI,iBAAiB;EACjB,+BAA+B,EAAA;;AAI3C;EAEQ,0CAA0C,EAAA;;AAGlD;EACI,aAAa;EACb,0CAA0C;EAC1C,SAAS;EACT,mBAAmB;EACnB,oDAAoD,EAAA;;AAGxD;EACI,0BAA0B,EAAA;;AAG9B;EAEW,WAAW;EACX,kBAAkB;EAClB,YAAY,EAAA;;AAGvB;EAEW,6BAA6B;EAC7B,kBAAkB,EAAA;;AAG7B;EACK,0CAA0C,EAAA;;AAE/C;EAEQ;IACI,qCAAqC;IACrC,SAAS,EAAA,EACZ;;AAGT;EACI;IAEQ,0BAA0B,EAAA,EAC7B","sourcesContent":[".wsx-tiers-fields {\r\n    margin-bottom: 8px;\r\n}\r\n.wsx-tier {\r\n    &-wrapper, &-header {\r\n        display: grid;\r\n        grid-template-columns: repeat(4, 1fr) 40px;\r\n        gap: 24px;\r\n        align-items: end;\r\n        &2 {\r\n            grid-template-columns: repeat(3, 1fr) 40px;\r\n        }\r\n    }\r\n    &-wrapper {\r\n        margin-bottom: 16px;\r\n    }\r\n    &-header {\r\n        &-item {\r\n            padding-left: 4px;\r\n            color: var(--color-text-medium);\r\n        }\r\n    }\r\n}\r\n.wsx-condition-container .wsx-tier {\r\n    &-wrapper, &-header {\r\n        grid-template-columns: repeat(3, 1fr) 40px;\r\n    }\r\n}\r\n.wsx-single-product-settings-wrapper .wsx-tier-wrapper {\r\n    display: grid;\r\n    grid-template-columns: repeat(3, 1fr) 40px;\r\n    gap: 12px;\r\n    margin-bottom: 16px;\r\n    border-bottom: 1px solid var(--color-border-primary);\r\n}\r\n\r\n.wsx-single-product-settings-wrapper >.wsx-tier-wrapper {\r\n    grid-template-columns: 1fr;\r\n}\r\n\r\n.wsx-tier-price-table-wrapper{\r\n       select.wsx-tier-table-select{\r\n           width: 100%;\r\n           border-radius: 8px;\r\n           height: 40px;\r\n       }\r\n   }\r\n.wsx-form-setting .wsx-tier-price-table-wrapper{\r\n       select.wsx-tier-table-select{\r\n           width: fit-content !important;\r\n           border-radius: 8px;\r\n       }\r\n   }\r\n.wsx-form-setting .wsx-tier-wrapper, .wsx-tier-header {\r\n     grid-template-columns: repeat(3, 1fr) 40px;\r\n}\r\n@media (max-width: 768px) {\r\n    .wsx-tier {\r\n        &-wrapper, &-header {\r\n            grid-template-columns: repeat(4, 1fr);\r\n            gap: 12px;\r\n        }\r\n    }\r\n}\r\n@media (max-width: 576px) {\r\n    .wsx-condition-container .wsx-tier {\r\n        &-wrapper {\r\n            grid-template-columns: 1fr;\r\n        }\r\n    }\r\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

@@ -6655,6 +6655,7 @@ class WHOLESALEX_Dynamic_Rules {
 				$id                       = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
 				$_sale_price              = floatval(get_post_meta($id, '_sale_price', true));
 				$regular_price            = floatval(get_post_meta($id, '_regular_price', true)) + $woo_custom_price;
+				$regular_price 			  = $regular_price == 0 ? 1: $regular_price;
 				$get_discount             = abs($sale_price - $regular_price) / $regular_price;
 				$discouned_price          = number_format($get_discount, 2, '.', '');
 				$__current_role_id        = wholesalex()->get_current_user_role();

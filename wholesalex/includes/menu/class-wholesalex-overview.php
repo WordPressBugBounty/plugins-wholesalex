@@ -597,6 +597,103 @@ class WHOLESALEX_Overview
 		return $addons_data;
 	}
 
+	public static function get_dynamic_rules_localize_data( $dependency ) {
+		return array(
+			'whx_dr_fields'   => \WHOLESALEX\WHOLESALEX_Dynamic_Rules::get_dynamic_rules_field(),
+			'whx_dr_rule'     => $dependency == 'dokan' ? array_values( wholesalex()->get_dynamic_rules_by_user_id() ) : \WHOLESALEX\WHOLESALEX_Dynamic_Rules::dynamic_rules_get(),
+			'whx_dr_nonce'    => wp_create_nonce( 'whx-export-dynamic-rules' ),
+			'whx_dr_currency' => get_woocommerce_currency_symbol(),
+		);
+	}
+
+	public static function get_dynamic_roles_i18n_localize_data() {
+		return array(
+			  /**
+			  *
+			  * Dynamic Rules Translation Text Start
+			  *
+			  */
+			 'whx_dr_dynamic_rules'                                                 => __('Dynamic Rules','wholesalex'),
+			 'whx_dr_please_fill_all_fields'                                        => __('Please Fill All Fields.','wholesalex'),
+			 'whx_dr_minimum_product_quantity_should_greater_then_free_product_qty' => __('Minimum Product Quantity	Should Greater then	Free Product Quantity.','wholesalex'),
+			 'whx_dr_rule_title'                                                    => __('Rule	Title','wholesalex'),
+			 'whx_dr_create_dynamic_rule'                                           => __('Create Dynamic Rule','wholesalex'),
+			 'whx_dr_import'                                                        => __('Import','wholesalex'),
+			 'whx_dr_export'                                                        => __('Export','wholesalex'),
+			 'whx_dr_untitled'                                                      => __('Untitled','wholesalex'),
+			 'whx_dr_duplicate_of'                                                  => __('Duplicate of ','wholesalex'),
+			 'whx_dr_delete_this_rule'                                              => __('Delete this Rule','wholesalex'),
+			 'whx_dr_delete_condition'                                              => __('Delete Condition','wholesalex'),
+			 'whx_dr_duplicate_this_rule'                                           => __('Duplicate this Rule','wholesalex'),
+			 'whx_dr_show_hide_rule_details'                                        => __('Show/Hide Rule Details.','wholesalex'),
+			 'whx_dr_vendor'                                                        => __('Vendor #','wholesalex'),
+			 'whx_dr_untitled_rule'                                                 => __('Untitled	Rule','wholesalex'),
+			 'whx_dr_error_occured'                                                 => __('Error Occured!','wholesalex'),
+			 'whx_dr_map_csv_fields_to_dynamic_rules'                               => __('Map CSV Fields to Dynamic Rules','wholesalex'),
+			 'whx_dr_select_field_from_csv_msg'                                     => __('Select fields from your CSV file	to map against role	fields,	or to ignore during	import.','wholesalex'),
+			 'whx_dr_column_name'                                                   => __('Column name','wholesalex'),
+			 'whx_dr_map_to_field'                                                  => __('Map to field','wholesalex'),
+			 'whx_dr_do_not_import'                                                 => __('Do not import','wholesalex'),
+			 'whx_dr_run_the_importer'                                              => __('Run the importer','wholesalex'),
+			 'whx_dr_importing'                                                     => __('Importing','wholesalex'),
+			 'whx_dr_upload_csv'                                                    => __('Upload CSV','wholesalex'),
+			 'whx_dr_you_can_upload_only_csv_file_format'                           => __('You can upload only csv file	format','wholesalex'),
+			 'whx_dr_your_dynamic_rules_are_now_being_importing'                    => __('Your	Dynamic	Rules are now being	imported..','wholesalex'),
+			 'whx_dr_update_existing_rules'                                         => __('Update Existing Rules','wholesalex'),
+			 'whx_dr_select_update_exising_rule_msg'                                => __('Selecting "Update Existing Rules" will only update existing rules. No new rules will	be added.','wholesalex'),
+			 'whx_dr_continue'                                                      => __('Continue','wholesalex'),
+			 'whx_dr_dynamic_rule_imported'                                         => __('	Dynamic	Rules Imported.','wholesalex'),
+			 'whx_dr_dynamic_rule_updated'                                          => __('	Dynamic	Rules Updated.','wholesalex'),
+			 'whx_dr_dynamic_rule_skipped'                                          => __('	Dynamic	Rules Skipped.','wholesalex'),
+			 'whx_dr_dynamic_rule_failed'                                           => __('	Dynamic	Rules Failed.','wholesalex'),
+			 'whx_dr_view_error_logs'                                               => __('View	Error Logs','wholesalex'),
+			 'whx_dr_dynamic_rule'                                                  => __('Dynamic Rule','wholesalex'),
+			 'whx_dr_reason_for_failure'                                            => __('Reason for failure','wholesalex'),
+			 'whx_dr_import_dynamic_rules'                                          => __('Import Dynamic Rules','wholesalex'),
+			 'whx_dr_latest'                                                        => __('Latest','wholesalex'),
+			 'whx_dr_oldest'                                                        => __('Oldest','wholesalex'),
+			 'whx_dr_save'                                                          => __('Save','wholesalex'),
+			 'whx_dr_condition_label'                                               => __('Condition','wholesalex'),
+			 'whx_dr_operator_label'                                                => __('Operator','wholesalex'),
+			 'whx_dr_amount_label'                                                  => __('Amount','wholesalex'),
+			 'whx_dr_add_new_condition'                                             => __('Add New Condition','wholesalex'),
+			 /**
+			  *
+			  * Dynamic Rules Translation Text Stop
+			  *
+			  */
+			  'whx_users_delete'													=> __('Delete','wholesalex'),
+			  'whx_users_edit'														=> __('Edit','wholesalex'),
+			  'whx_dr_duplicate_this'                                               => __('Duplicate','wholesalex'),
+			  'whx_users_apply'														=> __('Apply','wholesalex'),
+		);
+	}
+
+	public static function new_output( $dependency ) {
+	
+		wp_enqueue_script('wholesalex_overview');
+		wp_localize_script(
+			'wholesalex_overview',
+			'wholesalex_overview',
+			apply_filters(
+				'wholesalex_overview_localize_integration_data',
+					apply_filters(
+						'wholesalex_overview_localize_integration_data',
+						array_merge(
+							self::get_dynamic_rules_localize_data( $dependency ),
+							array(
+								'i18n' => self::get_dynamic_roles_i18n_localize_data(),
+							)
+						)
+					)
+				)
+		);
+		wp_enqueue_style('wholesalex');
+	?>
+		<div id="wholesalex-overview"></div>
+	<?php	
+	}
+
 	/**
 	 * Output Function
 	 *
@@ -690,7 +787,7 @@ class WHOLESALEX_Overview
 			'wholesalex_overview',
 			apply_filters(
 				'wholesalex_overview_localize_data',
-					array(
+					array_merge( array(
 						/**
 						 * Wizard Translation Start
 						 */
@@ -810,15 +907,15 @@ class WHOLESALEX_Overview
 						/**
 						 * Dynamic Rules Translation Start
 						 */
-						'whx_dr_fields' => \WHOLESALEX\WHOLESALEX_Dynamic_Rules::get_dynamic_rules_field(),
-						'whx_dr_rule'   => \WHOLESALEX\WHOLESALEX_Dynamic_Rules::dynamic_rules_get(),
-						'whx_dr_nonce'  => wp_create_nonce( 'whx-export-dynamic-rules' ),
-						'whx_dr_currency'   => get_woocommerce_currency_symbol(),
+						// 'whx_dr_fields' => \WHOLESALEX\WHOLESALEX_Dynamic_Rules::get_dynamic_rules_field(),
+						// 'whx_dr_rule'   => \WHOLESALEX\WHOLESALEX_Dynamic_Rules::dynamic_rules_get(),
+						// 'whx_dr_nonce'  => wp_create_nonce( 'whx-export-dynamic-rules' ),
+						// 'whx_dr_currency'   => get_woocommerce_currency_symbol(),
 						/**
 						 * Dynamic Rules Translation Stop
 						 */
 
-						'i18n' => array(
+						'i18n' => array_merge( array(
 							'select_a_date_range_to_view_sale_data'	=> __('Select a	date range to view sale	data', 'wholesalex'),
 							'select_a_date_range'					=> __('Select a	date range', 'wholesalex'),
 							'date_range_title'					=> __('Date Range', 'wholesalex'),
@@ -886,13 +983,13 @@ class WHOLESALEX_Overview
 							 *
 							 */
 							'whx_users_users'											=> __('Users','wholesalex'),
-							'whx_users_edit'											=> __('Edit','wholesalex'),
+							// 'whx_users_edit'											=> __('Edit','wholesalex'),
 							'whx_users_active'											=> __('Active','wholesalex'),
 							'whx_users_reject'											=> __('Reject','wholesalex'),
 							'whx_users_pending'											=> __('Pending','wholesalex'),
-							'whx_users_delete'											=> __('Delete','wholesalex'),
+							// 'whx_users_delete'											=> __('Delete','wholesalex'),
 							'whx_users_selected_users'									=> __('Selected	Users','wholesalex'),
-							'whx_users_apply'											=> __('Apply','wholesalex'),
+							// 'whx_users_apply'											=> __('Apply','wholesalex'),
 							'whx_users_import'											=> __('Import','wholesalex'),
 							'whx_users_export'											=> __('Export','wholesalex'),
 							'whx_users_columns'											=> __('Columns','wholesalex'),
@@ -1174,62 +1271,6 @@ class WHOLESALEX_Overview
 
 							/**
 							 *
-							 * Dynamic Rules Translation Text Start
-							 *
-							 */
-							'whx_dr_dynamic_rules'													=> __('Dynamic Rules','wholesalex'),
-							'whx_dr_please_fill_all_fields'											=> __('Please Fill All Fields.','wholesalex'),
-							'whx_dr_minimum_product_quantity_should_greater_then_free_product_qty'	=> __('Minimum Product Quantity	Should Greater then	Free Product Quantity.','wholesalex'),
-							'whx_dr_rule_title'														=> __('Rule	Title','wholesalex'),
-							'whx_dr_create_dynamic_rule'											=> __('Create Dynamic Rule','wholesalex'),
-							'whx_dr_import'															=> __('Import','wholesalex'),
-							'whx_dr_export'															=> __('Export','wholesalex'),
-							'whx_dr_untitled'														=> __('Untitled','wholesalex'),
-							'whx_dr_duplicate_of'													=> __('Duplicate of ','wholesalex'),
-							'whx_dr_delete_this_rule'												=> __('Delete this Rule','wholesalex'),
-							'whx_dr_delete_condition'												=> __('Delete Condition','wholesalex'),
-							'whx_dr_duplicate_this'													=> __('Duplicate','wholesalex'),
-							'whx_dr_duplicate_this_rule'											=> __('Duplicate this Rule','wholesalex'),
-							'whx_dr_show_hide_rule_details'											=> __('Show/Hide Rule Details.','wholesalex'),
-							'whx_dr_vendor'															=> __('Vendor #','wholesalex'),
-							'whx_dr_untitled_rule'													=> __('Untitled	Rule','wholesalex'),
-							'whx_dr_error_occured'													=> __('Error Occured!','wholesalex'),
-							'whx_dr_map_csv_fields_to_dynamic_rules'								=> __('Map CSV Fields to Dynamic Rules','wholesalex'),
-							'whx_dr_select_field_from_csv_msg'										=> __('Select fields from your CSV file	to map against role	fields,	or to ignore during	import.','wholesalex'),
-							'whx_dr_column_name'													=> __('Column name','wholesalex'),
-							'whx_dr_map_to_field'													=> __('Map to field','wholesalex'),
-							'whx_dr_do_not_import'													=> __('Do not import','wholesalex'),
-							'whx_dr_run_the_importer'												=> __('Run the importer','wholesalex'),
-							'whx_dr_importing'														=> __('Importing','wholesalex'),
-							'whx_dr_upload_csv'														=> __('Upload CSV','wholesalex'),
-							'whx_dr_you_can_upload_only_csv_file_format'							=> __('You can upload only csv file	format','wholesalex'),
-							'whx_dr_your_dynamic_rules_are_now_being_importing'						=> __('Your	Dynamic	Rules are now being	imported..','wholesalex'),
-							'whx_dr_update_existing_rules'											=> __('Update Existing Rules','wholesalex'),
-							'whx_dr_select_update_exising_rule_msg'									=> __('Selecting "Update Existing Rules" will only update existing rules. No new rules will	be added.','wholesalex'),
-							'whx_dr_continue'														=> __('Continue','wholesalex'),
-							'whx_dr_dynamic_rule_imported'											=> __('	Dynamic	Rules Imported.','wholesalex'),
-							'whx_dr_dynamic_rule_updated'											=> __('	Dynamic	Rules Updated.','wholesalex'),
-							'whx_dr_dynamic_rule_skipped'											=> __('	Dynamic	Rules Skipped.','wholesalex'),
-							'whx_dr_dynamic_rule_failed'											=> __('	Dynamic	Rules Failed.','wholesalex'),
-							'whx_dr_view_error_logs'												=> __('View	Error Logs','wholesalex'),
-							'whx_dr_dynamic_rule'													=> __('Dynamic Rule','wholesalex'),
-							'whx_dr_reason_for_failure'												=> __('Reason for failure','wholesalex'),
-							'whx_dr_import_dynamic_rules'											=> __('Import Dynamic Rules','wholesalex'),
-							'whx_dr_latest'															=> __('Latest','wholesalex'),
-							'whx_dr_oldest'															=> __('Oldest','wholesalex'),
-							'whx_dr_save'															=> __('Save','wholesalex'),
-							'whx_dr_condition_label'												=> __('Condition','wholesalex'),
-							'whx_dr_operator_label'													=> __('Operator','wholesalex'),
-							'whx_dr_amount_label'													=> __('Amount','wholesalex'),
-							'whx_dr_add_new_condition'												=> __('Add New Condition','wholesalex'),
-							/**
-							 *
-							 * Dynamic Rules Translation Text Stop
-							 *
-							 */
-
-							/**
-							 *
 							 * Feature Translation Text Start
 							 *
 							 */
@@ -1336,8 +1377,8 @@ class WHOLESALEX_Overview
 							 * Quick Support Translation Text Stop
 							 *
 							 */
-						)
-					)
+						), self::get_dynamic_roles_i18n_localize_data()),
+					), self::get_dynamic_rules_localize_data('wholesalex'))
 			)
 		);
 
