@@ -2262,3 +2262,9 @@ label.wsx-slider {
          max-width: 46vw;
      }
  }
+@media (max-width: 490px) {
+    .wsx-sm-flex {
+         display: flex;
+         flex-direction: column;
+     }
+ }

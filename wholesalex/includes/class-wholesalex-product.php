@@ -1545,7 +1545,7 @@ class WHOLESALEX_Product {
 									'placeholder' => '',
 									'default'     => '',
 									'label'       => /* translators: %s: WholesaleX Role Name */
-									sprintf( __( ' %s Price', 'wholesalex' ), $role['name'] ),
+									sprintf( __( 'Price', 'wholesalex' )),
 								),
 								'_min_quantity'    => array(
 									'type'        => 'number',
@@ -1607,7 +1607,7 @@ class WHOLESALEX_Product {
 									'type'        => 'number',
 									'placeholder' => '',
 									'label'       => /* translators: %s: WholesaleX Role Name */
-									sprintf( __( ' %s Price', 'wholesalex' ), $role['name'] ),
+									sprintf( __( 'Price', 'wholesalex' )),
 									'default'     => '',
 								),
 								'_min_quantity'    => array(

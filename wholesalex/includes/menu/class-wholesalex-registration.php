@@ -1033,11 +1033,8 @@ class WHOLESALEX_Registration {
 
 
 	public function add_custom_woo_field_to_user_meta( $user_id ) {
-		$nonce_value = isset( $_POST['_wpnonce'] ) ? sanitize_key(wp_unslash( $_POST['_wpnonce'] )) : ''; 
-
-		if(!wp_verify_nonce( $nonce_value, 'woocommerce-register' )) {
-			return;
-		}
+		// Nonce is already checked woocommerce registration form.
+		// $nonce_value = isset( $_POST['_wpnonce'] ) ? sanitize_key(wp_unslash( $_POST['_wpnonce'] )) : '';.
 		if ( empty( $this->woo_custom_fields ) ) {
 			return;
 		}

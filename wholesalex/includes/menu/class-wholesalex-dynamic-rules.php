@@ -138,6 +138,20 @@ class WHOLESALEX_Dynamic_Rules {
 
 	}
 
+
+	public function get_actual_discount_price( $product, $regular_price, $sale_price ) {
+		$is_regular_price = wholesalex()->get_setting('_is_sale_or_regular_Price', 'is_regular_price');
+		if ($is_regular_price == 'is_regular_price') {
+			return $regular_price;
+		} else {
+			$actual_sale_price = $sale_price ? $sale_price : get_post_meta($product->get_id(), '_sale_price', true);
+			if( ! isset( $actual_sale_price ) || empty( $actual_sale_price ) || $actual_sale_price == "" ) {
+				$actual_sale_price = $regular_price;
+			}
+			return $actual_sale_price;
+		}
+	}
+
 	/**
 	 * Dynamic Rules Handler
 	 *
@@ -2661,7 +2675,12 @@ class WHOLESALEX_Dynamic_Rules {
 	{
 		$product = wc_get_product($id);
 
-		$product_price = $product->get_regular_price();
+		$is_regular_price = wholesalex()->get_setting('_is_sale_or_regular_Price', 'is_regular_price');
+		if ( 'is_sale_price' === $is_regular_price ) {
+			$product_price = $product->get_sale_price();
+		} else {
+			$product_price = $product->get_regular_price();
+		}
 
 		ob_start();
 		$this->wholesalex_price_table_generator($product_price, $product);
@@ -6122,6 +6141,35 @@ class WHOLESALEX_Dynamic_Rules {
 			2
 		);
 
+		/**
+		 * Specipic Product Variations Quantity Step Control
+		 */
+		add_filter('woocommerce_available_variation', function ($variation_data, $product, $variation) use ($data) {
+			// Ensure rules are present
+			if (!empty($data['min_order_qty'])) {
+				foreach ($data['min_order_qty'] as $rule) {
+					// Check if conditions are met for the rule
+					if (isset($rule['conditions']) && !self::check_rule_conditions($rule['conditions'])) {
+						continue;
+					}
+					// Check if the variation matches the rule
+					if (self::is_eligible_for_rule($variation->get_parent_id(), $variation->get_id(), $rule['filter'])) {
+						// Control minimum quantity
+						if (isset($rule['rule']['_min_order_qty_disable']) && $rule['rule']['_min_order_qty_disable'] === 'no') {
+							$variation_data['min_qty'] = $rule['rule']['_min_order_qty'];
+						}
+	
+						// Control quantity step
+						if (isset($rule['rule']['_min_order_qty_step']) && $rule['rule']['_min_order_qty_step']) {
+							$variation_data['step'] = $rule['rule']['_min_order_qty_step'];
+						}
+					}
+				}
+			}
+			return $variation_data;
+		}, 10, 3);
+
+
 		add_filter(
 			'woocommerce_loop_add_to_cart_args',
 			function ($args, $product) use ($data) {
@@ -6624,7 +6672,7 @@ class WHOLESALEX_Dynamic_Rules {
 		);
 
 		add_action('woocommerce_before_calculate_totals', array($this, 'update_cart_price'));
-
+		
 	}
 
 	public function update_cart_price($cart)
@@ -6976,6 +7024,10 @@ class WHOLESALEX_Dynamic_Rules {
 		return $tier_res;
 	}
 
+	public function get_role_base_sale_price( $product, $user_id = '') {
+		$role_base_sale_price = get_post_meta( $product->get_id(), $user_id . '_sale_price', true );
+		return $role_base_sale_price;
+	}
 
 	/**
 	 * Calculate Regular Price
@@ -6985,8 +7037,7 @@ class WHOLESALEX_Dynamic_Rules {
 	 * @param array  $data Data.
 	 * @return floatval
 	 */
-	public function calculate_regular_price($regular_price, $product, $data)
-	{
+	public function calculate_regular_price( $regular_price, $product, $data ) {
 		// Check Rolewise base price.
 		if (isset($data['role_id']) && !empty($data['role_id']) && $data['eligible']) {
 			$rrp = get_post_meta($product->get_id(), $data['role_id'] . '_base_price', true);
@@ -6995,6 +7046,26 @@ class WHOLESALEX_Dynamic_Rules {
 
 			if ($rrp) {
 				wholesalex()->set_wholesalex_regular_prices($product->get_id(), $rrp);
+			}
+		}
+		$is_regular_price = wholesalex()->get_setting('_is_sale_or_regular_Price', 'is_regular_price');
+		if ( $is_regular_price == 'is_sale_price' ) {
+			$role_sale_price = floatval( $this->get_role_base_sale_price($product, $data['role_id']) );
+			$db_sale_price =floatval(  get_post_meta($product->get_id(), '_sale_price', true) );
+			$get_session_sale_price = floatval( WC()->session->get('wsx_sale_price') );
+			
+			if ($get_session_sale_price) {
+				if($role_sale_price === $get_session_sale_price){
+					return $regular_price;
+				} else {
+					if ($get_session_sale_price === $db_sale_price) {
+						return $regular_price;
+					} else {
+						return $this->get_actual_discount_price( $product, $regular_price, $role_sale_price);
+					}
+				}
+			} else {
+				return $this->get_actual_discount_price( $product, $regular_price, $role_sale_price);
 			}
 		}
 		return $regular_price;
@@ -7148,6 +7219,12 @@ class WHOLESALEX_Dynamic_Rules {
 			$this->set_discounted_product($product_id);
 		}
 
+		if ($sale_price && 0.00 != $sale_price) {
+			// Set the Sale Price in Session
+			if (WC()->session) {
+				WC()->session->set('wsx_sale_price', $sale_price);
+			}
+		}
 		return $sale_price && 0.00 != $sale_price ? $sale_price : $previous_sp;
 	}
 

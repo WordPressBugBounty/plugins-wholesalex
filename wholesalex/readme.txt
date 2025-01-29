@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
 Tested up to: 6.7
 Requires PHP: 7.3
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -187,6 +187,11 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.0.5 - 29 January 2025 =
+* New: Regular Price or Sale Price Product Discount Feature Added in General Setting.
+* New: Added "Quantity Step" Feature To Min/Max Order Quantity Dynamic Rules.
+* Fix: WholesaleX Registration Now Works Seamlessly with WooCommerce Default Registration Form
 
 = 2.0.4 - 16 January 2025 =
 * Improvement: Compatibility With Dokan and WCFM New UI Design.

@@ -87,6 +87,39 @@
 		
 
 	});
+
+	//Product Variation Specific Step Control
+	$("body").on("show_variation", ".single_variation_wrap", function (event, variation) {
+		let $quantityInput = $(this).parent().find("[name=quantity]");
+		let step = variation.step || 1; // Default step to 1 if not provided
+		let maxQty = parseFloat(variation.max_qty) || 999999999; // Default max_qty to a large number
+		let minQty = parseFloat(variation.min_qty) || 0; // Default min_qty to 0
+	
+		// Set step and trigger change event
+		$quantityInput.attr("step", step).trigger("change");
+	
+		// Parse and adjust current quantity value
+		let currentQty = parseFloat($quantityInput.val()) || minQty;
+		currentQty = Math.max(minQty, Math.min(minQty, maxQty)); // Ensure within min and max range
+	
+		// Adjust quantity if step is defined
+		if (step) {
+			let remainder = currentQty % step;
+			if (remainder !== 0) {
+				let increaseBy = step - remainder;
+				let decreaseBy = remainder;
+				currentQty = currentQty + increaseBy <= maxQty ? currentQty + increaseBy : currentQty - decreaseBy;
+			}
+		}
+	
+		// Update input attributes and value
+		$quantityInput
+			.val(currentQty)
+			.attr("min", minQty)
+			.attr("max", maxQty)
+			.trigger("change");
+	});
+	
 	
 })(jQuery);
 

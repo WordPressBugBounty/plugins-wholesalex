@@ -188,6 +188,17 @@ class Settings {
 							// 'help_popup' => true,
 							// 'popup_gif_link' => 'https://plugins.svn.wordpress.org/wholesalex/assets/Screenshot-1.jpg',
 						),
+						'_is_sale_or_regular_Price'                 => array(
+							'type'    => 'radio',
+							'label'   => __( 'Apply Product Discount', 'wholesalex' ),
+							'options' => array(
+								'is_regular_price' => __( 'Regular Price', 'wholesalex' ),
+								'is_sale_price'    => __( 'Sale Price', 'wholesalex' ),
+							),
+							'default' => 'is_regular_price',
+							/* translators: %s - Plugin Name */
+							'tooltip' => __( 'Offer discounts either on the regular product price(s) or the sale price(s).', 'wholesalex' ),
+						),
 						'_settings_quantity_based_discount_priority' => array(
 							'type'    => 'dragList',
 							'label'   => __( 'Pricing / Discount Priority', 'wholesalex' ),

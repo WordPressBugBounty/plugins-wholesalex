@@ -648,6 +648,9 @@ class WHOLESALEX_Role {
 	 * @param string $option Include tax or Exclude Tax in Shop.
 	 */
 	public function tax_display( $option ) {
+		if(is_admin()){
+			return $option;
+		}
 		$__role_id      = wholesalex()->get_current_user_role();
 		$__role_content = wholesalex()->get_roles( 'by_id', $__role_id );
 		if ( isset( $__role_content['_display_price'] ) && ! empty( $__role_content['_display_price'] ) ) {
