@@ -133,9 +133,9 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$this->file               = isset( $_REQUEST['file'] ) ? wc_clean( wp_unslash( $_REQUEST['file'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$this->update_existing    = isset( $_REQUEST['update_existing'] ) ? 'yes' === wc_clean($_REQUEST['update_existing']) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$this->update_existing    = isset( $_REQUEST['update_existing'] ) ? 'yes' === wc_clean( $_REQUEST['update_existing'] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$this->delimiter          = ! empty( $_REQUEST['delimiter'] ) ? wc_clean( wp_unslash( $_REQUEST['delimiter'] ) ) : ','; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$this->map_preferences    = isset( $_REQUEST['map_preferences'] ) ? (bool) wc_clean($_REQUEST['map_preferences']) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$this->map_preferences    = isset( $_REQUEST['map_preferences'] ) ? (bool) wc_clean( $_REQUEST['map_preferences'] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$this->character_encoding = isset( $_REQUEST['character_encoding'] ) ? wc_clean( wp_unslash( $_REQUEST['character_encoding'] ) ) : 'UTF-8'; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		if ( $this->map_preferences ) {
@@ -149,7 +149,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 	 */
 	public function dispatch() {
 		// phpcs:ignore WordPress.Security.NonceVerification.MissingW
-
 	}
 
 
@@ -160,7 +159,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 	 * @return string|WP_Error
 	 */
 	public function handle_upload() {
-        if ( ! ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'wholesalex-registration' ) ) ) {
+		if ( ! ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'wholesalex-registration' ) ) ) {
 			return;
 		}
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce already verified in WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller::upload_form_handler()
@@ -382,10 +381,10 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 		if ( ! ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'wholesalex-registration' ) ) ) {
 			return;
 		}
-        
-        if( !current_user_can( 'manage_options' )) {
-            return;
-        }
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
 
 		$response_data = array(
 			'status'  => false,
@@ -405,7 +404,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 				'lines'              => 1,
 				'delimiter'          => $this->delimiter,
 				'character_encoding' => $this->character_encoding,
-				'update_existing'    => isset( $_POST['update_existing'] ) && 'yes' === wc_clean($_POST['update_existing']),
+				'update_existing'    => isset( $_POST['update_existing'] ) && 'yes' === wc_clean( $_POST['update_existing'] ),
 			);
 
 			$importer                         = self::get_importer( $this->file, $args );
@@ -431,9 +430,9 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 		if ( ! ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'wholesalex-registration' ) ) ) {
 			return;
 		}
-        if(!current_user_can( 'manage_options' )) {
-            return;
-        }
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
 		$response_data = array(
 			'status'  => false,
 			'message' => '',
@@ -468,7 +467,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 		$response_data['character_encoding'] = $this->character_encoding;
 
 		wp_send_json( $response_data );
-
 	}
 
 
@@ -482,17 +480,17 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 			return;
 		}
 
-        if( !current_user_can( 'manage_options' )) {
-            return;
-        }
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
 
 		include_once WHOLESALEX_PATH . 'includes/import/class-wholesalex-dynamic-rule-csv-importer.php';
 		$file   = wc_clean( wp_unslash( $_POST['file'] ) );  // phpcs:ignore
 		$params = array(
 			'delimiter'          => ! empty( $_POST['delimiter'] ) ? wc_clean( wp_unslash( $_POST['delimiter'] ) ) : ',', // phpcs:ignore 
-			'start_pos'          => isset( $_POST['position'] ) ? absint( wc_clean($_POST['position']) ) : 0, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			'start_pos'          => isset( $_POST['position'] ) ? absint( wc_clean( $_POST['position'] ) ) : 0, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			'mapping'            => isset( $_POST['mapping'] ) ? (array) wc_clean( wp_unslash( $_POST['mapping'] ) ) : array(), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			'update_existing'    => isset( $_POST['update_existing'] ) ? 'yes' === wc_clean($_POST['update_existing']) : false, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			'update_existing'    => isset( $_POST['update_existing'] ) ? 'yes' === wc_clean( $_POST['update_existing'] ) : false, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			'character_encoding' => isset( $_POST['character_encoding'] ) ? wc_clean( wp_unslash( $_POST['character_encoding'] ) ) : '', // phpcs:ignore
 
 			/**
@@ -583,5 +581,4 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 			wp_send_json( $response_data );
 		}
 	}
-
 }

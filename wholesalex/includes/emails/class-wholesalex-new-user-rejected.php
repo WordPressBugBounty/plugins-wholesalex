@@ -74,7 +74,6 @@ class WholesaleX_New_User_Rejected_Email extends WC_Email {
 
 		// Call parent constructor.
 		parent::__construct();
-		// $this->recipient = '';
 		add_action( 'wholesalex_set_status_reject_notification', array( $this, 'trigger' ), 10, 3 );
 	}
 

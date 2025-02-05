@@ -320,5 +320,4 @@ abstract class WHOLESALEX_Dynamic_Rule_Importer implements WHOLESALEX_Importer_I
 
 		return $value;
 	}
-
 }

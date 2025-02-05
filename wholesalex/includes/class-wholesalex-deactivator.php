@@ -20,5 +20,4 @@ class WholesaleX_Deactivator {
 	public static function deactivate() {
 		// TODO: Deactivate Actions.
 	}
-
 }

@@ -17,7 +17,6 @@ class WHOLESALEX_Menu {
 	 * Menu Constructor
 	 */
 	public function __construct() {
-		// add_action( 'admin_menu', array( $this, 'admin_menu_callback' ) );
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_settings_meta' ), 10, 2 );
 		add_filter( 'plugin_action_links_' . WHOLESALEX_BASE, array( $this, 'plugin_action_links_callback' ) );
 	}
@@ -25,6 +24,7 @@ class WHOLESALEX_Menu {
 	/**
 	 * Settings Pro Update Link
 	 *
+	 * @param ARRAY $links Plugin Action Links.
 	 * @since v.1.0.0
 	 * @return ARRAY
 	 */
@@ -43,6 +43,8 @@ class WHOLESALEX_Menu {
 	/**
 	 * Plugin Page Menu Add
 	 *
+	 * @param ARRAY  $links Plugin Action Links.
+	 * @param STRING $file Plugin File.
 	 * @since v.1.0.0
 	 * @return ARRAY
 	 */
@@ -63,10 +65,8 @@ class WHOLESALEX_Menu {
 	 * @since 1.0.0
 	 */
 	public function admin_menu_callback() {
-		// require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-users.php';
 		require_once WHOLESALEX_PATH . 'includes/options/Addons.php';
 
-		// new \WHOLESALEX\WHOLESALEX_Users();
 		new \WHOLESALEX\Addons();
 	}
 }

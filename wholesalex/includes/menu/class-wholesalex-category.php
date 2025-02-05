@@ -39,7 +39,6 @@ class WHOLESALEX_Category {
 		add_action( 'template_redirect', array( $this, 'redirect_from_hidden_products' ) );
 		add_action( 'woocommerce_check_cart_items', array( $this, 'prevent_hidden_category_product_at_checkout' ) );
 		add_action( 'rest_api_init', array( $this, 'save_category_callback' ) );
-
 	}
 
 	/**
@@ -115,7 +114,6 @@ class WHOLESALEX_Category {
 			wholesalex()->save_category_discounts( $term_id, $__tiers );
 
 		}
-
 	}
 
 
@@ -134,12 +132,12 @@ class WHOLESALEX_Category {
 				'visibility_settings' => wholesalex()->get_category_visibility_settings(),
 				'fields'              => $this->get_category_fields(),
 				'discounts'           => wholesalex()->get_category_discounts(),
-				'i18n' => array(
-					'unlock' => __("UNLOCK",'wholesalex'),
-					'unlock_heading' => __("Unlock All Features with",'wholesalex'),
-					'unlock_desc' => __("We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.",'wholesalex'),
-					'upgrade_to_pro' => __("Upgrade to Pro  ➤",'wholesalex'),
-				)
+				'i18n'                => array(
+					'unlock'         => __( 'UNLOCK', 'wholesalex' ),
+					'unlock_heading' => __( 'Unlock All Features with', 'wholesalex' ),
+					'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
+					'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
+				),
 			),
 		);
 		wp_nonce_field( 'wholesalex_cat_add_update', '_wpnonce_add_update_cat' ); ?>
@@ -150,10 +148,11 @@ class WHOLESALEX_Category {
 	/**
 	 * WholesaleX Category Script Callback
 	 *
+	 * @param object $term Term.
 	 * @return void
 	 * @since 1.1.0 Enqueue Script (Reconfigure Build File)
 	 */
-	public function category_content_edit_html($term) {
+	public function category_content_edit_html( $term ) {
 		wp_enqueue_script( 'wholesalex_category' );
 		wp_localize_script(
 			'wholesalex_category',
@@ -161,16 +160,17 @@ class WHOLESALEX_Category {
 			array(
 				'visibility_settings' => wholesalex()->get_category_visibility_settings(),
 				'fields'              => $this->get_category_fields(),
-				'discounts'           => array($term->term_id=>wholesalex()->get_category_discounts($term->term_id)),
-				'i18n' => array(
-					'unlock' => __("UNLOCK",'wholesalex'),
-					'unlock_heading' => __("Unlock All Features with",'wholesalex'),
-					'unlock_desc' => __("We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.",'wholesalex'),
-					'upgrade_to_pro' => __("Upgrade to Pro  ➤",'wholesalex'),
-				)
+				'discounts'           => array( $term->term_id => wholesalex()->get_category_discounts( $term->term_id ) ),
+				'i18n'                => array(
+					'unlock'         => __( 'UNLOCK', 'wholesalex' ),
+					'unlock_heading' => __( 'Unlock All Features with', 'wholesalex' ),
+					'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
+					'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
+				),
 			),
 		);
-		wp_nonce_field( 'wholesalex_cat_add_update', '_wpnonce_add_update_cat' ); ?>
+		wp_nonce_field( 'wholesalex_cat_add_update', '_wpnonce_add_update_cat' );
+		?>
 
 		<div id="_wholesalex_edit_category"></div>
 		<?php
@@ -329,14 +329,12 @@ class WHOLESALEX_Category {
 							'type'  => 'visibility_section',
 							'attr'  => array(
 								'_hide_for_b2c'      => array(
-									// 'type'    => 'switch',
 									'type'    => 'slider',
 									'label'   => __( 'Hide product for B2C', 'wholesalex' ),
 									'help'    => '',
 									'default' => 'no',
 								),
 								'_hide_for_visitors' => array(
-									// 'type'    => 'switch',
 									'type'    => 'slider',
 									'label'   => __( 'Hide product for Visitors', 'wholesalex' ),
 									'help'    => '',

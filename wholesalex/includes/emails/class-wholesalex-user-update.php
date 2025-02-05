@@ -69,20 +69,26 @@ class WholesaleX_User_Profile_Update_Notification_Email extends WC_Email {
 		$this->description   = __( 'WhoesaleX: User Get a Notification When Admin Can Changed Any User Data and User Can See The Changes.', 'wholesalex' );
 		$this->template_base = WHOLESALEX_PATH . 'templates/emails/';
 		$this->template_html = 'wholesalex-user-update_notify.php';
-		$this->placeholders  = apply_filters( 'wholesalex_email_new_user_registered_smart_tags', wholesalex()->smart_tag_name('{date}', '{admin_name}', '{site_name}') );
+		$this->placeholders  = apply_filters( 'wholesalex_email_new_user_registered_smart_tags', wholesalex()->smart_tag_name( '{date}', '{admin_name}', '{site_name}' ) );
 
 		// Call parent constructor.
 		parent::__construct();
-		// $this->recipient = '';
 		add_action( 'wholesalex_user_profile_update_notify_notification', array( $this, 'user_profile_update_notify' ), 10, 2 );
 	}
 
-    function user_profile_update_notify( $user_id, $updated_data ) {
-    $updated_dated = apply_filters( 'wholesalex_profile_updated_data', $updated_data, $user_id );
-        if( $user_id && !empty( $updated_dated ) ) {
-            $this->trigger( $user_id, $updated_dated );
-        }
-    }
+	/**
+	 * User Profile Update Notify.
+	 *
+	 * @param int    $user_id User ID.
+	 * @param string $updated_data User Updated Data.
+	 * @return void
+	 */
+	public function user_profile_update_notify( $user_id, $updated_data ) {
+		$updated_dated = apply_filters( 'wholesalex_profile_updated_data', $updated_data, $user_id );
+		if ( $user_id && ! empty( $updated_dated ) ) {
+			$this->trigger( $user_id, $updated_dated );
+		}
+	}
 	/**
 	 * Get email subject.
 	 *
@@ -107,19 +113,20 @@ class WholesaleX_User_Profile_Update_Notification_Email extends WC_Email {
 	 * Trigger.
 	 *
 	 * @param int    $user_id User ID.
-	 * @param string $user_pass User password.
-	 * @param bool   $password_generated Whether the password was generated automatically or not.
+	 * @param string $updated_data Updated Data.
+	 *
+	 * @return mixed
 	 */
 	public function trigger( $user_id, $updated_data = '' ) {
 		$this->setup_locale();
 
 		if ( $user_id ) {
-            $user = get_userdata($user_id);
-			$this->object = new WP_User( $user_id );
-            $this->recipient     = $user->user_email;
-			$this->updated_data  = $updated_data;
-			$this->user_login = stripslashes( $this->object->user_login );
-			$this->user_email = stripslashes( $this->object->user_email );
+			$user               = get_userdata( $user_id );
+			$this->object       = new WP_User( $user_id );
+			$this->recipient    = $user->user_email;
+			$this->updated_data = $updated_data;
+			$this->user_login   = stripslashes( $this->object->user_login );
+			$this->user_email   = stripslashes( $this->object->user_email );
 		}
 
 		if ( $this->is_enabled() && $this->get_recipient() ) {

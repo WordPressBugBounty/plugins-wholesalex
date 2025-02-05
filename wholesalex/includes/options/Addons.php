@@ -26,9 +26,6 @@ class Addons {
 		add_filter( 'wholesalex_addons_config', array( $this, 'pro_addons_config' ), 1 );
 
 		add_action( 'rest_api_init', array( $this, 'register_addons_restapi' ) );
-
-		// add_action( 'admin_menu', array( $this, 'submenu_page' ) );
-
 	}
 
 	/**
@@ -61,7 +58,7 @@ class Addons {
 	 */
 	public function addon_restapi_callback( $server ) {
 		$post = $server->get_params();
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key($post['nonce']), 'wholesalex-registration' ) ) ) {
+		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
 			return;
 		}
 
@@ -80,19 +77,18 @@ class Addons {
 			case 'post':
 				$request_for = isset( $post['request_for'] ) ? sanitize_text_field( $post['request_for'] ) : '';
 				$addon       = isset( $post['addon'] ) ? sanitize_text_field( $post['addon'] ) : '';
-				if ( 'install_plugin' == $request_for ) {
+				if ( 'install_plugin' === $request_for ) {
 					$response['status'] = true;
 
 					$response['data'] = $this->install_and_active_plugin( $addon );
 
 					return wp_send_json( $response );
-					die();
 				}
 
 				$addon_name  = isset( $post['addon'] ) ? sanitize_text_field( $post['addon'] ) : '';
 				$addon_value = isset( $post['status'] ) ? sanitize_text_field( $post['status'] ) : '';
 				if ( 'wsx_addon_dokan_integration' === $addon_name ) {
-					if ( 'no' == $addon_value ) {
+					if ( 'no' === $addon_value ) {
 						$activate_status = deactivate_plugins( 'multi-vendor-marketplace-b2b-for-wholesalex-dokan/multi-vendor-marketplace-b2b-for-wholesalex-dokan.php', true );
 						$message         = 'Success';
 					} else {
@@ -112,7 +108,7 @@ class Addons {
 				}
 
 				if ( 'wsx_addon_wcfm_integration' === $addon_name ) {
-					if ( 'no' == $addon_value ) {
+					if ( 'no' === $addon_value ) {
 						$activate_status = deactivate_plugins( 'wholesalex-wcfm-b2b-multivendor-marketplace/wholesalex-wcfm-b2b-multivendor-marketplace.php', true );
 						$message         = 'Success';
 					} else {
@@ -131,7 +127,7 @@ class Addons {
 					);
 				}
 				if ( 'wsx_addon_migration_integration' === $addon_name ) {
-					if ( 'no' == $addon_value ) {
+					if ( 'no' === $addon_value ) {
 						$activate_status = deactivate_plugins( 'wholesalex-migration-tool/wholesalex-migration-tool.php', true );
 						$message         = 'Success';
 					} else {
@@ -155,7 +151,7 @@ class Addons {
 					if ( empty( $__site_key ) || empty( $__secret_key ) ) {
 						$response['status'] = false;
 						/* translators: %s Plugin Name */
-						$response['data']   = sprintf( __( 'Please Set Site Key and Secret Key Before Enable Recaptcha (Path: Dashboard > %s > Settings > Recaptcha)', 'wholesalex' ), wholesalex()->get_plugin_name() );
+						$response['data'] = sprintf( __( 'Please Set Site Key and Secret Key Before Enable Recaptcha (Path: Dashboard > %s > Settings > Recaptcha)', 'wholesalex' ), wholesalex()->get_plugin_name() );
 					}
 				}
 				do_action( 'wholesalex_' . $addon_name . '_before_status_update', $addon_value );
@@ -193,11 +189,11 @@ class Addons {
 
 		$message    = '';
 		$plugin_url = '';
-		if ( 'wsx_addon_dokan_integration' == $addon ) {
+		if ( 'wsx_addon_dokan_integration' === $addon ) {
 			$plugin_url = 'https://downloads.wordpress.org/plugin/multi-vendor-marketplace-b2b-for-wholesalex-dokan.zip';
-		} elseif ( 'wsx_addon_wcfm_integration' == $addon ) {
+		} elseif ( 'wsx_addon_wcfm_integration' === $addon ) {
 			$plugin_url = 'https://downloads.wordpress.org/plugin/wholesalex-wcfm-b2b-multivendor-marketplace.zip';
-		} elseif ( 'wsx_addon_migration_integration' == $addon ) {
+		} elseif ( 'wsx_addon_migration_integration' === $addon ) {
 			$plugin_url = 'https://downloads.wordpress.org/plugin/wholesalex-migration-tool.zip';
 		}
 
@@ -212,12 +208,12 @@ class Addons {
 		if ( is_wp_error( $result ) ) {
 			$message = $result->get_error_message();
 		} else {
-			if ( 'wsx_addon_dokan_integration' == $addon ) {
+			if ( 'wsx_addon_dokan_integration' === $addon ) {
 				deactivate_plugins( 'wholesalex-dokan-b2b-multi-vendor-marketplace/wholesalex-dokan-b2b-multi-vendor-marketplace.php', true );
 				$activate_status = activate_plugin( 'multi-vendor-marketplace-b2b-for-wholesalex-dokan/multi-vendor-marketplace-b2b-for-wholesalex-dokan.php', '', false, true );
-			} elseif ( 'wsx_addon_wcfm_integration' == $addon ) {
+			} elseif ( 'wsx_addon_wcfm_integration' === $addon ) {
 				$activate_status = activate_plugin( 'wholesalex-wcfm-b2b-multivendor-marketplace/wholesalex-wcfm-b2b-multivendor-marketplace.php', '', false, true );
-			} elseif ( 'wsx_addon_migration_integration' == $addon ) {
+			} elseif ( 'wsx_addon_migration_integration' === $addon ) {
 				$activate_status = activate_plugin( 'wholesalex-migration-tool/wholesalex-migration-tool.php', '', false, true );
 			}
 			if ( is_wp_error( $activate_status ) ) {
@@ -244,36 +240,37 @@ class Addons {
 	/**
 	 * Check if Dokan Plugin is Active
 	 *
+	 * @param string $plugin_name Plugin Name.
 	 * @return bool
 	 */
-	public function check_required_plugins($plugin_name) {
-		// Ensure the `is_plugin_active` function is available
-		if (!function_exists('is_plugin_active')) {
-			include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+	public function check_required_plugins( $plugin_name ) {
+		// Ensure the `is_plugin_active` function is available.
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			include_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
-	
-		// Define plugin paths for each supported plugin
-		$plugin_paths = [
-			'dokan' => [
-				'dokan-lite/dokan.php', 
-			],
-			'wcfm' => [
-				'wc-frontend-manager/wc_frontend_manager.php', 
-			]
-		];
-	
-		// Check if the plugin name exists in the paths array
-		if (!isset($plugin_paths[$plugin_name])) {
+
+		// Define plugin paths for each supported plugin.
+		$plugin_paths = array(
+			'dokan' => array(
+				'dokan-lite/dokan.php',
+			),
+			'wcfm'  => array(
+				'wc-frontend-manager/wc_frontend_manager.php',
+			),
+		);
+
+		// Check if the plugin name exists in the paths array.
+		if ( ! isset( $plugin_paths[ $plugin_name ] ) ) {
 			return false;
 		}
-	
-		// Loop through plugin paths for the requested plugin and check if any are active
-		foreach ($plugin_paths[$plugin_name] as $plugin_path) {
-			if (is_plugin_active($plugin_path)) {
+
+		// Loop through plugin paths for the requested plugin and check if any are active.
+		foreach ( $plugin_paths[ $plugin_name ] as $plugin_path ) {
+			if ( is_plugin_active( $plugin_path ) ) {
 				return true;
 			}
 		}
-	
+
 		return false;
 	}
 
@@ -352,10 +349,9 @@ class Addons {
 			'lock_status'         => ! ( wholesalex()->is_pro_active() ),
 		);
 
-		$config['wsx_addon_wallet']    = array(
+		$config['wsx_addon_wallet'] = array(
 			'name'                => __( 'WholesaleX Wallet', 'wholesalex' ),
 			/* translators: %s Plugin Name */
-			// 'desc'                => sprintf( __( 'Use the %s wallet for storewide payments. Purchase products by adding funds to your Wallet from the Wholesale store.', 'wholesalex' ), wholesalex()->get_plugin_name() ),
 			'desc'                => __( 'Enable and configure it to let your buyers use the store wallet as a payment method.The registered users can add funds to the wallet and use it to purchase from your store.', 'wholesalex' ),
 			'img'                 => WHOLESALEX_URL . 'assets/img/addons/wallet.svg',
 			'docs'                => 'https://getwholesalex.com/docs/wholesalex/add-on/wallet/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
@@ -387,7 +383,7 @@ class Addons {
 
 		$config['wsx_addon_recaptcha'] = array(
 			'name'        => __( 'reCAPTCHA', 'wholesalex' ),
-			'desc'        => __( "Protect your website from suspicious login attempts with an added security layer using Google reCAPTCHA v3 for extended safety measures.  ", 'wholesalex' ),
+			'desc'        => __( 'Protect your website from suspicious login attempts with an added security layer using Google reCAPTCHA v3 for extended safety measures.  ', 'wholesalex' ),
 			'img'         => WHOLESALEX_URL . 'assets/img/addons/recaptcha.svg',
 			'docs'        => 'https://getwholesalex.com/docs/wholesalex/add-on/recaptcha/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
 			'live'        => '',
@@ -400,66 +396,70 @@ class Addons {
 		);
 
 		$config['wsx_addon_dokan_integration'] = array(
-			'name'                => __( 'WholesaleX for Dokan', 'wholesalex' ),
-			'desc'                => __( 'Turn your store into a B2B multi-vendor marketplace. Create and manage wholesale discounts with dynamic rules and user roles. Also manage conversations with WholesaleX for Dokan.', 'wholesalex' ),
-			'img'                 => WHOLESALEX_URL . 'assets/img/addons/dokan_integration.svg',
-			'docs'                => 'https://getwholesalex.com/docs/wholesalex/wholesalex-for-dokan/',
-			'live'                => '',
-			'is_pro'              => false,
-			'is_different_plugin' => true,
-			'eligible_price_ids'  => array( 1, 2, 3, 4, 5, 6, 7 ),
-			'status'              => function_exists( 'wholesalex_dokan_run' ),
-			'lock_status'         => false,
-			'setting_id'          => '#dokan_wholesalex',
-			'is_installed'        => file_exists( WP_PLUGIN_DIR . '/multi-vendor-marketplace-b2b-for-wholesalex-dokan/multi-vendor-marketplace-b2b-for-wholesalex-dokan.php' ),
-			'download_link'       => 'https://downloads.wordpress.org/plugin/multi-vendor-marketplace-b2b-for-wholesalex-dokan.zip',
-			'video'               => 'https://www.youtube.com/embed/4UatlL2-XXo',
-			// Translators: %s is the name of the required plugin
-			'depends_message'     => sprintf( __('This addon require %s plugin', 'wholesalex'),'<a class"wsx-link" href="https://wordpress.org/plugins/dokan-lite/" target="_blank">Dokan</a>'),
-			'is_dependency_active'=> $this->check_required_plugins( 'dokan' ),
+			'name'                 => __( 'WholesaleX for Dokan', 'wholesalex' ),
+			'desc'                 => __( 'Turn your store into a B2B multi-vendor marketplace. Create and manage wholesale discounts with dynamic rules and user roles. Also manage conversations with WholesaleX for Dokan.', 'wholesalex' ),
+			'img'                  => WHOLESALEX_URL . 'assets/img/addons/dokan_integration.svg',
+			'docs'                 => 'https://getwholesalex.com/docs/wholesalex/wholesalex-for-dokan/',
+			'live'                 => '',
+			'is_pro'               => false,
+			'is_different_plugin'  => true,
+			'eligible_price_ids'   => array( 1, 2, 3, 4, 5, 6, 7 ),
+			'status'               => function_exists( 'wholesalex_dokan_run' ),
+			'lock_status'          => false,
+			'setting_id'           => '#dokan_wholesalex',
+			'is_installed'         => file_exists( WP_PLUGIN_DIR . '/multi-vendor-marketplace-b2b-for-wholesalex-dokan/multi-vendor-marketplace-b2b-for-wholesalex-dokan.php' ),
+			'download_link'        => 'https://downloads.wordpress.org/plugin/multi-vendor-marketplace-b2b-for-wholesalex-dokan.zip',
+			'video'                => 'https://www.youtube.com/embed/4UatlL2-XXo',
+			// Translators: %s is the name of the required plugin.
+			'depends_message'      => sprintf( __( 'This addon require %s plugin', 'wholesalex' ), '<a class"wsx-link" href="https://wordpress.org/plugins/dokan-lite/" target="_blank">Dokan</a>' ),
+			'is_dependency_active' => $this->check_required_plugins( 'dokan' ),
 		);
 
 		$config['wsx_addon_wcfm_integration'] = array(
-			'name'                => __( 'WholesaleX for WCFM', 'wholesalex' ),
-			'desc'                => __( 'Let vendors set wholesale prices and discounts to your wholesale store with WCFM for Dokan integration. Manage conversations with users as well in your B2B multi-vendor store.', 'wholesalex' ),
-			'img'                 => WHOLESALEX_URL . 'assets/img/addons/wcfm_integration.svg',
-			'docs'                => 'https://getwholesalex.com/docs/wholesalex/wcfm-marketplace-integration/',
-			'live'                => '',
-			'is_pro'              => false,
-			'is_different_plugin' => true,
-			'eligible_price_ids'  => array( 1, 2, 3, 4, 5, 6, 7 ),
-			'status'              => function_exists( 'wholesalex_wcfm_run' ),
-			'lock_status'         => false,
-			'setting_id'          => '#wcfm_wholesalex',
-			'is_installed'        => file_exists( WP_PLUGIN_DIR . '/wholesalex-wcfm-b2b-multivendor-marketplace/wholesalex-wcfm-b2b-multivendor-marketplace.php' ),
-			'download_link'       => 'https://downloads.wordpress.org/plugin/wholesalex-wcfm-b2b-multivendor-marketplace.zip',
-			'video'               => 'https://www.youtube.com/embed/2OLOqyvv5rE',
+			'name'                 => __( 'WholesaleX for WCFM', 'wholesalex' ),
+			'desc'                 => __( 'Let vendors set wholesale prices and discounts to your wholesale store with WCFM for Dokan integration. Manage conversations with users as well in your B2B multi-vendor store.', 'wholesalex' ),
+			'img'                  => WHOLESALEX_URL . 'assets/img/addons/wcfm_integration.svg',
+			'docs'                 => 'https://getwholesalex.com/docs/wholesalex/wcfm-marketplace-integration/',
+			'live'                 => '',
+			'is_pro'               => false,
+			'is_different_plugin'  => true,
+			'eligible_price_ids'   => array( 1, 2, 3, 4, 5, 6, 7 ),
+			'status'               => function_exists( 'wholesalex_wcfm_run' ),
+			'lock_status'          => false,
+			'setting_id'           => '#wcfm_wholesalex',
+			'is_installed'         => file_exists( WP_PLUGIN_DIR . '/wholesalex-wcfm-b2b-multivendor-marketplace/wholesalex-wcfm-b2b-multivendor-marketplace.php' ),
+			'download_link'        => 'https://downloads.wordpress.org/plugin/wholesalex-wcfm-b2b-multivendor-marketplace.zip',
+			'video'                => 'https://www.youtube.com/embed/2OLOqyvv5rE',
 			// Translators: %s is the name of the required plugin with an HTML link.
-			'depends_message'     => sprintf( __('This addon require %s plugin', 'wholesalex'),'<a class"wsx-link" href="https://wordpress.org/plugins/wc-frontend-manager/" target="_blank">WCFM – Frontend Manager</a>'),
-			'is_dependency_active'=> $this->check_required_plugins( 'wcfm' ),
+			'depends_message'      => sprintf( __( 'This addon require %s plugin', 'wholesalex' ), '<a class"wsx-link" href="https://wordpress.org/plugins/wc-frontend-manager/" target="_blank">WCFM – Frontend Manager</a>' ),
+			'is_dependency_active' => $this->check_required_plugins( 'wcfm' ),
 		);
 		$config['wsx_addon_migration_integration'] = array(
-			'name'                => __( 'WholesaleX Migration Tool', 'wholesalex' ),
-			'desc'                => __( 'Let’s explore how to use the WholesaleX migration tool to import data from B2BKing and Wholesale Suite.', 'wholesalex' ),
-			'img'                 => WHOLESALEX_URL . 'assets/img/addons/migration_tool_icon.png',
-			'docs'                => 'https://getwholesalex.com/docs/wholesalex/wholesalex-migration-tool/',
-			'live'                => '',
-			'is_pro'              => false,
-			'is_different_plugin' => true,
-			'eligible_price_ids'  => array( 1, 2, 3, 4, 5, 6, 7 ),
-			'status'              => function_exists( 'wholesalex_migration_run' ),
-			'lock_status'         => false,
-			'setting_id'          => '#migration_wholesalex',
-			'is_installed'        => file_exists( WP_PLUGIN_DIR . '/wholesalex-migration-tool/wholesalex-migration-tool.php' ),
-			'download_link'       => 'https://downloads.wordpress.org/plugin/wholesalex-migration-tool.zip',
-			'video'               => 'https://www.youtube.com/embed/KVRg10OcfTI',
+			'name'                 => __( 'WholesaleX Migration Tool', 'wholesalex' ),
+			'desc'                 => __( 'Let’s explore how to use the WholesaleX migration tool to import data from B2BKing and Wholesale Suite.', 'wholesalex' ),
+			'img'                  => WHOLESALEX_URL . 'assets/img/addons/migration_tool_icon.png',
+			'docs'                 => 'https://getwholesalex.com/docs/wholesalex/wholesalex-migration-tool/',
+			'live'                 => '',
+			'is_pro'               => false,
+			'is_different_plugin'  => true,
+			'eligible_price_ids'   => array( 1, 2, 3, 4, 5, 6, 7 ),
+			'status'               => function_exists( 'wholesalex_migration_run' ),
+			'lock_status'          => false,
+			'setting_id'           => '#migration_wholesalex',
+			'is_installed'         => file_exists( WP_PLUGIN_DIR . '/wholesalex-migration-tool/wholesalex-migration-tool.php' ),
+			'download_link'        => 'https://downloads.wordpress.org/plugin/wholesalex-migration-tool.zip',
+			'video'                => 'https://www.youtube.com/embed/KVRg10OcfTI',
 			// Translators: %s is the name of the required plugin with an HTML link.
-			// 'depends_message'     => sprintf( __('This addon require %s plugin', 'wholesalex'),'<a class"wsx-link" href="https://wordpress.org/plugins/wc-frontend-manager/" target="_blank">WCFM – Frontend Manager</a>'),
-			'is_dependency_active'=> $this->check_required_plugins( 'no-setting' ),
+			'is_dependency_active' => $this->check_required_plugins( 'no-setting' ),
 		);
 		return $config;
 	}
 
+	/**
+	 * Addons Page Content
+	 *
+	 * @return void
+	 */
 	public function addons_page_content() {
 		wp_enqueue_script( 'whx_addons' );
 		wp_enqueue_script( 'wholesalex_node_vendors' );

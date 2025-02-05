@@ -39,14 +39,39 @@ class WHOLESALEX_Notice {
 	 */
 	private $content = '';
 
+	/**
+	 * Contains Notice Heading
+	 *
+	 * @var string
+	 */
 	private $heading = '';
 
+	/**
+	 * Contains Notice Subheading
+	 *
+	 * @var string
+	 */
 	private $subheading = '';
 
+	/**
+	 * Contains Notice Button Text
+	 *
+	 * @var string
+	 */
 	private $days_remaining = '';
 
+	/**
+	 * Contains Notice Button Text
+	 *
+	 * @var string
+	 */
 	private $available_notice = array();
 
+	/**
+	 * Contains Notice Button Text
+	 *
+	 * @var string
+	 */
 	private $price_id = false;
 
 	/**
@@ -56,7 +81,7 @@ class WHOLESALEX_Notice {
 	 */
 	public function install_notice() {
 		add_action( 'admin_notices', array( $this, 'wc_installation_notice_callback' ) );
-		add_action('wp_ajax_wsx_install_woocommerce_plugin', array( $this, 'wsx_install_woocommerce_plugin' ) );
+		add_action( 'wp_ajax_wsx_install_woocommerce_plugin', array( $this, 'wsx_install_woocommerce_plugin' ) );
 	}
 
 
@@ -67,7 +92,7 @@ class WHOLESALEX_Notice {
 	 */
 	public function active_notice() {
 		add_action( 'admin_notices', array( $this, 'wc_activation_notice_callback' ) );
-		add_action('wp_ajax_wsx_activate_woocommerce_plugin', array( $this, 'wsx_activate_woocommerce_plugin' ) );
+		add_action( 'wp_ajax_wsx_activate_woocommerce_plugin', array( $this, 'wsx_activate_woocommerce_plugin' ) );
 	}
 
 	/**
@@ -79,7 +104,12 @@ class WHOLESALEX_Notice {
 		add_action( 'admin_init', array( $this, 'notice_callback' ) );
 		add_action( 'admin_notices', array( $this, 'display_notices' ), 0 );
 	}
-	
+
+	/**
+	 * Set New Notice
+	 *
+	 * @return void
+	 */
 	public function display_notices() {
 
 		usort( $this->available_notice, array( $this, 'sort_notices' ) );
@@ -93,14 +123,20 @@ class WHOLESALEX_Notice {
 					}
 					if ( isset( $notice['id'], $notice['design_type'] ) ) {
 						echo $this->get_notice_content( $notice['id'], $notice['design_type'] );
-
 						++$displayed_notice_count;
 					}
 				}
 			}
 		}
 	}
-	
+
+	/**
+	 * Check if the notice is valid to display.
+	 *
+	 * @param mixed $id Notice ID.
+	 * @since 1.5.2
+	 * @return bool
+	 */
 	private function get_notice_by_id( $id ) {
 		if ( isset( $this->available_notice[ $id ] ) ) {
 			return $this->available_notice[ $id ];
@@ -144,8 +180,8 @@ class WHOLESALEX_Notice {
 			<div class="wholesalex-wc-install">
 				<img loading="lazy" width="200" src="<?php echo esc_url( WHOLESALEX_URL . 'assets/img/woocommerce.png' ); ?>" alt="logo" />
 				<div class="wholesalex-wc-install-body">
-					<h3><?php /* translators: %s: Plugin Name */ echo sprintf( esc_html__( 'Welcome to %s.', 'wholesalex' ), esc_html( wholesalex()->get_plugin_name() ) ); ?></h3>
-					<p><?php /* translators: %s: Plugin Name */ echo sprintf( esc_html__( 'WooCommerce %s is a WooCommerce plugin. To use this plugins you have to install and activate WooCommerce.', 'wholesalex' ), esc_html( wholesalex()->get_plugin_name() ) ); ?></p>
+					<h3><?php /* translators: %s: Plugin Name */ printf( esc_html__( 'Welcome to %s.', 'wholesalex' ), esc_html( wholesalex()->get_plugin_name() ) ); ?></h3>
+					<p><?php /* translators: %s: Plugin Name */ printf( esc_html__( 'WooCommerce %s is a WooCommerce plugin. To use this plugins you have to install and activate WooCommerce.', 'wholesalex' ), esc_html( wholesalex()->get_plugin_name() ) ); ?></p>
 					<p><button class="wholesalex-wc-install-btn button button-primary button-hero" id="wholesalex-install-woocommerce" class="button button-primary"> <?php esc_html_e( 'Install WooCommerce', 'wholesalex' ); ?> <span class="spinner" style="display:none;"></span></button></p>
 					<div id="installation-msg"></div>
 				</div>
@@ -163,7 +199,7 @@ class WHOLESALEX_Notice {
 						type: 'POST',
 						data: {
 							action: 'wsx_install_woocommerce_plugin',
-							_ajax_nonce: '<?php  echo esc_attr( wp_create_nonce( "install_woocommerce" ) ); ?>'// phpcs:ignore
+							_ajax_nonce: '<?php echo esc_attr( wp_create_nonce( 'install_woocommerce' ) ); ?>'// phpcs:ignore
 						},
 						success: function(response) {
 							if (response.success) {
@@ -174,7 +210,7 @@ class WHOLESALEX_Notice {
 									type: 'POST',
 									data: {
 										action: 'wsx_activate_woocommerce_plugin',
-										_ajax_nonce: '<?php echo esc_attr( wp_create_nonce( "activate_woocommerce" ) ); ?>'// phpcs:ignore
+										_ajax_nonce: '<?php echo esc_attr( wp_create_nonce( 'activate_woocommerce' ) ); ?>'// phpcs:ignore
 									},
 									success: function(response) {
 										$button.removeClass('activating');
@@ -214,28 +250,31 @@ class WHOLESALEX_Notice {
 	 * @return void
 	 */
 	public function wsx_install_woocommerce_plugin() {
-		check_ajax_referer('install_woocommerce', '_ajax_nonce');
+		check_ajax_referer( 'install_woocommerce', '_ajax_nonce' );
 		if ( ! current_user_can( 'install_plugins' ) ) {
 			wp_send_json_error( __( 'You do not have sufficient permissions to install plugins.', 'wholesalex' ) );
 		}
-	
-		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
-		include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+
+		include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+		include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 		$plugin_slug = 'woocommerce';
-		$api = plugins_api( 'plugin_information', array(
-			'slug' => $plugin_slug,
-			'fields' => array(
-				'sections' => false,
-			),
-		) );
-	
+		$api         = plugins_api(
+			'plugin_information',
+			array(
+				'slug'   => $plugin_slug,
+				'fields' => array(
+					'sections' => false,
+				),
+			)
+		);
+
 		if ( is_wp_error( $api ) ) {
 			wp_send_json_error( $api->get_error_message() );
 		}
-		$skin = new \WP_Ajax_Upgrader_Skin();
+		$skin     = new \WP_Ajax_Upgrader_Skin();
 		$upgrader = new \Plugin_Upgrader( $skin );
-		$result = $upgrader->install( $api->download_link );
-	
+		$result   = $upgrader->install( $api->download_link );
+
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( $result->get_error_message() );
 		}
@@ -244,18 +283,18 @@ class WHOLESALEX_Notice {
 		}
 		wp_send_json_success();
 	}
-	
+
 	/**
 	 * After Install Woo Automatic Activated Woo Plugin
 	 *
 	 * @return void
 	 */
 	public function wsx_activate_woocommerce_plugin() {
-		check_ajax_referer('activate_woocommerce', '_ajax_nonce');
+		check_ajax_referer( 'activate_woocommerce', '_ajax_nonce' );
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			wp_send_json_error( __( 'You do not have sufficient permissions to activate plugins.', 'wholesalex' ) );
 		}
-		$result = activate_plugin('woocommerce/woocommerce.php');
+		$result = activate_plugin( 'woocommerce/woocommerce.php' );
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( $result->get_error_message() );
 		}
@@ -275,8 +314,8 @@ class WHOLESALEX_Notice {
 			<div class="wholesalex-wc-install">
 				<img loading="lazy" width="200" src="<?php echo esc_url( WHOLESALEX_URL . 'assets/img/woocommerce.png' ); ?>" alt="logo" />
 				<div class="wholesalex-wc-install-body">
-				<h3><?php /* translators: %s: Plugin Name */ echo sprintf( esc_html__( 'Welcome to %s.', 'wholesalex' ), esc_html( wholesalex()->get_plugin_name() ) ); ?></h3>
-				<p><?php /* translators: %s: Plugin Name */ echo sprintf( esc_html__( 'WooCommerce %s is a WooCommerce plugin. To use this plugins you have to install and activate WooCommerce.', 'wholesalex' ), esc_html( wholesalex()->get_plugin_name() ) ); ?></p>
+				<h3><?php /* translators: %s: Plugin Name */ printf( esc_html__( 'Welcome to %s.', 'wholesalex' ), esc_html( wholesalex()->get_plugin_name() ) ); ?></h3>
+				<p><?php /* translators: %s: Plugin Name */ printf( esc_html__( 'WooCommerce %s is a WooCommerce plugin. To use this plugins you have to install and activate WooCommerce.', 'wholesalex' ), esc_html( wholesalex()->get_plugin_name() ) ); ?></p>
 				<p><button class="wholesalex-wc-install-btn button button-primary button-hero" id="wholesalex-activate-woocommerce" class="button button-primary"> <?php esc_html_e( 'Activate WooCommerce', 'wholesalex' ); ?> <span class="spinner" style="display:none;"></span></button></p>
 				</div>
 			</div>
@@ -313,34 +352,46 @@ class WHOLESALEX_Notice {
 			<?php
 		}
 	}
+
+	/**
+	 * Check if the notice is valid to display.
+	 *
+	 * @since 1.5.2
+	 * @return void
+	 */
 	public function notice_callback() {
 		$this->price_id         = $this->get_price_id();
 		$activate_date          = get_option( 'wholesalex_installation_date', false );
 		$this->available_notice = array(
-			// Free to Pro
+			// Free to Pro.
 			'wsx_holiday_2024_up'        => $this->set_new_notice( 'wsx_holiday_2024_up', 'promotion', 'holiday_img_banner', '24-12-2024', '01-01-2025', false, 10, ! wholesalex()->is_pro_active() ),
-			'wsx_holiday_2024_banner_up'       => $this->set_new_notice( 'wsx_holiday_2024_banner_up', 'promotion', 'holiday_img_banner', '02-01-2025', '10-01-2025', false, 10, ! wholesalex()->is_pro_active() ),
+			'wsx_holiday_2024_banner_up' => $this->set_new_notice( 'wsx_holiday_2024_banner_up', 'promotion', 'holiday_img_banner', '02-01-2025', '10-01-2025', false, 10, ! wholesalex()->is_pro_active() ),
 		);
 
-		if ( isset( $_GET['wsx-notice-disable'] ) ) {//phpcs:ignore
-			$notice_key = sanitize_text_field( $_GET['wsx-notice-disable'] );//phpcs:ignore
+		if ( isset( $_GET['wsx-notice-disable'] ) ) {//phpcs:ignore.
+			$notice_key = sanitize_text_field( $_GET['wsx-notice-disable'] );//phpcs:ignore.
 			$notice     = $this->get_notice_by_id( $notice_key );
-			if ( 'data_collect' == $notice['type'] ) {
+			if ( 'data_collect' === $notice['type'] ) {
 				if ( isset( $notice['repeat_notice_after'] ) && $notice['repeat_notice_after'] ) {
 					$repeat_timestamp = ( DAY_IN_SECONDS * intval( $notice['repeat_notice_after'] ) );
 					$this->set_notice( $notice_key, 'off', $repeat_timestamp );
 				}
-			} else {
-				if ( isset( $notice['repeat_notice_after'] ) && $notice['repeat_notice_after'] ) {
+			} elseif ( isset( $notice['repeat_notice_after'] ) && $notice['repeat_notice_after'] ) {
 					$repeat_timestamp = time() + ( DAY_IN_SECONDS * intval( $notice['repeat_notice_after'] ) );
 					$this->set_user_notice_meta( $notice_key, 'off', $repeat_timestamp );
-				} else {
-					$this->set_user_notice_meta( $notice_key, 'off', false );
-				}
+			} else {
+				$this->set_user_notice_meta( $notice_key, 'off', false );
 			}
 		}
 	}
 
+	/**
+	 * Get Notice Content
+	 *
+	 * @param mixed  $key key.
+	 * @param string $design_type design type.
+	 * @return bool
+	 */
 	public function get_notice_content( $key, $design_type ) {
 
 		$close_url = add_query_arg( 'wsx-notice-disable', $key );
@@ -348,7 +399,7 @@ class WHOLESALEX_Notice {
 		switch ( $design_type ) {
 			case 'holiday_one_img_banner':
 				//
-				// Will Get Free User
+				// Will Get Free User.
 				$icon        = WHOLESALEX_URL . 'assets/img/icon.svg';
 				$url         = 'https://getwholesalex.com/pricing/?utm_source=wholesalex_topbar&utm_medium=special_discount_pro&utm_campaign=wholesalex-DB';
 				$full_access = 'https://getwholesalex.com';
@@ -360,7 +411,7 @@ class WHOLESALEX_Notice {
 					<div class="wsx-notice-icon"> <img src="<?php echo esc_url( $icon ); ?>"/>  </div>
 					<div class="wsx-notice-content-wrapper">
 					<div class="wsx-notice-content"> <strong> Black Friday Deal Alert: </strong> WholesaleX on Sale - Enjoy <strong>65% OFF </strong> on this complete B2B WooCommerce Solution
-                    </div>
+					</div>
 					<div class="wsx-notice-buttons"> 
 						<a class="wsx-link wsx-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank"> Upgrade to Pro   </a>
 						<a class="wsx-link wsx-notice-btn button" href="<?php echo esc_url( $full_access ); ?>" target="_blank">  Explore WholesaleX  </a>
@@ -372,34 +423,30 @@ class WHOLESALEX_Notice {
 				</div>
 				<?php
 				return ob_get_clean();
-				// code...
-				break;
-                case 'holiday_img_banner':
-                $icon        = WHOLESALEX_URL . 'assets/img/wholesaleX_holiday24.jpg';
-                $url         = 'https://getwholesalex.com/pricing/?utm_source=wholesalex_topbar&utm_medium=special_discount_pro&utm_campaign=wholesalex-DB';
-                ob_start();
-                    ?>
-                    <div class="wsx-display-block">
+			case 'holiday_img_banner':
+				$icon = WHOLESALEX_URL . 'assets/img/wholesaleX_holiday24.jpg';
+				$url  = 'https://getwholesalex.com/pricing/?utm_source=wholesalex_topbar&utm_medium=special_discount_pro&utm_campaign=wholesalex-DB';
+				ob_start();
+				?>
+					<div class="wsx-display-block">
 						<div class="wsx-notice-wrapper notice">
 							<div class="wsx-install-body wsx-image-banner">
 								<a href="<?php echo esc_url( $close_url ); ?>" class="wsx-link wsx-promotion-dismiss promotional-dismiss-notice">
-									<?php esc_html_e( 'Dismiss', 'wholesalex' ); ?>
+								<?php esc_html_e( 'Dismiss', 'wholesalex' ); ?>
 								</a>
 								<a class="wsx-link" href="<?php echo esc_url( $url ); ?>" target="_blank">
-									<img class="wsx-halloween-img-banner" src="<?php echo $icon; ?>" alt="Banner">
+									<img class="wsx-halloween-img-banner" src="<?php echo esc_url( $icon ); ?>" alt="Banner">
 								</a>
 							</div>
 						</div>
 					</div>
-                <?php
-                return ob_get_clean();
-				break;
+				<?php
+				return ob_get_clean();
 			default:
 				// code...
 				break;
 		}
 		return '';
-
 	}
 
 	/**
@@ -594,6 +641,14 @@ class WHOLESALEX_Notice {
 		<?php
 	}
 
+	/**
+	 * Set Notice
+	 *
+	 * @param string $key key.
+	 * @param string $value value.
+	 * @param string $expiration expiration.
+	 * @return void
+	 */
 	public function set_notice( $key = '', $value = '', $expiration = '' ) {
 		if ( $key ) {
 			$option_name = 'wholesalex_notice';
@@ -612,6 +667,12 @@ class WHOLESALEX_Notice {
 		}
 	}
 
+	/**
+	 * Get Notice
+	 *
+	 * @param string $key key.
+	 * @return bool
+	 */
 	public function get_notice( $key = '' ) {
 		if ( $key ) {
 			$option_name = 'wholesalex_notice';
@@ -653,22 +714,40 @@ class WHOLESALEX_Notice {
 		return $notice_1['priority'] - $notice_2['priority'];
 	}
 
+	/**
+	 * Set New Notice
+	 *
+	 * @param string $id id.
+	 * @param string $type type.
+	 * @param string $design_type design type.
+	 * @param string $start start.
+	 * @param string $end end.
+	 * @param bool   $repeat repeat.
+	 * @param int    $priority priority.
+	 * @param bool   $show_if show if.
+	 * @return array
+	 */
 	private function set_new_notice( $id = '', $type = '', $design_type = '', $start = '', $end = '', $repeat = false, $priority = 10, $show_if = false ) {
 
 		return array(
 			'id'                        => $id,
 			'type'                      => $type,
 			'design_type'               => $design_type,
-			'start'                     => $start, // Start Date
-			'end'                       => $end, // End Date
-			'repeat_notice_after'       => $repeat, // Repeat after how many days
-			'priority'                  => $priority, // Notice Priority
-			'display_with_other_notice' => false, // Display With Other Notice
-			'show_if'                   => $show_if, // Notice Showing Conditions
-			'capability'                => 'manage_options', // Capability of users, who can see the notice
+			'start'                     => $start, // Start Date.
+			'end'                       => $end, // End Date.
+			'repeat_notice_after'       => $repeat, // Repeat after how many days.
+			'priority'                  => $priority, // Notice Priority.
+			'display_with_other_notice' => false, // Display With Other Notice.
+			'show_if'                   => $show_if, // Notice Showing Conditions.
+			'capability'                => 'manage_options', // Capability of users, who can see the notice.
 		);
 	}
 
+	/**
+	 * Get Price ID
+	 *
+	 * @return bool
+	 */
 	private function get_price_id() {
 		if ( wholesalex()->is_pro_active() ) {
 			$license_data = get_option( 'edd_wholesalex_license_data', false );
@@ -682,24 +761,36 @@ class WHOLESALEX_Notice {
 		return false;
 	}
 
+	/**
+	 * Check if the notice is valid to display.
+	 *
+	 * @param mixed $notice notice.
+	 * @since 1.5.2
+	 * @return bool
+	 */
 	public function is_valid_notice( $notice ) {
-		$is_data_collect = isset( $notice['type'] ) && 'data_collect' == $notice['type'];
+		$is_data_collect = isset( $notice['type'] ) && 'data_collect' === $notice['type'];
 		$notice_status   = $is_data_collect ? $this->get_notice( $notice['id'] ) : $this->get_user_notice( $notice['id'] );
 
 		if ( ! current_user_can( $notice['capability'] ) || 'off' === $notice_status ) {
 			return false;
 		}
 
-		$current_time = gmdate( 'U' ); // Todays Data
-		// $current_time = 1710493466;
-		if ( $current_time > strtotime( $notice['start'] ) && $current_time < strtotime( $notice['end'] ) && isset( $notice['show_if'] ) && true === $notice['show_if'] ) { // Has Duration
-			// Now Check Max Duration
+		$current_time = gmdate( 'U' ); // Todays Data.
+		if ( $current_time > strtotime( $notice['start'] ) && $current_time < strtotime( $notice['end'] ) && isset( $notice['show_if'] ) && true === $notice['show_if'] ) { // Has Duration.
 			return true;
 		}
 	}
 
 
-
+	/**
+	 * Set User Notice Meta
+	 *
+	 * @param string $key key.
+	 * @param string $value value.
+	 * @param string $expiration expiration.
+	 * @return void
+	 */
 	public function set_user_notice_meta( $key = '', $value = '', $expiration = '' ) {
 		if ( $key ) {
 			$user_id     = get_current_user_id();
@@ -721,6 +812,12 @@ class WHOLESALEX_Notice {
 		}
 	}
 
+	/**
+	 * Get User Notice
+	 *
+	 * @param string $key key.
+	 * @return bool
+	 */
 	public function get_user_notice( $key = '' ) {
 		if ( $key ) {
 			$user_id     = get_current_user_id();

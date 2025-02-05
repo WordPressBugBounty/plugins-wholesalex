@@ -145,49 +145,57 @@ class Recaptcha {
 		}
 	}
 
-	public function add_recaptcha_on_registration_form(  ) {
-		if(isset($_POST['token'],$_POST['wholesalex-registration-nonce']) && wp_verify_nonce(sanitize_key($_POST['wholesalex-registration-nonce']),'wholesalex-registration') ) {
+	/**
+	 * WholesaleX Process Recaptcha in user registration form
+	 *
+	 * @since 1.0.0
+	 */
+	public function add_recaptcha_on_registration_form() {
+		if ( isset( $_POST['token'], $_POST['wholesalex-registration-nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['wholesalex-registration-nonce'] ), 'wholesalex-registration' ) ) {
 			$data = array(
-				'error_messages' => array()
+				'error_messages' => array(),
 			);
-			
+
 			$__site_key      = wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' );
 			$__secret_key    = wholesalex()->get_setting( '_settings_google_recaptcha_v3_secret_key' );
-			$__token         = sanitize_text_field( $_POST['token']);
+			$__token         = sanitize_text_field( wp_unslash( $_POST['token'] ) );
 			$__minimum_score = apply_filters( 'wholesalex_recaptcha_minimum_score_allow', 0.5 );
 
 			if ( isset( $__token ) && $__site_key && $__secret_key ) {
 				$parsed_response = $this->parse_recaptcha_response( $__token );
 				if ( ! ( isset( $parsed_response['success'] ) && $parsed_response['success'] && $parsed_response['score'] >= $__minimum_score ) ) {
-					$error_header = __( 'reCAPTCHA v3:', 'wholesalex' );
-					$data['error_messages']['recaptcha'] = wc_print_notice($error_header . $this->recaptcha_error_message( $parsed_response['error-codes'][0] ),'error',array(),true);
-					wp_send_json_success($data);
+					$error_header                        = __( 'reCAPTCHA v3:', 'wholesalex' );
+					$data['error_messages']['recaptcha'] = wc_print_notice( $error_header . $this->recaptcha_error_message( $parsed_response['error-codes'][0] ), 'error', array(), true );
+					wp_send_json_success( $data );
 				}
 			}
-			
 		}
 	}
 
-	public function add_recaptcha_on_login_form(  ) {
-		if(isset($_POST['token'],$_POST['wholesalex-login-nonce']) && wp_verify_nonce(sanitize_key($_POST['wholesalex-login-nonce']),'wholesalex-login') ) {
+	/**
+	 * Add Recaptcha on Login Form
+	 *
+	 * @since 1.0.0
+	 */
+	public function add_recaptcha_on_login_form() {
+		if ( isset( $_POST['token'], $_POST['wholesalex-login-nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['wholesalex-login-nonce'] ), 'wholesalex-login' ) ) {
 			$data = array(
-				'error_messages' => array()
+				'error_messages' => array(),
 			);
-			
+
 			$__site_key      = wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' );
 			$__secret_key    = wholesalex()->get_setting( '_settings_google_recaptcha_v3_secret_key' );
-			$__token         = sanitize_text_field( $_POST['token']);
+			$__token         = sanitize_text_field( wp_unslash( $_POST['token'] ) );
 			$__minimum_score = apply_filters( 'wholesalex_recaptcha_minimum_score_allow', 1 );
 
 			if ( isset( $__token ) && $__site_key && $__secret_key ) {
 				$parsed_response = $this->parse_recaptcha_response( $__token );
 				if ( ! ( isset( $parsed_response['success'] ) && $parsed_response['success'] && $parsed_response['score'] >= $__minimum_score ) ) {
-					$error_header = __( 'reCAPTCHA v3:', 'wholesalex' );
-					$data['error_messages']['recaptcha'] = wc_add_notice($error_header . $this->recaptcha_error_message( $parsed_response['error-codes'][0] ),'error');
-					wp_send_json_success($data);
+					$error_header                        = __( 'reCAPTCHA v3:', 'wholesalex' );
+					$data['error_messages']['recaptcha'] = wc_add_notice( $error_header . $this->recaptcha_error_message( $parsed_response['error-codes'][0] ), 'error' );
+					wp_send_json_success( $data );
 				}
 			}
-			
 		}
 	}
 
@@ -236,12 +244,12 @@ class Recaptcha {
 		$__secret_key    = wholesalex()->get_setting( '_settings_google_recaptcha_v3_secret_key' );
 		$__token         = isset( $_POST['token'] ) ? sanitize_text_field( $_POST['token'] ) : ''; //phpcs:ignore
 		$__minimum_score = apply_filters( 'wholesalex_recaptcha_minimum_score_allow', 0.5 );
-		
+
 		if ( ! empty( $__token ) && $__site_key && $__secret_key ) {
 			$parsed_response = $this->parse_recaptcha_response( $__token );
 
 			if ( ! ( isset( $parsed_response['success'] ) && $parsed_response['success'] && $parsed_response['score'] >= $__minimum_score ) ) {
-				
+
 				return new WP_Error(
 					'recaptcha_error',
 					__( '<strong>reCAPTCHA v3:</strong> Error!', 'wholesalex' )

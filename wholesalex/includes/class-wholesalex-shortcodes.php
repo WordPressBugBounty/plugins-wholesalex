@@ -8,16 +8,16 @@
 
 namespace WHOLESALEX;
 
-/*
+/**
  * WholesaleX Shortcodes Class
  *
  * @since 1.0.0
  */
 class WHOLESALEX_Shortcodes {
+
 	/**
 	 * Shortcodes Constructor
 	 */
-	private $registrationFormFieldsName = array();
 	public function __construct() {
 		add_action( 'woocommerce_after_checkout_billing_form', array( $this, 'add_custom_fields_on_checkout_page' ) );
 		add_action( 'woocommerce_checkout_process', array( $this, 'validate_custom_checkout_fields' ) );
@@ -34,7 +34,7 @@ class WHOLESALEX_Shortcodes {
 		add_shortcode( 'wholesalex_registration', array( $this, 'registration_shortcode' ), 10 );
 		add_shortcode( 'wholesalex_login_registration', array( $this, 'login_registration_shortcode' ), 10 );
 		add_shortcode( 'wholesalex_login', array( $this, 'login_shortcode' ), 10 );
-		add_action( 'init', array( $this, 'wholesalex_handle_password_reset' ));
+		add_action( 'init', array( $this, 'wholesalex_handle_password_reset' ) );
 		/**
 		 * Filters the list of CSS class names for the current post.
 		 *
@@ -45,7 +45,7 @@ class WHOLESALEX_Shortcodes {
 		 */
 		add_filter(
 			'post_class',
-			function( array $classes, array $class, int $post_id ) : array {
+			function ( array $classes, array $class, int $post_id ): array {
 				array_push( $classes, '_wholesalex wsx-wholesalex-product' );
 				return $classes;
 			},
@@ -60,33 +60,35 @@ class WHOLESALEX_Shortcodes {
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-		add_action( 'wholesalex_before_registration_form_render', function() {
-			if(!is_admin() && function_exists('wc_print_notices')) {
-				woocommerce_output_all_notices();
+		add_action(
+			'wholesalex_before_registration_form_render',
+			function () {
+				if ( ! is_admin() && function_exists( 'wc_print_notices' ) ) {
+					woocommerce_output_all_notices();
+				}
 			}
-		} );
+		);
 
-		
 		$is_whitelabel_enable = wholesalex()->get_setting( 'wsx_addon_whitelabel' );
-        if('yes' === $is_whitelabel_enable ) {
-			$registration_page_slug = wholesalex()->get_setting('registration_form_buidler_submenu_slug');
-			if(''!=$registration_page_slug) {
-				add_shortcode($registration_page_slug.'_login_registration', array($this,'login_registration_shortcode'));
-				add_shortcode($registration_page_slug.'_registration', array($this,'registration_shortcode'));
+		if ( 'yes' === $is_whitelabel_enable ) {
+			$registration_page_slug = wholesalex()->get_setting( 'registration_form_buidler_submenu_slug' );
+			if ( '' != $registration_page_slug ) {
+				add_shortcode( $registration_page_slug . '_login_registration', array( $this, 'login_registration_shortcode' ) );
+				add_shortcode( $registration_page_slug . '_registration', array( $this, 'registration_shortcode' ) );
 			}
-        }
+		}
 	}
 
-    /**
+	/**
 	 * Display the forgot password form
 	 *
-	 * @return void
+	 * @return string
 	 */
 	public function wholesalex_forgot_password_form() {
-		if ( isset($_GET['reset']) && $_GET['reset'] === 'true' ) {
+		if ( isset( $_GET['reset'] ) && 'true' === $_GET['reset'] && isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wholesalex_reset_password' ) ) {
 			echo '<div class="woocommerce-message">' . esc_html__( 'A password reset email has been sent. Please check your inbox.', 'wholesalex' ) . '</div>';
 		}
-	
+
 		ob_start();
 		?>
 			<form method="post" class="wsx-lost-password-form">
@@ -101,61 +103,70 @@ class WHOLESALEX_Shortcodes {
 		<?php
 		return ob_get_clean();
 	}
-	
 
-    /**
+
+	/**
 	 * Handle form submission and trigger password reset email
 	 *
 	 * @return void
 	 */
-    public function wholesalex_handle_password_reset() {
-        if ( isset($_POST['wholesalex_reset_password']) ) {
-            $email = sanitize_email( $_POST['user_email'] );
+	public function wholesalex_handle_password_reset() {
+		if ( isset( $_POST['wholesalex_reset_password'] ) && isset( $_POST['wholesalex_reset_password_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wholesalex_reset_password_nonce'] ) ), 'wholesalex_reset_password_action' ) ) {
+			if ( isset( $_POST['user_email'] ) ) {
+				$email = sanitize_email( wp_unslash( $_POST['user_email'] ) );
+			} else {
+				$email = '';
+			}
 
-            if ( empty( $email ) ) {
-                wc_add_notice( 'Please enter a valid email address.', 'error' );
-                return;
-            }
+			if ( empty( $email ) ) {
+				wc_add_notice( 'Please enter a valid email address.', 'error' );
+				return;
+			}
 
-            // Check if user exists
-            $user = get_user_by('email', $email);
+			// Check if user exists.
+			$user = get_user_by( 'email', $email );
 
-            if ( !$user ) {
-                wc_add_notice( 'No user found with this email address.', 'error' );
-                return;
-            }
+			if ( ! $user ) {
+				wc_add_notice( 'No user found with this email address.', 'error' );
+				return;
+			}
 
-            // Generate password reset key
-            $key = get_password_reset_key( $user );
-            if ( is_wp_error( $key ) ) {
-                wc_add_notice( $key->get_error_message(), 'error' );
-                return;
-            }
-            $reset_link = network_site_url( "wp-login.php?action=rp&key=$key&login=" . rawurlencode( $user->user_login ), 'login' );
-            $this->wholesalex_send_password_reset_email( $user->user_login, $user->user_email, $reset_link );
-            wp_redirect( add_query_arg( 'reset', 'true', get_permalink() ) );
-            exit;
-        }
-    }
+			// Generate password reset key.
+			$key = get_password_reset_key( $user );
+			if ( is_wp_error( $key ) ) {
+				wc_add_notice( $key->get_error_message(), 'error' );
+				return;
+			}
+			$reset_link = network_site_url( "wp-login.php?action=rp&key=$key&login=" . rawurlencode( $user->user_login ), 'login' );
+			$this->wholesalex_send_password_reset_email( $user->user_login, $user->user_email, $reset_link );
+			wp_safe_redirect( add_query_arg( 'reset', 'true', get_permalink() ) );
+			exit;
+		}
+	}
 
-    /**
-	 * Forget Password Email Template
+	/**
+	 * Send password reset email
 	 *
-	 * @param [string] $user_login
-	 * @param [string] $user_email
-	 * @param [string] $reset_link
+	 * @param string $user_login User login.
+	 * @param string $user_email User email.
+	 * @param string $reset_link Reset link.
 	 * @return void
 	 */
 	public function wholesalex_send_password_reset_email( $user_login, $user_email, $reset_link ) {
-		$mailer = WC()->mailer();
+		$mailer        = WC()->mailer();
 		$email_heading = esc_html__( 'Password Reset Request', 'wholesalex' );
 		ob_start();
 		?>
-		<p><?php printf( esc_html__( 'Hi %s,', 'wholesalex' ), esc_html( $user_login ) ); ?></p>
-		<p><?php printf( 
-			esc_html__( 'Someone has requested a new password for the following account on %s:', 'wholesalex' ), 
-			esc_html( get_bloginfo( 'name' ) ) 
-		); ?></p>
+		<p><?php printf( /* translators: %s: User login name */ esc_html__( 'Hi %s,', 'wholesalex' ), esc_html( $user_login ) ); ?></p>
+		<p>
+		<?php
+		printf(
+			/* translators: %s: User login name */
+			esc_html__( 'Someone has requested a new password for the following account on %s:', 'wholesalex' ),
+			esc_html( get_bloginfo( 'name' ) )
+		);
+		?>
+		</p>
 		<p><strong><?php esc_html_e( 'Username:', 'wholesalex' ); ?></strong> <?php echo esc_html( $user_login ); ?></p>
 		<p><?php esc_html_e( 'If you didn’t make this request, just ignore this email. If you’d like to proceed:', 'wholesalex' ); ?></p>
 		<p><a class="wsx-link" href="<?php echo esc_url( $reset_link ); ?>"><?php esc_html_e( 'Click here to reset your password', 'wholesalex' ); ?></a></p>
@@ -168,7 +179,7 @@ class WHOLESALEX_Shortcodes {
 			$mailer->wrap_message( $email_heading, $message )
 		);
 	}
-	
+
 
 	/**
 	 * Enqueue Form Scripts
@@ -182,31 +193,41 @@ class WHOLESALEX_Shortcodes {
 
 		global $post;
 
-		$registration_page_slug = wholesalex()->get_setting('registration_form_buidler_submenu_slug');
+		$registration_page_slug = wholesalex()->get_setting( 'registration_form_buidler_submenu_slug' );
 
 		$is_elementor_builder =isset($_GET['elementor-preview']) && sanitize_text_field($_GET['elementor-preview']); // @codingStandardsIgnoreLine.
 		$is_breakdance_builder =  isset($_GET['breakdance_iframe']) && true==sanitize_text_field($_GET['breakdance_iframe']); // @codingStandardsIgnoreLine.
 
-		if (  has_shortcode( $post->post_content, 'wholesalex_registration' ) || has_shortcode( $post->post_content, 'wholesalex_login_registration' ) || has_shortcode( $post->post_content, 'wholesalex_login' ) || ( function_exists( 'has_block' ) && has_block( 'wholesalex/forms' ) ) || has_shortcode( $post->post_content, $registration_page_slug.'_login_registration' )  || has_shortcode( $post->post_content, $registration_page_slug.'_registration' )|| $is_breakdance_builder || $is_elementor_builder)	{
+		if ( has_shortcode( $post->post_content, 'wholesalex_registration' ) || has_shortcode( $post->post_content, 'wholesalex_login_registration' ) || has_shortcode( $post->post_content, 'wholesalex_login' ) || ( function_exists( 'has_block' ) && has_block( 'wholesalex/forms' ) ) || has_shortcode( $post->post_content, $registration_page_slug . '_login_registration' ) || has_shortcode( $post->post_content, $registration_page_slug . '_registration' ) || $is_breakdance_builder || $is_elementor_builder ) {
 			wp_enqueue_style( 'whx_form', WHOLESALEX_URL . 'assets/css/whx_form.css', array(), WHOLESALEX_VER );
 		}
 	}
 
-
+	/**
+	 * Current Page Password Lost Check
+	 *
+	 * @return bool
+	 */
 	public function check_current_page_is_lost_password() {
-		$current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-		if ( strpos($current_url, 'lost-password') !== false || strpos($current_url, '?reset=true') !== false ) {
+		$current_url = ( isset( $_SERVER['HTTPS'] ) && 'on' === $_SERVER['HTTPS'] ? 'https' : 'http' ) . '://' . ( isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '' ) . ( isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '' );
+		if ( strpos( $current_url, 'lost-password' ) !== false || strpos( $current_url, '?reset=true' ) !== false ) {
 			return false;
 		} else {
 			return true;
 		}
 	}
 
-	private function isFormRowValid($columns){
+	/**
+	 * From Validation
+	 *
+	 * @param mixed $columns columns.
+	 * @return mixed
+	 */
+	private function is_form_row_valid( $columns ) {
 		$status = false;
-		foreach ($columns as $field) {
-			$status = isset($field['status'])?$field['status']:true;
-			if($status) {
+		foreach ( $columns as $field ) {
+			$status = isset( $field['status'] ) ? $field['status'] : true;
+			if ( $status ) {
 				break;
 			}
 		}
@@ -214,7 +235,13 @@ class WHOLESALEX_Shortcodes {
 		return $status;
 	}
 
-	private function getSelectRoleField($is_only_b2b=false) {
+	/**
+	 * Get Select Role Field
+	 *
+	 * @param bool $is_only_b2b is only b2b.
+	 * @return mixed
+	 */
+	private function get_select_role_field( $is_only_b2b = false ) {
 		$__roles        = wholesalex()->get_roles( 'roles_option' );
 		$__roles_option = array(
 			array(
@@ -241,194 +268,209 @@ class WHOLESALEX_Shortcodes {
 		);
 
 		$field = array(
-			'id'=> 'wsx-select-role',
-			'type' => 'row',
-			'columns' => array($__select_role_dropdown),
-			'isMultiColumn' => false
+			'id'            => 'wsx-select-role',
+			'type'          => 'row',
+			'columns'       => array( $__select_role_dropdown ),
+			'isMultiColumn' => false,
 		);
 
 		return $field;
 	}
 
-	private function renderColumns($row,$isRolewise,$inputVariation, $is_only_b2b = false) {
-		$columns         = $row['columns'];
-		$multiColumnClass = isset($row['isMultiColumn']) && $row['isMultiColumn'] ? 'double-column':'';
+	/**
+	 * Generate Form Field
+	 *
+	 * @param mixed $row row.
+	 * @param mixed $is_role_wise is rolewise.
+	 * @param mixed $input_variation input variation.
+	 * @param mixed $is_only_b2b is only b2b.
+	 * @return void
+	 */
+	private function render_columns( $row, $is_role_wise, $input_variation, $is_only_b2b = false ) {
+		$columns            = $row['columns'];
+		$multi_column_class = isset( $row['isMultiColumn'] ) && $row['isMultiColumn'] ? 'double-column' : '';
 
-		if($this->isFormRowValid($columns)) {
-			
-			$rowClass = "wsx-reg-form-row {$multiColumnClass}";
+		if ( $this->is_form_row_valid( $columns ) ) {
+
+			$row_class = "wsx-reg-form-row {$multi_column_class}";
 			?>
-			<div class="<?php echo esc_attr($rowClass); ?>">
-				<?php 
-					foreach ($columns as $field) {
-						$exclude = $this->check_depends($field);
-						if($isRolewise) {
-							$excludeRoles = explode( ' ', $exclude );
-							if ( in_array( $isRolewise, $excludeRoles ) ) {
-								continue;
-							}
+			<div class="<?php echo esc_attr( $row_class ); ?>">
+				<?php
+				foreach ( $columns as $field ) {
+					$exclude = $this->check_depends( $field );
+					if ( $is_role_wise ) {
+						$exclude_roles = explode( ' ', $exclude );
+						if ( in_array( $is_role_wise, $exclude_roles, true ) ) {
+							continue;
 						}
-						$requiredClass = isset( $field['required'] ) && $field['required'] ?'wsx-field-required':'';
-						$displayNone = ( $exclude && ! $isRolewise )?'display:none':'';
-						$fieldName = $field['name'];
-						$fieldPosition = isset($field['columnPosition'])? $field['columnPosition']:'left';
-						$fieldClass = "wholesalex-registration-form-column {$fieldPosition} wsx-field {$requiredClass} wsx-field-{$fieldName}";
-						?>
-						<div data-wsx-exclude="<?php echo esc_attr($exclude); ?>" class="<?php echo esc_attr($fieldClass)?>" style="<?php echo esc_attr($displayNone);  ?>"> 
+					}
+					$required_class = isset( $field['required'] ) && $field['required'] ? 'wsx-field-required' : '';
+					$display_none   = ( $exclude && ! $is_role_wise ) ? 'display:none' : '';
+					$field_name     = $field['name'];
+					$field_position = isset( $field['columnPosition'] ) ? $field['columnPosition'] : 'left';
+					$field_class    = "wholesalex-registration-form-column {$field_position} wsx-field {$required_class} wsx-field-{$field_name}";
+					?>
+						<div data-wsx-exclude="<?php echo esc_attr( $exclude ); ?>" class="<?php echo esc_attr( $field_class ); ?>" style="<?php echo esc_attr( $display_none ); ?>"> 
 						
-						<?php 
-							$this->registrationFormFieldsName[]=$fieldName;
-							$this->generateFormField( $field, $isRolewise, $inputVariation, $is_only_b2b );
-						 ?>
+						<?php
+						$this->registrationFormFieldsName[] = $field_name;
+						$this->generate_form_field( $field, $is_role_wise, $input_variation, $is_only_b2b );
+						?>
 						</div>
 						<?php
-					}
+				}
 				?>
 			</div>
 			<?php
-			
+
 		}
 	}
 
-	private function renderForm($type,$formData,$inputVariation,$isRolewise=false,$is_only_b2b=false,$role=''){
-		$defaultForm = wholesalex()->get_empty_form();
+	/**
+	 * Render the form based on the type and provided data.
+	 *
+	 * @param string $type The type of form (registration or login).
+	 * @param array  $form_data The form data.
+	 * @param array  $input_variation The input variation.
+	 * @param bool   $is_rolewise Whether the form is role-specific.
+	 * @param bool   $is_only_b2b Whether the form is only for B2B.
+	 * @param string $role The role for the form.
+	 */
+	private function render_form( $type, $form_data, $input_variation, $is_rolewise = false, $is_only_b2b = false, $role = '' ) {
+		$default_form      = wholesalex()->get_empty_form();
 		$initial_form_data = wholesalex()->get_default_registration_form_fields();
-		if('registration'==$type) {
-			$enctype ='multipart/form-data';
-			$wrapperClass = 'wsx-reg-fields';
-			$headingClass = 'wsx-reg-form-heading';
-			$headingTitleClass = 'wsx-reg-form-heading-text';
-			$headingDescClass='wholesalex-registration-form-subtitle-text';
-			$buttonClass = 'wsx-register-btn';
-			$header = $formData['registrationFormHeader'];
-			$button = $formData['registrationFormButton'];
-			$fields = ( isset( $formData['registrationFields'] ) ? $formData['registrationFields'] : $initial_form_data );
+		if ( 'registration' === $type ) {
+			$enctype             = 'multipart/form-data';
+			$wrapper_class       = 'wsx-reg-fields';
+			$heading_class       = 'wsx-reg-form-heading';
+			$heading_title_class = 'wsx-reg-form-heading-text';
+			$heading_desc_class  = 'wholesalex-registration-form-subtitle-text';
+			$button_class        = 'wsx-register-btn';
+			$header              = $form_data['registrationFormHeader'];
+			$button              = $form_data['registrationFormButton'];
+			$fields              = ( isset( $form_data['registrationFields'] ) ? $form_data['registrationFields'] : $initial_form_data );
 		} else {
-			$enctype = 'application/x-www-form-urlencoded';
-			$wrapperClass = 'wsx-login-fields';
-			$headingClass = 'wholesalex-login-form-title';
-			$headingTitleClass = 'wsx-login-form-title-text';
-			$headingDescClass='wholesalex-login-form-subtitle-text';
-			$buttonClass = 'wsx-login-btn';
-			$header = $formData['loginFormHeader'];
-			// $fields = $formData['loginFields'];
-			$fields = $defaultForm['loginFields'];
-			$button = $formData['loginFormButton'];
+			$enctype             = 'application/x-www-form-urlencoded';
+			$wrapper_class       = 'wsx-login-fields';
+			$heading_class       = 'wholesalex-login-form-title';
+			$heading_title_class = 'wsx-login-form-title-text';
+			$heading_desc_class  = 'wholesalex-login-form-subtitle-text';
+			$button_class        = 'wsx-login-btn';
+			$header              = $form_data['loginFormHeader'];
+			$fields              = $default_form['loginFields'];
+			$button              = $form_data['loginFormButton'];
 		}
 
-        $allowed_html = array(
-            'div' => array(
-                'class' => array()
-            ),
-            'span' => array(
-                'class' => array()
-            ),
-            'button' => array(
-                'class' => array(),
-            ),
-        );
-
+		$allowed_html = array(
+			'div'    => array(
+				'class' => array(),
+			),
+			'span'   => array(
+				'class' => array(),
+			),
+			'button' => array(
+				'class' => array(),
+			),
+		);
 
 		?>
-		<form class="wholesalex-<?php echo esc_attr($type); ?>-form" enctype="<?php echo esc_attr($enctype);  ?>">
-				<?php
-				if ( isset( $formData['settings']['isShowFormTitle'] ) && $formData['settings']['isShowFormTitle'] ) {
-                    $output = '<div class="%s">';
-                    $output .= '<div class="%s">%s</div>';
+	<form class="wholesalex-<?php echo esc_attr( $type ); ?>-form" enctype="<?php echo esc_attr( $enctype ); ?>">
+		<?php
+		if ( isset( $form_data['settings']['isShowFormTitle'] ) && $form_data['settings']['isShowFormTitle'] ) {
+			$output  = '<div class="%s">';
+			$output .= '<div class="%s">%s</div>';
 
-                    if (isset($header['isHideDescription']) && !$header['isHideDescription']) {
-                        $output .= '<div class="%s">%s</div>';
-                    }
+			if ( isset( $header['isHideDescription'] ) && ! $header['isHideDescription'] ) {
+				$output .= '<div class="%s">%s</div>';
+			}
 
-                    $output .= '</div>';
+			$output .= '</div>';
 
-                    echo wp_kses(
-                        sprintf(
-                            $output,
-                            esc_attr($headingClass),
-                            esc_attr($headingTitleClass),
-                            isset($header['title']) ? esc_html($header['title']) : '',
-                            isset($header['description']) ? esc_attr($headingDescClass) : '',
-                            isset($header['description']) ? esc_html($header['description']) : ''
-                        ),
-                        $allowed_html
-                    );
-				}
+			echo wp_kses(
+				sprintf(
+					$output,
+					esc_attr( $heading_class ),
+					esc_attr( $heading_title_class ),
+					isset( $header['title'] ) ? esc_html( $header['title'] ) : '',
+					isset( $header['description'] ) ? esc_attr( $heading_desc_class ) : '',
+					isset( $header['description'] ) ? esc_html( $header['description'] ) : ''
+				),
+				$allowed_html
+			);
+		}
+		?>
+		<div class="wholesalex-fields-wrapper <?php echo esc_attr( $wrapper_class ); ?> wsx-fields-container">
+		<?php
+		foreach ( $fields as $row ) {
+			$this->render_columns( $row, $is_rolewise, $input_variation, $is_only_b2b );
+		}
+		if ( 'registration' === $type ) {
+			if ( $is_rolewise ) {
 				?>
-					<div class="wholesalex-fields-wrapper <?php echo esc_attr($wrapperClass); ?> wsx-fields-container">
-					<?php
-					foreach ( $fields as $row ) {						
-						$this->renderColumns($row,$isRolewise,$inputVariation, $is_only_b2b);
-					}
-					if('registration'==$type) {
-						if ( $isRolewise ) {
-							?>
-								<input type="hidden" name="wholesalex_registration_role" value="<?php echo esc_attr( $role ); ?>">
-								<?php
-						} else {
-							if (!in_array('wholesalex_registration_role',$this->registrationFormFieldsName) ) {
-								$this->renderColumns($this->getSelectRoleField($is_only_b2b),$isRolewise,$inputVariation);
-							}
-						}
-					}
-					?>
-					</div>
+				<input type="hidden" name="wholesalex_registration_role" value="<?php echo esc_attr( $role ); ?>">
+				<?php
+			} elseif ( ! in_array( 'wholesalex_registration_role', $this->registrationFormFieldsName, true ) ) {
+				$this->render_columns( $this->get_select_role_field( $is_only_b2b ), $is_rolewise, $input_variation );
+			}
+		}
+		?>
+		</div>
 
-					<input type="hidden" name="action" value="wholesalex_process_<?php echo esc_attr($type); ?>" />
+		<input type="hidden" name="action" value="wholesalex_process_<?php echo esc_attr( $type ); ?>" />
 
-					<?php
-					wp_nonce_field( 'wholesalex-'.$type, 'wholesalex-'.$type.'-nonce' );
-					$alignClass   = isset( $formData['styles']['layout']['button']['align'] ) ? sanitize_html_class( $formData['styles']['layout']['button']['align'] ) : '';
-					$buttonClass .= ' ' . $alignClass;
+		<?php
+		wp_nonce_field( 'wholesalex-' . $type, 'wholesalex-' . $type . '-nonce' );
+		$align_class   = isset( $form_data['styles']['layout']['button']['align'] ) ? sanitize_html_class( $form_data['styles']['layout']['button']['align'] ) : '';
+		$button_class .= ' ' . $align_class;
 
-                    $output = sprintf(
-                        '<div class="%s"><button class="%s">%s</button></div>',
-                        esc_attr( 'wsx-form-btn-wrapper' ),
-                        esc_attr( $buttonClass ),
-                        isset( $button['title'] ) ? esc_html( $button['title'] ) : ''
-                    );
+		$output = sprintf(
+			'<div class="%s"><button class="%s">%s</button></div>',
+			esc_attr( 'wsx-form-btn-wrapper' ),
+			esc_attr( $button_class ),
+			isset( $button['title'] ) ? esc_html( $button['title'] ) : ''
+		);
 
-                    echo wp_kses( $output, $allowed_html );
+		echo wp_kses( $output, $allowed_html );
 
-					if('login' == $type) {
-						?>
-						<div class="wsx-reg-form-row ">
-							<div class="wholesalex-registration-form-column left wsx-field woocommerce-LostPassword lost_password"> 
-								<a class="wsx-link" href="<?php echo esc_url( wp_lostpassword_url() ); ?>"><?php esc_html_e( 'Lost your password?', 'woocommerce' ); ?></a>
-							</div>
-						</div>
-							
-						<?php
-					}
-					?>
-					
-			</form>
+		if ( 'login' === $type ) {
+			?>
+			<div class="wsx-reg-form-row ">
+				<div class="wholesalex-registration-form-column left wsx-field woocommerce-LostPassword lost_password"> 
+					<a class="wsx-link" href="<?php echo esc_url( wp_lostpassword_url() ); ?>"><?php esc_html_e( 'Lost your password?', 'woocommerce' ); ?></a>
+				</div>
+			</div>
+			<?php
+		}
+		?>
+	</form>
 		<?php
 	}
 
 
-	private function render_registration_shortcode($atts=array()) {
-		$atts = array_change_key_case( (array) $atts, CASE_LOWER );
-		
+	/**
+	 * Get Form Style
+	 *
+	 * @param mixed $atts form array.
+	 * @return array
+	 */
+	private function render_registration_shortcode( $atts = array() ) {
+		$atts            = array_change_key_case( (array) $atts, CASE_LOWER );
+		$form_data       = wholesalex()->get_new_form_builder_data();
+		$input_variation = $form_data['settings']['inputVariation'];
+		$is_role_wise    = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' != $atts['registration_role'] && 'global' != $atts['registration_role'] ? $atts['registration_role'] : false;
+		$is_only_b2b     = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' == $atts['registration_role'] ? $atts['registration_role'] : false;
 
-		$formData = wholesalex()->get_new_form_builder_data();
-
-		$inputVariation     = $formData['settings']['inputVariation'];
-
-		$isRolewise          = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' != $atts['registration_role'] && 'global' != $atts['registration_role'] ? $atts['registration_role'] : false;
-		$is_only_b2b         = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' == $atts['registration_role'] ? $atts['registration_role'] : false;
-		
 		ob_start();
-		if(!wp_style_is('whx_form')) {
+		if ( ! wp_style_is( 'whx_form' ) ) {
 			wp_enqueue_style( 'whx_form', WHOLESALEX_URL . 'assets/css/whx_form.css', array(), WHOLESALEX_VER );
 		}
 		$this->load_form_js();
-		printf( '<style id="%1$s"> %2$s { %3$s } </style>', 'whx_form_css', ':root', wp_strip_all_tags( $this->get_vars_css( $this->getFormStyle( $formData['style'], $formData['loginFormHeader']['styles'], $formData['registrationFormHeader']['styles'] ) ) ) ); // @codingStandardsIgnoreLine.
- 
+		printf( '<style id="%1$s"> %2$s { %3$s } </style>', 'whx_form_css', ':root', wp_strip_all_tags( $this->get_vars_css( $this->get_form_style( $form_data['style'], $form_data['loginFormHeader']['styles'], $form_data['registrationFormHeader']['styles'] ) ) ) ); // @codingStandardsIgnoreLine.
+
 		do_action( 'wholesalex_before_registration_form_render' );
 
 		?>
-			<div class="wholesalex-form-wrapper wsx-form-wrapper_frontend wsx-without-login wsx_<?php echo esc_attr( $inputVariation ); ?>">
+			<div class="wholesalex-form-wrapper wsx-form-wrapper_frontend wsx-without-login wsx_<?php echo esc_attr( $input_variation ); ?>">
 			<div class="wholesalex_circular_loading__wrapper">
 				<div class="wholesalex_loading_spinner">
 					<svg viewBox="25 25 50 50" class="move_circular">
@@ -442,33 +484,39 @@ class WHOLESALEX_Shortcodes {
 					</svg>
 				</div>
 			</div>
-			<?php $this->renderForm('registration',$formData,$inputVariation,$isRolewise,$is_only_b2b, isset($atts['registration_role'])?$atts['registration_role']:'' ); ?>
+			<?php $this->render_form( 'registration', $form_data, $input_variation, $is_role_wise, $is_only_b2b, isset( $atts['registration_role'] ) ? $atts['registration_role'] : '' ); ?>
 			</div>
 		<?php
 		return ob_get_clean();
 	}
 
-	private function render_login_registration_shortcode($atts=array()) {
-		$formData = wholesalex()->get_new_form_builder_data();
+	/**
+	 * Render Login Registration Shortcode
+	 *
+	 * @param mixed $atts form array.
+	 * @return array
+	 */
+	private function render_login_registration_shortcode( $atts = array() ) {
+		$form_data = wholesalex()->get_new_form_builder_data();
 
-		$inputVariation     = $formData['settings']['inputVariation'];
+		$input_variation = $form_data['settings']['inputVariation'];
 
-		$isRolewise          = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' != $atts['registration_role'] && 'global' != $atts['registration_role'] ? $atts['registration_role'] : false;
-		$is_only_b2b         = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' == $atts['registration_role'] ? $atts['registration_role'] : false;
+		$is_role_wise = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' != $atts['registration_role'] && 'global' != $atts['registration_role'] ? $atts['registration_role'] : false;
+		$is_only_b2b  = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' == $atts['registration_role'] ? $atts['registration_role'] : false;
 
 		ob_start();
-		if(!wp_style_is('whx_form')) {
+		if ( ! wp_style_is( 'whx_form' ) ) {
 			wp_enqueue_style( 'whx_form', WHOLESALEX_URL . 'assets/css/whx_form.css', array(), WHOLESALEX_VER );
 		}
 		$this->load_form_js();
 
-		printf( '<style id="%1$s"> %2$s { %3$s } </style>', 'whx_form_css', ':root', esc_html( $this->get_vars_css( $this->getFormStyle( $formData['style'], $formData['loginFormHeader']['styles'], $formData['registrationFormHeader']['styles'] ) ) ) );
+		printf( '<style id="%1$s"> %2$s { %3$s } </style>', 'whx_form_css', ':root', esc_html( $this->get_vars_css( $this->get_form_style( $form_data['style'], $form_data['loginFormHeader']['styles'], $form_data['registrationFormHeader']['styles'] ) ) ) );
 
 		do_action( 'wholesalex_before_registration_form_render' );
 
 		?>
 			
-			<div class="wholesalex-form-wrapper wsx-form-wrapper_frontend wsx_<?php echo esc_attr( $inputVariation ); ?>">
+			<div class="wholesalex-form-wrapper wsx-form-wrapper_frontend wsx_<?php echo esc_attr( $input_variation ); ?>">
 			<div class="wholesalex_circular_loading__wrapper">
 				<div class="wholesalex_loading_spinner">
 					<svg viewBox="25 25 50 50" class="move_circular">
@@ -482,29 +530,34 @@ class WHOLESALEX_Shortcodes {
 					</svg>
 				</div>
 			</div>
-			<?php $this->renderForm('login',$formData,$inputVariation); ?>
+			<?php $this->render_form( 'login', $form_data, $input_variation ); ?>
 			<span class='wsx-form-separator'></span>
-			<?php $this->renderForm('registration',$formData,$inputVariation,$isRolewise,$is_only_b2b,isset($atts['registration_role'])?$atts['registration_role']:''); ?>
+			<?php $this->render_form( 'registration', $form_data, $input_variation, $is_role_wise, $is_only_b2b, isset( $atts['registration_role'] ) ? $atts['registration_role'] : '' ); ?>
 
 		</div>
 		<?php
 		return ob_get_clean();
 	}
 
-	private function render_login_shortcode($atts=array()) {
-		$formData 			= wholesalex()->get_new_form_builder_data();
-		$inputVariation     = $formData['settings']['inputVariation'];
-		$isRolewise         = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' != $atts['registration_role'] && 'global' != $atts['registration_role'] ? $atts['registration_role'] : false;
-		$is_only_b2b        = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' == $atts['registration_role'] ? $atts['registration_role'] : false;
+	/**
+	 * Render Login Shortcode
+	 *
+	 * @return array
+	 */
+	private function render_login_shortcode() {
+		$form_data       = wholesalex()->get_new_form_builder_data();
+		$input_variation = $form_data['settings']['inputVariation'];
+		// $is_role_wise     = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' != $atts['registration_role'] && 'global' != $atts['registration_role'] ? $atts['registration_role'] : false;
+		// $is_only_b2b    = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' == $atts['registration_role'] ? $atts['registration_role'] : false;
 		ob_start();
-		if(!wp_style_is('whx_form')) {
+		if ( ! wp_style_is( 'whx_form' ) ) {
 			wp_enqueue_style( 'whx_form', WHOLESALEX_URL . 'assets/css/whx_form.css', array(), WHOLESALEX_VER );
 		}
 		$this->load_form_js();
-		printf( '<style id="%1$s"> %2$s { %3$s } </style>', 'whx_form_css', ':root', esc_html( $this->get_vars_css( $this->getFormStyle( $formData['style'], $formData['loginFormHeader']['styles'], $formData['registrationFormHeader']['styles'] ) ) ) );
+		printf( '<style id="%1$s"> %2$s { %3$s } </style>', 'whx_form_css', ':root', esc_html( $this->get_vars_css( $this->get_form_style( $form_data['style'], $form_data['loginFormHeader']['styles'], $form_data['registrationFormHeader']['styles'] ) ) ) );
 		do_action( 'wholesalex_before_registration_form_render' );
 		?>
-			<div class="wholesalex-form-wrapper wsx-form-wrapper_frontend wsx_<?php echo esc_attr( $inputVariation ); ?>">
+			<div class="wholesalex-form-wrapper wsx-form-wrapper_frontend wsx_<?php echo esc_attr( $input_variation ); ?>">
 			<div class="wholesalex_circular_loading__wrapper">
 				<div class="wholesalex_loading_spinner">
 					<svg viewBox="25 25 50 50" class="move_circular">
@@ -518,11 +571,12 @@ class WHOLESALEX_Shortcodes {
 					</svg>
 				</div>
 			</div>
-			<?php $this->renderForm('login',$formData,$inputVariation); ?>
+			<?php $this->render_form( 'login', $form_data, $input_variation ); ?>
 		</div>
 		<?php
 		return ob_get_clean();
 	}
+
 	/**
 	 * Registration Form
 	 *
@@ -533,8 +587,8 @@ class WHOLESALEX_Shortcodes {
 	public function registration_shortcode( $atts = array() ) {
 		if ( is_user_logged_in() && is_singular() ) {
 			$__form_view_for_logged_in_user = wholesalex()->get_setting( '_settings_show_form_for_logged_in' );
-			
-			$__message_for_logged_in_user   = wholesalex()->get_setting( '_settings_message_for_logged_in_user' );
+
+			$__message_for_logged_in_user = wholesalex()->get_setting( '_settings_message_for_logged_in_user' );
 			if ( 'yes' !== $__form_view_for_logged_in_user ) {
 				if ( is_admin() || ! function_exists( 'wc_add_notice' ) || ! function_exists( 'wc_print_notices' ) ) {
 					return;
@@ -551,8 +605,8 @@ class WHOLESALEX_Shortcodes {
 				return;
 			}
 		}
-		if ( $this->check_current_page_is_lost_password() ){
-			return $this->render_registration_shortcode($atts);
+		if ( $this->check_current_page_is_lost_password() ) {
+			return $this->render_registration_shortcode( $atts );
 		} else {
 			return '';
 		}
@@ -567,9 +621,12 @@ class WHOLESALEX_Shortcodes {
 	 */
 	public function login_registration_shortcode( $atts = array() ) {
 
-		$atts = array_merge( array(
-			'lost_password' => 'false',
-		), $atts );
+		$atts = array_merge(
+			array(
+				'lost_password' => 'false',
+			),
+			$atts
+		);
 
 		if ( is_user_logged_in() && is_singular() ) {
 			$__form_view_for_logged_in_user = wholesalex()->get_setting( '_settings_show_form_for_logged_in' );
@@ -590,18 +647,14 @@ class WHOLESALEX_Shortcodes {
 				return;
 			}
 		}
-		if ( $this->check_current_page_is_lost_password() ){
+		if ( $this->check_current_page_is_lost_password() ) {
 			return $this->render_login_registration_shortcode( $atts );
-		}else{
-			if ( $atts['lost_password'] === 'true' ) {
+		} elseif ( 'true' === $atts['lost_password'] ) {
 				return $this->wholesalex_forgot_password_form();
-			} else {
-				if ( $atts['lost_password'] === 'true' ) {
-					return $this->wholesalex_forgot_password_form();
-				}else{
-					return '';
-				}
-			}
+		} elseif ( 'true' === $atts['lost_password'] ) {
+				return $this->wholesalex_forgot_password_form();
+		} else {
+			return '';
 		}
 	}
 
@@ -633,39 +686,47 @@ class WHOLESALEX_Shortcodes {
 				return;
 			}
 		}
-		if ( $this->check_current_page_is_lost_password() ){
+		if ( $this->check_current_page_is_lost_password() ) {
 			return $this->render_login_shortcode( $atts );
-		} else {
-			if ( $atts['lost_password'] === 'true' ) {
+		} elseif ( 'true' === $atts['lost_password'] ) {
 				return $this->wholesalex_forgot_password_form();
-			} else {
-				if ( $atts['lost_password'] === 'true' ) {
-					return $this->wholesalex_forgot_password_form();
-				} else {
-					return '';
-				}
-			}
+		} elseif ( 'true' === $atts['lost_password'] ) {
+				return $this->wholesalex_forgot_password_form();
+		} else {
+			return '';
 		}
 	}
 
+	/**
+	 * Load Form JS
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
 	public function load_form_js() {
 		add_action( 'wp_footer', array( $this, 'form_js' ) );
 	}
 
+	/**
+	 * Form JS
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
 	public function form_js() {
-		$formData           = wholesalex()->get_new_form_builder_data();
-		$initial_form_data = wholesalex()->get_default_registration_form_fields();
-		$registrationFields = ( isset( $formData['registrationFields'] ) ? $formData['registrationFields'] : $initial_form_data );
+		$form_data           = wholesalex()->get_new_form_builder_data();
+		$initial_form_data   = wholesalex()->get_default_registration_form_fields();
+		$registration_fields = ( isset( $form_data['registrationFields'] ) ? $form_data['registrationFields'] : $initial_form_data );
 
-		$conditions = array();
+		$conditions         = array();
 		$password_condition = array();
-		$password_message = '';
-		foreach ( $registrationFields as $row ) {
+		$password_message   = '';
+		foreach ( $registration_fields as $row ) {
 			$columns = $row['columns'];
 			foreach ( $columns as $field ) {
 				if ( isset( $field['status'] ) && $field['status'] ) {
-					if ( $field['name'] === 'user_pass' && isset( $field['passwordStrength'] ) ) {
-						foreach( $field['passwordStrength'] as $value ) {
+					if ( 'user_pass' === $field['name'] && isset( $field['passwordStrength'] ) ) {
+						foreach ( $field['passwordStrength'] as $value ) {
 							$password_condition[] = $value['value'];
 						}
 						$password_message = isset( $field['password_strength_message'] ) ? $field['password_strength_message'] : '';
@@ -676,7 +737,7 @@ class WHOLESALEX_Shortcodes {
 				}
 			}
 		}
-		$conditions_js_array = '["' . implode('", "', $password_condition) . '"]';
+		$conditions_js_array = '["' . implode( '", "', $password_condition ) . '"]';
 
 		?>
 		<script type="text/javascript">
@@ -686,7 +747,7 @@ class WHOLESALEX_Shortcodes {
 				 * All of the code for your public-facing JavaScript source
 				 * should reside in this file.
 				 */
-				const password_message = <?php echo wp_json_encode($password_message); ?>;
+				const password_message = <?php echo wp_json_encode( $password_message ); ?>;
 
 				const controlRegistrationForm = ()=>{
 					// Check User Role Selection Field
@@ -705,7 +766,6 @@ class WHOLESALEX_Shortcodes {
 									$(this).find('.wsx-field-required').removeAttr('required');
 								}
 							}
-
 						});
 					} else {
 						$(".wsx-field[style*='display: none'] > .wsx-field-required").removeAttr("required");
@@ -713,7 +773,6 @@ class WHOLESALEX_Shortcodes {
 				}
 
 				const checkConfirmPassword = ()=>{
-					
 					$("#user_confirm_pass").prop('required',true);
 					let confirmPassword = $("#user_confirm_pass").val();
 					let password = $("#reg_password").val(); //woocommerce password
@@ -883,7 +942,7 @@ class WHOLESALEX_Shortcodes {
 								fieldName = fieldName.replace(/\[\]/g, '');
 							}
 					if ( $(this).attr("name") === 'user_pass') {
-						let passwordConditions = <?php echo $conditions_js_array ?>;
+						let passwordConditions = <?php echo wp_json_encode( $conditions_js_array ); ?>;
 							// Validate button click event
 							let password = $(this).val();
 							let validationMessages = validatePassword( password, passwordConditions );
@@ -1286,7 +1345,7 @@ class WHOLESALEX_Shortcodes {
 									})
 								} else {
 									if(response['data']['redirect']) {
-										 window.location.href = response['data']['redirect'];
+										window.location.href = response['data']['redirect'];
 									}
 								}
 							}, 
@@ -1321,14 +1380,23 @@ class WHOLESALEX_Shortcodes {
 		<?php
 	}
 
-	
 
-	public function getFormStyle( $style, $loginHeaderStyle, $RegistrationHeaderStyle ) {
+
+	/**
+	 * Get Form Style
+	 *
+	 * @param  array $style Style Array.
+	 * @param  array $login_header_style Login Header Style Array.
+	 * @param  array $registration_header_style Registration Header Style Array.
+	 * @return array Style Array.
+	 * @since 1.0.0
+	 */
+	public function get_form_style( $style, $login_header_style, $registration_header_style ) {
 
 		$_style = array(
 
 			// Color
-			// Field Sign Up Normal
+			// Field Sign Up Normal.
 
 			'--wsx-input-color'                          => isset( $style['color']['field']['signUp']['normal']['text'] ) ? $style['color']['field']['signUp']['normal']['text'] : null,
 			'--wsx-input-bg'                             => isset( $style['color']['field']['signUp']['normal']['background'] ) ? $style['color']['field']['signUp']['normal']['background'] : null,
@@ -1336,20 +1404,20 @@ class WHOLESALEX_Shortcodes {
 			'--wsx-input-placeholder-color'              => isset( $style['color']['field']['signUp']['normal']['placeholder'] ) ? $style['color']['field']['signUp']['normal']['placeholder'] : null,
 			'--wsx-form-label-color'                     => isset( $style['color']['field']['signUp']['normal']['label'] ) ? $style['color']['field']['signUp']['normal']['label'] : null,
 
-			// Field Sign Up Active
+			// Field Sign Up Active.
 			'--wsx-input-focus-color'                    => isset( $style['color']['field']['signUp']['active']['text'] ) ? $style['color']['field']['signUp']['active']['text'] : null,
 			'--wsx-input-focus-bg'                       => isset( $style['color']['field']['signUp']['active']['background'] ) ? $style['color']['field']['signUp']['active']['background'] : null,
 			'--wsx-input-focus-border-color'             => isset( $style['color']['field']['signUp']['active']['border'] ) ? $style['color']['field']['signUp']['active']['border'] : null,
 			'--wsx-form-label-color-active'              => isset( $style['color']['field']['signUp']['active']['label'] ) ? $style['color']['field']['signUp']['active']['label'] : null,
 
-			// Field Sign Up Warning
+			// Field Sign Up Warning.
 
 			'--wsx-input-warning-color'                  => isset( $style['color']['field']['signUp']['warning']['text'] ) ? $style['color']['field']['signUp']['warning']['text'] : null,
 			'--wsx-input-warning-bg'                     => isset( $style['color']['field']['signUp']['warning']['background'] ) ? $style['color']['field']['signUp']['warning']['background'] : null,
 			'--wsx-input-warning-border-color'           => isset( $style['color']['field']['signUp']['warning']['border'] ) ? $style['color']['field']['signUp']['warning']['border'] : null,
 			'--wsx-form-label-color-warning'             => isset( $style['color']['field']['signUp']['warning']['label'] ) ? $style['color']['field']['signUp']['warning']['label'] : null,
 
-			// Field Sign In Normal
+			// Field Sign In Normal.
 
 			'--wsx-login-input-color'                    => isset( $style['color']['field']['signIn']['normal']['text'] ) ? $style['color']['field']['signIn']['normal']['text'] : null,
 			'--wsx-login-input-bg'                       => isset( $style['color']['field']['signIn']['normal']['background'] ) ? $style['color']['field']['signIn']['normal']['background'] : null,
@@ -1357,123 +1425,130 @@ class WHOLESALEX_Shortcodes {
 			'--wsx-login-input-placeholder-color'        => isset( $style['color']['field']['signIn']['normal']['placeholder'] ) ? $style['color']['field']['signIn']['normal']['placeholder'] : null,
 			'--wsx-login-form-label-color'               => isset( $style['color']['field']['signIn']['normal']['label'] ) ? $style['color']['field']['signIn']['normal']['label'] : null,
 
-			// Field Sign In Active
+			// Field Sign In Active.
 			'--wsx-login-input-focus-color'              => isset( $style['color']['field']['signIn']['active']['text'] ) ? $style['color']['field']['signIn']['active']['text'] : null,
 			'--wsx-login-input-focus-bg'                 => isset( $style['color']['field']['signIn']['active']['background'] ) ? $style['color']['field']['signIn']['active']['background'] : null,
 			'--wsx-login-input-focus-border-color'       => isset( $style['color']['field']['signIn']['active']['border'] ) ? $style['color']['field']['signIn']['active']['border'] : null,
 			'--wsx-login-form-label-color-active'        => isset( $style['color']['field']['signIn']['active']['label'] ) ? $style['color']['field']['signIn']['active']['label'] : null,
 
-			// Field Sign In Warning
+			// Field Sign In Warning.
 			'--wsx-login-input-warning-color'            => isset( $style['color']['field']['signIn']['warning']['text'] ) ? $style['color']['field']['signIn']['warning']['text'] : null,
 			'--wsx-login-input-warning-bg'               => isset( $style['color']['field']['signIn']['warning']['background'] ) ? $style['color']['field']['signIn']['warning']['background'] : null,
 			'--wsx-login-input-warning-border-color'     => isset( $style['color']['field']['signIn']['warning']['border'] ) ? $style['color']['field']['signIn']['warning']['border'] : null,
 			'--wsx-login-form-label-color-warning'       => isset( $style['color']['field']['signIn']['warning']['label'] ) ? $style['color']['field']['signIn']['warning']['label'] : null,
 
-			// Button Sign UP Normal
+			// Button Sign UP Normal.
 			'--wsx-form-button-color'                    => isset( $style['color']['button']['signUp']['normal']['text'] ) ? $style['color']['button']['signUp']['normal']['text'] : null,
 			'--wsx-form-button-bg'                       => isset( $style['color']['button']['signUp']['normal']['background'] ) ? $style['color']['button']['signUp']['normal']['background'] : null,
 			'--wsx-form-button-border-color'             => isset( $style['color']['button']['signUp']['normal']['border'] ) ? $style['color']['button']['signUp']['normal']['border'] : null,
 
-			// Button Sign UP Hover
+			// Button Sign UP Hover.
 			'--wsx-form-button-hover-color'              => isset( $style['color']['button']['signUp']['hover']['text'] ) ? $style['color']['button']['signUp']['hover']['text'] : null,
 			'--wsx-form-button-hover-bg'                 => isset( $style['color']['button']['signUp']['hover']['background'] ) ? $style['color']['button']['signUp']['hover']['background'] : null,
 			'--wsx-form-button-hover-border-color'       => isset( $style['color']['button']['signUp']['hover']['border'] ) ? $style['color']['button']['signUp']['hover']['border'] : null,
 
-			// Button Sign In Normal
+			// Button Sign In Normal.
 			'--wsx-login-form-button-color'              => isset( $style['color']['button']['signIn']['normal']['text'] ) ? $style['color']['button']['signIn']['normal']['text'] : null,
 			'--wsx-login-form-button-bg'                 => isset( $style['color']['button']['signIn']['normal']['background'] ) ? $style['color']['button']['signIn']['normal']['background'] : null,
 			'--wsx-login-form-button-border-color'       => isset( $style['color']['button']['signIn']['normal']['border'] ) ? $style['color']['button']['signIn']['normal']['border'] : null,
 
-			// Button Sign In Hover
+			// Button Sign In Hover.
 			'--wsx-login-form-button-hover-color'        => isset( $style['color']['button']['signIn']['hover']['text'] ) ? $style['color']['button']['signIn']['hover']['text'] : null,
 			'--wsx-login-form-button-hover-bg'           => isset( $style['color']['button']['signIn']['hover']['background'] ) ? $style['color']['button']['signIn']['hover']['background'] : null,
 			'--wsx-login-form-button-hover-border-color' => isset( $style['color']['button']['signIn']['hover']['border'] ) ? $style['color']['button']['signIn']['hover']['border'] : null,
 
-			// Container Main
+			// Container Main.
 			'--wsx-form-container-bg'                    => isset( $style['color']['container']['main']['background'] ) ? $style['color']['container']['main']['background'] : null,
 			'--wsx-form-container-border-color'          => isset( $style['color']['container']['main']['border'] ) ? $style['color']['container']['main']['border'] : null,
 
-			// Container Sign UP
+			// Container Sign UP.
 			'--wsx-form-reg-bg'                          => isset( $style['color']['container']['signUp']['background'] ) ? $style['color']['container']['signUp']['background'] : null,
 			'--wsx-form-reg-border-color'                => isset( $style['color']['container']['signUp']['border'] ) ? $style['color']['container']['signUp']['border'] : null,
 
-			// Container Sign IN
+			// Container Sign IN.
 			'--wsx-login-bg'                             => isset( $style['color']['container']['signIn']['background'] ) ? $style['color']['container']['signIn']['background'] : null,
 			'--wsx-login-border-color'                   => isset( $style['color']['container']['signIn']['border'] ) ? $style['color']['container']['signIn']['border'] : null,
 
-			// Typography
-			// Field - Label
+			// Typography.
+			// Field - Label.
 			'--wsx-form-label-font-size'                 => isset( $style['typography']['field']['label']['size'] ) ? $style['typography']['field']['label']['size'] . 'px' : null,
-			'--wsx-form-label-weight'                    => isset( $style['typography']['field']['label']['weight'] ) ? $style['typography']['field']['label']['weight']  : null,
+			'--wsx-form-label-weight'                    => isset( $style['typography']['field']['label']['weight'] ) ? $style['typography']['field']['label']['weight'] : null,
 			'--wsx-form-label-case-transform'            => isset( $style['typography']['field']['label']['transform'] ) ? $style['typography']['field']['label']['transform'] . 'px' : null,
-			// Field - Input
+			// Field - Input.
 			'--wsx-input-font-size'                      => isset( $style['typography']['field']['input']['size'] ) ? $style['typography']['field']['input']['size'] . 'px' : null,
 			'--wsx-input-weight'                         => isset( $style['typography']['field']['input']['weight'] ) ? $style['typography']['field']['input']['weight'] : null,
 			'--wsx-input-case-transform'                 => isset( $style['typography']['field']['input']['transform'] ) ? $style['typography']['field']['input']['transform'] : null,
 
-			// Button
+			// Button.
 
 			'--wsx-form-button-font-size'                => isset( $style['typography']['button']['size'] ) ? $style['typography']['button']['size'] . 'px' : null,
 			'--wsx-form-button-weight'                   => isset( $style['typography']['button']['weight'] ) ? $style['typography']['button']['weight'] : null,
 			'--wsx-form-button-case-transform'           => isset( $style['typography']['button']['transform'] ) ? $style['typography']['button']['transform'] : null,
 
 			// Size and Spacing
-			// Input
+			// Input.
 			'--wsx-input-padding'                        => isset( $style['sizeSpacing']['input']['padding'] ) ? $style['sizeSpacing']['input']['padding'] . 'px' : null,
 			'--wsx-input-width'                          => isset( $style['sizeSpacing']['input']['width'] ) ? $style['sizeSpacing']['input']['width'] . 'px' : null,
 			'--wsx-input-border-width'                   => isset( $style['sizeSpacing']['input']['border'] ) ? $style['sizeSpacing']['input']['border'] . 'px' : null,
 			'--wsx-input-border-radius'                  => isset( $style['sizeSpacing']['input']['borderRadius'] ) ? $style['sizeSpacing']['input']['borderRadius'] . 'px' : null,
 
-			// Button
+			// Button.
 			'--wsx-form-button-padding'                  => isset( $style['sizeSpacing']['button']['padding'] ) ? $style['sizeSpacing']['button']['padding'] . 'px' : null,
 			'--wsx-form-button-width'                    => isset( $style['sizeSpacing']['button']['width'] ) ? $style['sizeSpacing']['button']['width'] . '%' : null,
 			'--wsx-form-button-border-width'             => isset( $style['sizeSpacing']['button']['border'] ) ? $style['sizeSpacing']['button']['border'] . 'px' : null,
 			'--wsx-form-button-border-radius'            => isset( $style['sizeSpacing']['button']['borderRadius'] ) ? $style['sizeSpacing']['button']['borderRadius'] . 'px' : null,
 			'--wsx-form-button-align'                    => isset( $style['sizeSpacing']['button']['align'] ) ? $style['sizeSpacing']['button']['align'] : null,
 
-			// Container - Main
+			// Container - Main.
 			'--wsx-form-container-width'                 => isset( $style['sizeSpacing']['container']['main']['width'] ) ? $style['sizeSpacing']['container']['main']['width'] . 'px' : null,
 			'--wsx-form-container-border-width'          => isset( $style['sizeSpacing']['container']['main']['border'] ) ? $style['sizeSpacing']['container']['main']['border'] . 'px' : null,
 			'--wsx-form-container-border-radius'         => isset( $style['sizeSpacing']['container']['main']['borderRadius'] ) ? $style['sizeSpacing']['container']['main']['borderRadius'] . 'px' : null,
 			'--wsx-form-container-padding'               => isset( $style['sizeSpacing']['container']['main']['padding'] ) ? $style['sizeSpacing']['container']['main']['padding'] . 'px' : null,
 			'--wsx-form-container-separator'             => isset( $style['sizeSpacing']['container']['main']['separator'] ) ? $style['sizeSpacing']['container']['main']['separator'] . 'px' : null,
 
-			// Container - Sign In
+			// Container - Sign In.
 			'--wsx-login-width'                          => isset( $style['sizeSpacing']['container']['signIn']['width'] ) ? $style['sizeSpacing']['container']['signIn']['width'] . 'px' : null,
 			'--wsx-login-border-width'                   => isset( $style['sizeSpacing']['container']['signIn']['border'] ) ? $style['sizeSpacing']['container']['signIn']['border'] . 'px' : null,
 			'--wsx-login-padding'                        => isset( $style['sizeSpacing']['container']['signIn']['padding'] ) ? $style['sizeSpacing']['container']['signIn']['padding'] . 'px' : null,
 			'--wsx-login-border-radius'                  => isset( $style['sizeSpacing']['container']['signIn']['borderRadius'] ) ? $style['sizeSpacing']['container']['signIn']['borderRadius'] . 'px' : null,
 
-			// Container - Sign Up
+			// Container - Sign Up.
 			'--wsx-form-reg-width'                       => isset( $style['sizeSpacing']['container']['signUp']['width'] ) ? $style['sizeSpacing']['container']['signUp']['width'] . 'px' : null,
 			'--wsx-form-reg-border-width'                => isset( $style['sizeSpacing']['container']['signUp']['border'] ) ? $style['sizeSpacing']['container']['signUp']['border'] . 'px' : null,
 			'--wsx-form-reg-padding'                     => isset( $style['sizeSpacing']['container']['signUp']['padding'] ) ? $style['sizeSpacing']['container']['signUp']['padding'] . 'px' : null,
 			'--wsx-form-reg-border-radius'               => isset( $style['sizeSpacing']['container']['signUp']['borderRadius'] ) ? $style['sizeSpacing']['container']['signUp']['borderRadius'] . 'px' : null,
 
-			'--wsx-login-title-font-size'                => isset( $loginHeaderStyle['title']['size'] ) ? $loginHeaderStyle['title']['size'] . 'px' : null,
-			'--wsx-login-title-case-transform'           => isset( $loginHeaderStyle['title']['transform'] ) ? $loginHeaderStyle['title']['transform'] : null,
-			'--wsx-login-title-font-weight'              => isset( $loginHeaderStyle['title']['weight'] ) ? $loginHeaderStyle['title']['weight'] : null,
-			'--wsx-login-title-color'                    => isset( $loginHeaderStyle['title']['color'] ) ? $loginHeaderStyle['title']['color'] : null,
+			'--wsx-login-title-font-size'                => isset( $login_header_style['title']['size'] ) ? $login_header_style['title']['size'] . 'px' : null,
+			'--wsx-login-title-case-transform'           => isset( $login_header_style['title']['transform'] ) ? $login_header_style['title']['transform'] : null,
+			'--wsx-login-title-font-weight'              => isset( $login_header_style['title']['weight'] ) ? $login_header_style['title']['weight'] : null,
+			'--wsx-login-title-color'                    => isset( $login_header_style['title']['color'] ) ? $login_header_style['title']['color'] : null,
 
-			'--wsx-login-description-font-size'          => isset( $loginHeaderStyle['description']['size'] ) ? $loginHeaderStyle['description']['size'] . 'px' : null,
-			'--wsx-login-description-case-transform'     => isset( $loginHeaderStyle['description']['transform'] ) ? $loginHeaderStyle['description']['transform'] : null,
-			'--wsx-login-description-font-weight'        => isset( $loginHeaderStyle['description']['weight'] ) ? $loginHeaderStyle['description']['weight'] : null,
-			'--wsx-login-description-color'              => isset( $loginHeaderStyle['description']['color'] ) ? $loginHeaderStyle['description']['color'] : null,
+			'--wsx-login-description-font-size'          => isset( $login_header_style['description']['size'] ) ? $login_header_style['description']['size'] . 'px' : null,
+			'--wsx-login-description-case-transform'     => isset( $login_header_style['description']['transform'] ) ? $login_header_style['description']['transform'] : null,
+			'--wsx-login-description-font-weight'        => isset( $login_header_style['description']['weight'] ) ? $login_header_style['description']['weight'] : null,
+			'--wsx-login-description-color'              => isset( $login_header_style['description']['color'] ) ? $login_header_style['description']['color'] : null,
 
-			'--wsx-reg-title-font-size'                  => isset( $RegistrationHeaderStyle['title']['size'] ) ? $RegistrationHeaderStyle['title']['size'] . 'px' : null,
-			'--wsx-reg-title-case-transform'             => isset( $RegistrationHeaderStyle['title']['transform'] ) ? $RegistrationHeaderStyle['title']['transform'] : null,
-			'--wsx-reg-title-font-weight'                => isset( $RegistrationHeaderStyle['title']['weight'] ) ? $RegistrationHeaderStyle['title']['weight'] : null,
-			'--wsx-reg-title-color'                      => isset( $RegistrationHeaderStyle['title']['color'] ) ? $RegistrationHeaderStyle['title']['color'] : null,
+			'--wsx-reg-title-font-size'                  => isset( $registration_header_style['title']['size'] ) ? $registration_header_style['title']['size'] . 'px' : null,
+			'--wsx-reg-title-case-transform'             => isset( $registration_header_style['title']['transform'] ) ? $registration_header_style['title']['transform'] : null,
+			'--wsx-reg-title-font-weight'                => isset( $registration_header_style['title']['weight'] ) ? $registration_header_style['title']['weight'] : null,
+			'--wsx-reg-title-color'                      => isset( $registration_header_style['title']['color'] ) ? $registration_header_style['title']['color'] : null,
 
-			'--wsx-reg-description-font-size'            => isset( $RegistrationHeaderStyle['description']['size'] ) ? $RegistrationHeaderStyle['description']['size'] . 'px' : null,
-			'--wsx-reg-description-case-transform'       => isset( $RegistrationHeaderStyle['description']['transform'] ) ? $RegistrationHeaderStyle['description']['transform'] : null,
-			'--wsx-reg-description-font-weight'          => isset( $RegistrationHeaderStyle['description']['weight'] ) ? $RegistrationHeaderStyle['description']['weight'] : null,
-			'--wsx-reg-description-color'                => isset( $RegistrationHeaderStyle['description']['color'] ) ? $RegistrationHeaderStyle['description']['color'] : null,
+			'--wsx-reg-description-font-size'            => isset( $registration_header_style['description']['size'] ) ? $registration_header_style['description']['size'] . 'px' : null,
+			'--wsx-reg-description-case-transform'       => isset( $registration_header_style['description']['transform'] ) ? $registration_header_style['description']['transform'] : null,
+			'--wsx-reg-description-font-weight'          => isset( $registration_header_style['description']['weight'] ) ? $registration_header_style['description']['weight'] : null,
+			'--wsx-reg-description-color'                => isset( $registration_header_style['description']['color'] ) ? $registration_header_style['description']['color'] : null,
 		);
 
 		return $_style;
 	}
 
+	/**
+	 * Get CSS
+	 *
+	 * @param  mixed $vars Variables.
+	 * @return string CSS.
+	 * @since 1.0.0
+	 */
 	private function get_vars_css( $vars ) {
 
 		$result = '';
@@ -1485,41 +1560,48 @@ class WHOLESALEX_Shortcodes {
 		return $result;
 	}
 
+	/**
+	 * Check Depends
+	 *
+	 * @param  mixed $field Variables.
+	 * @return string CSS.
+	 * @since 1.0.0
+	 */
 	public function check_depends( $field ) {
-		$excludeString = '';
+		$exclude_string = '';
 		if ( isset( $field['excludeRoles'] ) && ! empty( $field['excludeRoles'] ) && is_array( $field['excludeRoles'] ) ) {
 			foreach ( $field['excludeRoles'] as $role ) {
-				$excludeString .= $role['value'] . ' ';
+				$exclude_string .= $role['value'] . ' ';
 			}
 		}
-		return $excludeString;
+		return $exclude_string;
 	}
 
 	/**
 	 * Render Term & Condition Field
 	 *
-	 * @param [array] $field
-	 * @param [bool] $isLabelHide
+	 * @param array $field Field Array.
+	 * @param bool  $is_label_hide Is Label Hide.
 	 * @return void
 	 */
-	public function render_term_condition_field( $field, $isLabelHide ) {
+	public function render_term_condition_field( $field, $is_label_hide ) {
 		?>
 		<div class="wsx-form-field wsx-form-checkbox">
-			<?php 
-			$term_link = '';
+			<?php
+			$term_link        = '';
 			$term_link_markup = '';
 			if ( isset( $field['term_link'] ) && $field['term_link'] ) {
 				$term_link = $field['term_link'];
 			}
-			if ( !empty( $term_link ) && isset( $field['default_text'] ) && $field['default_text'] ) {
+			if ( ! empty( $term_link ) && isset( $field['default_text'] ) && $field['default_text'] ) {
 				preg_match_all( '/\{([^}]*)\}/', $field['default_text'], $matches );
-				if ( !empty( $matches[1] ) ) {
-					$term_link = sanitize_url( $term_link );
-					$found = false;
+				if ( ! empty( $matches[1] ) ) {
+					$term_link        = sanitize_url( $term_link );
+					$found            = false;
 					$term_link_markup = preg_replace_callback(
 						'/\{([^}]*)\}/',
-						function( $match ) use (  $term_link, &$found) {
-							if (!$found) {
+						function ( $match ) use ( $term_link, &$found ) {
+							if ( ! $found ) {
 								$found = true;
 								return '<a class="wsx-link" href="' . $term_link . '">' . $match[1] . '</a>';
 							}
@@ -1528,13 +1610,13 @@ class WHOLESALEX_Shortcodes {
 						$field['default_text']
 					);
 				} else {
-					$term_link_markup = str_replace( ['{', '}'], '', $field['default_text']) ;
+					$term_link_markup = str_replace( array( '{', '}' ), '', $field['default_text'] );
 				}
 			} else {
-				$term_link_markup = str_replace( ['{', '}'], '', $field['default_text'] );
+				$term_link_markup = str_replace( array( '{', '}' ), '', $field['default_text'] );
 			}
-			
-			if( !$isLabelHide ) {
+
+			if ( ! $is_label_hide ) {
 				?>
 				<div class="wsx-field-heading">
 					<?php
@@ -1542,12 +1624,13 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
 							<?php echo esc_html( $field['label'] ); ?>
-							<?php 
-    	                     if(isset( $field['required'] ) && $field['required']) {
-    	                          ?>  
-    	                         <span aria-label="required">*</span>
-    	                        <?php 
-    	                        }  ?>
+							<?php
+							if ( isset( $field['required'] ) && $field['required'] ) {
+								?>
+																<span aria-label="required">*</span>
+								<?php
+							}
+							?>
 						</div>
 					<?php endif; ?>
 				</div>
@@ -1568,27 +1651,36 @@ class WHOLESALEX_Shortcodes {
 		<?php
 	}
 
-	public function generateFormField( $field, $isRolewise = false, $inputVariation = '', $is_only_b2b = false ) {
-		if(!isset($field['name'])) {
+	/**
+	 * Gemnerate Form Field
+	 *
+	 * @param  array  $field Field Array.
+	 * @param  bool   $is_role_wise Is Rolewise.
+	 * @param  string $input_variation Input Variation.
+	 * @param  bool   $is_only_b2b Is Only B2B.
+	 * @return array Role Field.
+	 */
+	public function generate_form_field( $field, $is_role_wise = false, $input_variation = '', $is_only_b2b = false ) {
+		if ( ! isset( $field['name'] ) ) {
 			return;
 		}
-		if ( $isRolewise && 'wholesalex_registration_role' == $field['name'] ) {
+		if ( $is_role_wise && 'wholesalex_registration_role' === $field['name'] ) {
 			return;
 		}
 		$exclude = $this->check_depends( $field );
 
-		if ( $isRolewise ) {
-			$excludeRoles = explode( ' ', $exclude );
-			if ( in_array( $isRolewise, $excludeRoles ) ) {
+		if ( $is_role_wise ) {
+			$exclude_roles = explode( ' ', $exclude );
+			if ( in_array( $is_role_wise, $exclude_roles, true ) ) {
 				return;
 			}
 		}
-		if ( ( ! $isRolewise || $is_only_b2b ) && $field['type'] == 'select' && $field['name'] === 'wholesalex_registration_role' ){
-			$field['option'] = $this->getSelectRoleField( $is_only_b2b )['columns'][0]['option'];
+		if ( ( ! $is_role_wise || $is_only_b2b ) && 'select' === $field['type'] && 'wholesalex_registration_role' === $field['name'] ) {
+			$field['option'] = $this->get_select_role_field( $is_only_b2b )['columns'][0]['option'];
 		}
-		$isLabelHide = isset($field['isLabelHide']) && $field['isLabelHide'];
+		$is_label_hide = isset( $field['isLabelHide'] ) && $field['isLabelHide'];
 
-		switch ( $inputVariation ) {
+		switch ( $input_variation ) {
 			case 'variation_1':
 			case 'variation_3':
 				switch ( $field['type'] ) {
@@ -1599,7 +1691,7 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div  class="wsx-form-field">
 							<?php
-							if(!$isLabelHide) {
+							if ( ! $is_label_hide ) {
 								?>
 								<div class="wsx-field-heading">
 								<?php
@@ -1607,12 +1699,13 @@ class WHOLESALEX_Shortcodes {
 									?>
 									<label class='wsx-label wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
 										<?php echo esc_html( $field['label'] ); ?>
-										<?php 
-                                         if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+										<?php
+										if ( isset( $field['required'] ) && $field['required'] ) {
+											?>
+												<span aria-label="required">*</span>
+											<?php
+										}
+										?>
 									</label>
 								<?php endif; ?>
 								</div>
@@ -1638,7 +1731,7 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div class="wsx-form-field">
 							<?php
-							if(!$isLabelHide) {
+							if ( ! $is_label_hide ) {
 								?>
 									<div class="wsx-field-heading">
 									<?php
@@ -1646,12 +1739,13 @@ class WHOLESALEX_Shortcodes {
 										?>
 										<label class='wsx-label wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
 											<?php echo esc_html( $field['label'] ); ?>
-											<?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+											<?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+													<span aria-label="required">*</span>
+												<?php
+											}
+											?>
 										</label>
 									<?php endif; ?>
 								</div>
@@ -1679,8 +1773,8 @@ class WHOLESALEX_Shortcodes {
 					case 'checkbox':
 						?>
 						<div class="wsx-form-field wsx-form-checkbox">
-							<?php 
-							if(!$isLabelHide) {
+							<?php
+							if ( ! $is_label_hide ) {
 								?>
 								<div class="wsx-field-heading">
 									<?php
@@ -1688,12 +1782,13 @@ class WHOLESALEX_Shortcodes {
 										?>
 										<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
 											<?php echo esc_html( $field['label'] ); ?>
-											<?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+											<?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+													<span aria-label="required">*</span>
+												<?php
+											}
+											?>
 										</div>
 									<?php endif; ?>
 								</div>
@@ -1714,18 +1809,18 @@ class WHOLESALEX_Shortcodes {
 								<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
 							<?php endif; ?>
 						</div>
-												<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
+							<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
 						<?php
 						break;
 					case 'termCondition':
-						$this->render_term_condition_field( $field, $isLabelHide );
+						$this->render_term_condition_field( $field, $is_label_hide );
 						break;
 
 					case 'radio':
 						?>
 						<div class="wsx-form-field wsx-field-radio">
-							<?php 
-							if(!$isLabelHide) {
+							<?php
+							if ( ! $is_label_hide ) {
 								?>
 								<div class="wsx-field-heading">
 								<?php
@@ -1733,19 +1828,20 @@ class WHOLESALEX_Shortcodes {
 									?>
 									<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
 										<?php echo esc_html( $field['label'] ); ?>
-										<?php 
-                                         if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+										<?php
+										if ( isset( $field['required'] ) && $field['required'] ) {
+											?>
+												<span aria-label="required">*</span>
+											<?php
+										}
+										?>
 									</div>
 								<?php endif; ?>
 								</div>
 
 								<?php
 							}
-							
+
 							?>
 							
 							<div class="wsx-field-content">
@@ -1760,7 +1856,7 @@ class WHOLESALEX_Shortcodes {
 									<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
 								<?php endif; ?>
 						</div>
-												<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
+							<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
 						<?php
 						break;
 
@@ -1768,25 +1864,26 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div class="wsx-form-field wsx-form-file">
 							<?php
-								if(!$isLabelHide) {
-									?>
+							if ( ! $is_label_hide ) {
+								?>
 									<div class="wsx-field-heading">
-										<?php
-										if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) :
-											?>
+									<?php
+									if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) :
+										?>
 											<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
-												<?php echo esc_html( $field['label'] ); ?>
-												<?php 
-                                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+											<?php echo esc_html( $field['label'] ); ?>
+											<?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+													<span aria-label="required">*</span>
+												<?php
+											}
+											?>
 											</div>
 										<?php endif; ?>
 									</div>
 									<?php
-								}
+							}
 							?>
 							
 							<label class="wsx-label wsx-field-content">
@@ -1805,7 +1902,7 @@ class WHOLESALEX_Shortcodes {
 								<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
 							<?php endif; ?>
 						</div>
-												<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
+							<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
 						<?php
 						break;
 
@@ -1813,7 +1910,7 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div class="wsx-form-field">
 							<?php
-							if(!$isLabelHide) {
+							if ( ! $is_label_hide ) {
 								?>
 									<div class="wsx-field-heading">
 										<?php
@@ -1821,18 +1918,19 @@ class WHOLESALEX_Shortcodes {
 											?>
 											<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
 												<?php echo esc_html( $field['label'] ); ?>
-												<?php 
-                                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+												<?php
+												if ( isset( $field['required'] ) && $field['required'] ) {
+													?>
+														<span aria-label="required">*</span>
+													<?php
+												}
+												?>
 											</label>
 										<?php endif; ?>
 									</div>
 								<?php
 							}
-							
+
 							?>
 							
 							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type='tel' name="<?php echo esc_attr( $field['name'] ); ?>"   placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
@@ -1852,7 +1950,7 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div class="wsx-form-field">
 							<?php
-							if(!$isLabelHide) {
+							if ( ! $is_label_hide ) {
 								?>
 								<div class="wsx-field-heading">
 									<?php
@@ -1860,12 +1958,13 @@ class WHOLESALEX_Shortcodes {
 										?>
 										<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
 											<?php echo esc_html( $field['label'] ); ?>
-											<?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+											<?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+														<span aria-label="required">*</span>
+												<?php
+											}
+											?>
 										</label>
 									<?php endif; ?>
 								</div>
@@ -1877,7 +1976,7 @@ class WHOLESALEX_Shortcodes {
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
 						<?php endif; ?>
-												<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
+								<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
 						<?php
 						break;
 
@@ -1885,26 +1984,27 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div class="wsx-form-field">
 							<?php
-								if(!$isLabelHide) {
-									?>
+							if ( ! $is_label_hide ) {
+								?>
 									<div class="wsx-field-heading">
-										<?php
-										if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) :
-											?>
+									<?php
+									if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) :
+										?>
 											<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
-												<?php echo esc_html( $field['label'] ); ?>
-												<?php 
-                                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+											<?php echo esc_html( $field['label'] ); ?>
+											<?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+													<span aria-label="required">*</span>
+												<?php
+											}
+											?>
 											</label>
 										<?php endif; ?>
 									</div>
 									<?php
-								}
-							
+							}
+
 							?>
 							
 							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type='password' name="<?php echo esc_attr( $field['name'] ); ?>"  minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>"  placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
@@ -1912,33 +2012,34 @@ class WHOLESALEX_Shortcodes {
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
 						<?php endif; ?>
-												<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
+							<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
 						<?php
 						break;
 
 					case 'textarea':
 						?>
 						<div class="wsx-form-field">
-							<?php 
-								if(!$isLabelHide) {
-									?>
+							<?php
+							if ( ! $is_label_hide ) {
+								?>
 									<div class="wsx-field-heading">
-										<?php
-										if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) :
-											?>
+									<?php
+									if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) :
+										?>
 											<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
-												<?php echo esc_html( $field['label'] ); ?>
-												<?php 
-                                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+											<?php echo esc_html( $field['label'] ); ?>
+											<?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+													<span aria-label="required">*</span>
+												<?php
+											}
+											?>
 											</label>
 										<?php endif; ?>
 									</div>
 									<?php
-								}
+							}
 							?>
 							
 							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>"></textarea>
@@ -1965,19 +2066,22 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div class="wsx-form-field wsx-outline-focus">
 							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
-							<div class='wsx-form-label wsx-clone-label'><?php echo esc_html( $field['label'] ); ?> <?php 
-                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+							<div class='wsx-form-label wsx-clone-label'><?php echo esc_html( $field['label'] ); ?> <?php
+							if ( isset( $field['required'] ) && $field['required'] ) {
+								?>
+									<span aria-label="required">*</span>
+								<?php
+							}
+							?>
+							</div>
 							<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
-								<?php echo esc_html( $field['label'] ); ?> <?php 
-                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+								<?php echo esc_html( $field['label'] ); ?> <?php
+								if ( isset( $field['required'] ) && $field['required'] ) {
+									?>
+										<span aria-label="required">*</span>
+									<?php
+								}
+								?>
 							</label>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
@@ -1993,20 +2097,23 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div class="wsx-form-field wsx-outline-focus">
 							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-input wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
-							<div class='wsx-form-label wsx-clone-label'><?php echo esc_html( $field['label'] ); ?> <?php 
-                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+							<div class='wsx-form-label wsx-clone-label'><?php echo esc_html( $field['label'] ); ?> <?php
+							if ( isset( $field['required'] ) && $field['required'] ) {
+								?>
+									<span aria-label="required">*</span>
+								<?php
+							}
+							?>
+							</div>
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 								<label class="wsx-label wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>">
-									<?php echo esc_html( $field['label'] ); ?> <?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+									<?php echo esc_html( $field['label'] ); ?> <?php
+									if ( isset( $field['required'] ) && $field['required'] ) {
+										?>
+											<span aria-label="required">*</span>
+										<?php
+									}
+									?>
 								</label>
 							<?php endif; ?>
 						</div>
@@ -2023,19 +2130,22 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<div class="wsx-form-field wsx-outline-focus wsx-form-textarea">
 							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>"></textarea>
-							<div class='wsx-form-label wsx-clone-label'><?php echo esc_html( $field['label'] ); ?> <?php 
-                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+							<div class='wsx-form-label wsx-clone-label'><?php echo esc_html( $field['label'] ); ?> <?php
+							if ( isset( $field['required'] ) && $field['required'] ) {
+								?>
+									<span aria-label="required">*</span>
+								<?php
+							}
+							?>
+							</div>
 							<label class="wsx-label wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>">
-								<?php echo esc_html( $field['label'] ); ?> <?php 
-                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+								<?php echo esc_html( $field['label'] ); ?> <?php
+								if ( isset( $field['required'] ) && $field['required'] ) {
+									?>
+										<span aria-label="required">*</span>
+									<?php
+								}
+								?>
 							</label>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
@@ -2053,20 +2163,24 @@ class WHOLESALEX_Shortcodes {
 							<label class="wsx-label wsx-field-content" for="<?php echo esc_attr( $field['name'] ); ?>">
 								<input class="wsx-input" type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
 									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-										<div class="wsx-form-label wsx-clone-label"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+										<div class="wsx-form-label wsx-clone-label"><?php echo esc_html( $field['label'] ); ?> <?php
+										if ( isset( $field['required'] ) && $field['required'] ) {
+											?>
+												<span aria-label="required">*</span>
+											<?php
+										}
+										?>
+												</div>
 									<?php endif; ?>
 									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-										<div class="wsx-form-label"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+										<div class="wsx-form-label"><?php echo esc_html( $field['label'] ); ?> <?php
+										if ( isset( $field['required'] ) && $field['required'] ) {
+											?>
+												<span aria-label="required">*</span>
+											<?php
+										}
+										?>
+												</div>
 									<?php endif; ?>
 									<div class="wsx-file-label">
 										<span>
@@ -2098,19 +2212,23 @@ class WHOLESALEX_Shortcodes {
 									<option value="<?php echo esc_attr( $option['value'] ); ?>"><?php echo esc_html( $option['name'] ); ?></option>
 								<?php endforeach; ?>
 							</select>
-							<div class='wsx-form-label wsx-clone-label'><?php echo esc_html( $field['label'] ); ?> <?php 
-                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+							<div class='wsx-form-label wsx-clone-label'><?php echo esc_html( $field['label'] ); ?> <?php
+							if ( isset( $field['required'] ) && $field['required'] ) {
+								?>
+									<span aria-label="required">*</span>
+								<?php
+							}
+							?>
+							</div>
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-								<label class="wsx-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></label>
+								<label class="wsx-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?> <?php
+								if ( isset( $field['required'] ) && $field['required'] ) {
+									?>
+										<span aria-label="required">*</span>
+									<?php
+								}
+								?>
+								</label>
 							<?php endif; ?>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
@@ -2127,21 +2245,23 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						<div class="wsx-form-field wsx-form-checkbox">
 							<?php
-								if(!$isLabelHide) {
-									?>
+							if ( ! $is_label_hide ) {
+								?>
 									<div class="wsx-field-heading">
-										<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-											<div class='wsx-form-label'><?php echo esc_html( $field['label'] ); ?> <?php 
-                                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
+											<div class='wsx-form-label'><?php echo esc_html( $field['label'] ); ?> <?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+													<span aria-label="required">*</span>
+												<?php
+											}
+											?>
+												</div>
 										<?php endif; ?>
 										
 									</div>
 									<?php
-								}
+							}
 							?>
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
@@ -2161,28 +2281,30 @@ class WHOLESALEX_Shortcodes {
 						<?php
 						break;
 					case 'termCondition':
-						$this->render_term_condition_field( $field, $isLabelHide );
+						$this->render_term_condition_field( $field, $is_label_hide );
 						break;
 					case 'radio':
 						?>
 						<!-- wsx-form-field--focused -->
 						<div class="wsx-form-field wsx-field-radio">
-							<?php 
-								if(!$isLabelHide) {
-									?>
+							<?php
+							if ( ! $is_label_hide ) {
+								?>
 									<div class="wsx-field-heading">
-										<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-											<div class='wsx-form-label'><?php echo esc_html( $field['label'] ); ?> <?php 
-                                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
+											<div class='wsx-form-label'><?php echo esc_html( $field['label'] ); ?> <?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+													<span aria-label="required">*</span>
+												<?php
+											}
+											?>
+												</div>
 										<?php endif; ?>
 										
 									</div>
 									<?php
-								}
+							}
 							?>
 							
 							<div class="wsx-field-content">
@@ -2207,7 +2329,6 @@ class WHOLESALEX_Shortcodes {
 						break;
 				}
 				break;
-				break;
 			case 'variation_4':
 				switch ( $field['type'] ) {
 					case 'text':
@@ -2222,12 +2343,13 @@ class WHOLESALEX_Shortcodes {
 						<div class="wsx-form-field wsx-outline-focus">
 							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>" />
 							<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
-								<?php echo esc_html( $field['label'] ); ?> <?php 
-                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+								<?php echo esc_html( $field['label'] ); ?> <?php
+								if ( isset( $field['required'] ) && $field['required'] ) {
+									?>
+																								<span aria-label="required">*</span>
+												<?php
+								}
+								?>
 							</label>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
@@ -2247,12 +2369,13 @@ class WHOLESALEX_Shortcodes {
 							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-input wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 								<div  class="wsx-form-label">
-									<?php echo esc_html( $field['label'] ); ?> <?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+									<?php echo esc_html( $field['label'] ); ?> <?php
+									if ( isset( $field['required'] ) && $field['required'] ) {
+										?>
+																								<span aria-label="required">*</span>
+												<?php
+									}
+									?>
 								</div>
 							<?php endif; ?>
 						</label>
@@ -2270,12 +2393,14 @@ class WHOLESALEX_Shortcodes {
 						<div class="wsx-form-field wsx-outline-focus wsx-form-textarea">
 							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea"  name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"></textarea>
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-								<label class="wsx-label wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></label>
+								<label class="wsx-label wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php
+								if ( isset( $field['required'] ) && $field['required'] ) {
+									?>
+										<span aria-label="required">*</span>
+									<?php
+								}
+								?>
+								</label>
 							<?php endif; ?>
 						</div>    
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
@@ -2293,12 +2418,13 @@ class WHOLESALEX_Shortcodes {
 						<div class="wsx-form-field wsx-form-file">
 						<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 								<div  class="wsx-form-label">
-									<?php echo esc_html( $field['label'] ); ?> <?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+									<?php echo esc_html( $field['label'] ); ?> <?php
+									if ( isset( $field['required'] ) && $field['required'] ) {
+										?>
+											<span aria-label="required">*</span>
+										<?php
+									}
+									?>
 								</div>
 							<?php endif; ?>
 						</label>
@@ -2335,12 +2461,14 @@ class WHOLESALEX_Shortcodes {
 								<?php endforeach; ?>
 							</select>
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-								<label class="wsx-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></label>
+								<label class="wsx-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?> <?php
+								if ( isset( $field['required'] ) && $field['required'] ) {
+									?>
+																							<span aria-label="required">*</span>
+											<?php
+								}
+								?>
+												</label>
 							<?php endif; ?>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
@@ -2356,22 +2484,25 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<!-- wsx-form-field--focused -->
 						<div class="wsx-form-field wsx-form-checkbox">
-							<?php 
-								if(!$isLabelHide) {
-									?>
+							<?php
+							if ( ! $is_label_hide ) {
+								?>
 									<div class="wsx-field-heading">
-									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-										<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?><?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+								<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
+										<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>
+											<?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+													<span aria-label="required">*</span>
+												<?php
+											}
+											?>
+										</div>
 									<?php endif; ?>
 								
 									</div>
 									<?php
-								}
+							}
 							?>
 							
 							<div class="wsx-field-content">
@@ -2393,7 +2524,7 @@ class WHOLESALEX_Shortcodes {
 						break;
 
 					case 'termCondition':
-						$this->render_term_condition_field( $field, $isLabelHide );
+						$this->render_term_condition_field( $field, $is_label_hide );
 						break;
 
 					case 'radio':
@@ -2401,22 +2532,25 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						<div class="wsx-form-field wsx-field-radio">
 							<?php
-							if(!$isLabelHide) {
+							if ( ! $is_label_hide ) {
 								?>
 								<div class="wsx-field-heading">
 									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-										<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?><?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+										<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>
+											<?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+													<span aria-label="required">*</span>
+												<?php
+											}
+											?>
+										</div>
 									<?php endif; ?>
 									
 								</div>
 								<?php
 							}
-							
+
 							?>
 							
 							<div class="wsx-field-content">
@@ -2455,12 +2589,13 @@ class WHOLESALEX_Shortcodes {
 						<div class="wsx-form-field wsx-outline-focus">
 							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>" />
 							<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
-								<?php echo esc_html( $field['label'] ); ?> <?php 
-                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+								<?php echo esc_html( $field['label'] ); ?> <?php
+								if ( isset( $field['required'] ) && $field['required'] ) {
+									?>
+										<span aria-label="required">*</span>
+									<?php
+								}
+								?>
 							</label>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
@@ -2480,12 +2615,13 @@ class WHOLESALEX_Shortcodes {
 							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-input wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 								<div  class="wsx-form-label">
-									<?php echo esc_html( $field['label'] ); ?> <?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+									<?php echo esc_html( $field['label'] ); ?> <?php
+									if ( isset( $field['required'] ) && $field['required'] ) {
+										?>
+											<span aria-label="required">*</span>
+										<?php
+									}
+									?>
 								</div>
 							<?php endif; ?>
 						</label>
@@ -2505,12 +2641,14 @@ class WHOLESALEX_Shortcodes {
 						<div class="wsx-form-field wsx-outline-focus wsx-form-textarea">
 							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea"  name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"></textarea>
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-								<label class="wsx-label wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></label>
+								<label class="wsx-label wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php
+								if ( isset( $field['required'] ) && $field['required'] ) {
+									?>
+										<span aria-label="required">*</span>
+									<?php
+								}
+								?>
+								</label>
 							<?php endif; ?>
 						</div>    
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
@@ -2527,16 +2665,17 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						<div class="wsx-form-field wsx-form-file">
 							<?php
-								if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) :
-									?>
+							if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) :
+								?>
 									<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
-										<?php echo esc_html( $field['label'] ); ?>
-										<?php 
-                                         if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+									<?php echo esc_html( $field['label'] ); ?>
+									<?php
+									if ( isset( $field['required'] ) && $field['required'] ) {
+										?>
+											<span aria-label="required">*</span>
+										<?php
+									}
+									?>
 									</div>
 							<?php endif; ?>
 							<label class="wsx-label wsx-field-content" for="<?php echo esc_attr( $field['name'] ); ?>">
@@ -2572,12 +2711,15 @@ class WHOLESALEX_Shortcodes {
 								<?php endforeach; ?>
 							</select>
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-								<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-label"><?php echo esc_html( $field['label'] ); ?><?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></label>
+								<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-label"><?php echo esc_html( $field['label'] ); ?>
+									<?php
+									if ( isset( $field['required'] ) && $field['required'] ) {
+										?>
+														<span aria-label="required">*</span>
+										<?php
+									}
+									?>
+								</label>
 							<?php endif; ?>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
@@ -2594,22 +2736,25 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						<div class="wsx-form-field wsx-form-checkbox">
 							<?php
-								if(!$isLabelHide) {
-									?>
+							if ( ! $is_label_hide ) {
+								?>
 									<div class="wsx-field-heading">
-										<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-											<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?><?php 
-                                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
+											<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>
+												<?php
+												if ( isset( $field['required'] ) && $field['required'] ) {
+													?>
+													<span aria-label="required">*</span>
+													<?php
+												}
+												?>
+											</div>
 										<?php endif; ?>
 										
 									</div>
 									<?php
-								}
-							
+							}
+
 							?>
 							
 							<div class="wsx-field-content">
@@ -2631,7 +2776,7 @@ class WHOLESALEX_Shortcodes {
 						break;
 
 					case 'termCondition':
-						$this->render_term_condition_field( $field, $isLabelHide );
+						$this->render_term_condition_field( $field, $is_label_hide );
 						break;
 
 					case 'radio':
@@ -2639,22 +2784,25 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						<div class="wsx-form-field wsx-field-radio">
 							<?php
-							if(!$isLabelHide) {
+							if ( ! $is_label_hide ) {
 								?>
 								<div class="wsx-field-heading">
 									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-										<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?><?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+										<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>
+											<?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+													<span aria-label="required">*</span>
+												<?php
+											}
+											?>
+										</div>
 									<?php endif; ?>
 									
 								</div>
 								<?php
 							}
-							
+
 							?>
 							
 							<div class="wsx-field-content">
@@ -2690,7 +2838,12 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus">
-							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo esc_attr($field['label']); echo isset( $field['required'] ) && $field['required'] ? '*' : '';  ?>"  />
+							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" placeholder="
+								<?php
+								echo esc_attr( $field['label'] );
+								echo isset( $field['required'] ) && $field['required'] ? '*' : '';
+								?>
+							"  />
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?>  </span>
@@ -2705,23 +2858,24 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<!-- wsx-form-field--focused -->
 						<?php
-							if(!$isLabelHide) {
-								?>
+						if ( ! $is_label_hide ) {
+							?>
 								<div class="wsx-field-heading">
-									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
+								<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 										<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
-											<?php echo esc_html( $field['label'] ); ?> <?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+											<?php echo esc_html( $field['label'] ); ?> <?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+													<span aria-label="required">*</span>
+												<?php
+											}
+											?>
 										</label>
 									<?php endif; ?>
 									
 								</div>
 								<?php
-							}
+						}
 						?>
 						<div class="wsx-form-field wsx-outline-focus wsx-form-date">
 							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  />
@@ -2740,7 +2894,12 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus">
-							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-input wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo esc_attr($field['label']); echo isset( $field['required'] ) && $field['required'] ? '*' : '';  ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
+							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-input wsx-form-field__input" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="
+								<?php
+								echo esc_attr( $field['label'] );
+								echo isset( $field['required'] ) && $field['required'] ? '*' : '';
+								?>
+							"  name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" />
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -2756,7 +2915,12 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						
 						<div class="wsx-form-field wsx-outline-focus wsx-form-textarea">
-							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="<?php echo esc_attr($field['label']); echo isset( $field['required'] ) && $field['required'] ? '*' : '';  ?>"></textarea>
+							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="
+								<?php
+									echo esc_attr( $field['label'] );
+									echo isset( $field['required'] ) && $field['required'] ? '*' : '';
+								?>
+							"></textarea>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -2774,12 +2938,13 @@ class WHOLESALEX_Shortcodes {
 								<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 								<div class="wsx-field-heading">
 									<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
-										<?php echo esc_html( $field['label'] ); ?> <?php 
-                                         if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+										<?php echo esc_html( $field['label'] ); ?> <?php
+										if ( isset( $field['required'] ) && $field['required'] ) {
+											?>
+												<span aria-label="required">*</span>
+											<?php
+										}
+										?>
 									</label>
 								</div>
 							<?php endif; ?>
@@ -2809,24 +2974,25 @@ class WHOLESALEX_Shortcodes {
 						?>
 						<!-- wsx-form-field--focused -->
 						<?php
-						if(!$isLabelHide) {
+						if ( ! $is_label_hide ) {
 							?>
 							<div class="wsx-field-heading">
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 								<div class="wsx-form-label">
-									<?php echo esc_html( $field['label'] ); ?> <?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+									<?php echo esc_html( $field['label'] ); ?> <?php
+									if ( isset( $field['required'] ) && $field['required'] ) {
+										?>
+											<span aria-label="required">*</span>
+										<?php
+									}
+									?>
 								</div>
 							<?php endif; ?>
 							
 							</div>
 							<?php
 						}
-						
+
 						?>
 						
 						<div class="wsx-form-field wsx-outline-focus wsx-form-select">
@@ -2850,22 +3016,25 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						<div class="wsx-form-field wsx-form-checkbox">
 							<?php
-								if(!$isLabelHide) {
-									?>
+							if ( ! $is_label_hide ) {
+								?>
 									<div class="wsx-field-heading">
-										<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-											<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?><?php 
-                                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
+											<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>
+												<?php
+												if ( isset( $field['required'] ) && $field['required'] ) {
+													?>
+														<span aria-label="required">*</span>
+													<?php
+												}
+												?>
+											</div>
 										<?php endif; ?>
 										
 									</div>
 									<?php
-								}
-							
+							}
+
 							?>
 							
 							<div class="wsx-field-content">
@@ -2887,7 +3056,7 @@ class WHOLESALEX_Shortcodes {
 						break;
 
 					case 'termCondition':
-						$this->render_term_condition_field( $field, $isLabelHide );
+						$this->render_term_condition_field( $field, $is_label_hide );
 						break;
 
 					case 'radio':
@@ -2895,23 +3064,24 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						<div class="wsx-form-field wsx-field-radio">
 							<?php
-							if(!$isLabelHide) {
+							if ( ! $is_label_hide ) {
 								?>
 								<div class="wsx-field-heading">
 									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-										<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?><?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+										<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>
+											<?php
+											if ( isset( $field['required'] ) && $field['required'] ) {
+												?>
+														<span aria-label="required">*</span>
+												<?php
+											}
+											?>
+										</div>
 									<?php endif; ?>
 									
 								</div>
 								<?php
 							}
-							
-							
 							?>
 							
 							<div class="wsx-field-content">
@@ -2948,19 +3118,22 @@ class WHOLESALEX_Shortcodes {
 						<div class="wsx-form-field wsx-outline-focus wsx-formBuilder-input-width">
 							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" placeholder=" " />
 							<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
-								<?php echo esc_html( $field['label'] ); ?> <?php 
-                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+								<?php echo esc_html( $field['label'] ); ?> <?php
+								if ( isset( $field['required'] ) && $field['required'] ) {
+									?>
+										<span aria-label="required">*</span>
+									<?php
+								}
+								?>
 							</label>
-							<div class="wsx-clone-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?> <?php 
-                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+							<div class="wsx-clone-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?> <?php
+							if ( isset( $field['required'] ) && $field['required'] ) {
+								?>
+									<span aria-label="required">*</span>
+								<?php
+							}
+							?>
+							</div>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -2976,20 +3149,23 @@ class WHOLESALEX_Shortcodes {
 						<div class="wsx-form-field wsx-outline-focus wsx-formBuilder-input-width">
 							<input type="<?php echo esc_attr( $field['type'] ); ?>" class="wsx-input wsx-form-field__input"  id="<?php echo esc_attr( $field['name'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>" placeholder=" " />
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-								<label  class="wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+								<label  class="wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php
+								if ( isset( $field['required'] ) && $field['required'] ) {
+									?>
+										<span aria-label="required">*</span>
+									<?php
+								}
+								?>
 								</label>
 							<?php endif; ?>
-							<div class="wsx-clone-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?> <?php 
-                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+							<div class="wsx-clone-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?> <?php
+							if ( isset( $field['required'] ) && $field['required'] ) {
+								?>
+									<span aria-label="required">*</span>
+								<?php
+							}
+							?>
+							</div>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -3005,12 +3181,13 @@ class WHOLESALEX_Shortcodes {
 						<div class="wsx-form-field wsx-outline-focus wsx-form-textarea wsx-formBuilder-input-width">
 							<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-form-field__textarea" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder=" "></textarea>
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-								<label class="wsx-label wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+								<label class="wsx-label wsx-form-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php
+								if ( isset( $field['required'] ) && $field['required'] ) {
+									?>
+										<span aria-label="required">*</span>
+									<?php
+								}
+								?>
 								</label>
 							<?php endif; ?>
 							<div class="wsx-clone-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?></div>
@@ -3029,20 +3206,24 @@ class WHOLESALEX_Shortcodes {
 							<label class="wsx-label wsx-field-content" for="<?php echo esc_attr( $field['name'] ); ?>">
 								<input class="wsx-input" type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" />
 									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-										<div class="wsx-form-label wsx-clone-label"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+										<div class="wsx-form-label wsx-clone-label"><?php echo esc_html( $field['label'] ); ?> <?php
+										if ( isset( $field['required'] ) && $field['required'] ) {
+											?>
+																							<span aria-label="required">*</span>
+												<?php
+										}
+										?>
+												</div>
 									<?php endif; ?>
 									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-										<div class="wsx-form-label"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+										<div class="wsx-form-label"><?php echo esc_html( $field['label'] ); ?> <?php
+										if ( isset( $field['required'] ) && $field['required'] ) {
+											?>
+																							<span aria-label="required">*</span>
+												<?php
+										}
+										?>
+												</div>
 									<?php endif; ?>
 								<div class="wsx-file-label">
 										<span>
@@ -3074,19 +3255,25 @@ class WHOLESALEX_Shortcodes {
 								<?php endforeach; ?>
 							</select>
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-								<label class="wsx-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?><?php 
-                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></label>
+								<label class="wsx-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?>
+									<?php
+									if ( isset( $field['required'] ) && $field['required'] ) {
+										?>
+											<span aria-label="required">*</span>
+										<?php
+									}
+									?>
+								</label>
 							<?php endif; ?>
-							<div class="wsx-clone-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?><?php 
-                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+							<div class="wsx-clone-label wsx-form-label"><?php echo esc_html( $field['label'] ); ?>
+								<?php
+								if ( isset( $field['required'] ) && $field['required'] ) {
+									?>
+											<span aria-label="required">*</span>
+									<?php
+								}
+								?>
+							</div>
 						</div>
 						<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
 							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
@@ -3102,7 +3289,7 @@ class WHOLESALEX_Shortcodes {
 						<!-- wsx-form-field--focused -->
 						<div class="wsx-form-field wsx-form-checkbox">
 							<?php
-							if(!$isLabelHide) {
+							if ( ! $is_label_hide ) {
 								?>
 								<div class="wsx-field-heading">
 									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
@@ -3112,8 +3299,7 @@ class WHOLESALEX_Shortcodes {
 
 								<?php
 							}
-							
-							
+
 							?>
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
@@ -3134,29 +3320,32 @@ class WHOLESALEX_Shortcodes {
 						break;
 
 					case 'termCondition':
-						$this->render_term_condition_field( $field, $isLabelHide );
+						$this->render_term_condition_field( $field, $is_label_hide );
 						break;
 
 					case 'radio':
 						?>
 						<div class="wsx-form-field wsx-field-radio">
 							<?php
-								if(!$isLabelHide) {
-									?>
+							if ( ! $is_label_hide ) {
+								?>
 									<div class="wsx-field-heading">
-										<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-											<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?><?php 
-                                                 if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
+											<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>
+												<?php
+												if ( isset( $field['required'] ) && $field['required'] ) {
+													?>
+													<span aria-label="required">*</span>
+													<?php
+												}
+												?>
+											</div>
 										<?php endif; ?>
 										
 									</div>
 									<?php
-								}							
-							?>							
+							}
+							?>
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<div class="wholesalex-field-wrap">
@@ -3191,12 +3380,13 @@ class WHOLESALEX_Shortcodes {
 							<label class="wsx-label wsx-form-field wsx-outline-focus wsx-formBuilder-input-width">
 								<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
 										<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
-										<?php echo esc_html( $field['label'] ); ?> <?php 
-                                         if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?>
+										<?php echo esc_html( $field['label'] ); ?> <?php
+										if ( isset( $field['required'] ) && $field['required'] ) {
+											?>
+												<span aria-label="required">*</span>
+											<?php
+										}
+										?>
 									</div>
 								<?php endif; ?>
 								<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>" />
@@ -3214,12 +3404,15 @@ class WHOLESALEX_Shortcodes {
 						?>
 							<div class="wsx-form-field wsx-outline-focus wsx-formBuilder-input-width">
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-									<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?><?php 
-                                         if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></label>
+									<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>
+										<?php
+										if ( isset( $field['required'] ) && $field['required'] ) {
+											?>
+										<span aria-label="required">*</span>
+											<?php
+										}
+										?>
+									</label>
 								<?php endif; ?>
 								<select class="wsx-select" name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>">
 								<?php foreach ( $field['option'] as $option ) : ?>
@@ -3240,21 +3433,24 @@ class WHOLESALEX_Shortcodes {
 						?>
 							<div class="wsx-form-field wsx-form-checkbox">
 								<?php
-									if(!$isLabelHide) {
-										?>
+								if ( ! $is_label_hide ) {
+									?>
 										<div class="wsx-field-heading">
-											<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-												<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?><?php 
-                                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+										<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
+												<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>
+													<?php
+													if ( isset( $field['required'] ) && $field['required'] ) {
+														?>
+															<span aria-label="required">*</span>
+														<?php
+													}
+													?>
+												</div>
 											<?php endif; ?>
 											
 										</div>
 										<?php
-									}
+								}
 								?>
 								<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
@@ -3275,7 +3471,7 @@ class WHOLESALEX_Shortcodes {
 						break;
 
 					case 'termCondition':
-						$this->render_term_condition_field( $field, $isLabelHide );
+						$this->render_term_condition_field( $field, $is_label_hide );
 						break;
 
 					case 'radio':
@@ -3283,24 +3479,26 @@ class WHOLESALEX_Shortcodes {
 							<!-- wsx-form-field--focused -->
 							<div class="wsx-form-field wsx-field-radio">
 								<?php
-									if(!$isLabelHide) {
-										?>
+								if ( ! $is_label_hide ) {
+									?>
 
 										<div class="wsx-field-heading">
-										<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-												<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?><?php 
-                                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></div>
+									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
+												<div class='wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>
+													<?php
+													if ( isset( $field['required'] ) && $field['required'] ) {
+														?>
+															<span aria-label="required">*</span>
+														<?php
+													}
+													?>
+												</div>
 											<?php endif; ?>
 										
 										</div>
 										<?php
+								}
 
-									}
-								
 								?>
 								
 								<div class="wsx-field-content">
@@ -3357,21 +3555,23 @@ class WHOLESALEX_Shortcodes {
 							<!-- wsx-form-field--focused -->
 							<div class="wsx-form-field">
 								<?php
-									if(!$isLabelHide) {
-										?>
+								if ( ! $is_label_hide ) {
+									?>
 										<div class="wsx-field-heading">
-										<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-												<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                                     if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></label>
+									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
+												<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php
+												if ( isset( $field['required'] ) && $field['required'] ) {
+													?>
+														<span aria-label="required">*</span>
+													<?php
+												}
+												?>
+												</label>
 											<?php endif; ?>
 										
 										</div>
 										<?php
-									}
+								}
 								?>
 								<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type='tel' name="<?php echo esc_attr( $field['name'] ); ?>"   />
 							</div>
@@ -3390,12 +3590,14 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-form-field wsx-outline-focus wsx-formBuilder-input-width">
 								<div class="wsx-field-heading wsx-outline-focus wsx-formBuilder-input-width">
 								<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-										<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                             if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></label>
+										<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php
+										if ( isset( $field['required'] ) && $field['required'] ) {
+											?>
+												<span aria-label="required">*</span>
+												<?php
+										}
+										?>
+												</label>
 									<?php endif; ?>
 								
 								</div>
@@ -3419,12 +3621,14 @@ class WHOLESALEX_Shortcodes {
 							
 							<div class="wsx-form-field wsx-outline-focus wsx-formBuilder-input-width">
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-									<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                         if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></label>
+									<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php
+									if ( isset( $field['required'] ) && $field['required'] ) {
+										?>
+											<span aria-label="required">*</span>
+										<?php
+									}
+									?>
+									</label>
 								<?php endif; ?>
 								<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type='password' name="<?php echo esc_attr( $field['name'] ); ?>"  minLength="<?php echo isset( $field['minLength'] ) ? esc_attr( $field['minLength'] ) : ''; ?>" maxLength="<?php echo isset( $field['maxLength'] ) ? esc_attr( $field['maxLength'] ) : ''; ?>" size="<?php echo isset( $field['size'] ) ? esc_attr( $field['size'] ) : ''; ?>"  placeholder="Type Password" />
 							</div>
@@ -3436,20 +3640,19 @@ class WHOLESALEX_Shortcodes {
 							<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
 							<?php
 						break;
-
 					case 'textarea':
 						?>
-
 							<!-- wsx-form-field--focused -->
-							
 							<div class="wsx-form-field wsx-outline-focus wsx-formBuilder-input-width">
 							<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-									<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php 
-                                         if(isset( $field['required'] ) && $field['required']) {
-                                                  ?>  
-                                                 <span aria-label="required">*</span>
-                                                <?php 
-                                                }  ?></label>
+									<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?> <?php
+									if ( isset( $field['required'] ) && $field['required'] ) {
+										?>
+											<span aria-label="required">*</span>
+										<?php
+									}
+									?>
+												</label>
 								<?php endif; ?>
 								<textarea class="wsx-textarea" id="<?php echo esc_attr( $field['name'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  rows="<?php echo isset( $field['rows'] ) ? esc_attr( $field['rows'] ) : ''; ?>" cols="<?php echo isset( $field['cols'] ) ? esc_attr( $field['cols'] ) : ''; ?>" placeholder="Write Message..."></textarea>
 							</div>
@@ -3460,8 +3663,8 @@ class WHOLESALEX_Shortcodes {
 							?>
 							<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
 							<?php
-
-						default:
+						break;
+					default:
 							// code...
 						break;
 				}
@@ -3471,7 +3674,6 @@ class WHOLESALEX_Shortcodes {
 				// code...
 				break;
 		}
-
 	}
 
 	/**
@@ -3488,31 +3690,25 @@ class WHOLESALEX_Shortcodes {
 		$__fields = $checkout->get_checkout_fields( 'billing' );
 		$__keys   = array_keys( $__fields );
 
-		$__custom_fields = array();
+		$__custom_fields    = array();
 		$__all_exclude_role = array();
 		if ( is_array( $custom_billing_fields ) ) {
 			foreach ( $custom_billing_fields as $value ) {
-				foreach ( $value['excludeRoles'] as $exclude_role){
+				foreach ( $value['excludeRoles'] as $exclude_role ) {
 					$__all_exclude_role[] = $exclude_role['value'];
 				}
 				if ( isset( $value['excludeRoles'] ) && is_array( $value['excludeRoles'] ) && in_array( $__role, $__all_exclude_role ) ) {
-					continue; // Exclude For this user
+					continue; // Exclude For this user.
 				}
 
 				if ( isset( $value['name'] ) && ! in_array( 'billing_' . $value['name'], $__keys, true ) ) {
 					$__default = '';
-					if ( isset( $value['enableForBillingForm'] ) && $value['enableForBillingForm'] ) {
-						// $__default = isset( $__current_user->$value['name'] ) ? $__current_user->$value['name'] : '';
-					}
 
 					if ( isset( $value['migratedFromOldBuilder'] ) && $value['migratedFromOldBuilder'] && ( ! isset( $value['custom_field'] ) || ! $value['custom_field'] ) ) {
-						// $selected = get_user_meta( $user->ID, $field['name'], true );
 						$__default = get_user_meta( get_current_user_id(), $value['name'], true );
 					}
 					if ( isset( $value['custom_field'] ) && $value['custom_field'] ) {
-						// $selected = get_user_meta( $user->ID, 'wholesalex_cf_' . $field['name'], true );
 						$__default = get_user_meta( get_current_user_id(), 'wholesalex_cf_' . $value['name'], true );
-
 					}
 
 					$__options = array();
@@ -3537,8 +3733,7 @@ class WHOLESALEX_Shortcodes {
 							),
 							$checkout->get_value( $value['name'] )
 						);
-					} else {
-						if ( 'file' != $value['type'] && 'checkbox' != $value['type'] ) {
+					} elseif ( 'file' !== $value['type'] && 'checkbox' !== $value['type'] ) {
 							woocommerce_form_field(
 								$value['name'],
 								array(
@@ -3551,27 +3746,27 @@ class WHOLESALEX_Shortcodes {
 								),
 								$checkout->get_value( $value['name'] )
 							);
-						} elseif ( 'checkbox' == $value['type'] ) {
-							if ( ! is_array( $__default ) ) {
-								$__default = array();
-							}
+					} elseif ( 'checkbox' === $value['type'] ) {
+						if ( ! is_array( $__default ) ) {
+							$__default = array();
+						}
 
-							?>
+						?>
 							<p class="form-row form-row-wise" id="<?php echo esc_attr( $value['name'] ); ?>"> 
 								<label class="wsx-label">
-									<?php echo esc_html( $value['label'] ); ?>
-									<?php
-									if ( isset( $value['isRequiredInBilling'] ) && $value['isRequiredInBilling'] ) {
-										 ?>
-                                         <span class="optional"><?php echo esc_html__( 'optional', 'woocommerce' ); ?></span>
-                                         <?php
-									}
+								<?php echo esc_html( $value['label'] ); ?>
+								<?php
+								if ( isset( $value['isRequiredInBilling'] ) && $value['isRequiredInBilling'] ) {
 									?>
+										<span class="optional"><?php echo esc_html__( 'optional', 'woocommerce' ); ?></span>
+										<?php
+								}
+								?>
 								</label>
 								<span class="woocommerce-input-wrapper">
-									<?php
-									foreach ( $value['option'] as $option ) :
-										?>
+								<?php
+								foreach ( $value['option'] as $option ) :
+									?>
 										<span>
 											<label class="wsx-label checkbox" for=<?php echo esc_attr( $option['value'] ); ?> >
                                             <input type="checkbox" class="input-checkbox" name="<?php echo esc_attr($option['name']); ?>" id="<?php echo esc_attr($option['name']); ?>" <?php checked( in_array( $option['value'], $__default ), 1, true ); //phpcs:ignore ?>>  <?php echo esc_html( $option['name'] ); ?> </label>
@@ -3579,11 +3774,11 @@ class WHOLESALEX_Shortcodes {
 
 										<?php
 									endforeach;
-									?>
+								?>
 								</span>
 							</p>
 							<?php
-						}
+
 					}
 
 					$__custom_fields[ $value['name'] ] = $value;
@@ -3604,31 +3799,29 @@ class WHOLESALEX_Shortcodes {
 	 * Validate Custom Fields on Checkout Page
 	 */
 	public function validate_custom_checkout_fields() {
-		// Verify nonce for security
+		// Verify nonce for security.
 		$nonce_value = wc_get_var( $_REQUEST['woocommerce-process-checkout-nonce'], wc_get_var( $_REQUEST['_wpnonce'], '' ) ); // phpcs:ignore
 		$nonce_value = sanitize_key( $nonce_value );
-	
+
 		if ( empty( $nonce_value ) || ! wp_verify_nonce( $nonce_value, 'woocommerce-process_checkout' ) ) {
 			return;
 		}
-	
-		// Sanitize post data
+
+		// Sanitize post data.
 		$post_data = wholesalex()->sanitize( $_POST ); // phpcs:ignore
 		$__user_id = get_current_user_id();
-	
-		// Fetch custom checkout fields
-		$__custom_fields = get_transient( 'wholesalex_custom_checkout_fields_' . $__user_id ); // Fixed typo in the transient key
+
+		// Fetch custom checkout fields.
+		$__custom_fields = get_transient( 'wholesalex_custom_checkout_fields_' . $__user_id ); // Fixed typo in the transient key.
 		if ( is_array( $__custom_fields ) && ! empty( $__custom_fields ) ) {
 			foreach ( $__custom_fields as $field ) {
-				// Skip file fields
+				// Skip file fields.
 				if ( 'file' === $field['type'] ) {
 					continue;
-				} else {
-					// Check if the field is required and missing
-					if ( isset( $field['isRequiredInBilling'] ) && $field['isRequiredInBilling'] && ( ! isset( $post_data[ $field['name'] ] ) || empty( $post_data[ $field['name'] ] ) ) ) {
-						/* translators: %s: Field Title. */
-						wc_add_notice( sprintf( '%s is Missing!', sanitize_text_field( $field['title'] ) ), 'error' ); // Changed 'title' to 'label'
-					}
+				} elseif ( isset( $field['isRequiredInBilling'] ) && $field['isRequiredInBilling'] && ( ! isset( $post_data[ $field['name'] ] ) || empty( $post_data[ $field['name'] ] ) ) ) {
+					// Check if the field is required and missing.
+					/* translators: %s: Field Title. */
+					wc_add_notice( sprintf( '%s is Missing!', sanitize_text_field( $field['title'] ) ), 'error' ); // Changed 'title' to 'label'.
 				}
 			}
 		}
@@ -3662,20 +3855,18 @@ class WHOLESALEX_Shortcodes {
 	 * @return void
 	 */
 	public function add_custom_fields_on_order_meta( $order_id ) {
-		// Get the current user ID
-		$__user_id = get_current_user_id();
-	
-		// Retrieve custom fields from global variables or other sources
+
+		// Retrieve custom fields from global variables or other sources.
 		$__custom_fields = isset( $GLOBALS['wholesalex_registration_fields']['billing_fields'] ) ? $GLOBALS['wholesalex_registration_fields']['billing_fields'] : array();
-	
-		// Check if custom fields exist and are an array
+
+		// Check if custom fields exist and are an array.
 		if ( ! empty( $__custom_fields ) && is_array( $__custom_fields ) ) {
 			foreach ( $__custom_fields as $field ) {
-				// Skip file type fields
+				// Skip file type fields.
 				if ( 'file' === $field['type'] ) {
 					continue;
 				}
-				// Check if the field data is posted and not empty, then sanitize and update post meta
+				// Check if the field data is posted and not empty, then sanitize and update post meta.
 				if ( isset( $_POST[ $field['name'] ] ) && ! empty( $_POST[ $field['name'] ] ) ) { // phpcs:ignore
 					$sanitized_value = $this->sanitize_field_data( $field, sanitize_text_field( $_POST[ $field['name'] ] ) );
 					update_post_meta( $order_id, 'wholesalex_cf_' . $field['name'], $sanitized_value );
@@ -3690,23 +3881,22 @@ class WHOLESALEX_Shortcodes {
 	 * @param string|int $order_id Order ID.
 	 * @return void
 	 */
-	public function show_custom_fields_value($order_id) {
-		// Ensure proper escaping and initialization
-		$__user_id = get_current_user_id();
-		$__custom_fields = isset($GLOBALS['wholesalex_registration_fields']['billing_fields']) 
-							? $GLOBALS['wholesalex_registration_fields']['billing_fields'] 
+	public function show_custom_fields_value( $order_id ) {
+		// Ensure proper escaping and initialization.
+		$__custom_fields = isset( $GLOBALS['wholesalex_registration_fields']['billing_fields'] )
+							? $GLOBALS['wholesalex_registration_fields']['billing_fields']
 							: array();
-	
-		if (is_array($__custom_fields)) {
+
+		if ( is_array( $__custom_fields ) ) {
 			echo '<div class="wholesalex_custom_fields">';
-			
-			foreach ($__custom_fields as $field) {
-				$__value = get_post_meta($order_id, 'wholesalex_cf_' . sanitize_key($field['name']), true);
-				if ($__value && !empty($__value)) {
-					echo '<label class="wsx-label">' . esc_html($field['label']) . '</label>: <strong>' . esc_html($__value) . '</strong><br />';
+
+			foreach ( $__custom_fields as $field ) {
+				$__value = get_post_meta( $order_id, 'wholesalex_cf_' . sanitize_key( $field['name'] ), true );
+				if ( $__value && ! empty( $__value ) ) {
+					echo '<label class="wsx-label">' . esc_html( $field['label'] ) . '</label>: <strong>' . esc_html( $__value ) . '</strong><br />';
 				}
 			}
-	
+
 			echo '</div>';
 		}
 	}
@@ -3718,26 +3908,26 @@ class WHOLESALEX_Shortcodes {
 	 * @param object $order Order Object.
 	 * @return void
 	 */
-	public function show_custom_fields_on_order_page($order) {
-		$order_id = $order->get_id();
-		$__user_id = get_current_user_id();
-		$__custom_fields = isset($GLOBALS['wholesalex_registration_fields']['billing_fields']) 
-							? $GLOBALS['wholesalex_registration_fields']['billing_fields'] 
+	public function show_custom_fields_on_order_page( $order ) {
+		$order_id        = $order->get_id();
+		$__user_id       = get_current_user_id();
+		$__custom_fields = isset( $GLOBALS['wholesalex_registration_fields']['billing_fields'] )
+							? $GLOBALS['wholesalex_registration_fields']['billing_fields']
 							: array();
-	
-		if (is_array($__custom_fields) && !empty($__custom_fields)) {
+
+		if ( is_array( $__custom_fields ) && ! empty( $__custom_fields ) ) {
 			echo '<div class="wholesalex_custom_fields">';
-			
-			foreach ($__custom_fields as $field) {
-				$__value = get_post_meta($order_id, 'wholesalex_cf_' . sanitize_key($field['name']), true);
-				if ($__value && !empty($__value)) {
+
+			foreach ( $__custom_fields as $field ) {
+				$__value = get_post_meta( $order_id, 'wholesalex_cf_' . sanitize_key( $field['name'] ), true );
+				if ( $__value && ! empty( $__value ) ) {
 					echo '<p class="form-field form-field-wide">';
-					echo '<strong>' . esc_html($field['label']) . ':</strong> ';
-					echo '<div>' . esc_html($__value) . '</div>';
+					echo '<strong>' . esc_html( $field['label'] ) . ':</strong> ';
+					echo '<div>' . esc_html( $__value ) . '</div>';
 					echo '</p>';
 				}
 			}
-	
+
 			echo '</div>';
 		}
 	}
@@ -3815,6 +4005,12 @@ class WHOLESALEX_Shortcodes {
 	}
 
 
+	/**
+	 * Process User login
+	 *
+	 * @return void
+	 * @throws \Exception Exception.
+	 */
 	public function process_login() {
 		if ( isset( $_POST['wholesalex-login-nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['wholesalex-login-nonce'] ), 'wholesalex-login' ) ) {
 			if ( isset( $_POST['username'], $_POST['password'] ) ) {
@@ -3887,10 +4083,7 @@ class WHOLESALEX_Shortcodes {
 						throw new \Exception();
 					} else {
 
-						
-
-
-						$data['redirect'] = wp_validate_redirect( apply_filters( 'woocommerce_login_redirect', wc_get_page_permalink( 'myaccount' ) , $user ), wc_get_page_permalink( 'myaccount' ) );
+						$data['redirect'] = wp_validate_redirect( apply_filters( 'woocommerce_login_redirect', wc_get_page_permalink( 'myaccount' ), $user ), wc_get_page_permalink( 'myaccount' ) );
 						wp_send_json_success( $data );
 					}
 				} catch ( \Exception $e ) {

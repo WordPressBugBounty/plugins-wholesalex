@@ -42,5 +42,4 @@ class WHOLESALEX_Email_Manager {
 		}
 		return $super_admin;
 	}
-
 }

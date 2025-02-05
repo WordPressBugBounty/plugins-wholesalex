@@ -91,7 +91,6 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/options/Addons.php';
 		require_once WHOLESALEX_PATH . 'includes/Deactive.php';
 
-		
 		new \WHOLESALEX\WHOLESALEX_Role();
 		new \WHOLESALEX\WHOLESALEX_Registration();
 		new \WHOLESALEX\WHOLESALEX_Dynamic_Rules();
@@ -115,15 +114,14 @@ class WholesaleX_Initialization {
 		new \WHOLESALEX\WHOLESALEX_Overview();
 
 		add_action( 'template_redirect', array( $this, 'wholesalex_process_user_email_confirmation' ) );
-
 	}
 
 
 	/**
 	 * Admin Enque Scripts
 	 */
-	public function admin_enqueue_scripts( ) {
-		$price_id = get_option('__wholesalex_price_id','');
+	public function admin_enqueue_scripts() {
+		$price_id = get_option( '__wholesalex_price_id', '' );
 		Scripts::register_backend_scripts();
 		Scripts::register_backend_style();
 
@@ -155,9 +153,9 @@ class WholesaleX_Initialization {
 					'plugin_name'         => wholesalex()->get_plugin_name(),
 					'whitelabel_enabled'  => 'yes' == wholesalex()->get_setting( 'wsx_addon_whitelabel' ) && function_exists( 'wholesalex_whitelabel_init' ),
 					'is_admin_interface'  => is_admin(),
-					'i18n'				  => array(
-						'smart_tags' => __('Available Smart Tags: ','wholesalex'),
-					)
+					'i18n'                => array(
+						'smart_tags' => __( 'Available Smart Tags: ', 'wholesalex' ),
+					),
 				)
 			)
 		);
@@ -170,17 +168,9 @@ class WholesaleX_Initialization {
 		Scripts::register_frontend_scripts();
 		Scripts::register_fronend_style();
 		wp_enqueue_style( 'wholesalex' );
-		
-		// if ( wp_style_is( 'wholesalex', 'enqueued' ) ) {
-		// 	$css = '.wholesalex-price-table table tbody td { background-color: inherit !important; }';
-		// 	wp_add_inline_style( 'wholesalex', $css );
-		// }
-
 		wp_enqueue_script( 'wholesalex' );
 
 		do_action( 'wholesalex_after_frontend_enqueue_scripts' );
-
-
 
 		wp_localize_script(
 			'wholesalex',
@@ -200,12 +190,12 @@ class WholesaleX_Initialization {
 					'logo_url'           => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/img/logo-option.svg' ),
 					'plugin_name'        => wholesalex()->get_plugin_name(),
 					'is_admin_interface' => is_admin(),
-					'i18n' => array(
-						'cannot_register_message_for_logged_in_user' => __('You cannot register while you are logged in.','wholesalex'),
-						'is_required' => __('is required','wholesalex'),
-						'register' => __('Register','wholesalex'),
-						
-					)
+					'i18n'               => array(
+						'cannot_register_message_for_logged_in_user' => __( 'You cannot register while you are logged in.', 'wholesalex' ),
+						'is_required' => __( 'is required', 'wholesalex' ),
+						'register'    => __( 'Register', 'wholesalex' ),
+
+					),
 
 				)
 			)
@@ -219,8 +209,8 @@ class WholesaleX_Initialization {
 
 		if ( isset( $_REQUEST['confirmation_code'],$_REQUEST['user_id'] ) ) { // @codingStandardsIgnoreLine.
 			$__user_id           = sanitize_text_field( $_REQUEST['user_id']  ); // @codingStandardsIgnoreLine.
-			$__confirmation_code = get_user_meta( $__user_id, '__wholesalex_email_confirmation_code', true );
-			$confirmation_status = get_user_meta( $__user_id, '__wholesalex_account_confirmed', true );
+			$__confirmation_code         = get_user_meta( $__user_id, '__wholesalex_email_confirmation_code', true );
+			$confirmation_status         = get_user_meta( $__user_id, '__wholesalex_account_confirmed', true );
             $requested_confirmation_code = sanitize_text_field($_REQUEST['confirmation_code']); // @codingStandardsIgnoreLine.
 
 			if ( $confirmation_status ) {
@@ -229,11 +219,11 @@ class WholesaleX_Initialization {
 				update_user_meta( $__user_id, '__wholesalex_account_confirmed', true );
 				update_user_meta( $__user_id, '__wholesalex_status', 'active' );
 
-                $__registration_role = get_user_meta( $__user_id, '__wholesalex_registration_role',true);
+				$__registration_role = get_user_meta( $__user_id, '__wholesalex_registration_role', true );
 
 				wholesalex()->change_role( $__user_id, $__registration_role );
 				wc_add_notice( __( '<strong>Success:</strong> Your account is successfully confirmed. ', 'wholesalex' ) );
-				// do_action( 'wholesalex_set_status_active', $__user_id, $__registration_role );
+				// do_action( 'wholesalex_set_status_active', $__user_id, $__registration_role );.
 				do_action( 'wholesalex_user_email_verified', $__user_id );
 			}
 		}
@@ -254,5 +244,4 @@ class WholesaleX_Initialization {
 		}
 		return $classes;
 	}
-
 }

@@ -69,12 +69,11 @@ class WholesaleX_Admin_New_User_Awating_Approval_Notification_Email extends WC_E
 		$this->description   = __( 'WhoesaleX: New User Approval Required emails are sent to the site admin when a customer signs up via wholesalex registration from and user status set to approve require.', 'wholesalex' );
 		$this->template_base = WHOLESALEX_PATH . 'templates/emails/';
 		$this->template_html = 'admin-wholesalex-registration-pending.php';
-		$this->placeholders  = apply_filters( 'wholesalex_email_new_user_approval_required_smart_tags', wholesalex()->smart_tag_name('{date}', '{admin_name}', '{site_name}') );
+		$this->placeholders  = apply_filters( 'wholesalex_email_new_user_approval_required_smart_tags', wholesalex()->smart_tag_name( '{date}', '{admin_name}', '{site_name}' ) );
 		$this->recipient     = $this->get_option( 'recipient', get_option( 'admin_email' ) );
 
 		// Call parent constructor.
 		parent::__construct();
-		// $this->recipient = '';
 		add_action( 'wholesalex_registration_form_user_status_admin_approve_notification', array( $this, 'trigger' ), 10, 3 );
 	}
 

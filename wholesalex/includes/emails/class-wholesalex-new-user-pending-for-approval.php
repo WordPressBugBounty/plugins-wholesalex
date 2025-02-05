@@ -70,11 +70,10 @@ class WholesaleX_New_User_Pending_For_Approval_Email extends WC_Email {
 		$this->description    = __( 'WholesaleX: Registration Pending For Approval emails are sent to the users when a customer signs up via wholesalex registration from and user status set to approval required.', 'wholesalex' );
 		$this->template_base  = WHOLESALEX_PATH . 'templates/emails/';
 		$this->template_html  = 'wholesalex-registration-pending.php';
-		$this->placeholders   = apply_filters( 'wholesalex_registration_pending_email_smart_tags', wholesalex()->smart_tag_name('{date}', '{admin_name}', '{site_name}') );
+		$this->placeholders   = apply_filters( 'wholesalex_registration_pending_email_smart_tags', wholesalex()->smart_tag_name( '{date}', '{admin_name}', '{site_name}' ) );
 
 		// Call parent constructor.
 		parent::__construct();
-		// $this->recipient = '';
 		add_action( 'wholesalex_registration_form_user_status_admin_approve_notification', array( $this, 'trigger' ), 10, 3 );
 	}
 

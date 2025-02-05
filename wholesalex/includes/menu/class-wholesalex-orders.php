@@ -19,7 +19,6 @@ class WHOLESALEX_Orders {
 	public function __construct() {
 		add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_order_type_column_on_order_page' ) );
 		add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'populate_data_on_order_type_column' ), 10, 2 );
-
 	}
 
 	/**
@@ -56,7 +55,5 @@ class WHOLESALEX_Orders {
 				echo esc_html( $__custom_meta_value );
 			}
 		}
-
 	}
-
 }

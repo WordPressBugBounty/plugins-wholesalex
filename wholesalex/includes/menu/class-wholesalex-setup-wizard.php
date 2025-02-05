@@ -23,30 +23,29 @@ class WHOLESALEX_Setup_Wizard {
 	 *
 	 * @var string
 	 */
-	private static $PLUGIN_NAME = 'WholesaleX';
+	private static $wsx_plugin_name = 'WholesaleX';
 	/**
 	 * Contain plugin slug
 	 *
 	 * @var string
 	 */
-	private static $PLUGIN_SLUG = 'wholesalex';
+	private static $wsx_plugin_slug = 'wholesalex';
 	/**
 	 * Contain plugin ver
 	 *
 	 * @var string
 	 */
-	private static $PLUGIN_VERSION = WHOLESALEX_VER;
+	private static $wsx_plugin_version = WHOLESALEX_VER;
 	/**
 	 * Contain WPXPO Api End Point
 	 *
 	 * @var string
 	 */
-	private static $API_ENDPOINT = 'https://inside.wpxpo.com';
+	private static $api_endpoint = 'https://inside.wpxpo.com';
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		// add_action( 'admin_menu', array( $this, 'submenu_page' ) );
 		add_action( 'wp_ajax_get_plugin_status', array( $this, 'get_plugin_status' ) );
 		add_action( 'wp_ajax_set_plugin_status', array( $this, 'set_plugin_status' ) );
 
@@ -127,10 +126,9 @@ class WHOLESALEX_Setup_Wizard {
 			'lock_status'         => ! ( wholesalex()->is_pro_active() ),
 		);
 
-		$config['wsx_addon_wallet']    = array(
+		$config['wsx_addon_wallet'] = array(
 			'name'                => __( 'WholesaleX Wallet', 'wholesalex' ),
-			/* translators: %s Plugin Name */
-			// 'desc'                => sprintf( __( 'Use the %s wallet for storewide payments. Purchase products by adding funds to your Wallet from the Wholesale store.', 'wholesalex' ), wholesalex()->get_plugin_name() ),
+			/*translators: %s Plugin Name */
 			'desc'                => __( 'Enable and configure it to let your buyers use the store wallet as a payment method.The registered users can add funds to the wallet and use it to purchase from your store.', 'wholesalex' ),
 			'img'                 => WHOLESALEX_URL . 'assets/img/addons/wallet.svg',
 			'docs'                => 'https://getwholesalex.com/docs/wholesalex/add-on/wallet/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
@@ -161,7 +159,7 @@ class WHOLESALEX_Setup_Wizard {
 
 		$config['wsx_addon_recaptcha'] = array(
 			'name'        => __( 'reCAPTCHA', 'wholesalex' ),
-			'desc'        => __( "Protect your website from suspicious login attempts with an added security layer using Google reCAPTCHA v3 for extended safety measures.  ", 'wholesalex' ),
+			'desc'        => __( 'Protect your website from suspicious login attempts with an added security layer using Google reCAPTCHA v3 for extended safety measures.  ', 'wholesalex' ),
 			'img'         => WHOLESALEX_URL . 'assets/img/addons/recaptcha.svg',
 			'docs'        => 'https://getwholesalex.com/docs/wholesalex/add-on/recaptcha/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
 			'live'        => '',
@@ -187,7 +185,7 @@ class WHOLESALEX_Setup_Wizard {
 			'is_installed'        => file_exists( WP_PLUGIN_DIR . '/multi-vendor-marketplace-b2b-for-wholesalex-dokan/multi-vendor-marketplace-b2b-for-wholesalex-dokan.php' ),
 			'download_link'       => 'https://downloads.wordpress.org/plugin/multi-vendor-marketplace-b2b-for-wholesalex-dokan.zip',
 			'video'               => 'https://www.youtube.com/embed/4UatlL2-XXo',
-			'depends_message'     => __('This addon require Dokan plugin','wholesalex')
+			'depends_message'     => __( 'This addon require Dokan plugin', 'wholesalex' ),
 		);
 
 		$config['wsx_addon_wcfm_integration'] = array(
@@ -205,7 +203,7 @@ class WHOLESALEX_Setup_Wizard {
 			'is_installed'        => file_exists( WP_PLUGIN_DIR . '/wholesalex-wcfm-b2b-multivendor-marketplace/wholesalex-wcfm-b2b-multivendor-marketplace.php' ),
 			'download_link'       => 'https://downloads.wordpress.org/plugin/wholesalex-wcfm-b2b-multivendor-marketplace.zip',
 			'video'               => 'https://www.youtube.com/embed/2OLOqyvv5rE',
-			'depends_message'	  => __('This addon require WCFM – Frontend Manager plugin','wholesalex')
+			'depends_message'     => __( 'This addon require WCFM – Frontend Manager plugin', 'wholesalex' ),
 		);
 		return $config;
 	}
@@ -288,14 +286,14 @@ class WHOLESALEX_Setup_Wizard {
 	 * @since 1.1.0
 	 */
 	public function get_plugin_status() {
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ):'';
-		if (!wp_verify_nonce($nonce,'wholesalex-setup-wizard') ) {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'wholesalex-setup-wizard' ) ) {
 			die();
 		}
-		
-        if(!current_user_can( 'manage_options' )) {
-            return;
-        }
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
 
 		$plugin_status = wholesalex()->get_setting( '_settings_status', 'b2b' );
 		wp_send_json_success( $plugin_status );
@@ -307,13 +305,13 @@ class WHOLESALEX_Setup_Wizard {
 	 * @since 1.1.0
 	 */
 	public function get_general_data() {
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ):'';
-		if (!wp_verify_nonce($nonce,'wholesalex-setup-wizard') ) {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'wholesalex-setup-wizard' ) ) {
 			die();
 		}
-        if(!current_user_can( 'manage_options' )) {
-            return;
-        }
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
 
 		$site_name           = get_bloginfo( 'name' );
 		$tier_layout         = wholesalex()->get_setting( '_settings_tier_layout', 'layout_one' );
@@ -389,15 +387,15 @@ class WHOLESALEX_Setup_Wizard {
 	 * @return void
 	 */
 	public function set_plugin_status() {
-		$nonce = isset($_POST['nonce'])?sanitize_key($_POST['nonce']):'';
-		if (!wp_verify_nonce( $nonce, 'wholesalex-setup-wizard' ) ) {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'wholesalex-setup-wizard' ) ) {
 			die();
 		}
-        if(!current_user_can( 'manage_options' )) {
-            return;
-        }
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
 
-		$plugin_status = isset( $_POST['plugin_status'] ) ? sanitize_text_field( $_POST['plugin_status'] ) : 'b2b';
+		$plugin_status = isset( $_POST['plugin_status'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin_status'] ) ) : 'b2b';
 
 		wholesalex()->set_setting( '_settings_status', $plugin_status );
 		wp_send_json_success( 'Updated' );
@@ -410,14 +408,14 @@ class WHOLESALEX_Setup_Wizard {
 	 * @return void
 	 */
 	public function wholesalex_activate_plugin() {
-		$nonce = isset( $_POST['nonce'] )?sanitize_key($_POST['nonce']):'';
-		if ( !wp_verify_nonce($nonce, 'wholesalex-setup-wizard' ) ) {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'wholesalex-setup-wizard' ) ) {
 			die();
 		}
 
 		if ( isset( $_POST['slug'] ) ) {
 			wp_clean_plugins_cache();
-			$slug        = sanitize_text_field( $_POST['slug'] );
+			$slug        = sanitize_text_field( wp_unslash( $_POST['slug'] ) );
 			$plugin_name = '';
 			if ( 'woocommerce' === $slug ) {
 				$plugin_name = 'woocommerce/woocommerce.php';
@@ -448,20 +446,20 @@ class WHOLESALEX_Setup_Wizard {
 	 * @since 1.1.0
 	 */
 	public function save_general_data() {
-		$nonce = isset( $_POST['nonce'] )?sanitize_key($_POST['nonce']):'';
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
 		if ( ! wp_verify_nonce( $nonce, 'wholesalex-setup-wizard' ) ) {
 			die();
 		}
 
-        if(!current_user_can( 'manage_options' )) {
-            return;
-        }
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
 
 		if ( isset( $_FILES['site_icon'] ) ) {
 
 			$file_extension     = strtolower( pathinfo( $_FILES['site_icon']['name'], PATHINFO_EXTENSION ) ); // phpcs:ignore
 			$allowed_extenstion = array( 'jpg', 'jpeg', 'png', 'gif', 'webp', 'ico' );
-			if ( in_array( $file_extension, $allowed_extenstion ) ) {
+			if ( in_array( $file_extension, $allowed_extenstion, true ) ) {
 				require_once ABSPATH . 'wp-admin/includes/image.php';
 				require_once ABSPATH . 'wp-admin/includes/file.php';
 				require_once ABSPATH . 'wp-admin/includes/media.php';
@@ -473,16 +471,16 @@ class WHOLESALEX_Setup_Wizard {
 		}
 
 		if ( isset( $_POST['website_name'] ) ) {
-			$site_name = sanitize_text_field( $_POST['website_name'] );
+			$site_name = sanitize_text_field( wp_unslash( $_POST['website_name'] ) );
 			update_option( 'blogname', $site_name );
 		}
 		if ( isset( $_POST['website_type'] ) ) {
-			$site_type = sanitize_text_field( $_POST['website_type'] );
+			$site_type = sanitize_text_field( wp_unslash( $_POST['website_type'] ) );
 			update_option( '__site_type', $site_type );
 		}
 
 		if ( isset( $_POST['tier_table_layout'] ) ) {
-			$tier_layout = sanitize_text_field( $_POST['tier_table_layout'] );
+			$tier_layout = sanitize_text_field( wp_unslash( $_POST['tier_table_layout'] ) );
 			wholesalex()->set_setting( '_settings_tier_layout', $tier_layout );
 		}
 
@@ -551,20 +549,20 @@ class WHOLESALEX_Setup_Wizard {
 	 * @return void
 	 */
 	public function data_collection() {
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ):'';
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
 
-		if ( !wp_verify_nonce($nonce, 'wholesalex-setup-wizard' ) ) {
+		if ( ! wp_verify_nonce( $nonce, 'wholesalex-setup-wizard' ) ) {
 			die();
 		}
 
-        if(!current_user_can( 'manage_options' )) {
-            return;
-        }
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
 
 		update_option( '__wholesalex_initial_setup', true );
 
-		$data_share_consent  = isset( $_POST['share_data_consent'] ) ? sanitize_text_field( $_POST['share_data_consent'] ) : '';
-		$get_updates_consent = isset( $_POST['get_updates_consent'] ) ? sanitize_text_field( $_POST['get_updates_consent'] ) : '';
+		$data_share_consent  = isset( $_POST['share_data_consent'] ) ? sanitize_text_field( wp_unslash( $_POST['share_data_consent'] ) ) : '';
+		$get_updates_consent = isset( $_POST['get_updates_consent'] ) ? sanitize_text_field( wp_unslash( $_POST['get_updates_consent'] ) ) : '';
 		if ( $data_share_consent ) {
 			set_transient( '__wholesalex_data_collection_consent', true );
 		}
@@ -601,7 +599,7 @@ class WHOLESALEX_Setup_Wizard {
 			}
 
 			$response = wp_remote_post(
-				self::$API_ENDPOINT,
+				self::$api_endpoint,
 				array(
 					'method'      => 'POST',
 					'timeout'     => 30,
@@ -644,7 +642,7 @@ class WHOLESALEX_Setup_Wizard {
 			$arr['author']  = isset( $plugin['Author'] ) ? $plugin['Author'] : '';
 			$arr['version'] = isset( $plugin['Version'] ) ? $plugin['Version'] : '';
 
-			if ( in_array( $key, $active_plugins ) ) {
+			if ( in_array( $key, $active_plugins, true ) ) {
 				$active[ $key ] = $arr;
 			} else {
 				$inactive[ $key ] = $arr;
@@ -748,9 +746,9 @@ class WHOLESALEX_Setup_Wizard {
 			'php_fsockopen'    => function_exists( 'fsockopen' ) ? 'Yes' : 'No',
 
 			'ip'               => self::get_user_ip(),
-			'plugin_name'      => self::$PLUGIN_NAME,
-			'plugin_version'   => self::$PLUGIN_VERSION,
-			'plugin_slug'      => self::$PLUGIN_SLUG,
+			'plugin_name'      => self::$wsx_plugin_name,
+			'plugin_version'   => self::$wsx_plugin_version,
+			'plugin_slug'      => self::$wsx_plugin_slug,
 			'is_local'         => self::is_local(),
 		);
 

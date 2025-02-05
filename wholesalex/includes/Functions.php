@@ -59,9 +59,13 @@ class Functions {
 		}
 
 		$this->update_single_product_database();
-
 	}
 
+	/**
+	 * Get New Form Builder Data
+	 *
+	 * @return array
+	 */
 	public function get_form_fields() {
 		$woo_custom_fields   = array();
 		$registration_fields = array();
@@ -234,10 +238,10 @@ class Functions {
 		if ( ! ( isset( $new_role_id ) && ! empty( $new_role_id ) ) ) {
 			return;
 		}
-        $wholesalex_roles = wholesalex()->get_roles( 'ids' );
-        if(!in_array($new_role_id,$wholesalex_roles)) {
-            return;
-        }
+		$wholesalex_roles = wholesalex()->get_roles( 'ids' );
+		if ( ! in_array( $new_role_id, $wholesalex_roles ) ) {
+			return;
+		}
 		$user = new WP_User( $user_id );
 		do_action( 'wholesalex_before_role_update', $user_id, $new_role_id, $prev_role_id );
 		if ( '' !== $prev_role_id ) {
@@ -261,6 +265,7 @@ class Functions {
 	 * Set Link with the Parameters
 	 *
 	 * @param STRING $url Url.
+	 * @param STRING $tag Tag.
 	 * @since v.1.0.0
 	 * @return STRING | URL with Arg
 	 */
@@ -279,13 +284,14 @@ class Functions {
 	 *
 	 * @since 1.0.0
 	 * @param STRING $key Key of the Option.
+	 * @param STRING $new_default Default Value.
 	 * @return ARRAY | STRING
 	 * @since 1.2.4 Add Default Option
 	 */
-	public function get_setting( $key = '', $default = '' ) {
+	public function get_setting( $key = '', $new_default = '' ) {
 		$data = $GLOBALS['wholesalex_settings'];
 		if ( '' !== $key ) {
-			return isset( $data[ $key ] ) ? $data[ $key ] : $default;
+			return isset( $data[ $key ] ) ? $data[ $key ] : $new_default;
 		} else {
 			return $data;
 		}
@@ -321,19 +327,19 @@ class Functions {
 			foreach ( $discounts as $role_name => $value ) {
 				$base_price_meta_name = $role_name . '_base_price';
 				$sale_price_meta_name = $role_name . '_sale_price';
-				$price_meta_name 	  = $role_name . '_price';
+				$price_meta_name      = $role_name . '_price';
 
 				if ( isset( $value['wholesalex_sale_price'] ) && ! empty( $value['wholesalex_sale_price'] ) ) {
 					update_post_meta( $id, $price_meta_name, $value['wholesalex_sale_price'] );
-				} elseif( ! empty( $value['wholesalex_base_price'] ) ) {
+				} elseif ( ! empty( $value['wholesalex_base_price'] ) ) {
 					update_post_meta( $id, $price_meta_name, $value['wholesalex_base_price'] );
 				}
 
-				// Update Base Price
+				// Update Base Price.
 				if ( isset( $value['wholesalex_base_price'] ) ) {
 					update_post_meta( $id, $base_price_meta_name, $value['wholesalex_base_price'] );
 				}
-				// Update Sale Price
+				// Update Sale Price.
 				if ( isset( $value['wholesalex_sale_price'] ) ) {
 					update_post_meta( $id, $sale_price_meta_name, $value['wholesalex_sale_price'] );
 				}
@@ -371,7 +377,6 @@ class Functions {
 			$data[ $role_id ]['tiers']                 = $tiers ? $tiers : array();
 		}
 		return $data;
-
 	}
 	/**
 	 * Save Single Product Settings
@@ -458,10 +463,6 @@ class Functions {
 	public function save_category_discounts( $id = '', $discounts = array() ) {
 		if ( '' !== $id && ! empty( $discounts ) ) {
 			// $data        = $GLOBALS['wholesalex_category_discounts'];
-			// $data[ $id ] = $discounts;
-			// update_option( '__wholesalex_category_discounts', $data );
-			// $GLOBALS['wholesalex_category_discounts'] = $data;
-
 			// save category discounts on product meta
 			foreach ( $discounts as $role_id => $discount ) {
 				if ( $discount['tiers'] ) {
@@ -507,7 +508,8 @@ class Functions {
 	/**
 	 * Get Single Product Settings
 	 *
-	 * @param mixed $id Product ID.
+	 * @param mixed  $id Product ID.
+	 * @param string $key Setting Key.
 	 * @return array
 	 * @since 1.0.0
 	 */
@@ -543,12 +545,12 @@ class Functions {
 	/**
 	 * Get Dynamic Rules By User ID
 	 *
-	 * @param string $user_id User ID
+	 * @param string $user_id User ID.
 	 * @return array
 	 * @since 1.2.4 (With Dokan Integration)
 	 */
 	public function get_dynamic_rules_by_user_id( $user_id = '' ) {
-		if ( '' == $user_id ) {
+		if ( '' === $user_id ) {
 			$user_id = get_current_user_id();
 		}
 
@@ -556,7 +558,7 @@ class Functions {
 		$user_rules = array();
 
 		foreach ( $rules as $rule ) {
-			if ( isset( $rule['created_by'] ) && $rule['created_by'] == $user_id ) {
+			if ( isset( $rule['created_by'] ) && $rule['created_by'] === $user_id ) {
 				$user_rules[] = $rule;
 			}
 		}
@@ -587,7 +589,7 @@ class Functions {
 				'id'                      => $_id,
 				'_rule_status'            => isset( $_rule['_rule_status'] ) ? $_rule['_rule_status'] : '',
 				'_rule_title'             => isset( $_rule['_rule_title'] ) ? $_rule['_rule_title'] : '',
-				'limit'                   => isset($_rule['limit']) && is_array($_rule['limit'])? array_merge( $_rule['limit'], array( 'usages_count' => $__usages_count ) ):array(),
+				'limit'                   => isset( $_rule['limit'] ) && is_array( $_rule['limit'] ) ? array_merge( $_rule['limit'], array( 'usages_count' => $__usages_count ) ) : array(),
 				'_rule_type'              => isset( $_rule['_rule_type'] ) ? $_rule['_rule_type'] : '',
 				$_rule['_rule_type']      => isset( $_rule[ $_rule['_rule_type'] ] ) ? $_rule[ $_rule['_rule_type'] ] : array(),
 				'_rule_for'               => isset( $_rule['_rule_for'] ) ? $_rule['_rule_for'] : '',
@@ -642,6 +644,13 @@ class Functions {
 	}
 
 
+	/**
+	 * Get User Role
+	 *
+	 * @param mixed $user_id User ID.
+	 * @return string
+	 * @since 1.0.0
+	 */
 	public function get_user_role( $user_id = '' ) {
 		if ( '' === $user_id || ! $user_id ) {
 			$user_id = get_current_user_id();
@@ -656,12 +665,18 @@ class Functions {
 			return $__user_role;
 		}
 
-		if(empty($__user_role)) {
+		if ( empty( $__user_role ) ) {
 			return 'wholesalex_b2c_users';
 		}
 	}
 
 
+	/**
+	 * Get License Status
+	 *
+	 * @return string
+	 * @since 1.0.0
+	 */
 	public function get_license_status() {
 		$status = get_option( 'edd_wholesalex_license_status', '' );
 		if ( 'invalid' === $status ) {
@@ -680,7 +695,7 @@ class Functions {
 	 *
 	 * @param string $role_id Role ID.
 	 * @param string $type Form Data Type.
-	 * @param bool   $is_only_b2b  Does Dropdown Contain All B2B Roles
+	 * @param bool   $is_only_b2b Does Dropdown Contain All B2B Roles.
 	 * @return array Form Data.
 	 * @since 1.0.0
 	 * @since 1.0.3 Billing and Registration Field Merged At Checkout Registration Issue Fixed
@@ -776,95 +791,112 @@ class Functions {
 				return $__billing_form_data;
 			}
 		}
-
 	}
 
 	/**
 	 * Get Default Registration Form Fields
 	 */
 	public function get_default_registration_form_fields() {
-		$is_woo_username = get_option('woocommerce_registration_generate_username');
-		$registrationFields = [
-				...(isset($is_woo_username) && $is_woo_username === 'no' ? [
-					[
-						"id" => "regi_3",
-						"type" => "row",
-						"columns" => [
-							[
-								"status" => true,
-								"type" => "text",
-								"label" => "Username",
-								"name" => "user_login",
-								"isLabelHide" => false,
-								"placeholder" => "",
-								"columnPosition" => "left",
-								"parent" => "regi_3",
-								"required" => true,
-								"conditions" => [
-									"status" => "show",
-									"relation" => "all",
-									"tiers" => [
-										["_id" => strval(time()), "condition" => "", "field" => "", "value" => "", "src" => "registration_form"]
-									]
-								]
-							]
-						],
-						"isMultiColumn" => false
-					]
-				] : []),
-				[
-					"id" => "regi_1",
-					"type" => "row",
-					"columns" => [
-						[
-							"status" => true,
-							"type" => "email",
-							"label" => "Email",
-							"name" => "user_email",
-							"isLabelHide" => false,
-							"placeholder" => "",
-							"columnPosition" => "left",
-							"parent" => "regi_1",
-							"required" => true,
-							"conditions" => [
-								"status" => "show",
-								"relation" => "all",
-								"tiers" => [
-									["_id" => strval(time()), "condition" => "", "field" => "", "value" => "", "src" => "registration_form"]
-								]
-							]
-						]
-					],
-					"isMultiColumn" => false
-				],
-				[
-					"id" => "regi_2",
-					"type" => "row",
-					"columns" => [
-						[
-							"status" => true,
-							"type" => "password",
-							"label" => "Password",
-							"name" => "user_pass",
-							"isLabelHide" => false,
-							"placeholder" => "",
-							"columnPosition" => "left",
-							"parent" => "regi_2",
-							"required" => true,
-							"conditions" => [
-								"status" => "show",
-								"relation" => "all",
-								"tiers" => [
-									["_id" => strval(time()), "condition" => "", "field" => "", "value" => "", "src" => "registration_form"]
-								]
-							]
-						]
-					],
-					"isMultiColumn" => false
-				]
-			];
-	
-		return $registrationFields;
+		$is_woo_username    = get_option( 'woocommerce_registration_generate_username' );
+		$registration_fields = array(
+			...( isset( $is_woo_username ) && 'no' === $is_woo_username ? array(
+				array(
+					'id'            => 'regi_3',
+					'type'          => 'row',
+					'columns'       => array(
+						array(
+							'status'         => true,
+							'type'           => 'text',
+							'label'          => 'Username',
+							'name'           => 'user_login',
+							'isLabelHide'    => false,
+							'placeholder'    => '',
+							'columnPosition' => 'left',
+							'parent'         => 'regi_3',
+							'required'       => true,
+							'conditions'     => array(
+								'status'   => 'show',
+								'relation' => 'all',
+								'tiers'    => array(
+									array(
+										'_id'       => strval( time() ),
+										'condition' => '',
+										'field'     => '',
+										'value'     => '',
+										'src'       => 'registration_form',
+									),
+								),
+							),
+						),
+					),
+					'isMultiColumn' => false,
+				),
+			) : array() ),
+			array(
+				'id'            => 'regi_1',
+				'type'          => 'row',
+				'columns'       => array(
+					array(
+						'status'         => true,
+						'type'           => 'email',
+						'label'          => 'Email',
+						'name'           => 'user_email',
+						'isLabelHide'    => false,
+						'placeholder'    => '',
+						'columnPosition' => 'left',
+						'parent'         => 'regi_1',
+						'required'       => true,
+						'conditions'     => array(
+							'status'   => 'show',
+							'relation' => 'all',
+							'tiers'    => array(
+								array(
+									'_id'       => strval( time() ),
+									'condition' => '',
+									'field'     => '',
+									'value'     => '',
+									'src'       => 'registration_form',
+								),
+							),
+						),
+					),
+				),
+				'isMultiColumn' => false,
+			),
+			array(
+				'id'            => 'regi_2',
+				'type'          => 'row',
+				'columns'       => array(
+					array(
+						'status'         => true,
+						'type'           => 'password',
+						'label'          => 'Password',
+						'name'           => 'user_pass',
+						'isLabelHide'    => false,
+						'placeholder'    => '',
+						'columnPosition' => 'left',
+						'parent'         => 'regi_2',
+						'required'       => true,
+						'conditions'     => array(
+							'status'   => 'show',
+							'relation' => 'all',
+							'tiers'    => array(
+								array(
+									'_id'       => strval( time() ),
+									'condition' => '',
+									'field'     => '',
+									'value'     => '',
+									'src'       => 'registration_form',
+								),
+							),
+						),
+					),
+				),
+				'isMultiColumn' => false,
+			),
+		);
+
+		return $registration_fields;
 	}
 
 	/**
@@ -901,7 +933,7 @@ class Functions {
 		if ( isset( $__user_role ) && ! empty( $__user_role ) ) {
 			return $__user_role;
 		}
-		if ( empty($__user_role) ){
+		if ( empty( $__user_role ) ) {
 			return 'wholesalex_b2c_users';
 		}
 	}
@@ -961,16 +993,16 @@ class Functions {
 	/**
 	 * Insert Into Array at specific position
 	 *
-	 * @param array $array Initial Array.
+	 * @param array $new_array Initial Array.
 	 * @param array $insert new element of array with key.
 	 * @param int   $position The Position where new elements are inserted.
 	 * @return array Updated Array.
 	 */
-	public function insert_into_array( $array, $insert, $position = '' ) {
+	public function insert_into_array( $new_array, $insert, $position = '' ) {
 		if ( empty( $position ) || '' === $position ) {
-			$position = count( $array );
+			$position = count( $new_array );
 		}
-		return array_slice( $array, 0, $position, true ) + $insert + array_slice( $array, $position, null, true );
+		return array_slice( $new_array, 0, $position, true ) + $insert + array_slice( $new_array, $position, null, true );
 	}
 
 	/**
@@ -1040,9 +1072,7 @@ class Functions {
 			case '':
 				return array();
 			default:
-				// if ( ! empty( wholesalex()->get_roles( 'by_id', $__role ) ) ) {
 				return array_unique( array_merge( $__product_ids_hidden_for_current_user, $__product_ids_hidden_for_b2b ) );
-				// }
 		}
 
 		return array();
@@ -1127,10 +1157,7 @@ class Functions {
 			case '':
 				return array();
 			default:
-				// if ( ! empty( wholesalex()->get_roles( 'by_id', $__role ) ) ) {
 				return array_unique( array_merge( $__ids_hidden_for_current_user, $__ids_hidden_for_b2b ) );
-				// }
-				break;
 		}
 
 		return array();
@@ -1282,7 +1309,7 @@ class Functions {
 			}
 		}
 
-		$cat_count = apply_filters('wholesalex_category_cart_count',$cat_count,$cat_id);
+		$cat_count = apply_filters( 'wholesalex_category_cart_count', $cat_count, $cat_id );
 		return $cat_count;
 	}
 
@@ -1293,11 +1320,11 @@ class Functions {
 	 * @return int Product count at cart.
 	 * @since 1.0.0
 	 */
-	public function cart_count( $product_id=false ) {
+	public function cart_count( $product_id = false ) {
 		$__quantity = 0;
 		if ( ! is_null( WC()->cart ) ) {
 			foreach ( WC()->cart->get_cart() as $cart_item ) {
-				if($product_id) {
+				if ( $product_id ) {
 					if ( ! empty( $cart_item['data'] ) && in_array( $product_id, array( $cart_item['product_id'], $cart_item['variation_id'] ), true ) ) {
 						$__is_parent_rule_apply = apply_filters( 'wholesalex_apply_parent_rule_to_variations', false );  // Add This Filter TO Work Dynamic Rule For Combine Variation Product Like Quantity Base Discount
 						if ( $__is_parent_rule_apply ) {
@@ -1307,16 +1334,13 @@ class Functions {
 							break; // stop the loop if product is found.
 						}
 					}
-				} else {
-					if(!isset($cart_item['free_product'])) {
+				} elseif ( ! isset( $cart_item['free_product'] ) ) {
 						$__quantity += $cart_item['quantity'];
-					}
-					
 				}
 			}
-		} 
+		}
 
-		$__quantity = apply_filters('wholesalex_cart_count',$__quantity,$product_id);
+		$__quantity = apply_filters( 'wholesalex_cart_count', $__quantity, $product_id );
 
 		return $__quantity;
 	}
@@ -1342,8 +1366,8 @@ class Functions {
 			}
 		} else {
 			$__is_enable_tax = ( 'yes' === wholesalex()->get_setting( '_settings_allow_tax_with_cart_total_amount' ) );
-			$__total    = 0.0;
-			$__with_tax = apply_filters( 'wholesalex_get_cart_total_with_tax', ( $__is_enable_tax ? true : false ) );
+			$__total         = 0.0;
+			$__with_tax      = apply_filters( 'wholesalex_get_cart_total_with_tax', ( $__is_enable_tax ? true : false ) );
 			foreach ( WC()->cart->get_cart() as $cart_item ) {
 				if ( isset( $cart_item['line_total'] ) ) {
 					if ( $__with_tax && isset( $cart_item['line_tax'] ) ) {
@@ -1357,7 +1381,6 @@ class Functions {
 		}
 
 		return 0;
-
 	}
 
 	/**
@@ -1414,15 +1437,19 @@ class Functions {
 			} else {
 				return $default;
 			}
-		} else {
-			if ( ! empty( $from_setting ) ) {
+		} elseif ( ! empty( $from_setting ) ) {
 				return $from_setting;
-			} else {
-				return $default;
-			}
+		} else {
+			return $default;
 		}
 	}
 
+	/**
+	 * IS Pro Enabled
+	 *
+	 * @return mixed Setting Value.
+	 * @since 1.0.0
+	 */
 	public function is_pro_enabled() {
 		return ( function_exists( 'wholesalex_pro' ) && wholesalex_pro()->is_active() );
 	}
@@ -1455,19 +1482,19 @@ class Functions {
 		$__sale_price = '';
 		switch ( $tier['_discount_type'] ) {
 			case 'percentage':
-				$__sale_price = max( 0, (float) $regular_price - ( ( (float) $regular_price * floatval($tier['_discount_amount']) ) / 100.00 ) );
+				$__sale_price = max( 0, (float) $regular_price - ( ( (float) $regular_price * floatval( $tier['_discount_amount'] ) ) / 100.00 ) );
 				break;
 			case 'amount':
-				$__sale_price = max( 0, (float) $regular_price - floatval($tier['_discount_amount']) );
+				$__sale_price = max( 0, (float) $regular_price - floatval( $tier['_discount_amount'] ) );
 				break;
 			case 'fixed_price':
-				$__sale_price = max( 0, (float) floatval($tier['_discount_amount']) );
+				$__sale_price = max( 0, (float) floatval( $tier['_discount_amount'] ) );
 				break;
 			case 'fixed':
-				$__sale_price = max( 0, (float) floatval($tier['_discount_amount']) );
+				$__sale_price = max( 0, (float) floatval( $tier['_discount_amount'] ) );
 				break;
 		}
-		return number_format((float)$__sale_price, 2, '.', '');
+		return number_format( (float) $__sale_price, 2, '.', '' );
 	}
 
 	/**
@@ -1545,18 +1572,18 @@ class Functions {
 		return get_option( '__wholesalex_license_type', '' );
 	}
 
-
 	/**
 	 * Get Upgrade Pro Popup HTML
 	 *
 	 * @param string $heading Heading.
 	 * @param string $subheading Subheading.
 	 * @param string $desc Description.
+	 * @param string $url URL.
 	 * @return void
 	 * @since 1.0.10
 	 */
 	public function get_upgrade_pro_popup_html( $heading = '', $subheading = '', $desc = '', $url = '' ) {
-		if ( '' == $url ) {
+		if ( '' === $url ) {
 			$url = wholesalex()->get_premium_link();
 		}
 		?>
@@ -1650,8 +1677,13 @@ class Functions {
 		}
 	}
 
-
-
+	/**
+	 * Check is wholesalex page
+	 *
+	 * @param string $page Page Name.
+	 * @return boolean
+	 * @since 1.1.7
+	 */
 	public function is_wholesalex_page( $page ) {
 		$status = false;
 		switch ( $page ) {
@@ -1678,9 +1710,9 @@ class Functions {
 			default:
 				break;
 		}
-		if ( $page == wholesalex()->get_setting( 'plugin_menu_slug' ) || $page == wholesalex()->get_setting( 'dynamic_rule_submenu_slug' ) || $page == wholesalex()->get_setting( 'emails_submenu_slug' ) ||
-			$page == wholesalex()->get_setting( 'registration_form_buidler_submenu_slug' ) || $page == wholesalex()->get_setting( 'role_submenu_slug' ) || $page == wholesalex()->get_setting( 'settings_submenu_slug' ) || $page == wholesalex()->get_setting( 'users_submenu_slug' )
-			|| $page == wholesalex()->get_setting( 'addons_submenu_slug' )
+		if ( wholesalex()->get_setting( 'plugin_menu_slug' ) === $page || wholesalex()->get_setting( 'dynamic_rule_submenu_slug' ) === $page || wholesalex()->get_setting( 'emails_submenu_slug' ) === $page ||
+			wholesalex()->get_setting( 'registration_form_buidler_submenu_slug' ) === $page || wholesalex()->get_setting( 'role_submenu_slug' ) === $page || wholesalex()->get_setting( 'settings_submenu_slug' ) === $page || wholesalex()->get_setting( 'users_submenu_slug' ) === $page
+			|| wholesalex()->get_setting( 'addons_submenu_slug' ) === $page
 		) {
 			$status = true;
 		}
@@ -1692,6 +1724,15 @@ class Functions {
 		return $status;
 	}
 
+	/**
+	 * Get Email Templates
+	 *
+	 * @param string $email_subject Email Subject.
+	 * @param string $email_content Email Content.
+	 * @param string $css Email CSS.
+	 * @return array
+	 * @since 1.1.7
+	 */
 	public function get_email_template( $email_subject, $email_content, $css ) {
 		ob_start();
 		wc_get_template(
@@ -1708,6 +1749,15 @@ class Functions {
 	}
 
 
+	/**
+	 * Send Email
+	 *
+	 * @param string $template Email Template.
+	 * @param string $to Email To.
+	 * @param array  $smart_tags Smart Tags.
+	 * @return array
+	 * @since 1.1.7
+	 */
 	public function send_email( $template, $to, $smart_tags ) {
 
 		$email_templates = WHOLESALEX_EMAIL::get_email_templates();
@@ -1720,9 +1770,6 @@ class Functions {
 			$content = str_replace( $key, $value, $content );
 		}
 
-		// ob_start();
-		// wc_get_template( 'emails/email-styles.php' );
-		// $css = apply_filters( 'woocommerce_email_styles', ob_get_clean() );
 		$css     = '';
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
 
@@ -1806,7 +1853,8 @@ class Functions {
 	 *     'info': Informational messages.
 	 *     'debug': Debug-level messages.
 	 *
-	 * @param string $message
+	 * @param string $message Message to log.
+	 * @param string $level Log level.
 	 *
 	 * @return void
 	 */
@@ -1817,6 +1865,11 @@ class Functions {
 		$logger->log( $level, $message, $context );
 	}
 
+	/**
+	 * Is Valid User
+	 *
+	 * @return string
+	 */
 	public function is_valid_user() {
 		$user_id        = get_current_user_id();
 		$plugins_status = wholesalex()->get_setting( '_settings_status', 'b2b' );
@@ -1849,14 +1902,14 @@ class Functions {
 		return $menu_slug;
 	}
 
-	 /**
-	  * Get Option Value bypassing cache
-	  * Inspired By WordPress Core get_option
-	  *
-	  * @param string  $option Option Name.
-	  * @param boolean $default_value option default value.
-	  * @return mixed
-	  */
+	/**
+	 * Get Option Value bypassing cache
+	 * Inspired By WordPress Core get_option
+	 *
+	 * @param string  $option Option Name.
+	 * @param boolean $default_value option default value.
+	 * @return mixed
+	 */
 	public function get_option_without_cache( $option, $default_value = false ) {
 		global $wpdb;
 
@@ -1881,20 +1934,25 @@ class Functions {
 		return apply_filters( "wholesalex_option_{$option}", maybe_unserialize( $value ), $option );
 	}
 
-	public function Badge_image_display() {
+	/**
+	 * Get Plugin URL
+	 *
+	 * @return string
+	 */
+	public function badge_image_display() {
 		$badge_image = apply_filters(
 			'wholesalex_settings_product_tier_layouts',
 			array(
-				'style_one'    => WHOLESALEX_URL . '/assets/img/badge-style-one.png',
-				'style_two'    => WHOLESALEX_URL . '/assets/img/badge-style-two.png',
-				'style_three'  => WHOLESALEX_URL . '/assets/img/badge-style-three.png',
-				'style_four'   => WHOLESALEX_URL . '/assets/img/badge-style-four.png',
-				'style_five'   => WHOLESALEX_URL . '/assets/img/badge-style-five.png',
+				'style_one'   => WHOLESALEX_URL . '/assets/img/badge-style-one.png',
+				'style_two'   => WHOLESALEX_URL . '/assets/img/badge-style-two.png',
+				'style_three' => WHOLESALEX_URL . '/assets/img/badge-style-three.png',
+				'style_four'  => WHOLESALEX_URL . '/assets/img/badge-style-four.png',
+				'style_five'  => WHOLESALEX_URL . '/assets/img/badge-style-five.png',
 			)
 		);
 		return $badge_image;
 	}
-	
+
 
 	/**
 	 * Get Transient Value bypassing cache
@@ -1969,7 +2027,6 @@ class Functions {
 		}
 
 		return $result;
-
 	}
 
 	/**
@@ -2022,6 +2079,7 @@ class Functions {
 	/**
 	 * Check current user is a b2b user or has admin access
 	 *
+	 * @param int $user_id User ID.
 	 * @return boolean
 	 * @since 1.1.3
 	 */
@@ -2036,14 +2094,13 @@ class Functions {
 	}
 
 
-	// For Migration Plugin
 	/**
 	 * Update Registration Form
 	 *
 	 * @param array $data Data.
 	 * @return void
 	 */
-	public function update_registration_form($data) {
+	public function update_registration_form( $data ) {
 		update_option( '__wholesalex_registration_form', wp_json_encode( $data ) );
 	}
 
@@ -2053,13 +2110,17 @@ class Functions {
 	 * @param array $data Dynamic Rules.
 	 * @return void
 	 */
-	public function update_dynamic_rules($data) {
+	public function update_dynamic_rules( $data ) {
 		update_option( '__wholesalex_dynamic_rules', $data );
 	}
 
-	// Get Empty
+	/**
+	 * Get Empty Form
+	 *
+	 * @return array
+	 */
 	public function get_empty_form() {
-		$defaultForm = array(
+		$default_form = array(
 			'registrationFormHeader' =>
 			array(
 				'isShowFormTitle'   => true,
@@ -2122,45 +2183,45 @@ class Functions {
 			'loginFields'            =>
 			array(
 				0 =>
-				 array(
-					 'id'            => 'login_row_1',
-					 'type'          => 'row',
-					 'columns'       =>
-					 array(
-						 0 =>
-						  array(
-							  'type'           => 'text',
-							  'label'          => __('Username or email address','wholesalex'),
-							  'name'           => 'username',
-							  'isLabelHide'    => false,
-							  'placeholder'    => '',
-							  'columnPosition' => 'left',
-							  'parent'         => 'login_row_1',
-							  'isRequired'     => true,
-						  ),
-					 ),
-					 'isMultiColumn' => false,
-				 ),
+				array(
+					'id'            => 'login_row_1',
+					'type'          => 'row',
+					'columns'       =>
+					array(
+						0 =>
+							array(
+								'type'           => 'text',
+								'label'          => __( 'Username or email address', 'wholesalex' ),
+								'name'           => 'username',
+								'isLabelHide'    => false,
+								'placeholder'    => '',
+								'columnPosition' => 'left',
+								'parent'         => 'login_row_1',
+								'isRequired'     => true,
+							),
+					),
+					'isMultiColumn' => false,
+				),
 				1 =>
-				 array(
-					 'id'            => 'login_row_2',
-					 'type'          => 'row',
-					 'columns'       =>
-					 array(
-						 0 =>
-						  array(
-							  'type'           => 'password',
-							  'label'          => __('Password','wholesalex'),
-							  'name'           => 'password',
-							  'isLabelHide'    => false,
-							  'placeholder'    => '',
-							  'columnPosition' => 'left',
-							  'parent'         => 'login_row_2',
-							  'isRequired'     => true,
-						  ),
-					 ),
-					 'isMultiColumn' => false,
-				 ),
+				array(
+					'id'            => 'login_row_2',
+					'type'          => 'row',
+					'columns'       =>
+					array(
+						0 =>
+							array(
+								'type'           => 'password',
+								'label'          => __( 'Password', 'wholesalex' ),
+								'name'           => 'password',
+								'isLabelHide'    => false,
+								'placeholder'    => '',
+								'columnPosition' => 'left',
+								'parent'         => 'login_row_2',
+								'isRequired'     => true,
+							),
+					),
+					'isMultiColumn' => false,
+				),
 				2 =>
 				array(
 					'id'            => 'login_row_3',
@@ -2168,29 +2229,29 @@ class Functions {
 					'columns'       =>
 					array(
 						0 =>
-						 array(
-							 'type'           => 'checkbox',
-							 'label'          => '',
-							 'name'           => 'rememberme',
-							 'isLabelHide'    => true,
-							 'columnPosition' => 'left',
-							 'option'         =>
-							 array(
-								 0 =>
-								  array(
-									  'name'  => __('Remember me','wholesalex'),
-									  'value' => 'rememberme',
-								  ),
-							 ),
-							 'parent'         => 'row_3438998',
-							 'excludeRoles'   =>
-							 array(),
-						 ),
+						array(
+							'type'           => 'checkbox',
+							'label'          => '',
+							'name'           => 'rememberme',
+							'isLabelHide'    => true,
+							'columnPosition' => 'left',
+							'option'         =>
+							array(
+								0 =>
+									array(
+										'name'  => __( 'Remember me', 'wholesalex' ),
+										'value' => 'rememberme',
+									),
+							),
+							'parent'         => 'row_3438998',
+							'excludeRoles'   =>
+							array(),
+						),
 					),
 					'isMultiColumn' => false,
 				),
 			),
-			'registrationFields' => $this->get_default_registration_form_fields(),
+			'registrationFields'     => $this->get_default_registration_form_fields(),
 			'registrationFormButton' =>
 			array(
 				'title' => 'Register',
@@ -2386,20 +2447,25 @@ class Functions {
 				),
 			),
 		);
-		return $defaultForm;
+		return $default_form;
 	}
 
+	/**
+	 * Get Default Registration Form Fields
+	 *
+	 * @return array
+	 */
 	public function get_new_form_builder_data() {
-		$formData = '';
+		$form_data = '';
 
-		$oldForm = get_option( '__wholesalex_registration_form' );
+		$old_form = get_option( '__wholesalex_registration_form' );
 
-		$newForm = get_option( 'wholesalex_registration_form' );
+		$new_form = get_option( 'wholesalex_registration_form' );
 
-		$defaultForm = $this->get_empty_form();
-		if ( ! $newForm && $oldForm ) {
-			$oldForm = json_decode( $oldForm, true );
-			foreach ( $oldForm as $field ) {
+		$default_form = $this->get_empty_form();
+		if ( ! $new_form && $old_form ) {
+			$old_form = json_decode( $old_form, true );
+			foreach ( $old_form as $field ) {
 				$field['columnPosition'] = 'left';
 				$field['parent']         = wp_unique_id( 'whx_form' );
 				$field['label']          = $field['title'];
@@ -2417,12 +2483,17 @@ class Functions {
 						),
 					),
 				);
-				if(!isset($field['option'])) {
-					$field['option'] = array(array('name'=>'Select Option','value'=>''));
+				if ( ! isset( $field['option'] ) ) {
+					$field['option'] = array(
+						array(
+							'name'  => 'Select Option',
+							'value' => '',
+						),
+					);
 				}
 				unset( $field['title'] );
-				$field['migratedFromOldBuilder']     = true;
-				$defaultForm['registrationFields'][] =
+				$field['migratedFromOldBuilder']      = true;
+				$default_form['registrationFields'][] =
 				array(
 					'id'            => $field['parent'],
 					'type'          => 'row',
@@ -2432,13 +2503,13 @@ class Functions {
 
 			}
 
-			$formData = $defaultForm;
+			$form_data = $default_form;
 
 		} else {
-			$formData = json_decode( $newForm, true );
+			$form_data = json_decode( $new_form, true );
 		}
 
-		return is_array( $formData ) ? $formData : $defaultForm;
+		return is_array( $form_data ) ? $form_data : $default_form;
 	}
 
 
@@ -2447,101 +2518,127 @@ class Functions {
 	 *
 	 * @param int|string $rule_id Rule ID.
 	 * @param int|string $product_id Product ID.
-	 * @param string $type Rule Type.
-	 * @param array $data Rule Data.
+	 * @param string     $type Rule Type.
+	 * @param array      $data Rule Data.
 	 * @return void
 	 */
-	public function set_rule_data($rule_id, $product_id, $type, $data)
-	{
-		if (!isset($GLOBALS['wholesalex_rule_data'][$product_id])) {
-			$GLOBALS['wholesalex_rule_data'][$product_id] = array();
+	public function set_rule_data( $rule_id, $product_id, $type, $data ) {
+		if ( ! isset( $GLOBALS['wholesalex_rule_data'][ $product_id ] ) ) {
+			$GLOBALS['wholesalex_rule_data'][ $product_id ] = array();
 		}
-		if (!isset($GLOBALS['wholesalex_rule_data'][$product_id][$type])) {
-			$GLOBALS['wholesalex_rule_data'][$product_id][$type][$rule_id] = array();
+		if ( ! isset( $GLOBALS['wholesalex_rule_data'][ $product_id ][ $type ] ) ) {
+			$GLOBALS['wholesalex_rule_data'][ $product_id ][ $type ][ $rule_id ] = array();
 		}
-		$GLOBALS['wholesalex_rule_data'][$product_id][$type][$rule_id] = $data;
+		$GLOBALS['wholesalex_rule_data'][ $product_id ][ $type ][ $rule_id ] = $data;
 	}
 
 	/**
 	 * Get Productwise Rule Data
 	 *
 	 * @param int|string $product_id Product ID.
-	 * @param string $type Product Type.
+	 * @param string     $type Product Type.
+	 * @param string     $rule_id Rule ID.
 	 * @return array
 	 */
-	public function get_rule_data($product_id, $type = '', $rule_id = '')
-	{
-		if ($type && $rule_id) {
-			if (isset($GLOBALS['wholesalex_rule_data'][$product_id][$type][$rule_id])) {
-				return $GLOBALS['wholesalex_rule_data'][$product_id][$type][$rule_id];
+	public function get_rule_data( $product_id, $type = '', $rule_id = '' ) {
+		if ( $type && $rule_id ) {
+			if ( isset( $GLOBALS['wholesalex_rule_data'][ $product_id ][ $type ][ $rule_id ] ) ) {
+				return $GLOBALS['wholesalex_rule_data'][ $product_id ][ $type ][ $rule_id ];
 			} else {
 				return array();
 			}
 		}
-		if ($type) {
-			if (isset($GLOBALS['wholesalex_rule_data'][$product_id][$type])) {
-				return $GLOBALS['wholesalex_rule_data'][$product_id][$type];
+		if ( $type ) {
+			if ( isset( $GLOBALS['wholesalex_rule_data'][ $product_id ][ $type ] ) ) {
+				return $GLOBALS['wholesalex_rule_data'][ $product_id ][ $type ];
 			} else {
 				return array();
 			}
 		}
-		if (isset($GLOBALS['wholesalex_rule_data'][$product_id])) {
-			return $GLOBALS['wholesalex_rule_data'][$product_id];
+		if ( isset( $GLOBALS['wholesalex_rule_data'][ $product_id ] ) ) {
+			return $GLOBALS['wholesalex_rule_data'][ $product_id ];
 		}
 		return array();
 	}
 
-	public function get_wholesalex_wholesale_prices($product_id) {
-		if(!isset($GLOBALS['wholesalex_wholesale_prices'][$product_id])) {
+	/**
+	 * Set Productwise Rule Data.
+	 *
+	 * @param mixed $product_id Product ID.
+	 * @return array
+	 */
+	public function get_wholesalex_wholesale_prices( $product_id ) {
+		if ( ! isset( $GLOBALS['wholesalex_wholesale_prices'][ $product_id ] ) ) {
 			return false;
 		}
-		return $GLOBALS['wholesalex_wholesale_prices'][$product_id];
+		return $GLOBALS['wholesalex_wholesale_prices'][ $product_id ];
 	}
 
-	public function set_wholesalex_wholesale_prices($product_id,$price) {
-		if(!isset($GLOBALS['wholesalex_wholesale_prices']) || !is_array($GLOBALS['wholesalex_wholesale_prices'])) {
+	/**
+	 * Set Productwise Rule Data.
+	 *
+	 * @param mixed $product_id Product ID.
+	 * @param mixed $price Price.
+	 * @return void
+	 */
+	public function set_wholesalex_wholesale_prices( $product_id, $price ) {
+		if ( ! isset( $GLOBALS['wholesalex_wholesale_prices'] ) || ! is_array( $GLOBALS['wholesalex_wholesale_prices'] ) ) {
 			$GLOBALS['wholesalex_wholesale_prices'] = array();
 		}
-		$GLOBALS['wholesalex_wholesale_prices'][$product_id] = $price; 
-	}
-	public function get_wholesalex_regular_prices($product_id) {
-		if(!isset($GLOBALS['wholesalex_regular_prices'][$product_id])) {
-			return false;
-		}
-		return $GLOBALS['wholesalex_regular_prices'][$product_id];
+		$GLOBALS['wholesalex_wholesale_prices'][ $product_id ] = $price;
 	}
 
-	public function set_wholesalex_regular_prices($product_id,$price) {
-		if(!isset($GLOBALS['wholesalex_regular_prices']) || !is_array($GLOBALS['wholesalex_regular_prices'])) {
+	/**
+	 * Set Productwise Rule Data.
+	 *
+	 * @param mixed $product_id Product ID.
+	 * @return array
+	 */
+	public function get_wholesalex_regular_prices( $product_id ) {
+		if ( ! isset( $GLOBALS['wholesalex_regular_prices'][ $product_id ] ) ) {
+			return false;
+		}
+		return $GLOBALS['wholesalex_regular_prices'][ $product_id ];
+	}
+
+	/**
+	 * Set Productwise Rule Data.
+	 *
+	 * @param mixed $product_id Product ID.
+	 * @param mixed $price Price.
+	 * @return void
+	 */
+	public function set_wholesalex_regular_prices( $product_id, $price ) {
+		if ( ! isset( $GLOBALS['wholesalex_regular_prices'] ) || ! is_array( $GLOBALS['wholesalex_regular_prices'] ) ) {
 			$GLOBALS['wholesalex_regular_prices'] = array();
 		}
-		$GLOBALS['wholesalex_regular_prices'][$product_id] = $price; 
+		$GLOBALS['wholesalex_regular_prices'][ $product_id ] = $price;
 	}
 
 	/**
 	 * Smart Tag Generate for Email Template
 	 *
-	 * @param [type] ...$args
-	 * @return void
+	 * @param mixed ...$args Arguments.
+	 * @return mixed
 	 */
-	function smart_tag_name(...$args) {
-		$current_date 	= gmdate('F j, Y');
-		$admin_email 	= get_option('admin_email');
-		$admin_user 	= get_user_by('email', $admin_email);
-		$admin_name 	= $admin_user ? $admin_user->display_name : '';
-		$site_name 		= get_bloginfo('name');
-		$result 		= [];
+	public function smart_tag_name( ...$args ) {
+		$current_date = gmdate( 'F j, Y' );
+		$admin_email  = get_option( 'admin_email' );
+		$admin_user   = get_user_by( 'email', $admin_email );
+		$admin_name   = $admin_user ? $admin_user->display_name : '';
+		$site_name    = get_bloginfo( 'name' );
+		$result       = array();
 
-		foreach ($args as $arg) {
-			switch ($arg) { 
+		foreach ( $args as $arg ) {
+			switch ( $arg ) {
 				case '{date}':
-					$result[$arg] = $current_date;
+					$result[ $arg ] = $current_date;
 					break;
 				case '{site_name}':
-					$result[$arg] = $site_name;
+					$result[ $arg ] = $site_name;
 					break;
 				case '{admin_name}':
-					$result[$arg] = $admin_name;
+					$result[ $arg ] = $admin_name;
 					break;
 			}
 		}
@@ -2553,50 +2650,52 @@ class Functions {
 	 * @return void
 	 */
 	public function wsx_migration_install_callback() {
-        if ( ! file_exists( WP_PLUGIN_DIR . '/wholesalex-migration-tool/wholesalex-migration-tool.php' ) ) {
-            include ABSPATH . 'wp-admin/includes/plugin-install.php';
-            include ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-			
+		if ( ! file_exists( WP_PLUGIN_DIR . '/wholesalex-migration-tool/wholesalex-migration-tool.php' ) ) {
+			include ABSPATH . 'wp-admin/includes/plugin-install.php';
+			include ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+
 			if ( ! class_exists( 'Plugin_Installer_Skin' ) ) {
 				include ABSPATH . 'wp-admin/includes/class-plugin-installer-skin.php';
 			}
-            if ( ! class_exists( 'Plugin_Upgrader' ) ) {
-                include ABSPATH . 'wp-admin/includes/class-plugin-upgrader.php';
-            }
-            $plugin = 'wholesalex-migration-tool';
-            $api = plugins_api( 'plugin_information', array(
-                'slug' => $plugin,
-                'fields' => array(
-                    'short_description' => false,
-                    'sections' => false,
-                    'requires' => false,
-                    'rating' => false,
-                    'ratings' => false,
-                    'downloaded' => false,
-                    'last_updated' => false,
-                    'added' => false,
-                    'tags' => false,
-                    'compatibility' => false,
-                    'homepage' => false,
-                    'donate_link' => false,
-                ),
-            ) );
+			if ( ! class_exists( 'Plugin_Upgrader' ) ) {
+				include ABSPATH . 'wp-admin/includes/class-plugin-upgrader.php';
+			}
+			$plugin = 'wholesalex-migration-tool';
+			$api    = plugins_api(
+				'plugin_information',
+				array(
+					'slug'   => $plugin,
+					'fields' => array(
+						'short_description' => false,
+						'sections'          => false,
+						'requires'          => false,
+						'rating'            => false,
+						'ratings'           => false,
+						'downloaded'        => false,
+						'last_updated'      => false,
+						'added'             => false,
+						'tags'              => false,
+						'compatibility'     => false,
+						'homepage'          => false,
+						'donate_link'       => false,
+					),
+				)
+			);
 			// Translators: %s is the plugin name and version.
-            $title = sprintf( __( 'Installing Plugin: %s', 'wholesalex-pro' ), $api->name . ' ' . $api->version );
-            $nonce = 'install-plugin_' . $plugin;
-            $url = 'update.php?action=install-plugin&plugin=' . urlencode( $plugin );
-            $upgrader = new \Plugin_Upgrader( new \WP_Ajax_Upgrader_Skin( compact( 'title', 'url', 'nonce', 'plugin', 'api' ) ) );
-            $upgrader->install( $api->download_link );
-            activate_plugin( '/wholesalex-migration-tool/wholesalex-migration-tool.php' );
-			wp_redirect( admin_url( 'admin.php?page=wholesalex-migration' ) );
+			$title    = sprintf( __( 'Installing Plugin: %s', 'wholesalex' ), $api->name . ' ' . $api->version );
+			$nonce    = 'install-plugin_' . $plugin;
+			$url      = 'update.php?action=install-plugin&plugin=' . rawurlencode( $plugin );
+			$upgrader = new \Plugin_Upgrader( new \WP_Ajax_Upgrader_Skin( compact( 'title', 'url', 'nonce', 'plugin', 'api' ) ) );
+			$upgrader->install( $api->download_link );
+			activate_plugin( '/wholesalex-migration-tool/wholesalex-migration-tool.php' );
+			wp_safe_redirect( admin_url( 'admin.php?page=wholesalex-migration' ) );
 			exit;
-        } else if ( file_exists( WP_PLUGIN_DIR . '/wholesalex-migration-tool/wholesalex-migration-tool.php' ) && ! is_plugin_active( 'wholesalex-migration-tool/wholesalex-migration-tool.php' ) ) {
-            activate_plugin( '/wholesalex-migration-tool/wholesalex-migration-tool.php' );
-			wp_redirect( admin_url( 'admin.php?page=wholesalex' ) );
+		} elseif ( file_exists( WP_PLUGIN_DIR . '/wholesalex-migration-tool/wholesalex-migration-tool.php' ) && ! is_plugin_active( 'wholesalex-migration-tool/wholesalex-migration-tool.php' ) ) {
+			activate_plugin( '/wholesalex-migration-tool/wholesalex-migration-tool.php' );
+			wp_safe_redirect( admin_url( 'admin.php?page=wholesalex' ) );
 			exit;
-        }
-        
-    }
+		}
+	}
 
 	/**
 	 * Check if a plugin is installed and activated.
@@ -2604,13 +2703,11 @@ class Functions {
 	 * @param string $plugin_path The relative path to the plugin file (e.g., 'woocommerce/woocommerce.php').
 	 * @return bool True if the plugin is installed and activated, false otherwise.
 	 */
-	function is_plugin_installed_and_activated($plugin_path) {
-		// Check if the plugin is installed and activated
-		if ( file_exists(WP_PLUGIN_DIR . '/' . $plugin_path) && is_plugin_active($plugin_path) ) {
+	public function is_plugin_installed_and_activated( $plugin_path ) {
+		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_path ) && is_plugin_active( $plugin_path ) ) {
 			return true;
 		}
 
 		return false;
 	}
-
 }

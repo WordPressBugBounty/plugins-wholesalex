@@ -314,5 +314,4 @@ abstract class WHOLESALEX_Role_Importer implements WHOLESALEX_Importer_Interface
 
 		return $value;
 	}
-
 }

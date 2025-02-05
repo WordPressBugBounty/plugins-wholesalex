@@ -21,20 +21,10 @@ class WHOLESALEX_Role {
 	 * @since v.1.0.0
 	 */
 	public function __construct() {
-		// add_action( 'admin_menu', array( $this, 'role_add_submenu_page' ) );
 		add_action( 'rest_api_init', array( $this, 'delete_selected_role_callback' ) );
 		add_action( 'rest_api_init', array( $this, 'save_role_callback' ) );
 		add_filter( 'option_woocommerce_tax_display_shop', array( $this, 'tax_display' ) );
 		add_filter( 'option_woocommerce_tax_display_cart', array( $this, 'tax_display' ) );
-
-		// add_action( 'woocommerce_package_rates', array( $this, 'filter_shipping_methods' ), 9, 2 );
-
-		/**
-		 * Available Payment Gateways Set For Specific Roles.
-		 *
-		 * @since 1.0.3
-		 */
-		// add_filter( 'woocommerce_available_payment_gateways', array( $this, 'available_payment_gateways' ), 99999 );
 
 		/**
 		 * Rolewise Hide/Disable Coupons
@@ -55,9 +45,13 @@ class WHOLESALEX_Role {
 		add_filter( 'wholesalex_csv_role_import_mapping_options', array( $this, 'set_import_column_value' ) );
 		add_filter( 'wholesalex_csv_role_import_mapping_default_columns', array( $this, 'set_import_mapping_default_column' ) );
 		add_filter( 'wholesalex_role_importer_parsed_data', array( $this, 'parse_import_data' ) );
-
 	}
 
+	/**
+	 * Delete Selected Role Callback
+	 *
+	 * @return void
+	 */
 	public function delete_selected_role_callback() {
 		register_rest_route(
 			'wholesalex/v1',
@@ -74,25 +68,43 @@ class WHOLESALEX_Role {
 			)
 		);
 	}
-	
-	function delete_selected_roles(\WP_REST_Request $request) {
-		$roles_to_delete = $request->get_param('roles');
-		if (!is_array($roles_to_delete) || empty($roles_to_delete)) {
-			return new \WP_REST_Response(['success' => false, 'message' => 'Invalid roles'], 400);
+
+	/**
+	 * Delete Selected Roles
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function delete_selected_roles( \WP_REST_Request $request ) {
+		$roles_to_delete = $request->get_param( 'roles' );
+		if ( ! is_array( $roles_to_delete ) || empty( $roles_to_delete ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'Invalid roles',
+				),
+				400
+			);
 		}
-		$roles_option = get_option('_wholesalex_roles', []);
-		if (empty($roles_option)) {
-			return new \WP_REST_Response(['success' => false, 'message' => 'No roles found'], 400);
+		$roles_option = get_option( '_wholesalex_roles', array() );
+		if ( empty( $roles_option ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'No roles found',
+				),
+				400
+			);
 		}
-		foreach ($roles_to_delete as $role_id) {
-			if (isset($roles_option[$role_id])) {
-				unset($roles_option[$role_id]);
+		foreach ( $roles_to_delete as $role_id ) {
+			if ( isset( $roles_option[ $role_id ] ) ) {
+				unset( $roles_option[ $role_id ] );
 			}
 		}
-		update_option('_wholesalex_roles', $roles_option);
-		return new \WP_REST_Response(['success' => true], 200);
+		update_option( '_wholesalex_roles', $roles_option );
+		return new \WP_REST_Response( array( 'success' => true ), 200 );
 	}
-	
+
 	/**
 	 * Save WholesaleX Role Actions
 	 *
@@ -123,7 +135,7 @@ class WHOLESALEX_Role {
 	 */
 	public function role_action_callback( $server ) {
 		$post = $server->get_params();
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key($post['nonce']), 'wholesalex-registration' ) ) ) {
+		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
 			return;
 		}
 
@@ -154,7 +166,7 @@ class WHOLESALEX_Role {
 				$__roles = array(
 					array(
 						'id'    => 1,
-						'label' => __('New Role','wholesalex'),
+						'label' => __( 'New Role', 'wholesalex' ),
 					),
 				);
 			}
@@ -194,7 +206,7 @@ class WHOLESALEX_Role {
 			$__roles = array(
 				array(
 					'id'    => 1,
-					'label' => __('New Role','wholesalex'),
+					'label' => __( 'New Role', 'wholesalex' ),
 				),
 			);
 		}
@@ -205,54 +217,54 @@ class WHOLESALEX_Role {
 					'fields' => self::get_role_fields(),
 					'data'   => $__roles,
 					'nonce'  => wp_create_nonce( 'whx-export-roles' ),
-					'i18n' => array(
-						'user_roles' => __('User Roles','wholesalex'),
-						'no_shipping_zone_found' => __('No Shipping Zones Found!','wholesalex'),
-						'please_fill_role_name_field' => __('Please Fill Role Name Field','wholesalex'),
-						'successfully_deleted' => __('Succesfully Deleted.','wholesalex'),
-						'successfully_saved' => __('Succesfully Saved.','wholesalex'),
-						'add_new_b2b_role' => __('Add New B2B Role','wholesalex'),
-						'import' => __('Import','wholesalex'),
-						'export' => __('Export','wholesalex'),
-						'b2b_role' => __('B2B Role: ','wholesalex'),
-						'untitled_role' => __('Untitled Role','wholesalex'),
-						'delete_this_role' => __('Delete this Role.','wholesalex'),
-						'duplicate_role' => __('Duplicate Role.','wholesalex'),
-						'untitled' => __('Untitled','wholesalex'),
-						'duplicate_of' => __('Duplicate of ','wholesalex'),
-						'show_hide_role_details' => __('Show/Hide Role Details.','wholesalex'),
-						'csv_fields_to_roles' => __('Map CSV Fields to Roles','wholesalex'),
-						'select_field_from_csv_file' => __('Select fields from your CSV file to map against role fields, or to ignore during import.','wholesalex'),
-						'column_name' => __('Column name','wholesalex'),
-						'map_to_field' => __('Map to field','wholesalex'),
-						'do_not_import' => __('Do not import','wholesalex'),
-						'run_the_importer' => __('Run the importer','wholesalex'),
-						'importing' => __('Importing','wholesalex'),
-						'your_roles_are_now_being_imported' => __('Your roles are now being imported..','wholesalex'),
-						'upload_csv' => __('Upload CSV','wholesalex'),
-						'you_can_upload_only_csv_file_format' => __('You can upload only csv file format','wholesalex'),
-						'update_existing_roles' => __('Update Existing Roles','wholesalex'),
-						'update_existing_roles_help_message' => __('Selecting "Update Existing Roles" will only update existing roles. No new role will be added.','wholesalex'),
-						'continue' => __('Continue','wholesalex'),
-						'error_occured' => __('Eror Occured!','wholesalex'),
-						'import_complete' => __('Import Complete!','wholesalex'),
-						'role_imported' => __(' Role Imported.','wholesalex'),
-						'role_updated' => __(' Role Updated.','wholesalex'),
-						'role_skipped' => __(' Role Skipped.','wholesalex'),
-						'role_failed' => __(' Role Failed.','wholesalex'),
-						'view_error_logs' => __(' View Error Logs','wholesalex'),
-						'role' => __('Role','wholesalex'),
-						'reason_for_failure' => __('Reason for failure','wholesalex'),
-						'import_user_roles' => __('Import User Roles','wholesalex'),
-						'b2c_users' => __('B2C Users','wholesalex'),
-						'guest_users' => __('Guest Users','wholesalex'),
-					)
+					'i18n'   => array(
+						'user_roles'                  => __( 'User Roles', 'wholesalex' ),
+						'no_shipping_zone_found'      => __( 'No Shipping Zones Found!', 'wholesalex' ),
+						'please_fill_role_name_field' => __( 'Please Fill Role Name Field', 'wholesalex' ),
+						'successfully_deleted'        => __( 'Succesfully Deleted.', 'wholesalex' ),
+						'successfully_saved'          => __( 'Succesfully Saved.', 'wholesalex' ),
+						'add_new_b2b_role'            => __( 'Add New B2B Role', 'wholesalex' ),
+						'import'                      => __( 'Import', 'wholesalex' ),
+						'export'                      => __( 'Export', 'wholesalex' ),
+						'b2b_role'                    => __( 'B2B Role: ', 'wholesalex' ),
+						'untitled_role'               => __( 'Untitled Role', 'wholesalex' ),
+						'delete_this_role'            => __( 'Delete this Role.', 'wholesalex' ),
+						'duplicate_role'              => __( 'Duplicate Role.', 'wholesalex' ),
+						'untitled'                    => __( 'Untitled', 'wholesalex' ),
+						'duplicate_of'                => __( 'Duplicate of ', 'wholesalex' ),
+						'show_hide_role_details'      => __( 'Show/Hide Role Details.', 'wholesalex' ),
+						'csv_fields_to_roles'         => __( 'Map CSV Fields to Roles', 'wholesalex' ),
+						'select_field_from_csv_file'  => __( 'Select fields from your CSV file to map against role fields, or to ignore during import.', 'wholesalex' ),
+						'column_name'                 => __( 'Column name', 'wholesalex' ),
+						'map_to_field'                => __( 'Map to field', 'wholesalex' ),
+						'do_not_import'               => __( 'Do not import', 'wholesalex' ),
+						'run_the_importer'            => __( 'Run the importer', 'wholesalex' ),
+						'importing'                   => __( 'Importing', 'wholesalex' ),
+						'your_roles_are_now_being_imported' => __( 'Your roles are now being imported..', 'wholesalex' ),
+						'upload_csv'                  => __( 'Upload CSV', 'wholesalex' ),
+						'you_can_upload_only_csv_file_format' => __( 'You can upload only csv file format', 'wholesalex' ),
+						'update_existing_roles'       => __( 'Update Existing Roles', 'wholesalex' ),
+						'update_existing_roles_help_message' => __( 'Selecting "Update Existing Roles" will only update existing roles. No new role will be added.', 'wholesalex' ),
+						'continue'                    => __( 'Continue', 'wholesalex' ),
+						'error_occured'               => __( 'Eror Occured!', 'wholesalex' ),
+						'import_complete'             => __( 'Import Complete!', 'wholesalex' ),
+						'role_imported'               => __( ' Role Imported.', 'wholesalex' ),
+						'role_updated'                => __( ' Role Updated.', 'wholesalex' ),
+						'role_skipped'                => __( ' Role Skipped.', 'wholesalex' ),
+						'role_failed'                 => __( ' Role Failed.', 'wholesalex' ),
+						'view_error_logs'             => __( ' View Error Logs', 'wholesalex' ),
+						'role'                        => __( 'Role', 'wholesalex' ),
+						'reason_for_failure'          => __( 'Reason for failure', 'wholesalex' ),
+						'import_user_roles'           => __( 'Import User Roles', 'wholesalex' ),
+						'b2c_users'                   => __( 'B2C Users', 'wholesalex' ),
+						'guest_users'                 => __( 'Guest Users', 'wholesalex' ),
+					),
 				)
 			);
 		?>
 		<div id="_wholesalex_role"></div>
 		<?php
-		do_action('wholesalex_role_after_content_render');
+		do_action( 'wholesalex_role_after_content_render' );
 	}
 
 	/**
@@ -271,96 +283,96 @@ class WHOLESALEX_Role {
 		}
 		$__shipping_sections = array();
 
-		$data_store = WC_Data_Store::load('shipping-zone');
-		$raw_zones = $data_store->get_zones();
-		$zones = array();
-		$__shipping_zones = array();
+		$data_store         = WC_Data_Store::load( 'shipping-zone' );
+		$raw_zones          = $data_store->get_zones();
+		$zones              = array();
+		$__shipping_zones   = array();
 		$__shipping_methods = array();
 
-		foreach ($raw_zones as $raw_zone) {
-			$zone = new WC_Shipping_Zone($raw_zone);
-			$zone_id = $zone->get_id();
-			$zone_name = $zone->get_zone_name();
+		foreach ( $raw_zones as $raw_zone ) {
+			$zone                  = new WC_Shipping_Zone( $raw_zone );
+			$zone_id               = $zone->get_id();
+			$zone_name             = $zone->get_zone_name();
 			$zone_shipping_methods = $zone->get_shipping_methods();
-			$shipping_methods = array();
+			$shipping_methods      = array();
 
-			foreach ($zone_shipping_methods as $key => $method) {
-				if ($method->is_enabled()) {
-					$method_instance_id = $method->get_instance_id();
-					$method_title = $method->get_title();
-					$shipping_methods[$method_instance_id] = $method_title;
-					$__shipping_methods[$zone_id][] = array(
+			foreach ( $zone_shipping_methods as $key => $method ) {
+				if ( $method->is_enabled() ) {
+					$method_instance_id                      = $method->get_instance_id();
+					$method_title                            = $method->get_title();
+					$shipping_methods[ $method_instance_id ] = $method_title;
+					$__shipping_methods[ $zone_id ][]        = array(
 						'value' => $method_instance_id,
-						'name' => $method_title,
+						'name'  => $method_title,
 					);
-					$__shipping_method_options[$zone_id . ':' . $method_instance_id] = $zone_name . ' : ' . $method_title;
+					$__shipping_method_options[ $zone_id . ':' . $method_instance_id ] = $zone_name . ' : ' . $method_title;
 				}
 			}
 
-			$__shipping_sections[$zone_id] = array(
-				'type' => 'shipping_zone',
+			$__shipping_sections[ $zone_id ] = array(
+				'type'  => 'shipping_zone',
 				'label' => $zone_name,
-				'attr' => array(
+				'attr'  => array(
 					'_shipping_methods' => array(
-						'type' => 'checkbox',
-						'label' => '',
+						'type'    => 'checkbox',
+						'label'   => '',
 						'options' => $shipping_methods,
-						'default' => array(''),
-						'help' => __('If no methods are selected, all methods are available for this role.', 'wholesalex'),
+						'default' => array( '' ),
+						'help'    => __( 'If no methods are selected, all methods are available for this role.', 'wholesalex' ),
 					),
 				),
 			);
 
-			$__shipping_zones[''] = __('Choose Shipping Zone...', 'wholesalex');
-			$__shipping_zones[$zone_id] = $zone_name;
-			$zones[] = array(
-				'name' => $zone_name,
-				'value' => $zone_id,
+			$__shipping_zones['']         = __( 'Choose Shipping Zone...', 'wholesalex' );
+			$__shipping_zones[ $zone_id ] = $zone_name;
+			$zones[]                      = array(
+				'name'            => $zone_name,
+				'value'           => $zone_id,
 				'shipping_method' => $shipping_methods,
 			);
 		}
 
-		// Add "Rest of the World" zone if any of its shipping methods are enabled
-		$rest_of_the_world = new WC_Shipping_Zone(0);
-		$zone_id = $rest_of_the_world->get_id();
-		$zone_name = $rest_of_the_world->get_zone_name();
+		// Add "Rest of the World" zone if any of its shipping methods are enabled.
+		$rest_of_the_world     = new WC_Shipping_Zone( 0 );
+		$zone_id               = $rest_of_the_world->get_id();
+		$zone_name             = $rest_of_the_world->get_zone_name();
 		$zone_shipping_methods = $rest_of_the_world->get_shipping_methods();
-		$shipping_methods = array();
-		$has_enabled_method = false;
+		$shipping_methods      = array();
+		$has_enabled_method    = false;
 
-		foreach ($zone_shipping_methods as $key => $method) {
-			if ($method->is_enabled()) {
-				$method_instance_id = $method->get_instance_id();
-				$method_title = $method->get_title();
-				$shipping_methods[$method_instance_id] = $method_title;
-				$__shipping_methods[$zone_id][] = array(
+		foreach ( $zone_shipping_methods as $key => $method ) {
+			if ( $method->is_enabled() ) {
+				$method_instance_id                      = $method->get_instance_id();
+				$method_title                            = $method->get_title();
+				$shipping_methods[ $method_instance_id ] = $method_title;
+				$__shipping_methods[ $zone_id ][]        = array(
 					'value' => $method_instance_id,
-					'name' => $method_title,
+					'name'  => $method_title,
 				);
-				$__shipping_method_options[$zone_id . ':' . $method_instance_id] = $zone_name . ' : ' . $method_title;
+				$__shipping_method_options[ $zone_id . ':' . $method_instance_id ] = $zone_name . ' : ' . $method_title;
 				$has_enabled_method = true;
 			}
 		}
 
-		if ($has_enabled_method) {
-			$__shipping_sections[$zone_id] = array(
-				'type' => 'shipping_zone',
+		if ( $has_enabled_method ) {
+			$__shipping_sections[ $zone_id ] = array(
+				'type'  => 'shipping_zone',
 				'label' => $zone_name,
-				'attr' => array(
+				'attr'  => array(
 					'_shipping_methods' => array(
-						'type' => 'checkbox',
-						'label' => '',
+						'type'    => 'checkbox',
+						'label'   => '',
 						'options' => $shipping_methods,
-						'default' => array(''),
-						'help' => __('If no methods are selected, all methods are available for this role.', 'wholesalex'),
+						'default' => array( '' ),
+						'help'    => __( 'If no methods are selected, all methods are available for this role.', 'wholesalex' ),
 					),
 				),
 			);
 
-			$__shipping_zones[$zone_id] = $zone_name;
-			$zones[] = array(
-				'name' => $zone_name,
-				'value' => $zone_id,
+			$__shipping_zones[ $zone_id ] = $zone_name;
+			$zones[]                      = array(
+				'name'            => $zone_name,
+				'value'           => $zone_id,
 				'shipping_method' => $shipping_methods,
 			);
 		}
@@ -412,35 +424,35 @@ class WHOLESALEX_Role {
 								),
 							),
 						),
-						'regi_url_form_section'             => array(
+						'regi_url_form_section'        => array(
 							'label' => __( 'Registration Form', 'wholesalex' ),
 							'type'  => 'role_setting',
 							'attr'  => array(
-								'user_status' => array(
+								'user_status'          => array(
 									'type'    => 'radio',
 									'label'   => __( 'Registration Approval Method', 'wholesalex' ),
 									'options' => array(
 										'global_setting' => __( 'Use Global Setting', 'wholesalex' ),
 										'email_confirmation_require' => __( 'Email Confirmation Required', 'wholesalex' ),
-										'auto_approve'  => __( 'Automatically Approve Account', 'wholesalex' ),
-										'admin_approve' => __( 'Admin Approval Required', 'wholesalex' ),
+										'auto_approve'   => __( 'Automatically Approve Account', 'wholesalex' ),
+										'admin_approve'  => __( 'Admin Approval Required', 'wholesalex' ),
 									),
-									'default' =>'global_setting',
+									'default' => 'global_setting',
 									'help'    => '',
 								),
 								'after_login_redirect' => array(
-									'type'       => 'url',
-									'label'      => __( 'Redirected to Page URL (After Login)', 'wholesalex' ),
-									'help'       => '',
-									'default'    => wholesalex()->get_setting('_settings_redirect_url_login'),
-									'excludes'   => apply_filters( 'wholesalex_exclude_regi_form_field', array( 'wholesalex_guest', 'wholesalex_b2c_users' ) ),
+									'type'     => 'url',
+									'label'    => __( 'Redirected to Page URL (After Login)', 'wholesalex' ),
+									'help'     => '',
+									'default'  => wholesalex()->get_setting( '_settings_redirect_url_login' ),
+									'excludes' => apply_filters( 'wholesalex_exclude_regi_form_field', array( 'wholesalex_guest', 'wholesalex_b2c_users' ) ),
 								),
 								'after_registration_redirect' => array(
-									'type'       => 'url',
-									'label'      => __( 'Redirected to Page URL (After Registration)', 'wholesalex' ),
-									'help'       => '',
-									'default'    => wholesalex()->get_setting('_settings_redirect_url_registration'),
-									'excludes'   => apply_filters( 'wholesalex_exclude_regi_form_field', array( 'wholesalex_guest', 'wholesalex_b2c_users' ) ),
+									'type'     => 'url',
+									'label'    => __( 'Redirected to Page URL (After Registration)', 'wholesalex' ),
+									'help'     => '',
+									'default'  => wholesalex()->get_setting( '_settings_redirect_url_registration' ),
+									'excludes' => apply_filters( 'wholesalex_exclude_regi_form_field', array( 'wholesalex_guest', 'wholesalex_b2c_users' ) ),
 								),
 							),
 						),
@@ -486,17 +498,17 @@ class WHOLESALEX_Role {
 							'label' => __( 'Role Setting', 'wholesalex' ),
 							'type'  => 'role_setting',
 							'attr'  => array(
-								'_disable_coupon'      => array(
+								'_disable_coupon' => array(
 									'type'    => 'slider',
 									'label'   => '',
 									'help'    => '',
-									'options' => ['_disable_coupon'=>__( 'Disable Coupons For This Role', 'wholesalex' )],
+									'options' => array( '_disable_coupon' => __( 'Disable Coupons For This Role', 'wholesalex' ) ),
 									'desc'    => 'Disable Coupons For This Role',
 									'default' => 'no',
 								),
 							),
 						),
-						'settings_combined_migration_field'             => array(
+						'settings_combined_migration_field' => array(
 							'label' => __( 'Role Setting', 'wholesalex' ),
 							'type'  => 'role_setting',
 							'attr'  => array(
@@ -505,7 +517,7 @@ class WHOLESALEX_Role {
 									'label'    => '',
 									'help'     => '',
 									'default'  => 'no',
-									'options'  => ['_auto_role_migration' => __( 'Enable Auto Role Migration', 'wholesalex' )],
+									'options'  => array( '_auto_role_migration' => __( 'Enable Auto Role Migration', 'wholesalex' ) ),
 									'desc'     => __( 'Enable Auto Role Migration', 'wholesalex' ),
 									'excludes' => apply_filters( 'wholesalex_exclude_auto_role_migration_field', array( 'wholesalex_guest', 'wholesalex_b2c_users' ) ),
 								),
@@ -549,7 +561,7 @@ class WHOLESALEX_Role {
 
 		$__available_gateways = array();
 
-		// Get Profile Gateways
+		// Get Profile Gateways.
 		$__profile_settings = get_user_meta( get_current_user_id(), '__wholesalex_profile_settings', true );
 
 		$__profile_gateways = array();
@@ -560,7 +572,7 @@ class WHOLESALEX_Role {
 			}
 		}
 
-		foreach ($__profile_gateways as $key => $value) {
+		foreach ( $__profile_gateways as $key => $value ) {
 			$__payment_methods[] = $value['value'];
 		}
 
@@ -605,7 +617,6 @@ class WHOLESALEX_Role {
 		}
 
 		return $__available_shipping_methods;
-
 	}
 
 
@@ -648,7 +659,7 @@ class WHOLESALEX_Role {
 	 * @param string $option Include tax or Exclude Tax in Shop.
 	 */
 	public function tax_display( $option ) {
-		if(is_admin()){
+		if ( is_admin() ) {
 			return $option;
 		}
 		$__role_id      = wholesalex()->get_current_user_role();
@@ -685,9 +696,10 @@ class WHOLESALEX_Role {
 	/**
 	 * Auto WholesaleX Role Migration
 	 *
+	 * @param int $user_id User ID.
 	 * @since 1.0.4
 	 */
-	public function auto_wholesalex_role_migration($user_id) {
+	public function auto_wholesalex_role_migration( $user_id ) {
 		$__roles = array_values( wholesalex()->get_roles() );
 		if ( empty( $__roles ) ) {
 			$__roles = array(
@@ -700,7 +712,7 @@ class WHOLESALEX_Role {
 		$__current_user_role = wholesalex()->get_current_user_role();
 
 		foreach ( $__roles as $role ) {
-			if ( isset($role['id']) &&  $__current_user_role === $role['id'] ) {
+			if ( isset( $role['id'] ) && $__current_user_role === $role['id'] ) {
 				continue;
 			}
 			if ( ! isset( $role['_auto_role_migration'] ) || ! isset( $role['_role_migration_threshold_value'] ) ) {
@@ -713,7 +725,6 @@ class WHOLESALEX_Role {
 				}
 			}
 		}
-
 	}
 
 
@@ -762,9 +773,9 @@ class WHOLESALEX_Role {
 				$full_name = $user->user_login;
 			}
 			$user_options[] = array(
-				'name'  => $full_name,
-				'value' => 'user_' . $user->ID,
-				'fullName'  => $full_name,
+				'name'     => $full_name,
+				'value'    => 'user_' . $user->ID,
+				'fullName' => $full_name,
 			);
 		}
 		return $user_options;
@@ -800,7 +811,6 @@ class WHOLESALEX_Role {
 		}
 
 		return $options;
-
 	}
 
 	/**

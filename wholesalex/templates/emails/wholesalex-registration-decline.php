@@ -9,7 +9,7 @@ $site_name  = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
 do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 
 <?php /* translators: %s: Customer username */ ?>
-<p><?php printf( esc_html_x( 'Hi %s,', 'WholesaleX Registration Decline Email (Customer)' ,'wholesalex' ), esc_html( $user_login ) ); ?></p>
+<p><?php printf( esc_html_x( 'Hi %s,', 'WholesaleX Registration Decline Email (Customer)', 'wholesalex' ), esc_html( $user_login ) ); ?></p>
 <?php /* translators: %s: Site Name */ ?>
 <p><?php printf( esc_html_x( 'Thank you for the registration request on %s. Unfortunately, your registration request has been declined.', 'WholesaleX Registration Decline Email (Customer)', 'wholesalex' ), esc_html( $site_name ) ); ?>
 

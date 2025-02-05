@@ -32,12 +32,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 */
 	protected $export_type = 'dynamic_rules';
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		parent::__construct();
-	}
 
 	/**
 	 * Return an array of columns to export.
@@ -100,14 +94,13 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 		$this->total_rows = count( $rules );
 		$this->row_data   = array();
 
-		$exported_ids = isset($_GET['exported_ids']) ? explode(',', sanitize_text_field($_GET['exported_ids'])) : []; // Convert string back to array for specific user role export
+		$exported_ids = isset( $_GET['exported_ids'] ) ? explode( ',', sanitize_text_field( $_GET['exported_ids'] ) ) : array(); // Convert string back to array for specific user role export
 
 		foreach ( $rules as $rule ) {
-			if( in_array( $rule['id'], $exported_ids ) ){
+			if ( in_array( $rule['id'], $exported_ids, true ) ) {
 				$this->row_data[] = $this->generate_row_data( $rule );
 			}
 		}
-
 	}
 
 	/**
@@ -673,6 +666,4 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 		}
 		return $data;
 	}
-
-
 }

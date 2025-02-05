@@ -3,8 +3,6 @@
 defined( 'ABSPATH' ) || exit;
 
 // For Backward Compatibility.
-// Will be removed in future update
-
 // Load colors.
 $bg        = get_option( 'woocommerce_email_background_color' );
 $body      = get_option( 'woocommerce_email_body_background_color' );
@@ -27,7 +25,7 @@ $text_lighter_20 = wc_hex_lighter( $text, 20 );
 $text_lighter_40 = wc_hex_lighter( $text, 40 );
 
 ?>
- <style type="text/css"> 
+<style type="text/css"> 
 				body{
 					background-color: <?php echo esc_attr( $bg ); ?>;
 					padding: 0;

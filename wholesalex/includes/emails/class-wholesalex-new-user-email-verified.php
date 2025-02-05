@@ -70,11 +70,10 @@ class WholesaleX_New_User_Verified_Email extends WC_Email {
 		$this->description    = __( 'WholesaleX: Email Verified emails are sent to the customer when email is verified.', 'wholesalex' );
 		$this->template_base  = WHOLESALEX_PATH . 'templates/emails/';
 		$this->template_html  = 'wholesalex-email-verified.php';
-		$this->placeholders   = apply_filters( 'wholesalex_email_verified_smart_tags', wholesalex()->smart_tag_name('{date}', '{admin_name}', '{site_name}') );
+		$this->placeholders   = apply_filters( 'wholesalex_email_verified_smart_tags', wholesalex()->smart_tag_name( '{date}', '{admin_name}', '{site_name}' ) );
 
 		// Call parent constructor.
 		parent::__construct();
-		// $this->recipient = '';
 		add_action( 'wholesalex_user_email_verified_notification', array( $this, 'trigger' ), 10, 3 );
 	}
 

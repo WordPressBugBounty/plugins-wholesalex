@@ -70,11 +70,10 @@ class WholesaleX_New_User_Auto_Approved_Email extends WC_Email {
 		$this->description    = __( 'WhoesaleX: New User emails are sent to the customer when a customer signs up via wholesalex registration from and User Status set to auto approval.', 'wholesalex' );
 		$this->template_base  = WHOLESALEX_PATH . 'templates/emails/';
 		$this->template_html  = 'new-wholesalex-user-auto-approved.php';
-		$this->placeholders   = apply_filters( 'wholesalex_email_new_user_auto_approved_smart_tags', wholesalex()->smart_tag_name('{date}', '{admin_name}', '{site_name}') );
+		$this->placeholders   = apply_filters( 'wholesalex_email_new_user_auto_approved_smart_tags', wholesalex()->smart_tag_name( '{date}', '{admin_name}', '{site_name}' ) );
 
 		// Call parent constructor.
 		parent::__construct();
-		// $this->recipient = '';
 		add_action( 'wholesalex_registration_form_user_status_auto_approve_notification', array( $this, 'trigger' ), 10, 3 );
 	}
 

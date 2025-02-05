@@ -33,13 +33,6 @@ class WHOLESALEX_Role_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	protected $export_type = 'role';
 
 	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		parent::__construct();
-	}
-
-	/**
 	 * Return an array of columns to export.
 	 *
 	 * @since  1.2.9
@@ -73,9 +66,9 @@ class WHOLESALEX_Role_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 		$this->total_rows = count( $roles );
 		$this->row_data   = array();
 
-		$exported_ids = isset($_GET['exported_ids']) ? explode(',', sanitize_text_field($_GET['exported_ids'])) : []; // Convert string back to array for specific user role export
+		$exported_ids = isset( $_GET['exported_ids'] ) ? explode( ',', sanitize_text_field( $_GET['exported_ids'] ) ) : array(); // Convert string back to array for specific user role export
 		foreach ( $roles as $role ) {
-			if( in_array( $role['id'], $exported_ids ) ){
+			if ( in_array( $role['id'], $exported_ids ) ) {
 				$this->row_data[] = $this->generate_row_data( $role );
 			}
 		}
@@ -211,6 +204,4 @@ class WHOLESALEX_Role_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 		$methods = isset( $role['_role_migration_threshold_value'] ) ? $role['_role_migration_threshold_value'] : '';
 		return $methods;
 	}
-
-
 }

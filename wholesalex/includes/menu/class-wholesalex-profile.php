@@ -57,7 +57,6 @@ class WHOLESALEX_Profile {
 		 */
 
 		add_filter( 'wholesalex_free_shipping_title', array( $this, 'change_free_shipping_title' ), 9999999 );
-
 	}
 
 	/**
@@ -74,7 +73,7 @@ class WHOLESALEX_Profile {
 					'methods'             => 'POST',
 					'callback'            => array( $this, 'profile_action_callback' ),
 					'permission_callback' => function () {
-						return current_user_can( 'manage_options' );
+						return current_user_can( 'manage_options' ) || current_user_can( 'manage_woocommerce' );
 					},
 					'args'                => array(),
 				),
@@ -88,7 +87,7 @@ class WHOLESALEX_Profile {
 	 * @param object $server Server.
 	 * @return void
 	 */
-    public function profile_action_callback( $server ) {
+	public function profile_action_callback( $server ) {
 		$post = $server->get_params();
 		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
 			return;
@@ -130,7 +129,7 @@ class WHOLESALEX_Profile {
 				case 'active_user':
 					update_user_meta( $user_id, '__wholesalex_status', 'active' );
 					wholesalex()->change_role( $user_id, $__user_role );
-					do_action( 'wholesalex_set_status_active', $user_id,'' );
+					do_action( 'wholesalex_set_status_active', $user_id, '' );
 					break;
 				case 'reject_user':
 					update_user_meta( $user_id, '__wholesalex_status', 'active' );
@@ -178,6 +177,7 @@ class WHOLESALEX_Profile {
 	/**
 	 * WholesaleX Profile Rules
 	 *
+	 * @param WP_User $user User Object.
 	 * @since 1.0.0
 	 * @since 1.0.9 Account Type Check Added
 	 * @access public
@@ -199,18 +199,22 @@ class WHOLESALEX_Profile {
 				 * @since 1.1.0 Enqueue Script (Reconfigure Build File)
 				 */
 				wp_enqueue_script( 'wholesalex_profile' );
-				wp_localize_script('wholesalex_profile','wholesalex_profile',array(
-					'i18n' => array(
-						'no_data_found' => __('No Data Found! Please try with another keyword.','wholesalex'),
-						'enter_more_character' => __('Enter 2 or more characters to search.','wholesalex'),
-						'searching' => __('Searching...','wholesalex'),
-						'this_user' => __('This User','wholesalex'),
-						'unlock' => __("UNLOCK",'wholesalex'),
-						'unlock_heading' => __("Unlock All Features",'wholesalex'),
-						'unlock_desc' => __("We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.",'wholesalex'),
-						'upgrade_to_pro' => __("Upgrade to Pro  ➤",'wholesalex'),
+				wp_localize_script(
+					'wholesalex_profile',
+					'wholesalex_profile',
+					array(
+						'i18n' => array(
+							'no_data_found'        => __( 'No Data Found! Please try with another keyword.', 'wholesalex' ),
+							'enter_more_character' => __( 'Enter 2 or more characters to search.', 'wholesalex' ),
+							'searching'            => __( 'Searching...', 'wholesalex' ),
+							'this_user'            => __( 'This User', 'wholesalex' ),
+							'unlock'               => __( 'UNLOCK', 'wholesalex' ),
+							'unlock_heading'       => __( 'Unlock All Features', 'wholesalex' ),
+							'unlock_desc'          => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
+							'upgrade_to_pro'       => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
+						),
 					)
-				));
+				);
 				?>
 				<div id="_wholesalex_edit_profile" class="wsx-profile-settings-wrapper"></div>
 				<?php
@@ -229,10 +233,8 @@ class WHOLESALEX_Profile {
 			if ( ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce_create-user'] ), 'create-user' ) ) {
 				return;
 			}
-		} else {
-			if ( ! ( isset( $_POST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'update-user_' . $user_id ) ) ) {
+		} elseif ( ! ( isset( $_POST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'update-user_' . $user_id ) ) ) {
 				return;
-			}
 		}
 		if ( ! current_user_can( 'edit_user', $user_id ) ) {
 			return false;
@@ -281,7 +283,7 @@ class WHOLESALEX_Profile {
 					}
 
 					if ( isset( $_POST['role'] ) && current_user_can( 'promote_users' ) && ( ! $user_id || current_user_can( 'promote_user', $user_id ) ) ) {
-						$new_role = sanitize_text_field( $_POST['role'] );
+						$new_role = sanitize_text_field( wp_unslash( $_POST['role'] ) );
 
 						// If the new role isn't editable by the logged-in user die with error.
 						$editable_roles = get_editable_roles();
@@ -312,10 +314,9 @@ class WHOLESALEX_Profile {
 		}
 		$__role_id = get_user_meta( $user_id, '__wholesalex_role', true );
 
-		$__fields = isset( $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'])?$GLOBALS['wholesalex_registration_fields']['wholesalex_fields']:array();
+		$__fields = isset( $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'] ) ? $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'] : array();
 
-
-		$default_fields   = array( 'user_login', 'user_pass', 'display_name', 'nickname', 'first_name', 'last_name', 'description', 'user_email', 'url', 'user_confirm_email', 'user_confirm_password', 'default_user_role', 'registration_role','wholesalex_registration_role','user_confirm_pass' );
+		$default_fields = array( 'user_login', 'user_pass', 'display_name', 'nickname', 'first_name', 'last_name', 'description', 'user_email', 'url', 'user_confirm_email', 'user_confirm_password', 'default_user_role', 'registration_role', 'wholesalex_registration_role', 'user_confirm_pass' );
 
 		if ( is_array( $__fields ) ) {
 
@@ -324,9 +325,9 @@ class WHOLESALEX_Profile {
 					continue;
 				}
 
-				if(isset($field['migratedFromOldBuilder']) && $field['migratedFromOldBuilder']  ) {
+				if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
 					$field_name = $field['name'];
-				} else if ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
+				} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
 					$field_name = 'wholesalex_cf_' . $field['name'];
 				}
                 if ( in_array( $field['name'], $default_fields ) ) { // phpcs:ignore
@@ -339,27 +340,26 @@ class WHOLESALEX_Profile {
 
 					switch ( $field['type'] ) {
 						case 'email':
-							$__value = sanitize_email( $_POST[ $field_name ] );
+							$__value = sanitize_email( wp_unslash( $_POST[ $field_name ] ) );
 							break;
 						case 'textarea':
-							$__value = sanitize_textarea_field( $_POST[ $field_name ] );							
+							$__value = sanitize_textarea_field( wp_unslash( $_POST[ $field_name ] ) );
 							break;
 						default:
 							if ( is_array( $_POST[ $field_name ] ) ) {
-								$__value = wholesalex()->sanitize( $_POST[ $field_name ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+								$__value = wholesalex()->sanitize( wp_unslash( $_POST[ $field_name ] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 							} else {
-								$__value = sanitize_text_field( $_POST[ $field_name ] );
+								$__value = sanitize_text_field( wp_unslash( $_POST[ $field_name ] ) );
 							}
 							break;
 					}
-					
+
 					update_user_meta( $user_id, $field_name, $__value );
 				}
 			}
 		}
 
-
-		if ( isset( $_POST['action'] ) && 'createuser' === sanitize_text_field( $_POST['action'] ) ) {
+		if ( isset( $_POST['action'] ) && 'createuser' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) {
 			update_user_meta( $user_id, '__wholesalex_status', 'active' );
 		}
 	}
@@ -472,8 +472,6 @@ class WHOLESALEX_Profile {
 					),
 				);
 				$query->set( 'meta_key', '__wholesalex_role' );
-				// $query->set( 'meta_value', $selected_role );
-				// $query->set( 'meta_compare', '=' );
 				$query->set( 'meta_query', $meta_query );
 			} elseif ( isset( $get_data[ 'filter_wholesalex_status_' . $button ] )  && !empty($get_data[ 'filter_wholesalex_status_' . $button ])) { // @codingStandardsIgnoreLine.
 				$selected_status = $get_data[ 'filter_wholesalex_status_' . $button ]; // @codingStandardsIgnoreLine.
@@ -487,8 +485,6 @@ class WHOLESALEX_Profile {
 				$query->set( 'meta_query', $meta_query );
 			}
 		}
-
-		// return $query;
 	}
 
 	/**
@@ -536,7 +532,6 @@ class WHOLESALEX_Profile {
 		$columns['wholesalex_role']   = 'wholesalex_role';
 		$columns['wholesalex_status'] = 'wholesalex_status';
 		return $columns;
-
 	}
 
 	/**
@@ -582,7 +577,7 @@ class WHOLESALEX_Profile {
 			return;
 		}
 
-		$__fields = isset( $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'])?$GLOBALS['wholesalex_registration_fields']['wholesalex_fields']:array();
+		$__fields = isset( $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'] ) ? $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'] : array();
 
 		$__user_id = $user->ID;
 
@@ -601,27 +596,26 @@ class WHOLESALEX_Profile {
 			return;
 		}
 
-
-		$default_fields     = array( 'user_login', 'user_pass', 'display_name', 'nickname', 'first_name', 'last_name', 'description', 'user_email', 'url', 'user_confirm_email', 'user_confirm_password', 'default_user_role', 'registration_role','wholesalex_registration_role','user_confirm_pass' );
+		$default_fields     = array( 'user_login', 'user_pass', 'display_name', 'nickname', 'first_name', 'last_name', 'description', 'user_email', 'url', 'user_confirm_email', 'user_confirm_password', 'default_user_role', 'registration_role', 'wholesalex_registration_role', 'user_confirm_pass' );
 		$__has_extra_fields = false;
 		?>
 			<h2 id="wholesalex_extra_information"><?php echo sprintf( esc_html__( '%s Extra Information', 'wholesalex' ), wholesalex()->get_plugin_name() ); //phpcs:ignore ?></h2>
 			<table class="wsx-table form-table">
 				<?php
 
-				foreach ($__fields as $field) {
+				foreach ( $__fields as $field ) {
 
-					$user_role = wholesalex()->get_user_role($user->ID);
-					if(empty($user_role)) {
-						$user_role = get_user_meta($user->ID,'__wholesalex_registration_role',true);
+					$user_role = wholesalex()->get_user_role( $user->ID );
+					if ( empty( $user_role ) ) {
+						$user_role = get_user_meta( $user->ID, '__wholesalex_registration_role', true );
 					}
 
-					if(isset($field['status']) && $field['status']) {
-						if(isset($field['excludeRoles']) && is_array($field['excludeRoles']) && in_array($user_role,$field['excludeRoles'])) {
-							continue; // Exclude For this user
+					if ( isset( $field['status'] ) && $field['status'] ) {
+						if ( isset( $field['excludeRoles'] ) && is_array( $field['excludeRoles'] ) && in_array( $user_role, $field['excludeRoles'] ) ) {
+							continue; // Exclude For this user.
 						} else {
 
-							if(!isset($field['title']) && isset($field['label'])) {
+							if ( ! isset( $field['title'] ) && isset( $field['label'] ) ) {
 								$field['title'] = $field['label'];
 							}
 
@@ -629,17 +623,14 @@ class WHOLESALEX_Profile {
 								continue;
 							}
 							$__has_extra_fields = true;
-							$field_name = $field['name'];
+							$field_name         = $field['name'];
 
-							if(isset($field['migratedFromOldBuilder']) && $field['migratedFromOldBuilder']  ) {
+							if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
 								$field_name = $field['name'];
-							} else if ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
+							} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
 								$field_name = 'wholesalex_cf_' . $field['name'];
 							}
 
-							
-
-							
 							?>
 
 								<tr>
@@ -658,9 +649,9 @@ class WHOLESALEX_Profile {
 												?>
 													<select class="wsx-select" name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" class="regular-text" style="width: 25em;">
 														<?php
-														if(isset($field['migratedFromOldBuilder']) && $field['migratedFromOldBuilder']  ) {
+														if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
 															$selected = get_user_meta( $user->ID, $field['name'], true );
-														} else if ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
+														} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
 															$selected = get_user_meta( $user->ID, 'wholesalex_cf_' . $field['name'], true );
 														}
 														foreach ( $field['option'] as $option ) :
@@ -675,9 +666,9 @@ class WHOLESALEX_Profile {
 													break;
 												}
 
-												if(isset($field['migratedFromOldBuilder']) && $field['migratedFromOldBuilder']  ) {
+												if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
 													$__selected_values = get_user_meta( $user->ID, $field['name'], true );
-												} else if ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
+												} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
 													$__selected_values = get_user_meta( $user->ID, 'wholesalex_cf_' . $field['name'], true );
 												}
 												if ( empty( $__selected_values ) || ! is_array( $__selected_values ) ) {
@@ -701,9 +692,9 @@ class WHOLESALEX_Profile {
 													break;
 												}
 
-												if(isset($field['migratedFromOldBuilder']) && $field['migratedFromOldBuilder']  ) {
+												if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
 													$__selected_value = get_user_meta( $user->ID, $field['name'], true );
-												} else if ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
+												} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
 													$__selected_value = get_user_meta( $user->ID, 'wholesalex_cf_' . $field['name'], true );
 												}
 												foreach ( $field['option'] as $option ) :
@@ -718,11 +709,9 @@ class WHOLESALEX_Profile {
 												endforeach;
 												break;
 											case 'file':
-												// $__value = get_user_meta( $user->ID, 'file_' . $field['name'], true );
-
-												if(isset($field['migratedFromOldBuilder']) && $field['migratedFromOldBuilder']  ) {
-													$__value = get_user_meta( $user->ID, 'file_'.$field['name'], true );
-												} else if ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
+												if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
+													$__value = get_user_meta( $user->ID, 'file_' . $field['name'], true );
+												} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
 													$__value = get_user_meta( $user->ID, 'wholesalex_cf_' . $field['name'], true );
 												}
 												if ( ! is_wp_error( $__value ) && ! empty( $__value ) ) {
@@ -746,24 +735,24 @@ class WHOLESALEX_Profile {
 												<?php
 												break;
 											case 'textarea':
-												if(isset($field['migratedFromOldBuilder']) && $field['migratedFromOldBuilder']  ) {
+												if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
 													$__value = get_user_meta( $user->ID, $field['name'], true );
-												} else if ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
+												} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
 													$__value = get_user_meta( $user->ID, 'wholesalex_cf_' . $field['name'], true );
 												}
 												?>
-												<textarea class="wsx-textarea " name="<?php echo esc_attr( $field_name); ?>" id="<?php echo esc_attr( $field_name); ?>" value="<?php echo esc_attr( $__value ); ?>"><?php echo esc_attr( $__value ); ?></textarea>
+												<textarea class="wsx-textarea " name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" value="<?php echo esc_attr( $__value ); ?>"><?php echo esc_attr( $__value ); ?></textarea>
 												<?php
 												break;
 
 											default:
 												$__value = '';
-												if(isset($field['migratedFromOldBuilder']) && $field['migratedFromOldBuilder']  ) {
+												if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
 													$__value = get_user_meta( $user->ID, $field['name'], true );
-												} else if ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
+												} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
 													$__value = get_user_meta( $user->ID, 'wholesalex_cf_' . $field['name'], true );
 												}
-												
+
 												?>
 												<input type=<?php echo esc_attr( $field['type'] ); ?> name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" value="<?php echo esc_attr( $__value ); ?>" class="wsx-input regular-text" />
 												<?php
@@ -778,8 +767,6 @@ class WHOLESALEX_Profile {
 
 						}
 					}
-					
-
 				}
 				?>
 				
@@ -795,7 +782,6 @@ class WHOLESALEX_Profile {
 				</style>
 				<?php
 			}
-
 	}
 
 
@@ -804,7 +790,6 @@ class WHOLESALEX_Profile {
 		 *
 		 * @since 1.2.4
 		 */
-
 	public static function get_shipping_zones() {
 		$data_store           = WC_Data_Store::load( 'shipping-zone' );
 		$raw_zones            = $data_store->get_zones();
@@ -870,7 +855,6 @@ class WHOLESALEX_Profile {
 							'attr'  => array(
 								'_wholesalex_profile_override_tax_exemption' => array(
 									'type'        => 'select',
-									// 'label'       => __( 'Tax Exemption', 'wholesalex' ),
 									'label'       => __( 'Override Tax Exemption', 'wholesalex' ),
 									'options'     => array(
 										''    => __( 'Select Tax Exeption Status...', 'wholesalex' ),
@@ -1221,8 +1205,11 @@ class WHOLESALEX_Profile {
 	}
 
 
+	/**
+	 * Custom Field on WC My Account
+	 *
+	 * @since 1.2.4
+	 */
 	public function add_custom_field_on_wc_myaccount() {
-
 	}
-
 }

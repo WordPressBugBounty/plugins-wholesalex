@@ -22,11 +22,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Include dependencies.
  */
 if ( ! class_exists( 'WHOLESALEX_Dynamic_Rule_Importer', false ) ) {
-	include_once dirname( __FILE__ ) . '/abstract-wholesalex-dynamic-rule-importer.php';
+	include_once __DIR__ . '/abstract-wholesalex-dynamic-rule-importer.php';
 }
 
 if ( ! class_exists( 'WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller', false ) ) {
-	include_once dirname( __FILE__ ) . '/class-wholesalex-dynamic-rule-csv-importer-controller.php';
+	include_once __DIR__ . '/class-wholesalex-dynamic-rule-csv-importer-controller.php';
 }
 
 /**
@@ -365,7 +365,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 		}
 
 		return $value;
-
 	}
 
 	/**
@@ -485,7 +484,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 				$product_obj = wc_get_product( $product_id );
 				if ( $product_obj ) {
 					$data[] = array(
-						'name'  => esc_attr($product_obj->get_title()),
+						'name'  => esc_attr( $product_obj->get_title() ),
 						'value' => $product_id,
 					);
 				}
@@ -493,7 +492,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 		}
 
 		return $data;
-
 	}
 
 	/**
@@ -528,7 +526,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 		}
 
 		return $data;
-
 	}
 
 	/**
@@ -574,7 +571,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 		}
 
 		return $data;
-
 	}
 
 	/**
@@ -795,7 +791,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 
 							if ( $method ) {
 								$shipping_data[] = array(
-									'name'  => esc_attr($method->get_title() ),
+									'name'  => esc_attr( $method->get_title() ),
 									'value' => $method_id,
 								);
 							}
@@ -856,7 +852,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			}
 		}
 		return $data;
-
 	}
 
 	/**
@@ -880,7 +875,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 		}
 
 		return array( 'tiers' => $data );
-
 	}
 
 	/**
@@ -1025,7 +1019,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			 */
 			$this->parsed_data[] = apply_filters( 'wholesalex_dynamic_rule_importer_parsed_data', $data, $this );
 		}
-
 	}
 
 	/**
@@ -1123,7 +1116,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 				$data['imported'][] = $result['id'];
 			}
 
-			$index ++;
+			++$index;
 
 			if ( $this->params['prevent_timeouts'] && ( $this->time_exceeded() || $this->memory_exceeded() ) ) {
 				$this->file_position = $this->file_positions[ $index ];

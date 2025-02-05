@@ -69,12 +69,11 @@ class WholesaleX_Admin_New_User_Notification_Email extends WC_Email {
 		$this->description   = __( 'WhoesaleX: New User Registered emails are sent to the site admin when a customer signs up via wholesalex registration from', 'wholesalex' );
 		$this->template_base = WHOLESALEX_PATH . 'templates/emails/';
 		$this->template_html = 'admin-new-wholesalex-user.php';
-		$this->placeholders  = apply_filters( 'wholesalex_email_new_user_registered_smart_tags', wholesalex()->smart_tag_name('{date}', '{admin_name}', '{site_name}') );
+		$this->placeholders  = apply_filters( 'wholesalex_email_new_user_registered_smart_tags', wholesalex()->smart_tag_name( '{date}', '{admin_name}', '{site_name}' ) );
 		$this->recipient     = $this->get_option( 'recipient', get_option( 'admin_email' ) );
 
 		// Call parent constructor.
 		parent::__construct();
-		// $this->recipient = '';
 		add_action( 'wholesalex_registration_form_user_status_auto_approve_notification', array( $this, 'trigger' ), 10, 3 );
 		add_action( 'wholesalex_user_email_confirmation_notification', array( $this, 'trigger' ), 10, 3 );
 	}

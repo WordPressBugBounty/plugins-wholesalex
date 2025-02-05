@@ -5,6 +5,7 @@
  * @package WholesaleX
  * @since 1.1.6
  */
+
 namespace WHOLESALEX;
 
 /**
@@ -52,9 +53,9 @@ class ImportExport {
 	 * @return void
 	 */
 	public function export_users_columns() {
-        if($this->export_import_allowed()) {
-            wp_send_json_success( $this->get_default_columns() );
-        }
+		if ( $this->export_import_allowed() ) {
+			wp_send_json_success( $this->get_default_columns() );
+		}
 	}
 
 	/**
@@ -93,7 +94,7 @@ class ImportExport {
 				'billing_company'           => 'Billing: Company',
 				'billing_address_1'         => 'Billing: Address Line 1',
 				'billing_city'              => 'Billing: City',
-				'billing_postcode'         => 'Billing: Post Code/ZIP',
+				'billing_postcode'          => 'Billing: Post Code/ZIP',
 				'billing_country'           => 'Billing: Country/Region',
 				'billing_state'             => 'Billing: State/County',
 				'billing_phone'             => 'Billing: Phone',
@@ -119,12 +120,14 @@ class ImportExport {
 	 * @param integer $page Page.
 	 * @param string  $status Account Status.
 	 * @param string  $search_query Search Query.
+	 * @param string  $role Role.
+	 * @param string  $user_ids User IDs.
 	 * @return array
 	 */
-	public function get_wholesale_users( $user_per_page = -1, $page = 1, $status = '', $search_query = '',$role='', $user_ids = '' ) {
+	public function get_wholesale_users( $user_per_page = -1, $page = 1, $status = '', $search_query = '', $role = '', $user_ids = '' ) {
 		$user_fields = array( 'ID', 'user_login', 'display_name', 'user_email', 'user_registered' );
-		$meta_query = array(
-			'relation'=> 'OR',
+		$meta_query  = array(
+			'relation' => 'OR',
 			array(
 				'key'     => '__wholesalex_status',
 				'value'   => '',
@@ -137,9 +140,9 @@ class ImportExport {
 			),
 		);
 
-		if(''!=$status && ''!=$role) {
+		if ( '' !== $status && '' !== $role ) {
 			$meta_query = array(
-				'relation'=> 'AND',
+				'relation' => 'AND',
 				array(
 					'key'     => '__wholesalex_status',
 					'value'   => $status,
@@ -153,43 +156,43 @@ class ImportExport {
 			);
 		}
 
-		if ( '' !== $status && ''==$role ) {
+		if ( '' !== $status && '' === $role ) {
 			$meta_query = array(
 				array(
 					'key'     => '__wholesalex_status',
 					'value'   => $status,
 					'compare' => '=',
-				)
+				),
 			);
 		}
-		if ( '' !== $role && ''==$status ) {
+		if ( '' !== $role && '' === $status ) {
 			$meta_query = array(
 				array(
 					'key'     => '__wholesalex_role',
 					'value'   => $role,
 					'compare' => '=',
-				)
+				),
 			);
 		}
 
 		$args = array(
-			'meta_query'  => $meta_query,
-			'orderby'     => 'registered',
-			'order'       => 'DESC',
-			'number'      => $user_per_page,
-			'paged'       => $page,
-			'fields'      => 'all',
-			'search'      => '*' . $search_query . '*',
+			'meta_query' => $meta_query,
+			'orderby'    => 'registered',
+			'order'      => 'DESC',
+			'number'     => $user_per_page,
+			'paged'      => $page,
+			'fields'     => 'all',
+			'search'     => '*' . $search_query . '*',
 		);
 
-		// If user IDs are passed, add 'include' to filter by those IDs
-		if ( !empty( $user_ids ) ) {
-			$user_ids_array = explode( ',', $user_ids );
-			$user_ids_array = array_map( 'trim', $user_ids_array );
+		// If user IDs are passed, add 'include' to filter by those IDs.
+		if ( ! empty( $user_ids ) ) {
+			$user_ids_array  = explode( ',', $user_ids );
+			$user_ids_array  = array_map( 'trim', $user_ids_array );
 			$args['include'] = $user_ids_array;
 		}
-	
-		$users = get_users($args);
+
+		$users = get_users( $args );
 		return $users;
 	}
 
@@ -200,20 +203,20 @@ class ImportExport {
 	 * @return void
 	 */
 	public function export_users() {
-		$nonce = isset( $_POST['nonce'] )?sanitize_key( $_POST['nonce'] ):'';
-		if(!wp_verify_nonce($nonce,'wholesalex-registration')) {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'wholesalex-registration' ) ) {
 			return;
 		}
-        if(! $this->export_import_allowed() ) {
-            return;
-        }
-		$user_status 		= isset($_POST["getFilterStatus"]) ? sanitize_text_field($_POST["getFilterStatus"]) : '';
-		$search_query 		= isset($_POST["getSearchValue"]) ? sanitize_text_field($_POST["getSearchValue"]) : '';
-		$user_role 			= isset($_POST["getFilterRole"]) ? sanitize_text_field($_POST["getFilterRole"]) : '';
-		$selectedUserIds 	= isset($_POST["getSelectedUserIds"]) ? sanitize_text_field($_POST["getSelectedUserIds"]) : [];
-		$selected_user_data = $this->get_wholesale_users( -1, 1, $user_status, $search_query,$user_role, $selectedUserIds );
+		if ( ! $this->export_import_allowed() ) {
+			return;
+		}
+		$user_status        = isset( $_POST['getFilterStatus'] ) ? sanitize_text_field( wp_unslash( $_POST['getFilterStatus'] ) ) : '';
+		$search_query       = isset( $_POST['getSearchValue'] ) ? sanitize_text_field( wp_unslash( $_POST['getSearchValue'] ) ) : '';
+		$user_role          = isset( $_POST['getFilterRole'] ) ? sanitize_text_field( wp_unslash( $_POST['getFilterRole'] ) ) : '';
+		$selected_user_ids  = isset( $_POST['getSelectedUserIds'] ) ? sanitize_text_field( wp_unslash( $_POST['getSelectedUserIds'] ) ) : array();
+		$selected_user_data = $this->get_wholesale_users( -1, 1, $user_status, $search_query, $user_role, $selected_user_ids );
 		$exportable_columns = isset( $_POST['columns'] ) ? json_decode( sanitize_text_field( wp_unslash( $_POST['columns'] ) ), true ) : array();
-		
+
 		$data  = array();
 		$users = $selected_user_data;
 		foreach ( $users as $user ) {
@@ -267,9 +270,11 @@ class ImportExport {
 					case 'billing_city':
 					case 'billing_postcode':
 						if ( get_user_meta( $user->ID, $column, true ) ) {
-							$user_data[ $column ] = get_user_meta( $user->ID, $column, true );;
+							$user_data[ $column ] = get_user_meta( $user->ID, $column, true );
+
 						} else {
-							$user_data[ $column ] = get_user_meta( $user->ID, 'billing_post_code', true );;
+							$user_data[ $column ] = get_user_meta( $user->ID, 'billing_post_code', true );
+
 						}
 						break;
 					case 'billing_country':
@@ -281,9 +286,11 @@ class ImportExport {
 					case 'shipping_city':
 					case 'shipping_postcode':
 						if ( get_user_meta( $user->ID, $column, true ) ) {
-							$user_data[ $column ] = get_user_meta( $user->ID, $column, true );;
+							$user_data[ $column ] = get_user_meta( $user->ID, $column, true );
+
 						} else {
-							$user_data[ $column ] = get_user_meta( $user->ID, 'shipping_post_code', true );;
+							$user_data[ $column ] = get_user_meta( $user->ID, 'shipping_post_code', true );
+
 						}
 						break;
 					case 'shipping_country':
@@ -300,22 +307,21 @@ class ImportExport {
 			$user_data = apply_filters( 'wholesalex_user_export_column_data', $user_data );
 			$data[]    = $user_data;
 		}
-		$csvData = '';
+		$csv_data = '';
 
 		// Add column headers to the CSV data.
-		$csvData .= implode( ',', $exportable_columns ) . "\n";
+		$csv_data .= implode( ',', $exportable_columns ) . "\n";
 
 		// Add data rows to the CSV data.
 		foreach ( $data as $row ) {
-			$rowData = array();
+			$row_data = array();
 			foreach ( $exportable_columns as $column ) {
-				$rowData[] = isset( $row[$column] ) ? $row[$column] : '';
+				$row_data[] = isset( $row[ $column ] ) ? $row[ $column ] : '';
 			}
-			$csvData .= implode( ',', $rowData ) . "\n";
+			$csv_data .= implode( ',', $row_data ) . "\n";
 		}
 
-		wp_send_json_success( $csvData );
-
+		wp_send_json_success( $csv_data );
 	}
 
 
@@ -326,13 +332,13 @@ class ImportExport {
 	 * @param string $file File Path.
 	 */
 	public function save_csv_file( $file ) {
-		$nonce = isset( $_POST['nonce'] )?sanitize_key( $_POST['nonce'] ):'';
-		if(!wp_verify_nonce($nonce,'wholesalex-registration')) {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'wholesalex-registration' ) ) {
 			return;
 		}
 
 		global $wp_filesystem;
-		require_once ( ABSPATH . '/wp-admin/includes/file.php' );
+		require_once ABSPATH . '/wp-admin/includes/file.php';
 		WP_Filesystem();
 
 		$upload_dir = wp_upload_dir(); // WordPress upload directory.
@@ -359,23 +365,24 @@ class ImportExport {
 			'mimes'     => self::get_valid_csv_filetypes(),
 		);
 
-		add_filter('upload_dir',array($this,'change_upload_dir'));
-		add_filter('wp_handle_upload_prefilter',array($this,'change_import_file_name'));
-		$upload_success = wp_handle_upload($file,$overrides);
-		remove_filter('wp_handle_upload_prefilter',array($this,'change_import_file_name'));
-		remove_filter('upload_dir',array($this,'change_upload_dir'));
+		add_filter( 'upload_dir', array( $this, 'change_upload_dir' ) );
+		add_filter( 'wp_handle_upload_prefilter', array( $this, 'change_import_file_name' ) );
+		$upload_success = wp_handle_upload( $file, $overrides );
+		remove_filter( 'wp_handle_upload_prefilter', array( $this, 'change_import_file_name' ) );
+		remove_filter( 'upload_dir', array( $this, 'change_upload_dir' ) );
 
-		if ( (is_object( $upload_success ) && !is_null($upload_success->url)) || is_array( $upload_success ) ) {
+		if ( ( is_object( $upload_success ) && ! is_null( $upload_success->url ) ) || is_array( $upload_success ) ) {
 			// count csv row and update in db.
 			$file_path                      = $upload_dir['basedir'] . '/wholesalex_import_data/' . $file_name;
 			$row_count                      = $this->count_and_filter_csv( $file_path );
 			$stats                          = get_option( '__wholesalex_customer_import_export_stats', array() );
 			$stats['total']                 = $row_count;
 			$stats['process']               = 0;
-			$stats['update_existing']       = isset( $_POST['update_existing'] ) ? sanitize_text_field( $_POST['update_existing'] ) : 'no';
-			$stats['process_per_iteration'] = isset( $_POST['process_per_iteration'] ) ? sanitize_text_field( $_POST['process_per_iteration'] ) : 10;
+			$stats['update_existing']       = isset( $_POST['update_existing'] ) ? sanitize_text_field( wp_unslash( $_POST['update_existing'] ) ) : 'no';
+			$process_per_iteration          = isset( $_POST['process_per_iteration'] ) ? sanitize_text_field( wp_unslash( $_POST['process_per_iteration'] ) ) : null;
+			$stats['process_per_iteration'] = null !== $process_per_iteration ? sanitize_text_field( $process_per_iteration ) : 10;
 			if ( $stats['update_existing'] ) {
-				$stats['find_user_by'] = isset( $_POST['find_user_by'] ) ? sanitize_text_field( $_POST['find_user_by'] ) : 'username';
+				$stats['find_user_by'] = isset( $_POST['find_user_by'] ) ? sanitize_text_field( wp_unslash( $_POST['find_user_by'] ) ) : 'username';
 			}
 			$stats['log'] = '';
 			update_option( '__wholesalex_customer_import_export_stats', $stats );
@@ -384,12 +391,24 @@ class ImportExport {
 		return $upload_success;
 	}
 
-	public function change_import_file_name($file) {
+	/**
+	 * Change Import File Name
+	 *
+	 * @param string $file File Name.
+	 * @return string
+	 */
+	public function change_import_file_name( $file ) {
 		$file['name'] = 'wholesalex_users.csv';
 		return $file;
 	}
 
-	public function change_upload_dir($dir) {
+	/**
+	 * Change Upload Directory
+	 *
+	 * @param string $dir Directory.
+	 * @return string
+	 */
+	public function change_upload_dir( $dir ) {
 		return array(
 			'path'   => $dir['basedir'] . '/wholesalex_import_data',
 			'url'    => $dir['baseurl'] . '/wholesalex_import_data',
@@ -417,14 +436,14 @@ class ImportExport {
 	 * Upload csv file
 	 */
 	public function import_users() {
-		$nonce = isset( $_POST['nonce'] )?sanitize_key( $_POST['nonce'] ):'';
-		if(!wp_verify_nonce($nonce,'wholesalex-registration')) {
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'wholesalex-registration' ) ) {
 			return;
 		}
 
-        if(! $this->export_import_allowed() ) {
-            return;
-        }
+		if ( ! $this->export_import_allowed() ) {
+			return;
+		}
 
 		$response = array(
 			'log'             => '',
@@ -439,7 +458,7 @@ class ImportExport {
 		if ( isset( $_FILES['file'] ) && ! empty( $_FILES['file'] ) ) {
 			$file           = $_FILES['file']; //phpcs:ignore
 			$file_extension = pathinfo( $file['name'], PATHINFO_EXTENSION );
-			if ( $file_extension !== 'csv' ) {
+			if ( 'csv' !== $file_extension ) {
 				return wp_send_json_success( $response );
 			}
 
@@ -459,7 +478,6 @@ class ImportExport {
 		}
 
 		wp_send_json_success( $response );
-
 	}
 
 	/**
@@ -474,11 +492,11 @@ class ImportExport {
 			$columns = fgetcsv( $handle );
 
 			$mapped_column = array_flip( $columns );
-			while ( ( $data = fgetcsv( $handle ) ) !== false ) {
+			while ( false !== ( $data = fgetcsv( $handle ) ) ) {
 				$email = $data[ $mapped_column['email'] ];
 
 				if ( ! empty( array_filter( $data ) ) || empty( $email ) ) {
-					$row_count++;
+					++$row_count;
 				}
 			}
 			fclose( $handle ); // @codingStandardsIgnoreLine.
@@ -498,9 +516,9 @@ class ImportExport {
 			return;
 		}
 
-        if(! $this->export_import_allowed() ) {
-            return;
-        }
+		if ( ! $this->export_import_allowed() ) {
+			return;
+		}
 
 		add_filter( 'send_password_change_email', '__return_false' );
 		add_filter( 'woocommerce_email_change_notification', '__return_false' );
@@ -509,7 +527,7 @@ class ImportExport {
 
 		$max_process = isset( $stats['process_per_iteration'] ) ? $stats['process_per_iteration'] : 10;
 		// Check if a previous end position is stored.
-		$startFrom        = isset( $stats['previous_position'] ) ? $stats['previous_position'] : 1;
+		$start_from        = isset( $stats['previous_position'] ) ? $stats['previous_position'] : 1;
 		$current_position = isset( $stats['current_position'] ) ? $stats['current_position'] : 1;
 
 		$is_update = isset( $_POST['update_existing'] ) ? 'yes' === $_POST['update_existing'] : false;
@@ -537,12 +555,12 @@ class ImportExport {
 			$log           = '';
 			$row_count     = isset( $stats['row_count'] ) ? $stats['row_count'] : 1;
 
-			if ( 1 == $startFrom ) {
+			if ( 1 === $start_from ) {
 				// Set the file pointer to the last processed position.
 				fseek( $handle, ftell( $handle ) );
 
 			} else {
-				fseek( $handle, $startFrom );
+				fseek( $handle, $start_from );
 			}
 
 			while ( ( $data = fgetcsv( $handle ) ) !== false ) {
@@ -554,10 +572,10 @@ class ImportExport {
 				$password         = $data[ $mapped_column['password'] ];
 
 				$log .= "Row $row_count: ";
-				$row_count++;
+				++$row_count;
 
 				if ( empty( $email ) ) {
-					$response['skipped_count']++;
+					++$response['skipped_count'];
 					$log .= "Email is mandatory! , Skipped\n";
 					continue;
 				}
@@ -569,8 +587,8 @@ class ImportExport {
 				if ( ! is_email( $email ) ) {
 					$errors[] = array( "$email is not a Valid Email!" );
 					$log     .= "$email is not a Valid Email! , Skipped\n";
-					$response['skipped_count']++;
-					$response['process']++;
+					++$response['skipped_count'];
+					++$response['process'];
 					continue;
 				}
 
@@ -587,8 +605,8 @@ class ImportExport {
 								$log .= "$username found!. \n";
 							} else {
 								$log .= "$username Not found!. \n";
-								$response['process']++;
-								$response['skipped_count']++;
+								++$response['process'];
+								++$response['skipped_count'];
 								$flag = true;
 								break;
 							}
@@ -599,8 +617,8 @@ class ImportExport {
 								$log .= "$email found!. \n";
 							} else {
 								$log .= "$email Not found!. \n";
-								$response['process']++;
-								$response['skipped_count']++;
+								++$response['process'];
+								++$response['skipped_count'];
 								$flag = true;
 								break;
 							}
@@ -617,8 +635,8 @@ class ImportExport {
 				} else {
 					if ( $is_email_exist ) {
 						$log .= "Skipped\n";
-						$response['skipped_count']++;
-						$response['process']++;
+						++$response['skipped_count'];
+						++$response['process'];
 						continue;
 					}
 					$user_id = wc_create_new_customer( $email, $username, $password );
@@ -634,13 +652,13 @@ class ImportExport {
 						}
 
 						$log .= "Skipped\n";
-						$response['skipped_count']++;
-						$response['process']++;
+						++$response['skipped_count'];
+						++$response['process'];
 						continue;
 					} else {
 						$log .= "User Created. User ID $user_id ";
-						$response['insert_count']++;
-						$response['process']++;
+						++$response['insert_count'];
+						++$response['process'];
 					}
 					$created[] = $user_id;
 					$user      = get_userdata( $user_id );
@@ -648,43 +666,43 @@ class ImportExport {
 
 				if ( ! is_object( $user ) ) {
 					$log .= "User Object Not Found.\n";
-					$response['skipped_count']++;
-					$response['process']++;
+					++$response['skipped_count'];
+					++$response['process'];
 					continue;
 				}
-				
+
 				$user_data       = array();
 				$user_data['ID'] = $user->ID;
 
-				if ( ! email_exists( $email ) && $email != $user->user_email ) {
+				if ( ! email_exists( $email ) && $email !== $user->user_email ) {
 					$user_data['user_email'] = $email;
 					$log                    .= "$username Email Updated. ";
 				}
 
 				if ( ! empty( $password ) && $is_update ) {
-					$user_data['user_pass'] = $password;
-					$log                   .= 'Password Updated.';
-					$user_extra_data_upsate[]	= 'password';
+					$user_data['user_pass']   = $password;
+					$log                     .= 'Password Updated.';
+					$user_extra_data_upsate[] = 'password';
 				}
 
-				// Define an array of fields and their corresponding meta keys or user data keys
-				$fields = [
-					'first_name'  => 'first_name',
-					'last_name'   => 'last_name',
-					'display_name'=> 'display_name',
-					'nickname'    => 'nickname',
-					'bio'         => 'description',
-					'avatar'      => 'avatar'
-				];
-				$user_data_full = get_userdata($user->ID);
+				// Define an array of fields and their corresponding meta keys or user data keys.
+				$fields         = array(
+					'first_name'   => 'first_name',
+					'last_name'    => 'last_name',
+					'display_name' => 'display_name',
+					'nickname'     => 'nickname',
+					'bio'          => 'description',
+					'avatar'       => 'avatar',
+				);
+				$user_data_full = get_userdata( $user->ID );
 
-				foreach ($fields as $field_key => $meta_key) {
-					$field_value = $field_key === 'nickname' || $field_key === 'bio' || $field_key === 'avatar' ? $data[$mapped_column[$field_key]] : $$field_key;
-					$current_value = ($field_key === 'display_name') ? $user_data_full->display_name : get_user_meta($user->ID, $meta_key, true);
-					
-					if (!empty($field_value) && $field_value != $current_value) {
-						$user_data[$meta_key] = $field_value;
-						$log .= ucfirst(str_replace('_', ' ', $field_key)) . ' Updated.';
+				foreach ( $fields as $field_key => $meta_key ) {
+					$field_value   = 'nickname' === $field_key || 'bio' === $field_key || 'avatar' === $field_key ? $data[ $mapped_column[ $field_key ] ] : $$field_key;
+					$current_value = ( 'display_name' === $field_key ) ? $user_data_full->display_name : get_user_meta( $user->ID, $meta_key, true );
+
+					if ( ! empty( $field_value ) && $field_value != $current_value ) {
+						$user_data[ $meta_key ]   = $field_value;
+						$log                     .= ucfirst( str_replace( '_', ' ', $field_key ) ) . ' Updated.';
 						$user_extra_data_upsate[] = $field_key;
 					}
 				}
@@ -692,37 +710,36 @@ class ImportExport {
 				if ( count( $user_data ) > 1 ) {
 					wp_update_user( $user_data );
 				}
-				if ( count($data)>0 && $is_update ) {
-					$response['process']++;
-					$response['update_count']++;
+				if ( count( $data ) > 0 && $is_update ) {
+					++$response['process'];
+					++$response['update_count'];
 				}
-				//enddd
 
-				$billing_shipping_fields = [
-					'billing_first_name' => 'Billing First Name',
-					'billing_last_name' => 'Billing Last Name',
-					'billing_company' => 'Billing Company',
-					'billing_address_1' => 'Billing Address 1',
-					'billing_city' => 'Billing City',
-					'billing_postcode' => 'Billing Postcode',
-					'billing_country' => 'Billing Country',
-					'billing_state' => 'Billing State',
-					'billing_phone' => 'Billing Phone',
+				$billing_shipping_fields = array(
+					'billing_first_name'  => 'Billing First Name',
+					'billing_last_name'   => 'Billing Last Name',
+					'billing_company'     => 'Billing Company',
+					'billing_address_1'   => 'Billing Address 1',
+					'billing_city'        => 'Billing City',
+					'billing_postcode'    => 'Billing Postcode',
+					'billing_country'     => 'Billing Country',
+					'billing_state'       => 'Billing State',
+					'billing_phone'       => 'Billing Phone',
 					'shipping_first_name' => 'Shipping First Name',
-					'shipping_last_name' => 'Shipping Last Name',
-					'shipping_company' => 'Shipping Company',
-					'shipping_address_1' => 'Shipping Address 1',
-					'shipping_city' => 'Shipping City',
-					'shipping_postcode' => 'Shipping PostCode',
-					'shipping_country' => 'Shipping Country',
-					'shipping_state' => 'Shipping State',
-					'shipping_phone' => 'Shipping Phone'
-				];
-				
-				foreach ($billing_shipping_fields as $field_key => $label) {
-					if (!empty( $data[$mapped_column[$field_key]] ) && $data[$mapped_column[$field_key]] != get_user_meta( $user->ID, $field_key, true ) ) {
-						update_user_meta($user->ID, $field_key, $data[$mapped_column[$field_key]]);
-						$log .= $label . ' Updated.';
+					'shipping_last_name'  => 'Shipping Last Name',
+					'shipping_company'    => 'Shipping Company',
+					'shipping_address_1'  => 'Shipping Address 1',
+					'shipping_city'       => 'Shipping City',
+					'shipping_postcode'   => 'Shipping PostCode',
+					'shipping_country'    => 'Shipping Country',
+					'shipping_state'      => 'Shipping State',
+					'shipping_phone'      => 'Shipping Phone',
+				);
+
+				foreach ( $billing_shipping_fields as $field_key => $label ) {
+					if ( ! empty( $data[ $mapped_column[ $field_key ] ] ) && get_user_meta( $user->ID, $field_key, true ) !== $data[ $mapped_column[ $field_key ] ] ) {
+						update_user_meta( $user->ID, $field_key, $data[ $mapped_column[ $field_key ] ] );
+						$log                     .= $label . ' Updated.';
 						$user_extra_data_upsate[] = $label;
 					}
 				}
@@ -730,7 +747,7 @@ class ImportExport {
 				if ( ! empty( $data[ $mapped_column['wholesalex_role'] ] ) ) {
 					$temp = explode( ':', $data[ $mapped_column['wholesalex_role'] ] );
 
-					if ( 'whx_old' == $temp[0] ) {
+					if ( 'whx_old' === $temp[0] ) {
 						$data[ $mapped_column['wholesalex_role'] ] = $temp[1];
 					}
 				}
@@ -762,7 +779,7 @@ class ImportExport {
 			$stats['skipped_count']     = $response['skipped_count'];
 			$stats['process']           = $response['process'];
 			$stats['log']              .= $log;
-			$stats['row_count'] 		= $row_count;
+			$stats['row_count']         = $row_count;
 
 			$response['total'] = $stats['total'];
 
@@ -774,7 +791,6 @@ class ImportExport {
 		}
 
 		wp_send_json_success( $response );
-
 	}
 
 	/**
@@ -786,7 +802,7 @@ class ImportExport {
 			$exporter = new \WC_Product_CSV_Exporter();
 
 			if ( ! empty( $_GET['filename'] ) ) { // WPCS: input var ok.
-				$exporter->set_filename( wp_unslash( sanitize_text_field( $_GET['filename'] ) ) ); // WPCS: input var ok, sanitization ok.
+				$exporter->set_filename( sanitize_text_field( wp_unslash( $_GET['filename'] ) ) ); // WPCS: input var ok, sanitization ok.
 			}
 
 			$exporter->export();
@@ -799,11 +815,11 @@ class ImportExport {
 	 * @return void
 	 */
 	public function export_roles() {
-		$nonce_value = isset($_GET['nonce'])? sanitize_key( wp_unslash( $_GET['nonce'] ) ):'';
-		if(!wp_verify_nonce($nonce_value, 'whx-export-roles' )) {
+		$nonce_value = isset( $_GET['nonce'] ) ? sanitize_key( wp_unslash( $_GET['nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce_value, 'whx-export-roles' ) ) {
 			return;
 		}
-		if ( isset( $_GET['action'] ) && sanitize_text_field( $_GET['action'] ) === 'export-roles-csv' ) { // WPCS: input var ok, sanitization ok.
+		if ( isset( $_GET['action'] ) && sanitize_text_field( wp_unslash( $_GET['action'] ) ) === 'export-roles-csv' ) { // WPCS: input var ok, sanitization ok.
 			include_once WHOLESALEX_PATH . 'includes/export/class-wholesalex-roles-csv-exporter.php';
 			$exporter = new \WHOLESALEX\WHOLESALEX_Role_CSV_Exporter();
 			$exporter->set_filename( 'wholesalex_roles.csv' ); // WPCS: input var ok, sanitization ok.
@@ -819,11 +835,11 @@ class ImportExport {
 	 * @return void
 	 */
 	public function export_dynamic_rules() {
-		$nonce_value = isset($_GET['nonce'])? sanitize_key( wp_unslash( $_GET['nonce'] ) ):'';
-		if(!wp_verify_nonce($nonce_value, 'whx-export-dynamic-rules' )) {
+		$nonce_value = isset( $_GET['nonce'] ) ? sanitize_key( wp_unslash( $_GET['nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce_value, 'whx-export-dynamic-rules' ) ) {
 			return;
 		}
-		if ( isset( $_GET['action'] ) && sanitize_text_field( $_GET['action'] ) === 'export-dynamic-rule-csv' ) { // WPCS: input var ok, sanitization ok.
+		if ( isset( $_GET['action'] ) && sanitize_text_field( wp_unslash( $_GET['action'] ) ) === 'export-dynamic-rule-csv' ) { // WPCS: input var ok, sanitization ok.
 			include_once WHOLESALEX_PATH . 'includes/export/class-wholesalex-dynamic-rule-exporter.php';
 			$exporter = new \WHOLESALEX\WHOLESALEX_Dynamic_Rule_CSV_Exporter();
 			$exporter->set_filename( 'wholesalex_dynamic_rules.csv' ); // WPCS: input var ok, sanitization ok.

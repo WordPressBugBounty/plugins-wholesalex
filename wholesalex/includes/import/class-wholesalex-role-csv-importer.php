@@ -19,11 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Include dependencies.
  */
 if ( ! class_exists( 'WHOLESALEX_Role_Importer', false ) ) {
-	include_once dirname( __FILE__ ) . '/abstract-wholesalex-role-importer.php';
+	include_once __DIR__ . '/abstract-wholesalex-role-importer.php';
 }
 
 if ( ! class_exists( 'WHOLESALEX_Role_CSV_Importer_Controller', false ) ) {
-	include_once dirname( __FILE__ ) . '/class-wholesalex-role-csv-importer-controller.php';
+	include_once __DIR__ . '/class-wholesalex-role-csv-importer-controller.php';
 }
 
 /**
@@ -143,16 +143,16 @@ class WHOLESALEX_Role_CSV_Importer extends WHOLESALEX_Role_Importer {
 	/**
 	 * Remove UTF-8 BOM signature.
 	 *
-	 * @param string $string String to handle.
+	 * @param string $new_string String to handle.
 	 *
 	 * @return string
 	 */
-	protected function remove_utf8_bom( $string ) {
-		if ( 'efbbbf' === substr( bin2hex( $string ), 0, 6 ) ) { // EFBBF is the byte order mark (BOM) of UTF-8.
-			$string = substr( $string, 3 );
+	protected function remove_utf8_bom( $new_string ) {
+		if ( 'efbbbf' === substr( bin2hex( $new_string ), 0, 6 ) ) { // EFBBF is the byte order mark (BOM) of UTF-8.
+			$new_string = substr( $new_string, 3 );
 		}
 
-		return $string;
+		return $new_string;
 	}
 
 	/**
@@ -413,7 +413,6 @@ class WHOLESALEX_Role_CSV_Importer extends WHOLESALEX_Role_Importer {
 			 */
 			$this->parsed_data[] = apply_filters( 'wholesalex_role_importer_parsed_data', $data, $this );
 		}
-
 	}
 
 	/**
@@ -509,7 +508,7 @@ class WHOLESALEX_Role_CSV_Importer extends WHOLESALEX_Role_Importer {
 				$data['imported'][] = $result['id'];
 			}
 
-			$index ++;
+			++$index;
 
 			if ( $this->params['prevent_timeouts'] && ( $this->time_exceeded() || $this->memory_exceeded() ) ) {
 				$this->file_position = $this->file_positions[ $index ];

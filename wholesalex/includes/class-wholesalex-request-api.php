@@ -33,14 +33,14 @@ class WHOLESALEX_Request_API {
 		if ( ! ( isset( $_REQUEST['wpnonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_REQUEST['wpnonce'] ) ), 'wholesalex-registration' ) ) ) {
 			return;
 		}
-		$addon_name  = isset( $_POST['addon'] ) ? sanitize_text_field( $_POST['addon'] ) : '';
-		$addon_value = isset( $_POST['value'] ) ? sanitize_text_field( $_POST['value'] ) : '';
+		$addon_name  = isset( $_POST['addon'] ) ? sanitize_text_field( wp_unslash( $_POST['addon'] ) ) : '';
+		$addon_value = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
 		if ( 'wsx_addon_recaptcha' === $addon_name ) {
 			$__site_key   = wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' );
 			$__secret_key = wholesalex()->get_setting( '_settings_google_recaptcha_v3_secret_key' );
 			if ( empty( $__site_key ) || empty( $__secret_key ) ) {
 				/* translators: %1s Plugin Name */
-				wp_send_json_error( sprintf( __( 'Please Set Site Key and Secret Key Before Enable Recaptcha (Path: Dashboard > %s > Settings > Recaptcha)', 'wholesalex' ) ),wholesalex()->get_plugin_name());
+				wp_send_json_error( sprintf( __( 'Please Set Site Key and Secret Key Before Enable Recaptcha (Path: Dashboard > %s > Settings > Recaptcha)', 'wholesalex' ) ), wholesalex()->get_plugin_name() );
 			}
 		}
 		do_action( 'wholesalex_' . $addon_name . '_before_status_update', $addon_value );

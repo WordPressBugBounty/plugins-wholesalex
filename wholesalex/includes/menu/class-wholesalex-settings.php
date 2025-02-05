@@ -18,7 +18,6 @@ class Settings {
 	 * @since v.1.0.0
 	 */
 	public function __construct() {
-		// add_action( 'admin_menu', array( $this, 'settings_submenu_page_callback' ) );
 		add_action( 'rest_api_init', array( $this, 'save_settings_callback' ) );
 		add_filter( 'option_woocommerce_tax_display_shop', array( $this, 'display_price_shop_including_tax' ) );
 		add_filter( 'option_woocommerce_tax_display_cart', array( $this, 'display_price_cart_including_tax' ) );
@@ -53,7 +52,6 @@ class Settings {
 
 			add_filter( 'wholesalex_dynamic_rules_product_filter_options', array( $this, 'unlock_option' ), 20 );
 		}
-
 	}
 
 
@@ -88,7 +86,7 @@ class Settings {
 	 */
 	public function settings_action_callback( $server ) {
 		$post = $server->get_params();
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key($post['nonce']), 'wholesalex-registration' ) ) ) {
+		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
 			return;
 		}
 
@@ -133,13 +131,13 @@ class Settings {
 			array(
 				'fields' => self::get_option_settings(),
 				'data'   => wholesalex()->get_setting(),
-				'i18n' => array(
-					'settings' => __('Settings','wholesalex'),
-					'unlock' => __("UNLOCK",'wholesalex'),
-					'unlock_heading' => __("Unlock All Features",'wholesalex'),
-					'unlock_desc' => __("We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.",'wholesalex'),
-					'upgrade_to_pro' => __("Upgrade to Pro  ➤",'wholesalex'),
-				)
+				'i18n'   => array(
+					'settings'       => __( 'Settings', 'wholesalex' ),
+					'unlock'         => __( 'UNLOCK', 'wholesalex' ),
+					'unlock_heading' => __( 'Unlock All Features', 'wholesalex' ),
+					'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
+					'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
+				),
 			)
 		);
 
@@ -165,15 +163,15 @@ class Settings {
 		}
 		$my_account_id = get_option( 'woocommerce_myaccount_page_id' );
 
-		$weight_unit = get_option('woocommerce_weight_unit');
+		$weight_unit = get_option( 'woocommerce_weight_unit' );
 		return apply_filters(
 			'wholesalex_setting_fields',
 			array(
 				'general'              => array(
-					'label' => __( 'General Settings', 'wholesalex' ),
-					'attr'  => array(
-						'type' => 'general_zero',
-						'_settings_status'                 => array(
+					'label'        => __( 'General Settings', 'wholesalex' ),
+					'attr'         => array(
+						'type'                      => 'general_zero',
+						'_settings_status'          => array(
 							'type'    => 'radio',
 							'label'   => __( 'Plugin Status', 'wholesalex' ),
 							'options' => array(
@@ -185,10 +183,9 @@ class Settings {
 							/* translators: %s - Plugin Name */
 							'tooltip' => sprintf( __( 'Choose which type of store you want to create & manage with %s.', 'wholesalex' ), wholesalex()->get_plugin_name() ),
 							'doc'     => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
-							// 'help_popup' => true,
 							// 'popup_gif_link' => 'https://plugins.svn.wordpress.org/wholesalex/assets/Screenshot-1.jpg',
 						),
-						'_is_sale_or_regular_Price'                 => array(
+						'_is_sale_or_regular_Price' => array(
 							'type'    => 'radio',
 							'label'   => __( 'Apply Product Discount', 'wholesalex' ),
 							'options' => array(
@@ -211,8 +208,8 @@ class Settings {
 						),
 					),
 					'attrGroupOne' => array(
-						'type' => 'general_one',
-						'_settings_show_table' => array(
+						'type'                             => 'general_one',
+						'_settings_show_table'             => array(
 							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Show Tiered Pricing Table', 'wholesalex' ),
@@ -223,7 +220,7 @@ class Settings {
 							// 'help_popup' => true,
 							// 'popup_gif_link' => 'https://plugins.svn.wordpress.org/wholesalex/assets/Screenshot-1.jpg',
 						),
-						'b2b_stock_management_status' => array(
+						'b2b_stock_management_status'      => array(
 							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Enable B2B Stock Management', 'wholesalex' ),
@@ -232,7 +229,7 @@ class Settings {
 							'default' => 'no',
 							'tooltip' => 'Enabling this option will give a option on inventory tab on product page to manage b2b stock.',
 						),
-						'_settings_disable_coupon' => array(
+						'_settings_disable_coupon'         => array(
 							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Disable Coupons', 'wholesalex' ),
@@ -268,7 +265,7 @@ class Settings {
 							// 'tooltip' => __('Once you click on this check box all products will be hidden from guest users.','wholesalex'),
 							// 'doc_link' => 'https://getwholesalex.com/pricing/?utm_source=wholesalex_plugin&utm_medium=support&utm_campaign=wholesalex-DB',
 						),
-						'_settings_private_store' => array(
+						'_settings_private_store'          => array(
 							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Make The Store Private', 'wholesalex' ),
@@ -310,8 +307,8 @@ class Settings {
 						),
 					),
 					'attrGroupTwo' => array(
-						'type' => 'general_two',
-						'_settings_regular_price_suffix'   => array(
+						'type'                           => 'general_two',
+						'_settings_regular_price_suffix' => array(
 							'type'        => 'text',
 							'label'       => __( 'Override Regular Price Suffix', 'wholesalex' ),
 							'placeholder' => '',
@@ -361,9 +358,9 @@ class Settings {
 					),
 				),
 				'registration_n_login' => array(
-					'label' => __( 'Registration & Login', 'wholesalex' ),
-					'attr' => array(
-						'type' => 'registration_zero',
+					'label'        => __( 'Registration & Login', 'wholesalex' ),
+					'attr'         => array(
+						'type'                         => 'registration_zero',
 						'_settings_user_login_option'  => array(
 							// 'type'    => 'select',
 							'type'    => 'radio',
@@ -392,8 +389,8 @@ class Settings {
 							// 'doc' => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
 						),
 					),
-					'attrGroupOne'  => array(
-						'type' => 'registration_one',
+					'attrGroupOne' => array(
+						'type'                         => 'registration_one',
 						'_settings_seperate_page_b2b'  => array(
 							'type'    => 'select',
 							'label'   => __( 'Separate My Account Page for B2B Users', 'wholesalex' ),
@@ -449,10 +446,10 @@ class Settings {
 					),
 				),
 				'price'                => array(
-					'label' => __( 'Price', 'wholesalex' ),
-					'attr'  => array(
-						'type' => 'price_zero',
-						'_settings_price_text'            => array(
+					'label'          => __( 'Price', 'wholesalex' ),
+					'attr'           => array(
+						'type'                 => 'price_zero',
+						'_settings_price_text' => array(
 							'type'        => 'text',
 							'label'       => __( 'Wholesale Price Text for Product Pages', 'wholesalex' ),
 							'placeholder' => __( 'Wholesale Price:', 'wholesalex' ),
@@ -467,7 +464,7 @@ class Settings {
 							'default'     => __( 'Wholesale Price:', 'wholesalex' ),
 						),
 					),
-					'attrGroupOne' => array(
+					'attrGroupOne'   => array(
 						'type' => 'price_one',
 						'_settings_display_price_shop_page' => array(
 							'type'    => 'radio',
@@ -498,10 +495,9 @@ class Settings {
 							'default'     => 'pricing_range',
 						),
 					),
-					'attrGroupTwo' => array(
-						'type' => 'price_two',
+					'attrGroupTwo'   => array(
+						'type'                            => 'price_two',
 						'_settings_hide_retail_price'     => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Hide Retail Price', 'wholesalex' ),
 							'desc'    => __( 'Click on the check box if you want to hide the retail price.', 'wholesalex' ),
@@ -509,7 +505,6 @@ class Settings {
 							'default' => 'no',
 						),
 						'_settings_hide_wholesalex_price' => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Hide Wholesale Price', 'wholesalex' ),
 							'desc'    => __( 'Hide wholesale price for all users.', 'wholesalex' ),
@@ -517,7 +512,6 @@ class Settings {
 							'default' => 'no',
 						),
 						'_settings_login_to_view_price_product_list' => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Show Login to view price on Product Listing Page', 'wholesalex' ),
 							'desc'    => __( 'Login to view price', 'wholesalex' ),
@@ -528,7 +522,6 @@ class Settings {
 					'attrGroupThree' => array(
 						'type' => 'price_three',
 						'_settings_login_to_view_price_product_page' => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Show Login to view price on Single Product Page', 'wholesalex' ),
 							'desc'    => __( 'Login to view price', 'wholesalex' ),
@@ -544,43 +537,40 @@ class Settings {
 						),
 					),
 				),
-				'dynamic_rules' => array(
+				'dynamic_rules'        => array(
 					'label' => __( 'Dynamic Rules', 'wholesalex' ),
 					'attr'  => array(
-						'type' => 'dynamic_rules_zero',
-						'show_promotions_on_sp' => array(
-							// 'type'    => 'switch',
+						'type'                             => 'dynamic_rules_zero',
+						'show_promotions_on_sp'            => array(
 							'type'    => 'slider',
-							// 'label'   => __( 'Show Promotions', 'wholesalex' ),
 							'label'   => __( 'Show promotional texts on single product pages.', 'wholesalex' ),
 							'desc'    => __( 'Click on the check box to display promotional texts on single product pages.', 'wholesalex' ),
 							'help'    => '',
 							'default' => 'no',
 						),
-						'promo_button_text_on_sp'            => array(
+						'promo_button_text_on_sp'          => array(
 							'type'        => 'text',
 							'label'       => __( 'Main Promo Text', 'wholesalex' ),
 							'placeholder' => __( 'Get exclusive offers', 'wholesalex' ),
 							'help'        => '',
 							'default'     => __( 'Get exclusive offers', 'wholesalex' ),
-							'depends_on' => array(
+							'depends_on'  => array(
 								array(
 									'key'   => 'show_promotions_on_sp',
 									'value' => 'yes',
 								),
 							),
 						),
-						'product_discount_promo_section' => array(
-							'type' => 'dynamic_rule_promo_section',
-							'label' => __('Product Discount','wholesalex'),
-							'attr'	=> array(
+						'product_discount_promo_section'   => array(
+							'type'  => 'dynamic_rule_promo_section',
+							'label' => __( 'Product Discount', 'wholesalex' ),
+							'attr'  => array(
 								'show_product_discounts_text' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									'label'   => __( 'Show Product Discount on Pop Up', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display product discounts promotional texts on single product pages.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'no',
+									'type'       => 'slider',
+									'label'      => __( 'Show Product Discount on Pop Up', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display product discounts promotional texts on single product pages.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'no',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -589,13 +579,11 @@ class Settings {
 									),
 								),
 								'product_discount_rule_sp_show_rule_info' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									// 'label'   => __( 'Show Label Text', 'wholesalex' ),
-									'label'   => __( 'Show Label before product discounts rule promotional card.', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display product discounts rule info before promotional card.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'no',
+									'type'       => 'slider',
+									'label'      => __( 'Show Label before product discounts rule promotional card.', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display product discounts rule info before promotional card.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'no',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -609,27 +597,26 @@ class Settings {
 									'placeholder' => __( 'Product Discount', 'wholesalex' ),
 									'help'        => '',
 									'default'     => __( 'Product Discount', 'wholesalex' ),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
 										),
 									),
 								),
-								
-							)
+
+							),
 						),
-						'cart_discount_promo_section'	=> array(
-							'label'=> __('Cart Discount','wholesalex'),
-							'type' => 'dynamic_rule_promo_section',
-							'attr' => array(
+						'cart_discount_promo_section'      => array(
+							'label' => __( 'Cart Discount', 'wholesalex' ),
+							'type'  => 'dynamic_rule_promo_section',
+							'attr'  => array(
 								'show_cart_discount_text' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									'label'   => __( 'Show Cart Discount on Pop Up', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display cart discounts promotional texts on single product pages.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'no',
+									'type'       => 'slider',
+									'label'      => __( 'Show Cart Discount on Pop Up', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display cart discounts promotional texts on single product pages.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'no',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -638,13 +625,11 @@ class Settings {
 									),
 								),
 								'cart_discount_rule_sp_show_rule_info' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									// 'label'   => __( 'Show Label Text', 'wholesalex' ),
-									'label'   => __( 'Show Label before Cart discount promotional card.', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display cart discounts rule info before promotional card.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'no',
+									'type'       => 'slider',
+									'label'      => __( 'Show Label before Cart discount promotional card.', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display cart discounts rule info before promotional card.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'no',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -652,45 +637,44 @@ class Settings {
 										),
 									),
 								),
-								'cart_discount_rule_info_rule_type_text'            => array(
+								'cart_discount_rule_info_rule_type_text' => array(
 									'type'        => 'text',
 									'label'       => __( 'Label Text', 'wholesalex' ),
 									'placeholder' => __( 'Cart Discount', 'wholesalex' ),
 									'help'        => '',
 									'default'     => __( 'Cart Discount', 'wholesalex' ),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
 										),
 									),
 								),
-								'cart_discount_promo_sp_desc_text'            => array(
+								'cart_discount_promo_sp_desc_text' => array(
 									'type'        => 'text',
 									'label'       => __( 'Promo Description Text', 'wholesalex' ),
 									'placeholder' => __( 'After adding to the cart', 'wholesalex' ),
 									'help'        => '',
 									'default'     => __( 'After adding to the cart ', 'wholesalex' ),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
 										),
 									),
 								),
-							)
+							),
 						),
 						'payment_method_discount_promo_section' => array(
-							'label' => __('Payment Method Discounts','wholesalex'),
-							'type' => 'dynamic_rule_promo_section',
-							'attr' => array(
+							'label' => __( 'Payment Method Discounts', 'wholesalex' ),
+							'type'  => 'dynamic_rule_promo_section',
+							'attr'  => array(
 								'show_payment_method_discount_promo_text_sp' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									'label'   => __( 'Show Payment Method Discount on Pop Up', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display payment method promotional texts on single product pages.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'no',
+									'type'       => 'slider',
+									'label'      => __( 'Show Payment Method Discount on Pop Up', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display payment method promotional texts on single product pages.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'no',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -699,13 +683,11 @@ class Settings {
 									),
 								),
 								'payment_discount_rule_sp_show_rule_info' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									// 'label'   => __( 'Show Label Text', 'wholesalex' ),
-									'label'   => __( 'Show Label before Payment Method Discounts promotional card.', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display payment discounts rule info before promotional card.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'no',
+									'type'       => 'slider',
+									'label'      => __( 'Show Label before Payment Method Discounts promotional card.', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display payment discounts rule info before promotional card.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'no',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -719,7 +701,7 @@ class Settings {
 									'placeholder' => __( 'Payment Method Discount', 'wholesalex' ),
 									'help'        => '',
 									'default'     => __( 'Payment Method Discount', 'wholesalex' ),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -733,30 +715,28 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'Use {payment_methods}', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{payment_methods}' => __('Allowed Payment Methods','wholesalex'),
+										'{payment_methods}' => __( 'Allowed Payment Methods', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
 										),
 									),
 								),
-								
-							)
+
+							),
 						),
-						'free_shipping_promo_section' => array(
-							'label'=> __('Free Shipping','wholesalex'),
-							'type' => 'dynamic_rule_promo_section',
-							'attr' => array(
+						'free_shipping_promo_section'      => array(
+							'label' => __( 'Free Shipping', 'wholesalex' ),
+							'type'  => 'dynamic_rule_promo_section',
+							'attr'  => array(
 								'show_free_shipping_promo_text_on_sp' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									// 'label'   => __( 'Show Promotion on Product Page', 'wholesalex' ),
-									'label'   => __( 'Show Free Shipping Offer on Pop up', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display free shipping texts on single product pages.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'no',
+									'type'       => 'slider',
+									'label'      => __( 'Show Free Shipping Offer on Pop up', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display free shipping texts on single product pages.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'no',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -764,45 +744,44 @@ class Settings {
 										),
 									),
 								),
-								'free_shipping_text_on_sp'            => array(
+								'free_shipping_text_on_sp' => array(
 									'type'        => 'text',
 									'label'       => __( 'Promo Text', 'wholesalex' ),
 									'placeholder' => __( 'Free Shipping', 'wholesalex' ),
 									'help'        => '',
 									'default'     => __( 'Free Shipping', 'wholesalex' ),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
 										),
 									),
 								),
-								'free_shipping_heading_text_on_sp'            => array(
+								'free_shipping_heading_text_on_sp' => array(
 									'type'        => 'text',
 									'label'       => __( 'Text on Promotional Popup', 'wholesalex' ),
 									'placeholder' => __( 'Free Shipping', 'wholesalex' ),
 									'help'        => '',
 									'default'     => __( 'Free Shipping', 'wholesalex' ),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
 										),
 									),
 								),
-							)
+							),
 						),
-						'bogo_discount_promo_section' => array(
-							'label' => __('Buy X Get 1 (BOGO)','wholesalex'),
-							'type' => 'dynamic_rule_promo_section',
-							'attr' => array(
+						'bogo_discount_promo_section'      => array(
+							'label' => __( 'Buy X Get 1 (BOGO)', 'wholesalex' ),
+							'type'  => 'dynamic_rule_promo_section',
+							'attr'  => array(
 								'show_bogo_discount_promo_text_on_sp' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									'label'   => __( 'Show BOGO Discounts Promotions Text', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display BOGO Discounts promotional texts on single product pages.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'no',
+									'type'       => 'slider',
+									'label'      => __( 'Show BOGO Discounts Promotions Text', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display BOGO Discounts promotional texts on single product pages.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'no',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -811,13 +790,11 @@ class Settings {
 									),
 								),
 								'bogo_discount_rule_sp_show_rule_info' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									// 'label'   => __( 'Show Label Text', 'wholesalex' ),
-									'label'   => __( 'Show Label before BOGO discounts promotional card.', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display bogo discounts rule info before promotional card.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'no',
+									'type'       => 'slider',
+									'label'      => __( 'Show Label before BOGO discounts promotional card.', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display bogo discounts rule info before promotional card.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'no',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -826,13 +803,11 @@ class Settings {
 									),
 								),
 								'bogo_discount_bogo_badge_enable' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									// 'label'   => __( 'Show Bogo Badge', 'wholesalex' ),
-									'label'   => __( 'Show BOGO BADGE in Shop and Product page.', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display BOGO BADGE in Shop and Product page.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'yes',
+									'type'       => 'slider',
+									'label'      => __( 'Show BOGO BADGE in Shop and Product page.', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display BOGO BADGE in Shop and Product page.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'yes',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -846,21 +821,21 @@ class Settings {
 									'placeholder' => __( 'BOGO Discount', 'wholesalex' ),
 									'help'        => '',
 									'default'     => __( 'BOGO Discount', 'wholesalex' ),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
 										),
 									),
 								),
-								
+
 								'bogo_discount_free_text_on_sp'            => array(
 									'type'        => 'text',
 									'label'       => __( 'Bogo Offer Text', 'wholesalex' ),
 									'placeholder' => __( 'Get 1 Free', 'wholesalex' ),
 									'help'        => '',
 									'default'     => __( 'Get 1 Free', 'wholesalex' ),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -874,10 +849,10 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'Buy at least {required_quantity} products', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{required_quantity}' => __('Required Quantity To Get Discounts','wholesalex'),
-										'{product_title}' => __('Product Title','wholesalex'),
+										'{required_quantity}' => __( 'Required Quantity To Get Discounts', 'wholesalex' ),
+										'{product_title}' => __( 'Product Title', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -891,19 +866,18 @@ class Settings {
 									'help'        => __( 'Use the following Smart Tags to highlight the BOGO discount on the cart page. ', 'wholesalex' ),
 									'default'     => '{product_title} (BOGO Discounts)',
 									'smart_tags'  => array(
-										'{x}' => __('minimum product quantity to avail discounts','wholesalex'),
-										'{y}' => __('Free products quantity','wholesalex'),
-										'{product_title}' => __('Product Title','wholesalex'),
+										'{x}'             => __( 'minimum product quantity to avail discounts', 'wholesalex' ),
+										'{y}'             => __( 'Free products quantity', 'wholesalex' ),
+										'{product_title}' => __( 'Product Title', 'wholesalex' ),
 									),
 								),
-							)
+							),
 						),
-						'bxgy_discounts_promo_section' => array(
-							'label' => __('Buy X Get Y ','wholesalex'),
-							'type' => 'dynamic_rule_promo_section',
-							'attr' => array(
+						'bxgy_discounts_promo_section'     => array(
+							'label' => __( 'Buy X Get Y ', 'wholesalex' ),
+							'type'  => 'dynamic_rule_promo_section',
+							'attr'  => array(
 								'_settings_show_bxgy_free_products_on_single_product_page' => array(
-									// 'type'    => 'switch',
 									'type'    => 'slider',
 									'label'   => __( 'Buy X Get Y (Show free item on Product Page)', 'wholesalex' ),
 									'desc'    => __( 'Click on the check box, if you want to showcase the free product(s) on the single product page.', 'wholesalex' ),
@@ -911,19 +885,18 @@ class Settings {
 									'default' => '',
 								),
 								'_settings_show_bxgy_free_products_badge' => array(
-									// 'type'    => 'switch',
 									'type'    => 'slider',
 									'label'   => __( 'Show Badge on Shop & Product Page)', 'wholesalex' ),
 									'desc'    => __( 'Click on the check box, if you want to show BADGE  on the shop & single product page.', 'wholesalex' ),
 									'help'    => '',
 									'default' => 'yes',
 								),
-							)
+							),
 						),
-						'restrict_checkout_promo_section' => array(
-							'label' => __('Checkout Restriction','wholesalex'),
-							'type' => 'dynamic_rule_promo_section',
-							'attr' => array(
+						'restrict_checkout_promo_section'  => array(
+							'label' => __( 'Checkout Restriction', 'wholesalex' ),
+							'type'  => 'dynamic_rule_promo_section',
+							'attr'  => array(
 								'only_total_cart_value_promo_text' => array(
 									'type'        => 'text',
 									'label'       => __( 'Cart Price', 'wholesalex' ),
@@ -931,9 +904,9 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'Specify the minimum amount for checkout', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{cart_value}' => __('Cart Price','wholesalex'),
+										'{cart_value}' => __( 'Cart Price', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -947,9 +920,9 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'Specify the minimum number of items for checkout', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{cart_quantity}' => __('Cart Quantity','wholesalex'),
+										'{cart_quantity}' => __( 'Cart Quantity', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -963,9 +936,9 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'Specify the minimum cart weight for checkout', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{cart_weight}' => __('Cart Weight','wholesalex'),
+										'{cart_weight}' => __( 'Cart Weight', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -979,9 +952,9 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'Specify the minimum user order count for checkout', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{order_count}' => __( 'User Order Count','wholesalex' ),
+										'{order_count}' => __( 'User Order Count', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -995,29 +968,27 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'Specify the minimum total purchase amount for checkout', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{total_purchase_amount}' => __( 'Total Purchase Amount','wholesalex' ),
+										'{total_purchase_amount}' => __( 'Total Purchase Amount', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
 										),
 									),
 								),
-							)
+							),
 						),
-						'min_max_discounts_promo_section' => array(
-							'label' => __('Min & Max Order Quantity','wholesalex'),
-							'type' => 'dynamic_rule_promo_section',
+						'min_max_discounts_promo_section'  => array(
+							'label' => __( 'Min & Max Order Quantity', 'wholesalex' ),
+							'type'  => 'dynamic_rule_promo_section',
 							'attr'  => array(
 								'show_order_qty_text_on_sp' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									// 'label'   => __( 'Required Order Quantity Notice on Product Page', 'wholesalex' ),
-									'label'   => __( 'Display Required Order Quantity Notice on Product Page', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display required order quantity notice.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'no',
+									'type'       => 'slider',
+									'label'      => __( 'Display Required Order Quantity Notice on Product Page', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display required order quantity notice.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'no',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -1032,10 +1003,10 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'You have to add minimun {minimum_qty} quantity', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{minimum_qty}' => __('Minimum Order Quantity','wholesalex'),
-										'{product_title}' => __('Product Title','wholesalex'),
+										'{minimum_qty}'   => __( 'Minimum Order Quantity', 'wholesalex' ),
+										'{product_title}' => __( 'Product Title', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -1049,10 +1020,10 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'You can add maximum {maximum_qty} quantity', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{maximum_qty}' => __('Maximum Order Quantity','wholesalex'),
-										'{product_title}' => __('Product Title','wholesalex'),
+										'{maximum_qty}'   => __( 'Maximum Order Quantity', 'wholesalex' ),
+										'{product_title}' => __( 'Product Title', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -1066,32 +1037,30 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'You can add minimum {minimum_qty} and maximum {maximum_qty} quantity of this product', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{minimum_qty}' => __('Minimum Order Quantity','wholesalex'),
-										'{maximum_qty}' => __('Maximum Order Quantity','wholesalex'),
-										'{product_title}' => __('Product Title','wholesalex'),
+										'{minimum_qty}'   => __( 'Minimum Order Quantity', 'wholesalex' ),
+										'{maximum_qty}'   => __( 'Maximum Order Quantity', 'wholesalex' ),
+										'{product_title}' => __( 'Product Title', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
 										),
 									),
 								),
-								
-							)
+
+							),
 						),
-						'conditions_promo_section' => array(
-							'label' => __('Conditions','wholesalex'),
-							'type' => 'dynamic_rule_promo_section',
-							'attr' => array(
+						'conditions_promo_section'         => array(
+							'label' => __( 'Conditions', 'wholesalex' ),
+							'type'  => 'dynamic_rule_promo_section',
+							'attr'  => array(
 								'show_discount_conditions_on_sp' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									// 'label'   => __( 'Show Cart Total Value Discount on Pop Up', 'wholesalex' ),
-									'label'   => __( 'Show discount conditions text on Pop Up.', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display discount conditions text.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'no',
+									'type'       => 'slider',
+									'label'      => __( 'Show discount conditions text on Pop Up.', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display discount conditions text.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'no',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -1106,9 +1075,9 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'Spend upto {min_value}', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{min_value}' => __('Minimum Value','wholesalex'),
+										'{min_value}' => __( 'Minimum Value', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -1122,9 +1091,9 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'Spend max {max_value}', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{max_value}' => __('Maximum Value','wholesalex'),
+										'{max_value}' => __( 'Maximum Value', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -1138,10 +1107,10 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'Spend {min_value} to {max_value}', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{min_value}' => __('Minimum Value','wholesalex'),
-										'{max_value}' => __('Maximum Value','wholesalex'),
+										'{min_value}' => __( 'Minimum Value', 'wholesalex' ),
+										'{max_value}' => __( 'Maximum Value', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -1155,10 +1124,10 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'Add {min_value} to {max_value} product(s) to cart', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{min_value}' => __('Minimum Value','wholesalex'),
-										'{max_value}' => __('Maximum Value','wholesalex'),
+										'{min_value}' => __( 'Minimum Value', 'wholesalex' ),
+										'{max_value}' => __( 'Maximum Value', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -1168,13 +1137,13 @@ class Settings {
 								'cart_total_qty_min_conditions_text'            => array(
 									'type'        => 'text',
 									'label'       => __( 'Cart Total Weight Min Text', 'wholesalex' ),
-									'placeholder' => __( 'Add min {max_value} product(s) to cart', 'wholesalex' ),
+									'placeholder' => __( 'Add min {min_value} product(s) to cart', 'wholesalex' ),
 									'help'        => '',
-									'default'     => __( 'Add min {max_value} product(s) to cart', 'wholesalex' ),
+									'default'     => __( 'Add min {min_value} product(s) to cart', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{max_value}' => __('Maximum Value','wholesalex'),
+										'{min_value}' => __( 'Minimum Value', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -1184,21 +1153,20 @@ class Settings {
 								'cart_total_qty_max_conditions_text'            => array(
 									'type'        => 'text',
 									'label'       => __( 'Cart Total Weight Max Text', 'wholesalex' ),
-									'placeholder' => __( 'Add {min_value} or more product(s) to cart', 'wholesalex' ),
+									'placeholder' => __( 'Add {max_value} or more product(s) to cart', 'wholesalex' ),
 									'help'        => '',
-									'default'     => __( 'Add {min_value} or more product(s) to cart', 'wholesalex' ),
+									'default'     => __( 'Add {max_value} or more product(s) to cart', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{min_value}' => __('Minimum Value','wholesalex'),
+										'{max_value}' => __( 'Maximum Value', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
 										),
 									),
 								),
-		
-		
+
 								'cart_total_weight_min_max_conditions_text'            => array(
 									'type'        => 'text',
 									'label'       => __( 'Cart Total Weight Min & Max Text', 'wholesalex' ),
@@ -1206,12 +1174,12 @@ class Settings {
 									'help'        => '',
 									'default'     => __( 'Add {min_value} to {max_value} {unit} to cart', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{min_value}' => __('Minimum Value','wholesalex'),
-										'{max_value}' => __('Maximum Value','wholesalex'),
+										'{min_value}' => __( 'Minimum Value', 'wholesalex' ),
+										'{max_value}' => __( 'Maximum Value', 'wholesalex' ),
 										// Translators: %s is the unit of measurement for weight.
-										'{unit}' => sprintf(__('Unit: %s','wholesalex'),$weight_unit),
+										'{unit}'      => sprintf( __( 'Unit: %s', 'wholesalex' ), $weight_unit ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -1221,16 +1189,16 @@ class Settings {
 								'cart_total_weight_min_conditions_text'            => array(
 									'type'        => 'text',
 									'label'       => __( 'Cart Total Quantity Min Text', 'wholesalex' ),
-									'placeholder' => __( 'Add min {max_value} {unit} to cart', 'wholesalex' ),
+									'placeholder' => __( 'Add min {min_value} {unit} to cart', 'wholesalex' ),
 									'help'        => '',
-									'default'     => __( 'Add min {max_value} {unit} to cart', 'wholesalex' ),
+									'default'     => __( 'Add min {min_value} {unit} to cart', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{max_value}' => __('Maximum Value','wholesalex'),
+										'{min_value}' => __( 'Minimum Value', 'wholesalex' ),
 										// Translators: %s is the unit of measurement for weight.
-										'{unit}' => sprintf(__('Unit: %s','wholesalex'),$weight_unit),
-		
+										'{unit}'      => sprintf( __( 'Unit: %s', 'wholesalex' ), $weight_unit ),
+
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
@@ -1240,34 +1208,33 @@ class Settings {
 								'cart_total_weight_max_conditions_text'            => array(
 									'type'        => 'text',
 									'label'       => __( 'Cart Total Quantity Max Text', 'wholesalex' ),
-									'placeholder' => __( 'Add up to {min_value} {unit} to cart', 'wholesalex' ),
+									'placeholder' => __( 'Add up to {max_value} {unit} to cart', 'wholesalex' ),
 									'help'        => '',
-									'default'     => __( 'Add up to {min_value} {unit} to cart', 'wholesalex' ),
+									'default'     => __( 'Add up to {max_value} {unit} to cart', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{min_value}' => __('Minimum Value','wholesalex'),
+										'{max_value}' => __( 'Maximum Value', 'wholesalex' ),
 										// Translators: %s is the unit of measurement for weight.
-										'{unit}' => sprintf(__('Unit: %s','wholesalex'),$weight_unit),
+										'{unit}'      => sprintf( __( 'Unit: %s', 'wholesalex' ), $weight_unit ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
 										),
 									),
 								),
-							)
+							),
 						),
 						'discounts_validity_promo_section' => array(
-							'label' => __('Discounts Validity','wholesalex'),
-							'type' => 'dynamic_rule_promo_section',
-							'attr' => array(
+							'label' => __( 'Discounts Validity', 'wholesalex' ),
+							'type'  => 'dynamic_rule_promo_section',
+							'attr'  => array(
 								'show_discounts_validity_text_on_sp' => array(
-									// 'type'    => 'switch',
-									'type'    => 'slider',
-									'label'   => __( 'Show Discounts Validity on Pop-Up', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box to display Discount Validity texts on promo texts.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'no',
+									'type'       => 'slider',
+									'label'      => __( 'Show Discounts Validity on Pop-Up', 'wholesalex' ),
+									'desc'       => __( 'Click on the check box to display Discount Validity texts on promo texts.', 'wholesalex' ),
+									'help'       => '',
+									'default'    => 'no',
 									'depends_on' => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
@@ -1275,44 +1242,44 @@ class Settings {
 										),
 									),
 								),
-								'discounts_validity_text'            => array(
+								'discounts_validity_text' => array(
 									'type'        => 'text',
 									'label'       => __( 'Discount Validity Text', 'wholesalex' ),
 									'placeholder' => __( 'Valid till: {end_date}', 'wholesalex' ),
 									'help'        => '',
 									'default'     => __( 'Valid till: {end_date}', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{end_date}' => __('End Date','wholesalex'),
+										'{end_date}' => __( 'End Date', 'wholesalex' ),
 									),
-									'depends_on' => array(
+									'depends_on'  => array(
 										array(
 											'key'   => 'show_promotions_on_sp',
 											'value' => 'yes',
 										),
 									),
 								),
-							)
+							),
 						),
-						'dynamic_rule_promotional_explainer_text_single_discount'            => array(
+						'dynamic_rule_promotional_explainer_text_single_discount' => array(
 							'type'        => 'text',
 							'label'       => __( 'Promotions Explainer Text for single discounts', 'wholesalex' ),
 							'placeholder' => __( 'You can avail one of the following offers by completing the requirements.', 'wholesalex' ),
 							'help'        => '',
 							'default'     => __( 'You can avail one of the following offers by completing the requirements.', 'wholesalex' ),
-							'depends_on' => array(
+							'depends_on'  => array(
 								array(
 									'key'   => 'show_promotions_on_sp',
 									'value' => 'yes',
 								),
 							),
 						),
-						'dynamic_rule_promotional_explainer_text_multiple_discount'            => array(
+						'dynamic_rule_promotional_explainer_text_multiple_discount' => array(
 							'type'        => 'text',
 							'label'       => __( 'Promotions Explainer Text for Multiple discounts', 'wholesalex' ),
 							'placeholder' => __( 'You can avail following offers by completing the requirements.', 'wholesalex' ),
 							'help'        => '',
 							'default'     => __( 'You can avail following offers by completing the requirements.', 'wholesalex' ),
-							'depends_on' => array(
+							'depends_on'  => array(
 								array(
 									'key'   => 'show_promotions_on_sp',
 									'value' => 'yes',
@@ -1323,12 +1290,12 @@ class Settings {
 				),
 				'language_n_text'      => array(
 					'label' => __( 'Language and Text', 'wholesalex' ),
-					
+
 					'attr'  => array(
-						'type' => 'language_zero',
-						'_language_login_and_registration'            => array(
-							'type' => 'language_n_text_section',
-							'label' => __('Login & Registration','wholesalex'),
+						'type'                             => 'language_zero',
+						'_language_login_and_registration' => array(
+							'type'  => 'language_n_text_section',
+							'label' => __( 'Login & Registration', 'wholesalex' ),
 							'attr'  => array(
 								'_language_registraion_from_combine_login_text' => array(
 									'type'        => 'text',
@@ -1360,7 +1327,7 @@ class Settings {
 								),
 							),
 						),
-						'_language_price_is_hidden'     => array(
+						'_language_price_is_hidden'        => array(
 							'type'        => 'text',
 							'label'       => __( 'Price is hidden Text', 'wholesalex' ),
 							'placeholder' => '',
@@ -1379,8 +1346,8 @@ class Settings {
 					),
 				),
 				'design'               => array(
-					'label' => __( 'Design', 'wholesalex' ),
-					'attr'  => array(
+					'label'          => __( 'Design', 'wholesalex' ),
+					'attr'           => array(
 						'type' => 'design_zero',
 						'_settings_tier_table_style_design' => array(
 							'type'    => 'toggleSlider',
@@ -1390,8 +1357,8 @@ class Settings {
 							'default' => 'table_style',
 						),
 					),
-					'attrGroupOne'		=> array(
-						'type' => 'design_one',
+					'attrGroupOne'   => array(
+						'type'                     => 'design_one',
 						'_settings_vertical_style' => array(
 							'type'    => 'slider',
 							'label'   => __( 'Vertical Style', 'wholesalex' ),
@@ -1405,9 +1372,9 @@ class Settings {
 							'default' => 'no',
 						),
 					),
-					'attrGroupTwo'			=> array(
-						'type' => 'design_two',
-						'_settings_tier_price_table_heading'            => array(
+					'attrGroupTwo'   => array(
+						'type'                     => 'design_two',
+						'_settings_tier_price_table_heading' => array(
 							'type'        => 'text',
 							'label'       => __( 'Table Heading', 'wholesalex' ),
 							'placeholder' => __( 'Heading Text', 'wholesalex' ),
@@ -1418,74 +1385,95 @@ class Settings {
 							'type'    => 'dragListEdit',
 							'label'   => __( 'Choose and Navigate Table Items', 'wholesalex' ),
 							'desc'    => __( 'Choose and Navigate Table Items', 'wholesalex' ),
-							// 'is_pro'  => true,
-							'options' => array( 
-								array( 'label'=> 'Quantity_Range', 'value'=> 'Quantity Range', 'status' => 'yes' ),
-								array( 'label'=> 'Discount', 'value'=> 'Discount', 'status' => 'yes' ),
-								array( 'label'=> 'Price_Per_Unit', 'value'=> 'Price Per Unit', 'status' => 'yes' ),
-								// array( 'label'=> 'Savings_Per_Unit', 'value'=> 'Savings Per Unit', 'status' => 'yes' ),
-							 ),
-							'default' => array( 
-								array( 'label'=> 'Quantity_Range', 'value'=> 'Quantity Range', 'status' => 'yes' ),
-								array( 'label'=> 'Discount', 'value'=> 'Discount', 'status' => 'yes' ),
-								array( 'label'=> 'Price_Per_Unit', 'value'=> 'Price Per Unit', 'status' => 'yes' ),
-								// array( 'label'=> 'Savings_Per_Unit', 'value'=> 'Savings Per Unit', 'status' => 'yes' ),
-							 ),
+							'options' => array(
+								array(
+									'label'  => 'Quantity_Range',
+									'value'  => 'Quantity Range',
+									'status' => 'yes',
+								),
+								array(
+									'label'  => 'Discount',
+									'value'  => 'Discount',
+									'status' => 'yes',
+								),
+								array(
+									'label'  => 'Price_Per_Unit',
+									'value'  => 'Price Per Unit',
+									'status' => 'yes',
+								),
+							),
+							'default' => array(
+								array(
+									'label'  => 'Quantity_Range',
+									'value'  => 'Quantity Range',
+									'status' => 'yes',
+								),
+								array(
+									'label'  => 'Discount',
+									'value'  => 'Discount',
+									'status' => 'yes',
+								),
+								array(
+									'label'  => 'Price_Per_Unit',
+									'value'  => 'Price Per Unit',
+									'status' => 'yes',
+								),
+							),
 							'tooltip' => 'Decide and select which pricing will be applicable if the prices are set in multiple ways.',
 							'doc'     => '',
 						),
-						'_settings_tier_font_size'    => array(
+						'_settings_tier_font_size' => array(
 							'type'    => 'fontSize',
 							'label'   => __( 'Font Size', 'wholesalex' ),
 							'desc'    => '',
 							'default' => '14',
 						),
 					),
-					'attrGroupThree' 		=> array(
-						'type' => 'design_three',
-						'_settings_tier_table_text_color' => array(
+					'attrGroupThree' => array(
+						'type'                             => 'design_three',
+						'_settings_tier_table_text_color'  => array(
 							'type'    => 'color',
 							'label'   => __( 'Table Text Color', 'wholesalex' ),
 							'desc'    => 'Table text color',
 							'default' => '#494949',
 						),
-						'_settings_tier_table_title_text_color'  => array(
+						'_settings_tier_table_title_text_color' => array(
 							'type'    => 'color',
 							'label'   => __( 'Title Text Color', 'wholesalex' ),
 							'desc'    => 'Table header text color',
 							'default' => '#3A3A3A',
 						),
-						'_settings_tier_table_title_bg_color'  => array(
+						'_settings_tier_table_title_bg_color' => array(
 							'type'    => 'color',
 							'label'   => __( 'Title Background Color', 'wholesalex' ),
 							'desc'    => 'Table header background color',
 							'default' => '#F7F7F7',
 						),
-						'_settings_tier_table_border_color'           => array(
+						'_settings_tier_table_border_color' => array(
 							'type'    => 'color',
 							'label'   => __( 'Table Border Color', 'wholesalex' ),
 							'desc'    => 'Table border color',
 							'default' => '#E5E5E5',
 						),
-						'_settings_active_tier_text_color'         => array(
+						'_settings_active_tier_text_color' => array(
 							'type'    => 'color',
 							'label'   => __( 'Active Tier Text Color', 'wholesalex' ),
 							'desc'    => 'Active row text color',
 							'default' => '#FFFFFF',
 						),
-						'_settings_active_tier_bg_color'    => array(
+						'_settings_active_tier_bg_color'   => array(
 							'type'    => 'color',
 							'label'   => __( 'Active Tier BG Color', 'wholesalex' ),
 							'desc'    => 'Active row background color',
 							'default' => '#6C6CFF',
 						),
-						'_settings_tier_discount_text_color'         => array(
+						'_settings_tier_discount_text_color' => array(
 							'type'    => 'color',
 							'label'   => __( 'Tier Discount Text Color', 'wholesalex' ),
 							'desc'    => 'Tier discount text color',
 							'default' => '#FFFFFF',
 						),
-						'_settings_tier_discount_bg_color'    => array(
+						'_settings_tier_discount_bg_color' => array(
 							'type'    => 'color',
 							'label'   => __( 'Tier Discount BG Color', 'wholesalex' ),
 							'desc'    => 'Tier discount background color',
@@ -1497,7 +1485,7 @@ class Settings {
 					'label' => __( 'reCAPTCHA', 'wholesalex' ),
 					'attr'  => array(
 						'type' => 'recaptcha_zero',
-						'_settings_google_recaptcha_v3_site_key'   => array(
+						'_settings_google_recaptcha_v3_site_key' => array(
 							'type'        => 'text',
 							'label'       => __( 'Site Key', 'wholesalex' ),
 							'placeholder' => __( 'Site Key...', 'wholesalex' ),

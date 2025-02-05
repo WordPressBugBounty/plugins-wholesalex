@@ -70,11 +70,10 @@ class WholesaleX_New_User_Approved_Email extends WC_Email {
 		$this->description    = __( 'WholesaleX: Registration Approve emails are sent to the customer when customer registration request is approved by the site admin.', 'wholesalex' );
 		$this->template_base  = WHOLESALEX_PATH . 'templates/emails/';
 		$this->template_html  = 'wholesalex-registration-approve.php';
-		$this->placeholders   = apply_filters( 'wholesalex_email_registration_approved_smart_tags', wholesalex()->smart_tag_name('{date}', '{admin_name}', '{site_name}') );
+		$this->placeholders   = apply_filters( 'wholesalex_email_registration_approved_smart_tags', wholesalex()->smart_tag_name( '{date}', '{admin_name}', '{site_name}' ) );
 
 		// Call parent constructor.
 		parent::__construct();
-		// $this->recipient = '';
 		add_action( 'wholesalex_set_status_active_notification', array( $this, 'trigger' ), 10, 2 );
 	}
 
@@ -86,7 +85,7 @@ class WholesaleX_New_User_Approved_Email extends WC_Email {
 	 */
 	public function get_default_subject() {
 		/* translators: %s Site Title */
-		return sprintf(__( 'Your %s Registration Request Approved', 'wholesalex' ),'{site_title}');
+		return sprintf( __( 'Your %s Registration Request Approved', 'wholesalex' ), '{site_title}' );
 	}
 
 	/**
@@ -97,7 +96,7 @@ class WholesaleX_New_User_Approved_Email extends WC_Email {
 	 */
 	public function get_default_heading() {
 		/* translators: %s Site Title */
-		return sprintf(__( 'Your %s Registration Request Approved', 'wholesalex' ),'{site_title}');
+		return sprintf( __( 'Your %s Registration Request Approved', 'wholesalex' ), '{site_title}' );
 	}
 
 	/**
@@ -105,7 +104,8 @@ class WholesaleX_New_User_Approved_Email extends WC_Email {
 	 *
 	 * @param int    $user_id User ID.
 	 * @param string $user_pass User password.
-	 * @param bool   $password_generated Whether the password was generated automatically or not.
+	 * @since 1.2.3
+	 * @return mixed
 	 */
 	public function trigger( $user_id, $user_pass = '' ) {
 		$this->setup_locale();

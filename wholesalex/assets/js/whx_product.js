@@ -2033,9 +2033,29 @@ const Button = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_1__.forwardRef)((_
       setIsActive(!isActive);
       button.style.transform = 'scale(0.95)';
       setTimeout(() => button.style.transform = 'scale(1)', 150);
-      buttonLink ? sameTab ? window.location.href = buttonLink : window.open(buttonLink, '_blank') : onClick(e);
+      if (buttonLink) {
+        if (sameTab) {
+          window.location.href = buttonLink;
+        } else {
+          window.open(buttonLink, '_blank');
+        }
+      } else {
+        onClick(e);
+      }
     }
   };
+  let transformValue;
+  if (iconRotation && isActive) {
+    if (iconRotation === 'full') {
+      transformValue = 'rotate(180deg)';
+    } else if (iconRotation === 'half') {
+      transformValue = 'rotate(90deg)';
+    } else {
+      transformValue = 'rotate(0deg)';
+    }
+  } else {
+    transformValue = 'rotate(0deg)';
+  }
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     ref: ref,
     className: "".concat(onlyText ? 'wsx-btn-text' : 'wsx-btn', " ").concat(background ? "wsx-bg-".concat(background) : '', " ").concat(color ? "wsx-color-".concat(color) : '', " ").concat(Icon ? 'wsx-btn-icon' : '', " ").concat(iconGap ? "wsx-gap-".concat(iconGap) : '', " ").concat(disable ? 'disable' : '', " ").concat(borderColor ? "wsx-border-default wsx-bc-".concat(borderColor) : '', " ").concat(smallButton ? 'wsx-btn-sm' : '', " ").concat(customClass),
@@ -2043,18 +2063,25 @@ const Button = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_1__.forwardRef)((_
       padding
     }, style),
     onClick: handleClick,
-    "data-target": dataTarget
+    "data-target": dataTarget,
+    onKeyDown: e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        handleClick;
+      }
+    },
+    role: "button",
+    tabIndex: "0"
   }, IconPosition && Icon && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     className: "wsx-icon ".concat(iconAnimation ? "wsx-anim-".concat(iconAnimation) : '', " ").concat(iconColor ? "wsx-color-".concat(iconColor) : '', " ").concat(iconClass ? iconClass : ''),
     style: {
       transition: 'transform var(--transition-md)',
-      transform: iconRotation && isActive ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)'
+      transform: transformValue
     }
   }, Icon), label, !IconPosition && Icon && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     className: "wsx-icon ".concat(iconAnimation ? "wsx-anim-".concat(iconAnimation) : '', " ").concat(iconColor ? "wsx-color-".concat(iconColor) : '', " ").concat(iconClass ? iconClass : ''),
     style: {
       transition: 'transform var(--transition-md)',
-      transform: iconRotation && isActive ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)'
+      transform: transformValue
     }
   }, Icon));
 });
@@ -2081,46 +2108,40 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const Choosebox = props => {
-  let {
+  const {
     label,
     labelClass,
     labelColor,
     isLabelSide,
-    type,
     className = '',
     name,
     options,
-    defaultValue,
     value,
-    setValue,
     tooltip,
     tooltipPosition,
-    help,
     onChange
   } = props;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-choose-box-field"
   }, !isLabelSide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-input-label wsx-font-medium ".concat(tooltip ? 'wsx-d-flex' : '', " ").concat(labelColor && "wsx-color-".concat(labelColor), " ").concat(labelClass)
-  }, label, "  ", tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
+  }, label, ' ', tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
     content: tooltip,
     direction: tooltipPosition,
     spaceLeft: "8px"
   }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-choose-box-options ".concat(className)
   }, Object.keys(options).map((option, k) => {
-    const plan = option.split('_');
     const _lockField = option.startsWith('pro_');
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
       className: "wsx-label ",
       htmlFor: option,
       key: "wsx-choose-box-".concat(k),
-      id: value === option ? "choose-box-selected" : "",
+      id: value === option ? 'choose-box-selected' : '',
       style: {
         position: "".concat(_lockField && 'relative')
       }
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
-      // disabled={_lockField?true:false}
       className: "wsx-input",
       id: option,
       name: name,
@@ -2170,7 +2191,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const Input = props => {
   var _wholesalex_overview;
-  let {
+  const {
     label,
     labelColor,
     labelClass,
@@ -2186,20 +2207,18 @@ const Input = props => {
     inputClass,
     className = '',
     onChange,
-    onClick,
-    onBlur,
-    isDisable,
+    disabled,
     placeholder,
     id,
     iconClass,
-    smart_tags,
+    smartTags,
     requiredColor
   } = props;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     className: "wsx-input-wrapper ".concat(className)
   }, !isLabelHide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     className: "wsx-input-label wsx-font-medium ".concat(tooltip ? 'wsx-d-flex' : '', " ").concat(labelColor && "wsx-color-".concat(labelColor), " ").concat(labelClass)
-  }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
+  }, label, ' ', required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
     className: "wsx-required",
     style: {
       color: requiredColor || '#fc143f'
@@ -2211,17 +2230,12 @@ const Input = props => {
   }, _utils_Icons__WEBPACK_IMPORTED_MODULE_3__["default"].help)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     className: "wsx-input-container"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("input", (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, props, {
-    // ref={ref}
-    // key={`${name}_${Date.now().toString()}`}
     id: id || name,
     name: name,
     type: type,
     defaultValue: value,
-    onChange: onChange
-    // onClick={onClick}
-    // onBlur={onBlur}
-    ,
-    disabled: isDisable ? true : false,
+    onChange: onChange,
+    disabled: disabled ? true : false,
     placeholder: placeholder,
     required: required,
     className: "wsx-input ".concat(inputClass)
@@ -2229,7 +2243,7 @@ const Input = props => {
     className: iconClass
   }), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     className: "wsx-input-help wsx-help-message ".concat(helpClass)
-  }, help), smart_tags && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+  }, help), smartTags && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     className: "wsx-help-message"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     className: "wsx-smart-tags-wrapper"
@@ -2237,10 +2251,12 @@ const Input = props => {
     className: "wsx-smart-tags-heading"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     className: "wsx-smart-tags-heading-text"
-  }, ((_wholesalex_overview = wholesalex_overview) === null || _wholesalex_overview === void 0 || (_wholesalex_overview = _wholesalex_overview.i18n) === null || _wholesalex_overview === void 0 ? void 0 : _wholesalex_overview.smart_tags) || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Available Smart Tags:', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+  }, ((_wholesalex_overview = wholesalex_overview) === null || _wholesalex_overview === void 0 || (_wholesalex_overview = _wholesalex_overview.i18n) === null || _wholesalex_overview === void 0 ? void 0 : _wholesalex_overview.smartTags) || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Available Smart Tags:', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     className: "wsx-smart-tags"
-  }, Object.keys(smart_tags).map(tag => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("code", null, tag, " : ", smart_tags[tag]);
+  }, Object.keys(smartTags).map(tag => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("code", {
+      key: tag
+    }, tag, " : ", smartTags[tag]);
   }))))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Input);
@@ -2268,39 +2284,52 @@ const LoadingGif = _ref => {
     customClass,
     loaderClass
   } = _ref;
-  return overlay ? insideContainer ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "wsx-absolute wsx-z-999 wsx-top wsx-bottom wsx-left wsx-right wsx-d-flex wsx-item-center wsx-justify-center",
-    style: {
-      backgroundColor: 'rgb(255 255 255 / 88%)'
+  // decide what to render
+  let content;
+  if (overlay) {
+    if (insideContainer) {
+      content = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+        className: "wsx-absolute wsx-z-999 wsx-top wsx-bottom wsx-left wsx-right wsx-d-flex wsx-item-center wsx-justify-center",
+        style: {
+          backgroundColor: 'rgb(255 255 255 / 88%)'
+        }
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+        className: "wsx-absolute wsx-z-99999 wsx-top-20p ".concat(loaderClass),
+        style: {
+          maxWidth: '100px',
+          maxHeight: '100px'
+        },
+        src: "".concat(wholesalex.url, "assets/img/wsx-loading.gif"),
+        alt: "loading-img"
+      }));
+    } else {
+      content = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+        className: "wsx-popup-overlay ".concat(customClass),
+        style: {
+          backgroundColor: 'rgb(255 255 255 / 88%)'
+        }
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+        className: "".concat(loaderClass),
+        style: {
+          maxWidth: '100px',
+          maxHeight: '100px'
+        },
+        src: "".concat(wholesalex.url, "assets/img/wsx-loading.gif"),
+        alt: "loading-gif"
+      }));
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
-    className: "wsx-absolute wsx-z-99999 wsx-top-20p ".concat(loaderClass),
-    style: {
-      maxWidth: '100px',
-      maxHeight: '100px'
-    },
-    src: "".concat(wholesalex.url, "assets/img/wsx-loading.gif"),
-    alt: "loading Image"
-  })) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "wsx-popup-overlay ".concat(customClass),
-    style: {
-      backgroundColor: 'rgb(255 255 255 / 88%)'
-    }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
-    className: "".concat(loaderClass),
-    style: {
-      maxWidth: '100px',
-      maxHeight: '100px'
-    },
-    src: "".concat(wholesalex.url, "assets/img/wsx-loading.gif")
-  })) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
-    className: "".concat(loaderClass),
-    style: {
-      maxWidth: '100px',
-      maxHeight: '100px'
-    },
-    src: "".concat(wholesalex.url, "assets/img/wsx-loading.gif")
-  });
+  } else {
+    content = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+      className: "".concat(loaderClass),
+      style: {
+        maxWidth: '100px',
+        maxHeight: '100px'
+      },
+      src: "".concat(wholesalex.url, "assets/img/wsx-loading.gif"),
+      alt: "loading-image"
+    });
+  }
+  return content;
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LoadingGif);
 
@@ -2334,15 +2363,12 @@ const MultiSelect = _ref => {
     placeholder,
     customClass,
     onMultiSelectChangeHandler,
-    isDisable,
-    tooltip,
-    isAjax,
-    requestFor
+    isDisable
   } = _ref;
   const [showList, setShowList] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [selectedOptions, setSelectedOptions] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(value);
   const [optionList, setOptionList] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(options);
-  const [searchValue, setSearchValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
+  const [searchValue, setSearchValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
   const myRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
   const onSearch = key => {
     let selectedOptionValues = [];
@@ -2351,10 +2377,10 @@ const MultiSelect = _ref => {
     }
     const searchResult = options.filter(option => {
       const {
-        name,
-        value
+        name: optionName,
+        value: optionValue
       } = option;
-      return name.toLowerCase().includes(key.toLowerCase()) && selectedOptionValues.indexOf(value) === -1;
+      return optionName.toLowerCase().includes(key.toLowerCase()) && selectedOptionValues.indexOf(optionValue) === -1;
     });
     return searchResult;
   };
@@ -2367,17 +2393,17 @@ const MultiSelect = _ref => {
   const optionClickHandler = option => {
     setShowList(false);
     setSelectedOptions([...selectedOptions, option]);
-    setSearchValue("");
-    setOptionList(onSearch(""));
+    setSearchValue('');
+    setOptionList(onSearch(''));
     onMultiSelectChangeHandler(name, [...selectedOptions, option]);
   };
   const onDeleteOption = indexToBeDeleted => {
     setShowList(false);
-    const selectedOptionAfterDeleted = selectedOptions.filter((value, index) => {
+    const selectedOptionAfterDeleted = selectedOptions.filter((val, index) => {
       return index !== indexToBeDeleted;
     });
     setSelectedOptions(selectedOptionAfterDeleted);
-    setOptionList(onSearch(""));
+    setOptionList(onSearch(''));
     onMultiSelectChangeHandler(name, selectedOptionAfterDeleted);
     setShowList(true);
   };
@@ -2387,8 +2413,8 @@ const MultiSelect = _ref => {
     }
   };
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     setSelectedOptions(value);
@@ -2396,7 +2422,8 @@ const MultiSelect = _ref => {
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     setOptionList(options);
     onMultiSelectChangeHandler(name, selectedOptions);
-  }, [options]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options, name]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-multiselect-wrapper ".concat(isDisable ? 'locked' : ''),
     key: "wsx-multiselect-".concat(name)
@@ -2411,7 +2438,13 @@ const MultiSelect = _ref => {
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
       tabIndex: -1,
       className: "wsx-icon-cross wsx-lh-0",
-      onClick: () => onDeleteOption(index)
+      onClick: () => onDeleteOption(index),
+      onKeyDown: e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          onDeleteOption(index);
+        }
+      },
+      role: "button"
     }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].cross), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_3__["default"], {
       content: option.name,
       position: "top",
@@ -2420,7 +2453,7 @@ const MultiSelect = _ref => {
       className: "multiselect-option-name"
     }, option.name)));
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "wsx-multiselect-option-wrapper ".concat(selectedOptions.length && selectedOptions.length != 0 ? '' : 'wsx-w-full')
+    className: "wsx-multiselect-option-wrapper ".concat(selectedOptions.length && selectedOptions.length !== 0 ? '' : 'wsx-w-full')
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
     key: "wsx-input-".concat(name),
     disabled: isDisable ? true : false,
@@ -2429,7 +2462,7 @@ const MultiSelect = _ref => {
     autoComplete: "off",
     value: searchValue,
     className: "wsx-input ".concat(customClass),
-    placeholder: selectedOptions.length > 0 ? "" : placeholder,
+    placeholder: selectedOptions.length > 0 ? '' : placeholder,
     onChange: e => onInputChangeHandler(e),
     onClick: e => onInputChangeHandler(e)
   })))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -2442,7 +2475,14 @@ const MultiSelect = _ref => {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-multiselect-option",
       key: "wsx-opt-".concat(name, "-").concat(option.value, "-").concat(index),
-      onClick: () => optionClickHandler(option)
+      onClick: () => optionClickHandler(option),
+      onKeyDown: e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          optionClickHandler(option);
+        }
+      },
+      role: "button",
+      tabIndex: "0"
     }, option.name);
   })), showList && optionList.length === 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     key: "wsx-".concat(name, "-not-found"),
@@ -2468,9 +2508,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
-/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
-
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/Icons */ "./reactjs/src/utils/Icons.js");
 
 
 const PopupModal = _ref => {
@@ -2496,8 +2534,15 @@ const PopupModal = _ref => {
     className: "wsx-popup-content wsx-scrollbar"
   }, renderContent()), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-modal-close wsx-icon-cross",
-    onClick: handleClose
-  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].cross)));
+    onClick: handleClose,
+    onKeyDown: e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        handleClose;
+      }
+    },
+    role: "button",
+    tabIndex: "0"
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"].cross)));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (PopupModal);
 
@@ -2522,12 +2567,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const RadioButtons = props => {
-  let {
+  const {
     options,
     label,
     labelSpace,
     name,
-    defaultValue,
     value,
     onChange,
     required,
@@ -2543,10 +2587,10 @@ const RadioButtons = props => {
     className: "wsx-radio-field ".concat(className)
   }, !isLabelHide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-input-label ".concat(labelSpace ? "wsx-mb-".concat(labelSpace) : 'wsx-mb-32', " wsx-font-medium wsx-color-text-medium ").concat(tooltip ? 'wsx-d-flex' : '')
-  }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+  }, label, ' ', required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
     className: "wsx-required",
     style: {
-      color: requiredColor || '#fc143f'
+      color: '#fc143f'
     }
   }, "*"), tooltip && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
     content: tooltip,
@@ -2570,7 +2614,7 @@ const RadioButtons = props => {
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
     htmlFor: option,
     className: "wsx-label wsx-option-desc"
-  }, " ", options[option])))), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+  }, ' ', options[option])))), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-radio-field-help wsx-help-message ".concat(helpClass)
   }, help)));
 };
@@ -2650,7 +2694,7 @@ function Select(_ref) {
   const dropdownRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const contentRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const inputRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  !textAlign && (direction == 'ltr' ? textAlign = 'left' : textAlign = 'right');
+  !textAlign && (direction === 'ltr' ? textAlign = 'left' : textAlign = 'right');
   const handleOutsideClick = e => {
     if (dropdownRef.current && (dropdownRef.current.contains(e.target) || contentRef.current && contentRef.current.contains(e.target))) {
       return;
@@ -2693,14 +2737,15 @@ function Select(_ref) {
       setIsDropdownOpen(false);
       return;
     }
-    const selected = options.find(option => option.value == optionValue);
+    const selected = options.find(option => option.value === optionValue);
     setSelectedOption(selected ? selected.label : selectionText);
     setIsDropdownOpen(false);
   };
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    value = value ? value : 'default';
-    const selected = options.find(option => option.value == value);
+    const effectiveValue = value ? value : 'default';
+    const selected = options.find(option => option.value === effectiveValue);
     setSelectedOption(selected ? selected.label : selectionText);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (isDropdownOpen) {
@@ -2717,7 +2762,7 @@ function Select(_ref) {
     ref: contentRef,
     style: {
       zIndex: isDropdownOpen ? 999999 : -999999,
-      visibility: isDropdownOpen ? "visible" : "hidden",
+      visibility: isDropdownOpen ? 'visible' : 'hidden',
       opacity: isDropdownOpen ? 1 : 0,
       top: isDropdownOpen ? "".concat(dropdownPosition.top, "px") : 0,
       left: isDropdownOpen ? "".concat(dropdownPosition.left, "px") : 0,
@@ -2725,9 +2770,26 @@ function Select(_ref) {
     }
   }, options.map(option => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     key: option.value,
-    className: "wsx-option-item ".concat(optionBorderBottom ? 'wsx-border-bottom' : '', " wsx-br-").concat(optionBorderRadius, " wsx-bc-").concat(optionBorderColor, " ").concat(option.value != 'default' && option.label === selectedOption ? 'active' : '', " ").concat(optionCustomClass),
-    onClick: () => handleOptionSelect(option.value)
+    className: "wsx-option-item ".concat(optionBorderBottom ? 'wsx-border-bottom' : '', " wsx-br-").concat(optionBorderRadius, " wsx-bc-").concat(optionBorderColor, " ").concat(option.value !== 'default' && option.label === selectedOption ? 'active' : '', " ").concat(optionCustomClass),
+    onClick: () => handleOptionSelect(option.value),
+    onKeyDown: e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        handleOptionSelect(option.value);
+      }
+    },
+    tabIndex: 0,
+    role: "button"
   }, option.label)));
+  const getIconRotation = (dropdownOpen, rotation) => {
+    if (dropdownOpen) {
+      if (rotation === 'full') {
+        return 'rotate(180deg)';
+      } else if (rotation === 'half') {
+        return 'rotate(90deg)';
+      }
+    }
+    return 'rotate(0deg)';
+  };
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-select-wrapper ".concat(wrapperClass, " ").concat(noValue ? 'wsx-d-flex wsx-item-center wsx-gap-8' : ''),
     ref: inputRef
@@ -2737,15 +2799,22 @@ function Select(_ref) {
     className: "wsx-input-inner-wrapper  ".concat(!noValue && (borderNone ? '' : "wsx-border-default wsx-bc-".concat(borderColor)), " wsx-bg-").concat(inputBackground, " wsx-color-").concat(inputColor, " wsx-br-").concat(borderRadius),
     ref: dropdownRef,
     style: {
-      minWidth: minWidth,
-      maxWidth: maxWidth
+      minWidth,
+      maxWidth
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-select ".concat(customClass),
     onClick: toggleDropdown,
+    onKeyDown: e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        toggleDropdown();
+      }
+    },
+    tabIndex: 0,
+    role: "button",
     style: {
-      textAlign: textAlign,
-      direction: direction,
+      textAlign,
+      direction,
       padding: !noValue && (inputPadding ? inputPadding : '10px 16px'),
       gap: !noValue && iconGap
     }
@@ -2753,7 +2822,7 @@ function Select(_ref) {
     className: "wsx-icon",
     style: {
       transition: 'transform var(--transition-md)',
-      transform: isDropdownOpen ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)',
+      transform: getIconRotation(isDropdownOpen, iconRotation),
       color: iconColor ? iconColor : 'unset'
     }
   }, Icon ? Icon : _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"].angleDown), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -2762,7 +2831,7 @@ function Select(_ref) {
     className: "wsx-icon",
     style: {
       transition: 'transform var(--transition-md)',
-      transform: isDropdownOpen ? iconRotation == 'full' ? 'rotate(180deg)' : iconRotation == 'half' ? 'rotate(90deg)' : 'rotate(0deg)' : 'rotate(0deg)',
+      transform: getIconRotation(isDropdownOpen, iconRotation),
       color: iconColor ? iconColor : 'unset'
     }
   }, Icon ? Icon : _utils_Icons__WEBPACK_IMPORTED_MODULE_1__["default"].angleDown)), /*#__PURE__*/react_dom__WEBPACK_IMPORTED_MODULE_2___default().createPortal(dropdownContent, document.body)));
@@ -2822,7 +2891,7 @@ const Slider = props => {
     className: "wsx-slider-wrapper ".concat(className)
   }, !isLabelHide && !isLabelSide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-input-label ".concat(tooltip ? 'wsx-d-flex wsx-item-center' : '', " ").concat(labelColor && "wsx-color-".concat(labelColor), " ").concat(labelClass)
-  }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+  }, label, ' ', required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-required",
     style: {
       color: requiredColor || '#fc143f'
@@ -2838,18 +2907,18 @@ const Slider = props => {
     className: "wsx-d-flex wsx-item-center wsx-gap-8"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
     htmlFor: name,
-    className: "wsx-label wsx-slider ".concat(value && value != 'no' && 'active', " ").concat(sliderClass)
+    className: "wsx-label wsx-slider ".concat(value && value !== 'no' && 'active', " ").concat(sliderClass)
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     ref: trackRef,
     className: "wsx-slider-track wsx-relative",
     style: {
-      backgroundColor: value && value != 'no' ? activeBackground || inputBackground || '#6C6CFF' : inputBackground || '#E2E4E9'
+      backgroundColor: value && value !== 'no' ? activeBackground || inputBackground || '#6C6CFF' : inputBackground || '#E2E4E9'
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
     name: name,
     id: name,
     type: "checkbox",
-    checked: value && value != 'no' ? true : false,
+    checked: value && value !== 'no' ? true : false,
     onChange: onChange,
     className: "wsx-slider-input",
     disabled: isDisable ? true : false
@@ -2860,7 +2929,7 @@ const Slider = props => {
     }
   })), !isLabelHide && isLabelSide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-input-label wsx-mb-0 ".concat(tooltip ? 'wsx-d-flex wsx-item-center' : '', " ").concat(labelColor && "wsx-color-".concat(labelColor), " ").concat(labelClass)
-  }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+  }, label, ' ', required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-required",
     style: {
       color: requiredColor || '#fc143f'
@@ -2899,15 +2968,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const Switch = props => {
-  let {
+  const {
     label,
     labelClass,
     name,
     onChange,
-    defaultValue,
     isDisable,
     value,
-    setValue,
     tooltip,
     tooltipPosition,
     help,
@@ -2923,7 +2990,7 @@ const Switch = props => {
     className: "wsx-switch-field ".concat(className)
   }, !isLabelHide && label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-input-label ".concat(tooltip ? 'wsx-d-flex' : '', " ").concat(labelClass)
-  }, label, " ", required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+  }, label, ' ', required && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
     className: "wsx-required",
     style: {
       color: requiredColor || '#fc143f'
@@ -2950,12 +3017,12 @@ const Switch = props => {
     className: inputFieldClass ? inputFieldClass : ''
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
     className: "wsx-checkbox-mark"
-  })), desc, " ", (props === null || props === void 0 ? void 0 : props.descTooltip) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
+  })), desc, ' ', (props === null || props === void 0 ? void 0 : props.descTooltip) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_1__["default"], {
     content: props === null || props === void 0 ? void 0 : props.descTooltip,
     direction: tooltipPosition,
     spaceLeft: "8px",
     className: "wsx-rtl-tooltip-left"
-  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help), " "), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].help), ' '), help && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-switch-help wsx-help-message ".concat(helpClass)
   }, help)));
 };
@@ -2983,12 +3050,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Tooltip__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Tooltip */ "./reactjs/src/components/Tooltip.js");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
 /* harmony import */ var _Button__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Button */ "./reactjs/src/components/Button.js");
-/* harmony import */ var _Select__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Select */ "./reactjs/src/components/Select.js");
-/* harmony import */ var _assets_scss_Tier_scss__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../assets/scss/Tier.scss */ "./reactjs/src/assets/scss/Tier.scss");
+/* harmony import */ var _assets_scss_Tier_scss__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../assets/scss/Tier.scss */ "./reactjs/src/assets/scss/Tier.scss");
 
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { (0,_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__["default"])(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-
 
 
 
@@ -3011,22 +3076,22 @@ const Tier = _ref => {
     deleteSpaceLeft = 'auto'
   } = _ref;
   const inputData = (fieldData, fieldName) => {
-    let flag = tier[tierName] && tier[tierName]['tiers'] && tier[tierName]['tiers'][index] && tier[tierName]['tiers'][index][fieldName];
-    const defValue = flag ? tier[tierName]['tiers'][index][fieldName] : fieldData['default'];
+    const flag = tier[tierName] && tier[tierName].tiers && tier[tierName].tiers[index] && tier[tierName].tiers[index][fieldName];
+    const defValue = flag ? tier[tierName].tiers[index][fieldName] : fieldData.default;
     const onChangeHandler = e => {
-      let tier_value = e.target.value;
-      if (fieldData['type'] === 'number' && tier_value != '' && tier_value < 0) {
-        tier_value = 1;
+      let tierValue = e.target.value;
+      if (fieldData.type === 'number' && tierValue !== '' && tierValue < 0) {
+        tierValue = 1;
       }
-      let parent = tier[tierName] ? tier[tierName] : {
+      const parent = tier[tierName] ? tier[tierName] : {
         tiers: []
       };
-      let copy = parent['tiers'];
+      const copy = parent.tiers;
       if (!copy[index]) {
         copy.push({});
       }
-      copy[index][e.target.getAttribute('data-name')] = tier_value;
-      parent['tiers'] = copy;
+      copy[index][e.target.getAttribute('data-name')] = tierValue;
+      parent.tiers = copy;
       setTier(_objectSpread(_objectSpread({}, tier), {}, {
         [tierName]: parent
       }));
@@ -3035,7 +3100,7 @@ const Tier = _ref => {
       label: index === 0 ? fieldData.label : '',
       id: "".concat(fieldName, "_").concat(index),
       "data-name": fieldName,
-      type: fieldData['type'],
+      type: fieldData.type,
       name: "".concat(fieldName, "_").concat(index),
       value: defValue,
       placeholder: fieldData.placeholder,
@@ -3045,23 +3110,23 @@ const Tier = _ref => {
     });
   };
   const selectData = (fieldData, fieldName) => {
-    let flag = tier[tierName] && tier[tierName]['tiers'] && tier[tierName]['tiers'][index] && tier[tierName]['tiers'][index][fieldName];
-    const defValue = flag ? tier[tierName]['tiers'][index][fieldName] : fieldData['default'];
+    const flag = tier[tierName] && tier[tierName].tiers && tier[tierName].tiers[index] && tier[tierName].tiers[index][fieldName];
+    const defValue = flag ? tier[tierName].tiers[index][fieldName] : fieldData.default;
     const onChangeHandler = e => {
       var _e$target;
       const isLock = e !== null && e !== void 0 && (_e$target = e.target) !== null && _e$target !== void 0 && (_e$target = _e$target.value) !== null && _e$target !== void 0 && _e$target.startsWith('pro_') ? true : false;
       if (isLock && setPopupStatus) {
         setPopupStatus(true);
       } else {
-        let parent = tier[tierName] ? tier[tierName] : {
+        const parent = tier[tierName] ? tier[tierName] : {
           tiers: []
         };
-        let copy = parent['tiers'];
+        const copy = parent.tiers;
         if (!copy[index]) {
           copy.push({});
         }
         copy[index][fieldName] = e.target.value;
-        parent['tiers'] = copy;
+        parent.tiers = copy;
         setTier(_objectSpread(_objectSpread({}, tier), {}, {
           [tierName]: parent
         }));
@@ -3088,7 +3153,7 @@ const Tier = _ref => {
         className: "wsx-tier-price-table-wrapper"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
         className: "wsx-input-label wsx-font-medium"
-      }, index == 0 ? fieldData.label : ''), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("select", {
+      }, index === 0 ? fieldData.label : ''), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("select", {
         name: "".concat(fieldName, "_").concat(index),
         value: defValue,
         onChange: onChangeHandler,
@@ -3106,33 +3171,33 @@ const Tier = _ref => {
     if (!deps) {
       return true;
     }
-    let _temp = tier[tierName] && tier[tierName]['tiers'] && tier[tierName]['tiers'][index] ? tier[tierName]['tiers'][index] : {};
+    const _temp = tier[tierName] && tier[tierName].tiers && tier[tierName].tiers[index] ? tier[tierName].tiers[index] : {};
     let _flag = true;
-    deps.map((dep, i) => {
-      if (_temp[dep['key']] !== dep['value']) {
+    deps.forEach(dep => {
+      if (_temp[dep.key] !== dep.value) {
         _flag = false;
       }
     });
     return _flag;
   };
   const multiselectData = (fieldData, fieldName) => {
-    let flag = tier[tierName] && tier[tierName]['tiers'] && tier[tierName]['tiers'][index] && tier[tierName]['tiers'][index][fieldName];
-    const defValue = flag ? tier[tierName]['tiers'][index][fieldName] : fieldData['default'];
+    const flag = tier[tierName] && tier[tierName].tiers && tier[tierName].tiers[index] && tier[tierName].tiers[index][fieldName];
+    const defValue = flag ? tier[tierName].tiers[index][fieldName] : fieldData.default;
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_pages_dynamic_rules_MultiSelect__WEBPACK_IMPORTED_MODULE_2__["default"], {
       name: fieldName,
       value: defValue,
-      options: fieldData['options'],
+      options: fieldData.options,
       placeholder: fieldData.placeholder,
-      onMultiSelectChangeHandler: (fieldName, selectedValues) => {
-        let parent = tier[tierName] ? tier[tierName] : {
+      onMultiSelectChangeHandler: (selectedFieldName, selectedValues) => {
+        const parent = tier[tierName] ? tier[tierName] : {
           tiers: []
         };
-        let copy = parent['tiers'];
+        const copy = parent.tiers;
         if (!copy[index]) {
           copy.push({});
         }
-        copy[index][fieldName] = [...selectedValues];
-        parent['tiers'] = copy;
+        copy[index][selectedFieldName] = [...selectedValues];
+        parent.tiers = copy;
         setTier(_objectSpread(_objectSpread({}, tier), {}, {
           [tierName]: parent
         }));
@@ -3143,23 +3208,23 @@ const Tier = _ref => {
     });
   };
   const getTierLastIndex = () => {
-    return tier && tier[tierName] && tier[tierName]['tiers'] && tier[tierName]['tiers'].length != 0 ? tier[tierName]['tiers'].length - 1 : 0;
+    return tier && tier[tierName] && tier[tierName].tiers && tier[tierName].tiers.length !== 0 ? tier[tierName].tiers.length - 1 : 0;
   };
   const handleDeleteCondition = () => {
-    let parent = _objectSpread({}, tier);
-    let copy = [...parent[tierName]['tiers']];
-    if (copy.length == 1) {
-      parent[tierName]['tiers'][0]._conditions_for = '';
-      parent[tierName]['tiers'][0]._conditions_operator = '';
-      parent[tierName]['tiers'][0]._conditions_value = '';
-      parent[tierName]['tiers'] = copy;
+    const parent = _objectSpread({}, tier);
+    let copy = [...parent[tierName].tiers];
+    if (copy.length === 1) {
+      parent[tierName].tiers[0]._conditions_for = '';
+      parent[tierName].tiers[0]._conditions_operator = '';
+      parent[tierName].tiers[0]._conditions_value = '';
+      parent[tierName].tiers = copy;
       setTier(parent);
       return;
     }
     copy = copy.filter((row, r) => {
-      return index != r;
+      return index !== r;
     });
-    parent[tierName]['tiers'] = copy;
+    parent[tierName].tiers = copy;
     setTier(parent);
   };
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
@@ -3168,7 +3233,7 @@ const Tier = _ref => {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     className: "wsx-tier-wrapper"
   }, Object.keys(fields).map((fieldName, i) => {
-    switch (fields[fieldName]['type']) {
+    switch (fields[fieldName].type) {
       case 'number':
       case 'text':
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
@@ -3181,29 +3246,31 @@ const Tier = _ref => {
           className: "tier-field ".concat(tierFieldClass)
         }, selectData(fields[fieldName], fieldName));
       case 'multiselect':
-        return dependencyCheck(fields[fieldName]['depends_on']) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+        return dependencyCheck(fields[fieldName].depends_on) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
           key: "tier_field_".concat(i),
           className: "tier-field multiselect ".concat(tierFieldClass)
         }, multiselectData(fields[fieldName], fieldName));
       case 'filter':
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
           className: "wsx-filter-group"
-        }, fields[fieldName] && Object.keys(fields[fieldName]).map((filterFieldName, i) => {
-          switch (fields[fieldName][filterFieldName]['type']) {
+        }, fields[fieldName] && Object.keys(fields[fieldName]).map((filterFieldName, idx) => {
+          switch (fields[fieldName][filterFieldName].type) {
             case 'select':
               return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-                key: "tier_field_".concat(i),
+                key: "tier_field_".concat(idx),
                 className: "tier-field ".concat(tierFieldClass)
               }, selectData(fields[fieldName][filterFieldName], filterFieldName));
             case 'multiselect':
-              return dependencyCheck(fields[fieldName][filterFieldName]['depends_on']) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
-                key: "tier_field_".concat(i),
+              return dependencyCheck(fields[fieldName][filterFieldName].depends_on) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
+                key: "tier_field_".concat(idx),
                 className: "tier-field multiselect ".concat(tierFieldClass)
               }, multiselectData(fields[fieldName][filterFieldName], filterFieldName));
+            default:
+              return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", null);
           }
         }));
       default:
-        break;
+        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", null);
     }
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_Tooltip__WEBPACK_IMPORTED_MODULE_5__["default"], {
     content: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Delete', 'wholesalex'),
@@ -3213,25 +3280,32 @@ const Tier = _ref => {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
     key: "wsx-tier-field-delete-".concat(tierName, "_").concat(index),
     className: "wsx-tier-delete",
-    onClick: handleDeleteCondition
-  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_4__["default"].delete_24))), index == getTierLastIndex() && (tierName === 'quantity_based' || tierName === 'conditions') && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_Button__WEBPACK_IMPORTED_MODULE_7__["default"], {
+    onClick: handleDeleteCondition,
+    onKeyDown: e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        handleDeleteCondition;
+      }
+    },
+    role: "button",
+    tabIndex: "0"
+  }, _utils_Icons__WEBPACK_IMPORTED_MODULE_4__["default"].delete_24))), index === getTierLastIndex() && (tierName === 'quantity_based' || tierName === 'conditions') && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_Button__WEBPACK_IMPORTED_MODULE_7__["default"], {
     label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_6__.__)('Add New Condition', 'wholesalex'),
     iconName: "plus_20",
     background: "tertiary",
     customClass: "wsx-mt-24",
-    onClick: e => {
-      let parent = _objectSpread({}, tier);
+    onClick: () => {
+      const parent = _objectSpread({}, tier);
       if (!parent[tierName]) {
         parent[tierName] = {
-          'tiers': []
+          tiers: []
         };
       }
-      let copy = [...parent[tierName]['tiers']];
+      const copy = [...parent[tierName].tiers];
       copy.push({
         _id: Date.now().toString(),
         src: src ? src : 'dynamic_rule'
       });
-      parent[tierName]['tiers'] = copy;
+      parent[tierName].tiers = copy;
       setTier(parent);
     }
   }));
@@ -3263,7 +3337,7 @@ const Tooltip = props => {
     top: 0,
     left: 0
   });
-  const [adjustedDirection, setAdjustedDirection] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(props.direction || "top");
+  const [adjustedDirection, setAdjustedDirection] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(props.direction || 'top');
   const parentRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const tooltipRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const calculatePosition = () => {
@@ -3274,55 +3348,55 @@ const Tooltip = props => {
       const viewportHeight = window.innerHeight;
       let top = parentRect.top + window.scrollY - (tooltipRect.height + 8 || 0);
       let left = parentRect.left + window.scrollX - ((tooltipRect.width - parentRect.width) / 2 || 0);
-      let newDirection = props.direction || "top";
-      if (newDirection === "top") {
+      let newDirection = props.direction || 'top';
+      if (newDirection === 'top') {
         top = parentRect.top + window.scrollY - (tooltipRect.height + 8);
         left = parentRect.left + window.scrollX + (parentRect.width - tooltipRect.width) / 2;
-      } else if (newDirection === "bottom") {
+      } else if (newDirection === 'bottom') {
         top = parentRect.bottom + window.scrollY + 8;
         left = parentRect.left + window.scrollX + (parentRect.width - tooltipRect.width) / 2;
-      } else if (newDirection === "left") {
+      } else if (newDirection === 'left') {
         top = parentRect.top + window.scrollY + (parentRect.height - tooltipRect.height) / 2;
         left = parentRect.left + window.scrollX - (tooltipRect.width + 8);
-      } else if (newDirection === "right") {
+      } else if (newDirection === 'right') {
         top = parentRect.top + window.scrollY + (parentRect.height - tooltipRect.height) / 2;
         left = parentRect.right + window.scrollX + 8;
       }
-      if (tooltipRect.bottom + 0 > viewportHeight && newDirection === "bottom") {
-        newDirection = "top";
+      if (tooltipRect.bottom + 0 > viewportHeight && newDirection === 'bottom') {
+        newDirection = 'top';
         top = parentRect.top + window.scrollY - (tooltipRect.height + 8);
-      } else if (tooltipRect.top < tooltipRect.height + 70 && newDirection === "top") {
-        newDirection = "bottom";
+      } else if (tooltipRect.top < tooltipRect.height + 70 && newDirection === 'top') {
+        newDirection = 'bottom';
         top = parentRect.bottom + window.scrollY + 8;
         if (tooltipRect.width + parentRect.right > viewportWidth) {
-          newDirection = "left";
+          newDirection = 'left';
           top = parentRect.top + window.scrollY + (parentRect.height - tooltipRect.height) / 2;
           left = parentRect.left + window.scrollX - (tooltipRect.width + 8);
         }
       }
-      if (tooltipRect.width + left + 70 > viewportWidth && newDirection === "right") {
+      if (tooltipRect.width + left + 70 > viewportWidth && newDirection === 'right') {
         if (tooltipRect.left > tooltipRect.width + 8) {
-          newDirection = "left";
+          newDirection = 'left';
           left = parentRect.left + window.scrollX - (tooltipRect.width + 8);
         } else if (tooltipRect.top < tooltipRect.height + 70) {
-          newDirection = "bottom";
+          newDirection = 'bottom';
           top = parentRect.bottom + window.scrollY + 8;
           left = parentRect.left + window.scrollX + (parentRect.width - tooltipRect.width) / 2;
         } else {
-          newDirection = "top";
+          newDirection = 'top';
           top = parentRect.top + window.scrollY - (tooltipRect.height + 8);
           left = parentRect.left + window.scrollX + (parentRect.width - tooltipRect.width) / 2;
         }
-      } else if (parentRect.left < tooltipRect.width + 8 && newDirection === "left") {
+      } else if (parentRect.left < tooltipRect.width + 8 && newDirection === 'left') {
         if (tooltipRect.width + parentRect.right + 70 < viewportWidth) {
-          newDirection = "right";
+          newDirection = 'right';
           left = parentRect.right + window.scrollX + 8;
         } else if (tooltipRect.top < tooltipRect.height + 70) {
-          newDirection = "bottom";
+          newDirection = 'bottom';
           top = parentRect.bottom + window.scrollY + 8;
           left = parentRect.left + window.scrollX + (parentRect.width - tooltipRect.width) / 2;
         } else {
-          newDirection = "top";
+          newDirection = 'top';
           top = parentRect.top + window.scrollY - (tooltipRect.height + 8);
           left = parentRect.left + window.scrollX + (parentRect.width - tooltipRect.width) / 2;
         }
@@ -3342,27 +3416,28 @@ const Tooltip = props => {
   };
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     calculatePosition();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
   const tooltipContent = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     ref: tooltipRef,
     className: "wsx-tooltip-content wsx-font-regular ".concat(props.tooltipContentClass, " ").concat(adjustedDirection),
     style: {
-      position: "absolute",
+      position: 'absolute',
       zIndex: active ? 999999 : -999999,
       top: active ? position.top : 0,
       left: active ? position.left : 0,
-      visibility: active ? "visible" : "hidden",
+      visibility: active ? 'visible' : 'hidden',
       opacity: active ? 1 : 0,
-      transition: "opacity var(--transition-md) ease-in-out"
+      transition: 'opacity var(--transition-md) ease-in-out'
     }
-  }, props.type === "element" ? props.content : props.content.replace(/{.*}/, ""));
+  }, props.type === 'element' ? props.content : props.content.replace(/{.*}/, ''));
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     ref: parentRef,
     className: "wsx-tooltip ".concat(props.className),
     onMouseEnter: showToolTip,
     onMouseLeave: hideToolTip,
     style: {
-      margin: "".concat(props.spaceTop || "0", " ").concat(props.spaceRight || "0", " ").concat(props.spaceBottom || "0", " ").concat(props.spaceLeft || "0")
+      margin: "".concat(props.spaceTop || '0', " ").concat(props.spaceRight || '0', " ").concat(props.spaceBottom || '0', " ").concat(props.spaceLeft || '0')
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "".concat(!props.onlyText && "wsx-lh-0 wsx-icon-wrapper ".concat(props.parentColor ? "wsx-color-".concat(props.parentColor) : 'wsx-color-secondary'), " wsx-w-fit")
@@ -3394,18 +3469,12 @@ __webpack_require__.r(__webpack_exports__);
 
 const UpgradeProPopUp = _ref => {
   let {
-    heading = '',
-    subheading = '',
-    desc = '',
-    setPopUpStatus,
     UpgradeUrl = '',
     addonCount = '',
     title = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Unlock', 'wholesalex'),
     onClose
   } = _ref;
-  heading = heading ? heading : '';
-  desc = desc ? desc : '';
-  if (UpgradeUrl == '') {
+  if (UpgradeUrl === '') {
     var _wholesalex;
     UpgradeUrl = (_wholesalex = wholesalex) === null || _wholesalex === void 0 ? void 0 : _wholesalex.pro_link;
   }
@@ -3420,7 +3489,7 @@ const UpgradeProPopUp = _ref => {
       className: "wsx-title wsx-font-18 wsx-font-medium"
     }, title), addonCount && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-title wsx-font-18 wsx-font-medium"
-    }, addonCount, "+ ", (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Addons with', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    }, addonCount, "+", ' ', (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Addons with', 'wholesalex'))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-d-flex wsx-item-center wsx-justify-center wsx-gap-4 wsx-mb-16"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-title wsx-font-18 wsx-font-medium"
@@ -3468,12 +3537,10 @@ const MultiSelect = _ref => {
   let {
     name,
     value,
-    options,
     placeholder,
     customClass,
     onMultiSelectChangeHandler,
     isDisable,
-    tooltip,
     isAjax,
     ajaxAction,
     ajaxSearch,
@@ -3482,7 +3549,7 @@ const MultiSelect = _ref => {
   const [showList, setShowList] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [selectedOptions, setSelectedOptions] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(value);
   const [optionList, setOptionList] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
-  const [searchValue, setSearchValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
+  const [searchValue, setSearchValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
   const [isSearching, setIsSearching] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [tempSearchValue, setTempSearchValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
   const [allOptions, setAllOptions] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
@@ -3495,10 +3562,9 @@ const MultiSelect = _ref => {
     setSelectedOptions([...selectedOptions, option]);
     const searchResult = optionList.filter(op => {
       const {
-        name,
-        value
+        value: optionValue
       } = op;
-      return value.toString().toLowerCase() !== option.value.toString().toLowerCase();
+      return optionValue.toString().toLowerCase() !== option.value.toString().toLowerCase();
     });
     setOptionList(searchResult);
     setTempSearchValue('');
@@ -3508,10 +3574,9 @@ const MultiSelect = _ref => {
   const deleteOption = option => {
     const selectedOptionAfterDeleted = selectedOptions.filter(op => {
       const {
-        name,
-        value
+        value: optionValue
       } = op;
-      return value.toString().toLowerCase() !== option.value.toString().toLowerCase();
+      return optionValue.toString().toLowerCase() !== option.value.toString().toLowerCase();
     });
     setSelectedOptions(selectedOptionAfterDeleted);
     setTempSearchValue('');
@@ -3523,12 +3588,12 @@ const MultiSelect = _ref => {
     }
   };
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
   const performAjaxSearch = async signal => {
     setIsSearching(true);
-    let attr = {
+    const attr = {
       type: 'get',
       action: 'dynamic_rule_action',
       nonce: wholesalex.nonce,
@@ -3540,7 +3605,7 @@ const MultiSelect = _ref => {
         path: '/wholesalex/v1/dynamic_rule_action',
         method: 'POST',
         data: attr,
-        signal: signal
+        signal
       });
       if (res.status) {
         var _res$data;
@@ -3550,10 +3615,9 @@ const MultiSelect = _ref => {
         }
         const searchResult = res === null || res === void 0 || (_res$data = res.data) === null || _res$data === void 0 ? void 0 : _res$data.filter(option => {
           const {
-            name,
-            value
+            value: optionValue
           } = option;
-          return selectedOptionValues.indexOf(value) === -1;
+          return selectedOptionValues.indexOf(optionValue) === -1;
         });
         searchResult.sort((a, b) => a.name.length - b.name.length);
         setOptionList(searchResult);
@@ -3564,27 +3628,26 @@ const MultiSelect = _ref => {
     } catch (error) {
       if (error.name === 'AbortError') {
         // Request was cancelled
-        return;
       }
     }
   };
   const getOptions = async signal => {
     setIsSearching(true);
-    let attr = {
+    const attr = {
       type: 'get',
       action: 'dynamic_rule_action',
       nonce: wholesalex.nonce,
       ajax_action: ajaxAction
     };
     if (dependsValue) {
-      attr['depends'] = dependsValue;
+      attr.depends = dependsValue;
     }
     try {
       const res = await wp.apiFetch({
         path: '/wholesalex/v1/dynamic_rule_action',
         method: 'POST',
         data: attr,
-        signal: signal
+        signal
       });
       if (res.status) {
         var _res$data2;
@@ -3594,10 +3657,9 @@ const MultiSelect = _ref => {
         }
         const searchResult = res === null || res === void 0 || (_res$data2 = res.data) === null || _res$data2 === void 0 ? void 0 : _res$data2.filter(option => {
           const {
-            name,
-            value
+            value: optionValue
           } = option;
-          return selectedOptionValues.indexOf(value) === -1;
+          return selectedOptionValues.indexOf(optionValue) === -1;
         });
         searchResult.sort((a, b) => a.name.length - b.name.length);
         setAllOptions(res.data);
@@ -3609,7 +3671,6 @@ const MultiSelect = _ref => {
     } catch (error) {
       if (error.name === 'AbortError') {
         // Request was cancelled
-        return;
       }
     }
   };
@@ -3620,10 +3681,10 @@ const MultiSelect = _ref => {
     }
     const searchResult = allOptions.filter(option => {
       const {
-        name,
-        value
+        name: optionName,
+        value: optionValue
       } = option;
-      return name.toLowerCase().includes(searchValue.toLowerCase()) && selectedOptionValues.indexOf(value) === -1;
+      return optionName.toLowerCase().includes(searchValue.toLowerCase()) && selectedOptionValues.indexOf(optionValue) === -1;
     });
     setOptionList(searchResult);
   };
@@ -3636,6 +3697,7 @@ const MultiSelect = _ref => {
     if (!ajaxSearch && isAjax) {
       getOptions(signal);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (ajaxSearch) {
@@ -3648,12 +3710,12 @@ const MultiSelect = _ref => {
       }
       return () => {
         if (abortController.current) {
-          abortController.current.abort("Duplicate");
+          abortController.current.abort('Duplicate');
         }
       };
-    } else {
-      performNonAjaxSearch();
     }
+    performNonAjaxSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, setSearchValue]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (ajaxSearch) {
@@ -3664,9 +3726,10 @@ const MultiSelect = _ref => {
     } else {
       setSearchValue(tempSearchValue);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tempSearchValue]);
 
-  //Remove Product title extra quote from esc_attr 
+  //Remove Product title extra quote from esc_attr
   const decodeHtmlEntities = str => {
     const textarea = document.createElement('textarea');
     textarea.innerHTML = str;
@@ -3686,7 +3749,13 @@ const MultiSelect = _ref => {
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
       tabIndex: -1,
       className: "wsx-icon-cross wsx-lh-0",
-      onClick: () => deleteOption(option)
+      onClick: () => deleteOption(option),
+      onKeyDown: e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          deleteOption(option);
+        }
+      },
+      role: "button"
     }, _utils_Icons__WEBPACK_IMPORTED_MODULE_2__["default"].cross), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_Tooltip__WEBPACK_IMPORTED_MODULE_3__["default"], {
       content: option.name,
       position: "top",
@@ -3695,7 +3764,7 @@ const MultiSelect = _ref => {
       className: "multiselect-option-name"
     }, decodeHtmlEntities(option.name))));
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "wsx-multiselect-option-wrapper ".concat(selectedOptions.length && selectedOptions.length != 0 ? '' : 'wsx-w-full')
+    className: "wsx-multiselect-option-wrapper ".concat(selectedOptions.length && selectedOptions.length !== 0 ? '' : 'wsx-w-full')
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
     key: "wsx-input".concat(name),
     disabled: isDisable ? true : false,
@@ -3704,7 +3773,7 @@ const MultiSelect = _ref => {
     autoComplete: "off",
     value: tempSearchValue,
     className: "wsx-input ".concat(customClass),
-    placeholder: selectedOptions.length > 0 ? "" : placeholder,
+    placeholder: selectedOptions.length > 0 ? '' : placeholder,
     onChange: e => onInputChangeHandler(e),
     onClick: e => onInputChangeHandler(e)
   })))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -3717,7 +3786,14 @@ const MultiSelect = _ref => {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "wsx-multiselect-option",
       key: "wsx-opt-".concat(name, "-").concat(option.value, "-").concat(index),
-      onClick: () => selectOption(option)
+      onClick: () => selectOption(option),
+      onKeyDown: e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          deleteOption(option);
+        }
+      },
+      role: "button",
+      tabIndex: -1
     }, decodeHtmlEntities(option.name));
   })), !isSearching && tempSearchValue.length > 1 && showList && optionList.length === 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     key: "wsx-".concat(name, "-not-found"),
@@ -3734,7 +3810,7 @@ const MultiSelect = _ref => {
     className: "wsx-card wsx-multiselect-options wsx-scrollbar"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-multiselect-option-message"
-  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Searching...', 'wholesalex'))))));
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Searching…', 'wholesalex'))))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MultiSelect);
 
@@ -3752,19 +3828,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/esm/defineProperty.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _components_Tier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Tier */ "./reactjs/src/components/Tier.js");
-/* harmony import */ var _components_Input__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/Input */ "./reactjs/src/components/Input.js");
-/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
-/* harmony import */ var _components_Button__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/Button */ "./reactjs/src/components/Button.js");
-/* harmony import */ var _components_LoadingGif__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/LoadingGif */ "./reactjs/src/components/LoadingGif.js");
-/* harmony import */ var _components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/UpgradeProPopUp */ "./reactjs/src/components/UpgradeProPopUp.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _components_Tier__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/Tier */ "./reactjs/src/components/Tier.js");
+/* harmony import */ var _components_Input__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Input */ "./reactjs/src/components/Input.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var _components_Button__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Button */ "./reactjs/src/components/Button.js");
+/* harmony import */ var _components_LoadingGif__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/LoadingGif */ "./reactjs/src/components/LoadingGif.js");
+/* harmony import */ var _components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/UpgradeProPopUp */ "./reactjs/src/components/UpgradeProPopUp.js");
 
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { (0,_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__["default"])(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-
 
 
 
@@ -3779,74 +3853,77 @@ const Product = _ref => {
     isWCFMVariation
   } = _ref;
   const initialTier = {
-    '_id': Date.now().toString(),
-    '_discount_type': '',
-    '_discount_amount': '',
-    '_min_quantity': '',
-    'src': 'single_product'
+    _id: Date.now().toString(),
+    _discount_type: '',
+    _discount_amount: '',
+    _min_quantity: '',
+    src: 'single_product'
   };
-  const [tier, setTier] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)({});
-  const [appState, setAppState] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)({
+  const [tier, setTier] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
+  const [appState, setAppState] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({
     loading: true,
-    currentWindow: "new",
-    ruleWindow: "new",
+    currentWindow: 'new',
+    ruleWindow: 'new',
     ruleIndex: -1,
     index: -1,
     loadingOnSave: false
   });
-  const [fields, setFields] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)({});
+  const [fields, setFields] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
   const _isProActivate = (_wholesalex = wholesalex) === null || _wholesalex === void 0 ? void 0 : _wholesalex.is_pro_active;
-  const [popUpStatus, setPopUpStatus] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
+  const [popUpStatus, setPopUpStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
   const getPostID = () => {
-    let product_id = '';
+    let productId = '';
     //Check If request comes from dokan dashboard or not
     if (!id) {
       if (wholesalex_single_product.is_dokan_dashboard) {
         var _document$getElementB;
-        product_id = (_document$getElementB = document.getElementById('dokan-edit-product-id')) === null || _document$getElementB === void 0 ? void 0 : _document$getElementB.value;
+        productId = (_document$getElementB = document.getElementById('dokan-edit-product-id')) === null || _document$getElementB === void 0 ? void 0 : _document$getElementB.value;
       } else {
         var _document$getElementB2, _document$getElementB3;
         // document.getElementById('pro_id')?.value is added to to support wcfm. In wcfm, product id set in pro_id field
-        product_id = ((_document$getElementB2 = document.getElementById('post_ID')) === null || _document$getElementB2 === void 0 ? void 0 : _document$getElementB2.value) || ((_document$getElementB3 = document.getElementById('pro_id')) === null || _document$getElementB3 === void 0 ? void 0 : _document$getElementB3.value);
+        productId = ((_document$getElementB2 = document.getElementById('post_ID')) === null || _document$getElementB2 === void 0 ? void 0 : _document$getElementB2.value) || ((_document$getElementB3 = document.getElementById('pro_id')) === null || _document$getElementB3 === void 0 ? void 0 : _document$getElementB3.value);
       }
     }
-    return id ? id : product_id;
+    return id ? id : productId;
   };
   const postId = getPostID();
-  (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+  (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
     if (wholesalex_single_product.fields) {
       setFields(wholesalex_single_product.fields);
     }
-    let sections = Object.keys(wholesalex_single_product.fields);
-    let initialRoleData = {};
-    sections.map((section, index) => {
-      Object.keys(wholesalex_single_product.fields[section]['attr']).map((role, i) => {
+    const sections = Object.keys(wholesalex_single_product.fields);
+    const initialRoleData = {};
+    sections.map(section => {
+      Object.keys(wholesalex_single_product.fields[section].attr).map(role => {
         initialRoleData[role] = {
           tiers: [_objectSpread({}, initialTier)]
         };
+        return null;
       });
+      return null;
     });
-    let _temp = _objectSpread(_objectSpread({}, initialRoleData), wholesalex_single_product.discounts[postId]);
+    const _temp = _objectSpread(_objectSpread({}, initialRoleData), wholesalex_single_product.discounts[postId]);
     setTier(_temp);
     setAppState(_objectSpread(_objectSpread({}, appState), {}, {
       loading: false
     }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const buttonData = (fieldData, tierName) => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_Button__WEBPACK_IMPORTED_MODULE_6__["default"], {
-      label: fieldData['label'],
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button__WEBPACK_IMPORTED_MODULE_5__["default"], {
+      label: fieldData.label,
       background: "tertiary",
       onClick: e => {
         e.preventDefault();
-        let copy = _objectSpread({}, tier);
-        copy[tierName]['tiers'].push(initialTier);
+        const copy = _objectSpread({}, tier);
+        copy[tierName].tiers.push(initialTier);
         setTier(copy);
       }
     });
   };
-  const UpgradeButton = (fieldData, tierName) => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_Button__WEBPACK_IMPORTED_MODULE_6__["default"], {
-      label: fieldData['label'],
+  const UpgradeButton = fieldData => {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Button__WEBPACK_IMPORTED_MODULE_5__["default"], {
+      label: fieldData.label,
       onClick: e => {
         e.preventDefault();
         setPopUpStatus(true);
@@ -3857,35 +3934,35 @@ const Product = _ref => {
       iconAnimation: "icon-left"
     });
   };
-  const [tierStatus, setTierStatus] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)({});
+  const [tierStatus, setTierStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
   const tierData = (fieldData, tierName, lockStatus) => {
-    var defaultTier = fieldData['_tiers']['data'];
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+    const defaultTier = fieldData._tiers.data;
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       key: tierName,
       className: "wsx-settings-tiers-wrapper"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-settings-tiers-container"
-    }, tier && tier[tierName] && tier[tierName]['tiers'].map((t, index) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_Tier__WEBPACK_IMPORTED_MODULE_3__["default"], {
+    }, tier && tier[tierName] && tier[tierName].tiers.map((t, index) => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Tier__WEBPACK_IMPORTED_MODULE_2__["default"], {
       key: "wholesalex_".concat(tierName, "_tier_").concat(index),
       fields: defaultTier,
       tier: tier,
       setTier: setTier,
       index: index,
       tierName: tierName
-    }))), !lockStatus && fieldData['_tiers']['add']['type'] === 'button' && buttonData(fieldData['_tiers']['add'], tierName), lockStatus && fieldData['_tiers']['upgrade_pro']['type'] === 'button' && UpgradeButton(fieldData['_tiers']['upgrade_pro'], tierName));
+    }))), !lockStatus && fieldData._tiers.add.type === 'button' && buttonData(fieldData._tiers.add, tierName), lockStatus && fieldData._tiers.upgrade_pro.type === 'button' && UpgradeButton(fieldData._tiers.upgrade_pro, tierName));
   };
   const inputData = (fieldData, fieldName, tierName) => {
-    let flag = tier[tierName] && tier[tierName][fieldName];
-    const defValue = flag ? tier[tierName][fieldName] : fieldData['default'];
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_Input__WEBPACK_IMPORTED_MODULE_4__["default"], {
+    const flag = tier[tierName] && tier[tierName][fieldName];
+    const defValue = flag ? tier[tierName][fieldName] : fieldData.default;
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Input__WEBPACK_IMPORTED_MODULE_3__["default"], {
       className: "wholesalex_single_product_field",
-      label: fieldData['label'],
-      type: fieldData['type'],
+      label: fieldData.label,
+      type: fieldData.type,
       name: fieldName,
       value: defValue,
       onChange: e => {
-        let parent = _objectSpread({}, tier);
-        let copy = parent[tierName];
+        const parent = _objectSpread({}, tier);
+        const copy = parent[tierName];
         copy[fieldName] = e.target.value;
         parent[tierName] = copy;
         setTier(_objectSpread(_objectSpread({}, tier), parent));
@@ -3893,84 +3970,93 @@ const Product = _ref => {
     });
   };
   const pricesData = (fieldData, tierName) => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       key: "wholesalex_".concat(tierName, "_separate")
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       key: "wholesalex_prices_".concat(tierName),
       className: "wsx-role-based-prices-section wsx-column-2 wsx-sm-column-1 wsx-gap-24"
-    }, Object.keys(fieldData['attr']).map((field, index) => fieldData['attr'][field]['type'] === 'number' && inputData(fieldData['attr'][field], field, tierName))));
+    }, Object.keys(fieldData.attr).map(field => fieldData.attr[field].type === 'number' && inputData(fieldData.attr[field], field, tierName))));
   };
   const tiersData = (fieldsData, section) => {
     let _limit = 99999999999;
-    const isPro = fieldsData['is_pro'];
+    const isPro = fieldsData.is_pro;
     if (isPro) {
       var _fieldsData$pro_data;
-      _limit = (_fieldsData$pro_data = fieldsData['pro_data']) === null || _fieldsData$pro_data === void 0 ? void 0 : _fieldsData$pro_data['value'];
+      _limit = (_fieldsData$pro_data = fieldsData.pro_data) === null || _fieldsData$pro_data === void 0 ? void 0 : _fieldsData$pro_data.value;
     }
     if (!_limit) {
       _limit = 99999999999;
     }
-    let isLock = tier[section]['tiers'].length >= _limit && !_isProActivate;
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("section", {
+    const isLock = tier[section].tiers.length >= _limit && !_isProActivate;
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("section", {
       key: "wholesalex_".concat(section),
       className: section + ' wsx-accordion-wrapper'
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-accordion-header",
       onClick: () => {
         setTierStatus(_objectSpread(_objectSpread({}, tierStatus), {}, {
           [section]: !tierStatus[section]
         }));
-      }
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+      },
+      onKeyDown: e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          setTierStatus(_objectSpread(_objectSpread({}, tierStatus), {}, {
+            [section]: !tierStatus[section]
+          }));
+        }
+      },
+      role: "button",
+      tabIndex: "0"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-accordion-title",
       key: "whx_role_header"
-    }, fieldsData['label']), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("span", {
+    }, fieldsData.label), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
       className: "wsx-icon ".concat(tierStatus[section] ? 'active' : '')
-    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_5__["default"].angleDown_24)), tierStatus[section] && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_4__["default"].angleDown_24)), tierStatus[section] && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-accordion-body"
-    }, tierStatus[section] && fieldsData['attr'] && Object.keys(fieldsData['attr']).map((fieldData, i) => {
-      switch (fieldsData['attr'][fieldData]['type']) {
+    }, tierStatus[section] && fieldsData.attr && Object.keys(fieldsData.attr).map(fieldData => {
+      switch (fieldsData.attr[fieldData].type) {
         case 'tier':
-          return tierData(fieldsData['attr'][fieldData], section, isLock);
+          return tierData(fieldsData.attr[fieldData], section, isLock);
         case 'prices':
-          return pricesData(fieldsData['attr'][fieldData], section);
+          return pricesData(fieldsData.attr[fieldData], section);
         default:
-          break;
+          return null;
       }
     })));
   };
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement((react__WEBPACK_IMPORTED_MODULE_2___default().Fragment), null, appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_LoadingGif__WEBPACK_IMPORTED_MODULE_7__["default"], null), !appState.loading && Object.keys(fields).map((section, c) => Object.keys(fields[section]['attr']).length > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_LoadingGif__WEBPACK_IMPORTED_MODULE_6__["default"], null), !appState.loading && Object.keys(fields).map((section, c) => Object.keys(fields[section].attr).length > 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     key: "wholesalex_product_key_".concat(section, "_").concat(c),
     className: "wsx-tier-wrapper ".concat(section === '_b2c_section' ? 'b2c' : '')
-  }, fields[section]['label'] && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+  }, fields[section].label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
     key: "wholesalex_b2c_b2b_sep_2",
     className: "wsx-font-18 wsx-font-bold"
-  }, fields[section]['label']), Object.keys(fields[section]['attr']).map((field, f) => {
-    switch (fields[section]['attr'][field]['type']) {
+  }, fields[section].label), Object.keys(fields[section].attr).map(field => {
+    switch (fields[section].attr[field].type) {
       case 'tiers':
-        return tiersData(fields[section]['attr'][field], field);
+        return tiersData(fields[section].attr[field], field);
       default:
-        break;
+        return null;
     }
-  }))), ((_wholesalex_single_pr = wholesalex_single_product) === null || _wholesalex_single_pr === void 0 ? void 0 : _wholesalex_single_pr.is_wcfm_dashboard) && isWCFMVariation && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("input", {
+  }))), ((_wholesalex_single_pr = wholesalex_single_product) === null || _wholesalex_single_pr === void 0 ? void 0 : _wholesalex_single_pr.is_wcfm_dashboard) && isWCFMVariation && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("input", {
     type: "hidden",
     className: "wholesalex_rolewise_pricing",
     id: "wholesalex_wcfm_product_variation_tiers_".concat(id ? id : postId),
     value: JSON.stringify(tier),
     name: "wholesalex_wcfm_product_variation_tiers_".concat(id ? id : postId)
-  }), ((_wholesalex_single_pr2 = wholesalex_single_product) === null || _wholesalex_single_pr2 === void 0 ? void 0 : _wholesalex_single_pr2.is_wcfm_dashboard) && !isWCFMVariation && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("input", {
+  }), ((_wholesalex_single_pr2 = wholesalex_single_product) === null || _wholesalex_single_pr2 === void 0 ? void 0 : _wholesalex_single_pr2.is_wcfm_dashboard) && !isWCFMVariation && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("input", {
     type: "hidden",
     className: "wholesalex_rolewise_pricing",
     id: "wholesalex_wcfm_simple_product_tiers_".concat(id ? id : postId),
     value: JSON.stringify(tier),
     name: "wholesalex_wcfm_simple_product_tiers_".concat(id ? id : postId)
-  }), !((_wholesalex_single_pr3 = wholesalex_single_product) !== null && _wholesalex_single_pr3 !== void 0 && _wholesalex_single_pr3.is_wcfm_dashboard) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("input", {
+  }), !((_wholesalex_single_pr3 = wholesalex_single_product) !== null && _wholesalex_single_pr3 !== void 0 && _wholesalex_single_pr3.is_wcfm_dashboard) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("input", {
     type: "hidden",
     className: "wholesalex_rolewise_pricing",
     id: "wholesalex_single_product_tiers_".concat(id ? id : postId),
     value: JSON.stringify(tier),
     name: "wholesalex_single_product_tiers_".concat(id ? id : postId)
-  }), popUpStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_8__["default"], {
+  }), popUpStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_7__["default"], {
     title: wholesalex_product.i18n.unlock_heading,
     onClose: () => setPopUpStatus(false)
   }));
@@ -3991,18 +4077,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/esm/defineProperty.js");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "./node_modules/@wordpress/i18n/build-module/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _components_MultiSelect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/MultiSelect */ "./reactjs/src/components/MultiSelect.js");
-/* harmony import */ var _components_Choosebox__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/Choosebox */ "./reactjs/src/components/Choosebox.js");
-/* harmony import */ var _components_Switch__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Switch */ "./reactjs/src/components/Switch.js");
-/* harmony import */ var _components_Slider__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/Slider */ "./reactjs/src/components/Slider.js");
-/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
-/* harmony import */ var _components_RadioButtons__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/RadioButtons */ "./reactjs/src/components/RadioButtons.js");
-/* harmony import */ var _components_Select__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../components/Select */ "./reactjs/src/components/Select.js");
-/* harmony import */ var _components_LoadingGif__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../components/LoadingGif */ "./reactjs/src/components/LoadingGif.js");
-/* harmony import */ var _components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../components/UpgradeProPopUp */ "./reactjs/src/components/UpgradeProPopUp.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _components_MultiSelect__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/MultiSelect */ "./reactjs/src/components/MultiSelect.js");
+/* harmony import */ var _components_Choosebox__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Choosebox */ "./reactjs/src/components/Choosebox.js");
+/* harmony import */ var _components_Switch__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/Switch */ "./reactjs/src/components/Switch.js");
+/* harmony import */ var _components_Slider__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Slider */ "./reactjs/src/components/Slider.js");
+/* harmony import */ var _utils_Icons__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../utils/Icons */ "./reactjs/src/utils/Icons.js");
+/* harmony import */ var _components_RadioButtons__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../components/RadioButtons */ "./reactjs/src/components/RadioButtons.js");
+/* harmony import */ var _components_Select__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../components/Select */ "./reactjs/src/components/Select.js");
+/* harmony import */ var _components_LoadingGif__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../components/LoadingGif */ "./reactjs/src/components/LoadingGif.js");
+/* harmony import */ var _components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../components/UpgradeProPopUp */ "./reactjs/src/components/UpgradeProPopUp.js");
 
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { (0,_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__["default"])(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
@@ -4016,14 +4101,13 @@ function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t =
 
 
 
-
 const ProductTab = () => {
-  const [productSettings, setProductSettings] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)({});
-  const [visibilitySectionStatus, setVisibilitySectionStatus] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(true);
-  const [fields, setFields] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)({});
-  const [appState, setAppState] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)({});
-  const [popUpStatus, setPopUpStatus] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
-  (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+  const [productSettings, setProductSettings] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
+  const [visibilitySectionStatus, setVisibilitySectionStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(true);
+  const [fields, setFields] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
+  const [appState, setAppState] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({});
+  const [popUpStatus, setPopUpStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
+  (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
     if (wholesalex_product_tab.fields) {
       setFields(wholesalex_product_tab.fields);
     }
@@ -4033,6 +4117,7 @@ const ProductTab = () => {
     setAppState(_objectSpread(_objectSpread({}, appState), {}, {
       loading: false
     }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const getOptionsArray = options => {
     return Object.keys(options).map(option => ({
@@ -4042,7 +4127,7 @@ const ProductTab = () => {
   };
   const selectData = (fieldData, field) => {
     const defValue = productSettings[field] || fieldData.default || '';
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_Select__WEBPACK_IMPORTED_MODULE_9__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Select__WEBPACK_IMPORTED_MODULE_8__["default"], {
       label: fieldData.label,
       options: getOptionsArray(fieldData.options),
       value: defValue,
@@ -4059,7 +4144,7 @@ const ProductTab = () => {
   };
   const chooseboxData = (fieldData, field) => {
     const defValue = productSettings[field] ? productSettings[field] : fieldData.default;
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_Choosebox__WEBPACK_IMPORTED_MODULE_4__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Choosebox__WEBPACK_IMPORTED_MODULE_3__["default"], {
       label: fieldData.label,
       name: field,
       value: defValue,
@@ -4081,14 +4166,18 @@ const ProductTab = () => {
   };
   const switchData = (fieldData, field) => {
     var _wholesalex_single_pr;
-    const defValue = productSettings[field] ? productSettings[field] == 'yes' ? true : false : fieldData.default;
-    let _className = (_wholesalex_single_pr = wholesalex_single_product) !== null && _wholesalex_single_pr !== void 0 && _wholesalex_single_pr.is_wcfm_dashboard ? 'wcfm-checkbox' : '';
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_Switch__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    let defValue;
+    if (productSettings[field]) {
+      defValue = productSettings[field] === 'yes' ? true : false;
+    } else {
+      defValue = fieldData.default;
+    }
+    const _className = (_wholesalex_single_pr = wholesalex_single_product) !== null && _wholesalex_single_pr !== void 0 && _wholesalex_single_pr.is_wcfm_dashboard ? 'wcfm-checkbox' : '';
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Switch__WEBPACK_IMPORTED_MODULE_4__["default"], {
       name: field,
       value: defValue,
       onChange: e => {
-        let _final;
-        _final = e.target.checked ? 'yes' : 'no';
+        const _final = e.target.checked ? 'yes' : 'no';
         setProductSettings(_objectSpread(_objectSpread({}, productSettings), {}, {
           [field]: _final
         }));
@@ -4100,7 +4189,7 @@ const ProductTab = () => {
     });
   };
   const getValue = (fieldName, fieldData) => {
-    if (productSettings[fieldName] == undefined) {
+    if (productSettings[fieldName] === undefined) {
       return fieldData.default;
     }
     return productSettings[fieldName];
@@ -4111,21 +4200,19 @@ const ProductTab = () => {
     const isLock = e.target.value && e.target.value.startsWith('pro_');
     if (isLock) {
       setPopUpStatus(true);
+    } else if (e.target.type === 'checkbox') {
+      setProductSettings(_objectSpread(_objectSpread({}, productSettings), {}, {
+        [e.target.name]: e.target.checked ? 'yes' : 'no'
+      }));
     } else {
-      if (e.target.type === 'checkbox') {
-        setProductSettings(_objectSpread(_objectSpread({}, productSettings), {}, {
-          [e.target.name]: e.target.checked ? 'yes' : 'no'
-        }));
-      } else {
-        setProductSettings(_objectSpread(_objectSpread({}, productSettings), {}, {
-          [name ? name : e.target.name]: value ? value : e.target.value
-        }));
-      }
+      setProductSettings(_objectSpread(_objectSpread({}, productSettings), {}, {
+        [name ? name : e.target.name]: value ? value : e.target.value
+      }));
     }
   };
   const radioData = (fieldData, field) => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_RadioButtons__WEBPACK_IMPORTED_MODULE_8__["default"], {
-      className: "wsx-mb-32",
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_RadioButtons__WEBPACK_IMPORTED_MODULE_7__["default"], {
+      className: 'wsx-mb-32',
       key: field,
       label: fieldData.label,
       options: fieldData.options,
@@ -4138,8 +4225,13 @@ const ProductTab = () => {
     });
   };
   const sliderData = (fieldData, field, customClass) => {
-    const defValue = productSettings[field] ? productSettings[field] == 'yes' ? true : false : fieldData.default;
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_Slider__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    let defValue;
+    if (productSettings[field]) {
+      defValue = productSettings[field] === 'yes' ? true : false;
+    } else {
+      defValue = fieldData.default;
+    }
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Slider__WEBPACK_IMPORTED_MODULE_5__["default"], {
       className: "wsx-single-product-settings-slider ".concat(customClass),
       label: fieldData.label,
       isLabelSide: true,
@@ -4147,8 +4239,7 @@ const ProductTab = () => {
       name: field,
       value: defValue,
       onChange: e => {
-        let _final;
-        _final = e.target.checked ? 'yes' : 'no';
+        const _final = e.target.checked ? 'yes' : 'no';
         setProductSettings(_objectSpread(_objectSpread({}, productSettings), {}, {
           [field]: _final
         }));
@@ -4157,67 +4248,76 @@ const ProductTab = () => {
   };
   const multiselectData = (fieldData, field) => {
     const defValue = productSettings[field] ? productSettings[field] : fieldData.default;
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_MultiSelect__WEBPACK_IMPORTED_MODULE_3__["default"], {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_MultiSelect__WEBPACK_IMPORTED_MODULE_2__["default"], {
       key: field,
       name: field,
       value: defValue,
-      options: fieldData['options'],
+      options: fieldData.options,
       placeholder: fieldData.placeholder,
       onMultiSelectChangeHandler: (fieldName, selectedValues) => {
-        let copy = _objectSpread({}, productSettings);
+        const copy = _objectSpread({}, productSettings);
         copy[fieldName] = [...selectedValues];
         setProductSettings(_objectSpread(_objectSpread({}, productSettings), copy));
       }
     });
   };
   const visibilitySectionData = (fieldData, section) => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       key: section,
       className: "wholesalex-product-data__visibility-section wsx-accordion-wrapper"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-accordion-header",
       onClick: () => {
         setVisibilitySectionStatus(!visibilitySectionStatus);
-      }
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+      },
+      onKeyDown: e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          setVisibilitySectionStatus(!visibilitySectionStatus);
+        }
+      },
+      role: "button",
+      tabIndex: "0"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-accordion-title",
       key: "whx_role_header_".concat(section)
-    }, fieldData['label']), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("span", {
+    }, fieldData.label), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("span", {
       className: "wsx-icon ".concat(visibilitySectionStatus ? 'active' : '')
-    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_7__["default"].angleDown_24)), visibilitySectionStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+    }, _utils_Icons__WEBPACK_IMPORTED_MODULE_6__["default"].angleDown_24)), visibilitySectionStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-accordion-body"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-visibility-slider-fields"
-    }, visibilitySectionStatus && Object.keys(fieldData['attr']).map((field, index) => {
-      switch (fieldData['attr'][field]['type']) {
+    }, visibilitySectionStatus && Object.keys(fieldData.attr).map(field => {
+      switch (fieldData.attr[field].type) {
         case 'switch':
-          return switchData(fieldData['attr'][field], field);
+          return switchData(fieldData.attr[field], field);
         case 'slider':
-          return sliderData(fieldData['attr'][field], field, 'wsx-slider-sm');
+          return sliderData(fieldData.attr[field], field, 'wsx-slider-sm');
         default:
-          break;
+          return null;
       }
-    })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("div", {
+    })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("div", {
       className: "wsx-visibility-select-options"
-    }, visibilitySectionStatus && Object.keys(fieldData['attr']).map((field, index) => {
-      switch (fieldData['attr'][field]['type']) {
+    }, visibilitySectionStatus && Object.keys(fieldData.attr).map(field => {
+      switch (fieldData.attr[field].type) {
         case 'select':
-          return selectData(fieldData['attr'][field], field);
+          return selectData(fieldData.attr[field], field);
         case 'multiselect':
-          if (productSettings['_hide_for_b2b_role_n_user'] === 'b2b_specific' && field === '_hide_for_roles') {
-            return multiselectData(fieldData['attr'][field], field);
+          if (productSettings._hide_for_b2b_role_n_user === 'b2b_specific' && field === '_hide_for_roles') {
+            return multiselectData(fieldData.attr[field], field);
           }
-          if (productSettings['_hide_for_b2b_role_n_user'] === 'user_specific' && field === '_hide_for_users') {
-            return multiselectData(fieldData['attr'][field], field);
+          if (productSettings._hide_for_b2b_role_n_user === 'user_specific' && field === '_hide_for_users') {
+            return multiselectData(fieldData.attr[field], field);
           }
+          break;
         default:
           break;
       }
+      return null;
     }))));
   };
   const tabData = fieldData => {
-    return Object.keys(fieldData).map((field, index) => {
-      switch (fieldData[field]['type']) {
+    return Object.keys(fieldData).map(field => {
+      switch (fieldData[field].type) {
         case 'choosebox':
           return chooseboxData(fieldData[field], field);
         case 'switch':
@@ -4231,15 +4331,15 @@ const ProductTab = () => {
         case 'visibility_section':
           return visibilitySectionData(fieldData[field], field);
         default:
-          break;
+          return null;
       }
     });
   };
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement((react__WEBPACK_IMPORTED_MODULE_2___default().Fragment), null, appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_LoadingGif__WEBPACK_IMPORTED_MODULE_10__["default"], null), !appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement((react__WEBPACK_IMPORTED_MODULE_2___default().Fragment), null, Object.keys(fields).map((section, c) => section === '_product_settings_tab' && tabData(fields[section]['attr'], section))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement("input", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_LoadingGif__WEBPACK_IMPORTED_MODULE_9__["default"], null), !appState.loading && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), null, Object.keys(fields).map(section => section === '_product_settings_tab' && tabData(fields[section].attr, section))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement("input", {
     type: "hidden",
     value: JSON.stringify(productSettings),
     name: "wholesalex_product_settings"
-  }), popUpStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_11__["default"], {
+  }), popUpStatus && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_UpgradeProPopUp__WEBPACK_IMPORTED_MODULE_10__["default"], {
     title: wholesalex_product.i18n.unlock_heading,
     onClose: () => setPopUpStatus(false)
   }));
@@ -6180,7 +6280,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', function () {
   var _wholesalex_single_pr, _wholesalex_single_pr2, _wholesalex_product;
   if (document.body.contains(document.getElementById('wsx_tab_data'))) {
     react_dom__WEBPACK_IMPORTED_MODULE_1___default().render(/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_ProductTab__WEBPACK_IMPORTED_MODULE_3__["default"], null)), document.getElementById('wsx_tab_data'));
@@ -6189,12 +6289,12 @@ document.addEventListener("DOMContentLoaded", function () {
   if (elements.length) {
     react_dom__WEBPACK_IMPORTED_MODULE_1___default().render(/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Product__WEBPACK_IMPORTED_MODULE_2__["default"], null)), elements[0]);
   }
-  jQuery('#woocommerce-product-data').on('woocommerce_variations_loaded', function (event) {
+  jQuery('#woocommerce-product-data').on('woocommerce_variations_loaded', function () {
     elements = document.getElementsByClassName('wsx-single-product-settings-wrapper');
     Array.from(elements).forEach(element => {
       element.classList.add('wsx-single-product-variation-settings');
     });
-    let ids = document.getElementsByClassName('variable_post_id');
+    const ids = document.getElementsByClassName('variable_post_id');
     for (let i = 1; i < elements.length; i++) {
       react_dom__WEBPACK_IMPORTED_MODULE_1___default().render(/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Product__WEBPACK_IMPORTED_MODULE_2__["default"], {
         id: ids[i - 1].value
@@ -6202,7 +6302,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
   if ((_wholesalex_single_pr = wholesalex_single_product) !== null && _wholesalex_single_pr !== void 0 && _wholesalex_single_pr.is_dokan_dashboard) {
-    jQuery('.dokan-product-variation-wrapper').on('dokan_variations_loaded', function (event) {
+    jQuery('.dokan-product-variation-wrapper').on('dokan_variations_loaded', function () {
       elements = document.getElementsByClassName('wsx-single-product-settings-wrapper');
       for (let i = 1; i < elements.length; i++) {
         var _document$getElements;
@@ -6229,11 +6329,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
   (_wholesalex_product = wholesalex_product) === null || _wholesalex_product === void 0 || (_wholesalex_product = _wholesalex_product.roles) === null || _wholesalex_product === void 0 || _wholesalex_product.forEach(role => {
-    jQuery('select.variation_actions').on('wholesalex_product_price_' + role.value + '_base', function (event) {
-      let data = {};
-      let value;
-      value = window.prompt(woocommerce_admin_meta_boxes_variations.i18n_enter_a_value);
-      if (value != null) {
+    jQuery('select.variation_actions').on('wholesalex_product_price_' + role.value + '_base', function () {
+      const data = {};
+      const value = window.prompt(woocommerce_admin_meta_boxes_variations.i18n_enter_a_value);
+      if (value !== null) {
         data.value = value;
       } else {
         return;
@@ -6249,16 +6348,15 @@ document.addEventListener("DOMContentLoaded", function () {
           data: data
         },
         type: 'POST',
-        success: function () {
+        success: () => {
           location.reload();
         }
       });
     });
-    jQuery('select.variation_actions').on('wholesalex_product_price_' + role.value + '_sale', function (event) {
-      let data = {};
-      let value;
-      value = window.prompt(woocommerce_admin_meta_boxes_variations.i18n_enter_a_value);
-      if (value != null) {
+    jQuery('select.variation_actions').on('wholesalex_product_price_' + role.value + '_sale', function () {
+      const data = {};
+      const value = window.prompt(woocommerce_admin_meta_boxes_variations.i18n_enter_a_value);
+      if (value !== null) {
         data.value = value;
       } else {
         return;
@@ -6271,10 +6369,10 @@ document.addEventListener("DOMContentLoaded", function () {
           product_id: woocommerce_admin_meta_boxes_variations.post_id,
           product_type: jQuery('#product-type').val(),
           bulk_action: 'wholesalex_product_price_' + role.value + '_sale',
-          data: data
+          data
         },
         type: 'POST',
-        success: function () {
+        success: () => {
           location.reload();
         }
       });

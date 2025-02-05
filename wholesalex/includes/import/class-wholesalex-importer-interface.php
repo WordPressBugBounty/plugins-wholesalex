@@ -8,6 +8,7 @@
  */
 
 namespace WHOLESALEX;
+
 /**
  * WHOLESALEX_Importer_Interface class.
  */

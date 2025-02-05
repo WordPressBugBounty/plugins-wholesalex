@@ -21,7 +21,7 @@ add_filter( 'wholesalex_addons_config', 'wholesalex_recaptcha_config', 1 );
 function wholesalex_recaptcha_config( $config ) {
 	$config['wsx_addon_recaptcha'] = array(
 		'name'        => __( 'reCAPTCHA', 'wholesalex' ),
-		'desc'        => __( "Protect your website from suspicious login attempts with an added security layer using Google reCAPTCHA v3 for extended safety measures.", 'wholesalex' ),
+		'desc'        => __( 'Protect your website from suspicious login attempts with an added security layer using Google reCAPTCHA v3 for extended safety measures.', 'wholesalex' ),
 		'img'         => WHOLESALEX_URL . 'assets/img/addons/recaptcha.svg',
 		'docs'        => 'https://getwholesalex.com/docs/wholesalex/add-on/recaptcha/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
 		'live'        => '',

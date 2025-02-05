@@ -70,11 +70,10 @@ class WholesaleX_New_User_Verification_Email extends WC_Email {
 		$this->description    = __( 'WholesaleX: Email Verification emails are sent to the users when a customer signs up via wholesalex registration from and user status set to Email Verification Required.', 'wholesalex' );
 		$this->template_base  = WHOLESALEX_PATH . 'templates/emails/';
 		$this->template_html  = 'wholesalex-email-verification.php';
-		$this->placeholders   = apply_filters( 'wholesalex_email_verification_smart_tags', wholesalex()->smart_tag_name('{date}', '{admin_name}', '{site_name}') );
+		$this->placeholders   = apply_filters( 'wholesalex_email_verification_smart_tags', wholesalex()->smart_tag_name( '{date}', '{admin_name}', '{site_name}' ) );
 
 		// Call parent constructor.
 		parent::__construct();
-		// $this->recipient = '';
 		add_action( 'wholesalex_user_email_confirmation_notification', array( $this, 'trigger' ), 10, 3 );
 	}
 
@@ -118,7 +117,7 @@ class WholesaleX_New_User_Verification_Email extends WC_Email {
 			$this->user_email       = stripslashes( $this->object->user_email );
 			$this->recipient        = $this->user_email;
 			$confirmation_code      = get_user_meta( $user_id, '__wholesalex_email_confirmation_code', true );
-			$this->confirmation_url = esc_url( get_site_url() . '/my-account/?user_id='.$user_id.'&confirmation_code=' . urlencode($confirmation_code) );
+			$this->confirmation_url = esc_url( get_site_url() . '/my-account/?user_id=' . $user_id . '&confirmation_code=' . urlencode( $confirmation_code ) );
 		}
 
 		if ( $this->is_enabled() && $this->get_recipient() ) {

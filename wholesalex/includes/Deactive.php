@@ -1,10 +1,11 @@
 <?php
 /**
  * Deactivation Action.
- * 
+ *
  * @package WHOLESALEX
  * @since v.1.4.3
  */
+
 namespace WHOLESALEX;
 
 defined( 'ABSPATH' ) || exit;
@@ -15,101 +16,130 @@ defined( 'ABSPATH' ) || exit;
  */
 class Deactive {
 
-	public static $PLUGIN_NAME = 'WholesaleX';
-	public static $PLUGIN_SLUG = 'wholesalex';
-	public static $PLUGIN_VERSION = WHOLESALEX_VER;
-    public static $API_ENDPOINT = 'https://inside.wpxpo.com';
-    
-    public function __construct() {
+	/**
+	 * Plugin Name.
+	 *
+	 * @var string
+	 */
+	public static $plugin_name = 'WholesaleX';
+
+	/**
+	 * Plugin Slug.
+	 *
+	 * @var string
+	 */
+	public static $plugin_slug = 'wholesalex';
+
+	/**
+	 * Plugin Version.
+	 *
+	 * @var string
+	 */
+	public static $plugin_version = WHOLESALEX_VER;
+
+	/**
+	 * API Endpoint.
+	 *
+	 * @var string
+	 */
+	public static $api_endpoint = 'https://inside.wpxpo.com';
+
+	/**
+	 * Deactive Constructor
+	 */
+	public function __construct() {
 		global $pagenow;
-        if ( $pagenow == 'plugins.php' ) {
+		if ( 'plugins.php' === $pagenow ) {
 			add_action( 'admin_footer', array( $this, 'get_source_data_callback' ) );
 		}
-		add_action( 'wp_ajax_wholesalex_deactive_plugin',  array(__CLASS__,'send_plugin_data')  );
+		add_action( 'wp_ajax_wholesalex_deactive_plugin', array( __CLASS__, 'send_plugin_data' ) );
 		$this->wholesalex_plugin_data_remove();
 	}
 
 	/**
 	 * Check Local / Live Server
-     * 
-     * @since v.1.4.3
+	 *
+	 * @since v.1.4.3
 	 * @return ARRAY | Return From The Server
 	 */
 	public function is_local() {
 		return in_array( $_SERVER['REMOTE_ADDR'], array( '127.0.0.1', '::1' ) ); //phpcs:ignore
 	}
 
-	public static function send_plugin_data( $type='deactive' , $site = '' ) {
-		
+	public static function send_plugin_data( $type = 'deactive', $site = '' ) {
+
 		if ( current_user_can( 'administrator' ) ) {
-			$data = self::get_data();
+			$data              = self::get_data();
 			$data['site_type'] = $site ? $site : get_option( '__site_type' );
 
 			$data['type'] = $type ? $type : 'deactive';
 			$form_data = isset($_POST) ? $_POST : array(); //phpcs:ignore
-		
-			if( isset( $form_data['action'] ) ){
+
+			if ( isset( $form_data['action'] ) ) {
 				unset( $form_data['action'] );
 			}
 
-			$response = wp_remote_post( self::$API_ENDPOINT, array(
-				'method'      => 'POST',
-				'timeout'     => 30,
-				'redirection' => 5,
-				'headers'     => array(
-					'user-agent' => 'wpxpo/' . md5( esc_url( home_url() ) ) . ';',
-					'Accept'     => 'application/json',
-				),
-				'blocking'    => true,
-				'httpversion' => '1.0',
-				'body'        => array_merge( $data, $form_data ),
-			) );
+			$response = wp_remote_post(
+				self::$api_endpoint,
+				array(
+					'method'      => 'POST',
+					'timeout'     => 30,
+					'redirection' => 5,
+					'headers'     => array(
+						'user-agent' => 'wpxpo/' . md5( esc_url( home_url() ) ) . ';',
+						'Accept'     => 'application/json',
+					),
+					'blocking'    => true,
+					'httpversion' => '1.0',
+					'body'        => array_merge( $data, $form_data ),
+				)
+			);
 
 			return $response;
-		}		
+		}
 	}
-	
+
 
 	/**
 	 * Settings Arguments
-     * 
-     * @since v.1.4.3
+	 *
+	 * @since v.1.4.3
 	 * @return ARRAY
 	 */
 	public function get_settings() {
 		$attr = array(
 			array(
-				'id'          	=> 'no-need',
-				'input' 		=> false,
-				'text'        	=> __( "I no longer need the plugin.", "wholesalex" )
+				'id'    => 'no-need',
+				'input' => false,
+				'text'  => __( 'I no longer need the plugin.', 'wholesalex' ),
 			),
 			array(
-				'id'          	=> 'better-plugin',
-				'input' 		=> true,
-				'text'        	=> __( "I found a better plugin.", "wholesalex" ),
-				'placeholder' 	=> __( "Please share which plugin.", "wholesalex" ),
+				'id'          => 'better-plugin',
+				'input'       => true,
+				'text'        => __( 'I found a better plugin.', 'wholesalex' ),
+				'placeholder' => __( 'Please share which plugin.', 'wholesalex' ),
 			),
 			array(
-				'id'          	=> 'stop-working',
-				'input' 		=> true,
-				'text'        	=> __( "The plugin suddenly stopped working.", "wholesalex" ),
-				'placeholder' 	=> __( "Please share more details.", "wholesalex" ),
+				'id'          => 'stop-working',
+				'input'       => true,
+				'text'        => __( 'The plugin suddenly stopped working.', 'wholesalex' ),
+				'placeholder' => __( 'Please share more details.', 'wholesalex' ),
 			),
 			array(
-				'id'          	=> 'not-working',
-				'input' 		=> false,
-				'text'        	=> __( "I could not get the plugin to work.", "wholesalex" )
+				'id'    => 'not-working',
+				'input' => false,
+				'text'  => __( 'I could not get the plugin to work.', 'wholesalex' ),
 			),
 			array(
-				'id'          	=> 'temporary-deactivation',
-				'input' 		=> false,
-				'text'        	=> __( "It's a temporary deactivation.", "wholesalex" )
+				'id'    => 'temporary-deactivation',
+				'input' => false,
+				'text'  => __( "It's a temporary deactivation.", 'wholesalex' ),
 			),
 			array(
-				'id'          	=> 'other',
-				'input' 		=> true,
-				'text'        	=> __( "Other.", "wholesalex" ),
-				'placeholder' 	=> __( "Please share the reason.", "wholesalex" ),
+				'id'          => 'other',
+				'input'       => true,
+				'text'        => __( 'Other.', 'wholesalex' ),
+				'placeholder' => __( 'Please share the reason.', 'wholesalex' ),
 			),
 		);
 		return $attr;
@@ -117,78 +147,93 @@ class Deactive {
 
 	/**
 	 * Popup Module of Action
-     * 
-     * @since v.1.4.3
+	 *
+	 * @since v.1.4.3
 	 * @return ARRAY
 	 */
-    public function get_source_data_callback(){
-        $this->deactive_html();
+	public function get_source_data_callback() {
+		$this->deactive_html();
 		$this->deactive_css();
 		$this->deactive_js();
 	}
 
-	public function deactive_html() { ?>
-    	<div class="wholesalex-modal" id="wholesalex-deactive-modal">
-            <div class="wholesalex-modal-wrap">
+	/**
+	 * Deactive HTML
+	 *
+	 * @since v.1.4.3
+	 * @return void
+	 */
+	public function deactive_html() {
+		?>
+		<div class="wholesalex-modal" id="wholesalex-deactive-modal">
+			<div class="wholesalex-modal-wrap">
 			
-                <div class="wholesalex-modal-header">
-                    <h2><?php esc_html_e( "Quick Feedback", "wholesalex" ); ?></h2>
-                    <button class="wholesalex-modal-cancel"><span class="dashicons dashicons-no-alt"></span></button>
-                </div>
+				<div class="wholesalex-modal-header">
+					<h2><?php esc_html_e( 'Quick Feedback', 'wholesalex' ); ?></h2>
+					<button class="wholesalex-modal-cancel"><span class="dashicons dashicons-no-alt"></span></button>
+				</div>
 
-                <div class="wholesalex-modal-body">
-                    <h3><?php esc_html_e( "If you have a moment, please let us know why you are deactivating WholesaleX:", "wholesalex" ); ?></h3>
-                    <ul class="wholesalex-modal-input">
-						<?php foreach ($this->get_settings() as $key => $setting) { ?>
+				<div class="wholesalex-modal-body">
+					<h3><?php esc_html_e( 'If you have a moment, please let us know why you are deactivating WholesaleX:', 'wholesalex' ); ?></h3>
+					<ul class="wholesalex-modal-input">
+						<?php foreach ( $this->get_settings() as $key => $setting ) { ?>
 							<li>
 								<label class="wsx-label">
-									<input class="wsx-radio" type="radio" <?php echo ($key == 0 ? 'checked="checked"' : ''); ?> id="<?php echo esc_attr($setting['id']); ?>" name="<?php echo esc_attr(self::$PLUGIN_SLUG); ?>" value="<?php echo esc_attr($setting['text']); ?>">
-									<div class="wholesalex-reason-text"><?php echo esc_html($setting['text']); ?></div>
-									<?php if( isset($setting['input']) && $setting['input'] ) { ?>
-										<textarea placeholder="<?php echo esc_attr($setting['placeholder']); ?>" class="wsx-textarea wholesalex-reason-input <?php echo ($key == 0 ? 'wholesalex-active' : ''); ?> <?php echo esc_html($setting['id']); ?>"></textarea>
+									<input class="wsx-radio" type="radio" <?php echo ( $key == 0 ? 'checked="checked"' : '' ); ?> id="<?php echo esc_attr( $setting['id'] ); ?>" name="<?php echo esc_attr( self::$plugin_slug ); ?>" value="<?php echo esc_attr( $setting['text'] ); ?>">
+									<div class="wholesalex-reason-text"><?php echo esc_html( $setting['text'] ); ?></div>
+									<?php if ( isset( $setting['input'] ) && $setting['input'] ) { ?>
+										<textarea placeholder="<?php echo esc_attr( $setting['placeholder'] ); ?>" class="wsx-textarea wholesalex-reason-input <?php echo ( $key == 0 ? 'wholesalex-active' : '' ); ?> <?php echo esc_html( $setting['id'] ); ?>"></textarea>
 									<?php } ?>
 								</label>
 							</li>
 						<?php } ?>
-                    </ul>
-                </div>
+					</ul>
+				</div>
 
-                <div class="wholesalex-modal-footer">
-                    <a class="wsx-link wholesalex-modal-submit wholesalex-btn wholesalex-btn-primary" href="#"><?php esc_html_e( "Submit & Deactivate", "wholesalex" ); ?><span class="dashicons dashicons-update rotate"></span></a>
-                    <a class="wsx-link wholesalex-modal-deactive" href="#"><?php esc_html_e( "Skip & Deactivate", "wholesalex" ); ?></a>
+				<div class="wholesalex-modal-footer">
+					<a class="wsx-link wholesalex-modal-submit wholesalex-btn wholesalex-btn-primary" href="#"><?php esc_html_e( 'Submit & Deactivate', 'wholesalex' ); ?><span class="dashicons dashicons-update rotate"></span></a>
+					<a class="wsx-link wholesalex-modal-deactive" href="#"><?php esc_html_e( 'Skip & Deactivate', 'wholesalex' ); ?></a>
 				</div>
 				
-            </div>
-        </div>
-	<?php }
+			</div>
+		</div>
+		<?php
+	}
 
-	public function deactive_css() { ?>
+	/**
+	 * Deactive CSS
+	 *
+	 * @since v.1.4.3
+	 * @return void
+	 */
+	public function deactive_css() {
+		?>
 		<style type="text/css">
 			.wholesalex-modal {
-                position: fixed;
-                z-index: 99999;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                left: 0;
-                background: rgba(0,0,0,0.5);
-                display: none;
-                box-sizing: border-box;
-                overflow: scroll;
-            }
-            .wholesalex-modal * {
-                box-sizing: border-box;
-            }
-            .wholesalex-modal.modal-active {
-                display: block;
-            }
+				position: fixed;
+				z-index: 99999;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				background: rgba(0,0,0,0.5);
+				display: none;
+				box-sizing: border-box;
+				overflow: scroll;
+			}
+			.wholesalex-modal * {
+				box-sizing: border-box;
+			}
+			.wholesalex-modal.modal-active {
+				display: block;
+			}
 			.wholesalex-modal-wrap {
-                max-width: 870px;
-                width: 100%;
-                position: relative;
-                margin: 10% auto;
-                background: #fff;
-            }
+				max-width: 870px;
+				width: 100%;
+				position: relative;
+				margin: 10% auto;
+				background: #fff;
+			}
 			.wholesalex-reason-input{
 				display: none;
 			}
@@ -321,19 +366,27 @@ class Deactive {
 			}
 			.wpxpo-btn-tracking-notice {
 				display: flex;
-                align-items: center;
-                flex-wrap: wrap;
-                padding: 5px 0;
+				align-items: center;
+				flex-wrap: wrap;
+				padding: 5px 0;
 			}
 			.wpxpo-btn-tracking-notice .wpxpo-btn-tracking {
 				margin: 0 5px;
 				text-decoration: none;
 			}
 		</style>
-    <?php }
+		<?php
+	}
 
-	public function deactive_js() { ?>
-        <script type="text/javascript">
+	/**
+	 * Deactive JS
+	 *
+	 * @since v.1.4.3
+	 * @return void
+	 */
+	public function deactive_js() {
+		?>
+		<script type="text/javascript">
 			jQuery( document ).ready( function( $ ) {
 				'use strict';
 
@@ -362,7 +415,7 @@ class Deactive {
 					$(this).addClass('loading');
 					const url = $(this).attr('href')
 					$.ajax({
-						url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+						url: '<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>',
 						type: 'POST',
 						data: { 
 							action: 'wholesalex_deactive_plugin',
@@ -380,61 +433,65 @@ class Deactive {
 				});
 			});
 		</script>
-    <?php }
+		<?php
+	}
 
 
 	/**
 	 * Plugin Data Callback
-     * 
-     * @since v.1.4.3
+	 *
+	 * @since v.1.4.3
 	 * @return ARRAY | Plugins Information
 	 */
 	public static function get_plugins() {
 		if ( ! function_exists( 'get_plugins' ) ) {
-            include ABSPATH . '/wp-admin/includes/plugin.php';
-        }
+			include ABSPATH . '/wp-admin/includes/plugin.php';
+		}
 
-		$active = array();
-        $inactive = array();
-        $all_plugins = get_plugins();
-        $active_plugins = get_option( 'active_plugins', array() );
+		$active         = array();
+		$inactive       = array();
+		$all_plugins    = get_plugins();
+		$active_plugins = get_option( 'active_plugins', array() );
 
-        foreach ( $all_plugins as $key => $plugin ) {
+		foreach ( $all_plugins as $key => $plugin ) {
 			$arr = array();
-			
-			$arr['name'] 	= isset( $plugin['Name'] ) ? $plugin['Name'] : '';
-			$arr['url'] 	= isset( $plugin['PluginURI'] ) ? $plugin['PluginURI'] : '';
-			$arr['author'] 	= isset( $plugin['Author'] ) ? $plugin['Author'] : '';
+
+			$arr['name']    = isset( $plugin['Name'] ) ? $plugin['Name'] : '';
+			$arr['url']     = isset( $plugin['PluginURI'] ) ? $plugin['PluginURI'] : '';
+			$arr['author']  = isset( $plugin['Author'] ) ? $plugin['Author'] : '';
 			$arr['version'] = isset( $plugin['Version'] ) ? $plugin['Version'] : '';
 
-			if ( in_array( $key, $active_plugins ) ){
-				$active[$key] = $arr;
+			if ( in_array( $key, $active_plugins ) ) {
+				$active[ $key ] = $arr;
 			} else {
-				$inactive[$key] = $arr;
+				$inactive[ $key ] = $arr;
 			}
 		}
 
-		return array( 'active' => $active, 'inactive' => $inactive );		
+		return array(
+			'active'   => $active,
+			'inactive' => $inactive,
+		);
 	}
 
 
 	/**
 	 * Get Theme Data Callback
-     * 
-     * @since v.1.4.3
+	 *
+	 * @since v.1.4.3
 	 * @return ARRAY | Theme Information
 	 */
 	public static function get_themes() {
 		$theme_data = array();
-		$all_themes = wp_get_themes();	
-		if ( is_array( $all_themes ) ){
+		$all_themes = wp_get_themes();
+		if ( is_array( $all_themes ) ) {
 			foreach ( $all_themes as $key => $theme ) {
-				$attr = array();
-				$attr['name'] 		= $theme->Name;
-				$attr['url'] 		= $theme->ThemeURI;
-				$attr['author'] 	= $theme->Author;
-				$attr['version'] 	= $theme->Version;
-				$theme_data[$key] 	= $attr;
+				$attr               = array();
+				$attr['name']       = $theme->Name;
+				$attr['url']        = $theme->ThemeURI;
+				$attr['author']     = $theme->Author;
+				$attr['version']    = $theme->Version;
+				$theme_data[ $key ] = $attr;
 			}
 		}
 		return $theme_data;
@@ -442,172 +499,177 @@ class Deactive {
 
 	/**
 	 * Get Current Users IP Address
-     * 
-     * @since v.1.4.3
+	 *
+	 * @since v.1.4.3
 	 * @return STRING | IP Address
 	 */
 	public static function get_user_ip() {
 		$response = wp_remote_get( 'https://icanhazip.com/' );
-		
-        if ( is_wp_error( $response ) ) {
-            return '';
-        } else {
+
+		if ( is_wp_error( $response ) ) {
+			return '';
+		} else {
 			$user_ip = trim( wp_remote_retrieve_body( $response ) );
 			return filter_var( $user_ip, FILTER_VALIDATE_IP ) ? $user_ip : '';
 		}
-    }
+	}
 
 	/**
 	 * All the Valid Information of The Users
-     * 
-     * @since v.1.4.3
+	 *
+	 * @since v.1.4.3
 	 * @return STRING | IP Address
 	 */
 	public static function get_data() {
 		global $wpdb;
-		$user = wp_get_current_user();
-		$user_count = count_users();
+		$user         = wp_get_current_user();
+		$user_count   = count_users();
 		$plugins_data = self::get_plugins();
 
 		$data = array(
-			'name' => get_bloginfo( 'name' ),
-			'home' => esc_url( home_url() ),
-			'admin_email' => $user->user_email,
-			'first_name' => isset($user->user_firstname) ? $user->user_firstname : '',
-			'last_name' => isset($user->user_lastname) ? $user->user_lastname : '',
-			'display_name' => $user->display_name,
-			'wordpress' => get_bloginfo( 'version' ),
-			'memory_limit' => WP_MEMORY_LIMIT,
-			'debug_mode' => ( defined('WP_DEBUG') && WP_DEBUG ) ? 'Yes' : 'No',
-			'locale' => get_locale(),
-			'multisite' => is_multisite() ? 'Yes' : 'No',
+			'name'             => get_bloginfo( 'name' ),
+			'home'             => esc_url( home_url() ),
+			'admin_email'      => $user->user_email,
+			'first_name'       => isset( $user->user_firstname ) ? $user->user_firstname : '',
+			'last_name'        => isset( $user->user_lastname ) ? $user->user_lastname : '',
+			'display_name'     => $user->display_name,
+			'wordpress'        => get_bloginfo( 'version' ),
+			'memory_limit'     => WP_MEMORY_LIMIT,
+			'debug_mode'       => ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? 'Yes' : 'No',
+			'locale'           => get_locale(),
+			'multisite'        => is_multisite() ? 'Yes' : 'No',
 
-			'themes' => self::get_themes(),
-			'active_theme' => get_stylesheet(),
-			'users' => isset($user_count['total_users']) ? $user_count['total_users'] : 0,
-			'active_plugins' => $plugins_data['active'],
+			'themes'           => self::get_themes(),
+			'active_theme'     => get_stylesheet(),
+			'users'            => isset( $user_count['total_users'] ) ? $user_count['total_users'] : 0,
+			'active_plugins'   => $plugins_data['active'],
 			'inactive_plugins' => $plugins_data['inactive'],
 			'server' => isset( $_SERVER['SERVER_SOFTWARE'] ) ?  $_SERVER['SERVER_SOFTWARE'] : '', //phpcs:ignore
-			
-			'timezone' => date_default_timezone_get(),
-			'php_curl' => function_exists( 'curl_init' ) ? 'Yes' : 'No',
-			'php_version' => function_exists('phpversion') ? phpversion() : '',
-			'upload_size' => size_format( wp_max_upload_size() ),
-			'mysql_version' => $wpdb->db_version(),
-			'php_fsockopen' => function_exists( 'fsockopen' ) ? 'Yes' : 'No',
 
-			'ip' => self::get_user_ip(),
-			'plugin_name' => self::$PLUGIN_NAME,
-			'plugin_version' => self::$PLUGIN_VERSION,
-			'plugin_slug' => self::$PLUGIN_SLUG
+			'timezone'         => date_default_timezone_get(),
+			'php_curl'         => function_exists( 'curl_init' ) ? 'Yes' : 'No',
+			'php_version'      => function_exists( 'phpversion' ) ? phpversion() : '',
+			'upload_size'      => size_format( wp_max_upload_size() ),
+			'mysql_version'    => $wpdb->db_version(),
+			'php_fsockopen'    => function_exists( 'fsockopen' ) ? 'Yes' : 'No',
+
+			'ip'               => self::get_user_ip(),
+			'plugin_name'      => self::$plugin_name,
+			'plugin_version'   => self::$plugin_version,
+			'plugin_slug'      => self::$plugin_slug,
 		);
 
 		return $data;
 	}
 
 
-	// Hook into plugin deactivation
+	/**
+	 * Remove Plugin Data
+	 *
+	 * @since v.1.4.3
+	 * @return void
+	 */
+	private function wholesalex_plugin_data_remove() {
+		$is_plugin_data_delete = wholesalex()->get_setting( '_settings_access_delete_wholesalex_plugin_data', '' );
+		if ( 'yes' === $is_plugin_data_delete ) {
+			global $wpdb;
 
-private function wholesalex_plugin_data_remove() {
-	$is_plugin_data_delete = wholesalex()->get_setting( '_settings_access_delete_wholesalex_plugin_data', '' );
-    if ( $is_plugin_data_delete == 'yes' ) {
-        global $wpdb;
+			$option_keys = array(
+				'wholesalex_settings',
+				'wholesalex_installation_date',
+				'__wholesalex_customer_import_export_stats',
+				'wholesalex_notice',
+				'__wholesalex_single_product_settings',
+				'__wholesalex_single_product_db_update_v2',
+				'__wholesalex_category_settings',
+				'__wholesalex_dynamic_rules',
+				'_wholesalex_roles',
+				'__wholesalex_registration_form',
+				'__wholesalex_email_templates',
+				'__wholesalex_initial_setup',
+				'woocommerce_wholesalex_new_user_approval_required_settings',
+				'woocommerce_wholesalex_new_user_approved_settings',
+				'woocommerce_wholesalex_new_user_auto_approve_settings',
+				'woocommerce_wholesalex_new_user_email_verified_settings',
+				'woocommerce_wholesalex_registration_pending_settings',
+				'woocommerce_wholesalex_new_user_registered_settings',
+				'woocommerce_wholesalex_registration_rejected_settings',
+				'woocommerce_wholesalex_new_user_email_verification_settings',
+				'woocommerce_wholesalex_user_profile_update_notify_settings',
+			);
 
-        $option_keys = [
-            'wholesalex_settings',
-            'wholesalex_installation_date',
-            '__wholesalex_customer_import_export_stats',
-            'wholesalex_notice',
-            '__wholesalex_single_product_settings',
-            '__wholesalex_single_product_db_update_v2',
-            '__wholesalex_category_settings',
-            '__wholesalex_dynamic_rules',
-            '_wholesalex_roles',
-            '__wholesalex_registration_form',
-            '__wholesalex_email_templates',
-            '__wholesalex_initial_setup',
-            'woocommerce_wholesalex_new_user_approval_required_settings',
-            'woocommerce_wholesalex_new_user_approved_settings',
-            'woocommerce_wholesalex_new_user_auto_approve_settings',
-            'woocommerce_wholesalex_new_user_email_verified_settings',
-            'woocommerce_wholesalex_registration_pending_settings',
-            'woocommerce_wholesalex_new_user_registered_settings',
-            'woocommerce_wholesalex_registration_rejected_settings',
-            'woocommerce_wholesalex_new_user_email_verification_settings',
-            'woocommerce_wholesalex_user_profile_update_notify_settings',
-        ];
+			// Delete options from the wp_options table.
+			$placeholders = array_fill( 0, count( $option_keys ), '%s' );
+			$query        = "DELETE FROM $wpdb->options WHERE option_name IN (" . implode( ', ', $placeholders ) . ')';
+			$wpdb->query($wpdb->prepare($query, ...$option_keys));//phpcs:ignore
 
-        // Delete options from the wp_options table
-        $placeholders = array_fill(0, count($option_keys), '%s');
-        $query = "DELETE FROM $wpdb->options WHERE option_name IN (" . implode(', ', $placeholders) . ")";
-        $wpdb->query($wpdb->prepare($query, ...$option_keys));//phpcs:ignore
+			$post_meta_keys = array(
+				'wholesalex_b2b_stock_status',
+				'wholesalex_b2b_stock',
+				'wholesalex_b2b_backorders',
+				'wholesalex_b2b_separate_stock_status',
+				'wholesalex_b2b_variable_stock',
+				'wholesalex_b2b_variable_backorders',
+				'wholesalex_b2b_variable_separate_stock_status',
+			);
 
-        $post_meta_keys = [
-            'wholesalex_b2b_stock_status',
-            'wholesalex_b2b_stock',
-            'wholesalex_b2b_backorders',
-            'wholesalex_b2b_separate_stock_status',
-            'wholesalex_b2b_variable_stock',
-            'wholesalex_b2b_variable_backorders',
-            'wholesalex_b2b_variable_separate_stock_status',
-        ];
+			// Delete post meta keys from the wp_postmeta table.
+			$placeholders = array_fill( 0, count( $post_meta_keys ), '%s' );
+			$query        = "DELETE FROM $wpdb->postmeta WHERE meta_key IN (" . implode( ', ', $placeholders ) . ')';
+			$wpdb->query($wpdb->prepare($query, ...$post_meta_keys));//phpcs:ignore
+			$dynamic_prefix = 'wholesalex_';
+			$suffixes       = array( '_base_price', '_sale_price' );
+			foreach ( $suffixes as $suffix ) {
+				$wpdb->query($wpdb->prepare( //phpcs:ignore
+					"DELETE FROM $wpdb->postmeta WHERE meta_key LIKE %s",
+					$wpdb->esc_like( $dynamic_prefix ) . '%' . $wpdb->esc_like( $suffix )
+					)
+				);
+			}
+			// Delete all keys with prefix 'wholesalex_'.
+			$wpdb->query($wpdb->prepare(//phpcs:ignore
+				"DELETE FROM $wpdb->postmeta WHERE meta_key LIKE %s",
+				$wpdb->esc_like( $dynamic_prefix ) . '%'
+            )
+			);
 
-        // Delete post meta keys from the wp_postmeta table
-        $placeholders = array_fill(0, count($post_meta_keys), '%s');
-        $query = "DELETE FROM $wpdb->postmeta WHERE meta_key IN (" . implode(', ', $placeholders) . ")";
-        $wpdb->query($wpdb->prepare($query, ...$post_meta_keys));//phpcs:ignore
-		$dynamic_prefix = 'wholesalex_';
-        $suffixes = ['_base_price', '_sale_price'];
-        foreach ($suffixes as $suffix) {
-            $wpdb->query($wpdb->prepare( //phpcs:ignore
-                "DELETE FROM $wpdb->postmeta WHERE meta_key LIKE %s",
-                $wpdb->esc_like($dynamic_prefix) . '%' . $wpdb->esc_like($suffix)
-            ));
-        }
-        // Delete all keys with prefix 'wholesalex_'
-        $wpdb->query($wpdb->prepare(//phpcs:ignore
-            "DELETE FROM $wpdb->postmeta WHERE meta_key LIKE %s",
-            $wpdb->esc_like($dynamic_prefix) . '%'
-        ));
+			$wpdb->query($wpdb->prepare(//phpcs:ignore
+				"DELETE FROM $wpdb->termmeta WHERE meta_key LIKE %s",
+				$wpdb->esc_like( $dynamic_prefix ) . '%'
+            )
+			);
 
-		$wpdb->query($wpdb->prepare(//phpcs:ignore
-            "DELETE FROM $wpdb->termmeta WHERE meta_key LIKE %s",
-            $wpdb->esc_like($dynamic_prefix) . '%'
-        ));
+			$wpdb->query($wpdb->prepare(//phpcs:ignore
+				"DELETE FROM $wpdb->usermeta WHERE meta_key LIKE %s",
+				$wpdb->esc_like( '__wholesalex_' ) . '%'
+            )
+			);
+			$user_meta_keys = array(
+				'__wholesalex_status',
+				'__wholesalex_account_confirmed',
+				'wholesalex_notice',
+				'__wholesalex_role',
+				'__wholesalex_profile_discounts',
+				'__wholesalex_profile_settings',
+				'__wholesalex_email_confirmation_code',
+			);
 
-		$wpdb->query($wpdb->prepare(//phpcs:ignore
-            "DELETE FROM $wpdb->usermeta WHERE meta_key LIKE %s",
-            $wpdb->esc_like('__wholesalex_') . '%'
-        ));
-        $user_meta_keys = [
-            '__wholesalex_status',
-            '__wholesalex_account_confirmed',
-            'wholesalex_notice',
-            '__wholesalex_role',
-            '__wholesalex_profile_discounts',
-            '__wholesalex_profile_settings',
-            '__wholesalex_email_confirmation_code',
-        ];
+			// Delete user meta keys from the wp_usermeta table.
+			$placeholders = array_fill( 0, count( $user_meta_keys ), '%s' );
+			$query        = "DELETE FROM $wpdb->usermeta WHERE meta_key IN (" . implode( ', ', $placeholders ) . ')';
+			$wpdb->query($wpdb->prepare($query, ...$user_meta_keys));//phpcs:ignore
 
-        // Delete user meta keys from the wp_usermeta table
-        $placeholders = array_fill(0, count($user_meta_keys), '%s');
-        $query = "DELETE FROM $wpdb->usermeta WHERE meta_key IN (" . implode(', ', $placeholders) . ")";
-        $wpdb->query($wpdb->prepare($query, ...$user_meta_keys));//phpcs:ignore
+			$user_option_keys = array(
+				'wholesalex_dynamic_rule_import_mapping',
+				'wholesalex_role_import_mapping',
+				'wholesalex_role_import_error_log',
+			);
 
-        $user_option_keys = [
-            'wholesalex_dynamic_rule_import_mapping',
-            'wholesalex_role_import_mapping',
-            'wholesalex_role_import_error_log',
-        ];
+			// Delete user option keys from the wp_usermeta table for specific users.
+			$placeholders = array_fill( 0, count( $user_option_keys ), '%s' );
+			$query = "DELETE FROM $wpdb->usermeta WHERE meta_key IN (" . implode(', ', $placeholders) . ")";//phpcs:ignore
+			$wpdb->query($wpdb->prepare($query, ...$user_option_keys));//phpcs:ignore
 
-        // Delete user option keys from the wp_usermeta table for specific users
-        $placeholders = array_fill(0, count($user_option_keys), '%s');
-        $query = "DELETE FROM $wpdb->usermeta WHERE meta_key IN (" . implode(', ', $placeholders) . ")";//phpcs:ignore
-        $wpdb->query($wpdb->prepare($query, ...$user_option_keys));//phpcs:ignore
-
-    }
-}
-
-
-    
+		}
+	}
 }
