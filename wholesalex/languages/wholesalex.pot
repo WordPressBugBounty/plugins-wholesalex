@@ -2,9 +2,9 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
-"Project-Id-Version: WholesaleX 2.0.6\n"
+"Project-Id-Version: WholesaleX 2.0.7\n"
 "Report-Msgid-Bugs-To: https://wpxpo.com/contact/\n"
-"POT-Creation-Date: 2025-02-05 10:00:49+00:00\n"
+"POT-Creation-Date: 2025-02-09 11:13:32+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2108,7 +2108,7 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:2347
 #: includes/menu/class-wholesalex-dynamic-rules.php:2365
-#: includes/menu/class-wholesalex-dynamic-rules.php:6535
+#: includes/menu/class-wholesalex-dynamic-rules.php:6534
 #: includes/menu/class-wholesalex-settings.php:1326
 msgid "Login to see prices"
 msgstr ""
@@ -2198,9 +2198,9 @@ msgid ""
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4584
-#: includes/menu/class-wholesalex-dynamic-rules.php:6224
-#: includes/menu/class-wholesalex-dynamic-rules.php:6292
-#: includes/menu/class-wholesalex-dynamic-rules.php:6358
+#: includes/menu/class-wholesalex-dynamic-rules.php:6223
+#: includes/menu/class-wholesalex-dynamic-rules.php:6291
+#: includes/menu/class-wholesalex-dynamic-rules.php:6357
 #: includes/menu/class-wholesalex-settings.php:1002
 #: includes/menu/class-wholesalex-settings.php:1004
 #. translators: 1: minimum quantity, 2: product name
@@ -2270,17 +2270,17 @@ msgstr ""
 msgid "%s Free Shipping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:5860
+#: includes/menu/class-wholesalex-dynamic-rules.php:5859
 msgid "(BOGO Discounts)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:5891
-#: includes/menu/class-wholesalex-dynamic-rules.php:5923
+#: includes/menu/class-wholesalex-dynamic-rules.php:5890
+#: includes/menu/class-wholesalex-dynamic-rules.php:5922
 msgid "Cart Discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:5963
-#: includes/menu/class-wholesalex-dynamic-rules.php:5994
+#: includes/menu/class-wholesalex-dynamic-rules.php:5962
+#: includes/menu/class-wholesalex-dynamic-rules.php:5993
 msgid "Payment Discount!"
 msgstr ""
 

@@ -2938,6 +2938,15 @@ const Tooltip = props => {
   const [adjustedDirection, setAdjustedDirection] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(props.direction || 'top');
   const parentRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   const tooltipRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const getContent = contentProps => {
+    if (contentProps.type === 'element') {
+      return contentProps.content;
+    }
+    if (contentProps.content) {
+      return contentProps.content.replace(/{.*}/, '');
+    }
+    return '';
+  };
   const calculatePosition = () => {
     if (tooltipRef.current && parentRef.current) {
       const tooltipRect = tooltipRef.current.getBoundingClientRect();
@@ -3028,7 +3037,7 @@ const Tooltip = props => {
       opacity: active ? 1 : 0,
       transition: 'opacity var(--transition-md) ease-in-out'
     }
-  }, props.type === 'element' ? props.content : props.content.replace(/{.*}/, ''));
+  }, getContent(props));
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     ref: parentRef,
     className: "wsx-tooltip ".concat(props.className),

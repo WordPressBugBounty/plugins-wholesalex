@@ -5473,9 +5473,8 @@ class WHOLESALEX_Dynamic_Rules {
 				}
 
 				$allowed_rates = array();
-
 				foreach ( $package_rates as $rate_key => $rate ) {
-					if ( in_array( $rate->instance_id, $data['roles'], true ) ) {
+					if ( in_array( (string) $rate->instance_id, $data['roles'], true ) ) {
 						$allowed_rates[ $rate_key ] = $package_rates[ $rate_key ];
 					}
 				}
@@ -6673,7 +6672,7 @@ class WHOLESALEX_Dynamic_Rules {
 				$id                       = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
 				$_sale_price              = floatval( get_post_meta( $id, '_sale_price', true ) );
 				$regular_price            = floatval( get_post_meta( $id, '_regular_price', true ) ) + $woo_custom_price;
-				$regular_price            = 0 === $regular_price ? 1 : $regular_price;
+				$regular_price            = 0.0 === $regular_price ? 1 : $regular_price;
 				$get_discount             = abs( $sale_price - $regular_price ) / $regular_price;
 				$discouned_price          = number_format( $get_discount, 2, '.', '' );
 				$__current_role_id        = wholesalex()->get_current_user_role();
@@ -7017,8 +7016,11 @@ class WHOLESALEX_Dynamic_Rules {
 		if ( 'is_sale_price' === $is_regular_price ) {
 			$role_sale_price        = floatval( $this->get_role_base_sale_price( $product, $data['role_id'] ) );
 			$db_sale_price          = floatval( get_post_meta( $product->get_id(), '_sale_price', true ) );
-			$get_session_sale_price = floatval( WC()->session->get( 'wsx_sale_price' ) );
-			$get_session_sale_price = ( WC()->session && WC()->session->get( 'wsx_sale_price' ) !== null ) ? floatval( WC()->session->get( 'wsx_sale_price' ) ) : 0;
+			$get_session_sale_price = 0;
+			if ( WC()->session && null !== WC()->session->get( 'wsx_sale_price' ) ) {
+				$get_session_sale_price = WC()->session->get( 'wsx_sale_price' );
+				$get_session_sale_price = floatval( $get_session_sale_price );
+			}
 
 			if ( $get_session_sale_price ) {
 				if ( $role_sale_price === $get_session_sale_price ) {
@@ -7182,7 +7184,7 @@ class WHOLESALEX_Dynamic_Rules {
 				WC()->session->set( 'wsx_sale_price', $sale_price );
 			}
 		}
-		return $sale_price && 0.00 !== $sale_price ? $sale_price : $previous_sp;
+		return $sale_price && 0.00 !== (float) $sale_price ? $sale_price : $previous_sp;
 	}
 
 
