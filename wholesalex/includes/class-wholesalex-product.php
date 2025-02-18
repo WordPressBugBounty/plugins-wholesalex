@@ -1116,10 +1116,10 @@ class WHOLESALEX_Product {
 			array(
 				'roles' => wholesalex()->get_roles( 'b2b_roles_option' ),
 				'i18n'  => array(
-					'unlock'         => __( 'UNLOCK', 'wholesalex' ),
-					'unlock_heading' => __( 'Unlock All Features with', 'wholesalex' ),
-					'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
-					'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
+					// 'unlock'         => __( 'UNLOCK', 'wholesalex' ),
+					// 'unlock_heading' => __( 'Unlock All Features with', 'wholesalex' ),
+					// 'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
+					// 'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
 				),
 			)
 		);
@@ -1236,6 +1236,34 @@ class WHOLESALEX_Product {
 		<div class="wsx-single-product-settings-wrapper"></div>
 		<?php
 	}
+	/**
+	 * Filters out invalid tier pricing data from WholesaleX product meta.
+	 *
+	 * This function iterates through the provided product data and removes any
+	 * tier pricing entries where the `_discount_type`, `_discount_amount`, or
+	 * `_min_quantity` fields are empty. It ensures that only valid tier pricing
+	 * data is retained.
+	 *
+	 * @param array $products_data Array containing product pricing data for different roles.
+	 *
+	 * @return array Filtered $products_data with invalid tiers removed.
+	 *
+	 * @since 1.0.0
+	 * @access public
+	 */
+	public function filter_tiers( $products_data ) {
+		foreach ( $products_data as $role => &$role_data ) {
+			if ( isset( $role_data['tiers'] ) && is_array( $role_data['tiers'] ) ) {
+				$role_data['tiers'] = array_filter(
+					$role_data['tiers'],
+					function ( $tier ) {
+						return ! empty( $tier['_discount_type'] ) && ! empty( $tier['_discount_amount'] ) && ! empty( $tier['_min_quantity'] );
+					}
+				);
+			}
+		}
+		return $products_data;
+	}
 
 	/**
 	 * Save WholesaleX Product Meta
@@ -1258,7 +1286,10 @@ class WHOLESALEX_Product {
 
 		if ( $is_nonce_verify && isset( $_POST[ 'wholesalex_single_product_tiers_' . $post_id ] ) ) {
 			$product_discounts = wholesalex()->sanitize( json_decode( wp_unslash( $_POST[ 'wholesalex_single_product_tiers_' . $post_id ] ), true ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			wholesalex()->save_single_product_discount( $post_id, $product_discounts );
+
+			// filter the tier value which is empty.
+			$filtered_products_data = $this->filter_tiers( $product_discounts );
+			wholesalex()->save_single_product_discount( $post_id, $filtered_products_data );
 		}
 	}
 
@@ -2738,7 +2769,7 @@ class WHOLESALEX_Product {
 
 		$product_id  = absint( sanitize_text_field( wp_unslash( $_POST['product_id'] ) ) );
 		$bulk_action = sanitize_text_field( wp_unslash( $_POST['bulk_action'] ) );
-		$data        = ! empty( $_POST['data'] ) ? wc_clean( sanitize_text_field( wp_unslash( $_POST['data'] ) ) ) : array();
+		$data        = ! empty( $_POST['data'] ) ? wc_clean( wp_unslash( $_POST['data'] ) ) : array();
 		$variations  = array();
 
 		$variations = get_posts(

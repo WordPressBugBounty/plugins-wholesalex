@@ -216,6 +216,11 @@ button.wsx-login-btn:hover {
       color: var(--wsx-login-form-button-hover-color);
       border-color: var(--wsx-login-form-button-hover-border-color);
       background-color: var(--wsx-login-form-button-hover-bg); }
+  .wholesalex-form-wrapper input:-webkit-autofill {
+    background-color: transparent;
+    color: #130f0f;
+    -webkit-text-fill-color: #868686;
+    transition: background-color 5000s ease-in-out 0s; }
   .wholesalex-form-wrapper button.wsx-register-btn,
   .wholesalex-form-wrapper button.wsx-login-btn {
     width: 100%;

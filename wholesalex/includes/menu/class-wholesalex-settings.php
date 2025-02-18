@@ -132,11 +132,11 @@ class Settings {
 				'fields' => self::get_option_settings(),
 				'data'   => wholesalex()->get_setting(),
 				'i18n'   => array(
-					'settings'       => __( 'Settings', 'wholesalex' ),
-					'unlock'         => __( 'UNLOCK', 'wholesalex' ),
-					'unlock_heading' => __( 'Unlock All Features', 'wholesalex' ),
-					'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
-					'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
+					// 'settings'       => __( 'Settings', 'wholesalex' ),
+					// 'unlock'         => __( 'UNLOCK', 'wholesalex' ),
+					// 'unlock_heading' => __( 'Unlock All Features', 'wholesalex' ),
+					// 'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
+					// 'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
 				),
 			)
 		);
@@ -1427,6 +1427,13 @@ class Settings {
 							'label'   => __( 'Font Size', 'wholesalex' ),
 							'desc'    => '',
 							'default' => '14',
+						),
+						'_settings_tier_table_discount_apply_on_variable' => array(
+							'type'    => 'slider',
+							'label'   => __( 'Tiered pricing discount applies to combined variations', 'wholesalex' ),
+							'desc'    => __( 'Tiered pricing discount applies to combined variations', 'wholesalex' ),
+							'default' => 'no',
+							'tooltip' => 'Tiered pricing now applies to variations - a user can choose multiple variants of products and the tiered pricing will get applied',
 						),
 					),
 					'attrGroupThree' => array(

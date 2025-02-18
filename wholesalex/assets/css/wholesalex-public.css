@@ -140,6 +140,8 @@
     position: relative;
 }
 .wholesalex-bogo-badge-single-product-container{
+    position: absolute;
+    top: 0px;
     height: 30px;
     inset: 0px 0px auto auto;
 }
@@ -274,6 +276,11 @@ select.wsx-br-md, input.wsx-br-md, input:is([type=url],[type=tel],[type=text],[t
 
 
 /* Table Style */
+
+.wsx-account-table-container {
+    overflow: auto;
+}
+
 .wsx-account-table-container table.wsx-table {
     border: none;
     border-collapse: collapse;

@@ -9,7 +9,7 @@
  * Plugin Name:             WholesaleX
  * Plugin URI:              https://getwholesalex.com/?utm_source=plugin_details&utm_medium=home_page&utm_campaign=wholesalex-DB
  * Description:             The WholesaleX plugin is a brand-new, highly-promising WooCommerce B2B solution to set up a conversion-focused B2B store for selling wholesale products. It offers everything required to operate an effective B2B store.
- * Version:                 2.0.7
+ * Version:                 2.0.8
  * Author:                  Wholesale Team
  * Author URI:              https://getwholesalex.com/
  * License:                 GPLv3
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin Defined.
-define( 'WHOLESALEX_VER', '2.0.7' );
+define( 'WHOLESALEX_VER', '2.0.8' );
 define( 'WHOLESALEX_URL', plugin_dir_url( __FILE__ ) );
 define( 'WHOLESALEX_BASE', plugin_basename( __FILE__ ) );
 define( 'WHOLESALEX_PATH', plugin_dir_path( __FILE__ ) );
@@ -66,7 +66,7 @@ add_action(
  * Load Language
  */
 function wholesalex_language_load() {
-	load_plugin_textdomain( 'wholesalex', false, basename( __DIR__ ) . '/languages/' );
+	load_plugin_textdomain( 'wholesalex', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 }
 add_action( 'init', 'wholesalex_language_load' );
 

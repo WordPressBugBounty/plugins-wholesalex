@@ -1,109 +1,111 @@
-===  WholesaleX - WooCommerce Wholesale Plugin (Wholesale Prices, Dynamic Pricing, Tiered Pricing) ===
+===  WholesaleX – WooCommerce Wholesale Plugin (B2B Wholesale Prices, Order Form, Catalog Mode, Tiered Pricing) ===
 Contributors: wpxpo, anik4e, jakirhasan
 Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
 Tested up to: 6.7
 Requires PHP: 7.3
-Stable tag: 2.0.7
+Stable tag: 2.0.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-WholesaleX is the best WooCommerce Wholesale plugin with lots of features including, Wholesale Prices, Dynamic Pricing, Tiered Pricing, etc.
+Best WooCommerce wholesale plugin with features like b2b wholesale prices, wholesale order form, tiered pricing, catalog mode, dynamic pricing, and more!
 
-== Description ==
-WholesaleX - The Simplest WooCommerce B2B Solution to Start Wholesaling with wholesale prices, discounts, and dynamic pricing.
+=== Description ===
 
+🥇 Most **advanced** WooCommerce Wholesale Plugin.
+🎁 Fatured packed solution to create **B2B+B2C** hybrid stores. 
+💕 A plugin by WPXPO, **empowering 60K+** businesses.
+📞 **Dedicated support** team with **4.9/5** customer satisfaction on [Trustpilot] (https://uk.trustpilot.com/review/wpxpo.com)!
 
-WholesaleX is the most complete WooCommerce wholesale plugin to create and manage B2B or B2B+B2C hybrid stores in WooCommerce. This Wholesale plugin lets you add simple wholesale pricing or tiered pricing to complex dynamic pricing & wholesale discount rules, all in a simpler way. So that is why it is known as the simplest WooCommerce B2B Solution.
-
-
-WholesaleX has all the required features that an ideal WooCommerce B2B store should have. So that you don't have to look for other solutions.
-
-Hear what reputed WordPress influencer and popular Plugins reviewer David Garray aka "Mr. Web," has to say about WholesaleX.
+😲 [Free Demo](https://trywholesalex.wpxpo.com/) | 🔥 [WholesaleX Pro](https://getwholesalex.com/) | 📃 [Documentation](https://getwholesalex.com/documentation/)
 
 
-[youtube https://www.youtube.com/watch?v=AFYtmpJVxsA]
+## WholesaleX - The Ultimate WooCommerce Wholesale Plugin! 
 
-👉 **Learn More about WholesaleX (Pro):** [All Features of WholesaleX](https://getwholesalex.com/features/)
+WholesaleX is the most advanced WooCommercwe wholesale plugin that comes with all the essential features that an ideal wholesaling store should have. However, it also comes with more effective features such as dynamic pricing & discounts, request a quote, buy x get y, etc, which are suitable for both woocommerce wholesale and retail stores.
 
-👉 Try WholesaleX Pro Demo for Free: [Try Demo Now](https://getwholesalex.com/)
+And with features like catalog mode, and logging in to view prices, you can manage both B2C and B2B customers in the same store. That’s why WholesaleX is the best WooCommerce Wholesale Plugin.
 
-👉 Check out the [Dynamic Rule Feature](https://getwholesalex.com/dynamic-rules/) - The simplest way to manage complex wholesale **pricing** & **discount** rules globally.
+[https://www.youtube.com/watch?v=Zvfxpu8Gtd0]
 
-👉 **Want to learn how it works?** - Check out detailed [Documentation](https://getwholesalex.com/documentation/).
+✅ Dynamic Pricing and Discount Rules
+✅ Tiered Pricing / Bulk Discount / Quantity Discount  
+✅ Cart Discount
+✅ Payment Method Discount
+✅ Minimum and Maximum Order Quantity
+✅ Buy X Get 1 Free (BOGO)
+✅ Buy X Get Y Free
+✅ Catalog Mode 
+✅ WooCommerce Wholesale Registration Form
+✅ WooCommerce Wholesale User Roles
+✅ WooCommerce Wholesale Bulk Order Form
+✅ Conversation
+✅ WooCommerce Request a Quote
+✅ Wholesale Wallet
+✅ WooCommerce Wholesale Subaccounts
 
-👉 **Want to see WholesaleX in action?** - Check out short [video tutorials](https://www.youtube.com/@WholesaleX/featured).
 
-WholesaleX is already getting so much love and positive feedback within a short period.
+[**Dynamic Rules for Wholesale Pricing and Discounts**](https://getwholesalex.com/dynamic-rules/)  
 
-👏 “As an avid user of Woo commerce for my website, I recently incorporated the Wholesale X on my website, and I must say it has been a game-changer. WholesaleX is a robust and feature-rich b2b solution that seamlessly integrates with all my requirements, allowing me to create and manage my b2b clients with ease. On the top of it the customer support by Ton and the team is super helpful. their support is the main advantage!! must recommend this plugin… Azam Sidd”
+Dynamic rules come with all essential wholesale pricing and discount criteria like quantity-based discounts, cart discounts, and more. Take a look at the following opportunities.
+
+✔ Product Discount / Wholesale Pricing and Discount
+✔ Quantity-Based Pricing / WooCommerce Tiered Pricing
+✔ User Role Based Pricing
+✔ Cart Discount
+✔ Buy X Get 1 for Free (BOGO Discount)
+✔ Buy X Get Y for Free
+✔ Required Quantity for Payment Method
+✔ Shipping Rule
+✔ Tax Rule
+✔ Payment Method-Based Discount
+✔ Minimum Order Quantity
+✔ Maximum Order Quantity
+✔ Checkout Restrictions
+✔ Hidden Price
+✔ Nonpurchable for Catalog Mode
 
 
-👏 “WholesaleX is an exceptional plugin that provides a complete solution for anyone looking to start a wholesale business or manage B2B and B2B+B2C hybrid stores in WooCommerce. It is user-friendly, packed with features, and offers excellent value for money. If you’re looking to take your wholesale business to the next level, WholesaleX is definitely worth considering.”
+[**WooCommerce Wholesale User Roles**](https://getwholesalex.com/user-roles/)
+
+It helps to create unlimited additional rules for B2B users. So you can facilitate and restrict a group of users at once.
+
+[**WooCommerce Wholesale Registration Form Builder**](https://getwholesalex.com/registration-form-builder/)
+
+The registration form builder allows you to create a custom registration form with unlimited additional fields and a role selection option. It simplifies customer acquisition and manages B2B & B2C users effortlessly.
+
+[**WooCommerce Wholesale Bulk Order Form**](https://getwholesalex.com/bulk-order/)
+
+The Bulk Order Form feature allows you to create a woocommerce wholesale area exclusively for B2B users. So, wholesale customers can order products in bulk or create & save purchase lists to order them later. 
 
 
-👏 “It has practically all the functions I need, and all of them are very complete.
+[**Private Store and WooCommerce Product Visibility Control**](https://getwholesalex.com/private-store/) 
 
-I already left suggestions for interesting additions to the plugin and they responded positively. The plugin is in constant development and with each update, it gets even better.
+Hide your Wholesale store from guests and B2C users like an ideal WooCommerce Private store plugin. Either you can completely hide your entire store, or hide the prices and encourage potential B2B users with the login message to view prices.
 
-Thanks to the developers!”
+[**WooCommerce Wholesale Conversation**](https://getwholesalex.com/conversation/)
 
-WholesaleX is the perfect WooCommerce wholesale plugin for adding wholesale prices, discounts, and more. Discover the exclusive features of WholesaleX to create your wholesale strategy today!
+WholesaleX has a built-in conversation system that can be added to the customer’s “My Account Page.” So they can send general queries and start communicating with the site’s admin.
 
-You may also like to check out other plugins of WPXPO, the company behind WholesaleX.
+[**WooCommerce Request a Quote**](https://getwholesalex.com/request-a-quote/)
 
-* [PostX – Gutenberg Post Grid Blocks](https://wordpress.org/plugins/ultimate-post/)
-* [WowStore – WooCommerce Builder & Gutenberg WooCommerce Blocks](https://wordpress.org/plugins/product-blocks/)
+Request a Quote is an exciting feature of the built-in conversation system for both B2B and B2C stores. So when the customers add any products to the cart, they will see a “Request a Quote” button. The customer can send quote requests and the store admin can negotiate with the buyer by sending custom offers.
 
-### Dynamic Rules for Wholesale Pricing and Discounts
+[**WholesaleX Wallet**](https://getwholesalex.com/wallet/)
 
-WholesaleX - the best wholesale plugin comes with a one-stop solution to set complex wholesale pricing & wholesale discounts or quantity-based tiered pricing based on all essential criteria. So, you can offer exclusive discounts on specific products, products of specific categories, or all products simultaneously. You can do the following opportunities with the dynamic pricing rule feature.
+The digital wallet system can be used as a payment method. Both B2B & B2C customers can add funds to their wallets and then use them while purchasing products from your store. 
 
-* Product Discount / Wholesale Pricing and Discount
-* Quantity-Based Pricing / WooCommerce Tiered Pricing
-* User Role Based Pricing
-* Cart Discount
-* Buy X Get 1 for Free (Bogo Discount)
-* Buy X, Get Y for Free
-* Payment Method-Based Discount
-* Minimum Order Quantity
-* Maximum Order Quantity
+## Catalog Mode
 
-### WooCommerce Wholesale User Roles 
+Enable catalog mode for your WooCommerce store by making the products nonpurchasable. You can also add a Request a Quote button to collect leads.
 
-Want to manage your B2B users effectively? WholesaleX allows you to create as many wholesale user roles as you want to assign multiple users to the roles to facilitate them with offerings and restrict them with conditions. 
+## WooCommerce Wholesale Subaccounts 
 
-### WooCommerce Wholesale Registration Form Builder
+It allows the registered B2B customer to create subaccounts. The subaccount holder can place orders on behalf of the main account holder. However, the main account holder can monitor and control the activities of the subaccount holder.
 
-WholesaleX also lets you create a custom registration form with desired custom fields. So that you can make a separate registration & login page for the B2B users, and once someone completes registration, you can assign them to desired user roles automatically or manually.
+## Email
 
-### WooCommerce Wholesale Bulk Order Form
-
-The Bulk Bulk Order Form feature allows you to create a wholesale area exclusively for B2B users. So, wholesale customers can order products in bulk or create & save purchase lists to order them later. The bulk order form can be enabled on the customer's "My Account Page," or you can also create a separate bulk order page via shortcode.
-
-### Private Store and WooCommerce Product Visibility Control
-
-WholesaleX also allows you to hide your Wholesale store from guests and B2C users like an ideal WooCommerce Private store plugin. Either you can completely hide your entire store, or you can also hide the prices and encourage potential B2B users with the login message to view prices.
-
-### Conversation
-
-Want to stay connected with the users? Guess what? WholesaleX has a built-in conversation system that can be added to the customer's "My Account Page." So they can send general queries to start communicating with the site's admin.
-
-### WooCommerce Request a Quote
-
-WooCommerce Request a Quote is an exciting feature of the built-in conversation system of WholesaleX. So when the customers add any products to the cart, they will see a "Request a Quote" button. And when the potential customer sends any quote request, the store admin can negotiate with the buyer by sending a custom offer.
-
-### WholesaleX Wallet
-
-WholesaleX also has a digital wallet system that can be used as a payment method. Customers can add funds to their wallets and then use them while purchasing products from your store. And as a store admin can also manually add funds to any registered customer's wallet.
-
-### Subaccounts 
-
-This feature allows the registered B2B customer to create subaccounts. So the subaccounts holder can place orders on behalf of the main account holder. The main account holder provides desired permission to subaccount holders to control what they can do and what they cannot.
-
-### Email
-
-WholesaleX comes with ready email templates for various purposes. You can replace the default text as per your requirements. You can also customize the email templates using YayMail. They have a dedicated integration addon for WholesaleX.
+WholesaleX comes with ready email templates for various purposes. You can replace the default text as per your requirements and customize the email templates using YayMail. They have a dedicated integration addon for WholesaleX - WooCommerce Wholesale Plugin.
 Check out all compatible plugins:
 
 * [Dokan](https://wordpress.org/plugins/dokan-lite/)
@@ -113,6 +115,20 @@ Check out all compatible plugins:
 * [YayMail Email Customizer](https://wordpress.org/plugins/yaymail/)
 
 * [YayMail Addon for WholesaleX](https://yaycommerce.com/yaymail-addons/yaymail-addon-for-wholesalex/)
+
+Other Amazing Plugins
+
+Thank you for considering WholesaleX - the ultimate WooCommerce wholesale plugin. Take a look at our other WordPress and WooCommerce Plugins.
+
+
+💝 [WowStore](https://wordpress.org/plugins/product-blocks/): A complete WooCommerce builder with premade templates to make a visually appealing & conversion-focused WooCommerce store.
+
+💸 [WowRevenue](https://wordpress.org/plugins/revenue/): Collection of marketing campaigns including product bundles, mix, and match product bundles, buy x get y, bulk discount, and more to boost revenue by increasing the average order value.
+
+🧲 [WowOptin](https://wordpress.org/plugins/optin/): The next-gen popup maker and lead generation plugin with Canva-like editing flexibility and an advanced targeting system.
+
+📃 [PostX](https://wordpress.org/plugins/ultimate-post/): The #1 News Magazine and Blogging solution for WordPress. It has numerous blocks, templates, and a powerful dynamic site builder.
+
 
 = Author =
 Developed by [WPXPO](https://www.wpxpo.com). [Contribute to WholesaleX on Bitbucket](https://bitbucket.org/wpstabon/wholesalex/src/master/) and join the party.
@@ -187,6 +203,15 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.0.8 - 18 February 2025 =
+* New: Added a Setting to Apply "Tiered Pricing Discount" to Combined Variations.
+* Improvement: Optimized Dynamic Checkout Restriction Rule for WowStore Compatibility.
+* Improvement: Improved Design Support for Commonly Used Themes.
+* Improvement: WooCommerce Default Registration Form Now Fully Syncs With User Roles.
+* Fix: Fixed an Issue Where the Tier Price Table Was Not Displaying Correctly.
+* Fix: Specific Categories Filter Now Works as Expected With Dynamic Rules.
+* Fix: Resolved Language Translation Issue for Better Localization.
 
 = 2.0.7 - 09 February 2025 =
 * Fix: User Role Shipping Methods Showing Issue Fixed.

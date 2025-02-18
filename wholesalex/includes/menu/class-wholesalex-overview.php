@@ -38,8 +38,27 @@ class WHOLESALEX_Overview {
 		add_action( 'wp_dashboard_setup', array( $this, 'my_custom_dashboard_widgets' ) );
 		add_action( 'wp_ajax_wholesalex_migration_tool_install', array( $this, 'install_callback' ) );
 		$this->init_migrations();
+		add_action( 'init', array( $this, 'wsx_translations_script_load' ) );
 	}
 
+	/**
+	 * Translations Script Load
+	 */
+	public function wsx_translations_script_load() {
+		$scripts = array(
+			'wholesalex_overview',
+			'wholesalex_node_vendors',
+			'wholesalex_components',
+			'wholesalex_category',
+			'wholesalex_product',
+			'wholesalex_profile',
+			'wholesalex-builder',
+		);
+
+		foreach ( $scripts as $script ) {
+			wp_set_script_translations( $script, 'wholesalex', WHOLESALEX_PATH . 'languages/' );
+		}
+	}
 	/**
 	 * Check b2bking or wholesale Suite is Exist or Not
 	 *

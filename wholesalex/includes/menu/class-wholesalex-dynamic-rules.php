@@ -1191,14 +1191,24 @@ class WHOLESALEX_Dynamic_Rules {
 
 		$user_options = array();
 		foreach ( $users as $user ) {
-			$first_name     = get_user_meta( $user->ID, 'first_name', true );
-			$last_name      = get_user_meta( $user->ID, 'last_name', true );
-			$full_name      = trim( $first_name . ' ' . $last_name );
-			$user_options[] = array(
-				'name'     => $full_name,
-				'value'    => 'user_' . $user->ID,
-				'userName' => $user->user_login,
-			);
+			$first_name   = get_user_meta( $user->ID, 'first_name', true );
+			$last_name    = get_user_meta( $user->ID, 'last_name', true );
+			$display_name = get_the_author_meta( 'display_name', $user->ID );
+			$full_name    = trim( $first_name . ' ' . $last_name );
+
+			if ( $display_name ) {
+				$user_options[] = array(
+					'name'     => $display_name,
+					'value'    => 'user_' . $user->ID,
+					'userName' => $user->user_login,
+				);
+			} else {
+				$user_options[] = array(
+					'name'     => $full_name,
+					'value'    => 'user_' . $user->ID,
+					'userName' => $user->user_login,
+				);
+			}
 		}
 
 		return array(
@@ -1569,42 +1579,42 @@ class WHOLESALEX_Dynamic_Rules {
 				'rule'   => self::dynamic_rules_get(),
 				'nonce'  => wp_create_nonce( 'whx-export-dynamic-rules' ),
 				'i18n'   => array(
-					'dynamic_rules'                       => __( 'Dynamic Rules', 'wholesalex' ),
-					'please_fill_all_fields'              => __( 'Please Fill All Fields.', 'wholesalex' ),
-					'minimum_product_quantity_should_greater_then_free_product_qty' => __( 'Minimum Product Quantity Should Greater then Free Product Quantity.', 'wholesalex' ),
-					'rule_title'                          => __( 'Rule Title', 'wholesalex' ),
-					'create_dynamic_rule'                 => __( 'Create Dynamic Rule', 'wholesalex' ),
-					'import'                              => __( 'Import', 'wholesalex' ),
-					'export'                              => __( 'Export', 'wholesalex' ),
-					'untitled'                            => __( 'Untitled', 'wholesalex' ),
-					'duplicate_of'                        => __( 'Duplicate of ', 'wholesalex' ),
-					'delete_this_rule'                    => __( 'Delete this Rule.', 'wholesalex' ),
-					'duplicate_this_rule'                 => __( 'Duplicate this Rule.', 'wholesalex' ),
-					'show_hide_rule_details'              => __( 'Show/Hide Rule Details.', 'wholesalex' ),
-					'vendor'                              => __( 'Vendor #', 'wholesalex' ),
-					'untitled_rule'                       => __( 'Untitled Rule', 'wholesalex' ),
-					'error_occured'                       => __( 'Error Occured!', 'wholesalex' ),
-					'map_csv_fields_to_dynamic_rules'     => __( 'Map CSV Fields to Dynamic Rules', 'wholesalex' ),
-					'select_field_from_csv_msg'           => __( 'Select fields from your CSV file to map against role fields, or to ignore during import.', 'wholesalex' ),
-					'column_name'                         => __( 'Column name', 'wholesalex' ),
-					'map_to_field'                        => __( 'Map to field', 'wholesalex' ),
-					'do_not_import'                       => __( 'Do not import', 'wholesalex' ),
-					'run_the_importer'                    => __( 'Run the importer', 'wholesalex' ),
-					'importing'                           => __( 'Importing', 'wholesalex' ),
-					'upload_csv'                          => __( 'Upload CSV', 'wholesalex' ),
-					'you_can_upload_only_csv_file_format' => __( 'You can upload only csv file format', 'wholesalex' ),
-					'your_dynamic_rules_are_now_being_importing' => __( 'Your Dynamic Rules are now being imported..', 'wholesalex' ),
-					'update_existing_rules'               => __( 'Update Existing Rules', 'wholesalex' ),
-					'select_update_exising_rule_msg'      => __( 'Selecting "Update Existing Rules" will only update existing rules. No new rules will be added.', 'wholesalex' ),
-					'continue'                            => __( 'Continue', 'wholesalex' ),
-					'dynamic_rule_imported'               => __( ' Dynamic Rules Imported.', 'wholesalex' ),
-					'dynamic_rule_updated'                => __( ' Dynamic Rules Updated.', 'wholesalex' ),
-					'dynamic_rule_skipped'                => __( ' Dynamic Rules Skipped.', 'wholesalex' ),
-					'dynamic_rule_failed'                 => __( ' Dynamic Rules Failed.', 'wholesalex' ),
-					'view_error_logs'                     => __( 'View Error Logs', 'wholesalex' ),
-					'dynamic_rule'                        => __( 'Dynamic Rule', 'wholesalex' ),
-					'reason_for_failure'                  => __( 'Reason for failure', 'wholesalex' ),
-					'import_dynamic_rules'                => __( 'Import Dynamic Rules', 'wholesalex' ),
+					// 'dynamic_rules'                       => __( 'Dynamic Rules', 'wholesalex' ),
+					// 'please_fill_all_fields'              => __( 'Please Fill All Fields.', 'wholesalex' ),
+					// 'minimum_product_quantity_should_greater_then_free_product_qty' => __( 'Minimum Product Quantity Should Greater then Free Product Quantity.', 'wholesalex' ),
+					// 'rule_title'                          => __( 'Rule Title', 'wholesalex' ),
+					// 'create_dynamic_rule'                 => __( 'Create Dynamic Rule', 'wholesalex' ),
+					// 'import'                              => __( 'Import', 'wholesalex' ),
+					// 'export'                              => __( 'Export', 'wholesalex' ),
+					// 'untitled'                            => __( 'Untitled', 'wholesalex' ),
+					// 'duplicate_of'                        => __( 'Duplicate of ', 'wholesalex' ),
+					// 'delete_this_rule'                    => __( 'Delete this Rule.', 'wholesalex' ),
+					// 'duplicate_this_rule'                 => __( 'Duplicate this Rule.', 'wholesalex' ),
+					// 'show_hide_rule_details'              => __( 'Show/Hide Rule Details.', 'wholesalex' ),
+					// 'vendor'                              => __( 'Vendor #', 'wholesalex' ),
+					// 'untitled_rule'                       => __( 'Untitled Rule', 'wholesalex' ),
+					// 'error_occured'                       => __( 'Error Occured!', 'wholesalex' ),
+					// 'map_csv_fields_to_dynamic_rules'     => __( 'Map CSV Fields to Dynamic Rules', 'wholesalex' ),
+					// 'select_field_from_csv_msg'           => __( 'Select fields from your CSV file to map against role fields, or to ignore during import.', 'wholesalex' ),
+					// 'column_name'                         => __( 'Column name', 'wholesalex' ),
+					// 'map_to_field'                        => __( 'Map to field', 'wholesalex' ),
+					// 'do_not_import'                       => __( 'Do not import', 'wholesalex' ),
+					// 'run_the_importer'                    => __( 'Run the importer', 'wholesalex' ),
+					// 'importing'                           => __( 'Importing', 'wholesalex' ),
+					// 'upload_csv'                          => __( 'Upload CSV', 'wholesalex' ),
+					// 'you_can_upload_only_csv_file_format' => __( 'You can upload only csv file format', 'wholesalex' ),
+					// 'your_dynamic_rules_are_now_being_importing' => __( 'Your Dynamic Rules are now being imported..', 'wholesalex' ),
+					// 'update_existing_rules'               => __( 'Update Existing Rules', 'wholesalex' ),
+					// 'select_update_exising_rule_msg'      => __( 'Selecting "Update Existing Rules" will only update existing rules. No new rules will be added.', 'wholesalex' ),
+					// 'continue'                            => __( 'Continue', 'wholesalex' ),
+					// 'dynamic_rule_imported'               => __( ' Dynamic Rules Imported.', 'wholesalex' ),
+					// 'dynamic_rule_updated'                => __( ' Dynamic Rules Updated.', 'wholesalex' ),
+					// 'dynamic_rule_skipped'                => __( ' Dynamic Rules Skipped.', 'wholesalex' ),
+					// 'dynamic_rule_failed'                 => __( ' Dynamic Rules Failed.', 'wholesalex' ),
+					// 'view_error_logs'                     => __( 'View Error Logs', 'wholesalex' ),
+					// 'dynamic_rule'                        => __( 'Dynamic Rule', 'wholesalex' ),
+					// 'reason_for_failure'                  => __( 'Reason for failure', 'wholesalex' ),
+					// 'import_dynamic_rules'                => __( 'Import Dynamic Rules', 'wholesalex' ),
 				),
 			)
 		);
@@ -2762,7 +2772,10 @@ class WHOLESALEX_Dynamic_Rules {
 				border-radius:
 					<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px' ); ?>;
 			}
-
+			.wsx-table-overflow {
+				overflow: auto;
+				width: 100vw;
+			}
 			.wsx-price-table-header {
 				width: fit-content;
 				font-weight: 600;
@@ -2776,9 +2789,9 @@ class WHOLESALEX_Dynamic_Rules {
 			}
 
 			.wsx-price-table-row {
-				width: 100%;
+				width: fit-content;
 				display: grid;
-				grid-template-columns: repeat(3, minmax(120px, 1fr));
+				grid-template-columns: repeat(3, minmax(140px, 1fr));
 				border-bottom: 1px solid <?php echo esc_attr( $table_border_color ); ?>;
 			}
 
@@ -2798,9 +2811,8 @@ class WHOLESALEX_Dynamic_Rules {
 				padding: 12px 16px;
 				text-align: left;
 				border-right: 1px solid <?php echo esc_attr( $table_border_color ); ?>;
-				min-width: 110px;
 				white-space: nowrap;
-				width: 100%;
+				width: auto;
 			}
 
 			.wsx-price-table-cell:last-child {
@@ -2862,6 +2874,7 @@ class WHOLESALEX_Dynamic_Rules {
 				border-radius:
 					<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px' ); ?>;
 				margin-bottom: 40px;
+				width: fit-content;
 			}
 
 			.wsx-price-classical-item {
@@ -3002,40 +3015,45 @@ class WHOLESALEX_Dynamic_Rules {
 
 		$product_id = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
 
-		$tier_layout = 'layout_one';
+		$tier_layout = '';
 
 		if ( wholesalex()->get_single_product_setting( $product_id, '_settings_tire_price_product_layout' ) ) {
-			$tier_layout_product_compatibility = wholesalex()->get_single_product_setting( $product_id, '_settings_tier_layout_single_product' );
-			if ( ! isset( $tier_layout_product_compatibility ) ) {
-				$tier_layout_product_compatibility = ''; // Default value if not set.
-			}
-			$product_tire_layout = wholesalex()->get_single_product_setting( $product_id, '_settings_tire_price_product_layout' );
-			$is_vertical_layout  = wholesalex()->get_single_product_setting( $product_id, '_settings_vertical_product_style' );
-			$is_table_radius     = wholesalex()->get_single_product_setting( $product_id, '_settings_tier_table_radius_product_style' );
-
-			if ( ( 'table_style' === $product_tire_layout && 'no' === $is_vertical_layout ) || 'layout_four' === $tier_layout_product_compatibility || 'layout_one' === $tier_layout_product_compatibility ) {
-				$tier_layout = 'layout_one';
-			} elseif ( ( 'table_style' === $product_tire_layout && 'yes' === $is_vertical_layout ) || 'layout_six' === $tier_layout_product_compatibility ) {
-				$tier_layout = 'layout_six';
-			} elseif ( ( 'classic_style' === $product_tire_layout && 'no' === $is_vertical_layout ) || 'layout_five' === $tier_layout_product_compatibility || 'layout_two' === $tier_layout_product_compatibility || 'layout_seven' === $tier_layout_product_compatibility ) {
-				$tier_layout = 'layout_two';
-			} elseif ( ( 'classic_style' === $product_tire_layout && 'yes' === $is_vertical_layout ) || 'layout_three' === $tier_layout_product_compatibility || 'layout_eight' === $tier_layout_product_compatibility ) {
-				$tier_layout = 'layout_three';
-			}
+			$tier_layout_compatibility = wholesalex()->get_single_product_setting( $product_id, '_settings_tier_layout_single_product' ) ? wholesalex()->get_single_product_setting( $product_id, '_settings_tier_layout_single_product' ) : '';
+			$product_tire_layout       = wholesalex()->get_single_product_setting( $product_id, '_settings_tire_price_product_layout' );
+			$is_vertical_layout        = wholesalex()->get_single_product_setting( $product_id, '_settings_vertical_product_style' );
 		} else {
 			$tier_layout_compatibility = wholesalex()->get_setting( '_settings_tier_layout', 'layout_one' );
-			$tier_table_style_layout   = wholesalex()->get_setting( '_settings_tier_table_style_design', 'table_style' );
+			$product_tire_layout       = wholesalex()->get_setting( '_settings_tier_table_style_design', 'table_style' );
 			$is_vertical_layout        = wholesalex()->get_setting( '_settings_vertical_style', 'no' );
+		}
 
-			if ( ( 'table_style' === $tier_table_style_layout && 'no' === $is_vertical_layout ) || 'layout_four' === $tier_layout_compatibility || 'layout_one' === $tier_layout_compatibility ) {
-				$tier_layout = 'layout_one';
-			} elseif ( ( 'table_style' === $tier_table_style_layout && 'yes' === $is_vertical_layout ) || 'layout_six' === $tier_layout_compatibility ) {
-				$tier_layout = 'layout_six';
-			} elseif ( ( 'classic_style' === $tier_table_style_layout && 'no' === $is_vertical_layout ) || 'layout_five' === $tier_layout_compatibility || 'layout_two' === $tier_layout_compatibility || 'layout_seven' === $tier_layout_compatibility ) {
-				$tier_layout = 'layout_two';
-			} elseif ( ( 'classic_style' === $tier_table_style_layout && 'yes' === $is_vertical_layout ) || 'layout_three' === $tier_layout_compatibility || 'layout_eight' === $tier_layout_compatibility ) {
-				$tier_layout = 'layout_three';
-			}
+		$tier_layout_mapping = array(
+			'table_style_no'    => 'layout_one',
+			'table_style_yes'   => 'layout_six',
+			'classic_style_no'  => 'layout_two',
+			'classic_style_yes' => 'layout_three',
+		);
+
+		$tier_layout_key = "{$product_tire_layout}_{$is_vertical_layout}";
+		$tier_layout     = $tier_layout_mapping[ $tier_layout_key ] ?? '';
+
+		if ( ! $tier_layout ) {
+			$fallback_mapping = array(
+				'layout_four'  => 'layout_one',
+				'layout_one'   => 'layout_one',
+				'layout_six'   => 'layout_six',
+				'layout_five'  => 'layout_two',
+				'layout_two'   => 'layout_two',
+				'layout_seven' => 'layout_two',
+				'layout_three' => 'layout_three',
+				'layout_eight' => 'layout_three',
+			);
+
+			$tier_layout = $fallback_mapping[ $tier_layout_compatibility ] ?? $tier_layout;
+		}
+
+		if ( '' === $tier_layout ) {
+			$tier_layout = 'layout_one';
 		}
 
 		$tier_layout     = apply_filters( 'wholesalex_tier_layout', $tier_layout, $product_id );
@@ -3105,7 +3123,7 @@ class WHOLESALEX_Dynamic_Rules {
 			case 'layout_six':
 				?>
 				<div class="wsx-price-container-title"><?php echo esc_html( $table_label ); ?></div>
-				<div class="wsx-price-table-container <?php echo 'layout_six' === $tier_layout ? 'layout-vertical' : ''; ?>">
+				<div class="wsx-price-table-container wsx-scrollbar wsx-table-overflow <?php echo 'layout_six' === $tier_layout ? 'layout-vertical' : ''; ?>">
 					<div class="wsx-price-table-header">
 						<div class="wsx-price-table-row">
 							<?php
@@ -3139,12 +3157,12 @@ class WHOLESALEX_Dynamic_Rules {
 							}
 
 							$__sale_price = wholesalex()->calculate_sale_price( $__current_tier, $regular_price );
-							$__discount   = $regular_price - $__sale_price;
+							$__discount   = floatval( $regular_price ) - floatval( $__sale_price );
 
 							$__sale_price = wc_get_price_to_display( $product, array( 'price' => $__sale_price ) );
 							?>
 							<div
-								class="wsx-price-table-row <?php echo esc_attr( ( $__current_tier['_id'] === $active_tier ) ? 'active' : '' ); ?>">
+								class="wsx-price-table-row <?php echo esc_attr( ( $__current_tier['_id'] == $active_tier ) ? 'active' : '' ); ?>">
 								<?php
 								foreach ( $table_column_priority as $column ) {
 									if ( isset( $column['status'] ) && ( 'yes' === $column['status'] || $column['status'] ) ) {
@@ -5875,7 +5893,31 @@ class WHOLESALEX_Dynamic_Rules {
 				if ( isset( $rules['cart_discount'] ) && ! empty( $rules['cart_discount'] ) ) {
 					$hash = array();
 					foreach ( $rules['cart_discount'] as $rule ) {
-						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+						if ( ! isset( WC()->cart ) || null === WC()->cart->get_cart() ) {
+							return;
+						}
+
+						// calculating the discounted product quantity.
+						$discounted_product_quantity = 0;
+						foreach ( WC()->cart->get_cart() as $cart_item ) {
+							if ( self::is_eligible_for_rule( $cart_item['product_id'], $cart_item['variation_id'], $rule['filter'] ) ) {
+								$discounted_product_quantity += $cart_item['quantity'];
+							}
+						}
+
+						// check if the discounted product quantity matched the condition.
+						$is_condition_passed = false;
+						$is_all_passed      = true;
+						foreach ( $rule['conditions']['tiers'] as $condition ) {
+							$__conditions_value = isset( $condition['_conditions_value'] ) ? (float) $condition['_conditions_value'] : 0;
+							$is_condition_passed = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], $discounted_product_quantity );
+							if ( ! $is_condition_passed ) {
+								$is_all_passed = false;
+								break;
+							}
+						}
+
+						if ( ! $is_all_passed ) {
 							continue;
 						}
 						$discount_amount = 0;
@@ -5909,9 +5951,9 @@ class WHOLESALEX_Dynamic_Rules {
 							}
 							$rule_total_amount = 0;
 							foreach ( WC()->cart->get_cart() as $cart_item ) {
+
 								if ( self::is_eligible_for_rule( $cart_item['product_id'], $cart_item['variation_id'], $rule['filter'] ) ) {
 									$rule_total_amount += $cart_item['line_total'];
-
 									if ( apply_filters( 'wholesalex_dr_cart_discount_on_tax', false ) ) {
 										$rule_total_amount += $cart_item['line_tax'];
 									}
@@ -7137,9 +7179,23 @@ class WHOLESALEX_Dynamic_Rules {
 			} else {
 				$sale_price = floatval( $rrs );
 			}
-			$__is_parent_rule_apply = apply_filters( 'wholesalex_apply_parent_rule_to_variations', false ); // Add This Filter TO Work Dynamic Rule For Combine Variation Product Like Quantity Base Discount.
-			if ( $product->is_type( 'variation' ) && $__is_parent_rule_apply ) {
-				$cart_qty = wholesalex()->cart_count( $parent_id );
+			$__is_parent_rule_apply = wholesalex()->get_setting( '_settings_tier_table_discount_apply_on_variable', 'no' ); // Add This Filter TO Work Dynamic Rule For Combine Variation Product Like Quantity Base Discount.
+			if ( $product->is_type( 'variation' ) && 'yes' === $__is_parent_rule_apply ) {
+				$cart_qty             = wholesalex()->cart_count( $parent_id );
+				$variation_quantities = array();
+				$total_variation_qty  = 0;
+				foreach ( WC()->cart->get_cart() as $cart_item ) {
+					if ( $cart_item['product_id'] === $parent_id ) {
+						$variation_id = $cart_item['variation_id'];
+						if ( ! isset( $variation_quantities[ $variation_id ] ) ) {
+							$variation_quantities[ $variation_id ] = 0;
+						}
+						$variation_quantities[ $variation_id ] += $cart_item['quantity'];
+						$total_variation_qty                   += $cart_item['quantity'];
+					}
+				}
+				// Now you can use $variation_quantities array and $total_variation_qty as needed.
+				$cart_qty = $total_variation_qty;
 			} else {
 				$cart_qty = wholesalex()->cart_count( $product_id );
 			}
@@ -7152,7 +7208,7 @@ class WHOLESALEX_Dynamic_Rules {
 					$this->active_tiers[ $product_id ] = $tier_res;
 				}
 
-				if ( $tier_res['price'] && $tier_res['src'] && 0.00 !== $tier_res['price'] ) {
+				if ( $tier_res['price'] && $tier_res['src'] && 0.00 != $tier_res['price'] ) {
 					$sale_price = $tier_res['price'];
 					break;
 				}
