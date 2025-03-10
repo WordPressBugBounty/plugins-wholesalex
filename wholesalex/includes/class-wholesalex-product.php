@@ -40,6 +40,7 @@ class WHOLESALEX_Product {
 		add_filter( 'woocommerce_product_options_pricing', array( $this, 'wholesalex_single_product_settings' ) );
 		add_filter( 'woocommerce_product_after_variable_attributes', array( $this, 'wholesalex_single_product_settings' ), 10, 3 );
 		add_action( 'woocommerce_process_product_meta_simple', array( $this, 'wholesalex_product_meta_save' ) );
+		add_action( 'woocommerce_process_product_meta_yith_bundle', array( $this, 'wholesalex_product_meta_save' ) );
 		add_action( 'woocommerce_save_product_variation', array( $this, 'wholesalex_product_meta_save' ) );
 		add_action( 'rest_api_init', array( $this, 'get_product_callback' ) );
 		add_filter( 'woocommerce_product_data_tabs', array( $this, 'product_custom_tab' ) );
@@ -111,6 +112,44 @@ class WHOLESALEX_Product {
 			$this->b2b_stock_management();
 		}
 		add_action( 'admin_footer', array( $this, 'render_wsx_product_rule_modal' ) );
+		add_action( 'yith_wcpb_after_product_bundle_options_tab', array( $this, 'wsx_single_product_role_wise_price_option_added' ) );
+	}
+
+	/**
+	 * Compatibility with Bundle Product Plugin.
+	 */
+	public function wsx_single_product_role_wise_price_option_added() {
+
+		$post_id   = get_the_ID();
+		$discounts = array();
+		if ( $post_id ) {
+			$product = wc_get_product( $post_id );
+			if ( $product ) {
+				$is_variable = 'variable' === $product->get_type();
+				if ( $is_variable ) {
+					if ( $product->has_child() ) {
+						$childrens = $product->get_children();
+						foreach ( $childrens as $key => $child_id ) {
+							$discounts[ $child_id ] = wholesalex()->get_single_product_discount( $child_id );
+						}
+					}
+				} else {
+					$discounts[ $post_id ] = wholesalex()->get_single_product_discount( $post_id );
+				}
+			}
+		}
+		wp_localize_script(
+			'wholesalex_components',
+			'wholesalex_single_product',
+			array(
+				'fields'    => self::get_product_fields(),
+				'discounts' => $discounts,
+			),
+		);
+
+		?>
+		<div class="wsx-bundle-product-wrapper"></div>
+		<?php
 	}
 
 	/**
@@ -1284,9 +1323,18 @@ class WHOLESALEX_Product {
 			$is_nonce_verify = true;
 		}
 
-		if ( $is_nonce_verify && isset( $_POST[ 'wholesalex_single_product_tiers_' . $post_id ] ) ) {
-			$product_discounts = wholesalex()->sanitize( json_decode( wp_unslash( $_POST[ 'wholesalex_single_product_tiers_' . $post_id ] ), true ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( $is_nonce_verify && isset( $_POST[ 'wholesalex_single_product_tiers_' . $post_id . '_simple' ] ) ) {
+			$product_discounts = wholesalex()->sanitize( json_decode( wp_unslash( $_POST[ 'wholesalex_single_product_tiers_' . $post_id . '_simple' ] ), true ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
+			// filter the tier value which is empty.
+			$filtered_products_data = $this->filter_tiers( $product_discounts );
+			wholesalex()->save_single_product_discount( $post_id, $filtered_products_data );
+		}
+
+		$product      = wc_get_product( $post_id );
+		$product_type = $product ? $product->get_type() : 'Unknown';
+		if ( 'yith_bundle' === $product_type && $is_nonce_verify && isset( $_POST[ 'wholesalex_single_product_tiers_' . $post_id . '_yith' ] ) ) {
+			$product_discounts = wholesalex()->sanitize( json_decode( wp_unslash( $_POST[ 'wholesalex_single_product_tiers_' . $post_id . '_yith' ] ), true ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			// filter the tier value which is empty.
 			$filtered_products_data = $this->filter_tiers( $product_discounts );
 			wholesalex()->save_single_product_discount( $post_id, $filtered_products_data );

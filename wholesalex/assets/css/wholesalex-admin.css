@@ -1250,7 +1250,7 @@ input:checked ~ .wsx-checkbox-mark:after {
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--color-border-primary);
 }
-.wsx-single-product-settings-wrapper .wsx-tier-wrapper 
+.wsx-single-product-settings-wrapper .wsx-tier-wrapper {
     display: grid;
     grid-template-columns: 1fr;
     gap: 12px;
@@ -1381,10 +1381,7 @@ input:checked ~ .wsx-checkbox-mark:after {
     gap: 20px;
 }
 .wsx-category-wrapper .wsx-settings-tiers-wrapper .wsx-input-wrapper:has(.wsx-input-label) {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 20px;
-    align-items: center;
+    display: block;
 }
 .wsx-category-wrapper .wsx-settings-tiers-wrapper .wsx-input-wrapper {
     grid-template-columns: 1fr;

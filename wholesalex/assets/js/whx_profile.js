@@ -834,6 +834,11 @@ const Tier = _ref => {
       parent[tierName].tiers[0]._conditions_for = '';
       parent[tierName].tiers[0]._conditions_operator = '';
       parent[tierName].tiers[0]._conditions_value = '';
+      parent[tierName].tiers[0]._discount_type = '';
+      parent[tierName].tiers[0]._min_quantity = '';
+      parent[tierName].tiers[0]._discount_name = '';
+      parent[tierName].tiers[0]._discount_amount = '';
+      parent[tierName].tiers[0]._product_filter = '';
       parent[tierName].tiers = copy;
       setTier(parent);
       return;
@@ -3024,6 +3029,9 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.wsx-tiers-fields {
 .wsx-single-product-settings-wrapper > .wsx-tier-wrapper {
   grid-template-columns: 1fr; }
 
+.wsx-bundle-product-wrapper > .wsx-tier-wrapper {
+  grid-template-columns: 1fr; }
+
 .wsx-tier-price-table-wrapper select.wsx-tier-table-select {
   width: 100%;
   border-radius: 8px;
@@ -3038,13 +3046,18 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.wsx-tiers-fields {
 
 @media (max-width: 768px) {
   .wsx-tier-wrapper, .wsx-tier-header {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(1, 1fr);
+    gap: 12px; } }
+
+@media (max-width: 1400px) {
+  .wsx-tier-wrapper, .wsx-tier-header {
+    grid-template-columns: repeat(1, 1fr);
     gap: 12px; } }
 
 @media (max-width: 576px) {
   .wsx-condition-container .wsx-tier-wrapper {
     grid-template-columns: 1fr; } }
-`, "",{"version":3,"sources":["webpack://./reactjs/src/assets/scss/Tier.scss"],"names":[],"mappings":"AAAA;EACI,kBAAkB,EAAA;;AAGlB;EACI,aAAa;EACb,0CAA0C;EAC1C,SAAS;EACT,gBAAgB,EAAA;EAChB;IACI,0CAA0C,EAAA;;AAGlD;EACI,mBAAmB,EAAA;;AAGnB;EACI,iBAAiB;EACjB,+BAA+B,EAAA;;AAI3C;EAEQ,0CAA0C,EAAA;;AAGlD;EACI,aAAa;EACb,0CAA0C;EAC1C,SAAS;EACT,mBAAmB;EACnB,oDAAoD,EAAA;;AAGxD;EACI,0BAA0B,EAAA;;AAG9B;EAEW,WAAW;EACX,kBAAkB;EAClB,YAAY,EAAA;;AAGvB;EAEW,6BAA6B;EAC7B,kBAAkB,EAAA;;AAG7B;EACK,0CAA0C,EAAA;;AAE/C;EAEQ;IACI,qCAAqC;IACrC,SAAS,EAAA,EACZ;;AAGT;EACI;IAEQ,0BAA0B,EAAA,EAC7B","sourcesContent":[".wsx-tiers-fields {\r\n    margin-bottom: 8px;\r\n}\r\n.wsx-tier {\r\n    &-wrapper, &-header {\r\n        display: grid;\r\n        grid-template-columns: repeat(4, 1fr) 40px;\r\n        gap: 24px;\r\n        align-items: end;\r\n        &2 {\r\n            grid-template-columns: repeat(3, 1fr) 40px;\r\n        }\r\n    }\r\n    &-wrapper {\r\n        margin-bottom: 16px;\r\n    }\r\n    &-header {\r\n        &-item {\r\n            padding-left: 4px;\r\n            color: var(--color-text-medium);\r\n        }\r\n    }\r\n}\r\n.wsx-condition-container .wsx-tier {\r\n    &-wrapper, &-header {\r\n        grid-template-columns: repeat(3, 1fr) 40px;\r\n    }\r\n}\r\n.wsx-single-product-settings-wrapper .wsx-tier-wrapper {\r\n    display: grid;\r\n    grid-template-columns: repeat(3, 1fr) 40px;\r\n    gap: 12px;\r\n    margin-bottom: 16px;\r\n    border-bottom: 1px solid var(--color-border-primary);\r\n}\r\n\r\n.wsx-single-product-settings-wrapper >.wsx-tier-wrapper {\r\n    grid-template-columns: 1fr;\r\n}\r\n\r\n.wsx-tier-price-table-wrapper{\r\n       select.wsx-tier-table-select{\r\n           width: 100%;\r\n           border-radius: 8px;\r\n           height: 40px;\r\n       }\r\n   }\r\n.wsx-form-setting .wsx-tier-price-table-wrapper{\r\n       select.wsx-tier-table-select{\r\n           width: fit-content !important;\r\n           border-radius: 8px;\r\n       }\r\n   }\r\n.wsx-form-setting .wsx-tier-wrapper, .wsx-tier-header {\r\n     grid-template-columns: repeat(3, 1fr) 40px;\r\n}\r\n@media (max-width: 768px) {\r\n    .wsx-tier {\r\n        &-wrapper, &-header {\r\n            grid-template-columns: repeat(4, 1fr);\r\n            gap: 12px;\r\n        }\r\n    }\r\n}\r\n@media (max-width: 576px) {\r\n    .wsx-condition-container .wsx-tier {\r\n        &-wrapper {\r\n            grid-template-columns: 1fr;\r\n        }\r\n    }\r\n}"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./reactjs/src/assets/scss/Tier.scss"],"names":[],"mappings":"AAAA;EACI,kBAAkB,EAAA;;AAGlB;EACI,aAAa;EACb,0CAA0C;EAC1C,SAAS;EACT,gBAAgB,EAAA;EAChB;IACI,0CAA0C,EAAA;;AAGlD;EACI,mBAAmB,EAAA;;AAGnB;EACI,iBAAiB;EACjB,+BAA+B,EAAA;;AAI3C;EAEQ,0CAA0C,EAAA;;AAGlD;EACI,aAAa;EACb,0CAA0C;EAC1C,SAAS;EACT,mBAAmB;EACnB,oDAAoD,EAAA;;AAGxD;EACI,0BAA0B,EAAA;;AAE9B;EACI,0BAA0B,EAAA;;AAG9B;EAEW,WAAW;EACX,kBAAkB;EAClB,YAAY,EAAA;;AAGvB;EAEW,6BAA6B;EAC7B,kBAAkB,EAAA;;AAG7B;EACK,0CAA0C,EAAA;;AAE/C;EAEQ;IACI,qCAAqC;IACrC,SAAS,EAAA,EACZ;;AAGT;EAEQ;IACI,qCAAqC;IACrC,SAAS,EAAA,EACZ;;AAGT;EACI;IAEQ,0BAA0B,EAAA,EAC7B","sourcesContent":[".wsx-tiers-fields {\r\n    margin-bottom: 8px;\r\n}\r\n.wsx-tier {\r\n    &-wrapper, &-header {\r\n        display: grid;\r\n        grid-template-columns: repeat(4, 1fr) 40px;\r\n        gap: 24px;\r\n        align-items: end;\r\n        &2 {\r\n            grid-template-columns: repeat(3, 1fr) 40px;\r\n        }\r\n    }\r\n    &-wrapper {\r\n        margin-bottom: 16px;\r\n    }\r\n    &-header {\r\n        &-item {\r\n            padding-left: 4px;\r\n            color: var(--color-text-medium);\r\n        }\r\n    }\r\n}\r\n.wsx-condition-container .wsx-tier {\r\n    &-wrapper, &-header {\r\n        grid-template-columns: repeat(3, 1fr) 40px;\r\n    }\r\n}\r\n.wsx-single-product-settings-wrapper .wsx-tier-wrapper {\r\n    display: grid;\r\n    grid-template-columns: repeat(3, 1fr) 40px;\r\n    gap: 12px;\r\n    margin-bottom: 16px;\r\n    border-bottom: 1px solid var(--color-border-primary);\r\n}\r\n\r\n.wsx-single-product-settings-wrapper >.wsx-tier-wrapper {\r\n    grid-template-columns: 1fr;\r\n}\r\n.wsx-bundle-product-wrapper >.wsx-tier-wrapper {\r\n    grid-template-columns: 1fr;\r\n}\r\n\r\n.wsx-tier-price-table-wrapper{\r\n       select.wsx-tier-table-select{\r\n           width: 100%;\r\n           border-radius: 8px;\r\n           height: 40px;\r\n       }\r\n   }\r\n.wsx-form-setting .wsx-tier-price-table-wrapper{\r\n       select.wsx-tier-table-select{\r\n           width: fit-content !important;\r\n           border-radius: 8px;\r\n       }\r\n   }\r\n.wsx-form-setting .wsx-tier-wrapper, .wsx-tier-header {\r\n     grid-template-columns: repeat(3, 1fr) 40px;\r\n}\r\n@media (max-width: 768px) {\r\n    .wsx-tier {\r\n        &-wrapper, &-header {\r\n            grid-template-columns: repeat(1, 1fr);\r\n            gap: 12px;\r\n        }\r\n    }\r\n}\r\n@media (max-width: 1400px) {\r\n    .wsx-tier {\r\n        &-wrapper, &-header {\r\n            grid-template-columns: repeat(1, 1fr);\r\n            gap: 12px;\r\n        }\r\n    }\r\n}\r\n@media (max-width: 576px) {\r\n    .wsx-condition-container .wsx-tier {\r\n        &-wrapper {\r\n            grid-template-columns: 1fr;\r\n        }\r\n    }\r\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

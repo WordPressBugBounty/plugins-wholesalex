@@ -4,18 +4,18 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
 Tested up to: 6.7
 Requires PHP: 7.3
-Stable tag: 2.0.8
+Stable tag: 2.0.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Best WooCommerce wholesale plugin with features like b2b wholesale prices, wholesale order form, tiered pricing, catalog mode, dynamic pricing, and more!
+Best WooCommerce wholesale plugin with features like b2b wholesale prices, wholesale order form, tiered pricing, catalog mode, dynamic pricing, etc!
 
 === Description ===
 
 🥇 Most **advanced** WooCommerce Wholesale Plugin.
 🎁 Fatured packed solution to create **B2B+B2C** hybrid stores. 
 💕 A plugin by WPXPO, **empowering 60K+** businesses.
-📞 **Dedicated support** team with **4.9/5** customer satisfaction on [Trustpilot] (https://uk.trustpilot.com/review/wpxpo.com)!
+📞 **Dedicated support** team with **4.9/5** customer satisfaction on [Trustpilot](https://uk.trustpilot.com/review/wpxpo.com)!
 
 😲 [Free Demo](https://trywholesalex.wpxpo.com/) | 🔥 [WholesaleX Pro](https://getwholesalex.com/) | 📃 [Documentation](https://getwholesalex.com/documentation/)
 
@@ -26,7 +26,9 @@ WholesaleX is the most advanced WooCommercwe wholesale plugin that comes with al
 
 And with features like catalog mode, and logging in to view prices, you can manage both B2C and B2B customers in the same store. That’s why WholesaleX is the best WooCommerce Wholesale Plugin.
 
-[https://www.youtube.com/watch?v=Zvfxpu8Gtd0]
+Hear what reputed WordPress influencer and popular Plugins reviewer David Garray aka "Mr. Web," has to say about WholesaleX.
+
+[youtube https://www.youtube.com/watch?v=AFYtmpJVxsA]
 
 ✅ Dynamic Pricing and Discount Rules
 ✅ Tiered Pricing / Bulk Discount / Quantity Discount  
@@ -116,6 +118,10 @@ Check out all compatible plugins:
 
 * [YayMail Addon for WholesaleX](https://yaycommerce.com/yaymail-addons/yaymail-addon-for-wholesalex/)
 
+You can explore more about WholesaleX from the following video:
+
+[youtube https://www.youtube.com/watch?v=Zvfxpu8Gtd0]
+
 Other Amazing Plugins
 
 Thank you for considering WholesaleX - the ultimate WooCommerce wholesale plugin. Take a look at our other WordPress and WooCommerce Plugins.
@@ -203,6 +209,12 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.0.9 - 10 March 2025 =
+* Improvement: Compatibility With FOX – Currency Switcher Professional for WooCommerce.
+* Improvement: Compatibility With YITH WooCommerce Product Bundles.
+* Improvement: Compatibility With Product Add-Ons for WooCommerce.
+* Improvement: Compatibility With WowStore Shop Manager.
 
 = 2.0.8 - 18 February 2025 =
 * New: Added a Setting to Apply "Tiered Pricing Discount" to Combined Variations.

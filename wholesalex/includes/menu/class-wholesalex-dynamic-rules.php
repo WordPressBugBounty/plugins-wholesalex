@@ -843,7 +843,7 @@ class WHOLESALEX_Dynamic_Rules {
 
 			if ( isset( $discount['conditions']['tiers'] ) ) {
 				$__conditions = $discount['conditions'];
-				if ( ! self::is_conditions_fullfiled( $__conditions['tiers'] ) ) {
+				if ( ! self::is_conditions_fullfiled( $__conditions['tiers'], null ) ) {
 					continue;
 				}
 			}
@@ -2243,8 +2243,8 @@ class WHOLESALEX_Dynamic_Rules {
 														'cart_total_qty' => __( 'Cart - Total Quantity', 'wholesalex' ),
 														'cart_total_value' => __( 'Cart - Total Value', 'wholesalex' ),
 														'cart_total_weight' => __( 'Cart - Total Weight', 'wholesalex' ),
-														'pro_order_count' => __( 'User Order Count (Pro)', 'wholesalex' ),
-														'pro_total_purchase' => __( 'Total Purchase Amount (Pro)', 'wholesalex' ),
+														'pro_order_count' => __( 'Lifetime Order Count (Pro)', 'wholesalex' ),
+														'pro_total_purchase' => __( 'Lifetime Purchase (Pro)', 'wholesalex' ),
 													),
 													'conditions'
 												),
@@ -2772,9 +2772,11 @@ class WHOLESALEX_Dynamic_Rules {
 				border-radius:
 					<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px' ); ?>;
 			}
-			.wsx-table-overflow {
-				overflow: auto;
-				width: 100vw;
+			@media (max-width: 768px) {
+				.wsx-table-overflow {
+					overflow: auto;
+					width: 100vw;
+				}
 			}
 			.wsx-price-table-header {
 				width: fit-content;
@@ -2791,7 +2793,7 @@ class WHOLESALEX_Dynamic_Rules {
 			.wsx-price-table-row {
 				width: fit-content;
 				display: grid;
-				grid-template-columns: repeat(3, minmax(140px, 1fr));
+				grid-template-columns: repeat(3, minmax(155px, 1fr));
 				border-bottom: 1px solid <?php echo esc_attr( $table_border_color ); ?>;
 			}
 
@@ -3377,12 +3379,13 @@ class WHOLESALEX_Dynamic_Rules {
 	 * Check the dynamic rule has any conditions and if has then check the rules meets the conditions or not
 	 *
 	 * @param array $conditions Conditions Array.
+	 * @param array $rule_filter rule_filter Array.
 	 * @since 1.0.0
 	 * @since 1.0.4 Order Count Coditions Added.
 	 * @since 1.0.4 Total Purchase Amount Added.
 	 * @since 1.0.8 Make Static to Use on WholesaleX Pro
 	 */
-	public static function is_conditions_fullfiled( $conditions ) {
+	public static function is_conditions_fullfiled( $conditions, $rule_filter ) {
 		if ( is_admin() || null === WC()->cart ) {
 			return true;
 		}
@@ -3390,7 +3393,66 @@ class WHOLESALEX_Dynamic_Rules {
 		$__status            = true;
 		$__total_cart_weight = wholesalex()->get_cart_total_weight();
 
-		$__total_cart_total = wholesalex()->get_cart_total();
+		$__total_cart_total           = wholesalex()->get_cart_total();
+		$is_all_quantity_rule         = true;
+		$is_all_cart_total_value_rule = true;
+		$is_all_cart_weight_rule      = true;
+		$discounted_product_quantity  = 0;
+		$cart_total_value             = 0;
+		$cart_total_weight            = 0.0;
+
+		// check if all the condition is for cart_total_qty.
+		foreach ( $conditions as $condition ) {
+			if ( 'cart_total_qty' !== $condition['_conditions_for'] ) {
+				$is_all_quantity_rule = false;
+			}
+		}
+
+		// check if all the condition is for cart_total_value.
+		foreach ( $conditions as $condition ) {
+			if ( 'cart_total_value' !== $condition['_conditions_for'] ) {
+				$is_all_cart_total_value_rule = false;
+			}
+		}
+
+		// check if all the condition is for cart_total_weight.
+		foreach ( $conditions as $condition ) {
+			if ( 'cart_total_weight' !== $condition['_conditions_for'] ) {
+				$is_all_cart_weight_rule = false;
+			}
+		}
+
+		if ( $is_all_cart_weight_rule && $rule_filter ) {
+			// calculate the cart_total weight.
+			foreach ( WC()->cart->get_cart() as $cart_item ) {
+				if ( self::is_eligible_for_rule( $cart_item['product_id'], $cart_item['variation_id'], $rule_filter ) ) {
+					$__item_weight = $cart_item['data']->get_weight();
+					if ( ! empty( $__item_weight ) ) {
+						$cart_total_weight = $cart_total_weight + ( $__item_weight * $cart_item['quantity'] );
+					}
+				}
+			}
+		}
+
+		if ( $is_all_quantity_rule && $rule_filter ) {
+			// calculating the discounted product quantity.
+			foreach ( WC()->cart->get_cart() as $cart_item ) {
+				if ( self::is_eligible_for_rule( $cart_item['product_id'], $cart_item['variation_id'], $rule_filter ) ) {
+					$discounted_product_quantity += $cart_item['quantity'];
+				}
+			}
+		}
+		if ( $is_all_cart_total_value_rule && $rule_filter ) {
+			// calculating the cart total value.
+			foreach ( WC()->cart->get_cart() as $cart_item ) {
+				if ( self::is_eligible_for_rule( $cart_item['product_id'], $cart_item['variation_id'], $rule_filter ) ) {
+					$cart_total_value += $cart_item['line_total'];
+					if ( apply_filters( 'wholesalex_dr_cart_discount_on_tax', false ) ) {
+						$cart_total_value += $cart_item['line_tax'];
+					}
+				}
+			}
+		}
 
 		foreach ( $conditions as $condition ) {
 			$__conditions_value = isset( $condition['_conditions_value'] ) ? (float) $condition['_conditions_value'] : 0;
@@ -3408,7 +3470,11 @@ class WHOLESALEX_Dynamic_Rules {
 			}
 			switch ( $__conditions_for ) {
 				case 'cart_total_value':
-					$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], $__total_cart_total );
+					if ( $is_all_cart_total_value_rule ) {
+						$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], $cart_total_value );
+					} else {
+						$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], $__total_cart_total );
+					}
 					break;
 				case 'cart_total_qty':
 					$__is_unique_cart_count  = apply_filters( 'wholesalex_is_unique_cart_count', false );
@@ -3418,10 +3484,18 @@ class WHOLESALEX_Dynamic_Rules {
 					} elseif ( ! self::$total_cart_counts ) {
 							self::$total_cart_counts = wholesalex()->cart_count();
 					}
-					$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], self::$total_cart_counts );
+					if ( $is_all_quantity_rule ) {
+						$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], $discounted_product_quantity );
+					} else {
+						$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], self::$total_cart_counts );
+					}
 					break;
 				case 'cart_total_weight':
-					$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], $__total_cart_weight );
+					if ( $is_all_cart_weight_rule ) {
+						$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], $cart_total_weight );
+					} else {
+						$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], $__total_cart_weight );
+					}
 					break;
 				case 'order_count':
 					$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], self::$cu_order_counts );
@@ -3622,6 +3696,20 @@ class WHOLESALEX_Dynamic_Rules {
 					$total_rate = \Yay_Currency\Helpers\YayCurrencyHelper::get_rate_fee( $applied_currency );
 					return ( floatval( $price / $total_rate ) );
 				}
+			}
+		}
+
+		/**
+		 * Fox Currency Switcher Compatibility.
+		 *
+		 * @since 2.0.8
+		 */
+
+		if ( defined( 'WOOCS_VERSION' ) && class_exists( 'WOOCS' ) ) {
+			global $WOOCS;
+
+			if ( isset( $WOOCS ) && $WOOCS->is_multiple_allowed ) {
+				$price = $WOOCS->woocs_back_convert_price( $price );
 			}
 		}
 
@@ -4201,7 +4289,7 @@ class WHOLESALEX_Dynamic_Rules {
 			// Minimum.
 			if ( 'yes' === wholesalex()->get_setting( 'show_order_qty_text_on_sp', 'no' ) && isset( $min_max_data['min_order_qty'] ) && ! empty( $min_max_data['min_order_qty'] ) ) {
 				foreach ( $min_max_data['min_order_qty'] as $rule ) {
-					if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+					if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 						continue;
 					}
 					$is_all_products = $rule['filter']['is_all_products'];
@@ -4225,7 +4313,7 @@ class WHOLESALEX_Dynamic_Rules {
 			// Maximum.
 			if ( 'yes' === wholesalex()->get_setting( 'show_order_qty_text_on_sp', 'no' ) && isset( $min_max_data['max_order_qty'] ) && ! empty( $min_max_data['max_order_qty'] ) ) {
 				foreach ( $min_max_data['max_order_qty'] as $rule ) {
-					if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+					if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 						continue;
 					}
 					$is_all_products = $rule['filter']['is_all_products'];
@@ -5268,7 +5356,7 @@ class WHOLESALEX_Dynamic_Rules {
 			$is_customer_vat_exempt = '';
 
 			foreach ( $data['rules'] as $rule ) {
-				if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+				if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 					continue;
 				}
 
@@ -5447,7 +5535,7 @@ class WHOLESALEX_Dynamic_Rules {
 				if ( ! empty( $data['rules'] ) ) {
 					$allowed_rates = array();
 					foreach ( $data['rules'] as $rule ) {
-						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 							continue;
 						}
 
@@ -5546,7 +5634,7 @@ class WHOLESALEX_Dynamic_Rules {
 
 					foreach ( $data['rules'] as $rule ) {
 						$rule_gateway = isset( $rule['rule']['_payment_gateways'] ) ? self::get_multiselect_values( $rule['rule']['_payment_gateways'] ) : array();
-						if ( ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) || empty( $rule_gateway ) ) {
+						if ( ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) || empty( $rule_gateway ) ) {
 							continue;
 						}
 
@@ -5830,7 +5918,7 @@ class WHOLESALEX_Dynamic_Rules {
 					$hash = array();
 					foreach ( $rules['buy_x_get_one'] as $rule ) {
 
-						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 							continue;
 						}
 
@@ -5896,28 +5984,7 @@ class WHOLESALEX_Dynamic_Rules {
 						if ( ! isset( WC()->cart ) || null === WC()->cart->get_cart() ) {
 							return;
 						}
-
-						// calculating the discounted product quantity.
-						$discounted_product_quantity = 0;
-						foreach ( WC()->cart->get_cart() as $cart_item ) {
-							if ( self::is_eligible_for_rule( $cart_item['product_id'], $cart_item['variation_id'], $rule['filter'] ) ) {
-								$discounted_product_quantity += $cart_item['quantity'];
-							}
-						}
-
-						// check if the discounted product quantity matched the condition.
-						$is_condition_passed = false;
-						$is_all_passed      = true;
-						foreach ( $rule['conditions']['tiers'] as $condition ) {
-							$__conditions_value = isset( $condition['_conditions_value'] ) ? (float) $condition['_conditions_value'] : 0;
-							$is_condition_passed = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], $discounted_product_quantity );
-							if ( ! $is_condition_passed ) {
-								$is_all_passed = false;
-								break;
-							}
-						}
-
-						if ( ! $is_all_passed ) {
+						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 							continue;
 						}
 						$discount_amount = 0;
@@ -5986,7 +6053,7 @@ class WHOLESALEX_Dynamic_Rules {
 					$hash = array();
 					foreach ( $rules['payment_discount'] as $rule ) {
 
-						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 							continue;
 						}
 
@@ -6122,7 +6189,7 @@ class WHOLESALEX_Dynamic_Rules {
 
 				if ( ! empty( $data['min_order_qty'] ) ) {
 					foreach ( $data['min_order_qty'] as $rule ) {
-						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 							continue;
 						}
 
@@ -6156,7 +6223,7 @@ class WHOLESALEX_Dynamic_Rules {
 				if ( ! empty( $data['min_order_qty'] ) ) {
 					foreach ( $data['min_order_qty'] as $rule ) {
 						// Check if conditions are met for the rule.
-						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 							continue;
 						}
 						// Check if the variation matches the rule.
@@ -6187,7 +6254,7 @@ class WHOLESALEX_Dynamic_Rules {
 				}
 
 				foreach ( $data['min_order_qty'] as $rule ) {
-					if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+					if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 						continue;
 					}
 					if ( self::is_eligible_for_rule( $product->get_id(), $product->get_id(), $rule['filter'] ) ) {
@@ -6220,7 +6287,7 @@ class WHOLESALEX_Dynamic_Rules {
 				$min_qty_data = array();
 				$min          = '';
 				foreach ( $data['min_order_qty'] as $rule ) {
-					if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+					if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 						continue;
 					}
 					if ( self::is_eligible_for_rule( $product_id, $variation_id, $rule['filter'] ) ) {
@@ -6290,7 +6357,7 @@ class WHOLESALEX_Dynamic_Rules {
 					'product'   => '',
 				);
 				foreach ( $data['min_order_qty'] as $rule ) {
-					if ( isset( $rule['conditions']['tiers'] ) && ! empty( $rule['conditions']['tiers'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+					if ( isset( $rule['conditions']['tiers'] ) && ! empty( $rule['conditions']['tiers'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 						continue;
 					}
 					if ( self::is_eligible_for_rule( $product_id, $variation_id, $rule['filter'] ) ) {
@@ -6366,7 +6433,7 @@ class WHOLESALEX_Dynamic_Rules {
 						'product'   => '',
 					);
 					foreach ( $data['min_order_qty'] as $rule ) {
-						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 							continue;
 						}
 						$min = $rule['rule']['_min_order_qty'];
@@ -6413,7 +6480,7 @@ class WHOLESALEX_Dynamic_Rules {
 			function ( $value, $product ) use ( $data ) {
 				if ( ! empty( $data['min_order_qty'] ) ) {
 					foreach ( $data['min_order_qty'] as $rule ) {
-						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'] ) ) {
+						if ( isset( $rule['conditions'] ) && ! self::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 							continue;
 						}
 						if ( self::is_eligible_for_rule( $product->get_parent_id() ? $product->get_parent_id() : $product->get_id(), $product->get_id(), $rule['filter'] ) ) {
@@ -6427,6 +6494,74 @@ class WHOLESALEX_Dynamic_Rules {
 			2
 		);
 	}
+
+	/**
+	 * YITH WooCommerce Product Bundles Compatibility and Check if the product is in a bundle.
+	 *
+	 * @param mixed $product_id Product ID.
+	 * @return bool
+	 */
+	private function is_product_in_bundle( $product_id ) {
+
+		// Check if 'YITH WooCommerce Product Bundles' plugin is active.
+		if ( ! is_plugin_active( 'yith-woocommerce-product-bundles/init.php' ) ) {
+			return false; // Plugin is not active, return false.
+		}
+
+		// Check if the product is a bundle (Parent Bundle Product).
+		$bundle_data = get_post_meta( $product_id, '_yith_wcpb_bundle_data', true );
+		if ( ! empty( $bundle_data ) ) {
+			return true; // It's a bundle product.
+		}
+
+		// Check if the product is a child in any bundle.
+		$args = array(
+			'post_type'      => 'product',
+			'posts_per_page' => -1,
+			'meta_query'     => array(
+				array(
+					'key'     => '_yith_wcpb_bundle_data',
+					'value'   => '"' . $product_id . '"',
+					'compare' => 'LIKE',
+				),
+			),
+		);
+
+		$query = new WP_Query( $args );
+		if ( $query->have_posts() ) {
+			return true; // Product is a child in a bundle.
+		}
+		return false; // Not a bundle product or a child of a bundle.
+	}
+
+	/**
+	 * Calculate Sale Price
+	 *
+	 * @param object $product_id product id.
+	 * @return float
+	 */
+	public function calculate_actual_sale_price( $product_id ) {
+		$__current_role_id        = wholesalex()->get_current_user_role();
+		$price                    = floatval( get_post_meta( $product_id, '_price', true ) );
+		$regular_price            = floatval( get_post_meta( $product_id, '_regular_price', true ) );
+		$sale_price               = floatval( get_post_meta( $product_id, '_sale_price', true ) );
+
+		if ( isset( $__current_role_id ) ) {
+			$_user_role_base_price    = floatval( get_post_meta( $product_id, $__current_role_id . '_base_price', true ) );
+			$_user_role_sale_price    = floatval( get_post_meta( $product_id, $__current_role_id . '_sale_price', true ) );
+
+			if ( ! empty( $_user_role_sale_price ) ) {
+				return $_user_role_sale_price;
+			} elseif ( ! empty( $_user_role_base_price ) ) {
+				return $_user_role_base_price;
+			}
+		}
+
+		$price = $sale_price && 0.0 !== $sale_price ? $sale_price : $regular_price;
+
+		return $price;
+	}
+
 
 	/**
 	 * Handle Discounts
@@ -6448,13 +6583,19 @@ class WHOLESALEX_Dynamic_Rules {
 			function ( $price, $product ) use ( $data ) {
 
 				$product_id    = $product->get_id();
-				$sale_price    = floatval( $this->calculate_sale_price( '', $product, $data ) );
+				$price         = $this->calculate_actual_sale_price( $product_id );
+				$sale_price    = floatval( $this->calculate_sale_price( $price, $product, $data ) );
 				$regular_price = floatval( $this->calculate_regular_price( $price, $product, $data ) );
 
-				$orginal_base_price = floatval( get_post_meta( $product->get_id(), '_regular_price', true ) );
-				$orginal_sale_price = floatval( get_post_meta( $product->get_id(), '_sale_price', true ) );
+				$orginal_base_price  = floatval( get_post_meta( $product->get_id(), '_regular_price', true ) );
+				$orginal_sale_price  = floatval( get_post_meta( $product->get_id(), '_sale_price', true ) );
+				$to_be_display_price = $price;
 
-				$to_be_display_price = $sale_price && 0 !== $sale_price ? $sale_price : $regular_price;
+				if ( $this->is_product_in_bundle( $product_id ) ) {
+					$to_be_display_price = $price;
+				} else {
+					$to_be_display_price = $sale_price && 0 !== $sale_price ? $sale_price : $regular_price;
+				}
 
 				if ( apply_filters( 'wholesalex_compatibility_with_extra_options_plugin', false ) ) {
 					// Check Price is modified by anyone rather than wholesalex.
@@ -6590,7 +6731,7 @@ class WHOLESALEX_Dynamic_Rules {
 
 				// Check if product has custom price set by WooCommerce Product Addons plugin Compatibility.
 				$is_woo_custom_price = get_post_meta( $product->get_id(), '_product_addons', true );
-				if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && ( $sp || $rp ) && is_array( $is_woo_custom_price ) && ! empty( $is_woo_custom_price ) ) {
+				if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $sp || $rp && is_array( $is_woo_custom_price ) && ! empty( $is_woo_custom_price ) ) {
 					add_filter(
 						'woocommerce_available_variation',
 						function ( $data, $variation ) use ( $rp, $sp ) {
@@ -6726,10 +6867,10 @@ class WHOLESALEX_Dynamic_Rules {
 					$is_user_role_price_apply = ( ! empty( $_user_role_base_price ) || ! empty( $_user_role_sale_price ) ) ? true : false;
 				}
 				$calculate_totlal_price = ( $regular_price - $woo_custom_price ) * ( 1 - $discouned_price );
-				if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 && is_array( $is_woo_custom_price ) && ! empty( $is_woo_custom_price ) && $is_user_role_price_apply ) {
+				if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 && isset( $is_woo_custom_price ) && ! empty( $is_woo_custom_price ) && $is_user_role_price_apply ) {
 					// Set the Price with user role price.
 					$product->set_price( max( 0, $this->price_after_currency_changed( $price ) ) + $woo_custom_price );
-				} elseif ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 && is_array( $is_woo_custom_price ) && ! empty( $is_woo_custom_price ) && ! $is_sale_price_modified ) {
+				} elseif ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 && isset( $is_woo_custom_price ) && ! empty( $is_woo_custom_price ) && ! $is_sale_price_modified ) {
 					// Set the Price without user role price.
 					$product->set_price( max( 0, $this->price_after_currency_changed( $calculate_totlal_price ) ) + $woo_custom_price );
 				} else {
@@ -6841,11 +6982,12 @@ class WHOLESALEX_Dynamic_Rules {
 	 * Undocumented function
 	 *
 	 * @param mixed $conditions Conditions.
+	 * @param mixed $rule_filter Rule Filter.
 	 * @return boolean
 	 */
-	public static function check_rule_conditions( $conditions ) {
+	public static function check_rule_conditions( $conditions, $rule_filter = array() ) {
 		if ( isset( $conditions, $conditions['tiers'] ) ) {
-			if ( ! ( method_exists( self::class, 'is_conditions_fullfiled' ) && self::is_conditions_fullfiled( $conditions['tiers'] ) ) ) {
+			if ( ! ( method_exists( self::class, 'is_conditions_fullfiled' ) && self::is_conditions_fullfiled( $conditions['tiers'], $rule_filter ) ) ) {
 				return false;
 			}
 		}
@@ -6939,7 +7081,7 @@ class WHOLESALEX_Dynamic_Rules {
 				$dynamic_rule_tiers = array();
 				if ( ! empty( $data['quantity_based'] ) ) {
 					foreach ( $data['quantity_based'] as $qbd ) {
-						if ( isset( $qbd['conditions'] ) && ! self::check_rule_conditions( $qbd['conditions'] ) ) {
+						if ( isset( $qbd['conditions'] ) && ! self::check_rule_conditions( $qbd['conditions'], $qbd['filter'] ) ) {
 							continue;
 						}
 						if ( self::is_eligible_for_rule( $parent_id ? $parent_id : $product_id, $product_id, $qbd['filter'] ) ) {
@@ -7095,6 +7237,8 @@ class WHOLESALEX_Dynamic_Rules {
 
 		$base_price = $this->price_after_currency_changed( $base_price );
 
+		$rrs = false;
+
 		$previous_sp = $sale_price;
 
 		$used_rule_id = '';
@@ -7134,12 +7278,11 @@ class WHOLESALEX_Dynamic_Rules {
 									)
 								);
 							}
-							if ( isset( $pd['conditions'] ) && ! self::check_rule_conditions( $pd['conditions'] ) ) {
+							if ( isset( $pd['conditions'] ) && ! self::check_rule_conditions( $pd['conditions'], $pd['filter'] ) ) {
 								continue;
 							}
-							$used_rule_id = $pd['id'];
-							$sale_price   = wholesalex()->calculate_sale_price( $pd['rule'], $base_price );
-
+							$used_rule_id         = $pd['id'];
+							$sale_price           = wholesalex()->calculate_sale_price( $pd['rule'], $base_price );
 							$applied_discount_src = 'product_discount';
 						}
 					}
@@ -7168,7 +7311,7 @@ class WHOLESALEX_Dynamic_Rules {
 								)
 							);
 						}
-						if ( isset( $pd['conditions'] ) && ! self::check_rule_conditions( $pd['conditions'] ) ) {
+						if ( isset( $pd['conditions'] ) && ! self::check_rule_conditions( $pd['conditions'], $pd['filter'] ) ) {
 							continue;
 						}
 						$used_rule_id         = $pd['id'];
@@ -7176,7 +7319,7 @@ class WHOLESALEX_Dynamic_Rules {
 						$applied_discount_src = 'product_discount';
 					}
 				}
-			} else {
+			} elseif ( $rrs ) {
 				$sale_price = floatval( $rrs );
 			}
 			$__is_parent_rule_apply = wholesalex()->get_setting( '_settings_tier_table_discount_apply_on_variable', 'no' ); // Add This Filter TO Work Dynamic Rule For Combine Variation Product Like Quantity Base Discount.
@@ -7184,14 +7327,17 @@ class WHOLESALEX_Dynamic_Rules {
 				$cart_qty             = wholesalex()->cart_count( $parent_id );
 				$variation_quantities = array();
 				$total_variation_qty  = 0;
-				foreach ( WC()->cart->get_cart() as $cart_item ) {
-					if ( $cart_item['product_id'] === $parent_id ) {
-						$variation_id = $cart_item['variation_id'];
-						if ( ! isset( $variation_quantities[ $variation_id ] ) ) {
-							$variation_quantities[ $variation_id ] = 0;
+
+				if ( WC()->cart ) {
+					foreach ( WC()->cart->get_cart() as $cart_item ) {
+						if ( $cart_item['product_id'] === $parent_id ) {
+							$variation_id = $cart_item['variation_id'];
+							if ( ! isset( $variation_quantities[ $variation_id ] ) ) {
+								$variation_quantities[ $variation_id ] = 0;
+							}
+							$variation_quantities[ $variation_id ] += $cart_item['quantity'];
+							$total_variation_qty                   += $cart_item['quantity'];
 						}
-						$variation_quantities[ $variation_id ] += $cart_item['quantity'];
-						$total_variation_qty                   += $cart_item['quantity'];
 					}
 				}
 				// Now you can use $variation_quantities array and $total_variation_qty as needed.
@@ -7240,6 +7386,7 @@ class WHOLESALEX_Dynamic_Rules {
 				WC()->session->set( 'wsx_sale_price', $sale_price );
 			}
 		}
+
 		return $sale_price && 0.00 !== (float) $sale_price ? $sale_price : $previous_sp;
 	}
 
