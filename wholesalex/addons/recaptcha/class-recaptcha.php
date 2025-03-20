@@ -301,9 +301,20 @@ class Recaptcha {
 										curState.submit();
 									});
 								} catch (error) {
-
+									// error
 								}
-							});
+								});
+							} else {
+								$("<input>")
+								.attr({
+									name: "login",
+									id: "login",
+									type: "hidden",
+									value: 'Login',
+								})
+								.appendTo("form");
+								
+								curState.submit();
 							}
 						});
 					});

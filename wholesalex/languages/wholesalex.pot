@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
-"Project-Id-Version: WholesaleX 2.0.9\n"
+"Project-Id-Version: WholesaleX 2.0.10\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wholesalex\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-03-10T08:59:17+00:00\n"
+"POT-Creation-Date: 2025-03-20T08:36:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wholesalex\n"
@@ -2516,7 +2516,7 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:948
 #: includes/menu/class-wholesalex-users.php:192
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4185
 #: assets/js/whx_overview.js:4
 msgid "Select Status"
 msgstr ""
@@ -4261,17 +4261,18 @@ msgctxt "WholesaleX Registration Pending (Customer)"
 msgid "We have received your registration request. Our team will review your information, and you will receive another email once your Request has been approved/rejected."
 msgstr ""
 
-#: assets/js/wholesalex_bulkorder.js:1
+#: assets/js/wholesalex_bulkorder.js:2008
 #: assets/js/wholesalex_components.js:1
-#: assets/js/wholesalex_subaccount.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/wholesalex_subaccount.js:2008
+#: assets/js/whx_conversation.js:2008
 msgid "OK"
 msgstr ""
 
-#: assets/js/wholesalex_bulkorder.js:1
+#: assets/js/wholesalex_bulkorder.js:2009
 #: assets/js/wholesalex_components.js:1
-#: assets/js/wholesalex_subaccount.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/wholesalex_subaccount.js:2009
+#: assets/js/whx_conversation.js:2009
+#: assets/js/whx_conversation.js:2724
 #: assets/js/whx_profile.js:364
 msgid "Cancel"
 msgstr ""
@@ -4305,7 +4306,7 @@ msgid "Edit this header"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2532
 #: assets/js/whx_migration_tools.js:461
 msgid "More"
 msgstr ""
@@ -4317,25 +4318,25 @@ msgid "Available Smart Tags:"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2701
 #: assets/js/whx_profile.js:341
 msgid "Confirm Delete"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2713
 #: assets/js/whx_profile.js:353
 msgid "Do You Want to delete"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2713
 #: assets/js/whx_profile.js:353
 msgid "Be careful, this procedure is irreversible. Do you want to proceed?"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2734
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1296
 #: assets/js/whx_profile.js:374
@@ -4377,7 +4378,7 @@ msgid "Pro"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:3482
 msgid "Show Result:"
 msgstr ""
 
@@ -4393,50 +4394,52 @@ msgstr ""
 msgid "Searching…"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4060
+#: assets/js/whx_conversation.js:4072
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:4
 msgid "Edit"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4065
+#: assets/js/whx_conversation.js:4077
 #: assets/js/whx_overview.js:4
 msgid "Resolved"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4082
 #: assets/js/whx_overview.js:4
 msgid "Force Delete"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4113
+#: assets/js/whx_overview.js:4
+msgid "Selected Conversations"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4155
 #: assets/js/whx_overview.js:4
 msgid "Add New Conversation"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4172
 #: assets/js/whx_overview.js:4
 msgid "Apply"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4191
 #: assets/js/whx_overview.js:4
 msgid "Select Post Status"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4198
 #: assets/js/whx_overview.js:4
 msgid "Select Type"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4212
 #: assets/js/whx_overview.js:4
 msgid "Search…"
-msgstr ""
-
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_overview.js:4
-msgid "Selected Conversations"
 msgstr ""
 
 #: assets/js/whx_overview.js:1
@@ -6001,11 +6004,11 @@ msgstr ""
 msgid "Sent to Parent Account For Approval"
 msgstr ""
 
-#: assets/js/whx_wallet_gateway.js:1
+#: assets/js/whx_wallet_gateway.js:202
 msgid "WholesaleX Wallet Payment"
 msgstr ""
 
 #. translators: 1: Wallet amount
-#: assets/js/whx_wallet_gateway.js:1
+#: assets/js/whx_wallet_gateway.js:211
 msgid "| Current Balance: %s"
 msgstr ""

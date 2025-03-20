@@ -971,7 +971,7 @@ class WHOLESALEX_Dynamic_Rules {
 			case 'export':
 				foreach ( $rule_ids as $rule_id ) {
 					if ( isset( $rules[ $rule_id ] ) ) {
-						unset( $rules[ $rule_id ] );
+						$rules[ $rule_id ];
 					}
 				}
 				$dynamic_message = 'export';
