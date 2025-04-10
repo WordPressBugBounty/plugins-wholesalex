@@ -174,6 +174,7 @@ class WHOLESALEX_Dynamic_Rules {
 	public function __construct() {
 
 		add_action( 'rest_api_init', array( $this, 'dynamic_rule_restapi_callback' ) );
+		add_action( 'rest_api_init', array( $this, 'dynamic_rule_restapi_pagination_callback' ) );
 		add_action( 'rest_api_init', array( $this, 'dynamic_rule_rest_api_bulk_action_callback' ) );
 
 		add_action( 'woocommerce_checkout_create_order', array( $this, 'add_custom_meta_on_wholesale_order' ), 10 );
@@ -1012,6 +1013,32 @@ class WHOLESALEX_Dynamic_Rules {
 	}
 
 	/**
+	 * Dynamic Rule Rest API Callback for rules per page
+	 *
+	 * @since 2.0.8
+	 */
+	public function dynamic_rule_restapi_pagination_callback() {
+		register_rest_route(
+			'wholesalex/v1',
+			'/dynamic_rule_per_page_action/',
+			array(
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'get_dynamic_rules_per_page' ),
+					'permission_callback' => array( $this, 'dynamic_rules_restapi_permission_callback' ),
+					'args'                => array(),
+				),
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'dynamic_rules_per_page_action' ),
+					'permission_callback' => array( $this, 'dynamic_rules_restapi_permission_callback' ),
+					'args'                => array(),
+				),
+			)
+		);
+	}
+
+	/**
 	 * WholesaleX Dynamic Rule RestAPI Permission Callback
 	 */
 	public function dynamic_rules_restapi_permission_callback() {
@@ -1145,6 +1172,49 @@ class WHOLESALEX_Dynamic_Rules {
 				);
 			}
 		}
+	}
+
+	/**
+	 * Get dynamic rules per page
+	 *
+	 * @return Array dynamic rules page
+	 * @since 2.0.8
+	 */
+	public function get_dynamic_rules_per_page() {
+		$rules_per_page = wholesalex()->get_setting( 'dynamic_rule_per_page', 10 );
+
+		return wp_send_json_success(
+			array(
+				'rules_per_page' => floatval( $rules_per_page ),
+			)
+		);
+	}
+
+	/**
+	 * Get dynamic rules per page input
+	 *
+	 * @param object $server Server.
+	 * @return void
+	 * @since 2.0.8
+	 */
+	public function dynamic_rules_per_page_action( $server ) {
+		$post = $server->get_params();
+
+		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
+			return;
+		}
+
+		$rules_per_page = isset( $post['rules_per_page'] ) ? sanitize_text_field( $post['rules_per_page'] ) : 10;
+
+		if ( $rules_per_page ) {
+			wholesalex()->set_setting( 'dynamic_rule_per_page', $rules_per_page );
+		}
+
+		wp_send_json_success(
+			array(
+				'message' => __( 'Successfully Saved Rule Per Page.', 'wholesalex' ),
+			)
+		);
 	}
 
 	/**
@@ -1578,44 +1648,6 @@ class WHOLESALEX_Dynamic_Rules {
 				'fields' => self::get_dynamic_rules_field(),
 				'rule'   => self::dynamic_rules_get(),
 				'nonce'  => wp_create_nonce( 'whx-export-dynamic-rules' ),
-				'i18n'   => array(
-					// 'dynamic_rules'                       => __( 'Dynamic Rules', 'wholesalex' ),
-					// 'please_fill_all_fields'              => __( 'Please Fill All Fields.', 'wholesalex' ),
-					// 'minimum_product_quantity_should_greater_then_free_product_qty' => __( 'Minimum Product Quantity Should Greater then Free Product Quantity.', 'wholesalex' ),
-					// 'rule_title'                          => __( 'Rule Title', 'wholesalex' ),
-					// 'create_dynamic_rule'                 => __( 'Create Dynamic Rule', 'wholesalex' ),
-					// 'import'                              => __( 'Import', 'wholesalex' ),
-					// 'export'                              => __( 'Export', 'wholesalex' ),
-					// 'untitled'                            => __( 'Untitled', 'wholesalex' ),
-					// 'duplicate_of'                        => __( 'Duplicate of ', 'wholesalex' ),
-					// 'delete_this_rule'                    => __( 'Delete this Rule.', 'wholesalex' ),
-					// 'duplicate_this_rule'                 => __( 'Duplicate this Rule.', 'wholesalex' ),
-					// 'show_hide_rule_details'              => __( 'Show/Hide Rule Details.', 'wholesalex' ),
-					// 'vendor'                              => __( 'Vendor #', 'wholesalex' ),
-					// 'untitled_rule'                       => __( 'Untitled Rule', 'wholesalex' ),
-					// 'error_occured'                       => __( 'Error Occured!', 'wholesalex' ),
-					// 'map_csv_fields_to_dynamic_rules'     => __( 'Map CSV Fields to Dynamic Rules', 'wholesalex' ),
-					// 'select_field_from_csv_msg'           => __( 'Select fields from your CSV file to map against role fields, or to ignore during import.', 'wholesalex' ),
-					// 'column_name'                         => __( 'Column name', 'wholesalex' ),
-					// 'map_to_field'                        => __( 'Map to field', 'wholesalex' ),
-					// 'do_not_import'                       => __( 'Do not import', 'wholesalex' ),
-					// 'run_the_importer'                    => __( 'Run the importer', 'wholesalex' ),
-					// 'importing'                           => __( 'Importing', 'wholesalex' ),
-					// 'upload_csv'                          => __( 'Upload CSV', 'wholesalex' ),
-					// 'you_can_upload_only_csv_file_format' => __( 'You can upload only csv file format', 'wholesalex' ),
-					// 'your_dynamic_rules_are_now_being_importing' => __( 'Your Dynamic Rules are now being imported..', 'wholesalex' ),
-					// 'update_existing_rules'               => __( 'Update Existing Rules', 'wholesalex' ),
-					// 'select_update_exising_rule_msg'      => __( 'Selecting "Update Existing Rules" will only update existing rules. No new rules will be added.', 'wholesalex' ),
-					// 'continue'                            => __( 'Continue', 'wholesalex' ),
-					// 'dynamic_rule_imported'               => __( ' Dynamic Rules Imported.', 'wholesalex' ),
-					// 'dynamic_rule_updated'                => __( ' Dynamic Rules Updated.', 'wholesalex' ),
-					// 'dynamic_rule_skipped'                => __( ' Dynamic Rules Skipped.', 'wholesalex' ),
-					// 'dynamic_rule_failed'                 => __( ' Dynamic Rules Failed.', 'wholesalex' ),
-					// 'view_error_logs'                     => __( 'View Error Logs', 'wholesalex' ),
-					// 'dynamic_rule'                        => __( 'Dynamic Rule', 'wholesalex' ),
-					// 'reason_for_failure'                  => __( 'Reason for failure', 'wholesalex' ),
-					// 'import_dynamic_rules'                => __( 'Import Dynamic Rules', 'wholesalex' ),
-				),
 			)
 		);
 		?>
@@ -2319,228 +2351,6 @@ class WHOLESALEX_Dynamic_Rules {
 		return $hash;
 	}
 	/**
-	 * Show Formated WholesaleX Prices
-	 *
-	 * @param WC_Price|string $price_html Product Sale Price HTML.
-	 * @param WC_Product      $product Woocommerce Product Object.
-	 * @since 1.0.0
-	 * @access public
-	 * @return WC_Price $price_html Formated Regular and Sale Price.
-	 * @since 1.0.7 is_wholesalex_sale_price_applied Condition Added
-	 * @since 1.0.8 Variable Product Pricing, Include, Exclude Tax Issue Fixed.
-	 * @since 1.1.4 Duplicate Price (Empty Sale Price) Issue Fixed.
-	 * @since 1.2.13 Login to see price Login Url Setting Added
-	 */
-	public function get_price_html( $price_html, $product ) {
-		if ( is_admin() ) {
-			return $price_html;
-		}
-
-		do_action( 'wholesalex_dynamic_rule_get_price_html' );
-
-		$__product_id         = $product->get_id();
-		$__wholesale_products = array();
-
-		if ( ! ( is_object( $product ) && is_a( $product, 'WC_Product' ) ) ) {
-			return $price_html;
-		}
-
-		/** Login To View Price Section */
-		$__view_price_product_list   = wholesalex()->get_setting( '_settings_login_to_view_price_product_list' );
-		$__view_price_product_single = wholesalex()->get_setting( '_settings_login_to_view_price_product_page' );
-
-		$__hide_login_to_see_price_message = false;
-
-		$login_to_view_price_login_url = wholesalex()->get_setting( '_settings_login_to_view_price_login_url', get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
-		$redirect_url = esc_url(add_query_arg('redirect', isset($_SERVER['REQUEST_URI']) ? esc_url($_SERVER['REQUEST_URI']) : '', $login_to_view_price_login_url)); //phpcs:ignore
-		if ( 'yes' === $__view_price_product_list && ! is_user_logged_in() && ! ( is_single() ) ) {
-			$price_html = '<div><a class="wsx-link" href="' . $redirect_url . '">' . esc_html( wholesalex()->get_language_n_text( '_language_login_to_see_prices', __( 'Login to see prices', 'wholesalex' ) ) ) . '</a></div>';
-
-			// hide add to cart button also.
-			remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10 );
-
-			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
-
-			remove_all_actions( 'woocommerce_' . $product->get_type() . '_add_to_cart' );
-
-			add_filter( 'woocommerce_is_purchasable', '__return_false' );
-
-			if ( $__hide_login_to_see_price_message ) {
-				return;
-			}
-			return $price_html;
-		}
-
-		if ( 'yes' === $__view_price_product_single && ! is_user_logged_in() && is_single() ) {
-			$price_html = '<div><a class="wsx-link" href="' . $redirect_url . '">' . esc_html( wholesalex()->get_language_n_text( '_language_login_to_see_prices', __( 'Login to see prices', 'wholesalex' ) ) ) . '</a></div>';
-
-			remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10 );
-			// hide add to cart button also.
-			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
-
-			remove_all_actions( 'woocommerce_' . $product->get_type() . '_add_to_cart' );
-
-			add_filter( 'woocommerce_is_purchasable', '__return_false' );
-
-			if ( $__hide_login_to_see_price_message ) {
-				return;
-			}
-			return $price_html;
-		}
-
-		$is_wholesalex_sale_price_applied = true;
-		if ( isset( WC()->session ) && ! is_admin() ) {
-			$__wholesale_products = WC()->session->get( '__wholesalex_wholesale_products' );
-			if ( $product->is_type( 'simple' ) || $product->is_type( 'variation' ) ) {
-				if ( isset( $__wholesale_products[ $__product_id ] ) && $__wholesale_products[ $__product_id ] === $product->get_sale_price() ) {
-					$is_wholesalex_sale_price_applied = false;
-				}
-			}
-		}
-
-		if ( $product->is_type( 'variable' ) || $product->is_type( 'grouped' ) ) {
-			$variations               = $product->get_children();
-			$regular_prices           = array();
-			$regular_price            = '';
-			$sale_prices              = array();
-			$sale_price               = '';
-			$has_sale_price           = false;
-			$has_wholesale_sale_price = false;
-
-			foreach ( $variations as $variation_id ) {
-				$single_variation = wc_get_product( $variation_id );
-
-				if ( ! ( is_object( $single_variation ) && is_a( $single_variation, 'WC_Product' ) ) ) {
-					return $price_html;
-				}
-				if ( $single_variation->get_status( 'edit' ) !== 'publish' ) {
-					continue;
-				}
-				array_push( $regular_prices, wc_get_price_to_display( $single_variation, array( 'price' => $single_variation->get_regular_price() ) ) );
-
-				if ( isset( $__wholesale_products[ $variation_id ] ) && $__wholesale_products[ $variation_id ] !== $single_variation->get_sale_price() ) {
-					$has_wholesale_sale_price = true;
-				}
-
-				if ( ! empty( $single_variation->get_sale_price() ) ) {
-					$has_sale_price = true;
-					array_push( $sale_prices, wc_get_price_to_display( $single_variation, array( 'price' => $single_variation->get_sale_price() ) ) );
-				} else {
-					array_push( $sale_prices, wc_get_price_to_display( $single_variation, array( 'price' => $single_variation->get_regular_price() ) ) );
-				}
-			}
-
-			sort( $sale_prices );
-			sort( $regular_prices );
-
-			if ( empty( $sale_prices ) || empty( $regular_prices ) ) {
-				return $price_html;
-			}
-
-			if ( $regular_prices[0] === $regular_prices[ count( $regular_prices ) - 1 ] ) {
-				$regular_price = wc_price( $regular_prices[0] );
-			} else {
-				$regular_price = wc_format_price_range( $regular_prices[0], $regular_prices[ count( $regular_prices ) - 1 ] );
-			}
-			if ( $sale_prices[0] === $sale_prices[ count( $sale_prices ) - 1 ] ) {
-				$sale_price = wc_price( $sale_prices[0] );
-			} else {
-				$sale_price = wc_format_price_range( $sale_prices[0], $sale_prices[ count( $sale_prices ) - 1 ] );
-			}
-
-			if ( $has_sale_price ) {
-				if ( ! is_single() ) {
-					$__product_list_page_price = wholesalex()->get_setting( '_settings_price_product_list_page', 'pricing_range' );
-					$__product_list_page_price = isset( $__product_list_page_price ) ? $__product_list_page_price : '';
-					// 2-1-24 -> WHO609 -> Variable Price alaways show price range
-					switch ( $__product_list_page_price ) {
-						case 'pricing_range':
-						case 'minimum_pricing':
-						case 'maximum_pricing':
-							$price_html = $this->format_sale_price( $regular_price, $sale_price, $has_wholesale_sale_price ) . $product->get_price_suffix();
-							break;
-						default:
-							$price_html = $this->format_sale_price( $regular_price, $sale_price, $has_wholesale_sale_price ) . $product->get_price_suffix();
-							break;
-					}
-				}
-				if ( is_single() ) {
-					$price_html = $this->format_sale_price( $regular_price, $sale_price, $has_wholesale_sale_price ) . $product->get_price_suffix();
-				}
-			} else {
-				$price_html = $regular_price . $product->get_price_suffix();
-			}
-
-			/**
-			 * Hide Prices on Variable Products.
-			 *
-			 * @since 1.0.2
-			 */
-			$__hide_regular_price = wholesalex()->get_setting( '_settings_hide_retail_price' ) ?? '';
-
-			$__hide_wholesale_price = wholesalex()->get_setting( '_settings_hide_wholesalex_price' ) ?? '';
-
-			if ( ! is_admin() ) {
-				if ( 'yes' === (string) $__hide_wholesale_price && 'yes' === (string) $__hide_regular_price ) {
-					return apply_filters( 'wholesalex_regular_sale_price_hidden_text', wholesalex()->get_language_n_text( '_language_price_is_hidden', 'Price is hidden!' ) );
-				}
-			}
-
-			$price_html = apply_filters( 'wholesalex_variable_product_price_html', $price_html, $product );
-
-			return $price_html;
-		}
-
-		$product_sale_price = $product->get_sale_price();
-
-		if ( ( empty( $product_sale_price ) || (float) $product->get_sale_price() === (float) 0.0 ) && $product->get_regular_price() ) {
-			$price_html = $this->format_sale_price( wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) ), '', $is_wholesalex_sale_price_applied ) . $product->get_price_suffix();
-			return $price_html;
-		}
-
-		if ( empty( $product_sale_price ) || (float) $product->get_sale_price() === (float) 0.0 ) {
-			return $price_html;
-		}
-
-		if ( is_shop() || is_product_category() ) {
-			$__product_list_page_price = wholesalex()->get_setting( '_settings_price_product_list_page', 'pricing_range' );
-			$__product_list_page_price = isset( $__product_list_page_price ) ? $__product_list_page_price : '';
-
-			$__min_sale_price = wc_get_price_to_display( $product, array( 'price' => $product->get_sale_price() ) );
-			$__max_sale_price = wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) );
-
-			switch ( $__product_list_page_price ) {
-				case 'pricing_range':
-					if ( $__min_sale_price === $__max_sale_price ) {
-						$__max_sale_price = wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) );
-					}
-					$price_html = $this->format_sale_price( wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) ), wc_format_price_range( $__min_sale_price, $__max_sale_price ), $is_wholesalex_sale_price_applied ) . $product->get_price_suffix();
-					break;
-				case 'minimum_pricing':
-					$price_html = $this->format_sale_price( wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) ), $__min_sale_price, $is_wholesalex_sale_price_applied ) . $product->get_price_suffix();
-					break;
-				case 'maximum_pricing':
-					$price_html = $this->format_sale_price( wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) ), $__max_sale_price, $is_wholesalex_sale_price_applied ) . $product->get_price_suffix();
-					break;
-				default:
-					$price_html = $this->format_sale_price( wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) ), wc_get_price_to_display( $product, array( 'price' => $product->get_sale_price() ) ), $is_wholesalex_sale_price_applied ) . $product->get_price_suffix();
-					break;
-			}
-
-			return $price_html;
-		}
-
-		if ( $is_wholesalex_sale_price_applied || $product->is_on_sale() ) {
-			$price_html = $this->format_sale_price( wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) ), wc_get_price_to_display( $product, array( 'price' => $product->get_sale_price() ) ), $is_wholesalex_sale_price_applied ) . $product->get_price_suffix();
-		}
-
-		if ( $this->is_wholesalex_base_price_applied && $product->get_date_on_sale_to() && ! $product->is_on_sale() ) {
-			$price_html = $this->format_sale_price( wc_get_price_to_display( $product, array( 'price' => $product->get_regular_price() ) ), '', $is_wholesalex_sale_price_applied ) . $product->get_price_suffix();
-		}
-
-		return $price_html;
-	}
-	/**
 	 * Formate Wholesale Price.
 	 *
 	 * @param mixed $regular_price Regular Price.
@@ -2573,6 +2383,9 @@ class WHOLESALEX_Dynamic_Rules {
 				return apply_filters( 'wholesalex_regular_sale_price_hidden_text', wholesalex()->get_language_n_text( '_language_price_is_hidden', 'Price is hidden!' ) );
 			}
 			if ( 'yes' === (string) $__hide_regular_price && ! empty( $sale_price ) ) {
+				if ( is_string( $sale_price ) && $product->get_type() === 'variable' ) {
+					return $sale_text . $sale_price;
+				}
 				return $sale_text . wc_price( floatval( $sale_price ) );
 			}
 			if ( 'yes' === (string) $__hide_wholesale_price && ! empty( $regular_price ) && $is_wholesalex_sale_price_applied ) {
@@ -2655,63 +2468,133 @@ class WHOLESALEX_Dynamic_Rules {
 	}
 
 	/**
-	 * WholesaleX product variation price table
-	 *
-	 * @param Object $data WC Product Data.
-	 * @param Object $product WC Product Object.
-	 * @param Object $variation WC Variation Product Data.
-	 * @since 1.0.0
-	 * @since 1.0.5 In Stock Message Display Multiple Times Issue Fixed.
-	 */
-	public function wholesalex_product_variation_price_table( $data, $product, $variation ) {
-		$product      = $product;
-		$variation_id = $variation->get_id();
-		$product_id   = $product->get_id();
-
-		if ( ! ( $product_id && 'yes' === wholesalex()->get_single_product_setting( $product_id, '_settings_show_tierd_pricing_table' ) ) ) {
-			return $data;
-		}
-		$tiers = isset( $this->active_tiers[ $variation_id ] ) ? $this->active_tiers[ $variation_id ] : array();
-
-		if ( isset( $tiers['tiers'] ) ) {
-			$tiers['tiers'] = $this->filter_empty_tier( $tiers['tiers'] );
-		}
-
-		if ( ! empty( $tiers ) ) {
-			$tier_table                 = $this->quantity_based_pricing_table( '', $variation_id );
-			$data['availability_html'] .= $tier_table;
-		}
-
-		if ( ( function_exists( 'wholesalex_pro' ) && version_compare( WHOLESALEX_PRO_VER, '1.3.1', '<=' ) ) && empty( $tiers ) ) {
-			$tier_table                 = $this->quantity_based_pricing_table( '', $variation_id );
-			$data['availability_html'] .= $tier_table;
-		}
-		return $data;
-	}
-
-	/**
 	 * Quantity Based Pricing Table
 	 *
-	 * @param array $data Quantity Based Prices.
+	 * @param array $markup Quantity Based Prices.
 	 * @param mixed $id Product Id.
 	 * @return mixed Table Data.
 	 * @since 1.0.0
 	 */
-	public function quantity_based_pricing_table( $data, $id ) {
-		$product = wc_get_product( $id );
+	public function quantity_based_pricing_table( $markup, $id, $discount_data ) {
+		$product            = wc_get_product( $id );
+		$is_regular_price   = wholesalex()->get_setting( '_is_sale_or_regular_Price', 'is_regular_price' );
+		$current_role       = wholesalex()->get_current_user_role();
+		$role_sale_price    = floatval( $this->get_role_base_sale_price( $product, $current_role ) );
+		$role_regular_price = floatval( $this->get_role_regular_price( $product, $current_role ) );
 
-		$is_regular_price = wholesalex()->get_setting( '_is_sale_or_regular_Price', 'is_regular_price' );
 		if ( 'is_sale_price' === $is_regular_price ) {
-			$product_price = $product->get_sale_price();
+			if ( $role_sale_price ) {
+				$product_price = $role_sale_price;
+			} elseif ( $role_regular_price ) {
+				$product_price = $role_regular_price;
+			} elseif ( $product->get_sale_price( 'edit' ) ) {
+				$product_price = $product->get_sale_price( 'edit' );
+			} else {
+				$product_price = $product->get_regular_price();
+			}
+			$parent_id = $product->get_parent_id();
+
+			$flipped_priority = array_flip( wholesalex()->get_quantity_based_discount_priorities() );
+			if ( isset( $discount_data['role_id'] ) && ! empty( $discount_data['role_id'] ) ) {
+				$rrs = get_post_meta( $id, $discount_data['role_id'] . '_sale_price', true );
+			} else {
+				$rrs = false;
+			}
+
+			$applied_discount_src = '';
+
+			if ( $flipped_priority['dynamic_rule'] < $flipped_priority['single_product'] ) {
+
+				if ( ! empty( $discount_data['product_discount'] ) ) {
+					foreach ( $discount_data['product_discount'] as $pd ) {
+
+						if ( self::is_eligible_for_rule( $parent_id ? $parent_id : $id, $id, $pd['filter'] ) ) {
+							if ( isset( $pd['conditions'] ) && ! self::check_rule_conditions( $pd['conditions'], $pd['filter'] ) ) {
+								continue;
+							}
+							$product_price = wholesalex()->calculate_sale_price( $pd['rule'], $product_price );
+
+							$applied_discount_src = 'product_discount';
+
+						}
+					}
+				}
+
+				if ( '' === $applied_discount_src && $rrs ) {
+					// Single Product Rolewise.
+					$product_price = floatval( $rrs );
+
+				}
+			} elseif ( ! $rrs && ! empty( $discount_data['product_discount'] ) ) {
+
+				foreach ( $discount_data['product_discount'] as $pd ) {
+
+					if ( self::is_eligible_for_rule( $parent_id ? $parent_id : $id, $id, $pd['filter'] ) ) {
+						if ( isset( $pd['conditions'] ) && ! self::check_rule_conditions( $pd['conditions'], $pd['filter'] ) ) {
+							continue;
+						}
+						$product_price        = wholesalex()->calculate_sale_price( $pd['rule'], $product_price );
+						$applied_discount_src = 'product_discount';
+					}
+				}
+			} elseif ( $rrs ) {
+				$product_price = floatval( $rrs );
+			}
 		} else {
 			$product_price = $product->get_regular_price();
+
+			$parent_id = $product->get_parent_id();
+
+			$flipped_priority = array_flip( wholesalex()->get_quantity_based_discount_priorities() );
+			if ( isset( $discount_data['role_id'] ) && ! empty( $discount_data['role_id'] ) ) {
+				$rrs = get_post_meta( $id, $discount_data['role_id'] . '_regular_price', true );
+			} else {
+				$rrs = false;
+			}
+
+			$applied_discount_src = '';
+
+			if ( $flipped_priority['dynamic_rule'] < $flipped_priority['single_product'] ) {
+
+				if ( ! empty( $discount_data['product_discount'] ) ) {
+					foreach ( $discount_data['product_discount'] as $pd ) {
+
+						if ( self::is_eligible_for_rule( $parent_id ? $parent_id : $id, $id, $pd['filter'] ) ) {
+							if ( isset( $pd['conditions'] ) && ! self::check_rule_conditions( $pd['conditions'], $pd['filter'] ) ) {
+								continue;
+							}
+							$product_price        = wholesalex()->calculate_sale_price( $pd['rule'], $product_price );
+							$applied_discount_src = 'product_discount';
+
+						}
+					}
+				}
+
+				if ( '' === $applied_discount_src && $rrs ) {
+					// Single Product Rolewise.
+					$product_price = floatval( $rrs );
+				}
+			} elseif ( ! $rrs && ! empty( $discount_data['product_discount'] ) ) {
+				foreach ( $discount_data['product_discount'] as $pd ) {
+
+					if ( self::is_eligible_for_rule( $parent_id ? $parent_id : $id, $id, $pd['filter'] ) ) {
+						if ( isset( $pd['conditions'] ) && ! self::check_rule_conditions( $pd['conditions'], $pd['filter'] ) ) {
+							continue;
+						}
+						$product_price        = wholesalex()->calculate_sale_price( $pd['rule'], $product_price );
+						$applied_discount_src = 'product_discount';
+					}
+				}
+			} elseif ( $rrs ) {
+				$product_price = floatval( $rrs );
+			}
 		}
 
 		ob_start();
 		$this->wholesalex_price_table_generator( $product_price, $product );
-		$data .= ob_get_clean();
+		$markup .= ob_get_clean();
 
-		return $data;
+		return $markup;
 	}
 
 	/**
@@ -2726,6 +2609,9 @@ class WHOLESALEX_Dynamic_Rules {
 			return array();
 		}
 		foreach ( $tiers as $tier ) {
+			if ( ! isset( $tier['_id'] ) ) {
+				$tier['_id'] = wp_unique_id( 'wsx' );
+			}
 			if ( isset( $tier['_discount_type'] ) && ! empty( $tier['_discount_type'] ) && isset( $tier['_discount_amount'] ) && ! empty( $tier['_discount_amount'] ) && isset( $tier['_min_quantity'] ) && ! empty( $tier['_min_quantity'] ) ) {
 				array_push( $__tiers, $tier );
 			}
@@ -3164,7 +3050,7 @@ class WHOLESALEX_Dynamic_Rules {
 							$__sale_price = wc_get_price_to_display( $product, array( 'price' => $__sale_price ) );
 							?>
 							<div
-								class="wsx-price-table-row <?php echo esc_attr( ( $__current_tier['_id'] == $active_tier ) ? 'active' : '' ); ?>">
+								class="wsx-price-table-row <?php echo esc_attr( ( ! empty( $__current_tier['_id'] ) && $__current_tier['_id'] == $active_tier ) ? 'active' : '' ); ?>">
 								<?php
 								foreach ( $table_column_priority as $column ) {
 									if ( isset( $column['status'] ) && ( 'yes' === $column['status'] || $column['status'] ) ) {
@@ -3446,7 +3332,9 @@ class WHOLESALEX_Dynamic_Rules {
 			// calculating the cart total value.
 			foreach ( WC()->cart->get_cart() as $cart_item ) {
 				if ( self::is_eligible_for_rule( $cart_item['product_id'], $cart_item['variation_id'], $rule_filter ) ) {
-					$cart_total_value += $cart_item['line_total'];
+					if ( isset( $cart_item['line_total'] ) ) {
+						$cart_total_value += $cart_item['line_total'];
+					}
 					if ( apply_filters( 'wholesalex_dr_cart_discount_on_tax', false ) ) {
 						$cart_total_value += $cart_item['line_tax'];
 					}
@@ -4248,10 +4136,9 @@ class WHOLESALEX_Dynamic_Rules {
 
 		add_action(
 			'woocommerce_available_variation',
-			function ( $data, $product, $variation ) use ( $cart_related_data, $payment_related_rules, $profile_shipping_data, $min_max_data, $is_tax_exempt ) {
-
-				$data['availability_html'] .= $this->handle_single_product_page_promo( $variation, $cart_related_data, $payment_related_rules, $profile_shipping_data, $min_max_data, $is_tax_exempt, false );
-				return $data;
+			function ( $variation_array, $product, $variation ) use ( $cart_related_data, $payment_related_rules, $profile_shipping_data, $min_max_data, $is_tax_exempt ) {
+				$variation_array['availability_html'] .= $this->handle_single_product_page_promo( $variation, $cart_related_data, $payment_related_rules, $profile_shipping_data, $min_max_data, $is_tax_exempt, false );
+				return $variation_array;
 			},
 			10,
 			3
@@ -6538,17 +6425,25 @@ class WHOLESALEX_Dynamic_Rules {
 	 * Calculate Sale Price
 	 *
 	 * @param object $product_id product id.
+	 * @param object $is_variable variable id.
+	 *
 	 * @return float
+	 *
+	 * @since 2.0.9
 	 */
-	public function calculate_actual_sale_price( $product_id ) {
-		$__current_role_id        = wholesalex()->get_current_user_role();
-		$price                    = floatval( get_post_meta( $product_id, '_price', true ) );
-		$regular_price            = floatval( get_post_meta( $product_id, '_regular_price', true ) );
-		$sale_price               = floatval( get_post_meta( $product_id, '_sale_price', true ) );
+	public function calculate_actual_sale_price( $product_id, $is_variable = false ) {
+		$__current_role_id = wholesalex()->get_current_user_role();
+		$price             = floatval( get_post_meta( $product_id, '_price', true ) );
+		$regular_price     = floatval( get_post_meta( $product_id, '_regular_price', true ) );
+		$sale_price        = floatval( get_post_meta( $product_id, '_sale_price', true ) );
+
+		if ( $is_variable ) {
+			return $price;
+		}
 
 		if ( isset( $__current_role_id ) ) {
-			$_user_role_base_price    = floatval( get_post_meta( $product_id, $__current_role_id . '_base_price', true ) );
-			$_user_role_sale_price    = floatval( get_post_meta( $product_id, $__current_role_id . '_sale_price', true ) );
+			$_user_role_base_price = floatval( get_post_meta( $product_id, $__current_role_id . '_base_price', true ) );
+			$_user_role_sale_price = floatval( get_post_meta( $product_id, $__current_role_id . '_sale_price', true ) );
 
 			if ( ! empty( $_user_role_sale_price ) ) {
 				return $_user_role_sale_price;
@@ -6574,16 +6469,108 @@ class WHOLESALEX_Dynamic_Rules {
 
 		if ( 'yes' === $global_show_tier_table ) {
 			$tier_position = 'before';
-			add_action( 'woocommerce_' . $tier_position . '_add_to_cart_form', array( $this, 'wholesalex_product_price_table' ) );
-			add_filter( 'woocommerce_available_variation', array( $this, 'wholesalex_product_variation_price_table' ), 10, 3 );
+			// add_action( 'woocommerce_' . $tier_position . '_add_to_cart_form', array( $this, 'wholesalex_product_price_table' ) );
+			add_action(
+				'woocommerce_' . $tier_position . '_add_to_cart_form',
+				function () use( $data ) {
+
+					global $post;
+					$product_id = $post->ID;
+					$product    = wc_get_product( $post->ID );
+					if ( ! $product ) {
+						return;
+					}
+					if ( ! $product->is_type( 'simple' ) ) {
+						return;
+					}
+
+					if ( ! ( $product_id && 'yes' === wholesalex()->get_single_product_setting( $product_id, '_settings_show_tierd_pricing_table' ) ) ) {
+						return;
+					}
+
+					$tiers = isset( $this->active_tiers[ $product_id ] ) ? $this->active_tiers[ $product_id ] : array( 'tiers' => array() );
+
+					$tiers['tiers'] = $this->filter_empty_tier( $tiers['tiers'] );
+
+					$table_data = false;
+					if ( ! empty( $tiers['tiers'] ) ) {
+						$table_data = $this->quantity_based_pricing_table( '', $product_id, $data );
+					}
+
+					if ( ( function_exists( 'wholesalex_pro' ) && version_compare( WHOLESALEX_PRO_VER, '1.3.1', '<=' ) ) && ! $table_data ) {
+
+						$table_data = $this->quantity_based_pricing_table( '', $product_id, $data );
+					}
+
+					do_action( 'wholesalex_tier_pricing_table', $product );
+
+					$allowed_tags = array(
+						'table' => array(),
+						'thead' => array(),
+						'tbody' => array(),
+						'th'    => array(),
+						'tr'    => array( 'id' => array() ),
+						'td'    => array(),
+						'div'   => array(
+							'class' => array(),
+							'id'    => array(),
+							'style' => array(),
+						),
+						'span'  => array(
+							'class' => array(),
+							'id'    => array(),
+						),
+						'style' => array(),
+						'pre'   => array(),
+					);
+					if ( $table_data ) {
+						echo wp_kses( $table_data, $allowed_tags );
+					}
+				},
+				10
+			);
+			add_filter(
+				'woocommerce_available_variation',
+				function ( $variation_data, $product, $variation ) use( $data ) {
+					$product      = $product;
+					$variation_id = $variation->get_id();
+					$product_id   = $product->get_id();
+
+					if ( ! ( $product_id && 'yes' === wholesalex()->get_single_product_setting( $product_id, '_settings_show_tierd_pricing_table' ) ) ) {
+						return $variation_data;
+					}
+					$tiers = isset( $this->active_tiers[ $variation_id ] ) ? $this->active_tiers[ $variation_id ] : array();
+
+					if ( isset( $tiers['tiers'] ) ) {
+						$tiers['tiers'] = $this->filter_empty_tier( $tiers['tiers'] );
+					}
+
+					if ( ! empty( $tiers ) ) {
+						$tier_table                           = $this->quantity_based_pricing_table( '', $variation_id, $data );
+						$variation_data['availability_html'] .= $tier_table;
+					}
+
+					if ( ( function_exists( 'wholesalex_pro' ) && version_compare( WHOLESALEX_PRO_VER, '1.3.1', '<=' ) ) && empty( $tiers ) ) {
+						$tier_table                           = $this->quantity_based_pricing_table( '', $variation_id, $data );
+						$variation_data['availability_html'] .= $tier_table;
+					}
+					return $variation_data;
+				},
+				10,
+				3
+			);
 		}
 
 		add_filter(
 			'woocommerce_product_get_price',
 			function ( $price, $product ) use ( $data ) {
+				$product_id        = $product->get_id();
 
-				$product_id    = $product->get_id();
-				$price         = $this->calculate_actual_sale_price( $product_id );
+				if ( $this->is_wholesalex_topup_product( $product_id ) ) {
+					return $price;
+				}
+
+				$price         = $this->calculate_actual_sale_price( $product_id, $product->is_type( 'variable' ) );
 				$sale_price    = floatval( $this->calculate_sale_price( $price, $product, $data ) );
 				$regular_price = floatval( $this->calculate_regular_price( $price, $product, $data ) );
 
@@ -6612,6 +6599,37 @@ class WHOLESALEX_Dynamic_Rules {
 					}
 					$to_be_display_price = $to_be_display_price + $option_price;
 				}
+
+				// woocommerce product addons compatibility with simple product.
+				if ( function_exists( 'WC' ) && ( $cart = WC()->cart ) && wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) ) {
+					foreach ( $cart->get_cart() as $cart_item ) {
+						$woo_custom_price = 0;
+
+						$quantity = $cart_item['quantity'];
+
+						if ( isset( $cart_item['product_id'] ) && $cart_item['product_id'] === $product_id && isset( $cart_item['addons'] ) && is_array( $cart_item['addons'] ) ) {
+							foreach ( $cart_item['addons'] as $addon ) {
+								if ( isset( $addon['price'], $addon['price_type'] ) ) {
+									switch ( $addon['price_type'] ) {
+										case 'flat_fee':
+											$woo_custom_price += $addon['price'];
+											break;
+										case 'percentage_based':
+											$woo_custom_price += $to_be_display_price + ( $price * $addon['price'] * ( 1 / 100 ) );
+											break;
+										case 'quantity_based':
+											$woo_custom_price += $addon['price'];
+											break;
+									}
+								}
+							}
+						}
+
+						if ( $quantity > 0 && $woo_custom_price > 0 ) {
+							$to_be_display_price = ( $to_be_display_price * $quantity + $woo_custom_price ) / $quantity;
+						}
+					}
+				}
 				return $to_be_display_price;
 			},
 			9,
@@ -6621,6 +6639,15 @@ class WHOLESALEX_Dynamic_Rules {
 		add_filter(
 			'woocommerce_product_get_regular_price',
 			function ( $regular_price, $product ) use ( $data ) {
+				$product_id        = $product->get_id();
+
+				if ( $this->is_wholesalex_topup_product( $product_id ) ) {
+					return $regular_price;
+				}
+
+				if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'regular_price' ) ) {
+					return $regular_price;
+				}
 				$regular_price = $this->calculate_regular_price( $regular_price, $product, $data );
 				return ( ! empty( $regular_price ) ) ? (float) $regular_price : $regular_price;
 			},
@@ -6631,6 +6658,9 @@ class WHOLESALEX_Dynamic_Rules {
 		add_filter(
 			'woocommerce_product_variation_get_regular_price',
 			function ( $regular_price, $product ) use ( $data ) {
+				if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'regular_price' ) ) {
+					return $regular_price;
+				}
 				$regular_price = $this->calculate_regular_price( $regular_price, $product, $data );
 				return ( ! empty( $regular_price ) ) ? (float) $regular_price : $regular_price;
 			},
@@ -6640,6 +6670,9 @@ class WHOLESALEX_Dynamic_Rules {
 		add_filter(
 			'woocommerce_variation_prices_regular_price',
 			function ( $regular_price, $product ) use ( $data ) {
+				if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'regular_price' ) ) {
+					return $regular_price;
+				}
 				$regular_price = $this->calculate_regular_price( $regular_price, $product, $data );
 				return ( ! empty( $regular_price ) ) ? (float) $regular_price : $regular_price;
 			},
@@ -6650,7 +6683,26 @@ class WHOLESALEX_Dynamic_Rules {
 		add_filter(
 			'woocommerce_product_get_sale_price',
 			function ( $sale_price, $product ) use ( $data ) {
+				$product_id        = $product->get_id();
+
+				if ( $this->is_wholesalex_topup_product( $product_id ) ) {
+					return $sale_price;
+				}
+				if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'sale_price' ) ) {
+					return $sale_price;
+				}
+				$current_role       = wholesalex()->get_current_user_role();
+				$role_sale_price    = floatval( $this->get_role_base_sale_price( $product, $current_role ) );
+				$role_regular_price = floatval( $this->get_role_regular_price( $product, $current_role ) );
+
+				$has_rolewise_price = $role_sale_price || $role_regular_price;
+
+				// if ( $has_rolewise_price ) {
+				// $sale_price = $role_sale_price ? $role_sale_price : $role_regular_price;
+				// }
+
 				$sale_price = $this->calculate_sale_price( $sale_price, $product, $data );
+
 				return ( ! empty( $sale_price ) ) ? (float) $sale_price : $sale_price;
 			},
 			9,
@@ -6660,6 +6712,9 @@ class WHOLESALEX_Dynamic_Rules {
 		add_filter(
 			'woocommerce_product_variation_get_sale_price',
 			function ( $sale_price, $product ) use ( $data ) {
+				if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'sale_price' ) ) {
+					return $sale_price;
+				}
 				$sale_price = $this->calculate_sale_price( $sale_price, $product, $data );
 				return ( ! empty( $sale_price ) ) ? (float) $sale_price : $sale_price;
 			},
@@ -6669,6 +6724,9 @@ class WHOLESALEX_Dynamic_Rules {
 		add_filter(
 			'woocommerce_variation_prices_sale_price',
 			function ( $sale_price, $product ) use ( $data ) {
+				if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'sale_price' ) ) {
+					return $sale_price;
+				}
 				$sale_price = $this->calculate_sale_price( $sale_price, $product, $data );
 				return ( ! empty( $sale_price ) ) ? (float) $sale_price : $sale_price;
 			},
@@ -6690,136 +6748,185 @@ class WHOLESALEX_Dynamic_Rules {
 
 		add_filter( 'woocommerce_get_variation_prices_hash', array( $this, 'variation_price_hash' ), 9, 2 );
 
-		add_filter(
-			'woocommerce_get_price_html',
-			function ( $price_html, $product ) {
-
-				if ( ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) || ! ( is_object( $product ) && is_a( $product, 'WC_Product' ) ) ) {
-					return $price_html;
-				}
-
-				do_action( 'wholesalex_dynamic_rule_get_price_html' );
-
-				// Actions when user is logged out.
-				if ( ! is_user_logged_in() ) {
-					// Login to view price on product listing page.
-					$lvp_pl = wholesalex()->get_setting( '_settings_login_to_view_price_product_list' );
-
-					// Login to view price on product single page.
-					$lvp_sp = wholesalex()->get_setting( '_settings_login_to_view_price_product_page' );
-
-					if ( ( is_product() && 'yes' === $lvp_sp ) || ( ! is_product() && 'yes' === $lvp_pl ) ) {
-
-						$lvp_url = wholesalex()->get_setting( '_settings_login_to_view_price_login_url', get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
-						$lvp_url = esc_url(add_query_arg('redirect', isset($_SERVER['REQUEST_URI']) ? esc_url($_SERVER['REQUEST_URI']) : '', $lvp_url)); //phpcs:ignore
-
-						$this->make_product_non_purchasable_and_remove_add_to_cart( $product );
-						$price_html = '<div><a class="wsx-link" href="' . $lvp_url . '">' . esc_html( wholesalex()->get_language_n_text( '_language_login_to_see_prices', __( 'Login to see prices', 'wholesalex' ) ) ) . '</a></div>';
-
-						return $price_html;
-					}
-				}
-
-				$rp = $product->get_regular_price();
-				if ( $rp ) {
-					$rp = wc_get_price_to_display( $product, array( 'price' => $rp ) );
-				}
-				$sp = $product->get_sale_price();
-				if ( $sp ) {
-					$sp = wc_get_price_to_display( $product, array( 'price' => $sp ) );
-				}
-
-				// Check if product has custom price set by WooCommerce Product Addons plugin Compatibility.
-				$is_woo_custom_price = get_post_meta( $product->get_id(), '_product_addons', true );
-				if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $sp || $rp && is_array( $is_woo_custom_price ) && ! empty( $is_woo_custom_price ) ) {
-					add_filter(
-						'woocommerce_available_variation',
-						function ( $data, $variation ) use ( $rp, $sp ) {
-							// Set display price based on $sp or $rp.
-							$data['display_price'] = ! empty( $sp ) ? $sp : $rp;
-							return $data;
-						},
-						10,
-						2
-					);
-				}
-
-				if ( ! ( $product->is_type( 'variable' ) || $product->is_type( 'grouped' ) ) ) {
-					$is_wholesale_price_applied = wholesalex()->get_wholesalex_wholesale_prices( $product->get_id() ) ? true : false;
-					$price_html                 = $this->format_sale_price( $rp, $sp, $is_wholesale_price_applied ) . $product->get_price_suffix();
-
-					if ( is_shop() || is_product_category() ) {
-						$__product_list_page_price = wholesalex()->get_setting( '_settings_price_product_list_page', 'pricing_range' );
-						$__product_list_page_price = isset( $__product_list_page_price ) ? $__product_list_page_price : '';
-
-						$__min_sale_price = $sp;
-						$__max_sale_price = $rp;
-
-						switch ( $__product_list_page_price ) {
-							case 'pricing_range':
-								if ( $__min_sale_price === $__max_sale_price ) {
-									$__max_sale_price = $rp;
-								}
-								$__sp       = wc_format_price_range( $__min_sale_price, $__max_sale_price );
-								$__sp       = ( $rp !== $__sp ) ? $__sp = $__min_sale_price : $__sp;
-								$price_html = $this->format_sale_price( $rp, $__sp, $is_wholesale_price_applied ) . $product->get_price_suffix();
-								break;
-							case 'minimum_pricing':
-								$price_html = $this->format_sale_price( $rp, $__min_sale_price, $is_wholesale_price_applied ) . $product->get_price_suffix();
-								break;
-							case 'maximum_pricing':
-								$price_html = $this->format_sale_price( $rp, $__max_sale_price, $is_wholesale_price_applied ) . $product->get_price_suffix();
-								break;
-							default:
-								$price_html = $this->format_sale_price( $rp, $sp, $is_wholesale_price_applied ) . $product->get_price_suffix();
-								break;
-						}
-					}
-				}
-
-				if ( $product->is_type( 'variable' ) ) {
-					$variations_ids             = $product->get_children();
-					$variation_sale_prices      = array();
-					$variation_regular_prices   = array();
-					$is_wholesale_price_applied = true;
-
-					foreach ( $variations_ids as $variation_id ) {
-						$variation_obj = wc_get_product( $variation_id );
-						$regular_price = $variation_obj->get_regular_price();
-						if ( ! empty( $regular_price ) ) {
-							$variation_regular_prices[]  = $regular_price;
-							$is_wholesale_price_applied &= wholesalex()->get_wholesalex_wholesale_prices( $variation_id ) ? true : false;
-							$sale_price                  = $variation_obj->get_sale_price();
-							if ( ! empty( $sale_price ) ) {
-								$variation_sale_prices[] = $sale_price;
-							}
-						}
-					}
-
-					// If variations exist and wholesale price is applied.
-					if ( ! empty( $variations_ids ) && $is_wholesale_price_applied && ! empty( $variation_sale_prices ) ) {
-						$min_sp = min( $variation_sale_prices );
-						$max_sp = max( $variation_sale_prices );
-						$min_rp = min( $variation_regular_prices );
-						$max_rp = max( $variation_regular_prices );
-						if ( '' !== $min_sp && '' !== $max_sp && '' !== $min_rp && '' !== $max_rp ) {
-							$min_sp = wc_get_price_to_display( $product, array( 'price' => $min_sp ) );
-							$max_sp = wc_get_price_to_display( $product, array( 'price' => $max_sp ) );
-							$min_rp = wc_get_price_to_display( $product, array( 'price' => $min_rp ) );
-							$max_rp = wc_get_price_to_display( $product, array( 'price' => $max_rp ) );
-						}
-						$sp         = ( $min_sp !== $max_sp ) ? wc_format_price_range( $min_sp, $max_sp ) : $min_sp;
-						$rp         = ( $min_rp !== $max_rp ) ? wc_format_price_range( $min_rp, $max_rp ) : $min_rp;
-						$price_html = $this->format_sale_price( $rp, $sp, $is_wholesale_price_applied ) . $product->get_price_suffix();
-					}
-				}
-				return apply_filters( 'wholesalex_get_price_html', $price_html, $product );
-			},
-			9,
-			2
-		);
+		add_filter( 'woocommerce_get_price_html', array( $this, 'woocommerce_get_price_html' ), 9, 2 );
 
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_cart_price' ) );
+		add_filter( 'woocommerce_cart_item_price', array( $this, 'set_cart_item_price_to_display' ), 10, 2 );
+	}
+
+	/**
+	 * Check if the given product is the Wholesalex wallet top-up product.
+	 *
+	 * @param int $product_id product id of the product.
+	 *
+	 * @return bool Returns the sale price if it's a top-up product, or null otherwise.
+	 */
+	public function is_wholesalex_topup_product( $product_id ) {
+		$_topup_product_id = get_option( '__wholesalex_wallet_topup_product' );
+
+		if ( $_topup_product_id && $_topup_product_id == $product_id ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function woocommerce_get_price_html( $price_html, $product ) {
+		if ( ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) || ! ( is_object( $product ) && is_a( $product, 'WC_Product' ) ) ) {
+			return $price_html;
+		}
+
+		do_action( 'wholesalex_dynamic_rule_get_price_html' );
+
+		// Actions when user is logged out.
+		if ( ! is_user_logged_in() ) {
+			// Login to view price on product listing page.
+			$lvp_pl = wholesalex()->get_setting( '_settings_login_to_view_price_product_list' );
+
+			// Login to view price on product single page.
+			$lvp_sp = wholesalex()->get_setting( '_settings_login_to_view_price_product_page' );
+
+			if ( ( is_product() && 'yes' === $lvp_sp ) || ( ! is_product() && 'yes' === $lvp_pl ) ) {
+
+				$lvp_url = wholesalex()->get_setting( '_settings_login_to_view_price_login_url', get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
+				$lvp_url = esc_url(add_query_arg('redirect', isset($_SERVER['REQUEST_URI']) ? esc_url($_SERVER['REQUEST_URI']) : '', $lvp_url)); //phpcs:ignore
+
+				$this->make_product_non_purchasable_and_remove_add_to_cart( $product );
+				$price_html = '<div><a class="wsx-link" href="' . $lvp_url . '">' . esc_html( wholesalex()->get_language_n_text( '_language_login_to_see_prices', __( 'Login to see prices', 'wholesalex' ) ) ) . '</a></div>';
+
+				return $price_html;
+			}
+		}
+
+		$rp = $product->get_regular_price();
+		if ( $rp ) {
+			$rp = wc_get_price_to_display( $product, array( 'price' => $rp ) );
+		}
+		$sp = $product->get_sale_price();
+		if ( $sp ) {
+			$sp = wc_get_price_to_display( $product, array( 'price' => $sp ) );
+		}
+
+		$db_price = $product->get_price( 'edit' );
+
+		// Check if product has custom price set by WooCommerce Product Addons plugin Compatibility.
+		$is_woo_custom_price = get_post_meta( $product->get_id(), '_product_addons', true );
+		if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $sp || $rp && is_array( $is_woo_custom_price ) && ! empty( $is_woo_custom_price ) ) {
+			add_filter(
+				'woocommerce_available_variation',
+				function ( $data, $variation ) use ( $rp, $sp ) {
+					// Set display price based on $sp or $rp.
+					$data['display_price'] = ! empty( $sp ) ? $sp : $rp;
+					return $data;
+				},
+				10,
+				2
+			);
+		}
+
+		if ( ! ( $product->is_type( 'variable' ) || $product->is_type( 'grouped' ) ) ) {
+			$is_wholesale_price_applied = wholesalex()->get_wholesalex_wholesale_prices( $product->get_id() ) ? true : false;
+			if ( $sp == $db_price ) {
+				return apply_filters( 'wholesalex_get_price_html', $price_html, $product );
+			}
+
+			$price_html = $this->format_sale_price( $rp, $sp, $is_wholesale_price_applied ) . $product->get_price_suffix();
+
+			if ( is_shop() || is_product_category() ) {
+				$__product_list_page_price = wholesalex()->get_setting( '_settings_price_product_list_page', 'pricing_range' );
+				$__product_list_page_price = isset( $__product_list_page_price ) ? $__product_list_page_price : '';
+
+				$__min_sale_price = $sp;
+				$__max_sale_price = $rp;
+
+				switch ( $__product_list_page_price ) {
+					case 'pricing_range':
+						if ( $__min_sale_price === $__max_sale_price ) {
+							$__max_sale_price = $rp;
+						}
+						$__sp       = wc_format_price_range( $__min_sale_price, $__max_sale_price );
+						$__sp       = ( $rp !== $__sp ) ? $__sp = $__min_sale_price : $__sp;
+						$price_html = $this->format_sale_price( $rp, $__sp, $is_wholesale_price_applied ) . $product->get_price_suffix();
+						break;
+					case 'minimum_pricing':
+						$price_html = $this->format_sale_price( $rp, $__min_sale_price, $is_wholesale_price_applied ) . $product->get_price_suffix();
+						break;
+					case 'maximum_pricing':
+						$price_html = $this->format_sale_price( $rp, $__max_sale_price, $is_wholesale_price_applied ) . $product->get_price_suffix();
+						break;
+					default:
+						$price_html = $this->format_sale_price( $rp, $sp, $is_wholesale_price_applied ) . $product->get_price_suffix();
+						break;
+				}
+			}
+		}
+
+		if ( $product->is_type( 'variable' ) ) {
+			$variations_ids             = $product->get_children();
+			$variation_sale_prices      = array();
+			$variation_regular_prices   = array();
+			$is_wholesale_price_applied = true;
+
+			foreach ( $variations_ids as $variation_id ) {
+				$variation_obj = wc_get_product( $variation_id );
+				$regular_price = $variation_obj->get_regular_price();
+				if ( ! empty( $regular_price ) ) {
+					$variation_regular_prices[]  = $regular_price;
+					$is_wholesale_price_applied &= wholesalex()->get_wholesalex_wholesale_prices( $variation_id ) ? true : false;
+					$sale_price                  = $variation_obj->get_sale_price();
+					if ( ! empty( $sale_price ) ) {
+						$variation_sale_prices[] = $sale_price;
+					}
+				}
+			}
+
+			// If variations exist and wholesale price is applied.
+			if ( ! empty( $variations_ids ) && $is_wholesale_price_applied && ! empty( $variation_sale_prices ) ) {
+				$min_sp = min( $variation_sale_prices );
+				$max_sp = max( $variation_sale_prices );
+				$min_rp = min( $variation_regular_prices );
+				$max_rp = max( $variation_regular_prices );
+				if ( '' !== $min_sp && '' !== $max_sp && '' !== $min_rp && '' !== $max_rp ) {
+					$min_sp = wc_get_price_to_display( $product, array( 'price' => $min_sp ) );
+					$max_sp = wc_get_price_to_display( $product, array( 'price' => $max_sp ) );
+					$min_rp = wc_get_price_to_display( $product, array( 'price' => $min_rp ) );
+					$max_rp = wc_get_price_to_display( $product, array( 'price' => $max_rp ) );
+				}
+				$sp         = ( $min_sp !== $max_sp ) ? wc_format_price_range( $min_sp, $max_sp ) : $min_sp;
+				$rp         = ( $min_rp !== $max_rp ) ? wc_format_price_range( $min_rp, $max_rp ) : $min_rp;
+				$price_html = $this->format_sale_price( $rp, $sp, $is_wholesale_price_applied ) . $product->get_price_suffix();
+			}
+		}
+		return apply_filters( 'wholesalex_get_price_html', $price_html, $product );
+	}
+
+	/**
+	 * Adjusts the displayed cart item price to include custom addon prices from the
+	 * WooCommerce Product Addons plugin. This affects the price shown to the user,
+	 * but not the actual cart total calculations.
+	 *
+	 * @param string $price     The original formatted price string to display.
+	 * @param array  $cart_item The cart item array containing product data and possible addons.
+	 *
+	 * @return string Modified formatted price including addon prices if applicable.
+	 */
+	public function set_cart_item_price_to_display( $price, $cart_item ) {
+		$woo_custom_price = 0;
+		$product          = $cart_item['data'];
+
+		// Check if product has custom price set by WooCommerce Product Addons plugin Compatibility.
+		if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && isset( $cart_item['addons'] ) && is_array( $cart_item['addons'] ) ) {
+			foreach ( $cart_item['addons'] as $addon ) {
+				if ( isset( $addon['price'] ) ) {
+					$woo_custom_price += $addon['price'];
+				}
+			}
+
+			$price = $product->is_on_sale() ? wc_price( $product->get_sale_price() ) : wc_price( $product->get_regular_price() );
+
+		}
+
+		return $price;
 	}
 
 	/**
@@ -6833,49 +6940,69 @@ class WHOLESALEX_Dynamic_Rules {
 			return;
 		}
 
-		$woo_custom_price = 0;
 		foreach ( $cart->get_cart() as $cart_item ) {
-			$product = $cart_item['data'];
+			$woo_custom_price = 0;
+			$product          = $cart_item['data'];
+			$product_id       = $product->get_id();
 
+			if ( $this->is_wholesalex_topup_product( $product_id ) ) {
+				return;
+			}
+
+			$price = $product->is_on_sale() ? $product->get_sale_price() : $product->get_regular_price();
 			// Check if product has custom price set by WooCommerce Product Addons plugin Compatibility.
 			if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && isset( $cart_item['addons'] ) && is_array( $cart_item['addons'] ) ) {
 				foreach ( $cart_item['addons'] as $addon ) {
-					if ( isset( $addon['price'] ) ) {
-						$woo_custom_price = $addon['price'];
+					if ( isset( $addon['price'], $addon['price_type'] ) ) {
+						switch ( $addon['price_type'] ) {
+							case 'flat_fee':
+								$woo_custom_price += $addon['price'];
+								break;
+							case 'percentage_based':
+								$woo_custom_price += $price + ( $price * $addon['price'] * ( 1 / 100 ) );
+								break;
+							case 'quantity_based':
+								$woo_custom_price += $addon['price'];
+								break;
+
+							default:
+								break;
+						}
 					}
 				}
 			}
 
 			if ( ! $product->is_type( 'simple' ) ) {
-				$price = $product->is_on_sale() ? $product->get_sale_price() : $product->get_regular_price();
 				// Check if product has custom price set by WooCommerce Product Addons plugin Compatibility.
-				$is_woo_custom_price      = floatval( get_post_meta( $product->get_parent_id(), '_product_addons', true ) );
-				$regular_price            = floatval( $product->get_regular_price() );
-				$sale_price               = floatval( $product->get_sale_price() );
-				$id                       = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
-				$_sale_price              = floatval( get_post_meta( $id, '_sale_price', true ) );
-				$regular_price            = floatval( get_post_meta( $id, '_regular_price', true ) ) + $woo_custom_price;
-				$regular_price            = 0.0 === $regular_price ? 1 : $regular_price;
-				$get_discount             = abs( $sale_price - $regular_price ) / $regular_price;
-				$discouned_price          = number_format( $get_discount, 2, '.', '' );
-				$__current_role_id        = wholesalex()->get_current_user_role();
-				$is_sale_price_modified   = $sale_price - $woo_custom_price === $_sale_price;
-				$is_user_role_price_apply = false;
-				if ( isset( $__current_role_id ) ) {
-					$_user_role_base_price    = floatval( get_post_meta( $id, $__current_role_id . '_base_price', true ) );
-					$_user_role_sale_price    = floatval( get_post_meta( $id, $__current_role_id . '_sale_price', true ) );
-					$is_user_role_price_apply = ( ! empty( $_user_role_base_price ) || ! empty( $_user_role_sale_price ) ) ? true : false;
-				}
+				$is_woo_custom_price = floatval( get_post_meta( $product->get_parent_id(), '_product_addons', true ) );
+				$regular_price       = floatval( $product->get_regular_price() );
+				$sale_price          = floatval( $product->get_sale_price() );
+				$id                  = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+				$_sale_price         = floatval( get_post_meta( $id, '_sale_price', true ) );
+				$regular_price       = floatval( get_post_meta( $id, '_regular_price', true ) ) + $woo_custom_price;
+				$regular_price       = 0.0 === $regular_price ? 1 : $regular_price;
+				$get_discount        = abs( $sale_price - $regular_price ) / $regular_price;
+				$discouned_price     = number_format( $get_discount, 2, '.', '' );
+				$__current_role_id   = wholesalex()->get_current_user_role();
+				$quantity            = $cart_item['quantity'];
+
+				// $is_sale_price_modified   = $sale_price - $woo_custom_price === $_sale_price;
+				// $is_user_role_price_apply = false;
+				// if ( isset( $__current_role_id ) ) {
+				// $_user_role_base_price    = floatval( get_post_meta( $id, $__current_role_id . '_base_price', true ) );
+				// $_user_role_sale_price    = floatval( get_post_meta( $id, $__current_role_id . '_sale_price', true ) );
+				// $is_user_role_price_apply = ( ! empty( $_user_role_base_price ) || ! empty( $_user_role_sale_price ) ) ? true : false;
+				// }
 				$calculate_totlal_price = ( $regular_price - $woo_custom_price ) * ( 1 - $discouned_price );
-				if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 && isset( $is_woo_custom_price ) && ! empty( $is_woo_custom_price ) && $is_user_role_price_apply ) {
-					// Set the Price with user role price.
-					$product->set_price( max( 0, $this->price_after_currency_changed( $price ) ) + $woo_custom_price );
-				} elseif ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 && isset( $is_woo_custom_price ) && ! empty( $is_woo_custom_price ) && ! $is_sale_price_modified ) {
-					// Set the Price without user role price.
-					$product->set_price( max( 0, $this->price_after_currency_changed( $calculate_totlal_price ) ) + $woo_custom_price );
-				} else {
-					// Set the Default Price.
-					$product->set_price( max( 0, $this->price_after_currency_changed( $price ) ) );
+			if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 ) {
+
+				if ( $quantity > 0 ) {
+					$adjusted_unit_price = ( $price * $quantity + $woo_custom_price ) / $quantity;
+					$product->set_price( max( 0, $this->price_after_currency_changed( $adjusted_unit_price ) ) );
+				}
+			} else {
+				// Set the Default Price.
+				$product->set_price( max( 0, $this->price_after_currency_changed( $price ) ) );
 				}
 			}
 		}
@@ -7176,6 +7303,17 @@ class WHOLESALEX_Dynamic_Rules {
 		$role_base_sale_price = get_post_meta( $product->get_id(), $user_id . '_sale_price', true );
 		return $role_base_sale_price;
 	}
+	/**
+	 * Get Role Base Price
+	 *
+	 * @param mixed  $product Product.
+	 * @param string $user_id User ID.
+	 * @return  mixed
+	 */
+	public function get_role_regular_price( $product, $user_id = '' ) {
+		$role_base_sale_price = get_post_meta( $product->get_id(), $user_id . '_base_price', true );
+		return $role_base_sale_price;
+	}
 
 	/**
 	 * Calculate Regular Price
@@ -7198,7 +7336,13 @@ class WHOLESALEX_Dynamic_Rules {
 		}
 		$is_regular_price = wholesalex()->get_setting( '_is_sale_or_regular_Price', 'is_regular_price' );
 		if ( 'is_sale_price' === $is_regular_price ) {
-			$role_sale_price        = floatval( $this->get_role_base_sale_price( $product, $data['role_id'] ) );
+			$role_sale_price    = floatval( $this->get_role_base_sale_price( $product, $data['role_id'] ) );
+			$role_regular_price = get_post_meta( $product->get_id(), $data['role_id'] . '_base_price', true );
+
+			// if sale price is empty and role base price present.
+			if ( 0 == $role_sale_price && ! empty( $role_regular_price ) ) {
+				return $regular_price;
+			}
 			$db_sale_price          = floatval( get_post_meta( $product->get_id(), '_sale_price', true ) );
 			$get_session_sale_price = 0;
 			if ( WC()->session && null !== WC()->session->get( 'wsx_sale_price' ) ) {
@@ -7233,13 +7377,32 @@ class WHOLESALEX_Dynamic_Rules {
 		$parent_id  = $product->get_parent_id();
 		$product_id = $product->get_id();
 		// Product Base Price for further calculation.
+
+		$current_role       = wholesalex()->get_current_user_role();
+		$role_sale_price    = floatval( $this->get_role_base_sale_price( $product, $current_role ) );
+		$role_regular_price = floatval( $this->get_role_regular_price( $product, $current_role ) );
+
+		$has_rolewise_price = $role_sale_price || $role_regular_price;
+
+		if ( ! $role_sale_price && $role_regular_price ) {
+			$sale_price = false;
+		}
 		$base_price = $product->get_regular_price();
+		if ( $has_rolewise_price ) {
+			$base_price = $this->get_actual_discount_price( $product, $role_regular_price, $role_sale_price ? $role_sale_price : $role_regular_price );
+		}
+
+		$is_regular_price = wholesalex()->get_setting( '_is_sale_or_regular_Price', 'is_regular_price' );
 
 		$base_price = $this->price_after_currency_changed( $base_price );
 
 		$rrs = false;
 
 		$previous_sp = $sale_price;
+
+		if ( $has_rolewise_price || 'is_regular_price' === $is_regular_price ) {
+			$sale_price = false;
+		}
 
 		$used_rule_id = '';
 
@@ -7248,7 +7411,16 @@ class WHOLESALEX_Dynamic_Rules {
 			$priority         = wholesalex()->get_quantity_based_discount_priorities();
 			$flipped_priority = array_flip( wholesalex()->get_quantity_based_discount_priorities() );
 			if ( isset( $data['role_id'] ) && ! empty( $data['role_id'] ) ) {
-				$rrs = get_post_meta( $product_id, $data['role_id'] . '_sale_price', true );
+				if ( 'is_regular_price' === $is_regular_price ) {
+					if ( $role_sale_price ) {
+						$rrs = $role_sale_price;
+					} else {
+						$rrs = get_post_meta( $product_id, $data['role_id'] . '_base_price', true );
+					}
+				} else {
+					$rrs = get_post_meta( $product_id, $data['role_id'] . '_sale_price', true );
+
+				}
 			} else {
 				$rrs = false;
 			}
@@ -7258,7 +7430,6 @@ class WHOLESALEX_Dynamic_Rules {
 			if ( $flipped_priority['dynamic_rule'] < $flipped_priority['single_product'] ) {
 
 				if ( ! empty( $data['product_discount'] ) ) {
-
 					foreach ( $data['product_discount'] as $pd ) {
 
 						if ( self::is_eligible_for_rule( $parent_id ? $parent_id : $product_id, $product_id, $pd['filter'] ) ) {
@@ -7284,6 +7455,7 @@ class WHOLESALEX_Dynamic_Rules {
 							$used_rule_id         = $pd['id'];
 							$sale_price           = wholesalex()->calculate_sale_price( $pd['rule'], $base_price );
 							$applied_discount_src = 'product_discount';
+
 						}
 					}
 				}
@@ -7293,6 +7465,7 @@ class WHOLESALEX_Dynamic_Rules {
 					$sale_price = floatval( $rrs );
 				}
 			} elseif ( ! $rrs && ! empty( $data['product_discount'] ) ) {
+
 				foreach ( $data['product_discount'] as $pd ) {
 
 					if ( self::is_eligible_for_rule( $parent_id ? $parent_id : $product_id, $product_id, $pd['filter'] ) ) {
@@ -7346,7 +7519,15 @@ class WHOLESALEX_Dynamic_Rules {
 				$cart_qty = wholesalex()->cart_count( $product_id );
 			}
 			$tier_res = array();
+
+			$current_role       = wholesalex()->get_current_user_role();
+			$role_sale_price    = floatval( $this->get_role_base_sale_price( $product, $current_role ) );
+			$role_regular_price = floatval( $this->get_role_regular_price( $product, $current_role ) );
+
+			$has_rolewise_price = $role_sale_price || $role_regular_price;
+
 			foreach ( $priority as $pr ) {
+
 				$tier_res = $this->get_priority_wise_tier_price( $pr, $data, $product_id, $parent_id, $base_price, $cart_qty, true );
 
 				if ( ! empty( $tier_res['tiers'] ) && ! isset( $this->active_tiers[ $product_id ] ) ) {

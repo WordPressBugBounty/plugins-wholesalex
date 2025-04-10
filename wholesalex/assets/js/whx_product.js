@@ -1982,12 +1982,21 @@ const Product = _ref => {
   const inputData = (fieldData, fieldName, tierName) => {
     const flag = tier[tierName] && tier[tierName][fieldName];
     const defValue = flag ? tier[tierName][fieldName] : fieldData.default;
+    let requiredText = '';
+    if (parseFloat(tier[tierName].wholesalex_sale_price) > parseFloat(tier[tierName].wholesalex_base_price)) {
+      requiredText = 'Sale price must be less than base price';
+    } else if (tier[tierName].wholesalex_sale_price && !tier[tierName].wholesalex_base_price) {
+      requiredText = 'Base price is required';
+    }
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_1___default().createElement(_components_Input__WEBPACK_IMPORTED_MODULE_3__["default"], {
       className: "wholesalex_single_product_field",
       label: fieldData.label,
       type: fieldData.type,
       name: fieldName,
       value: defValue,
+      required: fieldData.label === 'Base Price' && requiredText ? true : false,
+      help: fieldData.label === 'Base Price' && requiredText,
+      helpClass: 'wsx-color-negative',
       onChange: e => {
         const parent = _objectSpread({}, tier);
         const copy = parent[tierName];

@@ -1154,12 +1154,6 @@ class WHOLESALEX_Product {
 			'wholesalex_product',
 			array(
 				'roles' => wholesalex()->get_roles( 'b2b_roles_option' ),
-				'i18n'  => array(
-					// 'unlock'         => __( 'UNLOCK', 'wholesalex' ),
-					// 'unlock_heading' => __( 'Unlock All Features with', 'wholesalex' ),
-					// 'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
-					// 'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
-				),
 			)
 		);
 		$settings = wholesalex()->get_single_product_setting();
@@ -1328,6 +1322,17 @@ class WHOLESALEX_Product {
 
 			// filter the tier value which is empty.
 			$filtered_products_data = $this->filter_tiers( $product_discounts );
+
+			// if the sale price is greater than base price, make the sale price empty.
+			foreach ( $filtered_products_data as &$role ) {
+				$sale_price = $role['wholesalex_sale_price'];
+				$base_price = $role['wholesalex_base_price'];
+
+				if ( floatval( $sale_price ) > floatval( $base_price ) ) {
+					$role['wholesalex_sale_price'] = '';
+				}
+			}
+
 			wholesalex()->save_single_product_discount( $post_id, $filtered_products_data );
 		}
 

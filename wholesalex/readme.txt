@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
 Tested up to: 6.7
 Requires PHP: 7.3
-Stable tag: 2.0.10
+Stable tag: 2.0.11
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -209,6 +209,14 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.0.11 - 9 April 2025 =
+* Improvement: Resolved price conflict between WooCommerce and WholesaleX role-based pricing.
+* Improvement: Added Compatibility With WPC product bundles.
+* Improvement: Compatibility With woocommerce Product addons.
+* Improvement: Saving pagination state in dynamic rules page.
+* Fix : Wallet Top up is not working issue Fixed.
+* Fix : Fixed dynamic rules display issue.
 
 = 2.0.10 - 20 March 2025 =
 * Fix: reCAPTCHA Issue Fixed.
