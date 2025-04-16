@@ -1788,9 +1788,11 @@ const MultiSelect = _ref => {
       content: option.name,
       position: "top",
       onlyText: true
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "multiselect-option-name"
-    }, decodeHtmlEntities(option.name))));
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("a", {
+      href: option.permalink,
+      target: "_blank",
+      rel: "noopener noreferrer"
+    }, decodeHtmlEntities(option.name)))));
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "wsx-multiselect-option-wrapper ".concat(selectedOptions.length && selectedOptions.length !== 0 ? '' : 'wsx-w-full')
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {

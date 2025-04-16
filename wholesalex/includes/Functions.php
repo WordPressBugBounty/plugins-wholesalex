@@ -2191,7 +2191,7 @@ class Functions {
 						0 =>
 							array(
 								'type'           => 'text',
-								'label'          => __( 'Username or email address', 'wholesalex' ),
+								'label'          => 'Username or email address',
 								'name'           => 'username',
 								'isLabelHide'    => false,
 								'placeholder'    => '',
@@ -2211,7 +2211,7 @@ class Functions {
 						0 =>
 							array(
 								'type'           => 'password',
-								'label'          => __( 'Password', 'wholesalex' ),
+								'label'          => 'Password',
 								'name'           => 'password',
 								'isLabelHide'    => false,
 								'placeholder'    => '',
@@ -2239,7 +2239,7 @@ class Functions {
 							array(
 								0 =>
 									array(
-										'name'  => __( 'Remember me', 'wholesalex' ),
+										'name'  => 'Remember me',
 										'value' => 'rememberme',
 									),
 							),

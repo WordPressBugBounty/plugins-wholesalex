@@ -1336,6 +1336,7 @@ class WHOLESALEX_Dynamic_Rules {
 				$product = array(
 					'value' => strval( $product_id ),
 					'name'  => esc_attr( $__product->get_name() ),
+					'permalink' => get_permalink( $product_id ),
 				);
 				if ( $without_child ) {
 					$__childrens = $__product->get_children();
@@ -1374,9 +1375,11 @@ class WHOLESALEX_Dynamic_Rules {
 		$categories_options = array();
 
 		foreach ( $categories as $category ) {
+			$permalink = get_term_link( $category );
 			$categories_options[] = array(
 				'value' => strval( $category->term_id ),
 				'name'  => $category->name,
+				'permalink'   => esc_url( $permalink ),
 			);
 		}
 
@@ -2383,7 +2386,7 @@ class WHOLESALEX_Dynamic_Rules {
 				return apply_filters( 'wholesalex_regular_sale_price_hidden_text', wholesalex()->get_language_n_text( '_language_price_is_hidden', 'Price is hidden!' ) );
 			}
 			if ( 'yes' === (string) $__hide_regular_price && ! empty( $sale_price ) ) {
-				if ( is_string( $sale_price ) && $product->get_type() === 'variable' ) {
+				if ( is_string( $sale_price ) && $product && $product->get_type() === 'variable' ) {
 					return $sale_text . $sale_price;
 				}
 				return $sale_text . wc_price( floatval( $sale_price ) );
@@ -3829,7 +3832,13 @@ class WHOLESALEX_Dynamic_Rules {
 				$exclude_variations = array();
 				$is_all_products    = false;
 
-				extract( $this->get_filtered_rules( $discount ) );
+				// Dynamic Rules Apply in Admin order or not.
+				$is_dynamic_rules_apply_in_backend = apply_filters( 'is_dynamic_rules_work_in_backend', true );
+				if ( ! is_admin() && '' !== $is_dynamic_rules_apply_in_backend ) {
+					extract( $this->get_filtered_rules( $discount ) );
+				} elseif ( is_admin() && $is_dynamic_rules_apply_in_backend ) {
+					extract( $this->get_filtered_rules( $discount ) );
+				}
 			} else {
 				continue;
 			}
@@ -6922,8 +6931,10 @@ class WHOLESALEX_Dynamic_Rules {
 				}
 			}
 
-			$price = $product->is_on_sale() ? wc_price( $product->get_sale_price() ) : wc_price( $product->get_regular_price() );
-
+			// if custom price is present then it will effect.
+			if ( $woo_custom_price > 0 ) {
+				$price = $product->is_on_sale() ? wc_price( $product->get_sale_price() ) : wc_price( $product->get_regular_price() );
+			}
 		}
 
 		return $price;
@@ -6994,15 +7005,15 @@ class WHOLESALEX_Dynamic_Rules {
 				// $is_user_role_price_apply = ( ! empty( $_user_role_base_price ) || ! empty( $_user_role_sale_price ) ) ? true : false;
 				// }
 				$calculate_totlal_price = ( $regular_price - $woo_custom_price ) * ( 1 - $discouned_price );
-			if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 ) {
+				if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 ) {
 
-				if ( $quantity > 0 ) {
-					$adjusted_unit_price = ( $price * $quantity + $woo_custom_price ) / $quantity;
-					$product->set_price( max( 0, $this->price_after_currency_changed( $adjusted_unit_price ) ) );
-				}
-			} else {
-				// Set the Default Price.
-				$product->set_price( max( 0, $this->price_after_currency_changed( $price ) ) );
+					if ( $quantity > 0 ) {
+						$adjusted_unit_price = ( $price * $quantity + $woo_custom_price ) / $quantity;
+						$product->set_price( max( 0, $this->price_after_currency_changed( $adjusted_unit_price ) ) );
+					}
+				} else {
+					// Set the Default Price.
+					$product->set_price( max( 0, $this->price_after_currency_changed( $price ) ) );
 				}
 			}
 		}

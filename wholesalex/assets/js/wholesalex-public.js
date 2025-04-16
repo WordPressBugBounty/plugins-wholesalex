@@ -107,27 +107,27 @@
 			const $quantityInput = $( this ).parent().find( '[name=quantity]' );
 			const step = variation.step || 1; // Default step to 1 if not provided
 			const maxQty = parseFloat( variation.max_qty ) || 999999999; // Default max_qty to a large number
-			const minQty = parseFloat( variation.min_qty ) || 0; // Default min_qty to 0
+			const minQty = parseFloat( variation.min_qty ) || 1; // Default min_qty to 0
 
 			// Set step and trigger change event
 			$quantityInput.attr( 'step', step ).trigger( 'change' );
 
 			// Parse and adjust current quantity value
-			let currentQty = parseFloat( $quantityInput.val() ) || minQty;
+			let currentQty = minQty ?? parseFloat( $quantityInput.val() );
 			currentQty = Math.max( minQty, Math.min( currentQty, maxQty ) ); // Ensure within min and max range
 
 			// Adjust quantity if step is defined
-			if ( step ) {
-				const remainder = currentQty % step;
-				if ( remainder !== 0 ) {
-					const increaseBy = step - remainder;
-					const decreaseBy = remainder;
-					currentQty =
-						currentQty + increaseBy <= maxQty
-							? currentQty + increaseBy
-							: currentQty - decreaseBy;
-				}
-			}
+			// if ( step ) {
+			// 	const remainder = currentQty % step;
+			// 	if ( remainder !== 0 ) {
+			// 		const increaseBy = step - remainder;
+			// 		const decreaseBy = remainder;
+			// 		currentQty =
+			// 			currentQty + increaseBy <= maxQty
+			// 				? currentQty + increaseBy
+			// 				: currentQty - decreaseBy;
+			// 	}
+			// }
 
 			// Update input attributes and value
 			$quantityInput

@@ -2,9 +2,9 @@
 Contributors: wpxpo, anik4e, jakirhasan
 Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 2.0.11
+Stable tag: 2.0.12
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -22,7 +22,7 @@ Best WooCommerce wholesale plugin with features like b2b wholesale prices, whole
 
 ## WholesaleX - The Ultimate WooCommerce Wholesale Plugin! 
 
-WholesaleX is the most advanced WooCommercwe wholesale plugin that comes with all the essential features that an ideal wholesaling store should have. However, it also comes with more effective features such as dynamic pricing & discounts, request a quote, buy x get y, etc, which are suitable for both woocommerce wholesale and retail stores.
+WholesaleX is the most advanced WooCommerce wholesale plugin that comes with all the essential features that an ideal wholesaling store should have. However, it also comes with more effective features such as dynamic pricing & discounts, request a quote, buy x get y, etc, which are suitable for both woocommerce wholesale and retail stores.
 
 And with features like catalog mode, and logging in to view prices, you can manage both B2C and B2B customers in the same store. That’s why WholesaleX is the best WooCommerce Wholesale Plugin.
 
@@ -210,13 +210,19 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 
 == Changelog ==
 
-= 2.0.11 - 9 April 2025 =
+= 2.0.12 - 16 April 2025 =
+* Improvement: Added a filter hook to allow Admin to enable or disable the use of Dynamic Rules in the backend.
+* Improvement: Made dynamic rules products and categories clickable for easier navigation.
+* Fix : Resolved the issue where the minimum quantity and step counter were not resetting for variation products.
+* Fix : Fixed translation warning with WordPress version 6.8.
+
+= 2.0.11 - 10 April 2025 =
 * Improvement: Resolved price conflict between WooCommerce and WholesaleX role-based pricing.
 * Improvement: Added Compatibility With WPC product bundles.
 * Improvement: Compatibility With woocommerce Product addons.
 * Improvement: Saving pagination state in dynamic rules page.
-* Fix : Wallet Top up is not working issue Fixed.
 * Fix : Fixed dynamic rules display issue.
+* Fix : Fixed an issue with saving addons.
 
 = 2.0.10 - 20 March 2025 =
 * Fix: reCAPTCHA Issue Fixed.
