@@ -1334,8 +1334,8 @@ class WHOLESALEX_Dynamic_Rules {
 			$__product = wc_get_product( $product_id );
 			if ( $__product ) {
 				$product = array(
-					'value' => strval( $product_id ),
-					'name'  => esc_attr( $__product->get_name() ),
+					'value'     => strval( $product_id ),
+					'name'      => esc_attr( $__product->get_name() ),
 					'permalink' => get_permalink( $product_id ),
 				);
 				if ( $without_child ) {
@@ -1375,11 +1375,11 @@ class WHOLESALEX_Dynamic_Rules {
 		$categories_options = array();
 
 		foreach ( $categories as $category ) {
-			$permalink = get_term_link( $category );
+			$permalink            = get_term_link( $category );
 			$categories_options[] = array(
-				'value' => strval( $category->term_id ),
-				'name'  => $category->name,
-				'permalink'   => esc_url( $permalink ),
+				'value'     => strval( $category->term_id ),
+				'name'      => $category->name,
+				'permalink' => esc_url( $permalink ),
 			);
 		}
 
@@ -2639,6 +2639,35 @@ class WHOLESALEX_Dynamic_Rules {
 		$table_active_bg_color     = wholesalex()->get_setting( '_settings_active_tier_bg_color', '#6C6CFF' );
 		$table_discount_text_color = wholesalex()->get_setting( '_settings_tier_discount_text_color', '#FFFFFF' );
 		$table_discount_bg_color   = wholesalex()->get_setting( '_settings_tier_discount_bg_color', '#070707' );
+		$tier_table_column         = wholesalex()->get_setting(
+			'_settings_tier_table_columns_priority',
+			array(
+				0 => array(
+					'label'  => 'Quantity_Range',
+					'value'  => 'Quantity Range',
+					'status' => 'yes',
+				),
+				1 => array(
+					'label'  => 'Discount',
+					'value'  => 'Discount',
+					'status' => '1',
+				),
+				2 => array(
+					'label'  => 'Price_Per_Unit',
+					'value'  => 'Price Per Unit',
+					'status' => '1',
+				),
+			)
+		);
+		$tier_table_length         = 0;
+
+		if ( is_array( $tier_table_column ) ) {
+			foreach ( $tier_table_column as $column ) {
+				if ( ! empty( $column['status'] ) ) {
+					++$tier_table_length;
+				}
+			}
+		}
 
 		?>
 		<style>
@@ -2651,7 +2680,7 @@ class WHOLESALEX_Dynamic_Rules {
 
 			/* Layout one */
 			.wsx-price-table-container {
-				width: max-content;
+				width: 100%;
 				border: 1px solid <?php echo esc_attr( $table_border_color ); ?>;
 				margin-bottom: 40px;
 				font-size:
@@ -2668,7 +2697,7 @@ class WHOLESALEX_Dynamic_Rules {
 				}
 			}
 			.wsx-price-table-header {
-				width: fit-content;
+				width: 100%;
 				font-weight: 600;
 				border-bottom: 1px solid <?php echo esc_attr( $table_border_color ); ?>;
 				color:
@@ -2680,9 +2709,9 @@ class WHOLESALEX_Dynamic_Rules {
 			}
 
 			.wsx-price-table-row {
-				width: fit-content;
+				width: 100%;
 				display: grid;
-				grid-template-columns: repeat(3, minmax(155px, 1fr));
+				grid-template-columns: minmax(155px, 2fr) repeat(<?php echo esc_attr( $tier_table_length - 1 ); ?>, minmax(155px, 1.9fr));
 				border-bottom: 1px solid <?php echo esc_attr( $table_border_color ); ?>;
 			}
 
@@ -2715,7 +2744,7 @@ class WHOLESALEX_Dynamic_Rules {
 				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
-				max-width: 140px;
+				max-width: 24rem;
 			}
 
 			/* Layout six */
@@ -3051,8 +3080,16 @@ class WHOLESALEX_Dynamic_Rules {
 							$__discount   = floatval( $regular_price ) - floatval( $__sale_price );
 
 							$__sale_price = wc_get_price_to_display( $product, array( 'price' => $__sale_price ) );
+
+							$cart_quantity = $this->get_product_quantity_in_cart( $product->get_id() );
+
 							?>
-							<div
+							<div 
+							<?php
+							echo isset( $__current_tier['_min_quantity'] ) && is_numeric( $__current_tier['_min_quantity'] )
+							? 'data-min="' . esc_attr( $__current_tier['_min_quantity'] ) . '"'
+							: '';
+							?>
 								class="wsx-price-table-row <?php echo esc_attr( ( ! empty( $__current_tier['_id'] ) && $__current_tier['_id'] == $active_tier ) ? 'active' : '' ); ?>">
 								<?php
 								foreach ( $table_column_priority as $column ) {
@@ -3101,6 +3138,39 @@ class WHOLESALEX_Dynamic_Rules {
 						}
 						?>
 					</div>
+					<script>
+						jQuery(function ($) {
+							const $quantityInput = $('[name=quantity]');
+							const quantityPrices = <?php echo wp_json_encode( $quantity_prices ); ?>;
+							const cartQuantity = <?php echo wp_json_encode( $cart_quantity ); ?>;
+
+							if ($quantityInput.length) {
+								$quantityInput.on('input change', function () {
+									let quantity = cartQuantity + parseInt($(this).val()) || 1;
+									let matchedTier = null;
+									let matchedMin = 0;
+
+									// Find the best matched tier where _min_quantity <= quantity
+									quantityPrices.forEach((tier) => {
+										const minQty = parseInt(tier['_min_quantity']) ;
+										if (quantity >= minQty && minQty >= matchedMin) {
+											matchedTier = minQty;
+											matchedMin = minQty;
+										}
+									});
+
+									// Remove all active classes
+									$('.wsx-price-table-row').removeClass('active');
+
+									// Add active class to matched tier row (if any)
+									if (matchedTier) {
+										$('.wsx-price-table-row[data-min="' + matchedTier + '"]').addClass('active');
+									}
+								}).trigger('change');
+							}
+						});
+						</script>
+
 				</div>
 				<?php
 				break;
@@ -3185,6 +3255,36 @@ class WHOLESALEX_Dynamic_Rules {
 		?>
 
 		<?php
+	}
+
+	/**
+	 * Get the quantity of a specific product in the WooCommerce cart.
+	 *
+	 * This function checks the current WooCommerce cart and returns the total quantity
+	 * of a given product (by product ID). It only considers the parent product ID,
+	 * not variations. If you want to count variation-specific quantities, you can modify
+	 * the function to check 'variation_id' instead.
+	 *
+	 * @param int $product_id The ID of the product to check.
+	 * @return int The total quantity of the specified product in the cart.
+	 */
+	public function get_product_quantity_in_cart( $product_id ) {
+		$quantity_in_cart = 0;
+
+		// Ensure WooCommerce cart is initialized.
+		if ( WC()->cart && ! WC()->cart->is_empty() ) {
+			foreach ( WC()->cart->get_cart() as $cart_item ) {
+				$cart_product_id = isset( $cart_item['variation_id'] ) && $cart_item['variation_id'] > 0
+				? $cart_item['variation_id']
+				: $cart_item['product_id'];
+
+				if ( $cart_product_id == $product_id ) {
+					$quantity_in_cart += $cart_item['quantity'];
+				}
+			}
+		}
+
+		return $quantity_in_cart;
 	}
 
 	/**
@@ -5231,6 +5331,13 @@ class WHOLESALEX_Dynamic_Rules {
 	 * Priority: Profile > Dynamic Rules.
 	 */
 	public function handle_tax( $data ) {
+		$current_user_id = get_current_user_id();
+		$customer        = new \WC_Customer( $current_user_id );
+
+		if ( null === WC()->customer ) {
+			WC()->customer = $customer;
+		}
+
 		if ( is_admin() || null === WC()->customer ) {
 			return;
 		}
@@ -6533,7 +6640,7 @@ class WHOLESALEX_Dynamic_Rules {
 						'pre'   => array(),
 					);
 					if ( $table_data ) {
-						echo wp_kses( $table_data, $allowed_tags );
+						echo $table_data;
 					}
 				},
 				10
@@ -6573,7 +6680,7 @@ class WHOLESALEX_Dynamic_Rules {
 		add_filter(
 			'woocommerce_product_get_price',
 			function ( $price, $product ) use ( $data ) {
-				$product_id        = $product->get_id();
+				$product_id = $product->get_id();
 
 				if ( $this->is_wholesalex_topup_product( $product_id ) ) {
 					return $price;
@@ -6648,7 +6755,7 @@ class WHOLESALEX_Dynamic_Rules {
 		add_filter(
 			'woocommerce_product_get_regular_price',
 			function ( $regular_price, $product ) use ( $data ) {
-				$product_id        = $product->get_id();
+				$product_id = $product->get_id();
 
 				if ( $this->is_wholesalex_topup_product( $product_id ) ) {
 					return $regular_price;
@@ -6692,7 +6799,7 @@ class WHOLESALEX_Dynamic_Rules {
 		add_filter(
 			'woocommerce_product_get_sale_price',
 			function ( $sale_price, $product ) use ( $data ) {
-				$product_id        = $product->get_id();
+				$product_id = $product->get_id();
 
 				if ( $this->is_wholesalex_topup_product( $product_id ) ) {
 					return $sale_price;
@@ -6786,6 +6893,21 @@ class WHOLESALEX_Dynamic_Rules {
 		}
 
 		do_action( 'wholesalex_dynamic_rule_get_price_html' );
+
+		// if user added schedule price and no role base price set then return the regular price.
+		$regular_price      = $product->get_regular_price();
+		$sale_from          = get_post_meta( $product->get_id(), '_sale_price_dates_from', true );
+		$current_time       = current_time( 'timestamp' );
+		$current_role       = wholesalex()->get_current_user_role();
+		$role_sale_price    = floatval( $this->get_role_base_sale_price( $product, $current_role ) );
+		$role_regular_price = floatval( $this->get_role_regular_price( $product, $current_role ) );
+
+		$has_rolewise_price = $role_sale_price || $role_regular_price;
+
+		if ( $sale_from > $current_time && ! $has_rolewise_price ) {
+			$scheduled_price_html = '<span class="scheduled-sale-price">' . wc_price( $regular_price ) . '</span>';
+			return $scheduled_price_html;
+		}
 
 		// Actions when user is logged out.
 		if ( ! is_user_logged_in() ) {
@@ -7389,11 +7511,20 @@ class WHOLESALEX_Dynamic_Rules {
 		$product_id = $product->get_id();
 		// Product Base Price for further calculation.
 
+		// if user added schedule pricing and no role price is set then return the regular price.
+		$regular_price = $product->get_regular_price();
+		$sale_from     = get_post_meta( $product->get_id(), '_sale_price_dates_from', true );
+		$current_time  = current_time( 'timestamp' );
+
 		$current_role       = wholesalex()->get_current_user_role();
 		$role_sale_price    = floatval( $this->get_role_base_sale_price( $product, $current_role ) );
 		$role_regular_price = floatval( $this->get_role_regular_price( $product, $current_role ) );
 
 		$has_rolewise_price = $role_sale_price || $role_regular_price;
+
+		if ( $sale_from > $current_time && ! $has_rolewise_price ) {
+			return $regular_price;
+		}
 
 		if ( ! $role_sale_price && $role_regular_price ) {
 			$sale_price = false;

@@ -2,8 +2,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$user       = get_user_by( 'login', $user_login );
-$user_email = $user->user_email; //phpcs:ignore
+$user = get_user_by( 'login', $user_login );
+
+if ( $user ) {
+	$user_email = $user->user_email; // phpcs:ignore
+}
 
 do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
 

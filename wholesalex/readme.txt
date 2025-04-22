@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
 Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 2.0.12
+Stable tag: 2.0.13
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -209,6 +209,14 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.0.13 - 22 April 2025 =
+* Improvement: Allow Multiple form validation in one page.
+* Improvement: Tier pricing table updates dynamically based on the Quantity field.
+* Improvement: Compatible with Tax blocks for the tax exemption on Cart page.
+* Fix: Fixed Woocommerce Schedule Sale is not working issue.
+* Fix: Fixed issue with user email sending.
+* Fix: Fixed Tier price table text length.
 
 = 2.0.12 - 16 April 2025 =
 * Improvement: Added a filter hook to allow Admin to enable or disable the use of Dynamic Rules in the backend.
