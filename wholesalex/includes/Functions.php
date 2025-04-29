@@ -558,7 +558,7 @@ class Functions {
 		$user_rules = array();
 
 		foreach ( $rules as $rule ) {
-			if ( isset( $rule['created_by'] ) && $rule['created_by'] === $user_id ) {
+			if ( isset( $rule['created_by'] ) && $rule['created_by'] == $user_id ) {
 				$user_rules[] = $rule;
 			}
 		}
