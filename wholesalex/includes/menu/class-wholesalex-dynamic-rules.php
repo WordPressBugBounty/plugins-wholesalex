@@ -190,7 +190,7 @@ class WHOLESALEX_Dynamic_Rules {
 		/**
 		 * Rewrite Dynamic Rules: Cart Total
 		 */
-		add_action( 'wp_loaded', array( $this, 'get_valid_dynamic_rules' ) );
+		 add_action( 'wp_loaded', array( $this, 'get_valid_dynamic_rules' ) );
 
 		add_action( 'woocommerce_blocks_loaded', array( $this, 'action_after_woo_block_loaded' ) );
 
@@ -5473,6 +5473,27 @@ class WHOLESALEX_Dynamic_Rules {
 					);
 				}
 			}
+
+			// if is_customer_vat_exempt is true then shipping tax should be zero.
+			if ( $is_customer_vat_exempt ) {
+				add_filter(
+					'woocommerce_package_rates',
+					function ( $rates, $package ) {
+						foreach ( $rates as $rate_key => $rate ) {
+							// Set taxes to zero.
+							$rates[ $rate_key ]->taxes = array_map(
+								function () {
+									return 0;
+								},
+								$rate->taxes
+							);
+						}
+						return $rates;
+					},
+					20,
+					2
+				);
+			}
 		}
 		if ( $is_customer_vat_exempt ) {
 			add_filter(
@@ -6680,6 +6701,11 @@ class WHOLESALEX_Dynamic_Rules {
 		add_filter(
 			'woocommerce_product_get_price',
 			function ( $price, $product ) use ( $data ) {
+
+				// if product is booking product.
+				if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'price' ) ) {
+					return $price;
+				}
 				$product_id = $product->get_id();
 
 				if ( $this->is_wholesalex_topup_product( $product_id ) ) {
@@ -6813,10 +6839,6 @@ class WHOLESALEX_Dynamic_Rules {
 
 				$has_rolewise_price = $role_sale_price || $role_regular_price;
 
-				// if ( $has_rolewise_price ) {
-				// $sale_price = $role_sale_price ? $role_sale_price : $role_regular_price;
-				// }
-
 				$sale_price = $this->calculate_sale_price( $sale_price, $product, $data );
 
 				return ( ! empty( $sale_price ) ) ? (float) $sale_price : $sale_price;
@@ -6887,8 +6909,21 @@ class WHOLESALEX_Dynamic_Rules {
 		return false;
 	}
 
+	/**
+	 * Modify the WooCommerce product price HTML before display.
+	 *
+	 * @param string     $price_html The original HTML for the product price.
+	 * @param WC_Product $product    The WooCommerce product object.
+	 *
+	 * @return string The modified or original product price HTML.
+	 */
 	public function woocommerce_get_price_html( $price_html, $product ) {
 		if ( ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) || ! ( is_object( $product ) && is_a( $product, 'WC_Product' ) ) ) {
+			return $price_html;
+		}
+
+		// if product is booking price.
+		if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'price_html' ) ) {
 			return $price_html;
 		}
 
@@ -7077,6 +7112,11 @@ class WHOLESALEX_Dynamic_Rules {
 			$woo_custom_price = 0;
 			$product          = $cart_item['data'];
 			$product_id       = $product->get_id();
+
+			// if product is booking product.
+			if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'cart_totals' ) ) {
+				continue;
+			}
 
 			if ( $this->is_wholesalex_topup_product( $product_id ) ) {
 				return;

@@ -364,6 +364,14 @@ class WHOLESALEX_Overview {
 				'callback'   => array( $this, 'render_submenu_page' ),
 				'identifier' => 'settings',
 			),
+			array(
+				'title'      => __( 'User Role Requests', 'wholesalex' ),
+				'menu_title' => __( 'User Role Requests', 'wholesalex' ),
+				'capability' => $manage_options_cap,
+				'slug'       => '/user_role_change_requests',
+				'callback'   => array( $this, 'render_submenu_page' ),
+				'identifier' => 'user-role-request',
+			),
 		);
 
 		if ( 'yes' !== $is_white_label_enabled ) {
@@ -376,17 +384,6 @@ class WHOLESALEX_Overview {
 				'identifier' => 'features',
 			);
 			array_splice( $submenus, 8, 0, array( $pro_submenu ) );
-		}
-		if ( 'yes' !== $is_white_label_enabled ) {
-			$pro_submenu = array(
-				'title'      => __( 'Quick Support', 'wholesalex' ),
-				'menu_title' => __( 'Quick Support', 'wholesalex' ),
-				'capability' => $manage_options_cap,
-				'slug'       => '/quick-support',
-				'callback'   => array( $this, 'render_submenu_page' ),
-				'identifier' => 'quick-support',
-			);
-			array_splice( $submenus, 9, 0, array( $pro_submenu ) );
 		}
 
 		// If Pro plugin is active, add the Pro submenu in the second position.
@@ -765,6 +762,21 @@ class WHOLESALEX_Overview {
 	}
 
 	/**
+	 * Retrieves the email address of the currently logged-in user.
+	 *
+	 * This method uses WordPress's wp_get_current_user() function to fetch
+	 * the current user object. If a user is logged in, their email address is returned.
+	 * If no user is logged in, the method returns null.
+	 */
+	public function get_current_user_info() {
+		$user_info = get_userdata( get_current_user_id() );
+		return array(
+			'name'  => $user_info->first_name ? $user_info->first_name . ( $user_info->last_name ? ' ' . $user_info->last_name : '' ) : $user_info->user_login,
+			'email' => $user_info->user_email,
+		);
+	}
+
+	/**
 	 * Output Function
 	 *
 	 * @since 1.0.0
@@ -917,6 +929,7 @@ class WHOLESALEX_Overview {
 						'pending_registration_heading'     => $this->prepare_as_heading_data( $this->get_pending_registrations_columns() ),
 						'wholesalex_conversation'          => menu_page_url( $conversation_slug, false ),
 						'wholesalex_users'                 => menu_page_url( $users_slug, false ),
+						'wholesalex_user_info'             => $this->get_current_user_info(),
 						/**
 						 * Conversation Translation Stop
 						 */
@@ -1001,475 +1014,11 @@ class WHOLESALEX_Overview {
 						'whx_roles_fields'                 => \WHOLESALEX\WHOLESALEX_Role::get_role_fields(),
 						'whx_roles_data'                   => $__roles,
 						'whx_roles_nonce'                  => wp_create_nonce( 'whx-export-roles' ),
-						/**
-						 * User Role Translation Stop
-						 */
-
-						/**
-						 * Dynamic Rules Translation Start
-						 */
-						// 'whx_dr_fields' => \WHOLESALEX\WHOLESALEX_Dynamic_Rules::get_dynamic_rules_field(),
-						// 'whx_dr_rule'   => \WHOLESALEX\WHOLESALEX_Dynamic_Rules::dynamic_rules_get(),
-						// 'whx_dr_nonce'  => wp_create_nonce( 'whx-export-dynamic-rules' ),
-						// 'whx_dr_currency'   => get_woocommerce_currency_symbol(),
-						/**
-						 * Dynamic Rules Translation Stop
-						 */
-
-						'i18n'                             => array_merge(
-							array(
-							// 'select_a_date_range_to_view_sale_data'  => __('Select a date range to view sale data', 'wholesalex'),
-							// 'select_a_date_range'                    => __('Select a date range', 'wholesalex'),
-							// 'date_range_title'                   => __('Date Range', 'wholesalex'),
-							// 'presets'                                => __('Presets', 'wholesalex'),
-							// 'custom'                             => __('Custom', 'wholesalex'),
-							// 'reset'                                  => __('Reset', 'wholesalex'),
-							// 'update'                             => __('Update', 'wholesalex'),
-							// 'today'                                  => __('Today', 'wholesalex'),
-							// 'yesterday'                              => __('Yesterday', 'wholesalex'),
-							// 'week_to_date'                           => __('Week to date', 'wholesalex'),
-							// 'last_week'                              => __('Last week', 'wholesalex'),
-							// 'month_to_date'                          => __('Month to date', 'wholesalex'),
-							// 'last_month'                         => __('Last month', 'wholesalex'),
-							// 'quarter_to_date'                        => __('Quarter to date', 'wholesalex'),
-							// 'last_quarter'                           => __('Last quarter', 'wholesalex'),
-							// 'year_to_date'                           => __('Year to date', 'wholesalex'),
-							// 'last_year'                              => __('Last year', 'wholesalex'),
-							// 'dashboard'                              => __('Dashboard', 'wholesalex'),
-							// 'new_messages'                           => __('New Messages', 'wholesalex'),
-							// 'view_all'                               => __('View All', 'wholesalex'),
-							// 'new_registrations'                      => __('New Registrations', 'wholesalex'),
-							// 'approve'                                => __('Approve', 'wholesalex'),
-							// 'no_new_orders_found'                    => __('No New Orders Found!', 'wholesalex'),
-							// 'pending_registration_in_empty'          => __('Pending Registration in Empty!', 'wholesalex'),
-							// 'view_order'                         => __('View Order', 'wholesalex'),
-							// 'review'                             => __('Review', 'wholesalex'),
-							// 'no_new_customer_found'                  => __('No New Customer Found!', 'wholesalex'),
-							// 'customer_no_b2b'                        => __('Customer No. (B2B)', 'wholesalex'),
-							// 'total_order_b2b'                        => __('Total Order (B2B)', 'wholesalex'),
-							// 'total_sale_b2b'                     => __('Total Sale (B2B)', 'wholesalex'),
-							// 'net_revenue_b2b'                        => __('Net Revenue (B2B)', 'wholesalex'),
-							// 'gross_sale_b2b'                     => __('Gross Sale (B2B)', 'wholesalex'),
-							// 'average_order_value_b2b'                => __('Average Order (B2B)', 'wholesalex'),
-							// 'full_access_to_dynamic_rules'           => __('Full Access to Dynamic Rules', 'wholesalex'),
-							// 'multiple_pricing_tiers'             => __('Multiple Pricing Tiers', 'wholesalex'),
-							// 'bulk_order_form'                        => __('Bulk Order Form', 'wholesalex'),
-							// 'request_a_quote'                        => __('Request A Quote', 'wholesalex'),
-							// 'subaccounts'                            => __('Subaccounts', 'wholesalex'),
-							// 'conversation'                           => __('Conversation', 'wholesalex'),
-							// 'wholesalex_wallet'                      => __('WholesaleX Wallet', 'wholesalex'),
-							// 'and_much_more'                          => __('And Much More!', 'wholesalex'),
-							// 'unlock_message_pro'                 => __('Unlock the full potential of WholesaleX to create and manage WooCommerce B2B or B2B+B2C stores with ease!', 'wholesalex'),
-							// 'join_the_community_message'         => __('Join the Facebook community of WholesaleX to stay up-to-date and share your thoughts and feedback.', 'wholesalex'),
-							// 'feature_request_message'                => __('Can’t find your desired feature? Let us know your requirements. We will definitely take them into our consideration.', 'wholesalex'),
-							// 'getting_started_guide'                  => __('Getting Started Guides', 'wholesalex'),
-							// 'how_to_create_the_dynamic_rule'     => __('How to Create the Dynamic Rules', 'wholesalex'),
-							// 'how_to_create_user_roles'               => __('How to Create User Roles', 'wholesalex'),
-							// 'how_to_create_registration_form'        => __('How to Create a Registration Form', 'wholesalex'),
-							// 'wholesalex_blog'                        => __('WholesaleX Blog', 'wholesalex'),
-							// 'join_wholesalex_community'              => __('Join WholesaleX Community', 'wholesalex'),
-							// 'request_a_feature'                      => __('Request a Feature', 'wholesalex'),
-							// 'pro_features'                           => __('Pro Features', 'wholesalex'),
-							// 'wholesalex_community'                   => __('WholesaleX Community', 'wholesalex'),
-							// 'feature_request'                        => __('Feature Request', 'wholesalex'),
-							// 'news_tips_updates'                      => __('News, Tips & Updates', 'wholesalex'),
-							// 'sale_summary_b2b'                       => __('Sales Summary (B2B)', 'wholesalex'),
-							// 'top_customers'                          => __('Top Customers', 'wholesalex'),
-							// 'recent_orders'                          => __('Recent Orders', 'wholesalex'),
-							// 'pending_registrations'                  => __('Pending Registrations', 'wholesalex'),
-							// 'select_a_preset_period'             => __('select a preset period', 'wholesalex'),
-
-							/**
-							 *
-							 * User Translation Text Start
-							 */
-							// 'whx_users_users'                                            => __('Users','wholesalex'),
-							// 'whx_users_edit'                                         => __('Edit','wholesalex'),
-							// 'whx_users_active'                                           => __('Active','wholesalex'),
-							// 'whx_users_reject'                                           => __('Reject','wholesalex'),
-							// 'whx_users_pending'                                          => __('Pending','wholesalex'),
-							// 'whx_users_delete'                                           => __('Delete','wholesalex'),
-							// 'whx_users_selected_users'                                   => __('Selected Users','wholesalex'),
-							// 'whx_users_apply'                                            => __('Apply','wholesalex'),
-							// 'whx_users_import'                                           => __('Import','wholesalex'),
-							// 'whx_users_export'                                           => __('Export','wholesalex'),
-							// 'whx_users_columns'                                          => __('Columns','wholesalex'),
-							// 'whx_users_no_users_found'                                   => __('No Users Found!','wholesalex'),
-							// 'whx_users_showing'                                          => __('Showing','wholesalex'),
-							// 'whx_users_pages'                                            => __('Pages','wholesalex'),
-							// 'whx_users_of'                                               => __('of','wholesalex'),
-							// 'whx_users_please_select_valid_csv_file'                 => __('Please Select a valid csv file to process import!','wholesalex'),
-							// 'whx_users_please_wait_to_complete_existing_import_request'  => __('Please Wait to complete existing import request!','wholesalex'),
-							// 'whx_users_error_occured'                                    => __('Error Occured!','wholesalex'),
-							// 'whx_users_import_successful'                                => __('Import Sucessful','wholesalex'),
-							// 'whx_users_users_updated'                                    => __('Users Updated','wholesalex'),
-							// 'whx_users_users_inserted'                                   => __('Users Inserted','wholesalex'),
-							// 'whx_users_users_skipped'                                    => __('Users Skipped','wholesalex'),
-							// 'whx_users_download'                                     => __('Download','wholesalex'),
-							// 'whx_users_log_for_more_info'                                => __('Log For More Info','wholesalex'),
-							// 'whx_users_close'                                            => __('Close','wholesalex'),
-							// 'whx_users_username'                                     => __('Username','wholesalex'),
-							// 'whx_users_email'                                            => __('Email','wholesalex'),
-							// 'whx_users_upload_csv'                                       => __('Upload CSV','wholesalex'),
-							// 'whx_users_you_can_upload_only_csv_file'                 => __('You can upload only csv file format','wholesalex'),
-							// 'whx_users_update_existing_users'                            => __('Update Existing Users','wholesalex'),
-							// 'whx_users_update_existing_users_message'                    => __('Selecting "Update Existing Users" will only update existing users. No new user will be added.','wholesalex'),
-							// 'whx_users_find_existing_user_by'                            => __('Find Existing Users By:','wholesalex'),
-							// 'whx_users_option_to_detect_user'                            => __("Option to detect user from the uploaded CSV's email or username field.",'wholesalex'),
-							// 'whx_users_process_per_iteration'                            => __("Process Per Iteration",'wholesalex'),
-							// 'whx_users_low_process_ppi'                                  => __("Low process per iteration (PPI) increases the import's accuracy and success rate. A (PPI) higher than your server's maximum execution time might fail the import.",'wholesalex'),
-							// 'whx_users_import'                                           => __("Import",'wholesalex'),
-							// 'whx_users_import_users'                                 => __("Import Users",'wholesalex'),
-							// 'whx_users_select_fields_to_export'                          => __("Select Fields to Export",'wholesalex'),
-							// 'whx_users_csv_comma_warning'                                => __("Warning: If any of the fields contain a comma (,), it might break the CSV file. Ensure the selected column value contains no comma(,).",'wholesalex'),
-							// 'whx_users_download_csv'                                 => __("Download CSV",'wholesalex'),
-							// 'whx_users_export_users'                                 => __("Export Users",'wholesalex'),
-							/**
-							 *
-							 * User Translation Text Stop
-							 */
-
-							/**
-							 *
-							 * Email Translation Text Start
-							 */
-							// 'whx_email_templates_admin_email_recipient'     => __('Admin Email Recipient','wholesalex'),
-							// 'whx_email_templates_subject'                   => __('Subject','wholesalex'),
-							// 'whx_email_templates_heading'                   => __('Heading','wholesalex'),
-							// 'whx_email_templates_additional_content'    => __('Additional Content','wholesalex'),
-							// 'whx_email_templates_smart_tag_used'        => __('Smart Tag Used','wholesalex'),
-							// 'whx_email_templates_email_type'            => __('Email Type','wholesalex'),
-							// 'whx_email_templates_smart_tags'            => __('Smart Tags','wholesalex'),
-							// 'whx_email_templates_save_changes'              => __('Save Changes','wholesalex'),
-							// 'whx_email_templates_status'                => __('Status','wholesalex'),
-							// 'whx_email_templates_email_template'        => __('Email Template','wholesalex'),
-							// 'whx_email_templates_content_type'              => __('Content Type','wholesalex'),
-							// 'whx_email_templates_action'                => __('Action','wholesalex'),
-							// 'whx_email_templates_edit'                      => __('Edit','wholesalex'),
-							// 'whx_email_templates_unlock'                => __('UNLOCK','wholesalex'),
-							// 'whx_email_templates_unlock_full_email_access' => __('Unlock Full Email  Access with','wholesalex'),
-							// 'whx_email_templates_with_wholesalex_pro'       => __('With WholesaleX Pro','wholesalex'),
-							// 'whx_email_templates_upgrade_pro_message'       => __('We are sorry, but only a limited number of emails are available on the free version. Please upgrade to a pro plan to get full access.','wholesalex'),
-							// 'whx_email_templates_upgrade_to_pro_btn'    => __('Upgrade to Pro  ➤','wholesalex'),
-							// 'whx_email_templates_emails'                => __('Emails','wholesalex'),
-							/**
-							 *
-							 * Email Translation Text Stop
-							 */
-
-							/**
-							 *
-							 * Registration From and Builder Translation Text Start
-							 */
-							// 'whx_form_builder_registration_form'                    =>__('Registration Form','wholesalex'),
-							// 'whx_form_builder_go_back'                              =>__('Go Back','wholesalex'),
-							// 'whx_form_builder_form_builder'                         => __( 'Form Builder', 'wholesalex' ),
-							// 'whx_form_builder_save_form_changes'                    => __( 'Save Changes', 'wholesalex' ),
-							// 'whx_form_builder_get_shortcodes'                       => __( 'Get Shortcodes', 'wholesalex' ),
-							// 'whx_form_builder_styling_n_formatting'                 => __( 'Styling & Formatting', 'wholesalex' ),
-							// 'whx_form_builder_premade_design'                       => __( 'Premade Design', 'wholesalex' ),
-							// 'whx_form_builder_show_login_form'                      => __( 'Show Login Form', 'wholesalex' ),
-							// 'whx_form_builder_form_title'                           => __( 'Form Title', 'wholesalex' ),
-							// 'whx_form_builder_form_title_setting'                   => __( 'Form Title Setting', 'wholesalex' ),
-							// 'whx_form_builder_hide_form_description'                => __( 'Hide Form Description', 'wholesalex' ),
-							// 'whx_form_builder_title'                                => __( 'Title', 'wholesalex' ),
-							// 'whx_form_builder_description'                          => __( 'Description', 'wholesalex' ),
-							// 'whx_form_builder_style'                                => __( 'Style', 'wholesalex' ),
-							// 'whx_form_builder_choose_input_style'                   => __( 'Choose Input Style', 'wholesalex' ),
-							// 'whx_form_builder_font_size'                            => __( 'Font Size', 'wholesalex' ),
-							// 'whx_form_builder_font_weight'                          => __( 'Font Weight', 'wholesalex' ),
-							// 'whx_form_builder_font_case'                            => __( 'Font Case', 'wholesalex' ),
-							// Fields Inserter
-							// 'whx_form_builder_default_fields'                       => __( 'Default User Fields', 'wholesalex' ),
-							// 'whx_form_builder_extra_fields'                         => __( 'Extra Fields', 'wholesalex' ),
-							// Already Field Used Message
-							// 'whx_form_builder_already_used'                         => __( 'This field is already used!', 'wholesalex' ),
-							// 'whx_form_builder_select_field'                         => __('Select Field','wholesalex'),
-							// 'whx_form_builder_field'                                => __('Field','wholesalex'),
-							// 'whx_form_builder_select_condition'                 => __('Select Condition','wholesalex'),
-							// 'whx_form_builder_condition'                            => __('Condition','wholesalex'),
-							// 'whx_form_builder_equal'                                => __('Equal','wholesalex'),
-							// 'whx_form_builder_not_equal'                            => __('Not Equal','wholesalex'),
-							// 'whx_form_builder_value'                                => __('Value','wholesalex'),
-							// 'whx_form_builder_custom_field_name_warning'            => __("Note: Make sure field name does not contain any space or special character. 'wholesalex_cf_'  prefix will be added to the field name.",'wholesalex'),
-							// 'whx_form_builder_edit_field'                           => __('Edit Field','wholesalex'),
-							// 'whx_form_builder_field_condition'                      => __('Field Condition','wholesalex'),
-							// 'whx_form_builder_field_status'                     => __('Field Status','wholesalex'),
-							// 'whx_form_builder_required'                         => __('Required','wholesalex'),
-							// 'whx_form_builder_hide_label'                           => __('Hide Label','wholesalex'),
-							// 'whx_form_builder_exclude_role_items'                   => __('Exclude Role Items','wholesalex'),
-							// 'whx_form_builder_password_condition_label'         => __('Password Strength Condition','wholesalex'),
-							// 'whx_form_builder_choose_password_strength'         => __('Choose Password Strength...','wholesalex'),
-							// 'whx_form_builder_choose_file_type'                 => __('Choose File Type...','wholesalex'),
-							// 'whx_form_builder_password_strength_message'            => __('Strength Message','wholesalex'),
-							// 'whx_form_builder_choose_roles'                     => __('Choose Roles...','wholesalex'),
-							// 'whx_form_builder_field_label'                          => __('Field Label','wholesalex'),
-							// 'whx_form_builder_label'                                => __('Label','wholesalex'),
-							// 'whx_form_builder_field_name'                           => __('Field Name','wholesalex'),
-							// 'whx_form_builder_options'                              => __('Options','wholesalex'),
-							// 'whx_form_builder_you_cant_edit_role_selection_field'   => __('You cannot edit Role selection options','wholesalex'),
-							// 'whx_form_builder_placeholder'                          => __('Placeholder','wholesalex'),
-							// 'whx_form_builder_help_message'                     => __('Help Message','wholesalex'),
-							// 'whx_form_builder_term_condition'                       => __('Terms and Conditions','wholesalex'),
-							// 'whx_form_builder_term_link'                            => __('Terms/Policy Link','wholesalex'),
-							// 'whx_form_builder_term_link_placeholder'                => __('Placeholder (Terms/Policy Link)','wholesalex'),
-							// 'whx_form_builder_term_condition_placeholder'           => __('I agree to the Terms and Conditions {Privacy Policy}','wholesalex'),
-							// 'whx_form_builder_term_condition_link_label_warning'    => __("Note: The provided link will be embedded within the {smart tag}.",'wholesalex'),
-							// 'whx_form_builder_term_condition_label_warning'     => __("Note: Terms/Policy Link will be embedded within the smart tag (for example {Privacy Policy}) . Smart tag name (text) can be changed within the brackets.",'wholesalex'),
-							// 'whx_form_builder_allowed_file_types'                   => __('Allowed File Types (Comma Separated)','wholesalex'),
-							// 'whx_form_builder_maximum_allowed_file_size_in_bytes'   => __('Maximum Allowed File Size in Bytes','wholesalex'),
-							// 'whx_form_builder_show'                             => __('Show','wholesalex'),
-							// 'whx_form_builder_hide'                             => __('Hide','wholesalex'),
-							// 'whx_form_builder_visibility'                           => __('Visibility','wholesalex'),
-							// 'whx_form_builder_all'                                  => __('All','wholesalex'),
-							// 'whx_form_builder_any'                                  => __('Any','wholesalex'),
-							// 'whx_form_builder_operator'                         => __('Operator','wholesalex'),
-							// 'whx_form_builder_operator_tooltip'                 => __('When the rule will be triggered? Upon matching all conditions or any of the added conditions.','wholesalex'),
-							// 'whx_form_builder_visibility_tooltip'                   => __('Select whether you want to display or hide this field when the conditions match.','wholesalex'),
-							// 'whx_form_builder_woocommerce_option'                   => __('WooCommerce Option','wholesalex'),
-							// 'whx_form_builder_add_woocommerce_registration'     => __('Add WooCommerce Registration','wholesalex'),
-							// 'whx_form_builder_add_custom_field_to_billing'          => __('Add Custom Field to Billing','wholesalex'),
-							// 'whx_form_builder_required_in_billing'                  => __('Required in Billing','wholesalex'),
-							// 'whx_form_builder_reset'                                => __('Reset','wholesalex'),
-							// 'whx_form_builder_reset_successful'                 => __('Reset Successful','wholesalex'),
-							// 'whx_form_builder_field_settings'                       => __('Field Settings','wholesalex'),
-							// 'whx_form_builder_video'                                => __('Video','wholesalex'),
-							// Text transform options
-							// 'whx_form_builder_none'                                 => __('None','wholesalex'),
-							// 'whx_form_builder_uppercase'                            => __('Uppercase','wholesalex'),
-							// 'whx_form_builder_lowercase'                            => __('Lowercase','wholesalex'),
-							// 'whx_form_builder_capitalize'                           => __('Capitalize','wholesalex'),
-							// Fields
-							// 'whx_form_builder_color_settings'                       => __('Color Settings','wholesalex'),
-							// 'whx_form_builder_sign_in'                          => __('Sign In','wholesalex'),
-							// 'whx_form_builder_sign_up'                          => __('Sign Up','wholesalex'),
-							// 'whx_form_builder_main'                                 => __('Main','wholesalex'),
-							// 'whx_form_builder_container'                            => __('Container','wholesalex'),
-							// 'whx_form_builder_separator'                            => __('Separator','wholesalex'),
-							// 'whx_form_builder_padding'                          => __('Padding','wholesalex'),
-							// 'whx_form_builder_border_radius'                        => __('Border Radius','wholesalex'),
-							// 'whx_form_builder_border'                               => __('Border','wholesalex'),
-							// 'whx_form_builder_max_width'                            => __('Max Width','wholesalex'),
-							// 'whx_form_builder_alignment'                            => __('Alignment','wholesalex'),
-							// 'whx_form_builder_left'                                 => __('Left','wholesalex'),
-							// 'whx_form_builder_center'                               => __('Center','wholesalex'),
-							// 'whx_form_builder_right'                                => __('Right','wholesalex'),
-							// 'whx_form_builder_size_and_spacing_settings'            => __('Size and Spacing Settings','wholesalex'),
-							// 'whx_form_builder_input'                                => __('Input','wholesalex'),
-							// 'whx_form_builder_button'                               => __('Button','wholesalex'),
-							// 'whx_form_builder_weight'                               => __('Weight','wholesalex'),
-							// 'whx_form_builder_transform'                            => __('Transform','wholesalex'),
-							// 'whx_form_builder_size'                                 => __('Size','wholesalex'),
-							// 'whx_form_builder_typography_settings'              => __('Typography Settings','wholesalex'),
-							// 'whx_form_builder_background'                           => __('Background','wholesalex'),
-							// 'whx_form_builder_text'                                 => __('Text','wholesalex'),
-							// 'whx_form_builder_placeholder'                      => __('Placeholder','wholesalex'),
-							// 'whx_form_builder_label'                                => __('Label','wholesalex'),
-							// 'whx_form_builder_input_text'                           => __('Input Text','wholesalex'),
-							// 'whx_form_builder_state'                                => __('State','wholesalex'),
-							// 'whx_form_builder_normal'                               => __('Normal','wholesalex'),
-							// 'whx_form_builder_active'                               => __('Active','wholesalex'),
-							// 'whx_form_builder_warning'                          => __('Warning','wholesalex'),
-							// 'whx_form_builder_hover'                                => __('Hover','wholesalex'),
-							// 'whx_form_builder_width'                                => __('Width','wholesalex'),
-							// Premade Modal
-							// 'whx_form_builder_premade_heading'                  => __('Create a Form Right Away Using a Pre-made Designs','wholesalex'),
-							// 'whx_form_builder_use_design'                           => __('Use Design','wholesalex'),
-							// Shortcode Modal
-							// 'whx_form_builder_specific_shortcode_list'          => __('Specific Shortcode List','wholesalex'),
-							// 'whx_form_builder_with_login_form'                  => __('With Login Form','wholesalex'),
-							// 'whx_form_builder_only_login_form'                  => __('Global Login Form','wholesalex'),
-							// 'whx_form_builder_regi_form_with_all_roles'             => __('Registration Form with All Roles.','wholesalex'),
-							// 'whx_form_builder_login_form_with_all_roles'            => __('Login Form with All Roles.','wholesalex'),
-							// 'whx_form_builder_copy_to_clipboard'                    => __('Copy To Clipboard','wholesalex'),
-							// 'whx_form_builder_b2b_global_form'                  => __('B2B Global Form','wholesalex'),
-							// 'whx_form_builder_regi_form_only_for'                   => __('Registration Form only for','wholesalex'),
-							// 'whx_form_builder_role'                                 => __('Role.','wholesalex'),
-							// pro popup
-							// 'whx_form_builder_unlock'                               => __("UNLOCK",'wholesalex'),
-							// 'whx_form_builder_unlock_heading'                       => __("Unlock all Features with",'wholesalex'),
-							// 'whx_form_builder_unlock_desc'                      => __("We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.",'wholesalex'),
-							// 'whx_form_builder_upgrade_to_pro'                       => __("Upgrade to Pro  ➤",'wholesalex'),
-							/**
-							 *
-							 * Registration From and Builder Translation Text Stop
-							 */
-
-							/**
-							 *
-							 * Settings Translation Text Start
-							 */
-							// 'whx_settings_settings'      => __('Settings','wholesalex'),
-							// 'whx_settings_unlock'            => __("UNLOCK",'wholesalex'),
-							// 'whx_settings_unlock_heading'    => __("Unlock All Features",'wholesalex'),
-							// 'whx_settings_unlock_desc'       => __("We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.",'wholesalex'),
-							// 'whx_settings_upgrade_to_pro'    => __("Upgrade to Pro  ➤",'wholesalex'),
-							/**
-							 *
-							 * Settings Translation Text Stop
-							 */
-
-							/**
-							 *
-							 * User Role Translation Text Start
-							 */
-							// 'whx_roles_user_roles'                               => __('User Roles','wholesalex'),
-							// 'whx_roles_no_shipping_zone_found'               => __('No Shipping Zones Found!','wholesalex'),
-							// 'whx_roles_please_fill_role_name_field'          => __('Please Fill Role Name Field','wholesalex'),
-							// 'whx_roles_successfully_deleted'                 => __('Succesfully Deleted.','wholesalex'),
-							// 'whx_roles_successfully_saved'                   => __('Succesfully Saved.','wholesalex'),
-							// 'whx_roles_add_new_b2b_role'                     => __('Add New B2B Role','wholesalex'),
-							// 'whx_roles_import'                               => __('Import','wholesalex'),
-							// 'whx_roles_export'                               => __('Export','wholesalex'),
-							// 'whx_roles_b2b_role'                             => __('B2B Role: ','wholesalex'),
-							// 'whx_roles_untitled_role'                        => __('Untitled Role','wholesalex'),
-							// 'whx_roles_delete_this_role'                     => __('Delete','wholesalex'),
-							// 'whx_roles_edit_this_role'                       => __('Edit','wholesalex'),
-							// 'whx_roles_duplicate_role'                       => __('Duplicate','wholesalex'),
-							// 'whx_roles_untitled'                             => __('Untitled','wholesalex'),
-							// 'whx_roles_duplicate_of'                         => __('Duplicate of ','wholesalex'),
-							// 'whx_roles_show_hide_role_details'               => __('Show/Hide Role Details.','wholesalex'),
-							// 'whx_roles_csv_fields_to_roles'                  => __('Map CSV Fields to Roles','wholesalex'),
-							// 'whx_roles_select_field_from_csv_file'           => __('Select fields from your CSV file to map against role fields, or to ignore during import.','wholesalex'),
-							// 'whx_roles_column_name'                          => __('Column name','wholesalex'),
-							// 'whx_roles_map_to_field'                         => __('Map to field','wholesalex'),
-							// 'whx_roles_do_not_import'                        => __('Do not import','wholesalex'),
-							// 'whx_roles_run_the_importer'                     => __('Run the importer','wholesalex'),
-							// 'whx_roles_importing'                            => __('Importing','wholesalex'),
-							// 'whx_roles_your_roles_are_now_being_imported'    => __('Your roles are now being imported..','wholesalex'),
-							// 'whx_roles_upload_csv'                           => __('Upload CSV','wholesalex'),
-							// 'whx_roles_you_can_upload_only_csv_file_format'  => __('You can upload only csv file format','wholesalex'),
-							// 'whx_roles_update_existing_roles'                => __('Update Existing Roles','wholesalex'),
-							// 'whx_roles_update_existing_roles_help_message'   => __('Selecting "Update Existing Roles" will only update existing roles. No new role will be added.','wholesalex'),
-							// 'whx_roles_continue'                             => __('Continue','wholesalex'),
-							// 'whx_roles_error_occured'                        => __('Eror Occured!','wholesalex'),
-							// 'whx_roles_import_complete'                      => __('Import Complete!','wholesalex'),
-							// 'whx_roles_role_imported'                        => __(' Role Imported.','wholesalex'),
-							// 'whx_roles_role_updated'                         => __(' Role Updated.','wholesalex'),
-							// 'whx_roles_role_skipped'                         => __(' Role Skipped.','wholesalex'),
-							// 'whx_roles_role_failed'                          => __(' Role Failed.','wholesalex'),
-							// 'whx_roles_view_error_logs'                      => __(' View Error Logs','wholesalex'),
-							// 'whx_roles_role'                                 => __('Role','wholesalex'),
-							// 'whx_roles_reason_for_failure'                   => __('Reason for failure','wholesalex'),
-							// 'whx_roles_import_user_roles'                    => __('Import User Roles','wholesalex'),
-							// 'whx_roles_b2c_users'                            => __('B2C Users','wholesalex'),
-							// 'whx_roles_guest_users'                          => __('Guest Users','wholesalex'),
-							/**
-							 *
-							 * User Role Translation Text Stop
-							 */
-
-							/**
-							 *
-							 * Feature Translation Text Start
-							 */
-							// 'whx_features_features'                                      => __('Features','wholesalex'),
-							// 'whx_features_restrict_guest_access'                     => __('Restrict Guest Access','wholesalex'),
-							// 'whx_features_bulk_order'                                    => __('Bulk Order','wholesalex'),
-							// 'whx_features_request_a_quote'                               => __('Request A Quote', 'wholesalex'),
-							// 'whx_features_wholesale_pricing'                         => __('Wholesale Pricing', 'wholesalex'),
-							// 'whx_features_registration_form'                         => __('Registration Form', 'wholesalex'),
-							// 'whx_features_subaccounts_management'                        => __('Subaccounts Management', 'wholesalex'),
-							// 'whx_features_wallet_management'                         => __('Wallet Management', 'wholesalex'),
-							// 'whx_features_dynamic_discount_rules'                        => __('Dynamic Discount Rules', 'wholesalex'),
-							// 'whx_features_conversations_built_in_messaging'              => __('Conversations Built-in Messaging', 'wholesalex'),
-							// 'whx_features_create_unlimited_user_roles'                   => __('Create Unlimited User Roles', 'wholesalex'),
-							// 'whx_features_tax_control'                                   => __('Tax Control', 'wholesalex'),
-							// 'whx_features_import_and_export_role_base_sale_price'        => __('Import and Export Role Base/Sale Price', 'wholesalex'),
-							// 'whx_features_import_export_customer'                        => __('Import Export Customer', 'wholesalex'),
-							// 'whx_features_automatic_approval_for_b2b_registration'       => __('Automatic Approval For B2B Registration', 'wholesalex'),
-							// 'whx_features_manual_approval_for_b2b_registration'          => __('Manual Approval For B2B Registration', 'wholesalex'),
-							// 'whx_features_email_notifications_for_different_actions' => __('Email Notifications For Different Actions', 'wholesalex'),
-							// 'whx_features_control_redirect_urls'                     => __('Control Redirect URLs', 'wholesalex'),
-							// 'whx_features_visibility_control'                            => __('Visibility Control', 'wholesalex'),
-							// 'whx_features_shipping_control'                              => __('Shipping Control', 'wholesalex'),
-							// 'whx_features_force_free_shipping'                           => __('Force Free Shipping', 'wholesalex'),
-							// 'whx_features_payment_gateway_control'                       => __('Payment Gateway Control', 'wholesalex'),
-							// 'whx_features_extra_charge'                                  => __('Extra Charge', 'wholesalex'),
-							// 'whx_features_bogo_discounts'                                => __('BOGO Discounts', 'wholesalex'),
-							// 'whx_features_show_login_to_view_prices'                 => __('Show Login to view prices', 'wholesalex'),
-							// 'whx_features_buy_x_get_y'                                   => __('Buy X Get Y', 'wholesalex'),
-							// 'whx_features_control_order_quantity'                        => __('Control Order Quantity', 'wholesalex'),
-							// 'whx_features_google_rrecaptcha_v3_integration'              => __('Google RreCAPTCHA V3 Integration', 'wholesalex'),
-							// 'whx_features_quote_request'                             => __('Quote Request', 'wholesalex'),
-							// 'whx_features_conversation_with_store_owner'             => __('Conversation With Store Owner', 'wholesalex'),
-							// 'whx_features_auto_role_migration'                           => __('Auto Role Migration', 'wholesalex'),
-							// 'whx_features_rolewise_credit_limit'                     => __('Rolewise Credit Limit', 'wholesalex'),
-							// 'whx_features_conditions_and_limits'                     => __('Conditions and Limits', 'wholesalex'),
-							// 'whx_features_restrict_guest_access_desc'                    => __('Make your wholesale area private for registered users and restrict guest users.', 'wholesalex'),
-							// 'whx_features_bulk_order_desc'                               => __('Allow your customers to order products in bulk or create purchase lists to order later.', 'wholesalex'),
-							// 'whx_features_request_a_quote_desc'                          => __('Let the potential buyers send quote requests to you directly from the cart page.', 'wholesalex'),
-							// 'whx_features_wholesale_pricing_desc'                        => __('Effortlessly manage wholesale pricing based on multiple wholesale/b2b user roles.', 'wholesalex'),
-							// 'whx_features_registration_form_desc'                        => __('Create a custom registration form with custom fields for effective customer acquisition.', 'wholesalex'),
-							// 'whx_features_subaccounts_management_desc'                   => __('Let your registered B2B customers create subaccounts with necessary user access.', 'wholesalex'),
-							// 'whx_features_wallet_management_desc'                        => __('Let B2B customers add funds to their digital wallets and use it as a payment method.', 'wholesalex'),
-							// 'whx_features_dynamic_discount_rules_desc'                   => __('Effectively manage discounted wholesale pricing using the dynamic discount rules.', 'wholesalex'),
-							// 'whx_features_conversations_built_in_messaging_desc'     => __('Let your registered customers communicate with you with the in-built conversation system.', 'wholesalex'),
-							// 'whx_features_the_most_complete_woocommerce'             => __('The Most Complete WooCommerce', 'wholesalex'),
-							// 'whx_features_b2b_n_b2c'                                 => __('B2B + B2C', 'wholesalex'),
-							// 'whx_features_hybrid_solution'                               => __('Hybrid Solution', 'wholesalex'),
-							// 'whx_features_checkout_the_main_attractive'                  => __('Check out the main attractive features at a glance', 'wholesalex'),
-							// 'whx_features_explore_more'                                  => __('Explore More', 'wholesalex'),
-							// 'whx_features_wholesalex_core'                               => __('WholesaleX Core', 'wholesalex'),
-							// 'whx_features_components'                                    => __('Components', 'wholesalex'),
-							// 'whx_features_explore_more_features'                     => __('Explore More Features', 'wholesalex'),
-							/**
-							 *
-							 * Feature Translation Text Stop
-							 */
-
-							/**
-							 *
-							 * Quick Support Translation Text Start
-							 */
-							// 'whx_support_quick_support'                     => __('Quick Support','wholesalex'),
-							// 'whx_support_technical_support'                 => __('Technical Support','wholesalex'),
-							// 'whx_support_free_support'                      => __('Free Support (WordPress ORG)','wholesalex'),
-							// 'whx_support_presale_question'                  => __('Presale Questions','wholesalex'),
-							// 'whx_support_license_activation_issue'          => __('License Activation Issues','wholesalex'),
-							// 'whx_support_bug_report'                    => __('Bug Report','wholesalex'),
-							// 'whx_support_compatibility_issue'               => __('Compatibility Issues','wholesalex'),
-							// 'whx_support_feature_request'                   => __('Feature Request','wholesalex'),
-							// 'whx_support_getting_started_with_wholesalex'  => __('Getting Started with WholesaleX','wholesalex'),
-							// 'whx_support_dynamic_pricing_n_discount_rules' => __('Dynamic Pricing &  Discount Rules','wholesalex'),
-							// 'whx_support_wholesale_user_roles'              => __('Wholesale User Roles','wholesalex'),
-							// 'whx_support_regi_form_builder'                 => __('Registration Form Builder','wholesalex'),
-							// 'whx_support_wholesalex_addons'                 => __('WholeasaleX Addons','wholesalex'),
-							// 'whx_support_how_to_create_private_store'       => __('How to Create a Private Store','wholesalex'),
-							// 'whx_support_please_select_support_type'    => __('Please Select Support type.','wholesalex'),
-							// 'whx_support_please_fill_all_the_input_field'  => __('Please Fill all the Input  Field..','wholesalex'),
-							// 'whx_support_having_difficulties'               => __('Having Difficulties? We are here to help','wholesalex'),
-							// 'whx_support_let_us_know'                       => __('Let us know how we can help you.','wholesalex'),
-							// 'whx_support_pro'                               => __('(Pro)','wholesalex'),
-							// 'whx_support_create_a_ticket'                   => __('Create a Ticket','wholesalex'),
-							// 'whx_support_select_support_type'               => __('Select Support Type from above','wholesalex'),
-							// 'whx_support_name'                              => __('Name','wholesalex'),
-							// 'whx_support_email'                             => __('Email','wholesalex'),
-							// 'whx_support_subject'                           => __('Subject','wholesalex'),
-							// 'whx_support_desc_label'                    => __('Explain your Problem','wholesalex'),
-							// 'whx_support_desc'                              => __('Description','wholesalex'),
-							// 'whx_support_type_here'                         => __('Type here','wholesalex'),
-							// 'whx_support_you_can_contact_in_support'    => __('You can Contact in Support via our ','wholesalex'),
-							// 'whx_support_contact_form'                      => __('Contact Form','wholesalex'),
-							// 'whx_support_submit_ticket'                     => __('Submit Ticket','wholesalex'),
-							// 'whx_support_wholesalex_community'              => __('WowCommerce Community','wholesalex'),
-							// 'whx_support_join_community'                => __('Join Community','wholesalex'),
-							// 'whx_support_useful_guides'                     => __('Useful Guides','wholesalex'),
-							// 'whx_support_check_out_in_depth_docs'           => __('Check out the in depth documentation','wholesalex'),
-							// 'whx_support_doc'                               => __('Doc','wholesalex'),
-							// 'whx_support_tutorial'                          => __('Tutorial','wholesalex'),
-							// 'whx_support_join_wholesalex_community_msg'     => __('Join the Facebook community of WholesaleX to stay up-to-date and share your thoughts and feedback.','wholesalex'),
-							/**
-							 *
-							 * Quick Support Translation Text Stop
-							 */
-							),
-							self::get_dynamic_roles_i18n_localize_data()
-						),
 					),
+					self::get_dynamic_roles_i18n_localize_data(),
 					self::get_dynamic_rules_localize_data( 'wholesalex' )
-				)
-			)
+				),
+			),
 		);
 
 		wp_set_script_translations( 'wholesalex_overview', 'wholesalex', WHOLESALEX_PATH . 'languages/' );

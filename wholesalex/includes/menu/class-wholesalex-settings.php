@@ -305,6 +305,13 @@ class Settings {
 							// 'tooltip' => 'Enabling this option will display the pricing tier table on the single product pages. {Check out the documentation} to learn more about the pricing tiers.',
 							// 'doc' => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
 						),
+						'_settings_role_switcher_option' => array(
+							'type'    => 'slider',
+							'label'   => __( 'Enable User Role Switching', 'wholesalex' ),
+							'desc'    => __( 'Check this box if you want to enable an option for User to Switch Roles', 'wholesalex' ),
+							'help'    => '',
+							'default' => 'no',
+						),
 					),
 					'attrGroupTwo' => array(
 						'type'                           => 'general_two',

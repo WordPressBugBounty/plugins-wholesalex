@@ -90,6 +90,8 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-support.php';
 		require_once WHOLESALEX_PATH . 'includes/options/Addons.php';
 		require_once WHOLESALEX_PATH . 'includes/Deactive.php';
+		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-request-role-change.php';
+		require_once WHOLESALEX_PATH . 'includes/compatibility/woocommerce-bookings.php';
 
 		new \WHOLESALEX\WHOLESALEX_Role();
 		new \WHOLESALEX\WHOLESALEX_Registration();
@@ -112,6 +114,8 @@ class WholesaleX_Initialization {
 		new \WHOLESALEX\WholesaleX_Support();
 		new \WHOLESALEX\Deactive();
 		new \WHOLESALEX\WHOLESALEX_Overview();
+		new \WHOLESALEX\WHOLESALEX_RequstRoleChange();
+		new \WHOLESALEX\WHOLESALEX_Woocommerce_Bookings();
 
 		add_action( 'template_redirect', array( $this, 'wholesalex_process_user_email_confirmation' ) );
 	}

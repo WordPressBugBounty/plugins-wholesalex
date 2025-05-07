@@ -1344,7 +1344,6 @@ class WHOLESALEX_Shortcodes {
 						return;
 					}
 					const processLogin  = ()=>{
-						console.log('insd');
 						$.ajax({ 
 							url: wholesalex.ajax, 
 							type: 'POST', 
