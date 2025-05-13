@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
-"Project-Id-Version: WholesaleX 2.0.15\n"
+"Project-Id-Version: WholesaleX 2.0.16\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wholesalex\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-05-07T04:55:51+00:00\n"
+"POT-Creation-Date: 2025-05-13T04:13:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wholesalex\n"
@@ -84,7 +84,7 @@ msgid "<strong>reCAPTCHA v3:</strong> Error!"
 msgstr ""
 
 #: addons/recaptcha/init.php:23
-#: includes/menu/class-wholesalex-settings.php:1499
+#: includes/menu/class-wholesalex-settings.php:1529
 #: includes/menu/class-wholesalex-setup-wizard.php:161
 #: includes/options/Addons.php:385
 msgid "reCAPTCHA"
@@ -97,12 +97,12 @@ msgstr ""
 #: includes/class-wholesalex-activator.php:59
 #: includes/menu/class-wholesalex-registration.php:698
 #: includes/menu/class-wholesalex-registration.php:1509
-#: includes/menu/class-wholesalex-settings.php:443
+#: includes/menu/class-wholesalex-settings.php:473
 msgid "Thank you for registering. Your account will be reviewed by us & approve manually. Please wait to be approved."
 msgstr ""
 
 #: includes/class-wholesalex-activator.php:62
-#: includes/menu/class-wholesalex-settings.php:451
+#: includes/menu/class-wholesalex-settings.php:481
 msgid "Sorry You Are Not Allowed To View This Form"
 msgstr ""
 
@@ -110,10 +110,10 @@ msgstr ""
 #: includes/class-wholesalex-activator.php:65
 #: includes/menu/class-wholesalex-dynamic-rules.php:2370
 #: includes/menu/class-wholesalex-dynamic-rules.php:2372
-#: includes/menu/class-wholesalex-settings.php:462
-#: includes/menu/class-wholesalex-settings.php:464
-#: includes/menu/class-wholesalex-settings.php:469
-#: includes/menu/class-wholesalex-settings.php:471
+#: includes/menu/class-wholesalex-settings.php:492
+#: includes/menu/class-wholesalex-settings.php:494
+#: includes/menu/class-wholesalex-settings.php:499
+#: includes/menu/class-wholesalex-settings.php:501
 msgid "Wholesale Price:"
 msgstr ""
 
@@ -156,8 +156,8 @@ msgid "Go Pro"
 msgstr ""
 
 #: includes/class-wholesalex-menu.php:39
-#: includes/menu/class-wholesalex-overview.php:360
 #: includes/menu/class-wholesalex-overview.php:361
+#: includes/menu/class-wholesalex-overview.php:362
 msgid "Settings"
 msgstr ""
 
@@ -306,8 +306,8 @@ msgid "Tier Price Table Style"
 msgstr ""
 
 #: includes/class-wholesalex-product.php:1500
-#: includes/menu/class-wholesalex-settings.php:1361
-#: includes/menu/class-wholesalex-settings.php:1362
+#: includes/menu/class-wholesalex-settings.php:1391
+#: includes/menu/class-wholesalex-settings.php:1392
 #: assets/js/wholesalex_components.js:1
 msgid "Table Style"
 msgstr ""
@@ -389,7 +389,7 @@ msgid "Base Price"
 msgstr ""
 
 #: includes/class-wholesalex-product.php:1601
-#: includes/menu/class-wholesalex-settings.php:193
+#: includes/menu/class-wholesalex-settings.php:202
 msgid "Sale Price"
 msgstr ""
 
@@ -469,7 +469,7 @@ msgstr ""
 #. translators: %s: WholesaleX Role Name
 #: includes/class-wholesalex-product.php:1632
 #: includes/class-wholesalex-product.php:1694
-#: includes/menu/class-wholesalex-settings.php:456
+#: includes/menu/class-wholesalex-settings.php:486
 msgid "Price"
 msgstr ""
 
@@ -959,7 +959,7 @@ msgstr ""
 #: includes/export/class-wholesalex-dynamic-rule-exporter.php:48
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:255
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:339
-#: includes/menu/class-wholesalex-overview.php:1063
+#: includes/menu/class-wholesalex-overview.php:1067
 #: includes/menu/class-wholesalex-users.php:459
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:4
@@ -1139,7 +1139,7 @@ msgstr ""
 #: includes/export/class-wholesalex-dynamic-rule-exporter.php:77
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:284
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:368
-#: includes/menu/class-wholesalex-settings.php:1259
+#: includes/menu/class-wholesalex-settings.php:1289
 msgid "End Date"
 msgstr ""
 
@@ -1238,9 +1238,9 @@ msgstr ""
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:317
 #: includes/menu/class-wholesalex-dynamic-rules.php:1703
 #: includes/menu/class-wholesalex-dynamic-rules.php:4362
-#: includes/menu/class-wholesalex-settings.php:573
-#: includes/menu/class-wholesalex-settings.php:604
-#: includes/menu/class-wholesalex-settings.php:606
+#: includes/menu/class-wholesalex-settings.php:603
+#: includes/menu/class-wholesalex-settings.php:634
+#: includes/menu/class-wholesalex-settings.php:636
 msgid "Product Discount"
 msgstr ""
 
@@ -1267,8 +1267,8 @@ msgstr ""
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:323
 #: includes/menu/class-wholesalex-dynamic-rules.php:1709
 #: includes/menu/class-wholesalex-dynamic-rules.php:2229
-#: includes/menu/class-wholesalex-settings.php:1013
-#: includes/menu/class-wholesalex-settings.php:1047
+#: includes/menu/class-wholesalex-settings.php:1043
+#: includes/menu/class-wholesalex-settings.php:1077
 msgid "Minimum Order Quantity"
 msgstr ""
 
@@ -1448,7 +1448,7 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:1163
 #: includes/menu/class-wholesalex-role.php:159
-#: includes/menu/class-wholesalex-settings.php:106
+#: includes/menu/class-wholesalex-settings.php:115
 msgid "Successfully Saved."
 msgstr ""
 
@@ -1492,8 +1492,8 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:1705
 #: includes/menu/class-wholesalex-dynamic-rules.php:4482
-#: includes/menu/class-wholesalex-settings.php:708
-#: includes/menu/class-wholesalex-settings.php:710
+#: includes/menu/class-wholesalex-settings.php:738
+#: includes/menu/class-wholesalex-settings.php:740
 msgid "Payment Method Discount"
 msgstr ""
 
@@ -1502,7 +1502,7 @@ msgid "Required Quantity for Payment Method"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:1711
-#: includes/menu/class-wholesalex-settings.php:904
+#: includes/menu/class-wholesalex-settings.php:934
 msgid "Checkout Restriction"
 msgstr ""
 
@@ -1690,9 +1690,9 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:2121
 #: includes/menu/class-wholesalex-dynamic-rules.php:4422
-#: includes/menu/class-wholesalex-settings.php:618
-#: includes/menu/class-wholesalex-settings.php:650
-#: includes/menu/class-wholesalex-settings.php:652
+#: includes/menu/class-wholesalex-settings.php:648
+#: includes/menu/class-wholesalex-settings.php:680
+#: includes/menu/class-wholesalex-settings.php:682
 msgid "Cart Discount"
 msgstr ""
 
@@ -1836,8 +1836,8 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4368
 #: includes/menu/class-wholesalex-dynamic-rules.php:4488
-#: includes/menu/class-wholesalex-settings.php:1273
-#: includes/menu/class-wholesalex-settings.php:1275
+#: includes/menu/class-wholesalex-settings.php:1303
+#: includes/menu/class-wholesalex-settings.php:1305
 msgid "You can avail one of the following offers by completing the requirements."
 msgstr ""
 
@@ -1855,8 +1855,8 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4428
 #: includes/menu/class-wholesalex-dynamic-rules.php:4548
-#: includes/menu/class-wholesalex-settings.php:1286
-#: includes/menu/class-wholesalex-settings.php:1288
+#: includes/menu/class-wholesalex-settings.php:1316
+#: includes/menu/class-wholesalex-settings.php:1318
 msgid "You can avail following offers by completing the requirements."
 msgstr ""
 
@@ -1865,30 +1865,30 @@ msgid "Use "
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4542
-#: includes/menu/class-wholesalex-settings.php:828
-#: includes/menu/class-wholesalex-settings.php:830
+#: includes/menu/class-wholesalex-settings.php:858
+#: includes/menu/class-wholesalex-settings.php:860
 msgid "BOGO Discount"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4562
-#: includes/menu/class-wholesalex-settings.php:842
-#: includes/menu/class-wholesalex-settings.php:844
+#: includes/menu/class-wholesalex-settings.php:872
+#: includes/menu/class-wholesalex-settings.php:874
 msgid "Get 1 Free"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4568
-#: includes/menu/class-wholesalex-settings.php:855
-#: includes/menu/class-wholesalex-settings.php:857
+#: includes/menu/class-wholesalex-settings.php:885
+#: includes/menu/class-wholesalex-settings.php:887
 msgid "Buy at least {required_quantity} products"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4599
 #: includes/menu/class-wholesalex-dynamic-rules.php:4717
-#: includes/menu/class-wholesalex-settings.php:738
-#: includes/menu/class-wholesalex-settings.php:757
-#: includes/menu/class-wholesalex-settings.php:759
-#: includes/menu/class-wholesalex-settings.php:770
-#: includes/menu/class-wholesalex-settings.php:772
+#: includes/menu/class-wholesalex-settings.php:768
+#: includes/menu/class-wholesalex-settings.php:787
+#: includes/menu/class-wholesalex-settings.php:789
+#: includes/menu/class-wholesalex-settings.php:800
+#: includes/menu/class-wholesalex-settings.php:802
 msgid "Free Shipping"
 msgstr ""
 
@@ -1897,8 +1897,8 @@ msgid "Promotions:"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4637
-#: includes/menu/class-wholesalex-settings.php:561
-#: includes/menu/class-wholesalex-settings.php:563
+#: includes/menu/class-wholesalex-settings.php:591
+#: includes/menu/class-wholesalex-settings.php:593
 msgid "Get exclusive offers"
 msgstr ""
 
@@ -1907,8 +1907,8 @@ msgid "Conditional Discount Offers"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4678
-#: includes/menu/class-wholesalex-settings.php:1043
-#: includes/menu/class-wholesalex-settings.php:1045
+#: includes/menu/class-wholesalex-settings.php:1073
+#: includes/menu/class-wholesalex-settings.php:1075
 msgid "You can add minimum {minimum_qty} and maximum {maximum_qty} quantity of this product"
 msgstr ""
 
@@ -1916,14 +1916,14 @@ msgstr ""
 #: includes/menu/class-wholesalex-dynamic-rules.php:6356
 #: includes/menu/class-wholesalex-dynamic-rules.php:6424
 #: includes/menu/class-wholesalex-dynamic-rules.php:6490
-#: includes/menu/class-wholesalex-settings.php:1009
-#: includes/menu/class-wholesalex-settings.php:1011
+#: includes/menu/class-wholesalex-settings.php:1039
+#: includes/menu/class-wholesalex-settings.php:1041
 msgid "You have to add minimun {minimum_qty} quantity"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4694
-#: includes/menu/class-wholesalex-settings.php:1026
-#: includes/menu/class-wholesalex-settings.php:1028
+#: includes/menu/class-wholesalex-settings.php:1056
+#: includes/menu/class-wholesalex-settings.php:1058
 msgid "You can add maximum {maximum_qty} quantity"
 msgstr ""
 
@@ -1936,8 +1936,8 @@ msgid "FREE"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4926
-#: includes/menu/class-wholesalex-settings.php:1113
-#: includes/menu/class-wholesalex-settings.php:1115
+#: includes/menu/class-wholesalex-settings.php:1143
+#: includes/menu/class-wholesalex-settings.php:1145
 msgid "Spend {min_value} to {max_value}"
 msgstr ""
 
@@ -1946,14 +1946,14 @@ msgid "Spend min {max_value}"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4933
-#: includes/menu/class-wholesalex-settings.php:1081
-#: includes/menu/class-wholesalex-settings.php:1083
+#: includes/menu/class-wholesalex-settings.php:1111
+#: includes/menu/class-wholesalex-settings.php:1113
 msgid "Spend upto {min_value}"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4943
-#: includes/menu/class-wholesalex-settings.php:1130
-#: includes/menu/class-wholesalex-settings.php:1132
+#: includes/menu/class-wholesalex-settings.php:1160
+#: includes/menu/class-wholesalex-settings.php:1162
 msgid "Add {min_value} to {max_value} product(s) to cart"
 msgstr ""
 
@@ -1966,8 +1966,8 @@ msgid "Don&apos;t buy more than {min_value} product(s) to get the discount"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4959
-#: includes/menu/class-wholesalex-settings.php:1180
-#: includes/menu/class-wholesalex-settings.php:1182
+#: includes/menu/class-wholesalex-settings.php:1210
+#: includes/menu/class-wholesalex-settings.php:1212
 msgid "Add {min_value} to {max_value} {unit} to cart"
 msgstr ""
 
@@ -1999,7 +1999,7 @@ msgid "Payment Discount!"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:6961
-#: includes/menu/class-wholesalex-settings.php:1333
+#: includes/menu/class-wholesalex-settings.php:1363
 msgid "Login to see prices"
 msgstr ""
 
@@ -2400,208 +2400,208 @@ msgstr ""
 msgid "Dashboard"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:312
 #: includes/menu/class-wholesalex-overview.php:313
-#: includes/menu/class-wholesalex-settings.php:548
+#: includes/menu/class-wholesalex-overview.php:314
+#: includes/menu/class-wholesalex-settings.php:578
 #: assets/js/whx_overview.js:4
 msgid "Dynamic Rules"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:320
 #: includes/menu/class-wholesalex-overview.php:321
+#: includes/menu/class-wholesalex-overview.php:322
 #: assets/js/whx_overview.js:4
 msgid "User Roles"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:328
 #: includes/menu/class-wholesalex-overview.php:329
+#: includes/menu/class-wholesalex-overview.php:330
 #: includes/menu/class-wholesalex-role.php:428
 #: assets/js/whx_overview.js:4
 msgid "Registration Form"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:336
 #: includes/menu/class-wholesalex-overview.php:337
+#: includes/menu/class-wholesalex-overview.php:338
 msgid "Addons"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:344
 #: includes/menu/class-wholesalex-overview.php:345
+#: includes/menu/class-wholesalex-overview.php:346
 msgid "Users"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:352
 #: includes/menu/class-wholesalex-overview.php:353
+#: includes/menu/class-wholesalex-overview.php:354
 msgid "Emails"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:368
-#: includes/menu/class-wholesalex-overview.php:369
+#: includes/menu/class-wholesalex-overview.php:372
+#: includes/menu/class-wholesalex-overview.php:373
 msgid "User Role Requests"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:379
-#: includes/menu/class-wholesalex-overview.php:380
+#: includes/menu/class-wholesalex-overview.php:383
+#: includes/menu/class-wholesalex-overview.php:384
 msgid "Features"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:391
-#: includes/menu/class-wholesalex-overview.php:399
-#: includes/menu/class-wholesalex-overview.php:410
+#: includes/menu/class-wholesalex-overview.php:395
+#: includes/menu/class-wholesalex-overview.php:403
+#: includes/menu/class-wholesalex-overview.php:414
 #: includes/menu/class-wholesalex-setup-wizard.php:116
 #: includes/options/Addons.php:337
 msgid "Conversations"
 msgstr ""
 
 #. translators: %1$s: Menu title, %2$d: Pending conversation count.
-#: includes/menu/class-wholesalex-overview.php:401
+#: includes/menu/class-wholesalex-overview.php:405
 msgid "%1$s <span class=\"menu-counter\"><span>%2$d</span></span>"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:414
-#: includes/menu/class-wholesalex-overview.php:415
+#: includes/menu/class-wholesalex-overview.php:418
+#: includes/menu/class-wholesalex-overview.php:419
 msgid "License"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:427
-#: includes/menu/class-wholesalex-overview.php:428
+#: includes/menu/class-wholesalex-overview.php:431
+#: includes/menu/class-wholesalex-overview.php:432
 msgid "Migration Tool"
-msgstr ""
-
-#: includes/menu/class-wholesalex-overview.php:563
-#: assets/js/whx_overview.js:4
-msgid "Customer No. (B2B)"
-msgstr ""
-
-#: includes/menu/class-wholesalex-overview.php:564
-#: assets/js/whx_overview.js:4
-msgid "Total Order (B2B)"
-msgstr ""
-
-#: includes/menu/class-wholesalex-overview.php:565
-#: assets/js/whx_overview.js:4
-msgid "Total Sale (B2B)"
-msgstr ""
-
-#: includes/menu/class-wholesalex-overview.php:566
-#: assets/js/whx_overview.js:4
-msgid "Net Revenue (B2B)"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:567
 #: assets/js/whx_overview.js:4
-msgid "Gross Sale (B2B)"
+msgid "Customer No. (B2B)"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:568
 #: assets/js/whx_overview.js:4
+msgid "Total Order (B2B)"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:569
+#: assets/js/whx_overview.js:4
+msgid "Total Sale (B2B)"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:570
+#: assets/js/whx_overview.js:4
+msgid "Net Revenue (B2B)"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:571
+#: assets/js/whx_overview.js:4
+msgid "Gross Sale (B2B)"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:572
+#: assets/js/whx_overview.js:4
 msgid "Average Order (B2B)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:893
+#: includes/menu/class-wholesalex-overview.php:897
 #: includes/menu/class-wholesalex-role.php:169
 #: includes/menu/class-wholesalex-role.php:209
 msgid "New Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:961
+#: includes/menu/class-wholesalex-overview.php:965
 #: includes/menu/class-wholesalex-users.php:192
 #: assets/js/whx_conversation.js:4185
 #: assets/js/whx_overview.js:4
 msgid "Select Status"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:984
+#: includes/menu/class-wholesalex-overview.php:988
 #: includes/menu/class-wholesalex-registration.php:204
 msgid "No Mapping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:985
+#: includes/menu/class-wholesalex-overview.php:989
 msgid "Billing\tFirst Name"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:986
+#: includes/menu/class-wholesalex-overview.php:990
 msgid "Billing\tLast Name"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:987
+#: includes/menu/class-wholesalex-overview.php:991
 msgid "Billing\tCompany"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:988
+#: includes/menu/class-wholesalex-overview.php:992
 msgid "Billing\tAddress\t1"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:989
+#: includes/menu/class-wholesalex-overview.php:993
 msgid "Billing\tAddress\t2"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:990
+#: includes/menu/class-wholesalex-overview.php:994
 msgid "Billing\tCity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:991
+#: includes/menu/class-wholesalex-overview.php:995
 msgid "Billing\tPost Code"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:992
+#: includes/menu/class-wholesalex-overview.php:996
 msgid "Billing\tCountry"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:993
+#: includes/menu/class-wholesalex-overview.php:997
 msgid "Billing\tState"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:994
+#: includes/menu/class-wholesalex-overview.php:998
 msgid "Billing\tEmail"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:995
+#: includes/menu/class-wholesalex-overview.php:999
 msgid "Billing\tPhone"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:996
+#: includes/menu/class-wholesalex-overview.php:1000
 msgid "Custom User\tMeta Mapping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1037
-#: includes/menu/class-wholesalex-overview.php:1079
+#: includes/menu/class-wholesalex-overview.php:1041
+#: includes/menu/class-wholesalex-overview.php:1083
 msgid "Name and Email"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1038
+#: includes/menu/class-wholesalex-overview.php:1042
 msgid "Wallet Balance"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1039
+#: includes/menu/class-wholesalex-overview.php:1043
 msgid "Total Purchase"
 msgstr ""
 
 #. translators: %s - Plugin Name
-#: includes/menu/class-wholesalex-overview.php:1041
+#: includes/menu/class-wholesalex-overview.php:1045
 #: includes/menu/class-wholesalex-profile.php:378
 #: includes/menu/class-wholesalex-profile.php:1162
 msgid "%s Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1060
+#: includes/menu/class-wholesalex-overview.php:1064
 msgid "Order ID"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1061
+#: includes/menu/class-wholesalex-overview.php:1065
 #: includes/menu/class-wholesalex-role.php:402
 #: includes/menu/class-wholesalex-role.php:403
 msgid "Name"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1062
+#: includes/menu/class-wholesalex-overview.php:1066
 #: includes/menu/class-wholesalex-request-role-change.php:469
 #: includes/menu/class-wholesalex-users.php:457
 msgid "Date"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1064
-#: includes/menu/class-wholesalex-overview.php:1082
+#: includes/menu/class-wholesalex-overview.php:1068
+#: includes/menu/class-wholesalex-overview.php:1086
 #: includes/menu/class-wholesalex-request-role-change.php:476
 #: includes/menu/class-wholesalex-users.php:465
 #: assets/js/whx_overview.js:1
@@ -2609,15 +2609,15 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1080
+#: includes/menu/class-wholesalex-overview.php:1084
 msgid "Regi. Date"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1081
+#: includes/menu/class-wholesalex-overview.php:1085
 msgid "Regi. Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1139
+#: includes/menu/class-wholesalex-overview.php:1143
 #: assets/js/wholesalex_components.js:1
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1527
@@ -2984,7 +2984,7 @@ msgid "Role ID"
 msgstr ""
 
 #: includes/menu/class-wholesalex-role.php:433
-#: includes/menu/class-wholesalex-settings.php:388
+#: includes/menu/class-wholesalex-settings.php:418
 msgid "Registration Approval Method"
 msgstr ""
 
@@ -3001,7 +3001,7 @@ msgid "Automatically Approve Account"
 msgstr ""
 
 #: includes/menu/class-wholesalex-role.php:438
-#: includes/menu/class-wholesalex-settings.php:392
+#: includes/menu/class-wholesalex-settings.php:422
 msgid "Admin Approval Required"
 msgstr ""
 
@@ -3054,930 +3054,975 @@ msgid "Replace Add to Cart With Add to Quote"
 msgstr ""
 
 #. translators: %1s - Plugin Name, %2s - Plugin Name,
-#: includes/menu/class-wholesalex-settings.php:102
+#: includes/menu/class-wholesalex-settings.php:111
 msgid "To Active \"Email Confirmation\" Please Enable %1$s Email Template from \"Dashboard > %2$s > Emails\"."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:171
+#: includes/menu/class-wholesalex-settings.php:180
 msgid "General Settings"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:176
+#: includes/menu/class-wholesalex-settings.php:185
 msgid "Plugin Status"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:178
+#: includes/menu/class-wholesalex-settings.php:187
 msgid "B2B (Wholesale Only)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:179
+#: includes/menu/class-wholesalex-settings.php:188
 msgid "B2C (Public Only)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:180
+#: includes/menu/class-wholesalex-settings.php:189
 msgid "B2B & B2C Hybrid (Wholesale and Public)"
 msgstr ""
 
 #. translators: %s - Plugin Name
-#: includes/menu/class-wholesalex-settings.php:184
+#: includes/menu/class-wholesalex-settings.php:193
 msgid "Choose which type of store you want to create & manage with %s."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:190
+#: includes/menu/class-wholesalex-settings.php:199
 msgid "Apply Product Discount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:192
+#: includes/menu/class-wholesalex-settings.php:201
 msgid "Regular Price"
 msgstr ""
 
 #. translators: %s - Plugin Name
-#: includes/menu/class-wholesalex-settings.php:197
+#: includes/menu/class-wholesalex-settings.php:206
 msgid "Offer discounts either on the regular product price(s) or the sale price(s)."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:201
+#: includes/menu/class-wholesalex-settings.php:210
+msgid "Hide Product Stock for B2C Customers"
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:212
+msgid "Disabled"
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:213
+msgid "Hide Stock Completely for B2C Buyers"
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:214
+msgid "Only Hide Stock Quantity for B2C Buyers"
+msgstr ""
+
+#. translators: %s - Plugin Name
+#: includes/menu/class-wholesalex-settings.php:218
+msgid "Hide Stock Quantities Options for B2C Users"
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:222
 msgid "Pricing / Discount Priority"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:202
+#: includes/menu/class-wholesalex-settings.php:223
 msgid "Set the priority to declare which will be applied if discounts are assigned in multiple ways."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:215
+#: includes/menu/class-wholesalex-settings.php:236
 msgid "Show Tiered Pricing Table"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:216
+#: includes/menu/class-wholesalex-settings.php:237
 msgid "Product Single Page"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:226
+#: includes/menu/class-wholesalex-settings.php:247
 msgid "Enable B2B Stock Management"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:227
+#: includes/menu/class-wholesalex-settings.php:248
 msgid "B2B Stock Management"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:235
+#: includes/menu/class-wholesalex-settings.php:256
 msgid "Disable Coupons"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:236
+#: includes/menu/class-wholesalex-settings.php:257
 msgid "Hide coupon form of cart and checkout pages from wholesale users."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:247
+#: includes/menu/class-wholesalex-settings.php:268
 msgid "Hide All Products From B2C Users"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:248
+#: includes/menu/class-wholesalex-settings.php:269
 msgid "Click on the checkbox to hide all products from B2C users."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:249
+#: includes/menu/class-wholesalex-settings.php:270
 msgid "Once you click on this check box all products will be hidden from b2c users."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:259
+#: includes/menu/class-wholesalex-settings.php:280
 msgid "Hide All Products From Guest Users"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:260
+#: includes/menu/class-wholesalex-settings.php:281
 msgid "Click on the check box if you want to hide all products from guest users."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:261
+#: includes/menu/class-wholesalex-settings.php:282
 msgid "Once you click on this check box all products will be hidden from guest users."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:271
+#: includes/menu/class-wholesalex-settings.php:292
 msgid "Make The Store Private"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:272
+#: includes/menu/class-wholesalex-settings.php:293
 msgid "Click the check box to make the store private from logged out users"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:281
+#: includes/menu/class-wholesalex-settings.php:302
 msgid "Allow Hidden Product to Checkout"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:282
+#: includes/menu/class-wholesalex-settings.php:303
 msgid "Click the check box if you want to allow hidden product to checkout"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:291
+#: includes/menu/class-wholesalex-settings.php:312
 msgid "Allow Tax To Cart Total Amount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:292
+#: includes/menu/class-wholesalex-settings.php:313
 msgid "Click the check box if you want to allow Tax with Cart Total Amount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:301
+#: includes/menu/class-wholesalex-settings.php:322
 msgid "Allow Full Access to Shop Manager"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:302
+#: includes/menu/class-wholesalex-settings.php:323
 msgid "Check this box if you want to enable Full Access of WholesaleX to the Shop Manager"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:310
+#: includes/menu/class-wholesalex-settings.php:331
 msgid "Enable User Role Switching"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:311
+#: includes/menu/class-wholesalex-settings.php:332
 msgid "Check this box if you want to enable an option for User to Switch Roles"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:320
+#: includes/menu/class-wholesalex-settings.php:338
+msgid "Enable Page Visibility By Group"
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:339
+msgid "Check this box if you want to enable an option for enables page visibility by group"
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:350
 msgid "Override Regular Price Suffix"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:322
+#: includes/menu/class-wholesalex-settings.php:352
 msgid "Display desired text after regular prices on shop and single products pages."
 msgstr ""
 
 #. translators: %s - Plugin Name
-#: includes/menu/class-wholesalex-settings.php:330
+#: includes/menu/class-wholesalex-settings.php:360
 msgid "%s Price Suffix"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:332
+#: includes/menu/class-wholesalex-settings.php:362
 msgid "Display desired text after wholesale prices on shop and single products pages."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:339
+#: includes/menu/class-wholesalex-settings.php:369
 msgid "Force Redirect URL"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:346
+#: includes/menu/class-wholesalex-settings.php:376
 msgid "Enter an url where you want to force redirect logged out users."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:353
+#: includes/menu/class-wholesalex-settings.php:383
 msgid "Whitelist URL (For Private Store)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:360
+#: includes/menu/class-wholesalex-settings.php:390
 msgid "Enter Comma Separated URLs to make these whitelist on private store"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:368
+#: includes/menu/class-wholesalex-settings.php:398
 msgid "Registration & Login"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:374
+#: includes/menu/class-wholesalex-settings.php:404
 msgid "User Login Option"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:376
+#: includes/menu/class-wholesalex-settings.php:406
 msgid "Manual Login After Registration"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:377
+#: includes/menu/class-wholesalex-settings.php:407
 msgid "Auto Login After Registration"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:379
+#: includes/menu/class-wholesalex-settings.php:409
 msgid "Auto login after registration will work only if the user status option is set to “Auto Approve”. "
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:390
+#: includes/menu/class-wholesalex-settings.php:420
 msgid "Email Confirmation"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:391
+#: includes/menu/class-wholesalex-settings.php:421
 msgid "Auto Approval"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:403
+#: includes/menu/class-wholesalex-settings.php:433
 msgid "Separate My Account Page for B2B Users"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:405
+#: includes/menu/class-wholesalex-settings.php:435
 msgid "Select your desired page if you want to separate the My Account Page for B2B users."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:414
+#: includes/menu/class-wholesalex-settings.php:444
 msgid "Show Registration Form For Logged In User"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:415
+#: includes/menu/class-wholesalex-settings.php:445
 msgid "Click on the check box if you want to show registration form logged in users."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:423
+#: includes/menu/class-wholesalex-settings.php:453
 msgid "Redirect Page URL (After Registration)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:424
-#: includes/menu/class-wholesalex-settings.php:433
+#: includes/menu/class-wholesalex-settings.php:454
+#: includes/menu/class-wholesalex-settings.php:463
 msgid "http://"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:432
+#: includes/menu/class-wholesalex-settings.php:462
 msgid "Redirect Page URL (After Login)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:441
+#: includes/menu/class-wholesalex-settings.php:471
 msgid "Registration Successful Message"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:449
+#: includes/menu/class-wholesalex-settings.php:479
 msgid "Registration Form Message For Logged In User"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:461
+#: includes/menu/class-wholesalex-settings.php:491
 msgid "Wholesale Price Text for Product Pages"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:463
+#: includes/menu/class-wholesalex-settings.php:493
 msgid "The text is shown immediately before the wholesale price in product single page. The default text is “Wholesale Price:”"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:468
+#: includes/menu/class-wholesalex-settings.php:498
 msgid "Wholesale Price Text for Product Listing Pages"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:470
+#: includes/menu/class-wholesalex-settings.php:500
 msgid "The text is shown immediately before the wholesale price in product listing page. The default text is “Wholesale Price:”."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:478
+#: includes/menu/class-wholesalex-settings.php:508
 msgid "Display Prices in the Shop"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:480
+#: includes/menu/class-wholesalex-settings.php:510
 msgid "Use WooCommerce default"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:481
+#: includes/menu/class-wholesalex-settings.php:511
 msgid "Including Tax"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:482
+#: includes/menu/class-wholesalex-settings.php:512
 msgid "Excluding Tax"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:484
+#: includes/menu/class-wholesalex-settings.php:514
 msgid "Display prices including or excluding taxes on the shop page."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:494
+#: includes/menu/class-wholesalex-settings.php:524
 msgid "Wholesale Price On Product Listing Page"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:496
+#: includes/menu/class-wholesalex-settings.php:526
 msgid "Pricing Range"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:497
+#: includes/menu/class-wholesalex-settings.php:527
 msgid "Minimum Pricing"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:498
+#: includes/menu/class-wholesalex-settings.php:528
 msgid "Maximum Pricing"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:500
+#: includes/menu/class-wholesalex-settings.php:530
 msgid "Pricing Range, Minimum Pricing, Maximum Pricing"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:501
+#: includes/menu/class-wholesalex-settings.php:531
 msgid "Select whether you want to display wholesale price range, minimum price, or maximize price on the product listing page."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:509
+#: includes/menu/class-wholesalex-settings.php:539
 msgid "Hide Retail Price"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:510
+#: includes/menu/class-wholesalex-settings.php:540
 msgid "Click on the check box if you want to hide the retail price."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:511
+#: includes/menu/class-wholesalex-settings.php:541
 msgid "Once you click on this check box the regular price will be hidden if the wholesale price is present."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:516
+#: includes/menu/class-wholesalex-settings.php:546
 msgid "Hide Wholesale Price"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:517
+#: includes/menu/class-wholesalex-settings.php:547
 msgid "Hide wholesale price for all users."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:518
+#: includes/menu/class-wholesalex-settings.php:548
 msgid "This option will hide wholesale price in price-column of product-listing page."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:523
+#: includes/menu/class-wholesalex-settings.php:553
 msgid "Show Login to view price on Product Listing Page"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:524
-#: includes/menu/class-wholesalex-settings.php:534
+#: includes/menu/class-wholesalex-settings.php:554
+#: includes/menu/class-wholesalex-settings.php:564
 msgid "Login to view price"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:525
+#: includes/menu/class-wholesalex-settings.php:555
 msgid "Display logging option on the product listing page to view price."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:533
+#: includes/menu/class-wholesalex-settings.php:563
 msgid "Show Login to view price on Single Product Page"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:535
+#: includes/menu/class-wholesalex-settings.php:565
 msgid "Display logging option on single product pages to view price."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:540
-#: includes/menu/class-wholesalex-settings.php:541
+#: includes/menu/class-wholesalex-settings.php:570
+#: includes/menu/class-wholesalex-settings.php:571
 msgid "Login to View Price Login URL"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:542
+#: includes/menu/class-wholesalex-settings.php:572
 msgid "Will redirect to this link for login, when login to view prices enabled."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:553
+#: includes/menu/class-wholesalex-settings.php:583
 msgid "Show promotional texts on single product pages."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:554
+#: includes/menu/class-wholesalex-settings.php:584
 msgid "Click on the check box to display promotional texts on single product pages."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:560
+#: includes/menu/class-wholesalex-settings.php:590
 msgid "Main Promo Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:577
+#: includes/menu/class-wholesalex-settings.php:607
 msgid "Show Product Discount on Pop Up"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:578
+#: includes/menu/class-wholesalex-settings.php:608
 msgid "Click on the check box to display product discounts promotional texts on single product pages."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:590
+#: includes/menu/class-wholesalex-settings.php:620
 msgid "Show Label before product discounts rule promotional card."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:591
+#: includes/menu/class-wholesalex-settings.php:621
 msgid "Click on the check box to display product discounts rule info before promotional card."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:603
-#: includes/menu/class-wholesalex-settings.php:649
-#: includes/menu/class-wholesalex-settings.php:707
+#: includes/menu/class-wholesalex-settings.php:633
+#: includes/menu/class-wholesalex-settings.php:679
+#: includes/menu/class-wholesalex-settings.php:737
 msgid "Label Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:623
+#: includes/menu/class-wholesalex-settings.php:653
 msgid "Show Cart Discount on Pop Up"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:624
+#: includes/menu/class-wholesalex-settings.php:654
 msgid "Click on the check box to display cart discounts promotional texts on single product pages."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:636
+#: includes/menu/class-wholesalex-settings.php:666
 msgid "Show Label before Cart discount promotional card."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:637
+#: includes/menu/class-wholesalex-settings.php:667
 msgid "Click on the check box to display cart discounts rule info before promotional card."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:662
-#: includes/menu/class-wholesalex-settings.php:720
+#: includes/menu/class-wholesalex-settings.php:692
+#: includes/menu/class-wholesalex-settings.php:750
 msgid "Promo Description Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:663
+#: includes/menu/class-wholesalex-settings.php:693
 msgid "After adding to the cart"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:665
+#: includes/menu/class-wholesalex-settings.php:695
 msgid "After adding to the cart "
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:676
+#: includes/menu/class-wholesalex-settings.php:706
 msgid "Payment Method Discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:681
+#: includes/menu/class-wholesalex-settings.php:711
 msgid "Show Payment Method Discount on Pop Up"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:682
+#: includes/menu/class-wholesalex-settings.php:712
 msgid "Click on the check box to display payment method promotional texts on single product pages."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:694
+#: includes/menu/class-wholesalex-settings.php:724
 msgid "Show Label before Payment Method Discounts promotional card."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:695
+#: includes/menu/class-wholesalex-settings.php:725
 msgid "Click on the check box to display payment discounts rule info before promotional card."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:721
-#: includes/menu/class-wholesalex-settings.php:723
+#: includes/menu/class-wholesalex-settings.php:751
+#: includes/menu/class-wholesalex-settings.php:753
 msgid "Use {payment_methods}"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:725
+#: includes/menu/class-wholesalex-settings.php:755
 msgid "Allowed Payment Methods"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:743
+#: includes/menu/class-wholesalex-settings.php:773
 msgid "Show Free Shipping Offer on Pop up"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:744
+#: includes/menu/class-wholesalex-settings.php:774
 msgid "Click on the check box to display free shipping texts on single product pages."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:756
+#: includes/menu/class-wholesalex-settings.php:786
 msgid "Promo Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:769
+#: includes/menu/class-wholesalex-settings.php:799
 msgid "Text on Promotional Popup"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:783
+#: includes/menu/class-wholesalex-settings.php:813
 msgid "Buy X Get 1 (BOGO)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:788
+#: includes/menu/class-wholesalex-settings.php:818
 msgid "Show BOGO Discounts Promotions Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:789
+#: includes/menu/class-wholesalex-settings.php:819
 msgid "Click on the check box to display BOGO Discounts promotional texts on single product pages."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:801
+#: includes/menu/class-wholesalex-settings.php:831
 msgid "Show Label before BOGO discounts promotional card."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:802
+#: includes/menu/class-wholesalex-settings.php:832
 msgid "Click on the check box to display bogo discounts rule info before promotional card."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:814
+#: includes/menu/class-wholesalex-settings.php:844
 msgid "Show BOGO BADGE in Shop and Product page."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:815
+#: includes/menu/class-wholesalex-settings.php:845
 msgid "Click on the check box to display BOGO BADGE in Shop and Product page."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:827
+#: includes/menu/class-wholesalex-settings.php:857
 msgid "Label Text "
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:841
+#: includes/menu/class-wholesalex-settings.php:871
 msgid "Bogo Offer Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:854
+#: includes/menu/class-wholesalex-settings.php:884
 msgid "Promo Text on Pop-Up"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:859
+#: includes/menu/class-wholesalex-settings.php:889
 msgid "Required Quantity To Get Discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:860
-#: includes/menu/class-wholesalex-settings.php:878
-#: includes/menu/class-wholesalex-settings.php:1014
-#: includes/menu/class-wholesalex-settings.php:1031
-#: includes/menu/class-wholesalex-settings.php:1049
+#: includes/menu/class-wholesalex-settings.php:890
+#: includes/menu/class-wholesalex-settings.php:908
+#: includes/menu/class-wholesalex-settings.php:1044
+#: includes/menu/class-wholesalex-settings.php:1061
+#: includes/menu/class-wholesalex-settings.php:1079
 msgid "Product Title"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:871
+#: includes/menu/class-wholesalex-settings.php:901
 msgid "Promo Text on Cart"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:873
+#: includes/menu/class-wholesalex-settings.php:903
 msgid "Use the following Smart Tags to highlight the BOGO discount on the cart page. "
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:876
+#: includes/menu/class-wholesalex-settings.php:906
 msgid "minimum product quantity to avail discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:877
+#: includes/menu/class-wholesalex-settings.php:907
 msgid "Free products quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:884
+#: includes/menu/class-wholesalex-settings.php:914
 msgid "Buy X Get Y "
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:889
+#: includes/menu/class-wholesalex-settings.php:919
 msgid "Buy X Get Y (Show free item on Product Page)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:890
+#: includes/menu/class-wholesalex-settings.php:920
 msgid "Click on the check box, if you want to showcase the free product(s) on the single product page."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:896
+#: includes/menu/class-wholesalex-settings.php:926
 msgid "Show Badge on Shop & Product Page)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:897
+#: includes/menu/class-wholesalex-settings.php:927
 msgid "Click on the check box, if you want to show BADGE  on the shop & single product page."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:909
-#: includes/menu/class-wholesalex-settings.php:914
-msgid "Cart Price"
+#: includes/menu/class-wholesalex-settings.php:939
+#: includes/menu/class-wholesalex-settings.php:944
+msgid "Cart Value"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:910
-#: includes/menu/class-wholesalex-settings.php:912
+#: includes/menu/class-wholesalex-settings.php:940
+#: includes/menu/class-wholesalex-settings.php:942
 msgid "Specify the minimum amount for checkout"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:925
-#: includes/menu/class-wholesalex-settings.php:930
+#: includes/menu/class-wholesalex-settings.php:955
+#: includes/menu/class-wholesalex-settings.php:960
 msgid "Cart Quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:926
-#: includes/menu/class-wholesalex-settings.php:928
+#: includes/menu/class-wholesalex-settings.php:956
+#: includes/menu/class-wholesalex-settings.php:958
 msgid "Specify the minimum number of items for checkout"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:941
-#: includes/menu/class-wholesalex-settings.php:946
+#: includes/menu/class-wholesalex-settings.php:971
+#: includes/menu/class-wholesalex-settings.php:976
 msgid "Cart Weight"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:942
-#: includes/menu/class-wholesalex-settings.php:944
+#: includes/menu/class-wholesalex-settings.php:972
+#: includes/menu/class-wholesalex-settings.php:974
 msgid "Specify the minimum cart weight for checkout"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:957
-#: includes/menu/class-wholesalex-settings.php:962
+#: includes/menu/class-wholesalex-settings.php:987
+#: includes/menu/class-wholesalex-settings.php:992
 msgid "User Order Count"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:958
-#: includes/menu/class-wholesalex-settings.php:960
+#: includes/menu/class-wholesalex-settings.php:988
+#: includes/menu/class-wholesalex-settings.php:990
 msgid "Specify the minimum user order count for checkout"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:973
-#: includes/menu/class-wholesalex-settings.php:978
+#: includes/menu/class-wholesalex-settings.php:1003
+#: includes/menu/class-wholesalex-settings.php:1008
 msgid "Total Purchase Amount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:974
-#: includes/menu/class-wholesalex-settings.php:976
+#: includes/menu/class-wholesalex-settings.php:1004
+#: includes/menu/class-wholesalex-settings.php:1006
 msgid "Specify the minimum total purchase amount for checkout"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:990
+#: includes/menu/class-wholesalex-settings.php:1020
 msgid "Min & Max Order Quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:995
+#: includes/menu/class-wholesalex-settings.php:1025
 msgid "Display Required Order Quantity Notice on Product Page"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:996
+#: includes/menu/class-wholesalex-settings.php:1026
 msgid "Click on the check box to display required order quantity notice."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1008
+#: includes/menu/class-wholesalex-settings.php:1038
 msgid "Minimum Order Quantity Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1025
+#: includes/menu/class-wholesalex-settings.php:1055
 msgid "Maximum Order Quantity Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1030
-#: includes/menu/class-wholesalex-settings.php:1048
+#: includes/menu/class-wholesalex-settings.php:1060
+#: includes/menu/class-wholesalex-settings.php:1078
 msgid "Maximum Order Quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1042
+#: includes/menu/class-wholesalex-settings.php:1072
 msgid "Min and Max Order Quantity text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1062
+#: includes/menu/class-wholesalex-settings.php:1092
 msgid "Conditions"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1067
+#: includes/menu/class-wholesalex-settings.php:1097
 msgid "Show discount conditions text on Pop Up."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1068
+#: includes/menu/class-wholesalex-settings.php:1098
 msgid "Click on the check box to display discount conditions text."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1080
+#: includes/menu/class-wholesalex-settings.php:1110
 msgid "Cart Total Value Min Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1085
-#: includes/menu/class-wholesalex-settings.php:1117
-#: includes/menu/class-wholesalex-settings.php:1134
-#: includes/menu/class-wholesalex-settings.php:1151
-#: includes/menu/class-wholesalex-settings.php:1184
-#: includes/menu/class-wholesalex-settings.php:1203
+#: includes/menu/class-wholesalex-settings.php:1115
+#: includes/menu/class-wholesalex-settings.php:1147
+#: includes/menu/class-wholesalex-settings.php:1164
+#: includes/menu/class-wholesalex-settings.php:1181
+#: includes/menu/class-wholesalex-settings.php:1214
+#: includes/menu/class-wholesalex-settings.php:1233
 msgid "Minimum Value"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1096
+#: includes/menu/class-wholesalex-settings.php:1126
 msgid "Cart Total Value Max Text "
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1097
-#: includes/menu/class-wholesalex-settings.php:1099
+#: includes/menu/class-wholesalex-settings.php:1127
+#: includes/menu/class-wholesalex-settings.php:1129
 msgid "Spend max {max_value}"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1101
-#: includes/menu/class-wholesalex-settings.php:1118
-#: includes/menu/class-wholesalex-settings.php:1135
-#: includes/menu/class-wholesalex-settings.php:1167
-#: includes/menu/class-wholesalex-settings.php:1185
-#: includes/menu/class-wholesalex-settings.php:1222
+#: includes/menu/class-wholesalex-settings.php:1131
+#: includes/menu/class-wholesalex-settings.php:1148
+#: includes/menu/class-wholesalex-settings.php:1165
+#: includes/menu/class-wholesalex-settings.php:1197
+#: includes/menu/class-wholesalex-settings.php:1215
+#: includes/menu/class-wholesalex-settings.php:1252
 msgid "Maximum Value"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1112
+#: includes/menu/class-wholesalex-settings.php:1142
 msgid "Cart Total Value Min & Max Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1129
+#: includes/menu/class-wholesalex-settings.php:1159
 msgid "Cart Total Quantity Min & Max Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1146
+#: includes/menu/class-wholesalex-settings.php:1176
 msgid "Cart Total Weight Min Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1147
-#: includes/menu/class-wholesalex-settings.php:1149
+#: includes/menu/class-wholesalex-settings.php:1177
+#: includes/menu/class-wholesalex-settings.php:1179
 msgid "Add min {min_value} product(s) to cart"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1162
+#: includes/menu/class-wholesalex-settings.php:1192
 msgid "Cart Total Weight Max Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1163
-#: includes/menu/class-wholesalex-settings.php:1165
+#: includes/menu/class-wholesalex-settings.php:1193
+#: includes/menu/class-wholesalex-settings.php:1195
 msgid "Add {max_value} or more product(s) to cart"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1179
+#: includes/menu/class-wholesalex-settings.php:1209
 msgid "Cart Total Weight Min & Max Text"
 msgstr ""
 
 #. Translators: %s is the unit of measurement for weight.
-#: includes/menu/class-wholesalex-settings.php:1187
-#: includes/menu/class-wholesalex-settings.php:1205
-#: includes/menu/class-wholesalex-settings.php:1224
+#: includes/menu/class-wholesalex-settings.php:1217
+#: includes/menu/class-wholesalex-settings.php:1235
+#: includes/menu/class-wholesalex-settings.php:1254
 msgid "Unit: %s"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1198
+#: includes/menu/class-wholesalex-settings.php:1228
 msgid "Cart Total Quantity Min Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1199
-#: includes/menu/class-wholesalex-settings.php:1201
+#: includes/menu/class-wholesalex-settings.php:1229
+#: includes/menu/class-wholesalex-settings.php:1231
 msgid "Add min {min_value} {unit} to cart"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1217
+#: includes/menu/class-wholesalex-settings.php:1247
 msgid "Cart Total Quantity Max Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1218
-#: includes/menu/class-wholesalex-settings.php:1220
+#: includes/menu/class-wholesalex-settings.php:1248
+#: includes/menu/class-wholesalex-settings.php:1250
 msgid "Add up to {max_value} {unit} to cart"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1236
+#: includes/menu/class-wholesalex-settings.php:1266
 msgid "Discounts Validity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1241
+#: includes/menu/class-wholesalex-settings.php:1271
 msgid "Show Discounts Validity on Pop-Up"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1242
+#: includes/menu/class-wholesalex-settings.php:1272
 msgid "Click on the check box to display Discount Validity texts on promo texts."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1254
+#: includes/menu/class-wholesalex-settings.php:1284
 msgid "Discount Validity Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1255
-#: includes/menu/class-wholesalex-settings.php:1257
+#: includes/menu/class-wholesalex-settings.php:1285
+#: includes/menu/class-wholesalex-settings.php:1287
 msgid "Valid till: {end_date}"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1272
+#: includes/menu/class-wholesalex-settings.php:1302
 msgid "Promotions Explainer Text for single discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1285
+#: includes/menu/class-wholesalex-settings.php:1315
 msgid "Promotions Explainer Text for Multiple discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1299
+#: includes/menu/class-wholesalex-settings.php:1329
 msgid "Language and Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1305
+#: includes/menu/class-wholesalex-settings.php:1335
 msgid "Login & Registration"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1309
+#: includes/menu/class-wholesalex-settings.php:1339
 msgid "Login Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1312
+#: includes/menu/class-wholesalex-settings.php:1342
 msgid "Login"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1316
+#: includes/menu/class-wholesalex-settings.php:1346
 msgid "Registration Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1319
+#: includes/menu/class-wholesalex-settings.php:1349
 msgid "Registration"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1323
+#: includes/menu/class-wholesalex-settings.php:1353
 msgid "Logout To See this form Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1326
+#: includes/menu/class-wholesalex-settings.php:1356
 msgid "Logout To See this form"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1330
+#: includes/menu/class-wholesalex-settings.php:1360
 msgid "Login To See Price Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1339
+#: includes/menu/class-wholesalex-settings.php:1369
 msgid "Price is hidden Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1342
+#: includes/menu/class-wholesalex-settings.php:1372
 msgid "Price is hidden!"
 msgstr ""
 
 #. translators: %s - Plugin Name
-#: includes/menu/class-wholesalex-settings.php:1347
-#: includes/menu/class-wholesalex-settings.php:1351
+#: includes/menu/class-wholesalex-settings.php:1377
+#: includes/menu/class-wholesalex-settings.php:1381
 msgid "%s Free Shipping Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1356
+#: includes/menu/class-wholesalex-settings.php:1386
 msgid "Design"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1363
+#: includes/menu/class-wholesalex-settings.php:1393
 msgid "Table Style."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1371
-#: includes/menu/class-wholesalex-settings.php:1372
+#: includes/menu/class-wholesalex-settings.php:1401
+#: includes/menu/class-wholesalex-settings.php:1402
 msgid "Vertical Style"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1377
-#: includes/menu/class-wholesalex-settings.php:1378
+#: includes/menu/class-wholesalex-settings.php:1407
+#: includes/menu/class-wholesalex-settings.php:1408
 #: assets/js/whx_overview.js:4
 msgid "Border Radius"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1386
+#: includes/menu/class-wholesalex-settings.php:1416
 msgid "Table Heading"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1387
+#: includes/menu/class-wholesalex-settings.php:1417
 msgid "Heading Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1388
+#: includes/menu/class-wholesalex-settings.php:1418
 msgid "If you Write Something, The Heading will Visible"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1389
+#: includes/menu/class-wholesalex-settings.php:1419
 msgid "Buy More, Save More"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1393
-#: includes/menu/class-wholesalex-settings.php:1394
+#: includes/menu/class-wholesalex-settings.php:1423
+#: includes/menu/class-wholesalex-settings.php:1424
 msgid "Choose and Navigate Table Items"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1434
+#: includes/menu/class-wholesalex-settings.php:1464
 #: assets/js/whx_overview.js:4
 msgid "Font Size"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1440
-#: includes/menu/class-wholesalex-settings.php:1441
+#: includes/menu/class-wholesalex-settings.php:1470
+#: includes/menu/class-wholesalex-settings.php:1471
 msgid "Tiered pricing discount applies to combined variations"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1450
+#: includes/menu/class-wholesalex-settings.php:1480
 msgid "Table Text Color"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1456
+#: includes/menu/class-wholesalex-settings.php:1486
 msgid "Title Text Color"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1462
+#: includes/menu/class-wholesalex-settings.php:1492
 msgid "Title Background Color"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1468
+#: includes/menu/class-wholesalex-settings.php:1498
 msgid "Table Border Color"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1474
+#: includes/menu/class-wholesalex-settings.php:1504
 msgid "Active Tier Text Color"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1480
+#: includes/menu/class-wholesalex-settings.php:1510
 msgid "Active Tier BG Color"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1486
+#: includes/menu/class-wholesalex-settings.php:1516
 msgid "Tier Discount Text Color"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1492
+#: includes/menu/class-wholesalex-settings.php:1522
 msgid "Tier Discount BG Color"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1504
+#: includes/menu/class-wholesalex-settings.php:1534
 msgid "Site Key"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1505
+#: includes/menu/class-wholesalex-settings.php:1535
 msgid "Site Key..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1507
+#: includes/menu/class-wholesalex-settings.php:1537
 msgid "For Gettings reCAPTCHA Site Key, You have to create an project on google recaptcha. "
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1512
+#: includes/menu/class-wholesalex-settings.php:1542
 msgid "Secret Key"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1513
+#: includes/menu/class-wholesalex-settings.php:1543
 msgid "Secret Key..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1515
+#: includes/menu/class-wholesalex-settings.php:1545
 msgid "For Gettings reCAPTCHA secret Key, You have to create an project on google recaptcha. "
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1520
+#: includes/menu/class-wholesalex-settings.php:1550
 msgid "Minimum Allowed Score"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1522
+#: includes/menu/class-wholesalex-settings.php:1552
 msgid "0.5"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1523
+#: includes/menu/class-wholesalex-settings.php:1553
 msgid "Set minimum allowed score for reCAPTCHA. Default Range: 0.0 - 1.00"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1529
+#: includes/menu/class-wholesalex-settings.php:1559
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:4
 msgid "Save Changes"
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:1852
+msgid "B2C Groups"
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:1855
+msgid "Guest Users (Logged Out), "
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:1868
+msgid "B2C Users "
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:1880
+msgid "B2B Groups"
 msgstr ""
 
 #: includes/menu/class-wholesalex-setup-wizard.php:69

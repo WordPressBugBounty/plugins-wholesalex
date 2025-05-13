@@ -1,6 +1,6 @@
 <?php
 /**
- * Compatibility with woocommerce Booking product.
+ * Compatibility with woocommerce Booking product and woocommerce booking.
  *
  * @package WHOLESALEX
  * @since 2.0.14
@@ -36,7 +36,7 @@ class WHOLESALEX_Woocommerce_Bookings {
 	 * @return bool Returns true if the product is of type 'mwb_booking', false otherwise.
 	 */
 	public function is_booking_product( $price, $product ) {
-		if ( $product->is_type( 'mwb_booking' ) ) {
+		if ( $product->is_type( 'mwb_booking' ) || $product->is_type( 'booking' ) ) {
 			return true;
 		}
 		return false;

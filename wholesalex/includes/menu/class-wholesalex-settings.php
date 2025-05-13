@@ -25,6 +25,15 @@ class Settings {
 		add_filter( 'wholesalex_recaptcha_minimum_score_allow', array( $this, 'recaptcha_minimum_score_allow' ) );
 		add_filter( 'option_woocommerce_myaccount_page_id', array( $this, 'separate_my_account_page_for_b2b' ), 10, 1 );
 		add_filter( 'woocommerce_coupons_enabled', array( $this, 'hide_coupon_fields' ) );
+		add_filter( 'plugins_loaded', array( $this, 'hide_quantities_stock_for_b2c_users' ), 10, 2 );
+		$is_page_visibility_by_group = wholesalex()->get_setting( '_settings_page_visibility_by_group', '' );
+
+		if ( 'yes' === $is_page_visibility_by_group ) {
+			add_action( 'add_meta_boxes', array( $this, 'add_visibility_meta_box' ), 10, 2 );
+			add_action( 'save_post', array( $this, 'save_visibility_meta_box_data' ) );
+			add_action( 'template_redirect', array( $this, 'check_page_visibility_by_role' ) );
+		}
+
 		/**
 		 * Force Redirect Logged Out User to Specific Page
 		 *
@@ -196,6 +205,18 @@ class Settings {
 							/* translators: %s - Plugin Name */
 							'tooltip' => __( 'Offer discounts either on the regular product price(s) or the sale price(s).', 'wholesalex' ),
 						),
+						'hidden_stock_status' => array(
+							'type'    => 'radio',
+							'label'   => __( 'Hide Product Stock for B2C Customers', 'wholesalex' ),
+							'options' => array(
+								'disable' => __( 'Disabled', 'wholesalex' ),
+								'hide_stock_completely' => __( 'Hide Stock Completely for B2C Buyers', 'wholesalex' ),
+								'hide_stock_quantities' => __( 'Only Hide Stock Quantity for B2C Buyers', 'wholesalex' ),
+							),
+							'default' => 'disable',
+							/* translators: %s - Plugin Name */
+							'tooltip' => __( 'Hide Stock Quantities Options for B2C Users', 'wholesalex' ),
+						),
 						'_settings_quantity_based_discount_priority' => array(
 							'type'    => 'dragList',
 							'label'   => __( 'Pricing / Discount Priority', 'wholesalex' ),
@@ -311,6 +332,15 @@ class Settings {
 							'desc'    => __( 'Check this box if you want to enable an option for User to Switch Roles', 'wholesalex' ),
 							'help'    => '',
 							'default' => 'no',
+						),
+						'_settings_page_visibility_by_group' => array(
+							'type'    => 'slider',
+							'label'   => __( 'Enable Page Visibility By Group', 'wholesalex' ),
+							'desc'    => __( 'Check this box if you want to enable an option for enables page visibility by group', 'wholesalex' ),
+							'help'    => '',
+							'default' => 'no',
+							'tooltip' => 'Enable/Disable WholesaleX pages for specific user groups.',
+
 						),
 					),
 					'attrGroupTwo' => array(
@@ -906,12 +936,12 @@ class Settings {
 							'attr'  => array(
 								'only_total_cart_value_promo_text' => array(
 									'type'        => 'text',
-									'label'       => __( 'Cart Price', 'wholesalex' ),
+									'label'       => __( 'Cart Value', 'wholesalex' ),
 									'placeholder' => __( 'Specify the minimum amount for checkout', 'wholesalex' ),
 									'help'        => '',
 									'default'     => __( 'Specify the minimum amount for checkout', 'wholesalex' ),
 									'smart_tags'  => array(
-										'{cart_value}' => __( 'Cart Price', 'wholesalex' ),
+										'{cart_value}' => __( 'Cart Value', 'wholesalex' ),
 									),
 									'depends_on'  => array(
 										array(
@@ -1735,5 +1765,267 @@ class Settings {
 	 */
 	public function unlock_option( $options ) {
 		return wholesalex()->unlock_options( $options );
+	}
+
+	/**
+	 * Conditionally hides stock display for B2C users based on plugin settings.
+	 *
+	 * This method checks if the current user is a B2C user and, depending on the
+	 * `hidden_stock_status` setting, either completely hides the stock display or hides
+	 * the stock quantity while still showing the "In stock" message.
+	 *
+	 * - If `hidden_stock_status` is set to `hide_stock_completely`, the stock availability
+	 *   section will be removed entirely from product pages.
+	 * - If set to `hide_stock_quantities`, the stock quantity will be hidden (e.g., only
+	 *   "In stock" will be shown, without the number).
+	 *
+	 * Hook this method into a suitable action like `wp`, `init`, or `template_redirect`
+	 * to ensure user context is loaded before execution.
+	 *
+	 * @return void
+	 */
+	public function hide_quantities_stock_for_b2c_users() {
+
+		$user_id                = get_current_user_id();
+		$current_user_role      = wholesalex()->get_user_role( $user_id );
+		$hide_stock_status      = wholesalex()->get_setting( 'hidden_stock_status', '' );
+
+		if ( 'wholesalex_b2c_users' === $current_user_role ) {
+			if ( 'hide_stock_completely' === $hide_stock_status ) {
+				add_filter(
+					'woocommerce_get_stock_html',
+					function ( $html, $product ) {
+						return '';
+					},
+					10,
+					2
+				);
+			} elseif ( 'hide_stock_quantities' === $hide_stock_status ) {
+				add_filter(
+					'option_woocommerce_stock_format',
+					function ( $val ) {
+						return 'no_amount';
+					},
+					10,
+					1
+				);
+			}
+		}
+	}
+
+	/**
+	 * Registers a custom meta box for controlling page visibility by Wholesalex user roles.
+	 *
+	 * This meta box appears on the 'page' post type edit screen, allowing admins
+	 * to control visibility for guest and specific user roles defined by Wholesalex.
+	 *
+	 * @return void
+	 */
+	public function add_visibility_meta_box() {
+		add_meta_box(
+			'page_visibility_meta',
+			'Page Visibility For Wholesalex Users',
+			array( $this, 'render_visibility_meta_box' ),
+			'page',
+			'side',
+			'default'
+		);
+	}
+
+	/**
+	 * Renders the visibility settings meta box for the 'page' post type.
+	 *
+	 * Outputs a set of checkboxes for configuring which Wholesalex user roles
+	 * (including guest, B2C, and B2B roles) are allowed to access the current page.
+	 *
+	 * This function is used as a callback for `add_meta_box()` and expects the `$post` object
+	 * so that it can retrieve and display the saved visibility settings.
+	 *
+	 * @param  WP_Post $post The current post object.
+	 *
+	 * @return void
+	 */
+	public function render_visibility_meta_box( $post ) {
+		$value = get_post_meta( $post->ID, '_custom_page_visibility', true );
+		wp_nonce_field( 'save_visibility_meta_box', 'visibility_meta_box_nonce' );
+		?>
+		<label for="custom_page_visibility"><?php esc_html_e( 'B2C Groups', 'wholesalex' ); ?></label>
+		<div class="wsx_container_page_visibility_group">
+			<div class="wsx_container_page_visibility_group_checkbox_name">
+				<?php esc_html_e( 'Guest Users (Logged Out), ', 'wholesalex' ); ?>
+			</div>
+			<input type="hidden" name="wsx_group_0" value="0">
+			<input type="checkbox" 
+				value="1" 
+				class="wsx_container_page_visibility_group_input" 
+				name="wsx_group_0" 
+				id="wsx_group_0" 
+				<?php checked( isset( $value['guest'] ) ? $value['guest'] : true ); ?> 
+			/>
+		</div>
+		<div class="wsx_container_page_visibility_group">
+			<div class="wsx_container_page_visibility_group_checkbox_name">
+				<?php esc_html_e( 'B2C Users ', 'wholesalex' ); ?>
+			</div>
+			<input type="hidden" name="wsx_group_1" value="0">
+			<input type="checkbox" 
+				value="1" 
+				class="wsx_container_page_visibility_group_input" 
+				name="wsx_group_1" 
+				id="wsx_group_1" 
+				<?php checked( isset( $value['b2c'] ) ? $value['b2c'] : true ); ?> 
+			/>
+		</div>
+
+		<label for="custom_page_visibility"><?php esc_html_e( 'B2B Groups', 'wholesalex' ); ?></label>
+				<?php
+				$__roles = $GLOBALS['wholesalex_roles'];
+				foreach ( $__roles as $role ) {
+					$role_id = $role['id'];
+					if ( 'wholesalex_b2c_users' === $role_id || 'wholesalex_guest' === $role_id ) {
+						continue;
+					}
+					?>
+					<div class="wsx_container_page_visibility_group">
+						<div class="wsx_container_page_visibility_group_checkbox_name">
+							<?php echo esc_html( $role['_role_title'] ); ?>
+						</div>
+						<input type="hidden" name="wsx_group_<?php echo esc_attr( $role_id ); ?>" value="0">
+						<input type="checkbox" 
+							value="1" 
+							class="wsx_container_page_visibility_group_checkbox_name" 
+							name="wsx_group_<?php echo esc_attr( $role_id ); ?>" 
+							id="wsx_group_<?php echo esc_attr( $role_id ); ?>" 
+							<?php checked( isset( $value[ $role_id ] ) ? $value[ $role_id ] : true ); ?> 
+						/>
+					</div>
+					<?php
+				}
+				?>
+			</div>
+		<?php
+	}
+
+	/**
+	 * Saves the custom page visibility settings from the meta box.
+	 *
+	 * This function verifies the nonce, checks user permissions, and processes
+	 * checkbox inputs to store visibility preferences for different Wholesalex roles.
+	 *
+	 * It supports:
+	 * - Guest user visibility
+	 * - B2C user visibility
+	 * - B2B roles (defined in global $wholesalex_roles)
+	 *
+	 * The data is saved to the '_custom_page_visibility' post meta as an associative array.
+	 *
+	 * @param int $post_id The ID of the post being saved.
+	 *
+	 * @return void
+	 */
+	public function save_visibility_meta_box_data( $post_id ) {
+		if (
+			! isset( $_POST['visibility_meta_box_nonce'] ) ||
+			! wp_verify_nonce( wp_unslash( $_POST['visibility_meta_box_nonce'] ), 'save_visibility_meta_box' )
+		) {
+			return;
+		}
+
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
+		$roles_visibility = array();
+
+		// Guest visibility.
+		$roles_visibility['guest'] = isset( $_POST['wsx_group_0'] ) && '1' == $_POST['wsx_group_0'];
+
+		// B2C visibility.
+		$roles_visibility['b2c'] = isset( $_POST['wsx_group_1'] ) && '1' == $_POST['wsx_group_1'];
+
+		// B2B roles from global wholesalex roles.
+		if ( isset( $GLOBALS['wholesalex_roles'] ) && is_array( $GLOBALS['wholesalex_roles'] ) ) {
+			foreach ( $GLOBALS['wholesalex_roles'] as $role ) {
+				$role_id = $role['id'];
+				$key     = 'wsx_group_' . $role_id;
+
+				$roles_visibility[ $role_id ] = isset( $_POST[ $key ] ) && '1' == $_POST[ $key ];
+			}
+		}
+
+		update_post_meta( $post_id, '_custom_page_visibility', $roles_visibility );
+	}
+
+
+	/**
+	 * Restricts access to singular pages based on Wholesalex user roles.
+	 *
+	 * This function checks the current page's visibility settings (stored as post meta)
+	 * and determines whether the current user has access based on their Wholesalex role.
+	 * If the user does not have access, they are redirected to the login/my-account page
+	 * with the original URL passed in a `redirect_to` parameter.
+	 *
+	 * Visibility is controlled via custom fields (`_custom_page_visibility`) where each role
+	 * (e.g., 'guest', 'b2c', 'wholesalex_b2b_basic') is assigned a boolean flag indicating access.
+	 *
+	 * Roles checked include:
+	 * - Guest users (not logged in)
+	 * - B2C users (identified as 'wholesalex_b2c_users')
+	 * - B2B users defined in the $GLOBALS['wholesalex_roles'] array
+	 *
+	 * @return void
+	 */
+	public function check_page_visibility_by_role() {
+		if ( is_singular() ) {
+			global $post;
+
+			$visibility = get_post_meta( $post->ID, '_custom_page_visibility', true );
+			if ( ! $visibility || ! is_array( $visibility ) ) {
+				return;
+			}
+
+			$current_user = wp_get_current_user();
+			$has_access   = false;
+
+			// Check guest.
+			if ( ! is_user_logged_in() && ! empty( $visibility['guest'] ) ) {
+				$has_access = true;
+			}
+
+			// Check roles.
+			if ( is_user_logged_in() ) {
+				$current_user    = wp_get_current_user();
+				$user_id         = $current_user->ID;
+				$wholesalex_role = wholesalex()->get_current_user_role( $user_id );
+				$roles           = $GLOBALS['wholesalex_roles'];
+
+				if ( 'wholesalex_b2c_users' === $wholesalex_role && ! empty( $visibility['b2c'] ) ) {
+					$has_access = true;
+				} else {
+					foreach ( $roles as $role ) {
+						$role_id = $role['id'];
+
+						if ( $role_id === $wholesalex_role && ! empty( $visibility[ $role_id ] ) ) {
+							$has_access = true;
+							break;
+						}
+					}
+				}
+			}
+
+			if ( ! $has_access ) {
+				wp_redirect(
+					add_query_arg(
+						'redirect_to',
+						urlencode( $_SERVER['REQUEST_URI'] ),
+						apply_filters( 'wholesalex_no_access_redirection_url', get_permalink( wc_get_page_id( 'myaccount' ) ) )
+					)
+				);
+			}
+		}
 	}
 }

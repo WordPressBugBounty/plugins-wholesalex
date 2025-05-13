@@ -305,9 +305,10 @@ class WHOLESALEX_Overview {
 		);
 
 		// Sub Menu List Start.
-		$manage_options_cap     = apply_filters( 'wholesalex_capability_access', 'manage_options' );
-		$is_white_label_enabled = wholesalex()->get_setting( 'wsx_addon_whitelabel' );
-		$submenus               = array(
+		$manage_options_cap             = apply_filters( 'wholesalex_capability_access', 'manage_options' );
+		$is_white_label_enabled         = wholesalex()->get_setting( 'wsx_addon_whitelabel' );
+		$is_role_switcher_option_enable = wholesalex()->get_setting( '_settings_role_switcher_option', '' );
+		$submenus                       = array(
 			array(
 				'title'      => __( 'Dynamic Rules', 'wholesalex' ),
 				'menu_title' => __( 'Dynamic Rules', 'wholesalex' ),
@@ -364,15 +365,18 @@ class WHOLESALEX_Overview {
 				'callback'   => array( $this, 'render_submenu_page' ),
 				'identifier' => 'settings',
 			),
-			array(
+		);
+
+		if ( 'yes' === $is_role_switcher_option_enable ) {
+			$submenus[] = array(
 				'title'      => __( 'User Role Requests', 'wholesalex' ),
 				'menu_title' => __( 'User Role Requests', 'wholesalex' ),
 				'capability' => $manage_options_cap,
 				'slug'       => '/user_role_change_requests',
 				'callback'   => array( $this, 'render_submenu_page' ),
 				'identifier' => 'user-role-request',
-			),
-		);
+			);
+		}
 
 		if ( 'yes' !== $is_white_label_enabled ) {
 			$pro_submenu = array(
