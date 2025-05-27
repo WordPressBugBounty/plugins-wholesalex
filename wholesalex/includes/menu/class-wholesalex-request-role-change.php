@@ -66,10 +66,10 @@ class WHOLESALEX_RequstRoleChange {
 		$role_titles = array_values( array_filter( $role_titles ) );
 		?>
 		<div style="margin-bottom: 30px;">
-			<h2 style="margin-bottom: 15px; font-size: 24px;">Want to Switch Your User Role?</h2>
+			<h2 style="margin-bottom: 15px; font-size: 24px;"><?php echo esc_html__( 'Want to Switch Your User Role?', 'wholesalex' ); ?></h2>
 			<?php if ( ! empty( $current_role_name ) ) : ?>
 				<p style="margin-bottom: 15px; font-size: 16px;">
-					Your current role is  
+					<?php echo esc_html__( 'Your current role is', 'wholesalex' ); ?>
 					<span style="font-weight: bold; color: black;">
 						<?php echo esc_html( $current_role_name ); ?>
 					</span>
@@ -79,7 +79,7 @@ class WHOLESALEX_RequstRoleChange {
 			<?php if ( $show_role_request_ui ) : ?>
 				<div style="display: flex; gap: 10px; align-items: center;">
 					<select id="roleSelect" style="padding: 8px; font-size: 16px; flex: 1;">
-						<option value="">Choose a Role You Want to Switch to</option>
+						<option value=""><?php echo esc_html__( 'Choose a Role You Want to Switch to', 'wholesalex' ); ?></option>
 						<?php
 						if ( ! empty( $role_titles ) ) {
 							foreach ( $role_titles as $role ) {
@@ -91,17 +91,17 @@ class WHOLESALEX_RequstRoleChange {
 						?>
 					</select>
 
-					<button id="sendRequestBtn" class="custom-button">
-						Send Request
-					</button>
+					<div id="sendRequestBtn" class="custom-button">
+						<?php echo esc_html__( 'Send Request', 'wholesalex' ); ?>
+					</div>
 				</div>
 				<?php else : ?>
-					<p>You have already submitted a role change request. Please wait for an admin to respond.</p>
+					<p><?php echo esc_html__( 'You have already submitted a role change request. Please wait for an admin to respond.', 'wholesalex' ); ?></p>
 				<?php endif; ?>
-			<!-- Success Message (hidden by default) -->
-			<div id="successMessage" style="display: none; margin-top: 10px; padding: 10px 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px;">
-					Your request has been sent successfully!
-			</div>
+				<!-- Success Message (hidden by default) -->
+				<div id="successMessage" style="display: none; margin-top: 10px; padding: 10px 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px;">	
+					<?php echo esc_html__( 'Your request has been sent successfully!', 'wholesalex' ); ?>
+				</div>
 		</div>
 		<script>
 			

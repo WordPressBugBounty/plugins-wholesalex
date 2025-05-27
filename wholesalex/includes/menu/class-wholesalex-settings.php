@@ -217,6 +217,16 @@ class Settings {
 							/* translators: %s - Plugin Name */
 							'tooltip' => __( 'Hide Stock Quantities Options for B2C Users', 'wholesalex' ),
 						),
+						'bulk_order_table_or_form' => array(
+							'type'    => 'radio',
+							'label'   => __( 'Which type of bulk order form do you want?', 'wholesalex' ),
+							'options' => array(
+								'bulkorder_form' => __( 'Bulk Order Form', 'wholesalex' ),
+								'bulkorder_table' => __( 'Bulk Order Table', 'wholesalex' ),
+							),
+							'default' => 'bulkorder_form',
+							'tooltip' => __( 'Select the type of bulk order form you want to show your users', 'wholesalex' ),
+						),
 						'_settings_quantity_based_discount_priority' => array(
 							'type'    => 'dragList',
 							'label'   => __( 'Pricing / Discount Priority', 'wholesalex' ),

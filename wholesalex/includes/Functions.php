@@ -62,6 +62,40 @@ class Functions {
 	}
 
 	/**
+	 * Check if the product price is hidden.
+	 *
+	 * @param string $product_id Type.
+	 *
+	 * @return boolean
+	 */
+	public function is_price_hidden( $product_id = '' ) {
+		$current_id    = get_current_user_id();
+		$transient_key = 'whx_hidden_prices_' . $current_id;
+		$data          = get_transient( $transient_key );
+		if ( isset( $data[ $current_id ] ) && is_array( $data[ $current_id ] ) ) {
+			$dynamic_rules = $data[ $current_id ];
+		} else {
+			$dynamic_rules = array();
+		}
+
+		$is_hidden = false;
+		$cats      = wc_get_product_term_ids( $product_id, 'product_cat' );
+
+		if ( ! empty( $dynamic_rules['is_all_products'] ) ) {
+			$is_hidden = true;
+		} elseif ( ! empty( $dynamic_rules['include_product'] ) ) {
+			$is_hidden = in_array( $product_id, $dynamic_rules['include_product'], true );
+		} elseif ( ! empty( $dynamic_rules['exclude_product'] ) ) {
+			$is_hidden = ! in_array( $product_id, $dynamic_rules['exclude_product'], true );
+		} elseif ( ! empty( $dynamic_rules['include_cat'] ) ) {
+			$is_hidden = ! empty( array_intersect( $cats, $dynamic_rules['include_cat'] ) );
+		} elseif ( ! empty( $dynamic_rules['exclude_cat'] ) ) {
+			$is_hidden = empty( array_intersect( $cats, $dynamic_rules['exclude_cat'] ) );
+		}
+		return $is_hidden;
+	}
+
+	/**
 	 * Get New Form Builder Data
 	 *
 	 * @return array
@@ -539,6 +573,24 @@ class Functions {
 		} else {
 			return isset( $__rules[ $id ] ) ? $__rules[ $id ] : array();
 		}
+	}
+
+	/**
+	 * Get Dynamic Rules
+	 *
+	 * @return boolean
+	 */
+	public function is_any_dynamic_rules_active() {
+		$__rules         = $GLOBALS['wholesalex_dynamic_rules'];
+		$all_deactivated = true;
+
+		foreach ( $__rules as $rule ) {
+			if ( ! empty( $rule['_rule_status'] ) ) {
+				$all_deactivated = false;
+				break;
+			}
+		}
+		return $all_deactivated;
 	}
 
 

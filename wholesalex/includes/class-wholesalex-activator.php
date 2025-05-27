@@ -132,6 +132,9 @@ class Activator {
 		if ( wp_doing_ajax() ) {
 			return;
 		}
+		if ( wp_doing_ajax() || is_network_admin() || isset( $_GET['activate-multi'] ) || isset( $_POST['action'] ) && 'activate-selected' == $_POST['action'] ) {
+			return;
+		}
 		if ( 'wholesalex/wholesalex.php' === $plugin ) {
 			if ( ! class_exists( 'woocommerce' ) ) {
 				return;

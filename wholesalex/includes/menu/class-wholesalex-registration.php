@@ -756,7 +756,8 @@ class WHOLESALEX_Registration {
 	 */
 	public function generate_field_for_woo_registration( $field ) {
 		$depends     = $this->check_depends( $field );
-		$is_required = isset( $field['required'] ) && $field['required'];
+		$is_required = isset( $field['required'] ) ? $field['required'] : false;
+
 		// Check to Guest User Shouldn't Be Show In WooCommerce Registration Form.
 		if ( 'select' === $field['type'] && 'wholesalex_registration_role' === $field['name'] ) {
 			$filtered_role_options = array_filter(
@@ -770,10 +771,8 @@ class WHOLESALEX_Registration {
 		switch ( $field['type'] ) {
 			case 'text':
 			case 'password':
-			case 'date':
 			case 'url':
 			case 'tel':
-			case 'number':
 				?>
 					<p data-wsx-exclude="<?php echo esc_attr( $depends ); ?>" class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide wholesalex-custom-field wsx-field" style="<?php echo esc_attr( $depends ? 'display: none;' : '' ); ?>">
 						<?php
@@ -792,7 +791,42 @@ class WHOLESALEX_Registration {
 							<?php
 						}
 						?>
-						<input type="<?php echo esc_attr($field['type']);?>" class="wsx-input woocommerce-Input woocommerce-Input--text input-text <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( isset($_POST[$field['name']]) && ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>" required="<?php echo esc_attr($is_required) ?>"/><?php // @codingStandardsIgnoreLine ?>
+						<input type="<?php echo esc_attr($field['type']);?>" class="wsx-input woocommerce-Input woocommerce-Input--text input-text <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( isset($_POST[$field['name']]) && ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>" <?php if (!empty($is_required)) echo 'required'; ?> /><?php // @codingStandardsIgnoreLine ?>
+						<span class="wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>"> </span>
+						<?php
+						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
+							?>
+								<span class="description"><?php echo esc_html( $field['help_message'] ); ?></span>
+							<?php
+						}
+						?>
+						<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
+					</p>
+				<?php
+				// code...
+				break;
+
+			case 'number':
+			case 'date':
+				?>
+					<p data-wsx-exclude="<?php echo esc_attr( $depends ); ?>" class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide wholesalex-custom-field wsx-field" style="<?php echo esc_attr( $depends ? 'display: none;' : '' ); ?>">
+						<?php
+						if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
+							?>
+							<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
+							<?php
+							if ( isset( $field['required'] ) && $field['required'] ) {
+								?>
+									<span class="required">*</span>
+								<?php
+							}
+
+							?>
+								</label>
+							<?php
+						}
+						?>
+						<input type="<?php echo esc_attr($field['type']);?>" class="wsx-input woocommerce-Input woocommerce-Input--text input-text <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( isset($_POST[$field['name']]) && ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>" <?php if (!empty($is_required)) echo 'required'; ?> /><?php // @codingStandardsIgnoreLine ?>
 						<span class="wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>"> </span>
 						<?php
 						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
@@ -824,7 +858,7 @@ class WHOLESALEX_Registration {
 							<?php
 						}
 						?>
-						<input type="<?php echo esc_attr($field['type']);?>" class="wsx-input woocommerce-Input  <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>" required="<?php echo esc_attr($is_required) ?>"/><?php // @codingStandardsIgnoreLine ?>
+						<input type="<?php echo esc_attr($field['type']);?>" class="wsx-input woocommerce-Input  <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>" <?php if (!empty($is_required)) echo 'required'; ?> /><?php // @codingStandardsIgnoreLine ?>
 						<span class="wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>"> </span>
 						<?php
 						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
@@ -855,11 +889,24 @@ class WHOLESALEX_Registration {
 							<?php
 						}
 						?>
-						<select class="wsx-select" name="<?php echo esc_attr( $field['name'] ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>"  value="<?php echo ( isset( $_POST[ $field['name'] ] ) && !empty($_POST[ $field['name'] ]) ) ? esc_attr( wp_unslash( $_POST[ $field['name'] ] ) ) : ''; ?>" class="<?php echo esc_attr( isset( $field['required'] ) && $field['required'] ? 'wsx-field-required' : '' ); ?>" required="<?php echo esc_attr($is_required) ?>" > <?php // @codingStandardsIgnoreLine ?>
+						<select 
+							class="wsx-select <?php echo esc_attr( isset( $field['required'] ) && $field['required'] ? 'wsx-field-required' : '' ); ?>" 
+							name="<?php echo esc_attr( $field['name'] ); ?>" 
+							id="<?php echo esc_attr( $field['name'] ); ?>"
+							<?php
+							if ( ! empty( $is_required ) ) {
+								echo 'required';}
+							?>
+													>
+							<option value="" disabled <?php echo empty( $_POST[ $field['name'] ] ) ? 'selected' : ''; ?>>Please select</option>
+
 							<?php
 							foreach ( $field['option'] as $option ) {
+								$selected = ( isset( $_POST[ $field['name'] ] ) && $_POST[ $field['name'] ] == $option['value'] ) ? 'selected' : '';
 								?>
-									<option value="<?php echo esc_attr( $option['value'] ); ?>"> <?php echo esc_attr( $option['name'] ); ?> </option>
+								<option value="<?php echo esc_attr( $option['value'] ); ?>" <?php echo $selected; ?>>
+									<?php echo esc_html( $option['name'] ); ?>
+								</option>
 								<?php
 							}
 							?>
@@ -896,11 +943,23 @@ class WHOLESALEX_Registration {
 					?>
 					<span>
 					<?php
+					$index = 0;
 					foreach ( $field['option'] as $option ) {
 						?>
-								<input type="radio" class="wsx-radio woocommerce-form__input" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" id="<?php echo esc_attr( $option['value'] ); ?>" />
-								<span><?php echo esc_html( $option['name'] ); ?></span>
+						<input 
+							type="radio" 
+							class="wsx-radio woocommerce-form__input" 
+							name="<?php echo esc_attr( $field['name'] ); ?>" 
+							value="<?php echo esc_attr( $option['value'] ); ?>" 
+							id="<?php echo esc_attr( $option['value'] ); ?>"
 							<?php
+							if ( 0 === $index && ! empty( $is_required ) ) {
+								echo 'required';}
+							?>
+													/>
+						<span><?php echo esc_html( $option['name'] ); ?></span>
+						<?php
+						++$index;
 					}
 					?>
 					</span>

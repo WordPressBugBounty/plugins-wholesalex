@@ -190,7 +190,7 @@ class WHOLESALEX_Dynamic_Rules {
 		/**
 		 * Rewrite Dynamic Rules: Cart Total
 		 */
-		 add_action( 'wp_loaded', array( $this, 'get_valid_dynamic_rules' ) );
+		add_action( 'wp_loaded', array( $this, 'get_valid_dynamic_rules' ) );
 
 		add_action( 'woocommerce_blocks_loaded', array( $this, 'action_after_woo_block_loaded' ) );
 
@@ -2754,6 +2754,9 @@ class WHOLESALEX_Dynamic_Rules {
 
 			.layout-vertical .wsx-price-table-body {
 				display: flex;
+			}
+			.wsx-price-table-body {
+				overflow: scroll;
 			}
 
 			.layout-vertical .wsx-price-table-header {
@@ -6702,6 +6705,9 @@ class WHOLESALEX_Dynamic_Rules {
 			'woocommerce_product_get_price',
 			function ( $price, $product ) use ( $data ) {
 
+				// check if any dynamic rules are active or not.
+				$is_all_dynamic_rule_deactivate = wholesalex()->is_any_dynamic_rules_active();
+
 				// if product is booking product.
 				if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'price' ) ) {
 					return $price;
@@ -6740,6 +6746,19 @@ class WHOLESALEX_Dynamic_Rules {
 						}
 					}
 					$to_be_display_price = $to_be_display_price + $option_price;
+				}
+
+				// WowAddons compatibility.
+
+				if ( function_exists( 'WC' ) && ( $cart = WC()->cart ) && defined( 'PRAD_VER' ) ) {
+					$prad_option_price = 0;
+					foreach ( $cart->get_cart() as $cart_item ) {
+						if ( isset( $cart_item['prad_selection']['price'] ) && isset( $cart_item['product_id'] ) && $cart_item['product_id'] === $product_id ) {
+							$prad_option_price = floatval( $cart_item['prad_selection']['price'] );
+						}
+					}
+
+					$to_be_display_price = $to_be_display_price + $prad_option_price;
 				}
 
 				// woocommerce product addons compatibility with simple product.
