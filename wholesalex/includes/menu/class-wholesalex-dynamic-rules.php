@@ -2366,6 +2366,18 @@ class WHOLESALEX_Dynamic_Rules {
 	public function format_sale_price( $regular_price, $sale_price, $is_wholesalex_sale_price_applied ) {
 		global $product;
 		$sale_text = '';
+
+		// compatibility with aelia currency switcher.
+		if ( class_exists( 'Aelia_Integration_Helper' ) && \Aelia_Integration_Helper::aelia_currency_switcher_active() ) {
+			$active_currency = get_woocommerce_currency();
+			$product_id      = $product->get_id();
+			$base_currency   = \Aelia_Integration_Helper::get_product_base_currency( $product_id );
+
+			$wholesale_price = \Aelia_Integration_Helper::convert( $sale_price, $active_currency, $base_currency );
+
+			return wc_price( floatval( $wholesale_price ) );
+		}
+
 		if ( is_shop() || is_product_category() ) {
 			$sale_text = wholesalex()->get_setting( '_settings_price_text_product_list_page', __( 'Wholesale Price:', 'wholesalex' ) );
 		} else {
@@ -2695,6 +2707,9 @@ class WHOLESALEX_Dynamic_Rules {
 					overflow: auto;
 					width: 100vw;
 				}
+				.wsx-price-table-body {
+					overflow: scroll;
+				}
 			}
 			.wsx-price-table-header {
 				width: 100%;
@@ -2754,9 +2769,6 @@ class WHOLESALEX_Dynamic_Rules {
 
 			.layout-vertical .wsx-price-table-body {
 				display: flex;
-			}
-			.wsx-price-table-body {
-				overflow: scroll;
 			}
 
 			.layout-vertical .wsx-price-table-header {
@@ -2918,6 +2930,16 @@ class WHOLESALEX_Dynamic_Rules {
 		 *
 		 * @since 1.0.4
 		 */
+
+		// compatibility with aelia currency switcher.
+		if ( class_exists( 'Aelia_Integration_Helper' ) && \Aelia_Integration_Helper::aelia_currency_switcher_active() ) {
+			$active_currency = get_woocommerce_currency();
+			$product_id      = $product->get_id();
+			$base_currency   = \Aelia_Integration_Helper::get_product_base_currency( $product_id );
+
+			$regular_price = \Aelia_Integration_Helper::convert( $regular_price, $active_currency, $base_currency );
+		}
+
 		$layout_css = $this->price_table_layout_css(); // Call the method once and store the result.
 
 		if ( ! is_null( $layout_css ) && is_string( $layout_css ) && '' !== trim( $layout_css ) ) {
@@ -3141,40 +3163,58 @@ class WHOLESALEX_Dynamic_Rules {
 						}
 						?>
 					</div>
-					<script>
-						jQuery(function ($) {
-							const $quantityInput = $('[name=quantity]');
-							const quantityPrices = <?php echo wp_json_encode( $quantity_prices ); ?>;
-							const cartQuantity = <?php echo wp_json_encode( $cart_quantity ); ?>;
+						<script>
+							jQuery(function ($) {
+								const $quantityInput = $('[name=quantity]');
+								const quantityPrices = <?php echo wp_json_encode( $quantity_prices ); ?>;
+								const cartQuantity = <?php echo wp_json_encode( $cart_quantity ); ?>;
 
-							if ($quantityInput.length) {
-								$quantityInput.on('input change', function () {
-									let quantity = cartQuantity + parseInt($(this).val()) || 1;
+								function updatePricing() {
+									let quantity = cartQuantity + parseInt($quantityInput.val()) || 1;
 									let matchedTier = null;
 									let matchedMin = 0;
 
-									// Find the best matched tier where _min_quantity <= quantity
 									quantityPrices.forEach((tier) => {
-										const minQty = parseInt(tier['_min_quantity']) ;
+										const minQty = parseInt(tier['_min_quantity']);
 										if (quantity >= minQty && minQty >= matchedMin) {
 											matchedTier = minQty;
 											matchedMin = minQty;
 										}
 									});
 
-									// Remove all active classes
 									$('.wsx-price-table-row').removeClass('active');
-
-									// Add active class to matched tier row (if any)
 									if (matchedTier) {
 										$('.wsx-price-table-row[data-min="' + matchedTier + '"]').addClass('active');
 									}
-								}).trigger('change');
-							}
-						});
-						</script>
+								}
 
-				</div>
+								// Listen to native input events
+								if ($quantityInput.length) {
+									$quantityInput.on('input change', updatePricing).trigger('change');
+								}
+
+								// wowstore single page template compatibility.
+								$('.wopb-builder-cart-minus').on('click', function (e) {
+									e.preventDefault();
+									e.stopPropagation();
+
+									let currentVal = parseInt($quantityInput.val()) || 1;
+									if (currentVal > 1) {
+										$quantityInput.val(currentVal - 1).trigger('change');
+									}
+								});
+
+								// wowstore plus button
+								$('.wopb-builder-cart-plus').on('click', function (e) {
+									e.preventDefault();
+									e.stopPropagation();
+
+									let currentVal = parseInt($quantityInput.val()) || 1;
+									$quantityInput.val(currentVal + 1).trigger('change');
+								});
+							});
+						</script>
+					</div>
 				<?php
 				break;
 			case 'layout_two':
@@ -3465,9 +3505,9 @@ class WHOLESALEX_Dynamic_Rules {
 			switch ( $__conditions_for ) {
 				case 'cart_total_value':
 					if ( $is_all_cart_total_value_rule ) {
-						$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], $cart_total_value );
-					} else {
 						$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], $__total_cart_total );
+					} else {
+						$__status = self::is_condition_passed( $__conditions_value, $condition['_conditions_operator'], $cart_total_value );
 					}
 					break;
 				case 'cart_total_qty':
@@ -6791,6 +6831,18 @@ class WHOLESALEX_Dynamic_Rules {
 						}
 					}
 				}
+
+				// compatibility with aelia currency switcher.
+				if ( class_exists( 'Aelia_Integration_Helper' ) && \Aelia_Integration_Helper::aelia_currency_switcher_active() ) {
+					$active_currency = get_woocommerce_currency();
+					$product_id      = $product->get_id();
+					$base_currency   = \Aelia_Integration_Helper::get_product_base_currency( $product_id );
+
+					$wholesale_price = \Aelia_Integration_Helper::convert( $to_be_display_price, $active_currency, $base_currency );
+
+					return $wholesale_price;
+				}
+
 				return $to_be_display_price;
 			},
 			9,
@@ -6909,6 +6961,49 @@ class WHOLESALEX_Dynamic_Rules {
 
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_cart_price' ) );
 		add_filter( 'woocommerce_cart_item_price', array( $this, 'set_cart_item_price_to_display' ), 10, 2 );
+	}
+
+	/**
+	 * Retrieves the converted sale price of a WooCommerce product using Aelia Currency Switcher.
+	 *
+	 * This function uses Aelia's CurrencyPrices_Manager singleton to convert the product prices
+	 * into the selected currency. It then fetches the converted sale price using Aelia's
+	 * auxiliary data mechanism. If conversion fails or the price isn't available, it falls back
+	 * to WooCommerce's default sale price.
+	 *
+	 * @param int         $product_id The ID of the WooCommerce product.
+	 * @param string|null $currency Optional. The target currency code (e.g., 'USD', 'EUR').
+	 *                               If not provided, the current WooCommerce currency is used.
+	 *
+	 * @return float|false The converted sale price if available, false on failure.
+	 */
+	public function get_converted_sale_price_from_aelia( $product_id, $currency = null ) {
+		if (
+		class_exists( 'WC_Aelia_CurrencyPrices_Manager' ) &&
+		method_exists( 'WC_Aelia_CurrencyPrices_Manager', 'Instance' ) &&
+		function_exists( 'aelia_get_object_aux_data' )
+		) {
+			$product = wc_get_product( $product_id );
+
+			if ( ! $product instanceof \WC_Product ) {
+				return false;
+			}
+
+			// Use current currency if none provided.
+			if ( ! $currency ) {
+				$currency = get_woocommerce_currency();
+			}
+
+			// Convert product prices using Aelia.
+			$converted_product = \WC_Aelia_CurrencyPrices_Manager::Instance()->convert_product_prices( $product, $currency );
+
+			// Get the converted sale price.
+			$converted_sale_price = aelia_get_object_aux_data( $converted_product, 'sale_price' );
+
+			return ( $converted_sale_price !== null ) ? $converted_sale_price : $product->get_sale_price();
+		}
+
+		return false;
 	}
 
 	/**

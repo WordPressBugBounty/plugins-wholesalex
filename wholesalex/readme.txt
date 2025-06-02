@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
 Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 2.0.17
+Stable tag: 2.0.18
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -209,6 +209,12 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.0.18 - 02 June 2025 =
+* improvement: Added compatibility with Aelia Currency Switcher
+* improvement: Tiered pricing table now properly highlights on quantity change when using the WowStore Single template.
+* Fix: Checkout button not displaying in block-based cart when checkout restrictions are enabled.
+* Fix: Allow tax total settings is not working with restrict checkout and cart discount issue fixed.
 
 = 2.0.17 - 27 May 2025 =
 * Fix: Wholesalex Registration form option in woocommerce gets auto required.

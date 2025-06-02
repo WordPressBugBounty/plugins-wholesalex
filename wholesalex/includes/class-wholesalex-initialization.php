@@ -92,6 +92,7 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/Deactive.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-request-role-change.php';
 		require_once WHOLESALEX_PATH . 'includes/compatibility/woocommerce-bookings.php';
+		require_once WHOLESALEX_PATH . 'includes/compatibility/aeila_currency_switcher.php';
 
 		new \WHOLESALEX\WHOLESALEX_Role();
 		new \WHOLESALEX\WHOLESALEX_Registration();

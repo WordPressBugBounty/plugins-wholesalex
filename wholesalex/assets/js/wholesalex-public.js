@@ -154,3 +154,22 @@
 // 		.then( ( res ) => res.json() )
 // 		.then( () => {} );
 // };
+
+jQuery( document ).ready( function ( $ ) {
+	const warningSelector = '.wc-block-components-notice-banner__content'; // Adjust selector if needed
+	const checkoutButtonSelector = '.wc-block-cart__submit-button';
+
+	function toggleCheckoutButton() {
+		if ( $( warningSelector ).length > 0 ) {
+			$( checkoutButtonSelector ).hide();
+		} else {
+			$( checkoutButtonSelector ).show();
+		}
+	}
+
+	toggleCheckoutButton(); // Initial check
+
+	// Observe for dynamic changes
+	const observer = new MutationObserver( toggleCheckoutButton );
+	observer.observe( document.body, { childList: true, subtree: true } );
+} );

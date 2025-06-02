@@ -319,11 +319,11 @@ class Settings {
 						'_settings_allow_tax_with_cart_total_amount' => array(
 							// 'type'    => 'switch',
 							'type'    => 'slider',
-							'label'   => __( 'Allow Tax To Cart Total Amount', 'wholesalex' ),
+							'label'   => __( 'All Discount on Total Cart Amount Including Tax', 'wholesalex' ),
 							'desc'    => __( 'Click the check box if you want to allow Tax with Cart Total Amount', 'wholesalex' ),
 							'help'    => '',
 							'default' => 'no',
-							// 'tooltip' => 'Enabling this option will display the pricing tier table on the single product pages. {Check out the documentation} to learn more about the pricing tiers.',
+							'tooltip' => 'Enable it to let users get a discount on the total cart amount - including the tax amount.',
 							// 'doc' => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
 						),
 						'_settings_access_shop_manager_with_wxs_menu' => array(
