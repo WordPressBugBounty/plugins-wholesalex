@@ -205,11 +205,11 @@ class Settings {
 							/* translators: %s - Plugin Name */
 							'tooltip' => __( 'Offer discounts either on the regular product price(s) or the sale price(s).', 'wholesalex' ),
 						),
-						'hidden_stock_status' => array(
+						'hidden_stock_status'       => array(
 							'type'    => 'radio',
 							'label'   => __( 'Hide Product Stock for B2C Customers', 'wholesalex' ),
 							'options' => array(
-								'disable' => __( 'Disabled', 'wholesalex' ),
+								'disable'               => __( 'Disabled', 'wholesalex' ),
 								'hide_stock_completely' => __( 'Hide Stock Completely for B2C Buyers', 'wholesalex' ),
 								'hide_stock_quantities' => __( 'Only Hide Stock Quantity for B2C Buyers', 'wholesalex' ),
 							),
@@ -217,11 +217,11 @@ class Settings {
 							/* translators: %s - Plugin Name */
 							'tooltip' => __( 'Hide Stock Quantities Options for B2C Users', 'wholesalex' ),
 						),
-						'bulk_order_table_or_form' => array(
+						'bulk_order_table_or_form'  => array(
 							'type'    => 'radio',
 							'label'   => __( 'Which type of bulk order form do you want?', 'wholesalex' ),
 							'options' => array(
-								'bulkorder_form' => __( 'Bulk Order Form', 'wholesalex' ),
+								'bulkorder_form'  => __( 'Bulk Order Form', 'wholesalex' ),
 								'bulkorder_table' => __( 'Bulk Order Table', 'wholesalex' ),
 							),
 							'default' => 'bulkorder_form',
@@ -336,7 +336,7 @@ class Settings {
 							// 'tooltip' => 'Enabling this option will display the pricing tier table on the single product pages. {Check out the documentation} to learn more about the pricing tiers.',
 							// 'doc' => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
 						),
-						'_settings_role_switcher_option' => array(
+						'_settings_role_switcher_option'   => array(
 							'type'    => 'slider',
 							'label'   => __( 'Enable User Role Switching', 'wholesalex' ),
 							'desc'    => __( 'Check this box if you want to enable an option for User to Switch Roles', 'wholesalex' ),
@@ -1538,7 +1538,16 @@ class Settings {
 				'recaptcha'            => array(
 					'label' => __( 'reCAPTCHA', 'wholesalex' ),
 					'attr'  => array(
-						'type' => 'recaptcha_zero',
+						'recaptcha_version' => array(
+							'type'    => 'radio',
+							'label'   => __( 'Recaptcha Status', 'wholesalex' ),
+							'options' => array(
+								'recaptcha_v2' => __( 'Recaptcha v2', 'wholesalex' ),
+								'recaptcha_v3' => __( 'Recaptcha v3', 'wholesalex' ),
+							),
+							'default' => 'recaptcha_v3',
+						),
+						'type'              => 'recaptcha_zero',
 						'_settings_google_recaptcha_v3_site_key' => array(
 							'type'        => 'text',
 							'label'       => __( 'Site Key', 'wholesalex' ),
@@ -1561,6 +1570,10 @@ class Settings {
 							'placeholder' => '',
 							'default'     => __( '0.5', 'wholesalex' ),
 							'help'        => __( 'Set minimum allowed score for reCAPTCHA. Default Range: 0.0 - 1.00', 'wholesalex' ),
+							'hide_if'     => array(
+								'key'   => 'recaptcha_version',
+								'value' => 'recaptcha_v2',
+							),
 						),
 					),
 				),
@@ -1796,9 +1809,9 @@ class Settings {
 	 */
 	public function hide_quantities_stock_for_b2c_users() {
 
-		$user_id                = get_current_user_id();
-		$current_user_role      = wholesalex()->get_user_role( $user_id );
-		$hide_stock_status      = wholesalex()->get_setting( 'hidden_stock_status', '' );
+		$user_id           = get_current_user_id();
+		$current_user_role = wholesalex()->get_user_role( $user_id );
+		$hide_stock_status = wholesalex()->get_setting( 'hidden_stock_status', '' );
 
 		if ( 'wholesalex_b2c_users' === $current_user_role ) {
 			if ( 'hide_stock_completely' === $hide_stock_status ) {

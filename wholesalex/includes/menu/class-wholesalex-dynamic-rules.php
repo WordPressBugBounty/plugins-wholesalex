@@ -5430,6 +5430,89 @@ class WHOLESALEX_Dynamic_Rules {
 						}
 					}
 
+					add_filter(
+						'woocommerce_product_get_tax_class',
+						function ( $tax_class, $product ) use ( $rule ) {
+							$rule_tax_class = isset( $rule['rule']['_tax_class'] ) ? $rule['rule']['_tax_class'] : '';
+							$is_tax_exempt  = isset( $rule['rule']['_tax_exempted'] ) ? $rule['rule']['_tax_exempted'] : '';
+							if ( self::is_eligible_for_rule( $product->get_id(), 0, $rule['filter'] ) ) {
+								$is_based_on_country = isset( $rule['rule']['_exempted_country'] ) ? $rule['rule']['_exempted_country'] : false;
+								if ( $is_based_on_country ) {
+									$allowed_country = self::get_multiselect_values( $is_based_on_country );
+									$user_country    = '';
+									if ( is_a( WC()->customer, 'WC_Customer' ) ) {
+										$tax_setting = get_option( 'woocommerce_tax_based_on' );
+										if ( 'shipping' === $tax_setting ) {
+											$user_country = WC()->customer->get_shipping_country();
+										} else {
+											$user_country = WC()->customer->get_billing_country();
+										}
+									} else {
+										$user_country = 'NAC';
+									}
+
+									if ( ! in_array( $user_country, $allowed_country, true ) ) {
+										return $tax_class;
+									}
+								}
+								if ( 'yes' === $is_tax_exempt ) {
+									$tax_class = 'Zero Rate';
+									if ( ! isset( $this->product_page_notices[ $product->get_id() ] ) ) {
+										$this->product_page_notices[ $product->get_id() ] = array();
+									}
+									$this->product_page_notices[ $product->get_id() ]['tax_free'] = true;
+								} else {
+									$tax_class = $rule_tax_class;
+								}
+								wholesalex()->set_usages_dynamic_rule_id( $rule['id'] );
+							}
+							return $tax_class;
+						},
+						10,
+						2
+					);
+
+					add_filter(
+						'woocommerce_product_variation_get_tax_class',
+						function ( $tax_class, $product ) use ( $rule ) {
+							$rule_tax_class = isset( $rule['rule']['_tax_class'] ) ? $rule['rule']['_tax_class'] : '';
+							$is_tax_exempt  = isset( $rule['rule']['_tax_exempted'] ) ? $rule['rule']['_tax_exempted'] : '';
+							if ( self::is_eligible_for_rule( $product->get_id(), 0, $rule['filter'] ) ) {
+								$is_based_on_country = isset( $rule['rule']['_exempted_country'] ) ? $rule['rule']['_exempted_country'] : false;
+								if ( $is_based_on_country ) {
+									$allowed_country = self::get_multiselect_values( $is_based_on_country );
+									$user_country    = '';
+									if ( is_a( WC()->customer, 'WC_Customer' ) ) {
+										$tax_setting = get_option( 'woocommerce_tax_based_on' );
+										if ( 'shipping' === $tax_setting ) {
+											$user_country = WC()->customer->get_shipping_country();
+										} else {
+											$user_country = WC()->customer->get_billing_country();
+										}
+									} else {
+										$user_country = 'NAC';
+									}
+
+									if ( ! in_array( $user_country, $allowed_country, true ) ) {
+										return $tax_class;
+									}
+								}
+								if ( 'yes' === $is_tax_exempt ) {
+									$tax_class = 'Zero Rate';
+									if ( ! is_array( $this->product_page_notices[ $product->get_id() ] ) ) {
+										$this->product_page_notices[ $product->get_id() ] = array();
+									}
+									$this->product_page_notices[ $product->get_id() ]['tax_free'] = true;
+								} else {
+									$tax_class = $rule_tax_class;
+								}
+							}
+							return $tax_class;
+						},
+						10,
+						2
+					);
+
 					wholesalex()->set_usages_dynamic_rule_id( $rule['id'] );
 				} else {
 					add_filter(

@@ -40,11 +40,33 @@ class WHOLESALEX_Role {
 		 */
 		add_action( 'wholesalex_before_dynamic_rules_loaded', array( $this, 'auto_wholesalex_role_migration' ) );
 
-		add_filter( 'editable_roles', array( $this, 'make_wholesalex_roles_not_editable' ) );
+		add_action( 'admin_init', array( $this, 'conditionally_filter_additional_role' ) );
 
 		add_filter( 'wholesalex_csv_role_import_mapping_options', array( $this, 'set_import_column_value' ) );
 		add_filter( 'wholesalex_csv_role_import_mapping_default_columns', array( $this, 'set_import_mapping_default_column' ) );
 		add_filter( 'wholesalex_role_importer_parsed_data', array( $this, 'parse_import_data' ) );
+	}
+
+	/**
+	 * Conditionally adds a filter to modify editable roles on specific admin pages.
+	 *
+	 * This function checks if the current admin page is one of the user profile-related pages
+	 * (profile, add new user, edit user). If it is, it adds a filter to remove specific roles
+	 * (e.g., 'wholesalex') from the list of roles that can be assigned to users.
+	 *
+	 * Hooked to the 'admin_init' action.
+	 *
+	 * @return void
+	 */
+	public function conditionally_filter_additional_role() {
+		global $pagenow;
+
+		// Check if we are on one of the targeted pages.
+		$target_pages = array( 'profile.php', 'user-new.php', 'user-edit.php' );
+
+		if ( in_array( $pagenow, $target_pages, true ) ) {
+			add_filter( 'editable_roles', array( $this, 'make_wholesalex_roles_not_editable' ) );
+		}
 	}
 
 	/**

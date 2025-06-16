@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
-"Project-Id-Version: WholesaleX 2.0.18\n"
+"Project-Id-Version: WholesaleX 2.0.19\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wholesalex\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-06-02T04:34:22+00:00\n"
+"POT-Creation-Date: 2025-06-16T04:19:53+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wholesalex\n"
@@ -45,42 +45,74 @@ msgstr ""
 msgid "https://getwholesalex.com/"
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:101
+#: addons/recaptcha/class-recaptcha.php:168
 msgid "The secret parameter is missing."
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:103
+#: addons/recaptcha/class-recaptcha.php:170
 msgid "The secret parameter is invalid or malformed."
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:105
+#: addons/recaptcha/class-recaptcha.php:172
 msgid "The response parameter is missing."
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:107
+#: addons/recaptcha/class-recaptcha.php:174
 msgid "The response parameter is invalid or malformed."
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:109
+#: addons/recaptcha/class-recaptcha.php:176
 msgid "The request is invalid or malformed."
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:111
+#: addons/recaptcha/class-recaptcha.php:178
 msgid "The response is no longer valid: either is too old or has been used previously."
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:113
+#: addons/recaptcha/class-recaptcha.php:180
 msgid "Unknown!"
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:132
-#: addons/recaptcha/class-recaptcha.php:167
-#: addons/recaptcha/class-recaptcha.php:194
+#: addons/recaptcha/class-recaptcha.php:199
+#: addons/recaptcha/class-recaptcha.php:236
+#: addons/recaptcha/class-recaptcha.php:280
 msgid "reCAPTCHA v3:"
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:255
+#: addons/recaptcha/class-recaptcha.php:244
+#: addons/recaptcha/class-recaptcha.php:250
+#: addons/recaptcha/class-recaptcha.php:308
+#: addons/recaptcha/class-recaptcha.php:316
+#: addons/recaptcha/class-recaptcha.php:322
+msgid "reCAPTCHA v2:"
+msgstr ""
+
+#: addons/recaptcha/class-recaptcha.php:251
+msgid "Please complete the reCAPTCHA."
+msgstr ""
+
+#: addons/recaptcha/class-recaptcha.php:309
+msgid "Verification failed. Please try again."
+msgstr ""
+
+#: addons/recaptcha/class-recaptcha.php:323
+msgid "Please complete the reCAPTCHA checkbox."
+msgstr ""
+
+#: addons/recaptcha/class-recaptcha.php:443
 msgid "<strong>reCAPTCHA v3:</strong> Error!"
+msgstr ""
+
+#: addons/recaptcha/class-recaptcha.php:464
+msgid "<strong>reCAPTCHA v2:</strong> Verification failed. Please try again."
+msgstr ""
+
+#: addons/recaptcha/class-recaptcha.php:473
+msgid "<strong>reCAPTCHA v2:</strong> Invalid reCAPTCHA. Please check the box."
+msgstr ""
+
+#: addons/recaptcha/class-recaptcha.php:479
+msgid "<strong>reCAPTCHA v2:</strong> Please complete the reCAPTCHA."
 msgstr ""
 
 #: addons/recaptcha/init.php:23
@@ -95,8 +127,8 @@ msgid "Protect your website from suspicious login attempts with an added securit
 msgstr ""
 
 #: includes/class-wholesalex-activator.php:59
-#: includes/menu/class-wholesalex-registration.php:698
-#: includes/menu/class-wholesalex-registration.php:1568
+#: includes/menu/class-wholesalex-registration.php:569
+#: includes/menu/class-wholesalex-registration.php:1439
 #: includes/menu/class-wholesalex-settings.php:483
 msgid "Thank you for registering. Your account will be reviewed by us & approve manually. Please wait to be approved."
 msgstr ""
@@ -582,13 +614,13 @@ msgstr ""
 msgid "Logout to See this form"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:4062
+#: includes/class-wholesalex-shortcodes.php:4067
 msgid "Username is Required!"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:4066
-#: includes/menu/class-wholesalex-registration.php:1318
-#: includes/menu/class-wholesalex-registration.php:1547
+#: includes/class-wholesalex-shortcodes.php:4071
+#: includes/menu/class-wholesalex-registration.php:1189
+#: includes/menu/class-wholesalex-registration.php:1418
 msgid "Password is Required!"
 msgstr ""
 
@@ -1164,7 +1196,7 @@ msgstr ""
 #: includes/export/class-wholesalex-roles-csv-exporter.php:49
 #: includes/import/class-wholesalex-role-csv-importer-controller.php:258
 #: includes/import/class-wholesalex-role-csv-importer-controller.php:318
-#: includes/menu/class-wholesalex-role.php:484
+#: includes/menu/class-wholesalex-role.php:506
 msgid "Payment Methods"
 msgstr ""
 
@@ -1447,7 +1479,7 @@ msgid "Successfully Deleted."
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:1163
-#: includes/menu/class-wholesalex-role.php:159
+#: includes/menu/class-wholesalex-role.php:181
 #: includes/menu/class-wholesalex-settings.php:115
 msgid "Successfully Saved."
 msgstr ""
@@ -1462,7 +1494,7 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:1537
 #: includes/menu/class-wholesalex-profile.php:799
-#: includes/menu/class-wholesalex-role.php:326
+#: includes/menu/class-wholesalex-role.php:348
 msgid "Choose Shipping Zone..."
 msgstr ""
 
@@ -1523,7 +1555,7 @@ msgid "Rule Status"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:1733
-#: includes/menu/class-wholesalex-role.php:409
+#: includes/menu/class-wholesalex-role.php:431
 #: assets/js/whx_overview.js:4
 msgid "Save"
 msgstr ""
@@ -1913,9 +1945,9 @@ msgid "You can add minimum {minimum_qty} and maximum {maximum_qty} quantity of t
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4729
-#: includes/menu/class-wholesalex-dynamic-rules.php:6399
-#: includes/menu/class-wholesalex-dynamic-rules.php:6467
-#: includes/menu/class-wholesalex-dynamic-rules.php:6533
+#: includes/menu/class-wholesalex-dynamic-rules.php:6482
+#: includes/menu/class-wholesalex-dynamic-rules.php:6550
+#: includes/menu/class-wholesalex-dynamic-rules.php:6616
 #: includes/menu/class-wholesalex-settings.php:1049
 #: includes/menu/class-wholesalex-settings.php:1051
 msgid "You have to add minimun {minimum_qty} quantity"
@@ -1980,25 +2012,25 @@ msgid "Add up to {min_value} {unit} to cart"
 msgstr ""
 
 #. translators: %s: Plugin Name
-#: includes/menu/class-wholesalex-dynamic-rules.php:5572
+#: includes/menu/class-wholesalex-dynamic-rules.php:5655
 msgid "%s Free Shipping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:6032
+#: includes/menu/class-wholesalex-dynamic-rules.php:6115
 msgid "(BOGO Discounts)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:6066
-#: includes/menu/class-wholesalex-dynamic-rules.php:6098
+#: includes/menu/class-wholesalex-dynamic-rules.php:6149
+#: includes/menu/class-wholesalex-dynamic-rules.php:6181
 msgid "Cart Discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:6138
-#: includes/menu/class-wholesalex-dynamic-rules.php:6169
+#: includes/menu/class-wholesalex-dynamic-rules.php:6221
+#: includes/menu/class-wholesalex-dynamic-rules.php:6252
 msgid "Payment Discount!"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:7075
+#: includes/menu/class-wholesalex-dynamic-rules.php:7158
 #: includes/menu/class-wholesalex-settings.php:1373
 msgid "Login to see prices"
 msgstr ""
@@ -2415,7 +2447,7 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:329
 #: includes/menu/class-wholesalex-overview.php:330
-#: includes/menu/class-wholesalex-role.php:428
+#: includes/menu/class-wholesalex-role.php:450
 #: assets/js/whx_overview.js:4
 msgid "Registration Form"
 msgstr ""
@@ -2499,14 +2531,14 @@ msgid "Average Order (B2B)"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:897
-#: includes/menu/class-wholesalex-role.php:169
-#: includes/menu/class-wholesalex-role.php:209
+#: includes/menu/class-wholesalex-role.php:191
+#: includes/menu/class-wholesalex-role.php:231
 msgid "New Role"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:965
 #: includes/menu/class-wholesalex-users.php:192
-#: assets/js/whx_conversation.js:4185
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Select Status"
 msgstr ""
@@ -2589,8 +2621,8 @@ msgid "Order ID"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:1065
-#: includes/menu/class-wholesalex-role.php:402
-#: includes/menu/class-wholesalex-role.php:403
+#: includes/menu/class-wholesalex-role.php:424
+#: includes/menu/class-wholesalex-role.php:425
 msgid "Name"
 msgstr ""
 
@@ -2860,48 +2892,48 @@ msgid "Custom User Meta Mapping"
 msgstr ""
 
 #. translators: %s: Account Status
-#: includes/menu/class-wholesalex-registration.php:496
-#: includes/menu/class-wholesalex-registration.php:558
+#: includes/menu/class-wholesalex-registration.php:367
+#: includes/menu/class-wholesalex-registration.php:429
 msgid "Your account Status is %s. Please Contact with Site Administration to approve your account."
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:499
-#: includes/menu/class-wholesalex-registration.php:577
+#: includes/menu/class-wholesalex-registration.php:370
+#: includes/menu/class-wholesalex-registration.php:448
 msgid "Please confirm your account by clicking the confirmation link, that already sent your registered email."
 msgstr ""
 
 #. translators: %s: Account Status
-#: includes/menu/class-wholesalex-registration.php:562
-#: includes/menu/class-wholesalex-registration.php:566
+#: includes/menu/class-wholesalex-registration.php:433
+#: includes/menu/class-wholesalex-registration.php:437
 msgid "Your account Status is %s. Please Contact with Site Administration to Active your account."
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:1093
-#: includes/menu/class-wholesalex-registration.php:1305
+#: includes/menu/class-wholesalex-registration.php:964
+#: includes/menu/class-wholesalex-registration.php:1176
 msgid "Password and Confirm password does not match!"
 msgstr ""
 
 #. translators: %s Allowed File Types.
-#: includes/menu/class-wholesalex-registration.php:1130
-#: includes/menu/class-wholesalex-registration.php:1431
+#: includes/menu/class-wholesalex-registration.php:1001
+#: includes/menu/class-wholesalex-registration.php:1302
 msgid "File Type Does not support for %1$s Field! Supported File Types is %2$s."
 msgstr ""
 
 #. translators: 1: Field Label, 2: Allowed Size
-#: includes/menu/class-wholesalex-registration.php:1134
-#: includes/menu/class-wholesalex-registration.php:1436
+#: includes/menu/class-wholesalex-registration.php:1005
+#: includes/menu/class-wholesalex-registration.php:1307
 msgid "File is too large! Max Upload Size For %1$s field is %2$s."
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:1147
-#: includes/menu/class-wholesalex-registration.php:1152
-#: includes/menu/class-wholesalex-registration.php:1158
-#: includes/menu/class-wholesalex-registration.php:1163
+#: includes/menu/class-wholesalex-registration.php:1018
+#: includes/menu/class-wholesalex-registration.php:1023
+#: includes/menu/class-wholesalex-registration.php:1029
+#: includes/menu/class-wholesalex-registration.php:1034
 msgid " is Required!"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:1315
-#: includes/menu/class-wholesalex-registration.php:1544
+#: includes/menu/class-wholesalex-registration.php:1186
+#: includes/menu/class-wholesalex-registration.php:1415
 msgid "Email is Required!"
 msgstr ""
 
@@ -2985,95 +3017,95 @@ msgstr ""
 msgid "Requested Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:159
+#: includes/menu/class-wholesalex-role.php:181
 msgid "Before Status Update, You Have to save role."
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:321
-#: includes/menu/class-wholesalex-role.php:367
+#: includes/menu/class-wholesalex-role.php:343
+#: includes/menu/class-wholesalex-role.php:389
 msgid "If no methods are selected, all methods are available for this role."
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:387
+#: includes/menu/class-wholesalex-role.php:409
 #: assets/js/whx_overview.js:4
 msgid "Add New B2B Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:392
+#: includes/menu/class-wholesalex-role.php:414
 msgid "Create New Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:420
+#: includes/menu/class-wholesalex-role.php:442
 msgid "Role ID"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:433
+#: includes/menu/class-wholesalex-role.php:455
 #: includes/menu/class-wholesalex-settings.php:428
 msgid "Registration Approval Method"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:435
+#: includes/menu/class-wholesalex-role.php:457
 msgid "Use Global Setting"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:436
+#: includes/menu/class-wholesalex-role.php:458
 msgid "Email Confirmation Required"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:437
+#: includes/menu/class-wholesalex-role.php:459
 msgid "Automatically Approve Account"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:438
+#: includes/menu/class-wholesalex-role.php:460
 #: includes/menu/class-wholesalex-settings.php:432
 msgid "Admin Approval Required"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:445
+#: includes/menu/class-wholesalex-role.php:467
 msgid "Redirected to Page URL (After Login)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:452
+#: includes/menu/class-wholesalex-role.php:474
 msgid "Redirected to Page URL (After Registration)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:466
+#: includes/menu/class-wholesalex-role.php:488
 msgid "Display Prices"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:468
+#: includes/menu/class-wholesalex-role.php:490
 msgid "Default"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:469
+#: includes/menu/class-wholesalex-role.php:491
 msgid "Include Tax"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:470
+#: includes/menu/class-wholesalex-role.php:492
 msgid "Exclude Tax"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:498
-#: includes/menu/class-wholesalex-role.php:512
+#: includes/menu/class-wholesalex-role.php:520
+#: includes/menu/class-wholesalex-role.php:534
 msgid "Role Setting"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:505
+#: includes/menu/class-wholesalex-role.php:527
 msgid "Disable Coupons For This Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:520
-#: includes/menu/class-wholesalex-role.php:521
+#: includes/menu/class-wholesalex-role.php:542
+#: includes/menu/class-wholesalex-role.php:543
 msgid "Enable Auto Role Migration"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:526
+#: includes/menu/class-wholesalex-role.php:548
 msgid "Minimum Purchase Amount Required to Qualify for This Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-role.php:810
-#: includes/menu/class-wholesalex-role.php:823
-#: includes/menu/class-wholesalex-role.php:824
+#: includes/menu/class-wholesalex-role.php:832
+#: includes/menu/class-wholesalex-role.php:845
+#: includes/menu/class-wholesalex-role.php:846
 msgid "Replace Add to Cart With Add to Quote"
 msgstr ""
 
@@ -4010,61 +4042,73 @@ msgstr ""
 msgid "Tier Discount BG Color"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1544
-msgid "Site Key"
+#: includes/menu/class-wholesalex-settings.php:1543
+msgid "Recaptcha Status"
 msgstr ""
 
 #: includes/menu/class-wholesalex-settings.php:1545
-msgid "Site Key..."
+msgid "Recaptcha v2"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1547
-msgid "For Gettings reCAPTCHA Site Key, You have to create an project on google recaptcha. "
-msgstr ""
-
-#: includes/menu/class-wholesalex-settings.php:1552
-msgid "Secret Key"
+#: includes/menu/class-wholesalex-settings.php:1546
+msgid "Recaptcha v3"
 msgstr ""
 
 #: includes/menu/class-wholesalex-settings.php:1553
-msgid "Secret Key..."
+msgid "Site Key"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1555
-msgid "For Gettings reCAPTCHA secret Key, You have to create an project on google recaptcha. "
+#: includes/menu/class-wholesalex-settings.php:1554
+msgid "Site Key..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1560
-msgid "Minimum Allowed Score"
+#: includes/menu/class-wholesalex-settings.php:1556
+msgid "For Gettings reCAPTCHA Site Key, You have to create an project on google recaptcha. "
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:1561
+msgid "Secret Key"
 msgstr ""
 
 #: includes/menu/class-wholesalex-settings.php:1562
-msgid "0.5"
+msgid "Secret Key..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1563
-msgid "Set minimum allowed score for reCAPTCHA. Default Range: 0.0 - 1.00"
+#: includes/menu/class-wholesalex-settings.php:1564
+msgid "For Gettings reCAPTCHA secret Key, You have to create an project on google recaptcha. "
 msgstr ""
 
 #: includes/menu/class-wholesalex-settings.php:1569
+msgid "Minimum Allowed Score"
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:1571
+msgid "0.5"
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:1572
+msgid "Set minimum allowed score for reCAPTCHA. Default Range: 0.0 - 1.00"
+msgstr ""
+
+#: includes/menu/class-wholesalex-settings.php:1582
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:4
 msgid "Save Changes"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1862
+#: includes/menu/class-wholesalex-settings.php:1875
 msgid "B2C Groups"
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1865
+#: includes/menu/class-wholesalex-settings.php:1878
 msgid "Guest Users (Logged Out), "
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1878
+#: includes/menu/class-wholesalex-settings.php:1891
 msgid "B2C Users "
 msgstr ""
 
-#: includes/menu/class-wholesalex-settings.php:1890
+#: includes/menu/class-wholesalex-settings.php:1903
 msgid "B2B Groups"
 msgstr ""
 
@@ -4368,18 +4412,17 @@ msgctxt "WholesaleX Registration Pending (Customer)"
 msgid "We have received your registration request. Our team will review your information, and you will receive another email once your Request has been approved/rejected."
 msgstr ""
 
-#: assets/js/wholesalex_bulkorder.js:2008
+#: assets/js/wholesalex_bulkorder.js:1
 #: assets/js/wholesalex_components.js:1
-#: assets/js/wholesalex_subaccount.js:2008
-#: assets/js/whx_conversation.js:2008
+#: assets/js/wholesalex_subaccount.js:1
+#: assets/js/whx_conversation.js:1
 msgid "OK"
 msgstr ""
 
-#: assets/js/wholesalex_bulkorder.js:2009
+#: assets/js/wholesalex_bulkorder.js:1
 #: assets/js/wholesalex_components.js:1
-#: assets/js/wholesalex_subaccount.js:2009
-#: assets/js/whx_conversation.js:2009
-#: assets/js/whx_conversation.js:2724
+#: assets/js/wholesalex_subaccount.js:1
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_profile.js:363
 msgid "Cancel"
 msgstr ""
@@ -4413,7 +4456,7 @@ msgid "Edit this header"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:2532
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:461
 msgid "More"
 msgstr ""
@@ -4425,25 +4468,25 @@ msgid "Available Smart Tags:"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:2701
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_profile.js:340
 msgid "Confirm Delete"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:2713
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_profile.js:352
 msgid "Do You Want to delete"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:2713
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_profile.js:352
 msgid "Be careful, this procedure is irreversible. Do you want to proceed?"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:2734
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1295
 #: assets/js/whx_profile.js:373
@@ -4485,7 +4528,7 @@ msgid "Pro"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:3482
+#: assets/js/whx_conversation.js:1
 msgid "Show Result:"
 msgstr ""
 
@@ -4501,52 +4544,50 @@ msgstr ""
 msgid "Searching…"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4060
-#: assets/js/whx_conversation.js:4072
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:4
 msgid "Edit"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4065
-#: assets/js/whx_conversation.js:4077
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Resolved"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4082
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Force Delete"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4113
-#: assets/js/whx_overview.js:4
-msgid "Selected Conversations"
-msgstr ""
-
-#: assets/js/whx_conversation.js:4155
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Add New Conversation"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4172
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Apply"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4191
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Select Post Status"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4198
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Select Type"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4212
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Search…"
+msgstr ""
+
+#: assets/js/whx_conversation.js:1
+#: assets/js/whx_overview.js:4
+msgid "Selected Conversations"
 msgstr ""
 
 #: assets/js/whx_overview.js:1
@@ -6011,11 +6052,11 @@ msgstr ""
 msgid "Sent to Parent Account For Approval"
 msgstr ""
 
-#: assets/js/whx_wallet_gateway.js:202
+#: assets/js/whx_wallet_gateway.js:1
 msgid "WholesaleX Wallet Payment"
 msgstr ""
 
 #. translators: 1: Wallet amount
-#: assets/js/whx_wallet_gateway.js:211
+#: assets/js/whx_wallet_gateway.js:1
 msgid "| Current Balance: %s"
 msgstr ""

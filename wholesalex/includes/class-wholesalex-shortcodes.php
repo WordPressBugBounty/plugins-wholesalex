@@ -562,7 +562,7 @@ class WHOLESALEX_Shortcodes {
 		$input_variation = $form_data['settings']['inputVariation'];
 		// $is_role_wise     = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' != $atts['registration_role'] && 'global' != $atts['registration_role'] ? $atts['registration_role'] : false;
 		// $is_only_b2b    = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' == $atts['registration_role'] ? $atts['registration_role'] : false;
-		$wrapper         = wp_unique_id( 'whx_wrapper' );
+		$wrapper = wp_unique_id( 'whx_wrapper' );
 
 		ob_start();
 		if ( ! wp_style_is( 'whx_form' ) ) {
@@ -1704,6 +1704,7 @@ class WHOLESALEX_Shortcodes {
 		}
 		$is_label_hide = isset( $field['isLabelHide'] ) && $field['isLabelHide'];
 
+		ob_start();
 		switch ( $input_variation ) {
 			case 'variation_1':
 			case 'variation_3':
@@ -3698,6 +3699,10 @@ class WHOLESALEX_Shortcodes {
 				// code...
 				break;
 		}
+
+		$output = ob_get_clean();
+
+		echo apply_filters( 'wholesalex_registration_form_field', $output, $field['type'], $field['name'], $input_variation, $field );
 	}
 
 	/**

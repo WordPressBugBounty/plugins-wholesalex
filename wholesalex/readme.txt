@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
 Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 2.0.18
+Stable tag: 2.0.19
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -210,9 +210,15 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 
 == Changelog ==
 
+= 2.0.19 - 16 June 2025 =
+* New: Integrated reCAPTCHA v2 support for enhanced spam protection.
+* Improvement: Wholesalex role is now available in Elementor's display conditions.
+* Improvement: Added filter to customize registration form with select options.
+* Fix: Fixed tax exemption not applying correctly with reduced tax rate settings in dynamic rules.
+
 = 2.0.18 - 02 June 2025 =
-* improvement: Added compatibility with Aelia Currency Switcher
-* improvement: Tiered pricing table now properly highlights on quantity change when using the WowStore Single template.
+* Improvement: Added compatibility with Aelia Currency Switcher.
+* Improvement: Tiered pricing table now properly highlights on quantity change when using the WowStore Single template.
 * Fix: Checkout button not displaying in block-based cart when checkout restrictions are enabled.
 * Fix: Allow tax total settings is not working with restrict checkout and cart discount issue fixed.
 
