@@ -430,6 +430,7 @@ class WHOLESALEX_Shortcodes {
 		<input type="hidden" name="action" value="wholesalex_process_<?php echo esc_attr( $type ); ?>" />
 
 		<?php
+		do_action( 'wholesalex_' . $type . '_form' );
 		wp_nonce_field( 'wholesalex-' . $type, 'wholesalex-' . $type . '-nonce' );
 		$align_class   = isset( $form_data['styles']['layout']['button']['align'] ) ? sanitize_html_class( $form_data['styles']['layout']['button']['align'] ) : '';
 		$button_class .= ' ' . $align_class;
@@ -1379,7 +1380,7 @@ class WHOLESALEX_Shortcodes {
 					}
 
 					const formObject = new FormData(wrapper.find('.wholesalex-login-form')[0]);
-						if (wholesalex.recaptcha_status === 'yes' && typeof grecaptcha !== 'undefined' ) {
+						if (wholesalex.recaptcha_status === 'yes' && wholesalex.settings.recaptcha_version!="recaptcha_v2" && typeof grecaptcha !== 'undefined' ) {
 							let site_key      = "<?php echo esc_attr( wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' ) ); ?>";
 							grecaptcha.ready(function () {
 								try {
@@ -1391,6 +1392,7 @@ class WHOLESALEX_Shortcodes {
 								}
 								
 							});
+							processLogin();
 							
 					} else {
 						processLogin();
