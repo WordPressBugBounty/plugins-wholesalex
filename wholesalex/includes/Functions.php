@@ -1346,22 +1346,57 @@ class Functions {
 	 * @since 1.0.0
 	 */
 	public function category_cart_count( $cat_id ) {
+		static $cache_category_id = array();
+
+		// Return cached result if available.
+		if ( isset( $cache_category_id[ $cat_id ] ) ) {
+			return $cache_category_id[ $cat_id ];
+		}
+
 		$cat_count = 0;
-		if ( isset( WC()->cart ) && ! empty( WC()->cart ) ) {
+
+		if ( isset( WC()->cart ) && ! WC()->cart->is_empty() ) {
+			// Cache product objects by ID to avoid repeated wc_get_product calls.
+			static $product_cache = array();
+
+			// Cache has_term results to avoid duplicate term queries.
+			static $has_term_cache = array();
+
 			foreach ( WC()->cart->get_cart() as $cart_item ) {
 				$__product_id = $cart_item['product_id'];
-				$__product    = wc_get_product( $__product_id );
 
-				if ( 'product_variation' === $__product->post_type ) {
+				if ( ! isset( $product_cache[ $__product_id ] ) ) {
+					$product_cache[ $__product_id ] = wc_get_product( $__product_id );
+				}
+
+				$__product = $product_cache[ $__product_id ];
+
+				if ( ! $__product ) {
+					continue;
+				}
+
+				// Handle product variation.
+				if ( 'product_variation' === $__product->get_type() ) {
 					$__product_id = $__product->get_parent_id();
 				}
-				if ( has_term( $cat_id, 'product_cat', $__product_id ) ) {
+
+				$cache_key = $__product_id . '-' . $cat_id;
+
+				if ( ! isset( $has_term_cache[ $cache_key ] ) ) {
+					$has_term_cache[ $cache_key ] = has_term( $cat_id, 'product_cat', $__product_id );
+				}
+
+				if ( $has_term_cache[ $cache_key ] ) {
 					$cat_count += $cart_item['quantity'];
 				}
 			}
 		}
 
 		$cat_count = apply_filters( 'wholesalex_category_cart_count', $cat_count, $cat_id );
+
+		// Save to static cache or runtime cache before returning.
+		$cache_category_id[ $cat_id ] = $cat_count;
+
 		return $cat_count;
 	}
 

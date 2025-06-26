@@ -5499,7 +5499,7 @@ class WHOLESALEX_Dynamic_Rules {
 								}
 								if ( 'yes' === $is_tax_exempt ) {
 									$tax_class = 'Zero Rate';
-									if ( ! is_array( $this->product_page_notices[ $product->get_id() ] ) ) {
+									if ( isset( $this->product_page_notices[ $product->get_id() ] ) && ! is_array( $this->product_page_notices[ $product->get_id() ] ) ) {
 										$this->product_page_notices[ $product->get_id() ] = array();
 									}
 									$this->product_page_notices[ $product->get_id() ]['tax_free'] = true;
@@ -6915,6 +6915,17 @@ class WHOLESALEX_Dynamic_Rules {
 					}
 				}
 
+				// product extra addons for woocommerce compatibility.
+				if ( function_exists( 'WC' ) && ( $cart = WC()->cart ) && wholesalex()->is_plugin_installed_and_activated( 'product-extras-for-woocommerce/product-extras-for-woocommerce.php' ) ) {
+
+					foreach ( $cart->get_cart() as $cart_item ) {
+						if ( isset( $cart_item['product_extras']['price_with_extras'] ) ) {
+							$custom_price        = max( 0, $this->price_after_currency_changed( $cart_item['product_extras']['price_with_extras'] ) );
+							$to_be_display_price = $custom_price;
+						}
+					}
+				}
+
 				// compatibility with aelia currency switcher.
 				if ( class_exists( 'Aelia_Integration_Helper' ) && \Aelia_Integration_Helper::aelia_currency_switcher_active() ) {
 					$active_currency = get_woocommerce_currency();
@@ -7483,7 +7494,7 @@ class WHOLESALEX_Dynamic_Rules {
 	 * @return boolean
 	 */
 	public static function check_rule_conditions( $conditions, $rule_filter = array() ) {
-		if ( isset( $conditions, $conditions['tiers'] ) ) {
+		if ( isset( $conditions, $conditions['tiers'] ) && ! empty( $conditions['tiers'] ) ) {
 			if ( ! ( method_exists( self::class, 'is_conditions_fullfiled' ) && self::is_conditions_fullfiled( $conditions['tiers'], $rule_filter ) ) ) {
 				return false;
 			}

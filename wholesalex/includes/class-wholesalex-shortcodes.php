@@ -1253,6 +1253,15 @@ class WHOLESALEX_Shortcodes {
 				});
 
 				const processRegistration = (formObject)=>{
+					const entries = Object.fromEntries(formObject.entries());
+
+					// Check if reCAPTCHA is empty
+					const recaptchaValue = entries['g-recaptcha-response'];
+
+					if (typeof recaptchaValue === 'string' && recaptchaValue.trim() === '') {
+						alert('Please complete the reCAPTCHA checkbox.');
+						return;
+					}
 					wrapper.find('.wholesalex_circular_loading__wrapper').show();
 					$.ajax({ 
 						url: wholesalex.ajax, 

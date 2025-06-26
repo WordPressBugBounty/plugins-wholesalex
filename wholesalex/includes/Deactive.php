@@ -363,6 +363,17 @@ class Deactive {
 				transition: 400ms;
 				padding: 15px 35px;
 				cursor: pointer;
+				color: #fff;
+				background-color: var(--color-primary);
+			}
+
+			.wholesalex-btn:hover {
+				color: #fff;
+				background-color: #4c4cfb;
+			}
+			.wholesalex-btn:focus {
+				color: #fff;
+				background-color: #4c4cfb;
 			}
 			.wpxpo-btn-tracking-notice {
 				display: flex;
