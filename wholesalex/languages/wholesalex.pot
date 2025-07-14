@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
-"Project-Id-Version: WholesaleX 2.1.1\n"
+"Project-Id-Version: WholesaleX 2.1.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wholesalex\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-06-26T04:06:41+00:00\n"
+"POT-Creation-Date: 2025-07-14T09:40:55+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wholesalex\n"
@@ -73,52 +73,52 @@ msgstr ""
 msgid "Unknown!"
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:282
-#: addons/recaptcha/class-recaptcha.php:319
-#: addons/recaptcha/class-recaptcha.php:397
+#: addons/recaptcha/class-recaptcha.php:283
+#: addons/recaptcha/class-recaptcha.php:320
+#: addons/recaptcha/class-recaptcha.php:398
 msgid "reCAPTCHA v3:"
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:345
-#: addons/recaptcha/class-recaptcha.php:448
-#: addons/recaptcha/class-recaptcha.php:618
+#: addons/recaptcha/class-recaptcha.php:346
+#: addons/recaptcha/class-recaptcha.php:449
+#: addons/recaptcha/class-recaptcha.php:619
 msgid "<strong>reCAPTCHA v2:</strong> Invalid reCAPTCHA. Please check the box."
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:350
-#: addons/recaptcha/class-recaptcha.php:361
-#: addons/recaptcha/class-recaptcha.php:423
-#: addons/recaptcha/class-recaptcha.php:453
+#: addons/recaptcha/class-recaptcha.php:351
+#: addons/recaptcha/class-recaptcha.php:362
+#: addons/recaptcha/class-recaptcha.php:424
+#: addons/recaptcha/class-recaptcha.php:454
 msgid "reCAPTCHA v2:"
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:363
+#: addons/recaptcha/class-recaptcha.php:364
 msgid "Please complete the reCAPTCHA."
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:424
+#: addons/recaptcha/class-recaptcha.php:425
 msgid "Verification failed. Please try again."
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:454
+#: addons/recaptcha/class-recaptcha.php:455
 msgid "Please complete the reCAPTCHA checkbox."
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:574
+#: addons/recaptcha/class-recaptcha.php:575
 msgid "<strong>reCAPTCHA v3:</strong> Error!"
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:594
+#: addons/recaptcha/class-recaptcha.php:595
 msgid "<strong>reCAPTCHA v2:</strong> Verification failed. Please try again."
 msgstr ""
 
-#: addons/recaptcha/class-recaptcha.php:625
+#: addons/recaptcha/class-recaptcha.php:626
 msgid "<strong>reCAPTCHA v2:</strong> Please complete the reCAPTCHA."
 msgstr ""
 
 #: addons/recaptcha/init.php:23
 #: includes/menu/class-wholesalex-settings.php:1539
-#: includes/menu/class-wholesalex-setup-wizard.php:161
+#: includes/menu/class-wholesalex-setup-wizard.php:162
 #: includes/options/Addons.php:385
 msgid "reCAPTCHA"
 msgstr ""
@@ -160,27 +160,27 @@ msgstr ""
 msgid "Guest Users"
 msgstr ""
 
-#: includes/class-wholesalex-initialization.php:162
+#: includes/class-wholesalex-initialization.php:167
 msgid "Available Smart Tags: "
 msgstr ""
 
-#: includes/class-wholesalex-initialization.php:199
+#: includes/class-wholesalex-initialization.php:217
 msgid "You cannot register while you are logged in."
 msgstr ""
 
-#: includes/class-wholesalex-initialization.php:200
+#: includes/class-wholesalex-initialization.php:218
 msgid "is required"
 msgstr ""
 
-#: includes/class-wholesalex-initialization.php:201
+#: includes/class-wholesalex-initialization.php:219
 msgid "Register"
 msgstr ""
 
-#: includes/class-wholesalex-initialization.php:222
+#: includes/class-wholesalex-initialization.php:240
 msgid " Your account is already confirmed!. "
 msgstr ""
 
-#: includes/class-wholesalex-initialization.php:230
+#: includes/class-wholesalex-initialization.php:248
 msgid "<strong>Success:</strong> Your account is successfully confirmed. "
 msgstr ""
 
@@ -247,6 +247,7 @@ msgstr ""
 
 #: includes/class-wholesalex-notice.php:435
 #: includes/class-wholesalex-notice.php:455
+#: includes/notice/class-notice.php:227
 msgid "Dismiss"
 msgstr ""
 
@@ -631,10 +632,12 @@ msgid "I no longer need the plugin."
 msgstr ""
 
 #: includes/Deactive.php:119
+#: includes/deactive/class-deactive.php:73
 msgid "I found a better plugin."
 msgstr ""
 
 #: includes/Deactive.php:120
+#: includes/deactive/class-deactive.php:74
 msgid "Please share which plugin."
 msgstr ""
 
@@ -651,31 +654,46 @@ msgid "I could not get the plugin to work."
 msgstr ""
 
 #: includes/Deactive.php:136
+#: includes/deactive/class-deactive.php:79
 msgid "It's a temporary deactivation."
 msgstr ""
 
 #: includes/Deactive.php:141
+#: includes/deactive/class-deactive.php:84
 msgid "Other."
 msgstr ""
 
 #: includes/Deactive.php:142
+#: includes/deactive/class-deactive.php:85
 msgid "Please share the reason."
 msgstr ""
 
 #: includes/Deactive.php:172
+#: includes/deactive/class-deactive.php:101
 msgid "Quick Feedback"
 msgstr ""
 
 #: includes/Deactive.php:177
+#: includes/deactive/class-deactive.php:106
 msgid "If you have a moment, please let us know why you are deactivating WholesaleX:"
 msgstr ""
 
 #: includes/Deactive.php:194
+#: includes/deactive/class-deactive.php:123
 msgid "Submit & Deactivate"
 msgstr ""
 
 #: includes/Deactive.php:195
+#: includes/deactive/class-deactive.php:124
 msgid "Skip & Deactivate"
+msgstr ""
+
+#: includes/deactive/class-deactive.php:63
+msgid "The plugin isn’t working properly."
+msgstr ""
+
+#: includes/deactive/class-deactive.php:68
+msgid "Limited features on the free version."
 msgstr ""
 
 #: includes/emails/class-wholesalex-new-user-approval-require.php:69
@@ -1271,7 +1289,7 @@ msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:317
 #: includes/menu/class-wholesalex-dynamic-rules.php:1703
-#: includes/menu/class-wholesalex-dynamic-rules.php:4405
+#: includes/menu/class-wholesalex-dynamic-rules.php:4410
 #: includes/menu/class-wholesalex-settings.php:613
 #: includes/menu/class-wholesalex-settings.php:644
 #: includes/menu/class-wholesalex-settings.php:646
@@ -1525,7 +1543,7 @@ msgid "Choose Rule..."
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:1705
-#: includes/menu/class-wholesalex-dynamic-rules.php:4525
+#: includes/menu/class-wholesalex-dynamic-rules.php:4530
 #: includes/menu/class-wholesalex-settings.php:748
 #: includes/menu/class-wholesalex-settings.php:750
 msgid "Payment Method Discount"
@@ -1723,7 +1741,7 @@ msgid "Shipping Zone Methods"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:2121
-#: includes/menu/class-wholesalex-dynamic-rules.php:4465
+#: includes/menu/class-wholesalex-dynamic-rules.php:4470
 #: includes/menu/class-wholesalex-settings.php:658
 #: includes/menu/class-wholesalex-settings.php:690
 #: includes/menu/class-wholesalex-settings.php:692
@@ -1864,60 +1882,60 @@ msgstr ""
 msgid "End Data"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:3278
+#: includes/menu/class-wholesalex-dynamic-rules.php:3283
 msgid "Pieces"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4411
-#: includes/menu/class-wholesalex-dynamic-rules.php:4531
+#: includes/menu/class-wholesalex-dynamic-rules.php:4416
+#: includes/menu/class-wholesalex-dynamic-rules.php:4536
 #: includes/menu/class-wholesalex-settings.php:1313
 #: includes/menu/class-wholesalex-settings.php:1315
 msgid "You can avail one of the following offers by completing the requirements."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4427
-#: includes/menu/class-wholesalex-dynamic-rules.php:4486
-#: includes/menu/class-wholesalex-dynamic-rules.php:4546
+#: includes/menu/class-wholesalex-dynamic-rules.php:4432
+#: includes/menu/class-wholesalex-dynamic-rules.php:4491
+#: includes/menu/class-wholesalex-dynamic-rules.php:4551
 msgid " % OFF"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4429
-#: includes/menu/class-wholesalex-dynamic-rules.php:4488
-#: includes/menu/class-wholesalex-dynamic-rules.php:4548
+#: includes/menu/class-wholesalex-dynamic-rules.php:4434
+#: includes/menu/class-wholesalex-dynamic-rules.php:4493
+#: includes/menu/class-wholesalex-dynamic-rules.php:4553
 msgid " OFF"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4471
-#: includes/menu/class-wholesalex-dynamic-rules.php:4591
+#: includes/menu/class-wholesalex-dynamic-rules.php:4476
+#: includes/menu/class-wholesalex-dynamic-rules.php:4596
 #: includes/menu/class-wholesalex-settings.php:1326
 #: includes/menu/class-wholesalex-settings.php:1328
 msgid "You can avail following offers by completing the requirements."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4552
+#: includes/menu/class-wholesalex-dynamic-rules.php:4557
 msgid "Use "
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4585
+#: includes/menu/class-wholesalex-dynamic-rules.php:4590
 #: includes/menu/class-wholesalex-settings.php:868
 #: includes/menu/class-wholesalex-settings.php:870
 msgid "BOGO Discount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4605
+#: includes/menu/class-wholesalex-dynamic-rules.php:4610
 #: includes/menu/class-wholesalex-settings.php:882
 #: includes/menu/class-wholesalex-settings.php:884
 msgid "Get 1 Free"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4611
+#: includes/menu/class-wholesalex-dynamic-rules.php:4616
 #: includes/menu/class-wholesalex-settings.php:895
 #: includes/menu/class-wholesalex-settings.php:897
 msgid "Buy at least {required_quantity} products"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4642
-#: includes/menu/class-wholesalex-dynamic-rules.php:4760
+#: includes/menu/class-wholesalex-dynamic-rules.php:4647
+#: includes/menu/class-wholesalex-dynamic-rules.php:4765
 #: includes/menu/class-wholesalex-settings.php:778
 #: includes/menu/class-wholesalex-settings.php:797
 #: includes/menu/class-wholesalex-settings.php:799
@@ -1926,113 +1944,113 @@ msgstr ""
 msgid "Free Shipping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4676
+#: includes/menu/class-wholesalex-dynamic-rules.php:4681
 msgid "Promotions:"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4680
+#: includes/menu/class-wholesalex-dynamic-rules.php:4685
 #: includes/menu/class-wholesalex-settings.php:601
 #: includes/menu/class-wholesalex-settings.php:603
 msgid "Get exclusive offers"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4692
+#: includes/menu/class-wholesalex-dynamic-rules.php:4697
 msgid "Conditional Discount Offers"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4721
+#: includes/menu/class-wholesalex-dynamic-rules.php:4726
 #: includes/menu/class-wholesalex-settings.php:1083
 #: includes/menu/class-wholesalex-settings.php:1085
 msgid "You can add minimum {minimum_qty} and maximum {maximum_qty} quantity of this product"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4729
-#: includes/menu/class-wholesalex-dynamic-rules.php:6482
-#: includes/menu/class-wholesalex-dynamic-rules.php:6550
-#: includes/menu/class-wholesalex-dynamic-rules.php:6616
+#: includes/menu/class-wholesalex-dynamic-rules.php:4734
+#: includes/menu/class-wholesalex-dynamic-rules.php:6487
+#: includes/menu/class-wholesalex-dynamic-rules.php:6555
+#: includes/menu/class-wholesalex-dynamic-rules.php:6621
 #: includes/menu/class-wholesalex-settings.php:1049
 #: includes/menu/class-wholesalex-settings.php:1051
 msgid "You have to add minimun {minimum_qty} quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4737
+#: includes/menu/class-wholesalex-dynamic-rules.php:4742
 #: includes/menu/class-wholesalex-settings.php:1066
 #: includes/menu/class-wholesalex-settings.php:1068
 msgid "You can add maximum {maximum_qty} quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4887
+#: includes/menu/class-wholesalex-dynamic-rules.php:4892
 msgid "Quantity: %s"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4898
+#: includes/menu/class-wholesalex-dynamic-rules.php:4903
 msgid "FREE"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4969
+#: includes/menu/class-wholesalex-dynamic-rules.php:4974
 #: includes/menu/class-wholesalex-settings.php:1153
 #: includes/menu/class-wholesalex-settings.php:1155
 msgid "Spend {min_value} to {max_value}"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4973
+#: includes/menu/class-wholesalex-dynamic-rules.php:4978
 msgid "Spend min {max_value}"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4976
+#: includes/menu/class-wholesalex-dynamic-rules.php:4981
 #: includes/menu/class-wholesalex-settings.php:1121
 #: includes/menu/class-wholesalex-settings.php:1123
 msgid "Spend upto {min_value}"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4986
+#: includes/menu/class-wholesalex-dynamic-rules.php:4991
 #: includes/menu/class-wholesalex-settings.php:1170
 #: includes/menu/class-wholesalex-settings.php:1172
 msgid "Add {min_value} to {max_value} product(s) to cart"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4989
+#: includes/menu/class-wholesalex-dynamic-rules.php:4994
 msgid "Buy minimum {max_value} product(s) to get the discount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4991
+#: includes/menu/class-wholesalex-dynamic-rules.php:4996
 msgid "Don&apos;t buy more than {min_value} product(s) to get the discount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:5002
+#: includes/menu/class-wholesalex-dynamic-rules.php:5007
 #: includes/menu/class-wholesalex-settings.php:1220
 #: includes/menu/class-wholesalex-settings.php:1222
 msgid "Add {min_value} to {max_value} {unit} to cart"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:5010
+#: includes/menu/class-wholesalex-dynamic-rules.php:5015
 msgid "Add min {max_value} {unit} to cart"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:5018
+#: includes/menu/class-wholesalex-dynamic-rules.php:5023
 msgid "Add up to {min_value} {unit} to cart"
 msgstr ""
 
 #. translators: %s: Plugin Name
-#: includes/menu/class-wholesalex-dynamic-rules.php:5655
+#: includes/menu/class-wholesalex-dynamic-rules.php:5660
 msgid "%s Free Shipping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:6115
+#: includes/menu/class-wholesalex-dynamic-rules.php:6120
 msgid "(BOGO Discounts)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:6149
-#: includes/menu/class-wholesalex-dynamic-rules.php:6181
+#: includes/menu/class-wholesalex-dynamic-rules.php:6154
+#: includes/menu/class-wholesalex-dynamic-rules.php:6186
 msgid "Cart Discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:6221
-#: includes/menu/class-wholesalex-dynamic-rules.php:6252
+#: includes/menu/class-wholesalex-dynamic-rules.php:6226
+#: includes/menu/class-wholesalex-dynamic-rules.php:6257
 msgid "Payment Discount!"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:7169
+#: includes/menu/class-wholesalex-dynamic-rules.php:7174
 #: includes/menu/class-wholesalex-settings.php:1373
 msgid "Login to see prices"
 msgstr ""
@@ -2482,7 +2500,7 @@ msgstr ""
 #: includes/menu/class-wholesalex-overview.php:395
 #: includes/menu/class-wholesalex-overview.php:403
 #: includes/menu/class-wholesalex-overview.php:414
-#: includes/menu/class-wholesalex-setup-wizard.php:116
+#: includes/menu/class-wholesalex-setup-wizard.php:117
 #: includes/options/Addons.php:337
 msgid "Conversations"
 msgstr ""
@@ -2540,7 +2558,7 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:965
 #: includes/menu/class-wholesalex-users.php:192
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4196
 #: assets/js/whx_overview.js:4
 msgid "Select Status"
 msgstr ""
@@ -2651,7 +2669,8 @@ msgstr ""
 msgid "Regi. Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1143
+#: includes/menu/class-wholesalex-overview.php:1144
+#: includes/notice/class-notice.php:316
 #: assets/js/wholesalex_components.js:1
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1527
@@ -3180,7 +3199,7 @@ msgid "Which type of bulk order form do you want?"
 msgstr ""
 
 #: includes/menu/class-wholesalex-settings.php:224
-#: includes/menu/class-wholesalex-setup-wizard.php:69
+#: includes/menu/class-wholesalex-setup-wizard.php:70
 #: includes/options/Addons.php:287
 #: assets/js/whx_overview.js:4
 msgid "Bulk Order Form"
@@ -4114,117 +4133,117 @@ msgstr ""
 msgid "B2B Groups"
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:70
+#: includes/menu/class-wholesalex-setup-wizard.php:71
 #: includes/options/Addons.php:288
 msgid "It helps the buyers to quickly order a large number of products. They can also add desired products as purchase lists, update the list, and purchase from their “My Account Page”."
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:85
+#: includes/menu/class-wholesalex-setup-wizard.php:86
 #: includes/options/Addons.php:303
 msgid "Subaccounts "
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:86
+#: includes/menu/class-wholesalex-setup-wizard.php:87
 #: includes/options/Addons.php:304
 msgid "Let your registered users create subaccounts. So the subaccount holders will be able to do permitted tasks on behalf of the main account holder."
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:100
+#: includes/menu/class-wholesalex-setup-wizard.php:101
 #: includes/options/Addons.php:319
 #: assets/js/whx_overview.js:4
 msgid "Request a Quote"
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:101
+#: includes/menu/class-wholesalex-setup-wizard.php:102
 #: includes/options/Addons.php:320
 msgid "Let your buyers request a quote for their desired products. So you can send them custom prices and they can purchase with your given price or negotiate further."
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:107
+#: includes/menu/class-wholesalex-setup-wizard.php:108
 #: includes/options/Addons.php:326
 #: assets/js/whx_overview.js:4
 msgid "Conversation"
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:117
+#: includes/menu/class-wholesalex-setup-wizard.php:118
 #: includes/options/Addons.php:338
 msgid "Enabling this feature will let your customers send messages to you from their “My Account” Dashboard."
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:130
+#: includes/menu/class-wholesalex-setup-wizard.php:131
 #: includes/options/Addons.php:353
 #: assets/js/whx_overview.js:4
 msgid "WholesaleX Wallet"
 msgstr ""
 
 #. translators: %s Plugin Name
-#: includes/menu/class-wholesalex-setup-wizard.php:132
+#: includes/menu/class-wholesalex-setup-wizard.php:133
 #: includes/options/Addons.php:355
 msgid "Enable and configure it to let your buyers use the store wallet as a payment method.The registered users can add funds to the wallet and use it to purchase from your store."
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:146
+#: includes/menu/class-wholesalex-setup-wizard.php:147
 #: includes/options/Addons.php:370
 msgid "White Label"
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:147
+#: includes/menu/class-wholesalex-setup-wizard.php:148
 #: includes/options/Addons.php:371
 msgid "Add your own branding while building client’s sites using WholesaleX. You can set the custom plugin name, change the email, registration, roles, and more."
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:162
+#: includes/menu/class-wholesalex-setup-wizard.php:163
 #: includes/options/Addons.php:386
 msgid "Protect your website from suspicious login attempts with an added security layer using Google reCAPTCHA v3 for extended safety measures.  "
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:174
+#: includes/menu/class-wholesalex-setup-wizard.php:175
 #: includes/options/Addons.php:399
 msgid "WholesaleX for Dokan"
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:175
+#: includes/menu/class-wholesalex-setup-wizard.php:176
 #: includes/options/Addons.php:400
 msgid "Turn your store into a B2B multi-vendor marketplace. Create and manage wholesale discounts with dynamic rules and user roles. Also manage conversations with WholesaleX for Dokan."
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:188
+#: includes/menu/class-wholesalex-setup-wizard.php:189
 msgid "This addon require Dokan plugin"
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:192
+#: includes/menu/class-wholesalex-setup-wizard.php:193
 #: includes/options/Addons.php:419
 msgid "WholesaleX for WCFM"
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:193
+#: includes/menu/class-wholesalex-setup-wizard.php:194
 #: includes/options/Addons.php:420
 msgid "Let vendors set wholesale prices and discounts to your wholesale store with WCFM for Dokan integration. Manage conversations with users as well in your B2B multi-vendor store."
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:206
+#: includes/menu/class-wholesalex-setup-wizard.php:207
 msgid "This addon require WCFM – Frontend Manager plugin"
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:435
+#: includes/menu/class-wholesalex-setup-wizard.php:436
 msgid "Plugin Activate Successfully"
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:497
-#: includes/menu/class-wholesalex-setup-wizard.php:507
+#: includes/menu/class-wholesalex-setup-wizard.php:498
+#: includes/menu/class-wholesalex-setup-wizard.php:508
 msgid "WooCommerce Activation Failed!"
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:500
+#: includes/menu/class-wholesalex-setup-wizard.php:501
 msgid "WooCommerce Installation Failed!"
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:518
-#: includes/menu/class-wholesalex-setup-wizard.php:528
+#: includes/menu/class-wholesalex-setup-wizard.php:519
+#: includes/menu/class-wholesalex-setup-wizard.php:529
 msgid "ProductX Activation Failed!"
 msgstr ""
 
-#: includes/menu/class-wholesalex-setup-wizard.php:521
+#: includes/menu/class-wholesalex-setup-wizard.php:522
 msgid "ProductX Installation Failed!"
 msgstr ""
 
@@ -4273,6 +4292,67 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-users.php:460
 msgid "Transaction"
+msgstr ""
+
+#: includes/notice/class-notice.php:96
+msgid "Hello Bar Action performed"
+msgstr ""
+
+#: includes/notice/class-notice.php:305
+msgid "Summer Sale Deal Alert:"
+msgstr ""
+
+#. translators: %s: Discount percentage
+#: includes/notice/class-notice.php:309
+msgid "Wholesalex on Sale - Enjoy %s on the powerful site builder."
+msgstr ""
+
+#: includes/notice/class-notice.php:310
+msgid "up to 55% OFF"
+msgstr ""
+
+#: includes/notice/class-notice.php:327
+msgid "I don’t want to save money"
+msgstr ""
+
+#: includes/notice/class-notice.php:736
+msgid "Want to help make Wholesalex even more awesome?"
+msgstr ""
+
+#: includes/notice/class-notice.php:738
+msgid "Allow us to collect diagnostic data and usage information. see "
+msgstr ""
+
+#: includes/notice/class-notice.php:739
+msgid "what we collect."
+msgstr ""
+
+#: includes/notice/class-notice.php:756
+msgid "Accept & Close"
+msgstr ""
+
+#: includes/notice/class-notice.php:804
+msgid "Welcome to Wholesalex."
+msgstr ""
+
+#: includes/notice/class-notice.php:805
+msgid "Wholesalex is a WooCommerce-based plugin. So you need to installed & activate WooCommerce to start using Wholesalex."
+msgstr ""
+
+#: includes/notice/class-notice.php:807
+msgid " Activate WooCommerce"
+msgstr ""
+
+#: includes/notice/class-notice.php:807
+msgid " Install WooCommerce"
+msgstr ""
+
+#: includes/notice/class-notice.php:810
+msgid "Discard"
+msgstr ""
+
+#: includes/notice/class-notice.php:828
+msgid "Invalid request."
 msgstr ""
 
 #: includes/options/Addons.php:166
@@ -4414,17 +4494,18 @@ msgctxt "WholesaleX Registration Pending (Customer)"
 msgid "We have received your registration request. Our team will review your information, and you will receive another email once your Request has been approved/rejected."
 msgstr ""
 
-#: assets/js/wholesalex_bulkorder.js:1
+#: assets/js/wholesalex_bulkorder.js:2008
 #: assets/js/wholesalex_components.js:1
-#: assets/js/wholesalex_subaccount.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/wholesalex_subaccount.js:2008
+#: assets/js/whx_conversation.js:2008
 msgid "OK"
 msgstr ""
 
-#: assets/js/wholesalex_bulkorder.js:1
+#: assets/js/wholesalex_bulkorder.js:2009
 #: assets/js/wholesalex_components.js:1
-#: assets/js/wholesalex_subaccount.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/wholesalex_subaccount.js:2009
+#: assets/js/whx_conversation.js:2009
+#: assets/js/whx_conversation.js:2735
 #: assets/js/whx_profile.js:363
 msgid "Cancel"
 msgstr ""
@@ -4458,8 +4539,8 @@ msgid "Edit this header"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_migration_tools.js:461
+#: assets/js/whx_conversation.js:2539
+#: assets/js/whx_migration_tools.js:468
 msgid "More"
 msgstr ""
 
@@ -4470,25 +4551,25 @@ msgid "Available Smart Tags:"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2712
 #: assets/js/whx_profile.js:340
 msgid "Confirm Delete"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2724
 #: assets/js/whx_profile.js:352
 msgid "Do You Want to delete"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2724
 #: assets/js/whx_profile.js:352
 msgid "Be careful, this procedure is irreversible. Do you want to proceed?"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2745
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1295
 #: assets/js/whx_profile.js:373
@@ -4530,7 +4611,7 @@ msgid "Pro"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:3493
 msgid "Show Result:"
 msgstr ""
 
@@ -4546,50 +4627,88 @@ msgstr ""
 msgid "Searching…"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4071
+#: assets/js/whx_conversation.js:4083
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:4
 msgid "Edit"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4076
+#: assets/js/whx_conversation.js:4088
 #: assets/js/whx_overview.js:4
 msgid "Resolved"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4093
 #: assets/js/whx_overview.js:4
 msgid "Force Delete"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4124
+#: assets/js/whx_overview.js:4
+msgid "Selected Conversations"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4166
 #: assets/js/whx_overview.js:4
 msgid "Add New Conversation"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4183
 #: assets/js/whx_overview.js:4
 msgid "Apply"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4202
 #: assets/js/whx_overview.js:4
 msgid "Select Post Status"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4209
 #: assets/js/whx_overview.js:4
 msgid "Select Type"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4223
 #: assets/js/whx_overview.js:4
 msgid "Search…"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_overview.js:4
-msgid "Selected Conversations"
+#: assets/js/whx_conversation.js:4356
+#: assets/js/whx_migration_tools.js:873
+#: assets/js/whx_overview.js:1
+msgid "Summer Sale Alert:"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4356
+#: assets/js/whx_migration_tools.js:873
+#: assets/js/whx_overview.js:1
+msgid "Enjoy a"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4356
+#: assets/js/whx_migration_tools.js:873
+#: assets/js/whx_overview.js:1
+msgid "Flat 55% OFF"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4356
+#: assets/js/whx_migration_tools.js:873
+#: assets/js/whx_overview.js:1
+msgid "on WholesaleX Pro -"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4363
+#: assets/js/whx_migration_tools.js:880
+#: assets/js/whx_overview.js:1
+msgid "Grab Now"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4369
+#: assets/js/whx_migration_tools.js:886
+#: assets/js/whx_overview.js:1
+msgid "Close notification"
 msgstr ""
 
 #: assets/js/whx_overview.js:1
@@ -5191,95 +5310,107 @@ msgid "Back to dashboard"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Add New License"
+msgid "Ready to Use Wholesalex Pro?"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Enter your License Key"
+msgid "Enter Your License Key Here…"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Active License"
+msgid "If you’re unable to activate your product license, please contact the"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "How to use the license key to activate the pro version?"
+msgid "support team"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Note:"
+msgid "Activate License"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Make sure you have installed both the"
+msgid "Congratulations!"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "free and pro version of WholesaleX."
+msgid "Congratulations on unlocking Wholesalex Pro! Ignite your imagination and design your ideal experience. Let Wholesalex take care of you and your users."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Step 1:"
+msgid "Do I need the free version of the plugin on my site?"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Step 2:"
+msgid "Yes. You can use the free version of the plugin, which includes the free features of WholesaleX. However, please note that to use the pro features, you need the free version of the plugin installed on your WordPress site."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Paste the copied license on the above field. Then Click on the Activate License Button."
+msgid "How do I get the pro version?"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "See Documentation"
+msgid "Please note that you need both WooCommerce and the free version of WholesaleX installed on your WordPress site to use the pro features. You need to download the pro version of the plugin from your buyer’s dashboard, install it on your WordPress site, and activate the product license."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Getting Started with WholesaleX?"
+msgid "Where do I get my product license?"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Check out the documentation to learn how you can effectively use the features of WholesaleX."
+msgid "You can copy the product license from the client dashboard. Once you copy it, paste the license key into the WholesaleX license validation page."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Explore Documentation"
+msgid "How do I get help to use Wholesalex Pro?"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Congratulations! Your License Key is "
+msgid "Please contact the <a href='https://www.wpxpo.com/contact/.' target='_blank'>support team</a>, who are ready to help you with any queries, including how to use the pro version of WholesaleX."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Activated"
+msgid "Wholesalex is a product of WPXPO. The contact support team is ready to help you with any queries, including how to use the pro version of Wholesalex."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Expiry Date:"
+msgid "License Type"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Want to deactive this license?"
+msgid "Expire On"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Click here"
+msgid "Renew License"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Go back to Dashboard"
+msgid "Deactivate License"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "How to upgrade the existing License of WholesaleX?"
+msgid "5 Sites - Yearly"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Upgrade your current plan from wpxpo.com > my account > My Order > View Licenses > View Upgrades > Select Your Desired Plan"
+msgid "20 Sites - Yearly"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Complete the Payment and enjoy your plan."
+msgid "1 Site - Lifetime"
+msgstr ""
+
+#: assets/js/whx_overview.js:4
+msgid "5 Sites - Lifetime"
+msgstr ""
+
+#: assets/js/whx_overview.js:4
+msgid "20 Sites - Lifetime"
+msgstr ""
+
+#: assets/js/whx_overview.js:4
+msgid "Choose a upgrade plan"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
@@ -5287,43 +5418,39 @@ msgid "Upgrade Now"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "How to renew existing license?"
+msgid "is a complete WooCommerce store builder featuring advanced options to improve sales!"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "To renew your existing license you need to go the Upgrade your current plan from wpxpo.com > my account > My Order > View Licenses"
+msgid "boost sales and maximize revenue with the advanced discount campaigns of WowRevenue."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Then click on the “renew now” button and complete the payment process."
+msgid "generates actionable leads and boost sales with popups, banners, and floating bars using WowOptin."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Want to get rid of the renewing hassle?"
+msgid "creates wonderful custom blogs and more using the powerful and customizable PostX site builder."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Purchase a lifetime plan of WholesaleX and keep using all pro features forever without any renewal charges. Use this coupon,"
+msgid "extends the functionality of your WooCommerce store with additional features and options."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "to get 30% discount for any lifetime plan."
+msgid "Activated"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Claim Your Discount"
+msgid "Activate"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "Your WholesaleX license has been"
+msgid "Install"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
-msgid "expired"
-msgstr ""
-
-#: assets/js/whx_overview.js:4
-msgid "Please Renew your license to start using the pro features again."
+msgid "Plugin Details"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
@@ -6003,6 +6130,18 @@ msgid "Preview"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
+msgid "Thank You!"
+msgstr ""
+
+#: assets/js/whx_overview.js:4
+msgid "Your message has been received. We will contact you soon on your email with a response. Stay connected and check mail!"
+msgstr ""
+
+#: assets/js/whx_overview.js:4
+msgid "Message"
+msgstr ""
+
+#: assets/js/whx_overview.js:4
 msgid "Accept"
 msgstr ""
 
@@ -6054,11 +6193,11 @@ msgstr ""
 msgid "Sent to Parent Account For Approval"
 msgstr ""
 
-#: assets/js/whx_wallet_gateway.js:1
+#: assets/js/whx_wallet_gateway.js:202
 msgid "WholesaleX Wallet Payment"
 msgstr ""
 
 #. translators: 1: Wallet amount
-#: assets/js/whx_wallet_gateway.js:1
+#: assets/js/whx_wallet_gateway.js:211
 msgid "| Current Balance: %s"
 msgstr ""

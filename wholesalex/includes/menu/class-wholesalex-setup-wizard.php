@@ -11,6 +11,7 @@ namespace WHOLESALEX;
 
 use Plugin_Upgrader;
 use WP_Ajax_Upgrader_Skin;
+use WHOLESALEX\DurbinClient;
 
 /**
  * WholesaleX Email Class
@@ -476,7 +477,7 @@ class WHOLESALEX_Setup_Wizard {
 		}
 		if ( isset( $_POST['website_type'] ) ) {
 			$site_type = sanitize_text_field( wp_unslash( $_POST['website_type'] ) );
-			update_option( '__site_type', $site_type );
+			update_option( 'wsx__site_type', $site_type );
 		}
 
 		if ( isset( $_POST['tier_table_layout'] ) ) {
@@ -571,6 +572,7 @@ class WHOLESALEX_Setup_Wizard {
 		}
 		if ( $get_updates_consent || $data_share_consent ) {
 			$response = self::send_plugin_data( 'installation_wizard' );
+			DurbinClient::send( DurbinClient::WIZARD_ACTION );
 		}
 
 		$woocommer_installed = file_exists( WP_PLUGIN_DIR . '/woocommerce/woocommerce.php' );

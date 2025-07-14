@@ -8,6 +8,7 @@
  */
 
 use WHOLESALEX\Scripts;
+use WHOLESALEX\Xpo;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -89,10 +90,16 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-users.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-support.php';
 		require_once WHOLESALEX_PATH . 'includes/options/Addons.php';
-		require_once WHOLESALEX_PATH . 'includes/Deactive.php';
+		// require_once WHOLESALEX_PATH . 'includes/Deactive.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-request-role-change.php';
 		require_once WHOLESALEX_PATH . 'includes/compatibility/woocommerce-bookings.php';
 		require_once WHOLESALEX_PATH . 'includes/compatibility/aeila_currency_switcher.php';
+
+		require_once WHOLESALEX_PATH . 'includes/durbin/class-durbin-client.php';
+		require_once WHOLESALEX_PATH . 'includes/durbin/class-our-plugins.php';
+		require_once WHOLESALEX_PATH . 'includes/durbin/class-xpo.php';
+		require_once WHOLESALEX_PATH . 'includes/deactive/class-deactive.php';
+		require_once WHOLESALEX_PATH . 'includes/notice/class-notice.php';
 
 		new \WHOLESALEX\WHOLESALEX_Role();
 		new \WHOLESALEX\WHOLESALEX_Registration();
@@ -113,10 +120,13 @@ class WholesaleX_Initialization {
 		new \WHOLESALEX\ImportExport();
 		new \WHOLESALEX\WholesaleX_Features();
 		new \WHOLESALEX\WholesaleX_Support();
-		new \WHOLESALEX\Deactive();
 		new \WHOLESALEX\WHOLESALEX_Overview();
 		new \WHOLESALEX\WHOLESALEX_RequstRoleChange();
 		new \WHOLESALEX\WHOLESALEX_Woocommerce_Bookings();
+
+		new \WHOLESALEX\Deactive();
+		new \WHOLESALEX\Notice();
+		new \WHOLESALEX\OurPlugins();
 
 		add_action( 'template_redirect', array( $this, 'wholesalex_process_user_email_confirmation' ) );
 	}
@@ -132,36 +142,44 @@ class WholesaleX_Initialization {
 
 		wp_enqueue_style( 'wholesalex' );
 		wp_enqueue_script( 'wholesalex' );
+		$user_info     = get_userdata( get_current_user_id() );
+		$localize_data = array(
+			'url'                 => WHOLESALEX_URL,
+			'nonce'               => wp_create_nonce( 'wholesalex-registration' ),
+			'ajax'                => admin_url( 'admin-ajax.php' ),
+			'wholesalex_roles'    => get_option( '_wholesalex_roles' ),
+			'currency_symbol'     => get_woocommerce_currency_symbol(),
+			'current_version'     => WHOLESALEX_VER,
+			'wallet_status'       => wholesalex()->get_setting( 'wsx_addon_wallet' ),
+			'conversation_status' => wholesalex()->get_setting( 'wsx_addon_conversation' ),
+			'recaptcha_status'    => wholesalex()->get_setting( 'wsx_addon_recaptcha' ),
+			'pro_link'            => wholesalex()->get_premium_link(),
+			'is_pro_active'       => wholesalex()->is_pro_active(),
+			'ver'                 => WHOLESALEX_VER,
+			'pro_ver'             => wholesalex()->is_pro_active() ? WHOLESALEX_PRO_VER : '',
+			'settings'            => wholesalex()->get_setting(),
+			'license_status'      => wholesalex()->is_pro_enabled() ? wholesalex()->get_license_status() : '',
+			'logo_url'            => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/img/logo-option.svg' ),
+			'plugin_name'         => wholesalex()->get_plugin_name(),
+			'whitelabel_enabled'  => 'yes' == wholesalex()->get_setting( 'wsx_addon_whitelabel' ) && function_exists( 'wholesalex_whitelabel_init' ),
+			'is_admin_interface'  => is_admin(),
+			'i18n'                => array(
+				'smart_tags' => __( 'Available Smart Tags: ', 'wholesalex' ),
+			),
+			'helloBar'            => Xpo::get_transient_without_cache( 'wsx_helloBar' ),
+			'license'             => Xpo::get_lc_key(),
+			'userInfo'            => array(
+				'name'  => $user_info->first_name ? $user_info->first_name . ( $user_info->last_name ? ' ' . $user_info->last_name : '' ) : $user_info->user_login,
+				'email' => $user_info->user_email,
+			),
+		);
 
 		wp_localize_script(
 			'wholesalex',
 			'wholesalex',
 			apply_filters(
 				'wholesalex_backend_localize_data',
-				array(
-					'url'                 => WHOLESALEX_URL,
-					'nonce'               => wp_create_nonce( 'wholesalex-registration' ),
-					'ajax'                => admin_url( 'admin-ajax.php' ),
-					'wholesalex_roles'    => get_option( '_wholesalex_roles' ),
-					'currency_symbol'     => get_woocommerce_currency_symbol(),
-					'current_version'     => WHOLESALEX_VER,
-					'wallet_status'       => wholesalex()->get_setting( 'wsx_addon_wallet' ),
-					'conversation_status' => wholesalex()->get_setting( 'wsx_addon_conversation' ),
-					'recaptcha_status'    => wholesalex()->get_setting( 'wsx_addon_recaptcha' ),
-					'pro_link'            => wholesalex()->get_premium_link(),
-					'is_pro_active'       => wholesalex()->is_pro_active(),
-					'ver'                 => WHOLESALEX_VER,
-					'pro_ver'             => wholesalex()->is_pro_active() ? WHOLESALEX_PRO_VER : '',
-					'settings'            => wholesalex()->get_setting(),
-					'license_status'      => wholesalex()->is_pro_enabled() ? wholesalex()->get_license_status() : '',
-					'logo_url'            => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/img/logo-option.svg' ),
-					'plugin_name'         => wholesalex()->get_plugin_name(),
-					'whitelabel_enabled'  => 'yes' == wholesalex()->get_setting( 'wsx_addon_whitelabel' ) && function_exists( 'wholesalex_whitelabel_init' ),
-					'is_admin_interface'  => is_admin(),
-					'i18n'                => array(
-						'smart_tags' => __( 'Available Smart Tags: ', 'wholesalex' ),
-					),
-				)
+				array_merge( $localize_data, Xpo::get_wow_products_details() )
 			)
 		);
 	}

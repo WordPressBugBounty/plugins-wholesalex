@@ -272,11 +272,12 @@ EOT;
 	 * @since 1.0.0
 	 */
 	public function add_recaptcha( $post_data ) {
-		$__site_key      = wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' );
-		$__secret_key    = wholesalex()->get_setting( '_settings_google_recaptcha_v3_secret_key' );
-		$__token         = isset( $post_data['token'] ) ? $post_data['token'] : '';
-		$__minimum_score = apply_filters( 'wholesalex_recaptcha_minimum_score_allow', 0.5 );
-		if ( isset( $__token ) && $__site_key && $__secret_key ) {
+		$__site_key        = wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' );
+		$__secret_key      = wholesalex()->get_setting( '_settings_google_recaptcha_v3_secret_key' );
+		$__token           = isset( $post_data['token'] ) ? $post_data['token'] : '';
+		$__minimum_score   = apply_filters( 'wholesalex_recaptcha_minimum_score_allow', 0.5 );
+		$recaptcha_version = wholesalex()->get_setting( 'recaptcha_version' );
+		if ( isset( $__token ) && $__site_key && $__secret_key && 'recaptcha_v3' === $recaptcha_version ) {
 			$parsed_response = $this->parse_recaptcha_response( $__token );
 			if ( ! ( isset( $parsed_response['success'] ) && $parsed_response['success'] && $parsed_response['score'] >= $__minimum_score ) ) {
 				$error_header = __( 'reCAPTCHA v3:', 'wholesalex' );

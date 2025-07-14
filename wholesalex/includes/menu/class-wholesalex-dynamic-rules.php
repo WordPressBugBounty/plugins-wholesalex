@@ -2408,6 +2408,10 @@ class WHOLESALEX_Dynamic_Rules {
 			}
 		}
 
+		if ( $sale_price === $regular_price ) {
+			return '<ins>' . $sale_text . wc_price( floatval( $sale_price ) ) . '</ins>';
+		}
+
 		if ( ! empty( $sale_price ) && ! empty( $regular_price ) ) {
 			return '<del aria-hidden="true">' . ( is_numeric( $regular_price ) ? wc_price( $regular_price ) : $regular_price ) . '</del> <ins>' . $sale_text . ( ( is_numeric( $sale_price ) ? wc_price( $sale_price ) : $sale_price ) ) . '</ins>';
 		}
@@ -2415,6 +2419,7 @@ class WHOLESALEX_Dynamic_Rules {
 		if ( ! empty( $sale_price ) ) {
 			return '<ins>' . $sale_text . wc_price( floatval( $sale_price ) ) . '</ins>';
 		}
+
 		if ( ! empty( $regular_price ) ) {
 			return wc_price( floatval( $regular_price ) );
 		}
@@ -7203,6 +7208,9 @@ class WHOLESALEX_Dynamic_Rules {
 			if ( $sp == $db_price ) {
 				return apply_filters( 'wholesalex_get_price_html', $price_html, $product );
 			}
+			// if ( $is_wholesale_price_applied ) {
+			// $sp = $role_sale_price;
+			// }
 
 			$price_html = $this->format_sale_price( $rp, $sp, $is_wholesale_price_applied ) . $product->get_price_suffix();
 

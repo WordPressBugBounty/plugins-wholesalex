@@ -6,7 +6,7 @@
  * @since v.1.4.3
  */
 
-namespace WHOLESALEX;
+namespace WHOLESALEXsd;
 
 defined( 'ABSPATH' ) || exit;
 

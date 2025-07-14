@@ -1138,9 +1138,12 @@ class WHOLESALEX_Overview {
 	 * @since 1.1.2
 	 */
 	public function go_pro_menu_page() {
-		if ( ! wholesalex()->is_pro_active() ) {
-			// $title = sprintf('<span class="wholesalex-submenu-title__upgrade-to-pro"><span class="dashicons dashicons-star-filled"></span>%s</span>', __('Upgrade to Pro', 'wholesalex'));
-			$title = sprintf( '<div class="wsx-d-flex wsx-item-center wsx-gap-8 wsx-color-lime "><div class="wsx-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="currentColor" viewBox="0 0 32 32"><path fill="currentColor" d="m3.488 13.184 6.272 6.112-1.472 8.608L16 23.84l7.712 4.064-1.472-8.608 6.272-6.112-8.64-1.248L16 4.128l-3.872 7.808z"/></svg></div>%s</div>', __( 'Upgrade to Pro', 'wholesalex' ) );
+		if ( ! Xpo::is_lc_active() || Xpo::is_lc_expired() ) {
+			$title       = sprintf(
+				'<div class="wsx-d-flex wsx-item-center wsx-gap-8 wsx-color-lime "><div class="wsx-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="currentColor" viewBox="0 0 32 32"><path fill="currentColor" d="m3.488 13.184 6.272 6.112-1.472 8.608L16 23.84l7.712 4.064-1.472-8.608 6.272-6.112-8.64-1.248L16 4.128l-3.872 7.808z"/></svg></div>%s</div>',
+				Xpo::is_lc_expired() ? __( 'Renew License', 'revenue' ) : __( 'Upgrade to Pro', 'wholesalex' )
+			);
+
 			add_submenu_page(
 				'wholesalex',
 				'',
@@ -1158,8 +1161,10 @@ class WHOLESALEX_Overview {
 	 * @since 1.1.2
 	 */
 	public function go_pro_redirect() {
+		$license_key = Xpo::get_lc_key();
+		$pro_link    = ! Xpo::is_lc_expired() ? 'https://account.wpxpo.com/checkout/?edd_license_key=' . $license_key : Xpo::generate_utm_link( array( 'utmKey' => 'submenu' ) );
 		if (isset($_GET['page']) && 'go_wholesalex_pro' === sanitize_text_field($_GET['page'])) { //phpcs:ignore
-			wp_redirect('https://getwholesalex.com/pricing/?utm_source=wholesalex-plugins&utm_medium=go_pro&utm_campaign=wholesalex-DB'); //phpcs:ignore
+			wp_redirect($pro_link); //phpcs:ignore
 			die();
 		} else {
 			return;
