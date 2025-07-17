@@ -730,15 +730,8 @@ class Functions {
 	 * @since 1.0.0
 	 */
 	public function get_license_status() {
-		$status = get_option( 'edd_wholesalex_license_status', '' );
-		if ( 'invalid' === $status ) {
-			$license_data = get_option( 'edd_wholesalex_license_data', array() );
-			if ( isset( $license_data['error'] ) ) {
-				$status = $license_data['error'];
-			}
-		}
-
-		return $status;
+		$license_data = get_option( 'edd_wholesalex_license_data', array() );
+		return isset( $license_data['license'] ) ? $license_data['license'] : '';
 	}
 
 
@@ -849,7 +842,7 @@ class Functions {
 	 * Get Default Registration Form Fields
 	 */
 	public function get_default_registration_form_fields() {
-		$is_woo_username    = get_option( 'woocommerce_registration_generate_username' );
+		$is_woo_username     = get_option( 'woocommerce_registration_generate_username' );
 		$registration_fields = array(
 			...( isset( $is_woo_username ) && 'no' === $is_woo_username ? array(
 				array(
@@ -1546,10 +1539,8 @@ class Functions {
 	 */
 	public function is_pro_active() {
 		// For Pro Check.
-		$__is_pro_active = false;
-		if ( function_exists( 'wholesalex_pro' ) && wholesalex_pro()->is_active() && 'valid' === wholesalex()->get_license_status() ) {
-			$__is_pro_active = true;
-		}
+		$__is_pro_active = Xpo::is_lc_active();
+
 		return $__is_pro_active;
 	}
 
