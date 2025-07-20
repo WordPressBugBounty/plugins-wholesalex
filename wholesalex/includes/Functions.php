@@ -2788,4 +2788,22 @@ class Functions {
 
 		return false;
 	}
+
+	/**
+	 * Get Price ID
+	 *
+	 * @return bool
+	 */
+	public function get_price_id() {
+		if ( wholesalex()->is_pro_active() ) {
+			$license_data = get_option( 'edd_wholesalex_license_data', false );
+			$license_data = (array) $license_data;
+			if ( is_array( $license_data ) && isset( $license_data['price_id'] ) ) {
+				return $license_data['price_id'];
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
 }

@@ -376,7 +376,7 @@ class Addons {
 			'is_different_plugin' => false,
 			'eligible_price_ids'  => array( '3', '6', '7' ),
 			'status'              => wholesalex()->get_setting( 'wsx_addon_whitelabel' ),
-			'lock_status'         => ! ( wholesalex()->is_pro_active() && in_array( get_option( '__wholesalex_price_id', '' ), array( '3', '6', '7' ) ) ),
+			'lock_status'         => ! ( wholesalex()->is_pro_active() && in_array( wholesalex()->get_price_id(), array( '3', '6', '7' ) ) ),
 			'setting_id'          => '#whitelabel',
 			'video'               => 'https://www.youtube.com/embed/xMTJYQFbWEw',
 		);

@@ -136,7 +136,6 @@ class WholesaleX_Initialization {
 	 * Admin Enque Scripts
 	 */
 	public function admin_enqueue_scripts() {
-		$price_id = get_option( '__wholesalex_price_id', '' );
 		Scripts::register_backend_scripts();
 		Scripts::register_backend_style();
 
