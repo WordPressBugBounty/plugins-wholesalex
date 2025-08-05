@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
-"Project-Id-Version: WholesaleX 2.1.4\n"
+"Project-Id-Version: WholesaleX 2.1.5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wholesalex\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-20T04:39:44+00:00\n"
+"POT-Creation-Date: 2025-08-05T10:24:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wholesalex\n"
@@ -2558,7 +2558,7 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:965
 #: includes/menu/class-wholesalex-users.php:192
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4196
 #: assets/js/whx_overview.js:4
 msgid "Select Status"
 msgstr ""
@@ -2670,7 +2670,8 @@ msgid "Regi. Role"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:1144
-#: includes/notice/class-notice.php:316
+#: includes/notice/class-notice.php:262
+#: includes/notice/class-notice.php:298
 #: assets/js/wholesalex_components.js:1
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1527
@@ -4298,60 +4299,86 @@ msgstr ""
 msgid "Hello Bar Action performed"
 msgstr ""
 
-#: includes/notice/class-notice.php:305
-msgid "Summer Sale Deal Alert:"
+#: includes/notice/class-notice.php:257
+#: assets/js/whx_conversation.js:4356
+#: assets/js/whx_migration_tools.js:873
+#: assets/js/whx_overview.js:1
+msgid "Final Hour Sales Alert:"
 msgstr ""
 
-#. translators: %s: Discount percentage
-#: includes/notice/class-notice.php:309
-msgid "Wholesalex on Sale - Enjoy %s on the powerful site builder."
+#: includes/notice/class-notice.php:258
+msgid "WholesaleX on Sale – Get %s on this B2B Wholesale Store-building Solution!"
 msgstr ""
 
-#: includes/notice/class-notice.php:310
-msgid "up to 55% OFF"
+#: includes/notice/class-notice.php:275
+#: assets/js/whx_conversation.js:4364
+#: assets/js/whx_migration_tools.js:881
+#: assets/js/whx_overview.js:1
+msgid "Massive Sales Alert:"
 msgstr ""
 
-#: includes/notice/class-notice.php:327
-msgid "I don’t want to save money"
+#: includes/notice/class-notice.php:276
+msgid "<strong> WholesaleX </strong> on Sale - Enjoy %s on this B2B Wholesale Store-building Solution!"
 msgstr ""
 
-#: includes/notice/class-notice.php:736
+#: includes/notice/class-notice.php:280
+#: includes/notice/class-notice.php:316
+msgid "Claim Your Discount!"
+msgstr ""
+
+#: includes/notice/class-notice.php:293
+msgid "Grab the Flash Sale Offer:"
+msgstr ""
+
+#: includes/notice/class-notice.php:294
+msgid "Sale on WholesaleX - Enjoy %s on the complete B2B Wholesale Solution!"
+msgstr ""
+
+#: includes/notice/class-notice.php:311
+msgid "Exclusive Sale is Live:"
+msgstr ""
+
+#: includes/notice/class-notice.php:312
+msgid "Sale on <strong> WholesaleX </strong> - Enjoy %s on the complete B2B Wholesale Solution!"
+msgstr ""
+
+#: includes/notice/class-notice.php:798
 msgid "Want to help make Wholesalex even more awesome?"
 msgstr ""
 
-#: includes/notice/class-notice.php:738
+#: includes/notice/class-notice.php:800
 msgid "Allow us to collect diagnostic data and usage information. see "
 msgstr ""
 
-#: includes/notice/class-notice.php:739
+#: includes/notice/class-notice.php:801
 msgid "what we collect."
 msgstr ""
 
-#: includes/notice/class-notice.php:756
+#: includes/notice/class-notice.php:818
 msgid "Accept & Close"
 msgstr ""
 
-#: includes/notice/class-notice.php:804
+#: includes/notice/class-notice.php:866
 msgid "Welcome to Wholesalex."
 msgstr ""
 
-#: includes/notice/class-notice.php:805
+#: includes/notice/class-notice.php:867
 msgid "Wholesalex is a WooCommerce-based plugin. So you need to installed & activate WooCommerce to start using Wholesalex."
 msgstr ""
 
-#: includes/notice/class-notice.php:807
+#: includes/notice/class-notice.php:869
 msgid " Activate WooCommerce"
 msgstr ""
 
-#: includes/notice/class-notice.php:807
+#: includes/notice/class-notice.php:869
 msgid " Install WooCommerce"
 msgstr ""
 
-#: includes/notice/class-notice.php:810
+#: includes/notice/class-notice.php:872
 msgid "Discard"
 msgstr ""
 
-#: includes/notice/class-notice.php:828
+#: includes/notice/class-notice.php:890
 msgid "Invalid request."
 msgstr ""
 
@@ -4494,17 +4521,18 @@ msgctxt "WholesaleX Registration Pending (Customer)"
 msgid "We have received your registration request. Our team will review your information, and you will receive another email once your Request has been approved/rejected."
 msgstr ""
 
-#: assets/js/wholesalex_bulkorder.js:1
+#: assets/js/wholesalex_bulkorder.js:2008
 #: assets/js/wholesalex_components.js:1
-#: assets/js/wholesalex_subaccount.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/wholesalex_subaccount.js:2008
+#: assets/js/whx_conversation.js:2008
 msgid "OK"
 msgstr ""
 
-#: assets/js/wholesalex_bulkorder.js:1
+#: assets/js/wholesalex_bulkorder.js:2009
 #: assets/js/wholesalex_components.js:1
-#: assets/js/wholesalex_subaccount.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/wholesalex_subaccount.js:2009
+#: assets/js/whx_conversation.js:2009
+#: assets/js/whx_conversation.js:2735
 #: assets/js/whx_profile.js:363
 msgid "Cancel"
 msgstr ""
@@ -4538,7 +4566,7 @@ msgid "Edit this header"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2539
 #: assets/js/whx_migration_tools.js:468
 msgid "More"
 msgstr ""
@@ -4550,25 +4578,25 @@ msgid "Available Smart Tags:"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2712
 #: assets/js/whx_profile.js:340
 msgid "Confirm Delete"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2724
 #: assets/js/whx_profile.js:352
 msgid "Do You Want to delete"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2724
 #: assets/js/whx_profile.js:352
 msgid "Be careful, this procedure is irreversible. Do you want to proceed?"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:2745
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1295
 #: assets/js/whx_profile.js:373
@@ -4610,7 +4638,7 @@ msgid "Pro"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:3493
 msgid "Show Result:"
 msgstr ""
 
@@ -4626,84 +4654,128 @@ msgstr ""
 msgid "Searching…"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4071
+#: assets/js/whx_conversation.js:4083
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:4
 msgid "Edit"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4076
+#: assets/js/whx_conversation.js:4088
 #: assets/js/whx_overview.js:4
 msgid "Resolved"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4093
 #: assets/js/whx_overview.js:4
 msgid "Force Delete"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_overview.js:4
-msgid "Add New Conversation"
-msgstr ""
-
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_overview.js:4
-msgid "Apply"
-msgstr ""
-
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_overview.js:4
-msgid "Select Post Status"
-msgstr ""
-
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_overview.js:4
-msgid "Select Type"
-msgstr ""
-
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_overview.js:4
-msgid "Search…"
-msgstr ""
-
-#: assets/js/whx_conversation.js:1
+#: assets/js/whx_conversation.js:4124
 #: assets/js/whx_overview.js:4
 msgid "Selected Conversations"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_migration_tools.js:873
-#: assets/js/whx_overview.js:1
-msgid "Summer Sale Alert:"
+#: assets/js/whx_conversation.js:4166
+#: assets/js/whx_overview.js:4
+msgid "Add New Conversation"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_migration_tools.js:873
-#: assets/js/whx_overview.js:1
-msgid "Enjoy a"
+#: assets/js/whx_conversation.js:4183
+#: assets/js/whx_overview.js:4
+msgid "Apply"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_migration_tools.js:873
-#: assets/js/whx_overview.js:1
-msgid "Flat 55% OFF"
+#: assets/js/whx_conversation.js:4202
+#: assets/js/whx_overview.js:4
+msgid "Select Post Status"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_migration_tools.js:873
+#: assets/js/whx_conversation.js:4209
+#: assets/js/whx_overview.js:4
+msgid "Select Type"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4223
+#: assets/js/whx_overview.js:4
+msgid "Search…"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4357
+#: assets/js/whx_conversation.js:4365
+#: assets/js/whx_migration_tools.js:874
+#: assets/js/whx_migration_tools.js:882
+#: assets/js/whx_overview.js:1
+msgid "Enjoy"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4358
+#: assets/js/whx_conversation.js:4374
+#: assets/js/whx_migration_tools.js:875
+#: assets/js/whx_migration_tools.js:891
+#: assets/js/whx_overview.js:1
+msgid "up to 50% OFF"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4359
+#: assets/js/whx_conversation.js:4367
+#: assets/js/whx_conversation.js:4375
+#: assets/js/whx_conversation.js:4383
+#: assets/js/whx_migration_tools.js:876
+#: assets/js/whx_migration_tools.js:884
+#: assets/js/whx_migration_tools.js:892
+#: assets/js/whx_migration_tools.js:900
 #: assets/js/whx_overview.js:1
 msgid "on WholesaleX Pro -"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_migration_tools.js:880
+#: assets/js/whx_conversation.js:4360
+#: assets/js/whx_conversation.js:4368
+#: assets/js/whx_migration_tools.js:877
+#: assets/js/whx_migration_tools.js:885
 #: assets/js/whx_overview.js:1
-msgid "Grab Now"
+msgid "Buy Now!"
 msgstr ""
 
-#: assets/js/whx_conversation.js:1
-#: assets/js/whx_migration_tools.js:886
+#: assets/js/whx_conversation.js:4366
+#: assets/js/whx_conversation.js:4382
+#: assets/js/whx_migration_tools.js:883
+#: assets/js/whx_migration_tools.js:899
+#: assets/js/whx_overview.js:1
+msgid "up to 55% OFF"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4372
+#: assets/js/whx_migration_tools.js:889
+#: assets/js/whx_overview.js:1
+msgid "Flash Sale is live:"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4373
+#: assets/js/whx_conversation.js:4381
+#: assets/js/whx_migration_tools.js:890
+#: assets/js/whx_migration_tools.js:898
+#: assets/js/whx_overview.js:1
+msgid "Get"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4376
+#: assets/js/whx_conversation.js:4384
+#: assets/js/whx_migration_tools.js:893
+#: assets/js/whx_migration_tools.js:901
+#: assets/js/whx_overview.js:1
+msgid "Grab it Now!"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4380
+#: assets/js/whx_migration_tools.js:897
+#: assets/js/whx_overview.js:1
+msgid "Exclusive Deals Live:"
+msgstr ""
+
+#: assets/js/whx_conversation.js:4404
+#: assets/js/whx_migration_tools.js:921
 #: assets/js/whx_overview.js:1
 msgid "Close notification"
 msgstr ""
@@ -6190,11 +6262,11 @@ msgstr ""
 msgid "Sent to Parent Account For Approval"
 msgstr ""
 
-#: assets/js/whx_wallet_gateway.js:1
+#: assets/js/whx_wallet_gateway.js:202
 msgid "WholesaleX Wallet Payment"
 msgstr ""
 
 #. translators: 1: Wallet amount
-#: assets/js/whx_wallet_gateway.js:1
+#: assets/js/whx_wallet_gateway.js:211
 msgid "| Current Balance: %s"
 msgstr ""

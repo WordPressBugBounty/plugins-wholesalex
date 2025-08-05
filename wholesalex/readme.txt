@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
 Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 2.1.4
+Stable tag: 2.1.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -209,6 +209,9 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.1.5 - 05 August 2025 =
+* Fix: Translation Issues on Role Switching Option is fixed.
 
 = 2.1.4 - 20 July 2025 =
 * Fix: Resolved display issue with Addons card content.
