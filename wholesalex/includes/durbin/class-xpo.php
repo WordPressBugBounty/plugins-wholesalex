@@ -203,22 +203,22 @@ class Xpo {
 	public static function generate_utm_link( $params ) {
 		$default_config = array(
 			'summer_db'  => array(
-				'source'   => 'db-wholesalex-notice-text',
+				'source'   => 'db-wholesalex-notice-logo',
 				'medium'   => 'final-hour-sale',
 				'campaign' => 'wholesalex-dashboard',
 			),
 			'summer_db2' => array(
-				'source'   => 'db-wholesalex-notice-logo',
+				'source'   => 'db-wholesalex-notice-text',
 				'medium'   => 'massive-sale',
 				'campaign' => 'wholesalex-dashboard',
 			),
 			'summer_db3' => array(
-				'source'   => 'db-wholesalex-notice-text',
+				'source'   => 'db-wholesalex-notice-logo',
 				'medium'   => 'flash-sale',
 				'campaign' => 'wholesalex-dashboard',
 			),
 			'summer_db4' => array(
-				'source'   => 'db-wholesalex-notice-logo',
+				'source'   => 'db-wholesalex-notice-text',
 				'medium'   => 'exclusive-deals',
 				'campaign' => 'wholesalex-dashboard',
 			),

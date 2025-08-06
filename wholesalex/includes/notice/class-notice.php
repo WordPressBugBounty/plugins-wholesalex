@@ -85,9 +85,10 @@ class Notice {
 	public function hello_bar_callback( \WP_REST_Request $request ) {
 		$request_params = $request->get_params();
 		$type           = isset( $request_params['type'] ) ? $request_params['type'] : '';
+		$duration       = isset( $request_params['duration'] ) ? $request_params['duration'] : null;
 
 		if ( 'hello_bar' === $type ) {
-			Xpo::set_transient_without_cache( 'wsx_helloBar', 'hide', 1296000 );
+			Xpo::set_transient_without_cache( 'wsx_helloBar', 'hide', $duration );
 		}
 
 		return new \WP_REST_Response(
@@ -245,7 +246,7 @@ class Notice {
 
 		$content_notices = array(
 			array(
-				'key'                => 'wsx_dashboard_content_notice',
+				'key'                => 'wsx_dashboard_content_notice1',
 				'start'              => '2025-08-04 00:00 Asia/Dhaka',
 				'end'                => '2025-08-14 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
@@ -259,8 +260,9 @@ class Notice {
 				'discount_content'   => 'up to 50% OFF',
 				'border_color'       => '#FEAD01',
 				'icon'               => WHOLESALEX_URL . 'assets/icons/logo_sm.svg',
-				'button_text'        => __( 'Upgrade to Pro', 'wholesalex' ),
+				'button_text'        => __( 'Upgrade to Pro &nbsp;➣', 'wholesalex' ),
 				'is_discount_logo'   => false,
+				'background_color'   => '#FEAD01',
 			),
 			array(
 				'key'                => 'wsx_dashboard_content_notice2',
@@ -293,10 +295,11 @@ class Notice {
 				'content_heading'    => __( 'Grab the Flash Sale Offer:', 'wholesalex' ),
 				'content_subheading' => __( 'Sale on WholesaleX - Enjoy %s on the complete B2B Wholesale Solution!', 'wholesalex' ),
 				'discount_content'   => 'up to 50% OFF',
-				'border_color'       => '#FEAD01',
+				'border_color'       => '#6C6CFF',
 				'icon'               => WHOLESALEX_URL . 'assets/icons/logo_sm.svg',
-				'button_text'        => __( 'Upgrade to Pro', 'wholesalex' ),
+				'button_text'        => __( 'Upgrade to Pro &nbsp;➣', 'wholesalex' ),
 				'is_discount_logo'   => false,
+				'background_color'   => '#6C6CFF',
 			),
 			array(
 				'key'                => 'wsx_dashboard_content_notice4',
@@ -356,7 +359,11 @@ class Notice {
 					style="border-left: 3px solid <?php echo esc_attr( $border_color ); ?>;"
 					> 
 						<?php
-						if ( isset( $notice['icon'] ) ) {
+						if ( $notice['is_discount_logo'] ) {
+							?>
+								<div class="wsx-notice-discout-icon"> <img src="<?php echo esc_url( $notice['icon'] ); ?>"/>  </div>
+							<?php
+						} else {
 							?>
 								<div class="wsx-notice-icon"> <img src="<?php echo esc_url( $notice['icon'] ); ?>"/>  </div>
 							<?php
@@ -375,13 +382,16 @@ class Notice {
 							</div>
 							<div class="wsx-notice-buttons">
 								<?php if ( isset( $notice['is_discount_logo'] ) && $notice['is_discount_logo'] ) : ?>
-									<a class="discount_btn" href="<?php echo esc_url( $url ); ?>" target="_blank">
+									<a class="wsx-discount_btn" href="<?php echo esc_url( $url ); ?>" target="_blank">
 										<?php echo esc_html( $notice['button_text'] ); ?>
 									</a>
 								<?php else : ?>
-									<a class="wsx-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank">
-										<?php echo esc_html( $notice['button_text'] ); ?>
-									</a>
+									<a class="wsx-notice-btn button button-primary" 
+										href="<?php echo esc_url( $url ); ?>" 
+										target="_blank" 
+										style="background-color: <?php echo ! empty( $notice['background_color'] ) ? esc_attr( $notice['background_color'] ) : '#00A464'; ?>;">
+											<?php echo esc_html( $notice['button_text'] ); ?>
+										</a>
 								<?php endif; ?>
 							</div>
 						</div>
@@ -417,7 +427,7 @@ class Notice {
 				margin: 15px 0px !important;
 				display: flex;
 				align-items: center;
-				background: #F7F9FF;
+				/* background: #F7F9FF; */
 				width: 100%;
 				padding: 10px 0px;
 				position: relative;
@@ -432,15 +442,26 @@ class Notice {
 			}
 			.wsx-notice-icon {
 				margin-left: 15px;
+				margin-right: 3px;
+			}
+			.wsx-notice-discout-icon {
+				margin-left: 10px;
 			}
 			.wsx-notice-btn {
 				font-weight: 700;
 				text-transform: uppercase !important;
-				padding: 2px 10px !important;
+				padding: 3px 10px !important;
+				/* background-color: #6C6CFF !important; */
+				border: none !important;
 			}
 			.wsx-notice-icon img {
 				max-width: 42px;
-				width: 100%;
+				/* width: 100%; */
+				height: 70px;
+			}
+			.wsx-notice-discout-icon img {
+				height: 70px;
+				width: 70px;
 			}
 			.wsx-notice-content-wrapper {
 				display: flex;
@@ -454,6 +475,16 @@ class Notice {
 				display: flex;
 				align-items: center;
 				gap: 15px;
+			}
+			.wsx-discount_btn {
+				background-color: #ffffff;
+				text-decoration: none;
+				border: 1px solid #6C6CFF;
+				padding: 5px 10px;
+				border-radius: 5px;
+				font-weight: 500;
+				text-transform: uppercase;
+				color: #6C6CFF !important;
 			}
 			.wsx-notice-dont-save-money {
 				font-size: 12px;
