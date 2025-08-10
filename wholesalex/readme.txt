@@ -1,10 +1,10 @@
-===  WholesaleX – WooCommerce Wholesale Plugin (B2B Wholesale Prices, Order Form, Catalog Mode, Tiered Pricing) ===
+===  WholesaleX – Wholesale Plugin for WooCommerce (B2B Wholesale Prices, Order Form, Catalog Mode, Tiered Pricing) ===
 Contributors: wpxpo, anik4e, jakirhasan
 Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
 Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 2.1.6
+Stable tag: 2.1.7
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -20,7 +20,7 @@ Best WooCommerce wholesale plugin with features like b2b wholesale prices, whole
 😲 [Free Demo](https://trywholesalex.wpxpo.com/) | 🔥 [WholesaleX Pro](https://getwholesalex.com/) | 📃 [Documentation](https://getwholesalex.com/documentation/)
 
 
-## WholesaleX - The Ultimate WooCommerce Wholesale Plugin! 
+## WholesaleX - The Ultimate WooCommerce Wholesale Plugin!
 
 WholesaleX is the most advanced WooCommerce wholesale plugin that comes with all the essential features that an ideal wholesaling store should have. However, it also comes with more effective features such as dynamic pricing & discounts, request a quote, buy x get y, etc, which are suitable for both woocommerce wholesale and retail stores.
 
@@ -127,13 +127,15 @@ Other Amazing Plugins
 Thank you for considering WholesaleX - the ultimate WooCommerce wholesale plugin. Take a look at our other WordPress and WooCommerce Plugins.
 
 
-💝 [WowStore](https://wordpress.org/plugins/product-blocks/): A complete WooCommerce builder with premade templates to make a visually appealing & conversion-focused WooCommerce store.
+💝 [WowStore](https://wordpress.org/plugins/product-blocks/): The ultimate solution for building and managing eCommerce sites. Packed with features to enhance conversions and boost sales, it streamlines your store’s performance.
 
-💸 [WowRevenue](https://wordpress.org/plugins/revenue/): Collection of marketing campaigns including product bundles, mix, and match product bundles, buy x get y, bulk discount, and more to boost revenue by increasing the average order value.
+💸 [WowRevenue](https://wordpress.org/plugins/revenue/): Advanced discounts plugin for WooCommerce, offering product bundles, BOGO deals, bulk discounts, and more. Increase order value and revenue with dynamic campaigns.
 
-🧲 [WowOptin](https://wordpress.org/plugins/optin/): The next-gen popup maker and lead generation plugin with Canva-like editing flexibility and an advanced targeting system.
+🧲 [WowOptin](https://wordpress.org/plugins/optin/): A cutting-edge plugin for creating opt-ins and popups to capture leads and drive sales. It’s Canva-like builder ensures quick, customized designs to meet your goals.
 
-📃 [PostX](https://wordpress.org/plugins/ultimate-post/): The #1 News Magazine and Blogging solution for WordPress. It has numerous blocks, templates, and a powerful dynamic site builder.
+📃 [PostX](https://wordpress.org/plugins/ultimate-post/): The top plugin for creating news, magazine, or blog sites. With PostX, build professional websites in three easy steps, enjoying complete customization freedom.
+
+➕ [WowAddons](https://wordpress.org/plugins/product-addons/): The most advanced product addons plugin for WooCommerce that helps you add extra fields & options to product pages with ease.
 
 
 = Author =
@@ -209,6 +211,9 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.1.7 – 10 August 2025 =
+* Improvement – Enhanced product handling in dynamic rules; resolved search issue for attributes on simple products.
 
 = 2.1.6 - 06 August 2025 =
 * Fix – Improved compatibility with YayMail for email display in the WooCommerce Emails list.
