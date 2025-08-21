@@ -202,6 +202,12 @@ class WHOLESALEX_Dynamic_Rules {
 		add_action( 'woocommerce_before_shop_loop_item_title', array( $this, 'wholesalex_bogo_display_sale_badge' ), 10 );
 		add_action( 'woocommerce_before_single_product', array( $this, 'wholesalex_bogo_single_page_display_sale_badge' ), 10 );
 		add_action( 'wp_head', array( $this, 'wholesalex_bogo_badge_add_custom_css' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'wholesalex_enqueue_price_table_js' ) );
+	}
+
+	public function wholesalex_enqueue_price_table_js() {
+		// Enqueue the custom JS for the price table.
+		wp_enqueue_script( 'wholesalex_price_table' );
 	}
 
 
@@ -3168,131 +3174,19 @@ class WHOLESALEX_Dynamic_Rules {
 						}
 						?>
 					</div>
-						<script>
-							jQuery(function ($) {
-								const $quantityInput = $('[name=quantity]');
-								const quantityPrices = <?php echo wp_json_encode( $quantity_prices ); ?>;
-								const cartQuantity = <?php echo wp_json_encode( $cart_quantity ); ?>;
 
-								function updatePricing() {
-									let quantity = cartQuantity + parseInt($quantityInput.val()) || 1;
-									let matchedTier = null;
-									let matchedMin = 0;
 
-									quantityPrices.forEach((tier) => {
-										const minQty = parseInt(tier['_min_quantity']);
-										if (quantity >= minQty && minQty >= matchedMin) {
-											matchedTier = minQty;
-											matchedMin = minQty;
-										}
-									});
-
-									$('.wsx-price-table-row').removeClass('active');
-									if (matchedTier) {
-										$('.wsx-price-table-row[data-min="' + matchedTier + '"]').addClass('active');
-									}
-								}
-
-								// Listen to native input events
-								if ($quantityInput.length) {
-									$quantityInput.on('input change', updatePricing).trigger('change');
-								}
-
-								// wowstore single page template compatibility.
-								$('.wopb-builder-cart-minus').on('click', function (e) {
-									e.preventDefault();
-									e.stopPropagation();
-
-									let currentVal = parseInt($quantityInput.val()) || 1;
-									if (currentVal > 1) {
-										$quantityInput.val(currentVal - 1).trigger('change');
-									}
-								});
-
-								// wowstore plus button
-								$('.wopb-builder-cart-plus').on('click', function (e) {
-									e.preventDefault();
-									e.stopPropagation();
-
-									let currentVal = parseInt($quantityInput.val()) || 1;
-									$quantityInput.val(currentVal + 1).trigger('change');
-								});
-							});
-						</script>
+				
 					</div>
 				<?php
-				break;
-			case 'layout_two':
-			case 'layout_three':
-				$__show_discount_amount = apply_filters( 'wholesalex_tier_layout_two_show_discount_amount', true );
-				?>
-				<div class="wsx-price-container-title"><?php echo esc_html( $table_label ); ?></div>
-				<div class="wsx-price-classical-container <?php echo 'layout_three' === $tier_layout ? 'layout-vertical' : ''; ?>">
-					<?php
-					$__tier_size = count( $quantity_prices );
-					for ( $i = 0; $i < $__tier_size; $i++ ) {
-						$__current_tier = $quantity_prices[ $i ];
-						$__next_tier    = '';
-						if ( ( $__tier_size ) - 1 !== $i ) {
-							$__next_tier = $quantity_prices[ $i + 1 ];
-						}
-
-						$__sale_price = wholesalex()->calculate_sale_price( $__current_tier, floatval( $regular_price ) );
-						$__discount   = floatval( $regular_price ) - floatval( $__sale_price );
-
-						$__sale_price = wc_get_price_to_display( $product, array( 'price' => $__sale_price ) );
-
-						$__quantities = '';
-
-						if ( isset( $__current_tier['_min_quantity'] ) ) {
-							if ( ! empty( $__next_tier ) ) {
-
-								if ( $__current_tier['_min_quantity'] === $__next_tier['_min_quantity'] ) {
-									$__quantities = $__current_tier['_min_quantity'];
-								} else {
-									$__quantities = $__current_tier['_min_quantity'] . '-' . ( (int) $__next_tier['_min_quantity'] - 1 );
-								}
-							} else {
-								$__quantities = $__current_tier['_min_quantity'] . '+';
-							}
-						}
-
-						?>
-						<div
-							class="wsx-price-classical-item <?php echo esc_attr( ( isset( $__current_tier['_id'] ) && $__current_tier['_id'] === $active_tier ) ? 'active' : '' ); ?>">
-							<div class="wsx-price-classical-content">
-								<div class="wsx-price-classical-price">
-									<?php
-									if ( $__show_discount_amount && 'layout_three' !== $tier_layout ) {
-										echo '<div class="wsx-price-classical-text">' . wp_kses_post( $__wc_currency . ' ' . wc_price( $__sale_price ) . '</div><div class="wsx-price-classical-tag">' . -round( ( (float) $__discount / (float) $regular_price ) * 100.00, 2 ) . '% </div>' );
-									} else {
-										echo '<div class="wsx-price-classical-text">' . wp_kses_post( $__wc_currency . ' ' . wc_price( $__sale_price ) . '</div>' );
-									}
-									?>
-								</div>
-								<?php
-								if ( $__show_discount_amount && 'layout_three' === $tier_layout ) {
-									echo '<div class="wsx-price-classical-divider">/</div>';
-								}
-								?>
-								<div class="wsx-price-classical-quantity">
-									<span class="wsx-quantities">
-										<?php echo esc_html( $__quantities ); ?>
-									</span>
-									<span class="wsx-quantity-text">
-										<?php esc_html_e( 'Pieces', 'wholesalex' ); ?>
-									</span>
-								</div>
-								<?php if ( esc_attr( ( isset( $__current_tier['_id'] ) && $__current_tier['_id'] === $active_tier ) ) && 'layout_three' !== $tier_layout ) { ?>
-									<div class="wsx-price-classical-overlay"></div>
-								<?php } ?>
-							</div>
-						</div>
-						<?php
-					}
-					?>
-				</div>
-				<?php
+					wp_localize_script(
+						'wholesalex_price_table',
+						'wholesalexPriceTableData',
+						array(
+							'quantityPrices' => $quantity_prices,
+							'cartQuantity'   => $cart_quantity,
+						)
+					);
 				break;
 
 			default:

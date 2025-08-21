@@ -2,22 +2,22 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
-"Project-Id-Version: WholesaleX 2.1.7\n"
+"Project-Id-Version: WholesaleX 2.1.8\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wholesalex\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-08-10T10:45:35+00:00\n"
+"POT-Creation-Date: 2025-08-21T09:12:59+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wholesalex\n"
 
 #. Plugin Name of the plugin
 #: wholesalex.php
-#: includes/Functions.php:1969
-#: includes/menu/class-wholesalex-overview.php:287
+#: includes/Functions.php:1820
+#: includes/menu/class-wholesalex-overview.php:289
 #: assets/js/wholesalex_components.js:1
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1523
@@ -128,8 +128,8 @@ msgid "Protect your website from suspicious login attempts with an added securit
 msgstr ""
 
 #: includes/class-wholesalex-activator.php:59
-#: includes/menu/class-wholesalex-registration.php:569
-#: includes/menu/class-wholesalex-registration.php:1439
+#: includes/menu/class-wholesalex-registration.php:570
+#: includes/menu/class-wholesalex-registration.php:1441
 #: includes/menu/class-wholesalex-settings.php:483
 msgid "Thank you for registering. Your account will be reviewed by us & approve manually. Please wait to be approved."
 msgstr ""
@@ -141,8 +141,8 @@ msgstr ""
 
 #: includes/class-wholesalex-activator.php:64
 #: includes/class-wholesalex-activator.php:65
-#: includes/menu/class-wholesalex-dynamic-rules.php:2382
-#: includes/menu/class-wholesalex-dynamic-rules.php:2384
+#: includes/menu/class-wholesalex-dynamic-rules.php:2388
+#: includes/menu/class-wholesalex-dynamic-rules.php:2390
 #: includes/menu/class-wholesalex-settings.php:502
 #: includes/menu/class-wholesalex-settings.php:504
 #: includes/menu/class-wholesalex-settings.php:509
@@ -160,27 +160,39 @@ msgstr ""
 msgid "Guest Users"
 msgstr ""
 
-#: includes/class-wholesalex-initialization.php:166
+#: includes/class-wholesalex-common-utils.php:96
+msgid "Username or email address"
+msgstr ""
+
+#: includes/class-wholesalex-common-utils.php:116
+msgid "Password"
+msgstr ""
+
+#: includes/class-wholesalex-common-utils.php:144
+msgid "Remember me"
+msgstr ""
+
+#: includes/class-wholesalex-initialization.php:167
 msgid "Available Smart Tags: "
 msgstr ""
 
-#: includes/class-wholesalex-initialization.php:216
+#: includes/class-wholesalex-initialization.php:217
 msgid "You cannot register while you are logged in."
 msgstr ""
 
-#: includes/class-wholesalex-initialization.php:217
+#: includes/class-wholesalex-initialization.php:218
 msgid "is required"
 msgstr ""
 
-#: includes/class-wholesalex-initialization.php:218
+#: includes/class-wholesalex-initialization.php:219
 msgid "Register"
 msgstr ""
 
-#: includes/class-wholesalex-initialization.php:239
+#: includes/class-wholesalex-initialization.php:243
 msgid " Your account is already confirmed!. "
 msgstr ""
 
-#: includes/class-wholesalex-initialization.php:247
+#: includes/class-wholesalex-initialization.php:251
 msgid "<strong>Success:</strong> Your account is successfully confirmed. "
 msgstr ""
 
@@ -189,8 +201,8 @@ msgid "Go Pro"
 msgstr ""
 
 #: includes/class-wholesalex-menu.php:39
-#: includes/menu/class-wholesalex-overview.php:361
-#: includes/menu/class-wholesalex-overview.php:362
+#: includes/menu/class-wholesalex-overview.php:363
+#: includes/menu/class-wholesalex-overview.php:364
 msgid "Settings"
 msgstr ""
 
@@ -258,19 +270,19 @@ msgstr ""
 
 #: includes/class-wholesalex-product.php:275
 #: includes/class-wholesalex-product.php:428
-#: includes/menu/class-wholesalex-dynamic-rules.php:2046
-#: includes/menu/class-wholesalex-profile.php:861
-#: includes/menu/class-wholesalex-profile.php:879
-#: includes/menu/class-wholesalex-profile.php:957
+#: includes/menu/class-wholesalex-dynamic-rules.php:2052
+#: includes/menu/class-wholesalex-profile.php:865
+#: includes/menu/class-wholesalex-profile.php:883
+#: includes/menu/class-wholesalex-profile.php:961
 msgid "Yes"
 msgstr ""
 
 #: includes/class-wholesalex-product.php:276
 #: includes/class-wholesalex-product.php:429
-#: includes/menu/class-wholesalex-dynamic-rules.php:2047
-#: includes/menu/class-wholesalex-profile.php:862
-#: includes/menu/class-wholesalex-profile.php:880
-#: includes/menu/class-wholesalex-profile.php:958
+#: includes/menu/class-wholesalex-dynamic-rules.php:2053
+#: includes/menu/class-wholesalex-profile.php:866
+#: includes/menu/class-wholesalex-profile.php:884
+#: includes/menu/class-wholesalex-profile.php:962
 msgid "No"
 msgstr ""
 
@@ -409,13 +421,13 @@ msgstr ""
 
 #: includes/class-wholesalex-product.php:1552
 #: includes/menu/class-wholesalex-category.php:359
-#: includes/menu/class-wholesalex-dynamic-rules.php:1787
+#: includes/menu/class-wholesalex-dynamic-rules.php:1793
 msgid "Choose Roles..."
 msgstr ""
 
 #: includes/class-wholesalex-product.php:1559
 #: includes/menu/class-wholesalex-category.php:366
-#: includes/menu/class-wholesalex-dynamic-rules.php:1771
+#: includes/menu/class-wholesalex-dynamic-rules.php:1777
 msgid "Choose Users..."
 msgstr ""
 
@@ -435,11 +447,11 @@ msgstr ""
 #: includes/menu/class-wholesalex-category.php:275
 #: includes/menu/class-wholesalex-category.php:290
 #: includes/menu/class-wholesalex-category.php:468
-#: includes/menu/class-wholesalex-dynamic-rules.php:1930
-#: includes/menu/class-wholesalex-dynamic-rules.php:1977
-#: includes/menu/class-wholesalex-dynamic-rules.php:2132
-#: includes/menu/class-wholesalex-profile.php:1002
-#: includes/menu/class-wholesalex-profile.php:1017
+#: includes/menu/class-wholesalex-dynamic-rules.php:1936
+#: includes/menu/class-wholesalex-dynamic-rules.php:1983
+#: includes/menu/class-wholesalex-dynamic-rules.php:2138
+#: includes/menu/class-wholesalex-profile.php:1006
+#: includes/menu/class-wholesalex-profile.php:1021
 msgid "Discount Type"
 msgstr ""
 
@@ -457,8 +469,8 @@ msgstr ""
 #: includes/class-wholesalex-product.php:1701
 #: includes/menu/class-wholesalex-category.php:278
 #: includes/menu/class-wholesalex-category.php:303
-#: includes/menu/class-wholesalex-profile.php:1004
-#: includes/menu/class-wholesalex-profile.php:1029
+#: includes/menu/class-wholesalex-profile.php:1008
+#: includes/menu/class-wholesalex-profile.php:1033
 msgid "Min Quantity"
 msgstr ""
 
@@ -467,7 +479,7 @@ msgstr ""
 #: includes/menu/class-wholesalex-category.php:284
 #: includes/menu/class-wholesalex-category.php:400
 #: includes/menu/class-wholesalex-category.php:470
-#: includes/menu/class-wholesalex-profile.php:1011
+#: includes/menu/class-wholesalex-profile.php:1015
 msgid "Choose Discount Type..."
 msgstr ""
 
@@ -476,7 +488,7 @@ msgstr ""
 #: includes/menu/class-wholesalex-category.php:285
 #: includes/menu/class-wholesalex-category.php:401
 #: includes/menu/class-wholesalex-category.php:471
-#: includes/menu/class-wholesalex-profile.php:1012
+#: includes/menu/class-wholesalex-profile.php:1016
 msgid "Discount Amount"
 msgstr ""
 
@@ -485,7 +497,7 @@ msgstr ""
 #: includes/menu/class-wholesalex-category.php:286
 #: includes/menu/class-wholesalex-category.php:402
 #: includes/menu/class-wholesalex-category.php:472
-#: includes/menu/class-wholesalex-profile.php:1013
+#: includes/menu/class-wholesalex-profile.php:1017
 msgid "Discount Percentage"
 msgstr ""
 
@@ -494,10 +506,10 @@ msgstr ""
 #: includes/menu/class-wholesalex-category.php:287
 #: includes/menu/class-wholesalex-category.php:403
 #: includes/menu/class-wholesalex-category.php:473
-#: includes/menu/class-wholesalex-dynamic-rules.php:1934
-#: includes/menu/class-wholesalex-dynamic-rules.php:1981
-#: includes/menu/class-wholesalex-dynamic-rules.php:2136
-#: includes/menu/class-wholesalex-profile.php:1014
+#: includes/menu/class-wholesalex-dynamic-rules.php:1940
+#: includes/menu/class-wholesalex-dynamic-rules.php:1987
+#: includes/menu/class-wholesalex-dynamic-rules.php:2142
+#: includes/menu/class-wholesalex-profile.php:1018
 msgid "Fixed Price"
 msgstr ""
 
@@ -511,14 +523,14 @@ msgstr ""
 #: includes/class-wholesalex-product.php:1643
 #: includes/class-wholesalex-product.php:1706
 #: includes/menu/class-wholesalex-category.php:308
-#: includes/menu/class-wholesalex-profile.php:1142
+#: includes/menu/class-wholesalex-profile.php:1146
 msgid "Add Price Tier"
 msgstr ""
 
 #: includes/class-wholesalex-product.php:1647
 #: includes/class-wholesalex-product.php:1710
 #: includes/menu/class-wholesalex-category.php:312
-#: includes/menu/class-wholesalex-profile.php:1146
+#: includes/menu/class-wholesalex-profile.php:1150
 msgid "Go For Unlimited Price Tiers"
 msgstr ""
 
@@ -534,8 +546,8 @@ msgstr ""
 
 #: includes/class-wholesalex-product.php:2137
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:321
-#: includes/menu/class-wholesalex-dynamic-rules.php:1707
-#: includes/menu/class-wholesalex-dynamic-rules.php:2157
+#: includes/menu/class-wholesalex-dynamic-rules.php:1713
+#: includes/menu/class-wholesalex-dynamic-rules.php:2163
 msgid "BOGO Discounts (Buy X Get One Free)"
 msgstr ""
 
@@ -554,76 +566,76 @@ msgstr ""
 msgid "Please Set Site Key and Secret Key Before Enable Recaptcha (Path: Dashboard > %s > Settings > Recaptcha)"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:100
+#: includes/class-wholesalex-shortcodes.php:102
 msgid "A password reset email has been sent. Please check your inbox."
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:106
+#: includes/class-wholesalex-shortcodes.php:108
 msgid "Lost your password? Please enter your email address. You will receive a link to create a new password via email."
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:108
+#: includes/class-wholesalex-shortcodes.php:110
 msgid "Your email address"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:111
+#: includes/class-wholesalex-shortcodes.php:113
 msgid "Reset Password"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:168
-#: includes/class-wholesalex-shortcodes.php:189
+#: includes/class-wholesalex-shortcodes.php:170
+#: includes/class-wholesalex-shortcodes.php:191
 msgid "Password Reset Request"
 msgstr ""
 
 #. translators: %s: User login name
-#: includes/class-wholesalex-shortcodes.php:171
+#: includes/class-wholesalex-shortcodes.php:173
 msgid "Hi %s,"
 msgstr ""
 
 #. translators: %s: User login name
-#: includes/class-wholesalex-shortcodes.php:176
+#: includes/class-wholesalex-shortcodes.php:178
 msgid "Someone has requested a new password for the following account on %s:"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:181
+#: includes/class-wholesalex-shortcodes.php:183
 msgid "Username:"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:182
+#: includes/class-wholesalex-shortcodes.php:184
 msgid "If you didn’t make this request, just ignore this email. If you’d like to proceed:"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:183
+#: includes/class-wholesalex-shortcodes.php:185
 msgid "Click here to reset your password"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:184
+#: includes/class-wholesalex-shortcodes.php:186
 msgid "Thanks for reading."
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:259
+#: includes/class-wholesalex-shortcodes.php:261
 #: assets/js/whx_overview.js:4
 msgid "Select Role"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:274
-#: includes/Functions.php:825
+#: includes/class-wholesalex-shortcodes.php:276
+#: includes/Functions.php:781
 msgid "Select Registration Roles"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:618
-#: includes/class-wholesalex-shortcodes.php:660
-#: includes/class-wholesalex-shortcodes.php:699
+#: includes/class-wholesalex-shortcodes.php:619
+#: includes/class-wholesalex-shortcodes.php:661
+#: includes/class-wholesalex-shortcodes.php:700
 msgid "Logout to See this form"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:4078
+#: includes/class-wholesalex-shortcodes.php:4081
 msgid "Username is Required!"
 msgstr ""
 
-#: includes/class-wholesalex-shortcodes.php:4082
-#: includes/menu/class-wholesalex-registration.php:1189
-#: includes/menu/class-wholesalex-registration.php:1418
+#: includes/class-wholesalex-shortcodes.php:4085
+#: includes/menu/class-wholesalex-registration.php:1191
+#: includes/menu/class-wholesalex-registration.php:1420
 msgid "Password is Required!"
 msgstr ""
 
@@ -1011,7 +1023,7 @@ msgstr ""
 #: includes/export/class-wholesalex-dynamic-rule-exporter.php:48
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:255
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:339
-#: includes/menu/class-wholesalex-overview.php:1067
+#: includes/menu/class-wholesalex-overview.php:1069
 #: includes/menu/class-wholesalex-users.php:459
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:4
@@ -1184,7 +1196,7 @@ msgstr ""
 #: includes/export/class-wholesalex-dynamic-rule-exporter.php:76
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:283
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:367
-#: includes/menu/class-wholesalex-dynamic-rules.php:2322
+#: includes/menu/class-wholesalex-dynamic-rules.php:2328
 msgid "Start Date"
 msgstr ""
 
@@ -1239,12 +1251,12 @@ msgstr ""
 msgid "Role Migration Threshold Value"
 msgstr ""
 
-#: includes/Functions.php:1682
+#: includes/Functions.php:1533
 msgid "Get WholesaleX Pro"
 msgstr ""
 
 #. Translators: %s is the plugin name and version.
-#: includes/Functions.php:2763
+#: includes/Functions.php:2216
 msgid "Installing Plugin: %s"
 msgstr ""
 
@@ -1282,14 +1294,14 @@ msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:539
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:553
-#: includes/menu/class-wholesalex-dynamic-rules.php:1077
-#: includes/menu/class-wholesalex-dynamic-rules.php:1621
+#: includes/menu/class-wholesalex-dynamic-rules.php:1083
+#: includes/menu/class-wholesalex-dynamic-rules.php:1627
 msgid "New Rule"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:317
-#: includes/menu/class-wholesalex-dynamic-rules.php:1703
-#: includes/menu/class-wholesalex-dynamic-rules.php:4410
+#: includes/menu/class-wholesalex-dynamic-rules.php:1709
+#: includes/menu/class-wholesalex-dynamic-rules.php:4304
 #: includes/menu/class-wholesalex-settings.php:613
 #: includes/menu/class-wholesalex-settings.php:644
 #: includes/menu/class-wholesalex-settings.php:646
@@ -1297,12 +1309,12 @@ msgid "Product Discount"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:318
-#: includes/menu/class-wholesalex-dynamic-rules.php:1704
+#: includes/menu/class-wholesalex-dynamic-rules.php:1710
 msgid "Cart Discount "
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:319
-#: includes/menu/class-wholesalex-dynamic-rules.php:1955
+#: includes/menu/class-wholesalex-dynamic-rules.php:1961
 msgid "Payment Discount"
 msgstr ""
 
@@ -1311,32 +1323,32 @@ msgid "Payment Order Quantity "
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:322
-#: includes/menu/class-wholesalex-dynamic-rules.php:1708
-#: includes/menu/class-wholesalex-dynamic-rules.php:2086
+#: includes/menu/class-wholesalex-dynamic-rules.php:1714
+#: includes/menu/class-wholesalex-dynamic-rules.php:2092
 msgid "Shipping Rule"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:323
-#: includes/menu/class-wholesalex-dynamic-rules.php:1709
-#: includes/menu/class-wholesalex-dynamic-rules.php:2229
+#: includes/menu/class-wholesalex-dynamic-rules.php:1715
+#: includes/menu/class-wholesalex-dynamic-rules.php:2235
 #: includes/menu/class-wholesalex-settings.php:1053
 #: includes/menu/class-wholesalex-settings.php:1087
 msgid "Minimum Order Quantity"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:324
-#: includes/menu/class-wholesalex-dynamic-rules.php:1710
-#: includes/menu/class-wholesalex-dynamic-rules.php:2032
+#: includes/menu/class-wholesalex-dynamic-rules.php:1716
+#: includes/menu/class-wholesalex-dynamic-rules.php:2038
 msgid "Tax Rule"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:325
-#: includes/menu/class-wholesalex-dynamic-rules.php:1712
+#: includes/menu/class-wholesalex-dynamic-rules.php:1718
 msgid "Quantity Based Discount (Pro)"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:326
-#: includes/menu/class-wholesalex-dynamic-rules.php:1713
+#: includes/menu/class-wholesalex-dynamic-rules.php:1719
 msgid "Extra Charge (Pro)"
 msgstr ""
 
@@ -1345,12 +1357,12 @@ msgid "Buy X Get Y (Pro)"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:328
-#: includes/menu/class-wholesalex-dynamic-rules.php:1715
+#: includes/menu/class-wholesalex-dynamic-rules.php:1721
 msgid "Maximum Order Quantity (Pro)"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:329
-#: includes/menu/class-wholesalex-dynamic-rules.php:1716
+#: includes/menu/class-wholesalex-dynamic-rules.php:1722
 msgid "Restrict Product Visibility (Pro)"
 msgstr ""
 
@@ -1363,54 +1375,54 @@ msgid "All Roles"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:355
-#: includes/menu/class-wholesalex-dynamic-rules.php:1753
+#: includes/menu/class-wholesalex-dynamic-rules.php:1759
 msgid "Specific Users"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:356
-#: includes/menu/class-wholesalex-dynamic-rules.php:1754
+#: includes/menu/class-wholesalex-dynamic-rules.php:1760
 msgid "Specific Roles"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:443
-#: includes/menu/class-wholesalex-dynamic-rules.php:1808
-#: includes/menu/class-wholesalex-profile.php:1037
+#: includes/menu/class-wholesalex-dynamic-rules.php:1814
+#: includes/menu/class-wholesalex-profile.php:1041
 msgid "All Products"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:444
-#: includes/menu/class-wholesalex-dynamic-rules.php:1809
-#: includes/menu/class-wholesalex-profile.php:1038
+#: includes/menu/class-wholesalex-dynamic-rules.php:1815
+#: includes/menu/class-wholesalex-profile.php:1042
 msgid "Product in list"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:445
-#: includes/menu/class-wholesalex-dynamic-rules.php:1810
-#: includes/menu/class-wholesalex-profile.php:1039
+#: includes/menu/class-wholesalex-dynamic-rules.php:1816
+#: includes/menu/class-wholesalex-profile.php:1043
 msgid "Product not in list"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:446
-#: includes/menu/class-wholesalex-dynamic-rules.php:1811
-#: includes/menu/class-wholesalex-profile.php:1040
+#: includes/menu/class-wholesalex-dynamic-rules.php:1817
+#: includes/menu/class-wholesalex-profile.php:1044
 msgid "Categories in list"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:447
-#: includes/menu/class-wholesalex-dynamic-rules.php:1812
-#: includes/menu/class-wholesalex-profile.php:1041
+#: includes/menu/class-wholesalex-dynamic-rules.php:1818
+#: includes/menu/class-wholesalex-profile.php:1045
 msgid "Categories not in list"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:448
-#: includes/menu/class-wholesalex-dynamic-rules.php:1813
-#: includes/menu/class-wholesalex-profile.php:1042
+#: includes/menu/class-wholesalex-dynamic-rules.php:1819
+#: includes/menu/class-wholesalex-profile.php:1046
 msgid "Attribute in list"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:449
-#: includes/menu/class-wholesalex-dynamic-rules.php:1814
-#: includes/menu/class-wholesalex-profile.php:1043
+#: includes/menu/class-wholesalex-dynamic-rules.php:1820
+#: includes/menu/class-wholesalex-profile.php:1047
 msgid "Attribute not in list"
 msgstr ""
 
@@ -1494,448 +1506,444 @@ msgstr ""
 msgid "10"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1157
+#: includes/menu/class-wholesalex-dynamic-rules.php:1163
 msgid "Successfully Deleted."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1163
+#: includes/menu/class-wholesalex-dynamic-rules.php:1169
 #: includes/menu/class-wholesalex-role.php:181
 #: includes/menu/class-wholesalex-settings.php:115
 msgid "Successfully Saved."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1170
+#: includes/menu/class-wholesalex-dynamic-rules.php:1176
 msgid "Before Status Update, You Have to Save Rule Status."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1215
+#: includes/menu/class-wholesalex-dynamic-rules.php:1221
 msgid "Successfully Saved Rule Per Page."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1537
-#: includes/menu/class-wholesalex-profile.php:799
+#: includes/menu/class-wholesalex-dynamic-rules.php:1543
+#: includes/menu/class-wholesalex-profile.php:803
 #: includes/menu/class-wholesalex-role.php:348
 msgid "Choose Shipping Zone..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1676
+#: includes/menu/class-wholesalex-dynamic-rules.php:1682
 #: assets/js/whx_overview.js:4
 msgid "Create Dynamic Rule"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1681
+#: includes/menu/class-wholesalex-dynamic-rules.php:1687
 msgid "New Dynamic Rule"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1691
-#: includes/menu/class-wholesalex-dynamic-rules.php:1692
+#: includes/menu/class-wholesalex-dynamic-rules.php:1697
+#: includes/menu/class-wholesalex-dynamic-rules.php:1698
 #: assets/js/whx_overview.js:4
 msgid "Rule Title"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1698
+#: includes/menu/class-wholesalex-dynamic-rules.php:1704
 #: assets/js/whx_overview.js:4
 msgid "Rule Type"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1702
+#: includes/menu/class-wholesalex-dynamic-rules.php:1708
 msgid "Choose Rule..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1705
-#: includes/menu/class-wholesalex-dynamic-rules.php:4530
+#: includes/menu/class-wholesalex-dynamic-rules.php:1711
+#: includes/menu/class-wholesalex-dynamic-rules.php:4424
 #: includes/menu/class-wholesalex-settings.php:748
 #: includes/menu/class-wholesalex-settings.php:750
 msgid "Payment Method Discount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1706
+#: includes/menu/class-wholesalex-dynamic-rules.php:1712
 msgid "Required Quantity for Payment Method"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1711
+#: includes/menu/class-wholesalex-dynamic-rules.php:1717
 #: includes/menu/class-wholesalex-settings.php:944
 msgid "Checkout Restriction"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1714
+#: includes/menu/class-wholesalex-dynamic-rules.php:1720
 msgid "Buy X Get Y Free (Pro)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1717
+#: includes/menu/class-wholesalex-dynamic-rules.php:1723
 msgid "Hidden Price (Pro)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1718
+#: includes/menu/class-wholesalex-dynamic-rules.php:1724
 msgid "Non Purchasable (Pro)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1727
+#: includes/menu/class-wholesalex-dynamic-rules.php:1733
 msgid "Rule Status"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1733
+#: includes/menu/class-wholesalex-dynamic-rules.php:1739
 #: includes/menu/class-wholesalex-role.php:431
 #: assets/js/whx_overview.js:4
 msgid "Save"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1745
+#: includes/menu/class-wholesalex-dynamic-rules.php:1751
 msgid "Select User/Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1749
+#: includes/menu/class-wholesalex-dynamic-rules.php:1755
 msgid "Select Users/Role..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1750
+#: includes/menu/class-wholesalex-dynamic-rules.php:1756
 msgid "All (Registered and Guest Users)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1751
+#: includes/menu/class-wholesalex-dynamic-rules.php:1757
 msgid "All Registered Users"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1752
+#: includes/menu/class-wholesalex-dynamic-rules.php:1758
 msgid "All B2B Roles"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1762
+#: includes/menu/class-wholesalex-dynamic-rules.php:1768
 msgid "Select Users"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1778
+#: includes/menu/class-wholesalex-dynamic-rules.php:1784
 msgid "Select Roles"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1803
-#: includes/menu/class-wholesalex-profile.php:1005
-#: includes/menu/class-wholesalex-profile.php:1046
+#: includes/menu/class-wholesalex-dynamic-rules.php:1809
+#: includes/menu/class-wholesalex-profile.php:1009
+#: includes/menu/class-wholesalex-profile.php:1050
 #: assets/js/whx_overview.js:4
 msgid "Product Filter"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1807
-#: includes/menu/class-wholesalex-profile.php:1036
+#: includes/menu/class-wholesalex-dynamic-rules.php:1813
+#: includes/menu/class-wholesalex-profile.php:1040
 msgid "Choose Filter..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1821
-#: includes/menu/class-wholesalex-dynamic-rules.php:1837
+#: includes/menu/class-wholesalex-dynamic-rules.php:1827
+#: includes/menu/class-wholesalex-dynamic-rules.php:1843
 msgid "Select Multiple Products"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1830
-#: includes/menu/class-wholesalex-profile.php:1057
+#: includes/menu/class-wholesalex-dynamic-rules.php:1836
+#: includes/menu/class-wholesalex-profile.php:1061
 msgid "Choose Products to apply discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1846
-#: includes/menu/class-wholesalex-profile.php:1072
+#: includes/menu/class-wholesalex-dynamic-rules.php:1852
+#: includes/menu/class-wholesalex-profile.php:1076
 msgid "Choose Products that wont apply discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1853
-#: includes/menu/class-wholesalex-dynamic-rules.php:1869
+#: includes/menu/class-wholesalex-dynamic-rules.php:1859
+#: includes/menu/class-wholesalex-dynamic-rules.php:1875
 msgid "Select Multiple Categories"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1862
-#: includes/menu/class-wholesalex-profile.php:1087
+#: includes/menu/class-wholesalex-dynamic-rules.php:1868
+#: includes/menu/class-wholesalex-profile.php:1091
 msgid "Choose Categories to apply discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1878
-#: includes/menu/class-wholesalex-profile.php:1102
+#: includes/menu/class-wholesalex-dynamic-rules.php:1884
+#: includes/menu/class-wholesalex-profile.php:1106
 msgid "Choose Categories that wont apply discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1885
-#: includes/menu/class-wholesalex-dynamic-rules.php:1901
+#: includes/menu/class-wholesalex-dynamic-rules.php:1891
+#: includes/menu/class-wholesalex-dynamic-rules.php:1907
 msgid "Select Multiple Attributes"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1894
-#: includes/menu/class-wholesalex-profile.php:1117
+#: includes/menu/class-wholesalex-dynamic-rules.php:1900
+#: includes/menu/class-wholesalex-profile.php:1121
 msgid "Choose Product Variations to apply discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1910
-#: includes/menu/class-wholesalex-profile.php:1132
+#: includes/menu/class-wholesalex-dynamic-rules.php:1916
+#: includes/menu/class-wholesalex-profile.php:1136
 msgid "Choose Product Variations that wont apply discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1919
+#: includes/menu/class-wholesalex-dynamic-rules.php:1925
 msgid "Manage Discount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1932
-#: includes/menu/class-wholesalex-dynamic-rules.php:1979
-#: includes/menu/class-wholesalex-dynamic-rules.php:2134
+#: includes/menu/class-wholesalex-dynamic-rules.php:1938
+#: includes/menu/class-wholesalex-dynamic-rules.php:1985
+#: includes/menu/class-wholesalex-dynamic-rules.php:2140
 msgid "Percentage"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1933
-#: includes/menu/class-wholesalex-dynamic-rules.php:1940
-#: includes/menu/class-wholesalex-dynamic-rules.php:1980
-#: includes/menu/class-wholesalex-dynamic-rules.php:1987
-#: includes/menu/class-wholesalex-dynamic-rules.php:2135
-#: includes/menu/class-wholesalex-dynamic-rules.php:2142
-#: includes/menu/class-wholesalex-dynamic-rules.php:2308
-#: includes/menu/class-wholesalex-profile.php:1003
-#: includes/menu/class-wholesalex-profile.php:1023
+#: includes/menu/class-wholesalex-dynamic-rules.php:1939
+#: includes/menu/class-wholesalex-dynamic-rules.php:1946
+#: includes/menu/class-wholesalex-dynamic-rules.php:1986
+#: includes/menu/class-wholesalex-dynamic-rules.php:1993
+#: includes/menu/class-wholesalex-dynamic-rules.php:2141
+#: includes/menu/class-wholesalex-dynamic-rules.php:2148
+#: includes/menu/class-wholesalex-dynamic-rules.php:2314
+#: includes/menu/class-wholesalex-profile.php:1007
+#: includes/menu/class-wholesalex-profile.php:1027
 #: assets/js/whx_overview.js:4
 msgid "Amount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1947
-#: includes/menu/class-wholesalex-dynamic-rules.php:1994
-#: includes/menu/class-wholesalex-dynamic-rules.php:2149
+#: includes/menu/class-wholesalex-dynamic-rules.php:1953
+#: includes/menu/class-wholesalex-dynamic-rules.php:2000
+#: includes/menu/class-wholesalex-dynamic-rules.php:2155
 msgid "Discount name(optional)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1949
-#: includes/menu/class-wholesalex-dynamic-rules.php:1996
-#: includes/menu/class-wholesalex-dynamic-rules.php:2151
+#: includes/menu/class-wholesalex-dynamic-rules.php:1955
+#: includes/menu/class-wholesalex-dynamic-rules.php:2002
+#: includes/menu/class-wholesalex-dynamic-rules.php:2157
 msgid "Add discount name here"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:1966
-#: includes/menu/class-wholesalex-dynamic-rules.php:2013
-#: includes/menu/class-wholesalex-profile.php:966
+#: includes/menu/class-wholesalex-dynamic-rules.php:1972
+#: includes/menu/class-wholesalex-dynamic-rules.php:2019
+#: includes/menu/class-wholesalex-profile.php:970
 msgid "Payment Gateways"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2002
+#: includes/menu/class-wholesalex-dynamic-rules.php:2008
 msgid "Payment Order Quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2024
+#: includes/menu/class-wholesalex-dynamic-rules.php:2030
 msgid "Order Quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2043
+#: includes/menu/class-wholesalex-dynamic-rules.php:2049
 msgid "Tax Exempted?"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2045
+#: includes/menu/class-wholesalex-dynamic-rules.php:2051
 msgid "Choose Tax Exempted Status..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2060
+#: includes/menu/class-wholesalex-dynamic-rules.php:2066
 msgid "Tax Class Mapping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2068
+#: includes/menu/class-wholesalex-dynamic-rules.php:2074
 msgid "Country(optional)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2097
-#: includes/menu/class-wholesalex-profile.php:906
+#: includes/menu/class-wholesalex-dynamic-rules.php:2103
+#: includes/menu/class-wholesalex-profile.php:910
 msgid "Shipping Zone"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2108
-#: includes/menu/class-wholesalex-profile.php:927
+#: includes/menu/class-wholesalex-dynamic-rules.php:2114
+#: includes/menu/class-wholesalex-profile.php:931
 msgid "Shipping Zone Methods"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2121
-#: includes/menu/class-wholesalex-dynamic-rules.php:4470
+#: includes/menu/class-wholesalex-dynamic-rules.php:2127
+#: includes/menu/class-wholesalex-dynamic-rules.php:4364
 #: includes/menu/class-wholesalex-settings.php:658
 #: includes/menu/class-wholesalex-settings.php:690
 #: includes/menu/class-wholesalex-settings.php:692
 msgid "Cart Discount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2168
+#: includes/menu/class-wholesalex-dynamic-rules.php:2174
 msgid "Product Quantity (X)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2175
+#: includes/menu/class-wholesalex-dynamic-rules.php:2181
 msgid "Restrict Free Quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2176
+#: includes/menu/class-wholesalex-dynamic-rules.php:2182
 msgid "Restrict to one free product per order"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2179
+#: includes/menu/class-wholesalex-dynamic-rules.php:2185
 msgid "Enabling this option will restrict shoppers from availing of more than one product by adding the required number of products more than one time to the cart."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2183
+#: includes/menu/class-wholesalex-dynamic-rules.php:2189
 msgid "Enable Discount Badge"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2184
+#: includes/menu/class-wholesalex-dynamic-rules.php:2190
 msgid "Enable Discount Badge (Both Shop & Product Page)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2187
+#: includes/menu/class-wholesalex-dynamic-rules.php:2193
 msgid "Enable \"Offer Badge\" on Product Image for both the shop page and the single product page"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2191
+#: includes/menu/class-wholesalex-dynamic-rules.php:2197
 msgid "Badge Label Text"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2198
+#: includes/menu/class-wholesalex-dynamic-rules.php:2204
 msgid "Badge Background Color"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2204
+#: includes/menu/class-wholesalex-dynamic-rules.php:2210
 msgid "Badge Text Color"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2212
+#: includes/menu/class-wholesalex-dynamic-rules.php:2218
 msgid "Choose Badge Position..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2213
+#: includes/menu/class-wholesalex-dynamic-rules.php:2219
 #: assets/js/whx_overview.js:4
 msgid "Left"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2214
+#: includes/menu/class-wholesalex-dynamic-rules.php:2220
 #: assets/js/whx_overview.js:4
 msgid "Right"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2222
+#: includes/menu/class-wholesalex-dynamic-rules.php:2228
 msgid "Badge Style"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2240
+#: includes/menu/class-wholesalex-dynamic-rules.php:2246
 msgid "Minimum Product Quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2247
+#: includes/menu/class-wholesalex-dynamic-rules.php:2253
 msgid "Disable Quantity in Shop & Product Page"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2248
+#: includes/menu/class-wholesalex-dynamic-rules.php:2254
 msgid "Disable Minimum Product Limit"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2251
+#: includes/menu/class-wholesalex-dynamic-rules.php:2257
 msgid "Enabling it will disable the minimum order restriction from shop and product pages. So the buyers can add any number of products to the cart. However, they will be restricted in the checkout process."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2255
+#: includes/menu/class-wholesalex-dynamic-rules.php:2261
 msgid "Step"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2263
+#: includes/menu/class-wholesalex-dynamic-rules.php:2269
 msgid "Conditions: (optional)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2277
+#: includes/menu/class-wholesalex-dynamic-rules.php:2283
 msgid "Choose Conditions..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2278
+#: includes/menu/class-wholesalex-dynamic-rules.php:2284
 msgid "Cart - Total Quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2279
+#: includes/menu/class-wholesalex-dynamic-rules.php:2285
 msgid "Cart - Total Value"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2280
+#: includes/menu/class-wholesalex-dynamic-rules.php:2286
 msgid "Cart - Total Weight"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2281
+#: includes/menu/class-wholesalex-dynamic-rules.php:2287
 msgid "Lifetime Order Count (Pro)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2282
+#: includes/menu/class-wholesalex-dynamic-rules.php:2288
 msgid "Lifetime Purchase (Pro)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2294
+#: includes/menu/class-wholesalex-dynamic-rules.php:2300
 msgid "Choose Operators..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2295
+#: includes/menu/class-wholesalex-dynamic-rules.php:2301
 msgid "Less than (<)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2296
+#: includes/menu/class-wholesalex-dynamic-rules.php:2302
 msgid "Less than or equal (<=)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2297
+#: includes/menu/class-wholesalex-dynamic-rules.php:2303
 msgid "Greater than or equal (>=)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2298
+#: includes/menu/class-wholesalex-dynamic-rules.php:2304
 msgid "Greater than (>)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2317
+#: includes/menu/class-wholesalex-dynamic-rules.php:2323
 msgid "Date & Limit Rule"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:2329
+#: includes/menu/class-wholesalex-dynamic-rules.php:2335
 msgid "End Data"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:3283
-msgid "Pieces"
-msgstr ""
-
-#: includes/menu/class-wholesalex-dynamic-rules.php:4416
-#: includes/menu/class-wholesalex-dynamic-rules.php:4536
+#: includes/menu/class-wholesalex-dynamic-rules.php:4310
+#: includes/menu/class-wholesalex-dynamic-rules.php:4430
 #: includes/menu/class-wholesalex-settings.php:1313
 #: includes/menu/class-wholesalex-settings.php:1315
 msgid "You can avail one of the following offers by completing the requirements."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4432
-#: includes/menu/class-wholesalex-dynamic-rules.php:4491
-#: includes/menu/class-wholesalex-dynamic-rules.php:4551
+#: includes/menu/class-wholesalex-dynamic-rules.php:4326
+#: includes/menu/class-wholesalex-dynamic-rules.php:4385
+#: includes/menu/class-wholesalex-dynamic-rules.php:4445
 msgid " % OFF"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4434
-#: includes/menu/class-wholesalex-dynamic-rules.php:4493
-#: includes/menu/class-wholesalex-dynamic-rules.php:4553
+#: includes/menu/class-wholesalex-dynamic-rules.php:4328
+#: includes/menu/class-wholesalex-dynamic-rules.php:4387
+#: includes/menu/class-wholesalex-dynamic-rules.php:4447
 msgid " OFF"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4476
-#: includes/menu/class-wholesalex-dynamic-rules.php:4596
+#: includes/menu/class-wholesalex-dynamic-rules.php:4370
+#: includes/menu/class-wholesalex-dynamic-rules.php:4490
 #: includes/menu/class-wholesalex-settings.php:1326
 #: includes/menu/class-wholesalex-settings.php:1328
 msgid "You can avail following offers by completing the requirements."
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4557
+#: includes/menu/class-wholesalex-dynamic-rules.php:4451
 msgid "Use "
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4590
+#: includes/menu/class-wholesalex-dynamic-rules.php:4484
 #: includes/menu/class-wholesalex-settings.php:868
 #: includes/menu/class-wholesalex-settings.php:870
 msgid "BOGO Discount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4610
+#: includes/menu/class-wholesalex-dynamic-rules.php:4504
 #: includes/menu/class-wholesalex-settings.php:882
 #: includes/menu/class-wholesalex-settings.php:884
 msgid "Get 1 Free"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4616
+#: includes/menu/class-wholesalex-dynamic-rules.php:4510
 #: includes/menu/class-wholesalex-settings.php:895
 #: includes/menu/class-wholesalex-settings.php:897
 msgid "Buy at least {required_quantity} products"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4647
-#: includes/menu/class-wholesalex-dynamic-rules.php:4765
+#: includes/menu/class-wholesalex-dynamic-rules.php:4541
+#: includes/menu/class-wholesalex-dynamic-rules.php:4659
 #: includes/menu/class-wholesalex-settings.php:778
 #: includes/menu/class-wholesalex-settings.php:797
 #: includes/menu/class-wholesalex-settings.php:799
@@ -1944,113 +1952,113 @@ msgstr ""
 msgid "Free Shipping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4681
+#: includes/menu/class-wholesalex-dynamic-rules.php:4575
 msgid "Promotions:"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4685
+#: includes/menu/class-wholesalex-dynamic-rules.php:4579
 #: includes/menu/class-wholesalex-settings.php:601
 #: includes/menu/class-wholesalex-settings.php:603
 msgid "Get exclusive offers"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4697
+#: includes/menu/class-wholesalex-dynamic-rules.php:4591
 msgid "Conditional Discount Offers"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4726
+#: includes/menu/class-wholesalex-dynamic-rules.php:4620
 #: includes/menu/class-wholesalex-settings.php:1083
 #: includes/menu/class-wholesalex-settings.php:1085
 msgid "You can add minimum {minimum_qty} and maximum {maximum_qty} quantity of this product"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4734
-#: includes/menu/class-wholesalex-dynamic-rules.php:6487
-#: includes/menu/class-wholesalex-dynamic-rules.php:6555
-#: includes/menu/class-wholesalex-dynamic-rules.php:6621
+#: includes/menu/class-wholesalex-dynamic-rules.php:4628
+#: includes/menu/class-wholesalex-dynamic-rules.php:6381
+#: includes/menu/class-wholesalex-dynamic-rules.php:6449
+#: includes/menu/class-wholesalex-dynamic-rules.php:6515
 #: includes/menu/class-wholesalex-settings.php:1049
 #: includes/menu/class-wholesalex-settings.php:1051
 msgid "You have to add minimun {minimum_qty} quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4742
+#: includes/menu/class-wholesalex-dynamic-rules.php:4636
 #: includes/menu/class-wholesalex-settings.php:1066
 #: includes/menu/class-wholesalex-settings.php:1068
 msgid "You can add maximum {maximum_qty} quantity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4892
+#: includes/menu/class-wholesalex-dynamic-rules.php:4786
 msgid "Quantity: %s"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4903
+#: includes/menu/class-wholesalex-dynamic-rules.php:4797
 msgid "FREE"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4974
+#: includes/menu/class-wholesalex-dynamic-rules.php:4868
 #: includes/menu/class-wholesalex-settings.php:1153
 #: includes/menu/class-wholesalex-settings.php:1155
 msgid "Spend {min_value} to {max_value}"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4978
+#: includes/menu/class-wholesalex-dynamic-rules.php:4872
 msgid "Spend min {max_value}"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4981
+#: includes/menu/class-wholesalex-dynamic-rules.php:4875
 #: includes/menu/class-wholesalex-settings.php:1121
 #: includes/menu/class-wholesalex-settings.php:1123
 msgid "Spend upto {min_value}"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4991
+#: includes/menu/class-wholesalex-dynamic-rules.php:4885
 #: includes/menu/class-wholesalex-settings.php:1170
 #: includes/menu/class-wholesalex-settings.php:1172
 msgid "Add {min_value} to {max_value} product(s) to cart"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4994
+#: includes/menu/class-wholesalex-dynamic-rules.php:4888
 msgid "Buy minimum {max_value} product(s) to get the discount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:4996
+#: includes/menu/class-wholesalex-dynamic-rules.php:4890
 msgid "Don&apos;t buy more than {min_value} product(s) to get the discount"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:5007
+#: includes/menu/class-wholesalex-dynamic-rules.php:4901
 #: includes/menu/class-wholesalex-settings.php:1220
 #: includes/menu/class-wholesalex-settings.php:1222
 msgid "Add {min_value} to {max_value} {unit} to cart"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:5015
+#: includes/menu/class-wholesalex-dynamic-rules.php:4909
 msgid "Add min {max_value} {unit} to cart"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:5023
+#: includes/menu/class-wholesalex-dynamic-rules.php:4917
 msgid "Add up to {min_value} {unit} to cart"
 msgstr ""
 
 #. translators: %s: Plugin Name
-#: includes/menu/class-wholesalex-dynamic-rules.php:5660
+#: includes/menu/class-wholesalex-dynamic-rules.php:5554
 msgid "%s Free Shipping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:6120
+#: includes/menu/class-wholesalex-dynamic-rules.php:6014
 msgid "(BOGO Discounts)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:6154
-#: includes/menu/class-wholesalex-dynamic-rules.php:6186
+#: includes/menu/class-wholesalex-dynamic-rules.php:6048
+#: includes/menu/class-wholesalex-dynamic-rules.php:6080
 msgid "Cart Discounts"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:6226
-#: includes/menu/class-wholesalex-dynamic-rules.php:6257
+#: includes/menu/class-wholesalex-dynamic-rules.php:6120
+#: includes/menu/class-wholesalex-dynamic-rules.php:6151
 msgid "Payment Discount!"
 msgstr ""
 
-#: includes/menu/class-wholesalex-dynamic-rules.php:7174
+#: includes/menu/class-wholesalex-dynamic-rules.php:7068
 #: includes/menu/class-wholesalex-settings.php:1373
 msgid "Login to see prices"
 msgstr ""
@@ -2438,222 +2446,222 @@ msgstr ""
 msgid "%s B2C"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:112
+#: includes/menu/class-wholesalex-overview.php:114
 #: includes/options/Addons.php:438
 msgid "WholesaleX Migration Tool"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:203
+#: includes/menu/class-wholesalex-overview.php:205
 msgid "Install & Activate WholesaleX Migration Tool"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:300
-#: includes/menu/class-wholesalex-overview.php:301
+#: includes/menu/class-wholesalex-overview.php:302
+#: includes/menu/class-wholesalex-overview.php:303
 msgid "Dashboard"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:313
-#: includes/menu/class-wholesalex-overview.php:314
+#: includes/menu/class-wholesalex-overview.php:315
+#: includes/menu/class-wholesalex-overview.php:316
 #: includes/menu/class-wholesalex-settings.php:588
 #: assets/js/whx_overview.js:4
 msgid "Dynamic Rules"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:321
-#: includes/menu/class-wholesalex-overview.php:322
+#: includes/menu/class-wholesalex-overview.php:323
+#: includes/menu/class-wholesalex-overview.php:324
 #: assets/js/whx_overview.js:4
 msgid "User Roles"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:329
-#: includes/menu/class-wholesalex-overview.php:330
+#: includes/menu/class-wholesalex-overview.php:331
+#: includes/menu/class-wholesalex-overview.php:332
 #: includes/menu/class-wholesalex-role.php:450
 #: assets/js/whx_overview.js:4
 msgid "Registration Form"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:337
-#: includes/menu/class-wholesalex-overview.php:338
+#: includes/menu/class-wholesalex-overview.php:339
+#: includes/menu/class-wholesalex-overview.php:340
 msgid "Addons"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:345
-#: includes/menu/class-wholesalex-overview.php:346
+#: includes/menu/class-wholesalex-overview.php:347
+#: includes/menu/class-wholesalex-overview.php:348
 msgid "Users"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:353
-#: includes/menu/class-wholesalex-overview.php:354
+#: includes/menu/class-wholesalex-overview.php:355
+#: includes/menu/class-wholesalex-overview.php:356
 msgid "Emails"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:372
-#: includes/menu/class-wholesalex-overview.php:373
+#: includes/menu/class-wholesalex-overview.php:374
+#: includes/menu/class-wholesalex-overview.php:375
 msgid "User Role Requests"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:383
-#: includes/menu/class-wholesalex-overview.php:384
+#: includes/menu/class-wholesalex-overview.php:385
+#: includes/menu/class-wholesalex-overview.php:386
 msgid "Features"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:395
-#: includes/menu/class-wholesalex-overview.php:403
-#: includes/menu/class-wholesalex-overview.php:414
+#: includes/menu/class-wholesalex-overview.php:397
+#: includes/menu/class-wholesalex-overview.php:405
+#: includes/menu/class-wholesalex-overview.php:416
 #: includes/menu/class-wholesalex-setup-wizard.php:117
 #: includes/options/Addons.php:337
 msgid "Conversations"
 msgstr ""
 
 #. translators: %1$s: Menu title, %2$d: Pending conversation count.
-#: includes/menu/class-wholesalex-overview.php:405
+#: includes/menu/class-wholesalex-overview.php:407
 msgid "%1$s <span class=\"menu-counter\"><span>%2$d</span></span>"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:418
-#: includes/menu/class-wholesalex-overview.php:419
+#: includes/menu/class-wholesalex-overview.php:420
+#: includes/menu/class-wholesalex-overview.php:421
 msgid "License"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:431
-#: includes/menu/class-wholesalex-overview.php:432
+#: includes/menu/class-wholesalex-overview.php:433
+#: includes/menu/class-wholesalex-overview.php:434
 msgid "Migration Tool"
-msgstr ""
-
-#: includes/menu/class-wholesalex-overview.php:567
-#: assets/js/whx_overview.js:4
-msgid "Customer No. (B2B)"
-msgstr ""
-
-#: includes/menu/class-wholesalex-overview.php:568
-#: assets/js/whx_overview.js:4
-msgid "Total Order (B2B)"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:569
 #: assets/js/whx_overview.js:4
-msgid "Total Sale (B2B)"
+msgid "Customer No. (B2B)"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:570
 #: assets/js/whx_overview.js:4
-msgid "Net Revenue (B2B)"
+msgid "Total Order (B2B)"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:571
 #: assets/js/whx_overview.js:4
-msgid "Gross Sale (B2B)"
+msgid "Total Sale (B2B)"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:572
 #: assets/js/whx_overview.js:4
+msgid "Net Revenue (B2B)"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:573
+#: assets/js/whx_overview.js:4
+msgid "Gross Sale (B2B)"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:574
+#: assets/js/whx_overview.js:4
 msgid "Average Order (B2B)"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:897
+#: includes/menu/class-wholesalex-overview.php:899
 #: includes/menu/class-wholesalex-role.php:191
 #: includes/menu/class-wholesalex-role.php:231
 msgid "New Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:965
+#: includes/menu/class-wholesalex-overview.php:967
 #: includes/menu/class-wholesalex-users.php:192
-#: assets/js/whx_conversation.js:4196
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Select Status"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:988
-#: includes/menu/class-wholesalex-registration.php:204
+#: includes/menu/class-wholesalex-overview.php:990
+#: includes/menu/class-wholesalex-registration.php:205
 msgid "No Mapping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:989
+#: includes/menu/class-wholesalex-overview.php:991
 msgid "Billing\tFirst Name"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:990
+#: includes/menu/class-wholesalex-overview.php:992
 msgid "Billing\tLast Name"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:991
+#: includes/menu/class-wholesalex-overview.php:993
 msgid "Billing\tCompany"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:992
+#: includes/menu/class-wholesalex-overview.php:994
 msgid "Billing\tAddress\t1"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:993
+#: includes/menu/class-wholesalex-overview.php:995
 msgid "Billing\tAddress\t2"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:994
+#: includes/menu/class-wholesalex-overview.php:996
 msgid "Billing\tCity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:995
+#: includes/menu/class-wholesalex-overview.php:997
 msgid "Billing\tPost Code"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:996
+#: includes/menu/class-wholesalex-overview.php:998
 msgid "Billing\tCountry"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:997
+#: includes/menu/class-wholesalex-overview.php:999
 msgid "Billing\tState"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:998
+#: includes/menu/class-wholesalex-overview.php:1000
 msgid "Billing\tEmail"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:999
+#: includes/menu/class-wholesalex-overview.php:1001
 msgid "Billing\tPhone"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1000
+#: includes/menu/class-wholesalex-overview.php:1002
 msgid "Custom User\tMeta Mapping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1041
-#: includes/menu/class-wholesalex-overview.php:1083
+#: includes/menu/class-wholesalex-overview.php:1043
+#: includes/menu/class-wholesalex-overview.php:1085
 msgid "Name and Email"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1042
+#: includes/menu/class-wholesalex-overview.php:1044
 msgid "Wallet Balance"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1043
+#: includes/menu/class-wholesalex-overview.php:1045
 msgid "Total Purchase"
 msgstr ""
 
 #. translators: %s - Plugin Name
-#: includes/menu/class-wholesalex-overview.php:1045
-#: includes/menu/class-wholesalex-profile.php:378
-#: includes/menu/class-wholesalex-profile.php:1162
+#: includes/menu/class-wholesalex-overview.php:1047
+#: includes/menu/class-wholesalex-profile.php:381
+#: includes/menu/class-wholesalex-profile.php:1166
 msgid "%s Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1064
+#: includes/menu/class-wholesalex-overview.php:1066
 msgid "Order ID"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1065
+#: includes/menu/class-wholesalex-overview.php:1067
 #: includes/menu/class-wholesalex-role.php:424
 #: includes/menu/class-wholesalex-role.php:425
 msgid "Name"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1066
+#: includes/menu/class-wholesalex-overview.php:1068
 #: includes/menu/class-wholesalex-request-role-change.php:469
 #: includes/menu/class-wholesalex-users.php:457
 msgid "Date"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1068
-#: includes/menu/class-wholesalex-overview.php:1086
+#: includes/menu/class-wholesalex-overview.php:1070
+#: includes/menu/class-wholesalex-overview.php:1088
 #: includes/menu/class-wholesalex-request-role-change.php:476
 #: includes/menu/class-wholesalex-users.php:465
 #: assets/js/whx_overview.js:1
@@ -2661,15 +2669,15 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1084
+#: includes/menu/class-wholesalex-overview.php:1086
 msgid "Regi. Date"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1085
+#: includes/menu/class-wholesalex-overview.php:1087
 msgid "Regi. Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1144
+#: includes/menu/class-wholesalex-overview.php:1146
 #: assets/js/wholesalex_components.js:1
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1527
@@ -2677,7 +2685,7 @@ msgstr ""
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:207
+#: includes/menu/class-wholesalex-profile.php:209
 #: assets/js/whx_cat.js:1
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1832
@@ -2685,7 +2693,7 @@ msgstr ""
 msgid "No Data Found! Please try with another keyword."
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:208
+#: includes/menu/class-wholesalex-profile.php:210
 #: assets/js/whx_cat.js:1
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1837
@@ -2693,267 +2701,267 @@ msgstr ""
 msgid "Enter 2 or more characters to search."
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:209
+#: includes/menu/class-wholesalex-profile.php:211
 msgid "Searching..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:210
+#: includes/menu/class-wholesalex-profile.php:212
 msgid "This User"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:211
+#: includes/menu/class-wholesalex-profile.php:213
 msgid "UNLOCK"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:212
+#: includes/menu/class-wholesalex-profile.php:214
 #: assets/js/whx_overview.js:4
 msgid "Unlock All Features"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:213
+#: includes/menu/class-wholesalex-profile.php:215
 msgid "We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features."
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:214
+#: includes/menu/class-wholesalex-profile.php:216
 msgid "Upgrade to Pro  ➤"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:291
+#: includes/menu/class-wholesalex-profile.php:293
 msgid "Sorry, you are not allowed to give users that role."
 msgstr ""
 
 #. translators: %s - Plugin Name
-#: includes/menu/class-wholesalex-profile.php:380
+#: includes/menu/class-wholesalex-profile.php:383
 msgid "%s Status"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:431
+#: includes/menu/class-wholesalex-profile.php:434
 msgid "- Wholesale Role -"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:443
-#: includes/menu/class-wholesalex-profile.php:461
-#: includes/menu/class-wholesalex-profile.php:525
+#: includes/menu/class-wholesalex-profile.php:446
+#: includes/menu/class-wholesalex-profile.php:464
+#: includes/menu/class-wholesalex-profile.php:528
 msgid "Filter"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:500
+#: includes/menu/class-wholesalex-profile.php:503
 msgid "Waiting Approval"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:501
+#: includes/menu/class-wholesalex-profile.php:504
 #: assets/js/whx_overview.js:4
 msgid "Active"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:502
+#: includes/menu/class-wholesalex-profile.php:505
 msgid "Inactive"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:503
+#: includes/menu/class-wholesalex-profile.php:506
 #: assets/js/whx_overview.js:4
 msgid "Reject"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:510
+#: includes/menu/class-wholesalex-profile.php:513
 msgid "- Wholesale Status -"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:602
+#: includes/menu/class-wholesalex-profile.php:606
 msgid "%s Extra Information"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:721
+#: includes/menu/class-wholesalex-profile.php:725
 msgid "Download File"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:725
-#: includes/menu/class-wholesalex-profile.php:730
+#: includes/menu/class-wholesalex-profile.php:729
+#: includes/menu/class-wholesalex-profile.php:734
 msgid "The file does not exist."
 msgstr ""
 
 #. translators: %s - Plugin Name
-#: includes/menu/class-wholesalex-profile.php:851
+#: includes/menu/class-wholesalex-profile.php:855
 msgid "%s Profile Settings"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:854
 #: includes/menu/class-wholesalex-profile.php:858
+#: includes/menu/class-wholesalex-profile.php:862
 msgid "Override Tax Exemption"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:860
+#: includes/menu/class-wholesalex-profile.php:864
 msgid "Select Tax Exeption Status..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:872
+#: includes/menu/class-wholesalex-profile.php:876
 msgid "Override Shipping Method"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:876
+#: includes/menu/class-wholesalex-profile.php:880
 msgid "Override Shipping Method Options"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:878
+#: includes/menu/class-wholesalex-profile.php:882
 msgid "Select Shipping Option Override Status..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:888
+#: includes/menu/class-wholesalex-profile.php:892
 msgid "Shipping Method Type"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:896
+#: includes/menu/class-wholesalex-profile.php:900
 msgid "Choose Shipping Method..."
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:897
+#: includes/menu/class-wholesalex-profile.php:901
 #: assets/js/whx_overview.js:4
 msgid "Force Free Shipping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:898
+#: includes/menu/class-wholesalex-profile.php:902
 msgid "Specify Shipping Methods"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:950
 #: includes/menu/class-wholesalex-profile.php:954
+#: includes/menu/class-wholesalex-profile.php:958
 msgid "Override Payment Gateway Options"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:956
+#: includes/menu/class-wholesalex-profile.php:960
 msgid "Override Payment Gateway..."
 msgstr ""
 
 #. translators: %s - Plugin Name
-#: includes/menu/class-wholesalex-profile.php:988
+#: includes/menu/class-wholesalex-profile.php:992
 msgid "%s Profile Discount"
 msgstr ""
 
 #. translators: %s - Plugin Name
-#: includes/menu/class-wholesalex-profile.php:1157
+#: includes/menu/class-wholesalex-profile.php:1161
 msgid "%s User Settings"
 msgstr ""
 
 #. translators: %s - Plugin Name
-#: includes/menu/class-wholesalex-profile.php:1165
+#: includes/menu/class-wholesalex-profile.php:1169
 msgid "--Select %s Role--"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:1172
+#: includes/menu/class-wholesalex-profile.php:1176
 msgid "Registration Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:1179
+#: includes/menu/class-wholesalex-profile.php:1183
 msgid "Approve Request"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:1180
+#: includes/menu/class-wholesalex-profile.php:1184
 msgid "Reject Request"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:1181
+#: includes/menu/class-wholesalex-profile.php:1185
 msgid "Delete User"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:1182
+#: includes/menu/class-wholesalex-profile.php:1186
 msgid "Active User"
 msgstr ""
 
-#: includes/menu/class-wholesalex-profile.php:1183
+#: includes/menu/class-wholesalex-profile.php:1187
 msgid "Deactivated User"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:205
+#: includes/menu/class-wholesalex-registration.php:206
 msgid "Billing First Name"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:206
+#: includes/menu/class-wholesalex-registration.php:207
 msgid "Billing Last Name"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:207
+#: includes/menu/class-wholesalex-registration.php:208
 msgid "Billing Company"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:208
+#: includes/menu/class-wholesalex-registration.php:209
 msgid "Billing Address 1"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:209
+#: includes/menu/class-wholesalex-registration.php:210
 msgid "Billing Address 2"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:210
+#: includes/menu/class-wholesalex-registration.php:211
 msgid "Billing City"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:211
+#: includes/menu/class-wholesalex-registration.php:212
 msgid "Billing Post Code"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:212
+#: includes/menu/class-wholesalex-registration.php:213
 msgid "Billing Country"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:213
+#: includes/menu/class-wholesalex-registration.php:214
 msgid "Billing State"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:214
+#: includes/menu/class-wholesalex-registration.php:215
 msgid "Billing Email"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:215
+#: includes/menu/class-wholesalex-registration.php:216
 msgid "Billing Phone"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:216
+#: includes/menu/class-wholesalex-registration.php:217
 msgid "Custom User Meta Mapping"
 msgstr ""
 
 #. translators: %s: Account Status
-#: includes/menu/class-wholesalex-registration.php:367
-#: includes/menu/class-wholesalex-registration.php:429
+#: includes/menu/class-wholesalex-registration.php:368
+#: includes/menu/class-wholesalex-registration.php:430
 msgid "Your account Status is %s. Please Contact with Site Administration to approve your account."
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:370
-#: includes/menu/class-wholesalex-registration.php:448
+#: includes/menu/class-wholesalex-registration.php:371
+#: includes/menu/class-wholesalex-registration.php:449
 msgid "Please confirm your account by clicking the confirmation link, that already sent your registered email."
 msgstr ""
 
 #. translators: %s: Account Status
-#: includes/menu/class-wholesalex-registration.php:433
-#: includes/menu/class-wholesalex-registration.php:437
+#: includes/menu/class-wholesalex-registration.php:434
+#: includes/menu/class-wholesalex-registration.php:438
 msgid "Your account Status is %s. Please Contact with Site Administration to Active your account."
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:964
-#: includes/menu/class-wholesalex-registration.php:1176
+#: includes/menu/class-wholesalex-registration.php:966
+#: includes/menu/class-wholesalex-registration.php:1178
 msgid "Password and Confirm password does not match!"
 msgstr ""
 
 #. translators: %s Allowed File Types.
-#: includes/menu/class-wholesalex-registration.php:1001
-#: includes/menu/class-wholesalex-registration.php:1302
+#: includes/menu/class-wholesalex-registration.php:1003
+#: includes/menu/class-wholesalex-registration.php:1304
 msgid "File Type Does not support for %1$s Field! Supported File Types is %2$s."
 msgstr ""
 
 #. translators: 1: Field Label, 2: Allowed Size
-#: includes/menu/class-wholesalex-registration.php:1005
-#: includes/menu/class-wholesalex-registration.php:1307
+#: includes/menu/class-wholesalex-registration.php:1007
+#: includes/menu/class-wholesalex-registration.php:1309
 msgid "File is too large! Max Upload Size For %1$s field is %2$s."
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:1018
-#: includes/menu/class-wholesalex-registration.php:1023
-#: includes/menu/class-wholesalex-registration.php:1029
-#: includes/menu/class-wholesalex-registration.php:1034
+#: includes/menu/class-wholesalex-registration.php:1020
+#: includes/menu/class-wholesalex-registration.php:1025
+#: includes/menu/class-wholesalex-registration.php:1031
+#: includes/menu/class-wholesalex-registration.php:1036
 msgid " is Required!"
 msgstr ""
 
-#: includes/menu/class-wholesalex-registration.php:1186
-#: includes/menu/class-wholesalex-registration.php:1415
+#: includes/menu/class-wholesalex-registration.php:1188
+#: includes/menu/class-wholesalex-registration.php:1417
 msgid "Email is Required!"
 msgstr ""
 
@@ -4298,7 +4306,7 @@ msgid "Hello Bar Action performed"
 msgstr ""
 
 #: includes/notice/class-notice.php:258
-#: assets/js/whx_conversation.js:4356
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:873
 #: assets/js/whx_overview.js:1
 msgid "Final Hour Sales Alert:"
@@ -4314,7 +4322,7 @@ msgid "Upgrade to Pro &nbsp;➣"
 msgstr ""
 
 #: includes/notice/class-notice.php:277
-#: assets/js/whx_conversation.js:4365
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:882
 #: assets/js/whx_overview.js:1
 msgid "Massive Sales Alert:"
@@ -4524,18 +4532,17 @@ msgctxt "WholesaleX Registration Pending (Customer)"
 msgid "We have received your registration request. Our team will review your information, and you will receive another email once your Request has been approved/rejected."
 msgstr ""
 
-#: assets/js/wholesalex_bulkorder.js:2008
+#: assets/js/wholesalex_bulkorder.js:1
 #: assets/js/wholesalex_components.js:1
-#: assets/js/wholesalex_subaccount.js:2008
-#: assets/js/whx_conversation.js:2008
+#: assets/js/wholesalex_subaccount.js:1
+#: assets/js/whx_conversation.js:1
 msgid "OK"
 msgstr ""
 
-#: assets/js/wholesalex_bulkorder.js:2009
+#: assets/js/wholesalex_bulkorder.js:1
 #: assets/js/wholesalex_components.js:1
-#: assets/js/wholesalex_subaccount.js:2009
-#: assets/js/whx_conversation.js:2009
-#: assets/js/whx_conversation.js:2735
+#: assets/js/wholesalex_subaccount.js:1
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_profile.js:363
 msgid "Cancel"
 msgstr ""
@@ -4569,7 +4576,7 @@ msgid "Edit this header"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:2539
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:468
 msgid "More"
 msgstr ""
@@ -4581,25 +4588,25 @@ msgid "Available Smart Tags:"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:2712
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_profile.js:340
 msgid "Confirm Delete"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:2724
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_profile.js:352
 msgid "Do You Want to delete"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:2724
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_profile.js:352
 msgid "Be careful, this procedure is irreversible. Do you want to proceed?"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:2745
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1295
 #: assets/js/whx_profile.js:373
@@ -4641,7 +4648,7 @@ msgid "Pro"
 msgstr ""
 
 #: assets/js/wholesalex_components.js:1
-#: assets/js/whx_conversation.js:3493
+#: assets/js/whx_conversation.js:1
 msgid "Show Result:"
 msgstr ""
 
@@ -4657,74 +4664,67 @@ msgstr ""
 msgid "Searching…"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4071
-#: assets/js/whx_conversation.js:4083
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:4
 msgid "Edit"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4076
-#: assets/js/whx_conversation.js:4088
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Resolved"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4093
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Force Delete"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4124
-#: assets/js/whx_overview.js:4
-msgid "Selected Conversations"
-msgstr ""
-
-#: assets/js/whx_conversation.js:4166
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Add New Conversation"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4183
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Apply"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4202
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Select Post Status"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4209
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Select Type"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4223
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_overview.js:4
 msgid "Search…"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4357
-#: assets/js/whx_conversation.js:4366
+#: assets/js/whx_conversation.js:1
+#: assets/js/whx_overview.js:4
+msgid "Selected Conversations"
+msgstr ""
+
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:874
 #: assets/js/whx_migration_tools.js:883
 #: assets/js/whx_overview.js:1
 msgid "Enjoy"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4358
-#: assets/js/whx_conversation.js:4376
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:875
 #: assets/js/whx_migration_tools.js:893
 #: assets/js/whx_overview.js:1
 msgid "up to 50% OFF"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4359
-#: assets/js/whx_conversation.js:4368
-#: assets/js/whx_conversation.js:4377
-#: assets/js/whx_conversation.js:4386
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:876
 #: assets/js/whx_migration_tools.js:885
 #: assets/js/whx_migration_tools.js:894
@@ -4733,51 +4733,47 @@ msgstr ""
 msgid "on WholesaleX Pro -"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4360
-#: assets/js/whx_conversation.js:4369
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:877
 #: assets/js/whx_migration_tools.js:886
 #: assets/js/whx_overview.js:1
 msgid "Buy Now!"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4367
-#: assets/js/whx_conversation.js:4385
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:884
 #: assets/js/whx_migration_tools.js:902
 #: assets/js/whx_overview.js:1
 msgid "up to 55% OFF"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4374
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:891
 #: assets/js/whx_overview.js:1
 msgid "Flash Sale is live:"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4375
-#: assets/js/whx_conversation.js:4384
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:892
 #: assets/js/whx_migration_tools.js:901
 #: assets/js/whx_overview.js:1
 msgid "Get"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4378
-#: assets/js/whx_conversation.js:4387
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:895
 #: assets/js/whx_migration_tools.js:904
 #: assets/js/whx_overview.js:1
 msgid "Grab it Now!"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4383
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:900
 #: assets/js/whx_overview.js:1
 msgid "Exclusive Deals Live:"
 msgstr ""
 
-#: assets/js/whx_conversation.js:4416
+#: assets/js/whx_conversation.js:1
 #: assets/js/whx_migration_tools.js:933
 #: assets/js/whx_overview.js:1
 msgid "Close notification"
@@ -6265,11 +6261,11 @@ msgstr ""
 msgid "Sent to Parent Account For Approval"
 msgstr ""
 
-#: assets/js/whx_wallet_gateway.js:202
+#: assets/js/whx_wallet_gateway.js:1
 msgid "WholesaleX Wallet Payment"
 msgstr ""
 
 #. translators: 1: Wallet amount
-#: assets/js/whx_wallet_gateway.js:211
+#: assets/js/whx_wallet_gateway.js:1
 msgid "| Current Balance: %s"
 msgstr ""

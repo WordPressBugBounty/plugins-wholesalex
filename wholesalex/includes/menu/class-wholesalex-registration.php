@@ -9,6 +9,7 @@
 namespace WHOLESALEX;
 
 use Exception;
+use WHOLESALEX\WholesaleX_CommonUtils;
 use WP_Error;
 
 /**
@@ -185,8 +186,8 @@ class WHOLESALEX_Registration {
 			),
 		);
 
-		$form_regi_data    = wholesalex()->get_new_form_builder_data();
-		$default_form_data = wholesalex()->get_empty_form();
+		$form_regi_data    = WholesaleX_CommonUtils::get_default_registration_form_fields();
+		$default_form_data = WholesaleX_CommonUtils::get_empty_form();
 		wp_localize_script(
 			'wholesalex_form_builder',
 			'whx_form_builder',
@@ -268,7 +269,7 @@ class WHOLESALEX_Registration {
 
 		$role = isset( $post['role'] ) ? sanitize_text_field( $post['role'] ) : '';
 
-		$form_regi_data = wholesalex()->get_new_form_builder_data();
+		$form_regi_data = WholesaleX_CommonUtils::get_new_form_builder_data();
 
 		wp_send_json_success(
 			array(
@@ -297,7 +298,7 @@ class WHOLESALEX_Registration {
 			if ( isset( $post['data'] ) ) {
 				update_option( 'wholesalex_registration_form', sanitize_text_field( wp_unslash( $post['data'] ) ) );
 
-				$GLOBALS['wholesalex_registration_fields'] = wholesalex()->get_form_fields();
+				$GLOBALS['wholesalex_registration_fields'] = WholesaleX_CommonUtils::get_form_fields();
 
 				wp_send_json_success();
 			} else {
@@ -941,8 +942,9 @@ class WHOLESALEX_Registration {
 	 * @return void
 	 */
 	public function set_custom_fields() {
-		$this->woo_custom_fields   = $GLOBALS['wholesalex_registration_fields']['woo_custom_fields'];
-		$this->registration_fields = $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'];
+		$GLOBALS['wholesalex_registration_fields'] = WholesaleX_CommonUtils::get_form_fields();
+		$this->woo_custom_fields                   = $GLOBALS['wholesalex_registration_fields']['woo_custom_fields'];
+		$this->registration_fields                 = $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'];
 	}
 
 	/**

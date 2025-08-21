@@ -151,6 +151,12 @@ class Scripts {
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
+				'wholesalex_price_table'              => array(
+					'src'       => WHOLESALEX_URL . 'assets/js/wholesalex-price-table.js',
+					'deps'      => array( 'jquery', 'wp-i18n' ),
+					'ver'       => WHOLESALEX_VER,
+					'in_footer' => true,
+				),
 			)
 		);
 		foreach ( $register_scripts as $handle => $args ) {

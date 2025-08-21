@@ -8,6 +8,8 @@
 
 namespace WHOLESALEX;
 
+use WHOLESALEX\WholesaleX_CommonUtils;
+
 use stdClass;
 use WC_Data_Store;
 use WC_Shipping_Zone;
@@ -314,7 +316,8 @@ class WHOLESALEX_Profile {
 		}
 		$__role_id = get_user_meta( $user_id, '__wholesalex_role', true );
 
-		$__fields = isset( $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'] ) ? $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'] : array();
+		$GLOBALS['wholesalex_registration_fields'] = WholesaleX_CommonUtils::get_form_fields();
+		$__fields                                  = isset( $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'] ) ? $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'] : array();
 
 		$default_fields = array( 'user_login', 'user_pass', 'display_name', 'nickname', 'first_name', 'last_name', 'description', 'user_email', 'url', 'user_confirm_email', 'user_confirm_password', 'default_user_role', 'registration_role', 'wholesalex_registration_role', 'user_confirm_pass' );
 
@@ -577,7 +580,8 @@ class WHOLESALEX_Profile {
 			return;
 		}
 
-		$__fields = isset( $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'] ) ? $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'] : array();
+		$GLOBALS['wholesalex_registration_fields'] = WholesaleX_CommonUtils::get_form_fields();
+		$__fields                                  = isset( $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'] ) ? $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'] : array();
 
 		$__user_id = $user->ID;
 

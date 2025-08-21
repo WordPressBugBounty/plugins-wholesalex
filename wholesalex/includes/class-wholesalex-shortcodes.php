@@ -8,6 +8,8 @@
 
 namespace WHOLESALEX;
 
+use WHOLESALEX\WholesaleX_CommonUtils;
+
 /**
  * WholesaleX Shortcodes Class
  *
@@ -348,8 +350,8 @@ class WHOLESALEX_Shortcodes {
 	 * @param string $role The role for the form.
 	 */
 	private function render_form( $type, $form_data, $input_variation, $is_rolewise = false, $is_only_b2b = false, $role = '' ) {
-		$default_form      = wholesalex()->get_empty_form();
-		$initial_form_data = wholesalex()->get_default_registration_form_fields();
+		$default_form      = WholesaleX_CommonUtils::get_empty_form();
+		$initial_form_data = WholesaleX_CommonUtils::get_default_registration_form_fields();
 		if ( 'registration' === $type ) {
 			$enctype             = 'multipart/form-data';
 			$wrapper_class       = 'wsx-reg-fields';
@@ -467,7 +469,7 @@ class WHOLESALEX_Shortcodes {
 	 */
 	private function render_registration_shortcode( $atts = array() ) {
 		$atts            = array_change_key_case( (array) $atts, CASE_LOWER );
-		$form_data       = wholesalex()->get_new_form_builder_data();
+		$form_data       = WholesaleX_CommonUtils::get_new_form_builder_data();
 		$input_variation = $form_data['settings']['inputVariation'];
 		$is_role_wise    = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' != $atts['registration_role'] && 'global' != $atts['registration_role'] ? $atts['registration_role'] : false;
 		$is_only_b2b     = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' == $atts['registration_role'] ? $atts['registration_role'] : false;
@@ -510,7 +512,7 @@ class WHOLESALEX_Shortcodes {
 	 * @return array
 	 */
 	private function render_login_registration_shortcode( $atts = array() ) {
-		$form_data = wholesalex()->get_new_form_builder_data();
+		$form_data = WholesaleX_CommonUtils::get_new_form_builder_data();
 
 		$input_variation = $form_data['settings']['inputVariation'];
 
@@ -559,10 +561,9 @@ class WHOLESALEX_Shortcodes {
 	 * @return array
 	 */
 	private function render_login_shortcode() {
-		$form_data       = wholesalex()->get_new_form_builder_data();
+		$form_data       = WholesaleX_CommonUtils::get_new_form_builder_data();
 		$input_variation = $form_data['settings']['inputVariation'];
-		// $is_role_wise     = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' != $atts['registration_role'] && 'global' != $atts['registration_role'] ? $atts['registration_role'] : false;
-		// $is_only_b2b    = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' == $atts['registration_role'] ? $atts['registration_role'] : false;
+
 		$wrapper = wp_unique_id( 'whx_wrapper' );
 
 		ob_start();
@@ -737,8 +738,8 @@ class WHOLESALEX_Shortcodes {
 	 * @since 1.0.0
 	 */
 	public function form_js( $wrapper ) {
-		$form_data           = wholesalex()->get_new_form_builder_data();
-		$initial_form_data   = wholesalex()->get_default_registration_form_fields();
+		$form_data           = WholesaleX_CommonUtils::get_new_form_builder_data();
+		$initial_form_data   = WholesaleX_CommonUtils::get_default_registration_form_fields();
 		$registration_fields = ( isset( $form_data['registrationFields'] ) ? $form_data['registrationFields'] : $initial_form_data );
 
 		$conditions         = array();
@@ -3723,7 +3724,8 @@ class WHOLESALEX_Shortcodes {
 	 * @return void
 	 */
 	public function add_custom_fields_on_checkout_page( $checkout ) {
-		$__role = wholesalex()->get_current_user_role();
+		$__role                                    = wholesalex()->get_current_user_role();
+		$GLOBALS['wholesalex_registration_fields'] = WholesaleX_CommonUtils::get_form_fields();
 
 		$custom_billing_fields = isset( $GLOBALS['wholesalex_registration_fields']['billing_fields'] ) ? $GLOBALS['wholesalex_registration_fields']['billing_fields'] : array();
 
@@ -3897,7 +3899,8 @@ class WHOLESALEX_Shortcodes {
 	public function add_custom_fields_on_order_meta( $order_id ) {
 
 		// Retrieve custom fields from global variables or other sources.
-		$__custom_fields = isset( $GLOBALS['wholesalex_registration_fields']['billing_fields'] ) ? $GLOBALS['wholesalex_registration_fields']['billing_fields'] : array();
+		$GLOBALS['wholesalex_registration_fields'] = WholesaleX_CommonUtils::get_form_fields();
+		$__custom_fields                           = isset( $GLOBALS['wholesalex_registration_fields']['billing_fields'] ) ? $GLOBALS['wholesalex_registration_fields']['billing_fields'] : array();
 
 		// Check if custom fields exist and are an array.
 		if ( ! empty( $__custom_fields ) && is_array( $__custom_fields ) ) {

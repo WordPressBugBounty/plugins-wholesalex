@@ -100,6 +100,7 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/durbin/class-xpo.php';
 		require_once WHOLESALEX_PATH . 'includes/deactive/class-deactive.php';
 		require_once WHOLESALEX_PATH . 'includes/notice/class-notice.php';
+		require_once WHOLESALEX_PATH . 'includes/class-wholesalex-common-utils.php';
 
 		new \WHOLESALEX\WHOLESALEX_Role();
 		new \WHOLESALEX\WHOLESALEX_Registration();
@@ -218,6 +219,9 @@ class WholesaleX_Initialization {
 						'register'    => __( 'Register', 'wholesalex' ),
 
 					),
+					'cart_url'           => wc_get_cart_url(),
+					'currency_pos'       => get_option( 'woocommerce_currency_pos', 'left' ),
+					'currency_symbol'    => get_woocommerce_currency_symbol(),
 
 				)
 			)

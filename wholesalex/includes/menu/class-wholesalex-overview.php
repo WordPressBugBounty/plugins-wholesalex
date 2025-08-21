@@ -9,6 +9,8 @@
 
 namespace WHOLESALEX;
 
+use WHOLESALEX\WholesaleX_CommonUtils;
+
 use DateTime;
 use WP_Query;
 use WP_User_Query;
@@ -884,8 +886,8 @@ class WHOLESALEX_Overview {
 			),
 		);
 
-		$form_data         = wholesalex()->get_new_form_builder_data();
-		$default_form_data = wholesalex()->get_empty_form();
+		$form_data         = WholesaleX_CommonUtils::get_new_form_builder_data();
+		$default_form_data = WholesaleX_CommonUtils::get_empty_form();
 		// regis end.
 
 		// User Roles.
