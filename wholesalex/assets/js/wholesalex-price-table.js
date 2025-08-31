@@ -1,12 +1,16 @@
 ( function ( $ ) {
 	$( document ).ready( function () {
+		if ( typeof wholesalexPriceTableData === 'undefined' ) {
+			return;
+		}
 		const $quantityInput = $( '[name=quantity]' );
-		const quantityPrices = wholesalexPriceTableData.quantityPrices || [];
-		const cartQuantity = wholesalexPriceTableData.cartQuantity || 0;
+		const quantityPrices = wholesalexPriceTableData?.quantityPrices || [];
+		const cartQuantity = wholesalexPriceTableData?.cartQuantity || 0;
 
 		function updatePricing() {
 			const quantity =
-				cartQuantity + parseInt( $quantityInput.val() ) || 1;
+				parseInt( cartQuantity ) + parseInt( $quantityInput.val() ) ||
+				1;
 			let matchedTier = null;
 			let matchedMin = 0;
 

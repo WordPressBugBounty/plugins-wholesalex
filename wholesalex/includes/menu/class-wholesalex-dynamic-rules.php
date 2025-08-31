@@ -352,7 +352,7 @@ class WHOLESALEX_Dynamic_Rules {
 								break;
 							}
 						} elseif ( 0 !== $user_id ) {
-								array_push( $valid_rules, $discount );
+							array_push( $valid_rules, $discount );
 						}
 						break;
 				}
@@ -2707,11 +2707,11 @@ class WHOLESALEX_Dynamic_Rules {
 				border: 1px solid <?php echo esc_attr( $table_border_color ); ?>;
 				margin-bottom: 40px;
 				font-size:
-					<?php echo esc_attr( $table_font_size ); ?> px;
+				<?php echo esc_attr( $table_font_size ); ?> px;
 				color:
-					<?php echo esc_attr( $table_text_color ); ?>;
+				<?php echo esc_attr( $table_text_color ); ?>;
 				border-radius:
-					<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px' ); ?>;
+				<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px' ); ?>;
 			}
 			@media (max-width: 768px) {
 				.wsx-table-overflow {
@@ -2727,11 +2727,11 @@ class WHOLESALEX_Dynamic_Rules {
 				font-weight: 600;
 				border-bottom: 1px solid <?php echo esc_attr( $table_border_color ); ?>;
 				color:
-					<?php echo esc_attr( $table_title_text_color ); ?>;
+				<?php echo esc_attr( $table_title_text_color ); ?>;
 				background-color:
-					<?php echo esc_attr( $table_title_bg_color ); ?>;
+				<?php echo esc_attr( $table_title_bg_color ); ?>;
 				border-radius:
-					<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px 8px 0 0' ); ?>;
+				<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px 8px 0 0' ); ?>;
 			}
 
 			.wsx-price-table-row {
@@ -2743,9 +2743,9 @@ class WHOLESALEX_Dynamic_Rules {
 
 			.wsx-price-table-row.active {
 				color:
-					<?php echo esc_attr( $table_active_text_color ); ?>;
+				<?php echo esc_attr( $table_active_text_color ); ?>;
 				background-color:
-					<?php echo esc_attr( $table_active_bg_color ); ?>;
+				<?php echo esc_attr( $table_active_bg_color ); ?>;
 			}
 
 			.wsx-price-table-row:last-child {
@@ -2786,7 +2786,7 @@ class WHOLESALEX_Dynamic_Rules {
 				border-right: 1px solid <?php echo esc_attr( $table_border_color ); ?>;
 				border-bottom: 0;
 				border-radius:
-					<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px 0 0 8px' ); ?>;
+				<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px 0 0 8px' ); ?>;
 			}
 
 			.layout-vertical .wsx-price-table-row {
@@ -2816,9 +2816,9 @@ class WHOLESALEX_Dynamic_Rules {
 				align-items: center;
 				padding: 12px;
 				background-color:
-					<?php echo esc_attr( $table_title_bg_color ); ?>;
+				<?php echo esc_attr( $table_title_bg_color ); ?>;
 				border-radius:
-					<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px' ); ?>;
+				<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px' ); ?>;
 				margin-bottom: 40px;
 				width: fit-content;
 			}
@@ -2844,29 +2844,29 @@ class WHOLESALEX_Dynamic_Rules {
 			.wsx-price-classical-text {
 				font-weight: 500;
 				font-size:
-					<?php echo esc_attr( $table_font_size ); ?> px;
+				<?php echo esc_attr( $table_font_size ); ?> px;
 				color:
-					<?php echo esc_attr( $table_title_text_color ); ?>;
+				<?php echo esc_attr( $table_title_text_color ); ?>;
 			}
 
 			.wsx-price-classical-tag {
 				padding: 0 6px;
 				font-size:
-					<?php echo esc_attr( $table_font_size - 4 ); ?> px;
+				<?php echo esc_attr( $table_font_size - 4 ); ?> px;
 				color:
-					<?php echo esc_attr( $table_discount_text_color ); ?>;
+				<?php echo esc_attr( $table_discount_text_color ); ?>;
 				background-color:
-					<?php echo esc_attr( $table_discount_bg_color ); ?>;
+				<?php echo esc_attr( $table_discount_bg_color ); ?>;
 				border-radius:
-					<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '2px' ); ?>;
+				<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '2px' ); ?>;
 			}
 
 			.wsx-price-classical-divider,
 			.wsx-price-classical-quantity {
 				color:
-					<?php echo esc_attr( $table_text_color ); ?>;
+				<?php echo esc_attr( $table_text_color ); ?>;
 				font-size:
-					<?php echo esc_attr( $table_font_size - 2 ); ?> px;
+				<?php echo esc_attr( $table_font_size - 2 ); ?> px;
 			}
 
 			.wsx-quantities {
@@ -2878,7 +2878,7 @@ class WHOLESALEX_Dynamic_Rules {
 			.active .wsx-price-classical-divider,
 			.active .wsx-price-classical-quantity {
 				color:
-					<?php echo esc_attr( $table_active_text_color ); ?>;
+				<?php echo esc_attr( $table_active_text_color ); ?>;
 			}
 
 			.wsx-price-classical-overlay {
@@ -2890,9 +2890,9 @@ class WHOLESALEX_Dynamic_Rules {
 				left: -8px;
 				right: 12px;
 				background-color:
-					<?php echo esc_attr( $table_active_bg_color ); ?>;
+				<?php echo esc_attr( $table_active_bg_color ); ?>;
 				border-radius:
-					<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px' ); ?>;
+				<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '8px' ); ?>;
 			}
 
 			/* Layout three */
@@ -2905,12 +2905,12 @@ class WHOLESALEX_Dynamic_Rules {
 			.layout-vertical .wsx-price-classical-item {
 				padding: 8px 12px;
 				border-radius:
-					<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '4px' ); ?>;
+				<?php echo esc_attr( ( 'no' === $is_table_radius ) ? '0' : '4px' ); ?>;
 			}
 
 			.layout-vertical .wsx-price-classical-item.active {
 				background-color:
-					<?php echo esc_attr( $table_active_bg_color ); ?>;
+				<?php echo esc_attr( $table_active_bg_color ); ?>;
 			}
 
 			.layout-vertical .wsx-price-classical-content {
@@ -3082,22 +3082,22 @@ class WHOLESALEX_Dynamic_Rules {
 				<div class="wsx-price-table-container wsx-scrollbar wsx-table-overflow <?php echo 'layout_six' === $tier_layout ? 'layout-vertical' : ''; ?>">
 					<div class="wsx-price-table-header">
 						<div class="wsx-price-table-row">
-							<?php
-							foreach ( $table_column_priority as $column ) {
-								if ( isset( $column['status'] ) && ( 'yes' === $column['status'] || $column['status'] ) ) {
-									?>
+						<?php
+						foreach ( $table_column_priority as $column ) {
+							if ( isset( $column['status'] ) && ( 'yes' === $column['status'] || $column['status'] ) ) {
+								?>
 									<div class="wsx-tooltip wsx-tooltip-global wsx-price-table-cell">
 										<div class="wsx-ellipsis">
-											<?php echo esc_html( $column['value'] ); ?>
+										<?php echo esc_html( $column['value'] ); ?>
 										</div>
 										<div class="wsx-tooltip-content wsx-font-regular top wsx-text-center" style="margin-bottom: -16px;">
-											<?php echo esc_html( $column['value'] ); ?>
+										<?php echo esc_html( $column['value'] ); ?>
 										</div>
 									</div>
 									<?php
-								}
 							}
-							?>
+						}
+						?>
 						</div>
 					</div>
 					<div class="wsx-price-table-body">
@@ -3174,11 +3174,8 @@ class WHOLESALEX_Dynamic_Rules {
 						}
 						?>
 					</div>
-
-
-				
 					</div>
-				<?php
+					<?php
 					wp_localize_script(
 						'wholesalex_price_table',
 						'wholesalexPriceTableData',
@@ -3189,6 +3186,78 @@ class WHOLESALEX_Dynamic_Rules {
 					);
 				break;
 
+			case 'layout_two':
+			case 'layout_three':
+				$__show_discount_amount = apply_filters( 'wholesalex_tier_layout_two_show_discount_amount', true );
+				?>
+				<div class="wsx-price-container-title"><?php echo esc_html( $table_label ); ?></div>
+				<div class="wsx-price-classical-container <?php echo 'layout_three' === $tier_layout ? 'layout-vertical' : ''; ?>">
+				<?php
+				$__tier_size = count( $quantity_prices );
+				for ( $i = 0; $i < $__tier_size; $i++ ) {
+					$__current_tier = $quantity_prices[ $i ];
+					$__next_tier    = '';
+					if ( ( $__tier_size ) - 1 !== $i ) {
+						$__next_tier = $quantity_prices[ $i + 1 ];
+					}
+
+					$__sale_price = wholesalex()->calculate_sale_price( $__current_tier, floatval( $regular_price ) );
+					$__discount   = floatval( $regular_price ) - floatval( $__sale_price );
+
+					$__sale_price = wc_get_price_to_display( $product, array( 'price' => $__sale_price ) );
+
+					$__quantities = '';
+
+					if ( isset( $__current_tier['_min_quantity'] ) ) {
+						if ( ! empty( $__next_tier ) ) {
+
+							if ( $__current_tier['_min_quantity'] === $__next_tier['_min_quantity'] ) {
+								$__quantities = $__current_tier['_min_quantity'];
+							} else {
+								$__quantities = $__current_tier['_min_quantity'] . '-' . ( (int) $__next_tier['_min_quantity'] - 1 );
+							}
+						} else {
+							$__quantities = $__current_tier['_min_quantity'] . '+';
+						}
+					}
+
+					?>
+						<div
+							class="wsx-price-classical-item <?php echo esc_attr( ( ! empty( $__current_tier['_id'] ) && $__current_tier['_id'] == $active_tier ) ? 'active' : '' ); ?>">
+							<div class="wsx-price-classical-content">
+								<div class="wsx-price-classical-price">
+								<?php
+								if ( $__show_discount_amount && 'layout_three' !== $tier_layout ) {
+									echo '<div class="wsx-price-classical-text">' . wp_kses_post( $__wc_currency . ' ' . wc_price( $__sale_price ) . '</div><div class="wsx-price-classical-tag">' . -round( ( (float) $__discount / (float) $regular_price ) * 100.00, 2 ) . '% </div>' );
+								} else {
+									echo '<div class="wsx-price-classical-text">' . wp_kses_post( $__wc_currency . ' ' . wc_price( $__sale_price ) . '</div>' );
+								}
+								?>
+								</div>
+								<?php
+								if ( $__show_discount_amount && 'layout_three' === $tier_layout ) {
+									echo '<div class="wsx-price-classical-divider">/</div>';
+								}
+								?>
+								<div class="wsx-price-classical-quantity">
+									<span class="wsx-quantities">
+									<?php echo esc_html( $__quantities ); ?>
+									</span>
+									<span class="wsx-quantity-text">
+									<?php esc_html_e( 'Pieces', 'wholesalex' ); ?>
+									</span>
+								</div>
+								<?php if ( esc_attr( ( isset( $__current_tier['_id'] ) && $__current_tier['_id'] == $active_tier ) ) && 'layout_three' !== $tier_layout ) { ?>
+									<div class="wsx-price-classical-overlay"></div>
+								<?php } ?>
+							</div>
+						</div>
+						<?php
+				}
+				?>
+				</div>
+				<?php
+				break;
 			default:
 				// code...
 				break;
@@ -3196,7 +3265,7 @@ class WHOLESALEX_Dynamic_Rules {
 
 		?>
 
-		<?php
+			<?php
 	}
 
 	/**
@@ -3565,7 +3634,6 @@ class WHOLESALEX_Dynamic_Rules {
 		WC()->session->set( '__wholesalex_discounted_products', array() );
 	}
 
-
 	/**
 	 * Reset Wholesale Discount Product on Cart update.
 	 *
@@ -3718,7 +3786,6 @@ class WHOLESALEX_Dynamic_Rules {
 		$__product    = wc_get_product( $__product_id );
 		return $__product->get_sale_price();
 	}
-
 
 	/**
 	 * Modify ProductX Query to exclude hidden product ids
@@ -4754,7 +4821,6 @@ class WHOLESALEX_Dynamic_Rules {
 		}
 	}
 
-
 	/**
 	 * Buy X Get Y Free Items Templates for Single Product Page.
 	 *
@@ -5262,7 +5328,6 @@ class WHOLESALEX_Dynamic_Rules {
 		// If they are not equal, return -1 or 1 depending on which is smaller.
 		return ( $a['applied_on_priority'] < $b['applied_on_priority'] ) ? -1 : 1;
 	}
-
 
 	/**
 	 * Handle Tax Related Rules and Other Stuffs.
@@ -5853,8 +5918,6 @@ class WHOLESALEX_Dynamic_Rules {
 			<?php
 		}
 	}
-
-
 
 	/**
 	 * Generate HTML Markup For Showing Badge.
@@ -6619,7 +6682,6 @@ class WHOLESALEX_Dynamic_Rules {
 		return $price;
 	}
 
-
 	/**
 	 * Handle Discounts
 	 *
@@ -7325,8 +7387,6 @@ class WHOLESALEX_Dynamic_Rules {
 		return $allowed_methods;
 	}
 
-
-
 	/**
 	 * Check is given product is eligible for discount
 	 *
@@ -7430,7 +7490,6 @@ class WHOLESALEX_Dynamic_Rules {
 		}
 		return $res;
 	}
-
 
 	/**
 	 * Undocumented function
@@ -7862,7 +7921,6 @@ class WHOLESALEX_Dynamic_Rules {
 
 		return $sale_price && 0.00 !== (float) $sale_price ? $sale_price : $previous_sp;
 	}
-
 
 	/**
 	 * Apply Login to View Prices

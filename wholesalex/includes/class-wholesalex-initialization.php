@@ -222,6 +222,7 @@ class WholesaleX_Initialization {
 					'cart_url'           => wc_get_cart_url(),
 					'currency_pos'       => get_option( 'woocommerce_currency_pos', 'left' ),
 					'currency_symbol'    => get_woocommerce_currency_symbol(),
+					'is_required'        => __( 'is required', 'wholesalex' ),
 
 				)
 			)

@@ -908,7 +908,7 @@ class WHOLESALEX_Shortcodes {
 
 						if (!fieldValue) {
 							isValid = false;
-							wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} is required!`);
+							wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
 							wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
 
 						} else {
@@ -1001,7 +1001,7 @@ class WHOLESALEX_Shortcodes {
 							
 							if(wrapper.find(`.wsx-field-${fieldName}`).css('display') !== 'none') {
 									isValid = false;
-									wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} is required!`);
+									wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
 									wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
 							}
 						} else {
@@ -1024,7 +1024,7 @@ class WHOLESALEX_Shortcodes {
 							if (checkboxes.length > 0 && checkboxes.filter(":checked").length === 0) {
 								isValid = false;
 								
-								wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} is required!`);
+								wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')}${wholesalex.is_required}!`);
 								wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
 
 							} else {
@@ -1050,7 +1050,7 @@ class WHOLESALEX_Shortcodes {
 							if (checkboxes.length > 0 && checkboxes.filter(":checked").length === 0) {
 								isValid = false;
 								
-								$(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} is required!`);
+								$(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
 								$(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
 
 							} else {
@@ -1081,7 +1081,7 @@ class WHOLESALEX_Shortcodes {
 							
 							if($(`.wsx-field-${fieldName}`).css('display') !== 'none') {
 								isValid = false;
-								$(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} is required!`);
+								$(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
 								$(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
 							}
 						} else {
