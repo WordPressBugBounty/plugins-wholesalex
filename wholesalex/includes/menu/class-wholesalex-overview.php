@@ -920,7 +920,8 @@ class WHOLESALEX_Overview {
 						'wsx_wizard_setting_url'           => menu_page_url( 'wholesalex-settings', false ) ? menu_page_url( 'wholesalex-settings', false ) : get_dashboard_url(),
 						'wsx_wizard_dashboard_url'         => menu_page_url( 'wholesalex', false ) ? menu_page_url( 'wholesalex', false ) : get_dashboard_url(),
 						'wsx_wizard_site_name'             => get_bloginfo( 'name' ),
-						'wsx_wizard___wholesalex_initial_setup' => get_option( '__wholesalex_initial_setup', false ),
+						// 'wsx_wizard___wholesalex_initial_setup' => get_option( '__wholesalex_initial_setup', false ),
+						'wsx_wizard___wholesalex_initial_setup' => 1,
 						'wsx_wizard_woocommer_installed'   => file_exists( WP_PLUGIN_DIR . '/woocommerce/woocommerce.php' ),
 						'wsx_wizard_productx_installed'    => file_exists( WP_PLUGIN_DIR . '/product-blocks/product-blocks.php' ),
 						/**

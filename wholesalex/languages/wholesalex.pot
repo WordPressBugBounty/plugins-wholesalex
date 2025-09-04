@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
-"Project-Id-Version: WholesaleX 2.1.9\n"
+"Project-Id-Version: WholesaleX 2.1.10\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wholesalex\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-08-31T03:47:59+00:00\n"
+"POT-Creation-Date: 2025-09-04T02:50:33+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wholesalex\n"
@@ -1024,7 +1024,7 @@ msgstr ""
 #: includes/export/class-wholesalex-dynamic-rule-exporter.php:48
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:255
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:339
-#: includes/menu/class-wholesalex-overview.php:1069
+#: includes/menu/class-wholesalex-overview.php:1070
 #: includes/menu/class-wholesalex-users.php:459
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:4
@@ -2569,104 +2569,104 @@ msgstr ""
 msgid "New Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:967
+#: includes/menu/class-wholesalex-overview.php:968
 #: includes/menu/class-wholesalex-users.php:192
 #: assets/js/whx_conversation.js:4196
 #: assets/js/whx_overview.js:4
 msgid "Select Status"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:990
+#: includes/menu/class-wholesalex-overview.php:991
 #: includes/menu/class-wholesalex-registration.php:205
 msgid "No Mapping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:991
+#: includes/menu/class-wholesalex-overview.php:992
 msgid "Billing\tFirst Name"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:992
+#: includes/menu/class-wholesalex-overview.php:993
 msgid "Billing\tLast Name"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:993
+#: includes/menu/class-wholesalex-overview.php:994
 msgid "Billing\tCompany"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:994
+#: includes/menu/class-wholesalex-overview.php:995
 msgid "Billing\tAddress\t1"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:995
+#: includes/menu/class-wholesalex-overview.php:996
 msgid "Billing\tAddress\t2"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:996
+#: includes/menu/class-wholesalex-overview.php:997
 msgid "Billing\tCity"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:997
+#: includes/menu/class-wholesalex-overview.php:998
 msgid "Billing\tPost Code"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:998
+#: includes/menu/class-wholesalex-overview.php:999
 msgid "Billing\tCountry"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:999
+#: includes/menu/class-wholesalex-overview.php:1000
 msgid "Billing\tState"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1000
+#: includes/menu/class-wholesalex-overview.php:1001
 msgid "Billing\tEmail"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1001
+#: includes/menu/class-wholesalex-overview.php:1002
 msgid "Billing\tPhone"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1002
+#: includes/menu/class-wholesalex-overview.php:1003
 msgid "Custom User\tMeta Mapping"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1043
-#: includes/menu/class-wholesalex-overview.php:1085
+#: includes/menu/class-wholesalex-overview.php:1044
+#: includes/menu/class-wholesalex-overview.php:1086
 msgid "Name and Email"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1044
+#: includes/menu/class-wholesalex-overview.php:1045
 msgid "Wallet Balance"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1045
+#: includes/menu/class-wholesalex-overview.php:1046
 msgid "Total Purchase"
 msgstr ""
 
 #. translators: %s - Plugin Name
-#: includes/menu/class-wholesalex-overview.php:1047
+#: includes/menu/class-wholesalex-overview.php:1048
 #: includes/menu/class-wholesalex-profile.php:381
 #: includes/menu/class-wholesalex-profile.php:1166
 msgid "%s Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1066
+#: includes/menu/class-wholesalex-overview.php:1067
 msgid "Order ID"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1067
+#: includes/menu/class-wholesalex-overview.php:1068
 #: includes/menu/class-wholesalex-role.php:424
 #: includes/menu/class-wholesalex-role.php:425
 msgid "Name"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1068
+#: includes/menu/class-wholesalex-overview.php:1069
 #: includes/menu/class-wholesalex-request-role-change.php:469
 #: includes/menu/class-wholesalex-users.php:457
 msgid "Date"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1070
-#: includes/menu/class-wholesalex-overview.php:1088
+#: includes/menu/class-wholesalex-overview.php:1071
+#: includes/menu/class-wholesalex-overview.php:1089
 #: includes/menu/class-wholesalex-request-role-change.php:476
 #: includes/menu/class-wholesalex-users.php:465
 #: assets/js/whx_overview.js:1
@@ -2674,15 +2674,15 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1086
+#: includes/menu/class-wholesalex-overview.php:1087
 msgid "Regi. Date"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1087
+#: includes/menu/class-wholesalex-overview.php:1088
 msgid "Regi. Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:1146
+#: includes/menu/class-wholesalex-overview.php:1147
 #: assets/js/wholesalex_components.js:1
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_product.js:1527
@@ -6272,10 +6272,6 @@ msgstr ""
 
 #: assets/js/whx_overview.js:4
 msgid "Selected Users"
-msgstr ""
-
-#: assets/js/whx_parent_approval_gateway.js:1
-msgid "Sent to Parent Account For Approval"
 msgstr ""
 
 #: assets/js/whx_wallet_gateway.js:202
