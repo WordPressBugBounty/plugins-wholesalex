@@ -278,168 +278,6 @@ class WHOLESALEX_Dynamic_Rules {
 	}
 
 	/**
-	 * Get Valid Dynamic Rules
-	 *
-	 * @param int $user_id The user ID.
-	 * @since 1.0.0
-	 */
-	public function get_all_discounts( $user_id = '' ) {
-		if ( '' !== $user_id ) {
-			$user_id = get_current_user_id();
-		}
-
-		$this->rulewise_filtered_products = array();
-
-		$user_role = wholesalex()->get_user_role( $user_id );
-
-		$dynamic_rules = wholesalex()->get_dynamic_rules();
-		if ( ! is_array( $dynamic_rules ) ) {
-			return array();
-		}
-
-		$valid_rules = array();
-
-		$valid_product_filters = array( 'all_products', 'products_in_list', 'products_not_in_list', 'cat_in_list', 'cat_not_in_list', 'attribute_in_list', 'attribute_not_in_list' );
-
-		foreach ( $dynamic_rules as $discount ) {
-			if ( isset( $discount['_rule_status'], $discount['_rule_for'], $discount['_product_filter'], $discount['_rule_type'], $discount[ $discount['_rule_type'] ] ) && $discount['_rule_status'] && in_array( $discount['_product_filter'], $valid_product_filters ) ) {
-
-				$product_filter_data = array(
-					$discount['_product_filter'] => array(),
-				);
-
-				if ( isset( $discount['limit'] ) && ! empty( $discount['limit'] ) ) {
-					if ( ! self::has_limit( $discount['limit'] ) ) {
-						continue;
-					}
-				}
-
-				$__role_for = $discount['_rule_for'];
-				switch ( $__role_for ) {
-					case 'specific_roles':
-						foreach ( $discount['specific_roles'] as $role ) {
-							// Check The Discounts Rules In Valid or not.
-							if ( (string) $role['value'] === (string) $user_role || 'role_' . $user_role === $role['value'] ) {
-								array_push( $valid_rules, $discount );
-								break;
-							}
-						}
-						break;
-					case 'specific_users':
-						foreach ( $discount['specific_users'] as $user ) {
-							if ( ( is_numeric( $user['value'] ) && (int) $user['value'] === (int) $user_id ) || 'user_' . $user_id === $user['value'] ) {
-								array_push( $valid_rules, $discount );
-								break;
-							}
-						}
-						break;
-					case 'all_roles':
-						$__exclude_roles = apply_filters( 'wholesalex_dynamic_rules_exclude_roles', array( 'wholesalex_guest', 'wholesalex_b2c_users' ) );
-						if ( is_array( $__exclude_roles ) && ! empty( $__exclude_roles ) ) {
-							if (!in_array($user_role, $__exclude_roles)) { //phpcs:ignore
-								array_push( $valid_rules, $discount );
-								break;
-							}
-						} else {
-							array_push( $valid_rules, $discount );
-						}
-						break;
-					case 'all_users':
-						$__exclude_users = apply_filters( 'wholesalex_dynamic_rules_exclude_users', array() );
-						if ( is_array( $__exclude_users ) && ! empty( $__exclude_users ) ) {
-							if (!in_array($user_id, $__exclude_users)) { //phpcs:ignore
-								array_push( $valid_rules, $discount );
-								break;
-							}
-						} elseif ( 0 !== $user_id ) {
-							array_push( $valid_rules, $discount );
-						}
-						break;
-				}
-
-				switch ( $discount['_product_filter'] ) {
-					case 'all_products':
-						$product_filter_data['all_products'] = true;
-						break;
-					case 'products_in_list':
-						if ( ! isset( $discount['products_in_list'] ) ) {
-							break;
-						}
-						foreach ( $discount['products_in_list'] as $list ) {
-							if ( ! isset( $list['value'] ) ) {
-								continue;
-							}
-							$product_filter_data['products_in_list'][] = $list['value'];
-						}
-						break;
-					case 'products_not_in_list':
-						if ( ! isset( $discount['products_not_in_list'] ) ) {
-							break;
-						}
-						foreach ( $discount['products_not_in_list'] as $list ) {
-							if ( ! isset( $list['value'] ) ) {
-								continue;
-							}
-							$product_filter_data['products_not_in_list'][] = $list['value'];
-						}
-
-						break;
-					case 'cat_in_list':
-						if ( ! isset( $discount['cat_in_list'] ) ) {
-							break;
-						}
-						foreach ( $discount['cat_in_list'] as $list ) {
-							if ( ! isset( $list['value'] ) ) {
-								continue;
-							}
-							$product_filter_data['cat_in_list'][] = $list['value'];
-						}
-
-						break;
-
-					case 'cat_not_in_list':
-						if ( ! isset( $discount['cat_not_in_list'] ) ) {
-							break;
-						}
-						foreach ( $discount['cat_not_in_list'] as $list ) {
-							if ( ! isset( $list['value'] ) ) {
-								continue;
-							}
-							$product_filter_data['cat_not_in_list'][] = $list['value'];
-						}
-						break;
-					case 'attribute_in_list':
-						if ( ! isset( $discount['attribute_in_list'] ) ) {
-							break;
-						}
-						foreach ( $discount['attribute_in_list'] as $list ) {
-							if ( ! isset( $list['value'] ) ) {
-								continue;
-							}
-							$product_filter_data['attribute_in_list'][] = $list['value'];
-						}
-
-						break;
-					case 'attribute_not_in_list':
-						if ( ! isset( $discount['attribute_not_in_list'] ) ) {
-							break;
-						}
-						foreach ( $discount['attribute_not_in_list'] as $list ) {
-							if ( ! isset( $list['value'] ) ) {
-								continue;
-							}
-							$product_filter_data['attribute_not_in_list'][] = $list['value'];
-						}
-						break;
-				}
-
-				$this->rulewise_filtered_products[ $discount['id'] ] = $product_filter_data;
-			}
-		}
-		return $valid_rules;
-	}
-
-	/**
 	 * Apply WholesaleX Discount By WooCommerce Filter
 	 *
 	 * @param string $sale_price_generator WholesaleX Sale Price Generator.
@@ -661,256 +499,6 @@ class WHOLESALEX_Dynamic_Rules {
 			return $sale_price;
 		}
 	}
-	/**
-	 * Dynamic Rule Discounts
-	 *
-	 * @param mixed      $sale_price Sale Price.
-	 * @param WC_Product $product Product.
-	 * @return mixed Sale Price.
-	 * @since 1.0.0
-	 * @since 1.0.4 Set Initial Sale Price to Session Added.
-	 */
-	public function dynamic_rule_discounts( $sale_price, $product ) {
-		/**
-		 * Initial Sale Price Added to session For Further Processing
-		 *
-		 * @since 1.0.4
-		 */
-		$this->set_initial_sale_price_to_session( __FUNCTION__, $product->get_id(), $sale_price );
-
-		$__override_sale_price = false;
-		$__user_id             = apply_filters( 'wholesalex_set_current_user', get_current_user_id() );
-
-		/**
-		 * Activation Status Check if user is logged in
-		 *
-		 * @since 1.0.10
-		 */
-		/**
-		 * User activation status will be check only if plugin mode is b2b
-		 *
-		 * @since 1.2.4
-		 */
-		if ( is_user_logged_in() ) {
-			$plugins_status = wholesalex()->get_setting( '_settings_status', 'b2b' );
-			if ( 'b2b' === $plugins_status ) {
-				if ( ! ( $__user_id && 'active' === wholesalex()->get_user_status( $__user_id ) ) ) {
-					if ( empty( $sale_price ) ) {
-						return;
-					} else {
-						return $sale_price;
-					}
-				}
-			}
-		}
-
-		delete_transient( 'wholesalex_pricing_tiers_dynamic_rule_' . $__user_id );
-
-		$__discounts = $this->get_all_discounts( $__user_id );
-		$__role      = wholesalex()->get_current_user_role();
-
-		if ( empty( $__discounts ) ) {
-			if ( empty( $sale_price ) ) {
-				return;
-			} else {
-
-				return $sale_price;
-			}
-		}
-
-		$__discounts_for_me = array();
-
-		foreach ( $__discounts as $discount ) {
-			$__has_discount  = false;
-			$__product_id    = $product->get_id();
-			$__parent_id     = $product->get_parent_id();
-			$__cat_ids       = wc_get_product_term_ids( 0 === $__parent_id ? $__product_id : $__parent_id, 'product_cat' );
-			$__regular_price = $product->get_regular_price();
-			$__for           = '';
-			$__src_id        = '';
-
-			if ( isset( $discount['_rule_status'] ) && $discount['_rule_status'] && ! empty( $discount['_rule_status'] ) && isset( $discount['_product_filter'] ) ) {
-				switch ( $discount['_product_filter'] ) {
-					case 'all_products':
-						$__has_discount = true;
-						$__for          = 'all_products';
-						$__src_id       = -1;
-						break;
-					case 'products_in_list':
-						if ( ! isset( $discount['products_in_list'] ) ) {
-							break;
-						}
-						foreach ( $discount['products_in_list'] as $list ) {
-							if ( ! isset( $list['value'] ) ) {
-								continue;
-							}
-							if ( (int) $__product_id === (int) $list['value'] || (int) $__parent_id === (int) $list['value'] ) {
-								$__has_discount = true;
-								$__for          = 'product';
-								$__src_id       = $__product_id;
-								break;
-							}
-						}
-						break;
-					case 'products_not_in_list':
-						if ( ! isset( $discount['products_not_in_list'] ) ) {
-							break;
-						}
-						$__flag = true;
-						foreach ( $discount['products_not_in_list'] as $list ) {
-							if ( isset( $list['value'] ) && ( (int) $__product_id === (int) $list['value'] || (int) $__parent_id === (int) $list['value'] ) ) {
-								$__flag = false;
-							}
-						}
-						if ( $__flag ) {
-							$__has_discount = true;
-							$__for          = 'product';
-							$__src_id       = $__product_id;
-						}
-						break;
-					case 'cat_in_list':
-						if ( ! isset( $discount['cat_in_list'] ) ) {
-							break;
-						}
-						foreach ( $discount['cat_in_list'] as $list ) {
-							if (in_array($list['value'], $__cat_ids)) { //phpcs:ignore
-								$__has_discount = true;
-								$__for          = 'cat';
-								$__src_id       = $list['value'];
-								break;
-							}
-						}
-
-						break;
-
-					case 'cat_not_in_list':
-						if ( ! isset( $discount['cat_not_in_list'] ) ) {
-							break;
-						}
-						$__flag = true;
-						foreach ( $discount['cat_not_in_list'] as $list ) {
-							if (in_array($list['value'], $__cat_ids)) { //phpcs:ignore
-								$__flag = false;
-							}
-						}
-						if ( $__flag ) {
-							$__has_discount = true;
-							$__for          = 'cat';
-							$__src_id       = isset( $__cat_ids[0] ) ? $__cat_ids[0] : 0;
-						}
-						break;
-					case 'attribute_in_list':
-						if ( ! isset( $discount['attribute_in_list'] ) ) {
-							break;
-						}
-						if ( 'product_variation' === $product->post_type ) {
-							foreach ( $discount['attribute_in_list'] as $list ) {
-								if ( isset( $list['value'] ) && (int) $__product_id === (int) $list['value'] ) {
-									$__has_discount = true;
-									$__for          = 'variation';
-									$__src_id       = $__product_id;
-									break;
-								}
-							}
-						}
-						break;
-					case 'attribute_not_in_list':
-						if ( ! isset( $discount['attribute_not_in_list'] ) ) {
-							break;
-						}
-						if ( 'product_variation' === $product->post_type ) {
-							$__flag = true;
-							foreach ( $discount['attribute_not_in_list'] as $list ) {
-								if ( isset( $list['value'] ) && (int) $__product_id === (int) $list['value'] ) {
-									$__flag = false;
-								}
-							}
-							if ( $__flag ) {
-								$__has_discount = true;
-								$__for          = 'variation';
-								$__src_id       = $__product_id;
-							}
-						}
-						break;
-				}
-			}
-
-			if ( ! $__has_discount ) {
-				continue;
-			}
-			if ( isset( $discount['limit'] ) && ! empty( $discount['limit'] ) ) {
-				if ( ! self::has_limit( $discount['limit'] ) ) {
-					continue;
-				}
-			}
-
-			if ( ! isset( $discount['_rule_for'] ) ) {
-				continue;
-			}
-
-			if ( isset( $discount['conditions']['tiers'] ) ) {
-				$__conditions = $discount['conditions'];
-				if ( ! self::is_conditions_fullfiled( $__conditions['tiers'], null ) ) {
-					continue;
-				}
-			}
-
-			if ( ! isset( $discount['_rule_type'] ) || ! isset( $discount[ $discount['_rule_type'] ] ) ) {
-				continue;
-			}
-
-			switch ( $discount['_rule_type'] ) {
-				case 'quantity_based':
-					if ( ! isset( $discount['quantity_based']['tiers'] ) ) {
-						break;
-					}
-
-					$data = apply_filters(
-						'wholesalex_dynamic_rule_quantity_based_action',
-						array(
-							'id'            => $discount['id'],
-							'tiers'         => $discount['quantity_based']['tiers'],
-							'product_id'    => $__product_id,
-							'cat_ids'       => $__cat_ids,
-							'regular_price' => $__regular_price,
-							'for'           => $__for,
-							'src_id'        => $__src_id,
-						)
-					);
-					if ( isset( $data['override_sale_price'] ) && $data['override_sale_price'] ) {
-						$__override_sale_price = true;
-					}
-					if ( isset( $data['active_tier_id'] ) ) {
-						$this->active_tier_id = $data['active_tier_id'];
-					}
-					if ( isset( $data['sale_price'] ) ) {
-						$sale_price = $data['sale_price'];
-					}
-
-					break;
-				case 'extra_charge':
-					delete_transient( 'wholesalex_profile_payment_gateways_' . $__user_id );
-
-					$__discounts = $discount['extra_charge'];
-					$__rule_id   = $discount['id'];
-
-					do_action( 'wholesalex_dynamic_rules_extra_charge_action', $discount['extra_charge'], $discount['id'], $__product_id );
-
-					break;
-			}
-		}
-
-		if ( $__override_sale_price ) {
-			$this->discount_src = 'dynamic_rule';
-		}
-
-		if ( empty( $sale_price ) ) {
-			return;
-		} else {
-			$this->set_discounted_product( $__product_id );
-			return $sale_price;
-		}
-	}
 
 	/**
 	 * Dynamic Rules Bulk Action Rest Api
@@ -1106,6 +694,12 @@ class WHOLESALEX_Dynamic_Rules {
 					break;
 				case 'get_categories':
 					wp_send_json( $this->get_categories( $query ) );
+					break;
+				case 'get_brands':
+					wp_send_json( $this->get_brands( $query ) );
+					break;
+				case 'get_attributes':
+					wp_send_json( $this->get_attributes( $query ) );
 					break;
 				case 'get_variation_products':
 					if ( current_user_can( 'manage_options' ) ) {
@@ -1392,6 +986,72 @@ class WHOLESALEX_Dynamic_Rules {
 		return array(
 			'status' => true,
 			'data'   => $categories_options,
+		);
+	}
+
+	/**
+	 * Get Brands
+	 *
+	 * @param string $query Search Query.
+	 * @return array
+	 */
+	public function get_brands( $query = '' ) {
+		$args = array(
+			'taxonomy'   => array( 'product_brand' ),
+			'orderby'    => 'id',
+			'order'      => 'ASC',
+			'hide_empty' => true,
+			'fields'     => 'all',
+			'name__like' => $query,
+		);
+
+		$brands         = get_terms( $args );
+		$brands_options = array();
+
+		foreach ( $brands as $brand ) {
+			$permalink        = get_term_link( $brand );
+			$brands_options[] = array(
+				'value'     => strval( $brand->term_id ),
+				'name'      => $brand->name,
+				'permalink' => esc_url( $permalink ),
+			);
+		}
+
+		return array(
+			'status' => true,
+			'data'   => $brands_options,
+		);
+	}
+
+	/**
+	 * Get Attributes
+	 *
+	 * @param string $query Search Query.
+	 * @return array
+	 */
+	public function get_attributes( $query = '' ) {
+		// Get all registered WooCommerce product attributes.
+		$attributes         = wc_get_attribute_taxonomies();
+		$attributes_options = array();
+
+		if ( ! empty( $attributes ) ) {
+			foreach ( $attributes as $attribute ) {
+				if ( ! empty( $query ) && stripos( $attribute->attribute_label, $query ) === false ) {
+					continue;
+				}
+
+				$attributes_options[] = array(
+					'value' => strval( $attribute->attribute_id ),
+					'name'  => $attribute->attribute_label,
+					'slug'  => $attribute->attribute_name,
+					'type'  => $attribute->attribute_type,
+				);
+			}
+		}
+
+		return array(
+			'status' => true,
+			'data'   => $attributes_options,
 		);
 	}
 
@@ -1714,7 +1374,7 @@ class WHOLESALEX_Dynamic_Rules {
 											'shipping_rule' => __( 'Shipping Rule', 'wholesalex' ),
 											'min_order_qty' => __( 'Minimum Order Quantity', 'wholesalex' ),
 											'tax_rule' => __( 'Tax Rule', 'wholesalex' ),
-											'pro_restrict_checkout' => __( 'Checkout Restriction', 'wholesalex' ),
+											'pro_restrict_checkout' => __( 'Checkout Restriction (Pro)', 'wholesalex' ),
 											'pro_quantity_based' => __( 'Quantity Based Discount (Pro)', 'wholesalex' ),
 											'pro_extra_charge' => __( 'Extra Charge (Pro)', 'wholesalex' ),
 											'pro_buy_x_get_y' => __( 'Buy X Get Y Free (Pro)', 'wholesalex' ),
@@ -1816,8 +1476,12 @@ class WHOLESALEX_Dynamic_Rules {
 											'products_not_in_list' => __( 'Product not in list', 'wholesalex' ),
 											'cat_in_list'  => __( 'Categories in list', 'wholesalex' ),
 											'cat_not_in_list' => __( 'Categories not in list', 'wholesalex' ),
-											'attribute_in_list' => __( 'Attribute in list', 'wholesalex' ),
-											'attribute_not_in_list' => __( 'Attribute not in list', 'wholesalex' ),
+											'attribute_in_list' => __( 'Variations in list', 'wholesalex' ),
+											'attribute_not_in_list' => __( 'Variations not in list', 'wholesalex' ),
+											'pro_brand_in_list' => __( 'Brand in list (Pro)', 'wholesalex' ),
+											'pro_brand_not_in_list' => __( 'Brand not in list (Pro)', 'wholesalex' ),
+											'pro_att_in_list'  => __( 'Attribute in list (Pro)', 'wholesalex' ),
+											'pro_att_not_in_list' => __( 'Attribute not in list (Pro)', 'wholesalex' ),
 										),
 										'product_filter'
 									),
@@ -1888,7 +1552,7 @@ class WHOLESALEX_Dynamic_Rules {
 									'ajax_search' => true,
 								),
 								'attribute_in_list'     => array(
-									'label'       => __( 'Select Multiple Attributes', 'wholesalex' ),
+									'label'       => __( 'Select Multiple Variations', 'wholesalex' ),
 									'type'        => 'multiselect',
 									'depends_on'  => array(
 										array(
@@ -1904,7 +1568,7 @@ class WHOLESALEX_Dynamic_Rules {
 									'ajax_search' => true,
 								),
 								'attribute_not_in_list' => array(
-									'label'       => __( 'Select Multiple Attributes', 'wholesalex' ),
+									'label'       => __( 'Select Multiple Variations', 'wholesalex' ),
 									'type'        => 'multiselect',
 									'depends_on'  => array(
 										array(
@@ -1917,6 +1581,70 @@ class WHOLESALEX_Dynamic_Rules {
 									'default'     => array(),
 									'is_ajax'     => true,
 									'ajax_action' => 'get_variation_products',
+									'ajax_search' => true,
+								),
+								'brand_in_list'         => array(
+									'label'       => __( 'Select Multiple Brands', 'wholesalex' ),
+									'type'        => 'multiselect',
+									'depends_on'  => array(
+										array(
+											'key'   => '_product_filter',
+											'value' => 'brand_in_list',
+										),
+									),
+									'options'     => array(),
+									'placeholder' => apply_filters( 'wholesalex_dynamic_rules_brand_in_list_placeholder', __( 'Choose Brands to apply discounts', 'wholesalex' ) ),
+									'default'     => array(),
+									'is_ajax'     => true,
+									'ajax_action' => 'get_brands',
+									'ajax_search' => true,
+								),
+								'brand_not_in_list'     => array(
+									'label'       => __( 'Select Multiple Brands', 'wholesalex' ),
+									'type'        => 'multiselect',
+									'depends_on'  => array(
+										array(
+											'key'   => '_product_filter',
+											'value' => 'brand_not_in_list',
+										),
+									),
+									'options'     => array(),
+									'placeholder' => apply_filters( 'wholesalex_dynamic_rules_brand_not_in_list_placeholder', __( 'Choose Brands that wont apply discounts', 'wholesalex' ) ),
+									'default'     => array(),
+									'is_ajax'     => true,
+									'ajax_action' => 'get_brands',
+									'ajax_search' => true,
+								),
+								'att_in_list'           => array(
+									'label'       => __( 'Select Multiple Attributes', 'wholesalex' ),
+									'type'        => 'multiselect',
+									'depends_on'  => array(
+										array(
+											'key'   => '_product_filter',
+											'value' => 'att_in_list',
+										),
+									),
+									'options'     => array(),
+									'placeholder' => apply_filters( 'wholesalex_dynamic_rules_att_in_list_placeholder', __( 'Choose Attributes to apply discounts', 'wholesalex' ) ),
+									'default'     => array(),
+									'is_ajax'     => true,
+									'ajax_action' => 'get_attributes',
+									'ajax_search' => true,
+								),
+								'att_not_in_list'       => array(
+									'label'       => __( 'Select Multiple Attributes', 'wholesalex' ),
+									'type'        => 'multiselect',
+									'depends_on'  => array(
+										array(
+											'key'   => '_product_filter',
+											'value' => 'att_not_in_list',
+										),
+									),
+									'options'     => array(),
+									'placeholder' => apply_filters( 'wholesalex_dynamic_rules_att_not_in_list_placeholder', __( 'Choose Attributes that wont apply discounts', 'wholesalex' ) ),
+									'default'     => array(),
+									'is_ajax'     => true,
+									'ajax_action' => 'get_attributes',
 									'ajax_search' => true,
 								),
 							),
@@ -2356,7 +2084,7 @@ class WHOLESALEX_Dynamic_Rules {
 	 */
 	public function variation_price_hash( $hash, $product ) {
 		$user_id = apply_filters( 'wholesalex_set_current_user', get_current_user_id() );
-		$hash[]  = apply_filters( 'wholesalex_variation_prices_hash', strval( $user_id ) . strval( time() ), $product );
+		$hash[]  = apply_filters( 'wholesalex_variation_prices_hash', strval( $user_id ) . strval( floor( time() / 60 ) ), $product );
 		return $hash;
 	}
 	/**
@@ -2384,10 +2112,10 @@ class WHOLESALEX_Dynamic_Rules {
 			return wc_price( floatval( $wholesale_price ) );
 		}
 
-		if ( is_shop() || is_product_category() ) {
-			$sale_text = wholesalex()->get_setting( '_settings_price_text_product_list_page', __( 'Wholesale Price:', 'wholesalex' ) );
-		} else {
+		if ( is_product() ) {
 			$sale_text = wholesalex()->get_setting( '_settings_price_text', __( 'Wholesale Price:', 'wholesalex' ) );
+		} else {
+			$sale_text = wholesalex()->get_setting( '_settings_price_text_product_list_page', __( 'Wholesale Price:', 'wholesalex' ) );
 		}
 
 		$__hide_regular_price = wholesalex()->get_setting( '_settings_hide_retail_price' ) ?? '';
@@ -2414,15 +2142,15 @@ class WHOLESALEX_Dynamic_Rules {
 			}
 		}
 
-		if ( $sale_price === $regular_price ) {
-			return '<ins>' . $sale_text . wc_price( floatval( $sale_price ) ) . '</ins>';
-		}
-
 		if ( ! empty( $sale_price ) && ! empty( $regular_price ) ) {
 			return '<del aria-hidden="true">' . ( is_numeric( $regular_price ) ? wc_price( $regular_price ) : $regular_price ) . '</del> <ins>' . $sale_text . ( ( is_numeric( $sale_price ) ? wc_price( $sale_price ) : $sale_price ) ) . '</ins>';
 		}
 
 		if ( ! empty( $sale_price ) ) {
+			return '<ins>' . $sale_text . wc_price( floatval( $sale_price ) ) . '</ins>';
+		}
+
+		if ( $sale_price === $regular_price ) {
 			return '<ins>' . $sale_text . wc_price( floatval( $sale_price ) ) . '</ins>';
 		}
 
@@ -3935,10 +3663,14 @@ class WHOLESALEX_Dynamic_Rules {
 
 				$include_products   = array();
 				$include_cats       = array();
+				$include_brands     = array();
 				$include_variations = array();
+				$include_attributes = array();
 				$exclude_products   = array();
 				$exclude_cats       = array();
+				$exclude_brands     = array();
 				$exclude_variations = array();
+				$exclude_attributes = array();
 				$is_all_products    = false;
 
 				// Dynamic Rules Apply in Admin order or not.
@@ -4002,9 +3734,13 @@ class WHOLESALEX_Dynamic_Rules {
 					'id'                  => $discount['id'],
 					'filter'              => array(
 						'include_products'   => $include_products,
+						'include_attributes' => $include_attributes,
+						'include_brands' 	 => $include_brands,
 						'include_cats'       => $include_cats,
 						'include_variations' => $include_variations,
 						'exclude_products'   => $exclude_products,
+						'exclude_attributes' => $exclude_attributes,
+						'exclude_brands'     => $exclude_brands,
 						'exclude_cats'       => $exclude_cats,
 						'exclude_variations' => $exclude_variations,
 						'is_all_products'    => $is_all_products,
@@ -4042,9 +3778,13 @@ class WHOLESALEX_Dynamic_Rules {
 				$user_profile_filter = array(
 					'include_products'   => $include_products,
 					'include_cats'       => $include_cats,
+					'include_brands'     => $include_brands,
+					'include_attributes' => $include_attributes,
 					'include_variations' => $include_variations,
 					'exclude_products'   => $exclude_products,
 					'exclude_cats'       => $exclude_cats,
+					'exclude_brands'     => $exclude_brands,
+					'exclude_attributes' => $exclude_attributes,
 					'exclude_variations' => $exclude_variations,
 					'is_all_products'    => $is_all_products,
 				);
@@ -5189,10 +4929,14 @@ class WHOLESALEX_Dynamic_Rules {
 	public function get_filtered_rules( $discount ) {
 		$include_products   = array();
 		$include_cats       = array();
+		$include_brands     = array();
 		$include_variations = array();
+		$include_attributes = array();
 		$exclude_products   = array();
 		$exclude_cats       = array();
+		$exclude_brands     = array();
 		$exclude_variations = array();
+		$exclude_attributes = array();
 		$is_all_products    = false;
 		$product_priority   = 10;
 
@@ -5247,6 +4991,56 @@ class WHOLESALEX_Dynamic_Rules {
 					}
 				}
 				break;
+
+			case 'brand_in_list':
+				if ( ! isset( $discount['brand_in_list'] ) ) {
+					break;
+				}
+				foreach ( $discount['brand_in_list'] as $list ) {
+					if ( isset( $list['value'] ) ) {
+						array_push( $include_brands, (int) $list['value'] );
+						$product_priority = 30;
+					}
+				}
+
+				break;
+			case 'brand_not_in_list':
+				if ( ! isset( $discount['brand_not_in_list'] ) ) {
+					break;
+				}
+				foreach ( $discount['brand_not_in_list'] as $list ) {
+					if ( isset( $list['value'] ) ) {
+						array_push( $exclude_brands, (int) $list['value'] );
+						$product_priority = 30;
+					}
+				}
+
+				break;
+			case 'att_in_list':
+				if ( ! isset( $discount['att_in_list'] ) ) {
+					break;
+				}
+				foreach ( $discount['att_in_list'] as $list ) {
+					if ( isset( $list['value'] ) ) {
+						array_push( $include_attributes, (int) $list['value'] );
+						$product_priority = 30;
+					}
+				}
+
+				break;
+
+			case 'att_not_in_list':
+				if ( ! isset( $discount['att_not_in_list'] ) ) {
+					break;
+				}
+				foreach ( $discount['att_not_in_list'] as $list ) {
+					if ( isset( $list['value'] ) ) {
+						array_push( $exclude_attributes, (int) $list['value'] );
+						$product_priority = 30;
+					}
+				}
+
+				break;
 			case 'attribute_in_list':
 				if ( ! isset( $discount['attribute_in_list'] ) ) {
 					break;
@@ -5276,9 +5070,13 @@ class WHOLESALEX_Dynamic_Rules {
 		return array(
 			'include_products'   => $include_products,
 			'include_cats'       => $include_cats,
+			'include_brands'     => $include_brands,
+			'include_attributes' => $include_attributes,
 			'include_variations' => $include_variations,
 			'exclude_products'   => $exclude_products,
 			'exclude_cats'       => $exclude_cats,
+			'exclude_brands'     => $exclude_brands,
+			'exclude_attributes' => $exclude_attributes,
 			'exclude_variations' => $exclude_variations,
 			'is_all_products'    => $is_all_products,
 			'product_priority'   => $product_priority,
@@ -6059,7 +5857,15 @@ class WHOLESALEX_Dynamic_Rules {
 										$price = $cart_item['data']->get_regular_price();
 									}
 									if ( 'incl' === $cart->get_tax_price_display_mode() ) {
-										wc_get_price_excluding_tax(
+										$price = wc_get_price_excluding_tax(
+											$cart_item['data'],
+											array(
+												'qty'   => $free_quantity,
+												'price' => $price,
+											)
+										);
+									} else {
+										$price = wc_get_price_including_tax(
 											$cart_item['data'],
 											array(
 												'qty'   => $free_quantity,
@@ -6802,13 +6608,13 @@ class WHOLESALEX_Dynamic_Rules {
 					return $price;
 				}
 
-				$price         = $this->calculate_actual_sale_price( $product_id, $product->is_type( 'variable' ) );
+				$actual_price  = $this->calculate_actual_sale_price( $product_id, $product->is_type( 'variable' ) );
 				$sale_price    = floatval( $this->calculate_sale_price( $price, $product, $data ) );
 				$regular_price = floatval( $this->calculate_regular_price( $price, $product, $data ) );
 
 				$orginal_base_price  = floatval( get_post_meta( $product->get_id(), '_regular_price', true ) );
 				$orginal_sale_price  = floatval( get_post_meta( $product->get_id(), '_sale_price', true ) );
-				$to_be_display_price = $price;
+				$to_be_display_price = $actual_price;
 
 				if ( $this->is_product_in_bundle( $product_id ) ) {
 					$to_be_display_price = $price;
@@ -6877,15 +6683,15 @@ class WHOLESALEX_Dynamic_Rules {
 				}
 
 				// product extra addons for woocommerce compatibility.
-				if ( function_exists( 'WC' ) && ( $cart = WC()->cart ) && wholesalex()->is_plugin_installed_and_activated( 'product-extras-for-woocommerce/product-extras-for-woocommerce.php' ) ) {
+				// if ( function_exists( 'WC' ) && ( $cart = WC()->cart ) && wholesalex()->is_plugin_installed_and_activated( 'product-extras-for-woocommerce/product-extras-for-woocommerce.php' ) ) {
 
-					foreach ( $cart->get_cart() as $cart_item ) {
-						if ( isset( $cart_item['product_extras']['price_with_extras'] ) ) {
-							$custom_price        = max( 0, $this->price_after_currency_changed( $cart_item['product_extras']['price_with_extras'] ) );
-							$to_be_display_price = $custom_price;
-						}
-					}
-				}
+					// foreach ( $cart->get_cart() as $cart_item ) {
+					// 	if ( isset( $cart_item['product_extras']['price_with_extras'] ) ) {
+					// 		$custom_price        = max( 0, $this->price_after_currency_changed( $cart_item['product_extras']['price_with_extras'] ) );
+					// 		$to_be_display_price = $custom_price;
+					// 	}
+					// }
+				// }
 
 				// compatibility with aelia currency switcher.
 				if ( class_exists( 'Aelia_Integration_Helper' ) && \Aelia_Integration_Helper::aelia_currency_switcher_active() ) {
@@ -6896,6 +6702,20 @@ class WHOLESALEX_Dynamic_Rules {
 					$wholesale_price = \Aelia_Integration_Helper::convert( $to_be_display_price, $active_currency, $base_currency );
 
 					return $wholesale_price;
+				}
+
+				
+				// Set price to zero if the product is free product in cart.
+				if ( function_exists( 'WC' ) && is_cart() || is_checkout() ) {
+
+					foreach ( WC()->cart->get_cart() as $cart_item ) {
+						if (
+							! empty( $cart_item['free_product'] ) &&
+							(int) $cart_item['product_id'] === (int) $product->get_id()
+						) {
+							return 0;
+						}
+					}
 				}
 
 				return $to_be_display_price;
@@ -7331,15 +7151,16 @@ class WHOLESALEX_Dynamic_Rules {
 				$__current_role_id   = wholesalex()->get_current_user_role();
 				$quantity            = $cart_item['quantity'];
 
-				// $is_sale_price_modified   = $sale_price - $woo_custom_price === $_sale_price;
-				// $is_user_role_price_apply = false;
-				// if ( isset( $__current_role_id ) ) {
-				// $_user_role_base_price    = floatval( get_post_meta( $id, $__current_role_id . '_base_price', true ) );
-				// $_user_role_sale_price    = floatval( get_post_meta( $id, $__current_role_id . '_sale_price', true ) );
-				// $is_user_role_price_apply = ( ! empty( $_user_role_base_price ) || ! empty( $_user_role_sale_price ) ) ? true : false;
-				// }
-				$calculate_totlal_price = ( $regular_price - $woo_custom_price ) * ( 1 - $discouned_price );
-				if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 ) {
+				// NEW: PROUDUCT EXTRA ADDONS FOR WOOCOMMERCE COMPATIBILITY FOR VARIABLE PRODUCTS.
+				if ( function_exists( 'WC' ) && ( $cart = WC()->cart ) && wholesalex()->is_plugin_installed_and_activated( 'product-extras-for-woocommerce/product-extras-for-woocommerce.php' ) ) {
+
+					foreach ( $cart->get_cart() as $cart_item ) {
+						if ( isset( $cart_item['product_extras']['price_with_extras'] ) ) {
+							$custom_price        = max( 0, $this->price_after_currency_changed( $cart_item['product_extras']['price_with_extras'] -$cart_item['product_extras']['original_price'] + $price ) );
+							$product->set_price( $custom_price );
+						}
+					}
+				} else if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && $woo_custom_price > 0 ) {
 
 					if ( $quantity > 0 ) {
 						$adjusted_unit_price = ( $price * $quantity + $woo_custom_price ) / $quantity;
@@ -7396,7 +7217,10 @@ class WHOLESALEX_Dynamic_Rules {
 	 * @return boolean
 	 */
 	public static function is_eligible_for_rule( $product_id, $variation_id, $filter ) {
-		$cats   = wc_get_product_term_ids( $product_id, 'product_cat' );
+		$cats               = wc_get_product_term_ids( $product_id, 'product_cat' );
+		$brand              = wc_get_product_term_ids( $product_id, 'product_brand' );
+		$product_attributes = self::get_product_attributes( $product_id );
+
 		$status = false;
 
 		if ( isset( $filter['is_all_products'] ) && $filter['is_all_products'] ) {
@@ -7415,9 +7239,83 @@ class WHOLESALEX_Dynamic_Rules {
 			$status = true;
 		} elseif ( ! empty( $filter['exclude_cats'] ) && empty( array_intersect( $cats, $filter['exclude_cats'] ) ) ) {
 			$status = true;
+		} elseif ( ! empty( $filter['include_brands'] ) && ! empty( array_intersect( $brand, $filter['include_brands'] ) ) ) {
+			$status = true;
+		} elseif ( ! empty( $filter['exclude_brands'] ) && empty( array_intersect( $brand, $filter['exclude_brands'] ) ) ) {
+			$status = true;
+		} elseif ( ! empty( $filter['include_attributes'] ) && ! empty( $product_attributes ) && ! empty( array_intersect( $product_attributes, $filter['include_attributes'] ) ) ) {
+			$status = true;
+		} elseif ( ! empty( $filter['exclude_attributes'] ) && ! empty( $product_attributes ) && empty( array_intersect( $product_attributes, $filter['exclude_attributes'] ) ) ) {
+			// Product must HAVE attributes AND NOT match the excluded ones.
+			// Products with NO attributes will NOT pass this filter.
+			$status = true;
 		}
 
 		return $status;
+	}
+
+	/**
+	 * Get all attribute IDs for a product
+	 *
+	 * @param int|string $product_id Product ID.
+	 * @return array Array of attribute IDs or empty array if no attributes found.
+	 */
+	public static function get_product_attributes( $product_id ) {
+		$product = wc_get_product( $product_id );
+
+		if ( ! $product ) {
+			return array();
+		}
+
+		$attribute_ids = array();
+		$attributes    = $product->get_attributes();
+
+		if ( empty( $attributes ) ) {
+			return array();
+		}
+
+		// Get all registered WooCommerce attributes for mapping.
+		$registered_attributes = wc_get_attribute_taxonomies();
+		$taxonomy_to_id_map    = array();
+
+		foreach ( $registered_attributes as $registered_attr ) {
+			$taxonomy_name                        = wc_attribute_taxonomy_name( $registered_attr->attribute_name );
+			$taxonomy_to_id_map[ $taxonomy_name ] = intval( $registered_attr->attribute_id );
+		}
+
+		foreach ( $attributes as $attribute ) {
+			// $attribute may be an object (WC_Product_Attribute) or a string/array in some contexts.
+			$taxonomy = '';
+
+			if ( is_object( $attribute ) && method_exists( $attribute, 'is_taxonomy' ) ) {
+				// Check if it's a taxonomy-based attribute (not custom).
+				if ( ! $attribute->is_taxonomy() ) {
+					continue;
+				}
+
+				$taxonomy = $attribute->get_taxonomy();
+			} elseif ( is_string( $attribute ) && taxonomy_exists( $attribute ) ) {
+				// Fallback: if attribute is a string and refers to a taxonomy name, accept it.
+				$taxonomy = $attribute;
+			} elseif ( is_array( $attribute ) && ! empty( $attribute['name'] ) && taxonomy_exists( $attribute['name'] ) ) {
+				$taxonomy = $attribute['name'];
+			} else {
+				// Unknown attribute format — skip to avoid fatal errors.
+				continue;
+			}
+
+			// Check if product actually has terms for this attribute.
+			$terms = wc_get_product_terms( $product_id, $taxonomy, array( 'fields' => 'ids' ) );
+
+			if ( is_wp_error( $terms ) || empty( $terms ) ) {
+				continue;
+			}
+			if ( isset( $taxonomy_to_id_map[ $taxonomy ] ) ) {
+				$attribute_ids[] = $taxonomy_to_id_map[ $taxonomy ];
+			}
+		}
+
+		return array_unique( $attribute_ids );
 	}
 
 	/**

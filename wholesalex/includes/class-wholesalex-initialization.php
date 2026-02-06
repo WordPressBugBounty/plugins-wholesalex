@@ -93,6 +93,7 @@ class WholesaleX_Initialization {
 		// require_once WHOLESALEX_PATH . 'includes/Deactive.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-request-role-change.php';
 		require_once WHOLESALEX_PATH . 'includes/compatibility/woocommerce-bookings.php';
+		require_once WHOLESALEX_PATH . 'includes/compatibility/woo-product-bundles.php';
 		require_once WHOLESALEX_PATH . 'includes/compatibility/aeila_currency_switcher.php';
 
 		require_once WHOLESALEX_PATH . 'includes/durbin/class-durbin-client.php';
@@ -124,6 +125,7 @@ class WholesaleX_Initialization {
 		new \WHOLESALEX\WHOLESALEX_Overview();
 		new \WHOLESALEX\WHOLESALEX_RequstRoleChange();
 		new \WHOLESALEX\WHOLESALEX_Woocommerce_Bookings();
+		new \WHOLESALEX\WHOLESALEX_WooProduct_Bundles();
 
 		new \WHOLESALEX\Deactive();
 		new \WHOLESALEX\Notice();
@@ -166,7 +168,7 @@ class WholesaleX_Initialization {
 			'i18n'                => array(
 				'smart_tags' => __( 'Available Smart Tags: ', 'wholesalex' ),
 			),
-			'helloBar'            => Xpo::get_transient_without_cache( 'wsx_helloBar' ),
+			'helloBar'            => Xpo::get_transient_without_cache( 'wsx_bf_helloBar' ),
 			'license'             => Xpo::get_lc_key(),
 			'userInfo'            => array(
 				'name'  => $user_info->first_name ? $user_info->first_name . ( $user_info->last_name ? ' ' . $user_info->last_name : '' ) : $user_info->user_login,

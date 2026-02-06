@@ -771,464 +771,515 @@ class WHOLESALEX_Shortcodes {
 				 * All of the code for your public-facing JavaScript source
 				 * should reside in this file.
 				 */
-				const password_message = <?php echo wp_json_encode( $password_message ); ?>;
-				const wrapper = $(`#<?php echo esc_attr( $wrapper ); ?>`);
+				var password_message = <?php echo wp_json_encode( $password_message ); ?>;
+				var wrapper = $(`#<?php echo esc_attr( $wrapper ); ?>`);
+				
+				$(document).ready(function() {
+					
+					password_message = <?php echo wp_json_encode( $password_message ); ?>;
+					wrapper = $(`#<?php echo esc_attr( $wrapper ); ?>`);
 
-				const controlRegistrationForm = ()=>{
+					if(! wrapper) {
+						return;
+					}
+
+					const controlRegistrationForm = ()=>{
 					// Check User Role Selection Field
-					let selectedRole = wrapper.find('#wholesalex_registration_role').val();
-					if(selectedRole) {
-						let whxCustomFields = wrapper.find('.wsx-field');
-						whxCustomFields.each(function (i) {
-							let excludeRoles = this.getAttribute('data-wsx-exclude');
-							if(excludeRoles) {
-								excludeRoles = excludeRoles.split(' ');
-								if(!excludeRoles.includes(selectedRole)) {
-									$(this).show();
-									$(this).find('.wsx-field-required').prop('required','true');
-								} else {
-									$(this).hide();
-									$(this).find('.wsx-field-required').removeAttr('required');
+						let selectedRole = wrapper.find('#wholesalex_registration_role').val();
+						if(selectedRole) {
+							let whxCustomFields = wrapper.find('.wsx-field');
+							whxCustomFields.each(function (i) {
+								let excludeRoles = this.getAttribute('data-wsx-exclude');
+								if(excludeRoles) {
+									excludeRoles = excludeRoles.split(' ');
+									if(!excludeRoles.includes(selectedRole)) {
+										$(this).show();
+										$(this).find('.wsx-field-required').prop('required','true');
+									} else {
+										$(this).hide();
+										$(this).find('.wsx-field-required').removeAttr('required');
+									}
 								}
-							}
-						});
-					} else {
-						$(".wsx-field[style*='display: none'] > .wsx-field-required").removeAttr("required");
-					}
-				}
-
-				const checkConfirmPassword = ()=>{
-					wrapper.find("#user_confirm_pass").prop('required',true);
-					let confirmPassword = wrapper.find("#user_confirm_pass").val();
-					let password = wrapper.find("#reg_password").val(); //woocommerce password
-					let whxFormPassword = wrapper.find("#user_pass").val();
-
-					if(password && password.length) {
-						wrapper.find('.woocommerce-form-register__submit').prop('disabled',true); // Disable Register button
-					}
-
-					if(whxFormPassword && whxFormPassword.length) {
-						wrapper.find('.wsx-register-btn').prop('disabled',true); // Disable Register button
-					}
-
-
-					if(!confirmPassword) {
-						confirmPassword = wrapper.find("#user_confirm_password").val();
-					}
-					
-
-					if( confirmPassword ) {
-						// For WC
-						if( confirmPassword!==password) {
-							wrapper.find(".whx-field-error.user_confirm_pass").empty();
-							wrapper.find(".whx-field-error.user_confirm_pass").append("Password and Confirm Password Does not match!");
+							});
 						} else {
-							wrapper.find(".whx-field-error.user_confirm_pass").empty();
-							wrapper.find('.woocommerce-form-register__submit').prop('disabled',false);
-						}
-
-						// For WholesaleX Form
-						if(confirmPassword !=whxFormPassword) {
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_pass`).empty();
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_pass`).empty();
-
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_password`).empty();
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_pass`).empty();
-
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_pass`).append('Password and Confirm Password Does not match!');
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_password`).append('Password and Confirm Password Does not match!');
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_pass`).append('Password and Confirm Password Does not match!');
-
-						} else {
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_pass`).empty();
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_pass`).empty();
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_password`).empty();
-							wrapper.find('.wsx-register-btn').prop('disabled',false); // Disable Register button
-
-						}
-					} else {
-						wrapper.find('.wsx-register-btn').prop('disabled',false); // Disable Register button
-					}
-				}
-
-				const checkConfirmEmail = ()=>{
-					
-					wrapper.find("#user_confirm_email").prop('required',true);
-					let confirmEmail = wrapper.find("#user_confirm_email").val();
-					let email = wrapper.find("#reg_email").val(); //woocommerce password
-					let whxFormEmail = wrapper.find("#user_email").val();
-
-
-					if(email && email.length) {
-						wrapper.find('.woocommerce-form-register__submit').prop('disabled',true); // Disable Register button
-					}
-
-					if(whxFormEmail && whxFormEmail.length) {
-						wrapper.find('.wsx-register-btn').prop('disabled',true); // Disable Register button
-					}
-					
-					if( confirmEmail ) {
-
-						// For WC
-						if( confirmEmail!==email) {
-							wrapper.find(".whx-field-error.user_confirm_email").empty();
-							wrapper.find(".whx-field-error.user_confirm_email").append("Email and Confirm Email Does not match!");
-						} else {
-							wrapper.find(".whx-field-error.user_confirm_email").empty();
-							wrapper.find('.woocommerce-form-register__submit').prop('disabled',false);
-						}
-
-						// For WholesaleX Form
-						if(confirmEmail !=whxFormEmail) {
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_email`).empty();
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_email`).empty();
-
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_email`).append('Email and Confirm Email Does not match!');
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_email`).append('Email and Confirm Email Does not match!');
-							// $('.wsx-register-btn').prop('disabled',true); // Disable Register button
-
-
-						} else {
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_email`).empty();
-							wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_email`).empty();
-							wrapper.find('.wsx-register-btn').prop('disabled',false); // Disable Register button
-
-						}
-					} else {
-						wrapper.find('.wsx-register-btn').prop('disabled',false); // Disable Register button
-					}
-				}
-
-				const checkRequiredField = ()=> {
-					let isValid=true;
-					wrapper.find(".wsx-field-required input, .wsx-field-required select, .wsx-field-required textarea").on('focusout input', function() {
-						// Check the validity of the current field
-						let fieldValue = $(this).val().trim();
-						let fieldName = $(this).attr("name").replace(/\[\]/g, '');
-
-						if (!fieldValue) {
-							isValid = false;
-							wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
-							wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
-
-						} else {
-							wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text("");
-							wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').removeClass('wsx-field-warning');
-
-						}
-					});
-
-					// Validate at least one checkbox is checked in each checkbox group
-					wrapper.find(".wsx-field-required .wsx-form-checkbox").each(function () {
-						let checkboxes = $(this).find("input[type='checkbox']");
-						let checkboxGroupName = $(this).find("input[type='checkbox']").attr("name").replace(/\[\]/g, '');
-
-						if (checkboxes.length > 0 && checkboxes.filter(":checked").length === 0) {
-							isValid = false;
-						} else {
-							// Clear warning message for the checkbox group
-							wrapper.find(".wsx-form-field-warning-message." + checkboxGroupName).text("");
-						}
-					});
-
-
-				}
-				// Function to validate the password
-				function validatePassword(password, conditions) {
-					var messages = [];
-					if (conditions.includes('uppercase_condition')) {
-						if (!/[A-Z]/.test(password)) {
-							messages.push('At least one uppercase letter <br>');
+							$(".wsx-field[style*='display: none'] > .wsx-field-required").removeAttr("required");
 						}
 					}
-					if (conditions.includes('lowercase_condition')) {
-						if (!/[a-z]/.test(password)) {
-							messages.push('At least one lowercase letter <br>');
+
+					const checkConfirmPassword = ()=>{
+						wrapper.find("#user_confirm_pass").prop('required',true);
+						let confirmPassword = wrapper.find("#user_confirm_pass").val();
+						let password = wrapper.find("#reg_password").val(); //woocommerce password
+						let whxFormPassword = wrapper.find("#user_pass").val();
+
+						if(password && password.length) {
+							wrapper.find('.woocommerce-form-register__submit').prop('disabled',true); // Disable Register button
 						}
-					}
-					if (conditions.includes('special_character_condition')) {
-						if (!/[!@#$%^&*()_+=\\-]/.test(password)) {
-							messages.push('At least one special character  <br>');
+
+						if(whxFormPassword && whxFormPassword.length) {
+							wrapper.find('.wsx-register-btn').prop('disabled',true); // Disable Register button
 						}
-					}
-					if (conditions.includes('min_length_condition')) {
-						if (password.length < 8) {
-							messages.push('Minimum 8 characters <br>');
+
+
+						if(!confirmPassword) {
+							confirmPassword = wrapper.find("#user_confirm_password").val();
 						}
-					}
-					return messages;
-				}
-				//Check Password Validation
-				const checkPassWordRequiredFields = ()=> {
-					let isPasswordValid = true;
-					wrapper.find(".wsx-field-required input, .wsx-field-required select, .wsx-field-required textarea, .wsx-field-required radio").each(function() {
-					let fieldName = $(this).attr("name");
-							if(fieldName) {
-								fieldName = fieldName.replace(/\[\]/g, '');
-							}
-					if ( $(this).attr("name") === 'user_pass') {
-						let passwordConditions = <?php echo wp_json_encode( $conditions_js_array ); ?>;
-							// Validate button click event
-							let password = $(this).val();
-							let validationMessages = validatePassword( password, passwordConditions );
-							if (validationMessages.length > 0) {
-								isPasswordValid = false;
-								if(wrapper.find(`.wsx-field-${fieldName}`).css('display') !== 'none') {
-									const $warningMessage = wrapper.find(`.wsx-form-field-warning-message.${fieldName}`);
-									(password_message && password_message.length > 0) ?  $warningMessage.text(password_message) : $warningMessage.html(validationMessages);
-									wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
-							}
+						
+
+						if( confirmPassword ) {
+							// For WC
+							if( confirmPassword!==password) {
+								wrapper.find(".whx-field-error.user_confirm_pass").empty();
+								wrapper.find(".whx-field-error.user_confirm_pass").append("Password and Confirm Password Does not match!");
 							} else {
-								wrapper.find('#message').html('Password is valid!').css('color', 'green');
+								wrapper.find(".whx-field-error.user_confirm_pass").empty();
+								wrapper.find('.woocommerce-form-register__submit').prop('disabled',false);
 							}
-					}
-				});
-					return isPasswordValid;
-				}
 
-				const checkRequiredFields = ()=> {
+							// For WholesaleX Form
+							if(confirmPassword !=whxFormPassword) {
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_pass`).empty();
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_pass`).empty();
 
-					// Validate required fields
-					let isValid = true;
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_password`).empty();
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_pass`).empty();
 
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_pass`).append('Password and Confirm Password Does not match!');
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_password`).append('Password and Confirm Password Does not match!');
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_pass`).append('Password and Confirm Password Does not match!');
 
-					wrapper.find(".wsx-field-required input, .wsx-field-required select, .wsx-field-required textarea, .wsx-field-required radio").each(function() {
-						if ($(this).val().trim() === "") {
-							let fieldName = $(this).attr("name");
-							if(fieldName) {
-								fieldName = fieldName.replace(/\[\]/g, '');
-							}
-							
-							if(wrapper.find(`.wsx-field-${fieldName}`).css('display') !== 'none') {
-									isValid = false;
-									wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
-									wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
+							} else {
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_pass`).empty();
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_pass`).empty();
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_password`).empty();
+								wrapper.find('.wsx-register-btn').prop('disabled',false); // Disable Register button
+
 							}
 						} else {
-							// $(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').removeClass('wsx-field-warning');
-
+							wrapper.find('.wsx-register-btn').prop('disabled',false); // Disable Register button
 						}
-					});
+					}
+
+					const checkConfirmEmail = ()=>{
 						
-					// Validate at least one checkbox is checked in each checkbox group
-					wrapper.find(".wsx-field-required .wsx-form-checkbox").each(function () {
-						let checkboxes = $(this).find("input[type='checkbox']");
-						let fieldName = '';
-						if(checkboxes.length) {
-							fieldName = checkboxes[0].name;
-							fieldName = fieldName.replace(/\[\]/g, '');
+						wrapper.find("#user_confirm_email").prop('required',true);
+						let confirmEmail = wrapper.find("#user_confirm_email").val();
+						let email = wrapper.find("#reg_email").val(); //woocommerce password
+						let whxFormEmail = wrapper.find("#user_email").val();
+
+
+						if(email && email.length) {
+							wrapper.find('.woocommerce-form-register__submit').prop('disabled',true); // Disable Register button
+						}
+
+						if(whxFormEmail && whxFormEmail.length) {
+							wrapper.find('.wsx-register-btn').prop('disabled',true); // Disable Register button
 						}
 						
-						if(wrapper.find(`.wsx-field-${fieldName}`).css('display') !== 'none') { 
+						if( confirmEmail ) {
 
-							if (checkboxes.length > 0 && checkboxes.filter(":checked").length === 0) {
+							// For WC
+							if( confirmEmail!==email) {
+								wrapper.find(".whx-field-error.user_confirm_email").empty();
+								wrapper.find(".whx-field-error.user_confirm_email").append("Email and Confirm Email Does not match!");
+							} else {
+								wrapper.find(".whx-field-error.user_confirm_email").empty();
+								wrapper.find('.woocommerce-form-register__submit').prop('disabled',false);
+							}
+
+							// For WholesaleX Form
+							if(confirmEmail !=whxFormEmail) {
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_email`).empty();
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_email`).empty();
+
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_email`).append('Email and Confirm Email Does not match!');
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_email`).append('Email and Confirm Email Does not match!');
+								// $('.wsx-register-btn').prop('disabled',true); // Disable Register button
+
+
+							} else {
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_confirm_email`).empty();
+								wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.user_email`).empty();
+								wrapper.find('.wsx-register-btn').prop('disabled',false); // Disable Register button
+
+							}
+						} else {
+							wrapper.find('.wsx-register-btn').prop('disabled',false); // Disable Register button
+						}
+					}
+
+					const checkRequiredField = ()=> {
+						let isValid=true;
+						wrapper.find(".wsx-field-required input, .wsx-field-required select, .wsx-field-required textarea").on('focusout input', function() {
+							// Check the validity of the current field
+							let fieldValue = $(this).val().trim();
+							let fieldName = $(this).attr("name").replace(/\[\]/g, '');
+
+							if (!fieldValue) {
 								isValid = false;
-								
-								wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')}${wholesalex.is_required}!`);
+								wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
 								wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
 
 							} else {
-								wrapper.find(this).closest('.wsx-form-field').find('.wsx-form-field-warning-message').text("");
+								wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text("");
 								wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').removeClass('wsx-field-warning');
 
 							}
+						});
 
-						}
-						 
-					});
-					// Validate at least one checkbox is checked in each checkbox group
-					wrapper.find(".wsx-field-required .wsx-field-radio").each(function () {
-						let checkboxes = $(this).find("input[type='radio']");
-						let fieldName = '';
-						if(checkboxes.length) {
-							fieldName = checkboxes[0].name;
-							fieldName = fieldName.replace(/\[\]/g, '');
-						}
-						
-						if(wrapper.find(`.wsx-field-${fieldName}`).css('display') !== 'none') { 
+						// Validate at least one checkbox is checked in each checkbox group
+						wrapper.find(".wsx-field-required .wsx-form-checkbox").each(function () {
+							let checkboxes = $(this).find("input[type='checkbox']");
+							let checkboxGroupName = $(this).find("input[type='checkbox']").attr("name").replace(/\[\]/g, '');
 
 							if (checkboxes.length > 0 && checkboxes.filter(":checked").length === 0) {
 								isValid = false;
-								
-								$(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
-								$(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
-
 							} else {
-								$(this).closest('.wsx-form-field').find('.wsx-form-field-warning-message').text("");
-								$(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').removeClass('wsx-field-warning');
+								// Clear warning message for the checkbox group
+								wrapper.find(".wsx-form-field-warning-message." + checkboxGroupName).text("");
+							}
+						});
+
+
+					}
+					// Function to validate the password
+					function validatePassword(password, conditions) {
+						var messages = [];
+						if (conditions.includes('uppercase_condition')) {
+							if (!/[A-Z]/.test(password)) {
+								messages.push('At least one uppercase letter <br>');
+							}
+						}
+						if (conditions.includes('lowercase_condition')) {
+							if (!/[a-z]/.test(password)) {
+								messages.push('At least one lowercase letter <br>');
+							}
+						}
+						if (conditions.includes('special_character_condition')) {
+							if (!/[!@#$%^&*()_+=\\-]/.test(password)) {
+								messages.push('At least one special character  <br>');
+							}
+						}
+						if (conditions.includes('min_length_condition')) {
+							if (password.length < 8) {
+								messages.push('Minimum 8 characters <br>');
+							}
+						}
+						return messages;
+					}
+					//Check Password Validation
+					const checkPassWordRequiredFields = ()=> {
+						let isPasswordValid = true;
+						wrapper.find(".wsx-field-required input, .wsx-field-required select, .wsx-field-required textarea, .wsx-field-required radio").each(function() {
+						let fieldName = $(this).attr("name");
+								if(fieldName) {
+									fieldName = fieldName.replace(/\[\]/g, '');
+								}
+						if ( $(this).attr("name") === 'user_pass') {
+							let passwordConditions = <?php echo wp_json_encode( $conditions_js_array ); ?>;
+								// Validate button click event
+								let password = $(this).val();
+								let validationMessages = validatePassword( password, passwordConditions );
+								if (validationMessages.length > 0) {
+									isPasswordValid = false;
+									if(wrapper.find(`.wsx-field-${fieldName}`).css('display') !== 'none') {
+										const $warningMessage = wrapper.find(`.wsx-form-field-warning-message.${fieldName}`);
+										(password_message && password_message.length > 0) ?  $warningMessage.text(password_message) : $warningMessage.html(validationMessages);
+										wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
+								}
+								} else {
+									wrapper.find('#message').html('Password is valid!').css('color', 'green');
+								}
+						}
+					});
+						return isPasswordValid;
+					}
+
+					const checkRequiredFields = ()=> {
+
+						// Validate required fields
+						let isValid = true;
+
+
+						wrapper.find(".wsx-field-required input, .wsx-field-required select, .wsx-field-required textarea, .wsx-field-required radio").each(function() {
+							if ($(this).val().trim() === "") {
+								let fieldName = $(this).attr("name");
+								if(fieldName) {
+									fieldName = fieldName.replace(/\[\]/g, '');
+								}
+								
+								if(wrapper.find(`.wsx-field-${fieldName}`).css('display') !== 'none') {
+										isValid = false;
+										wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
+										wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
+								}
+							} else {
+								// $(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').removeClass('wsx-field-warning');
 
 							}
-
-						}
-						 
-					});
-
-					return isValid;
-
-				}
-				const checkLoginRequiredFields = ()=> {
-
-					// Validate required fields
-					let isValid = true;
-
-
-					wrapper.find(".wholesalex-login-form .wsx-field-required input").each(function() {
-						if ($(this).val().trim() === "") {
-							let fieldName = $(this).attr("name");
-							if(fieldName) {
+						});
+							
+						// Validate at least one checkbox is checked in each checkbox group
+						wrapper.find(".wsx-field-required .wsx-form-checkbox").each(function () {
+							let checkboxes = $(this).find("input[type='checkbox']");
+							let fieldName = '';
+							if(checkboxes.length) {
+								fieldName = checkboxes[0].name;
 								fieldName = fieldName.replace(/\[\]/g, '');
 							}
 							
-							if($(`.wsx-field-${fieldName}`).css('display') !== 'none') {
-								isValid = false;
-								$(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
-								$(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
+							if(wrapper.find(`.wsx-field-${fieldName}`).css('display') !== 'none') { 
+
+								if (checkboxes.length > 0 && checkboxes.filter(":checked").length === 0) {
+									isValid = false;
+									
+									wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')}${wholesalex.is_required}!`);
+									wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
+
+								} else {
+									wrapper.find(this).closest('.wsx-form-field').find('.wsx-form-field-warning-message').text("");
+									wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').removeClass('wsx-field-warning');
+
+								}
+
 							}
-						} else {
-							// $(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').removeClass('wsx-field-warning');
+							
+						});
+						// Validate at least one checkbox is checked in each checkbox group
+						wrapper.find(".wsx-field-required .wsx-field-radio").each(function () {
+							let checkboxes = $(this).find("input[type='radio']");
+							let fieldName = '';
+							if(checkboxes.length) {
+								fieldName = checkboxes[0].name;
+								fieldName = fieldName.replace(/\[\]/g, '');
+							}
+							
+							if(wrapper.find(`.wsx-field-${fieldName}`).css('display') !== 'none') { 
 
-						}
-					});
+								if (checkboxes.length > 0 && checkboxes.filter(":checked").length === 0) {
+									isValid = false;
+									
+									$(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
+									$(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
 
+								} else {
+									$(this).closest('.wsx-form-field').find('.wsx-form-field-warning-message').text("");
+									$(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').removeClass('wsx-field-warning');
 
+								}
 
-					return isValid;
-
-				}
-
-				function toggleRequiredAttribute() {
-					wrapper.find(".wsx-field-required").each(function() {
-					let fieldWrapper = $(this);
-					let fieldInput = fieldWrapper.find("input, select, textarea");
-
-					// Check for specific field types and handle accordingly
-					if (fieldInput.is(":file")) {
-						// For file inputs, consider them required if the wrapper is visible
-						if (fieldWrapper.css("display") === "none") {
-						fieldInput.removeAttr("required");
-						} else {
-						fieldInput.attr("required", "required");
-						}
-					} else {
-						// For other input types, toggle based on display style
-						if (fieldWrapper.css("display") === "none") {
-						fieldInput.removeAttr("required");
-						} else {
-						fieldInput.attr("required", "required");
-						}
-					}
-					});
-				}
-
-
-				const handleHiddenRow = ()=>{
-					wrapper.find('.wsx-reg-form-row').each(function () {
-						const $row = $(this);
-						const allChildrenHidden = $row.children().toArray().every(function (child) {
-							return $(child).css('display') === 'none';
+							}
+							
 						});
 
-						if (allChildrenHidden) {
-							$row.css('display', 'none');
-						} else {
-							if ($row.hasClass('double-column')) {
-								$row.css('display', 'flex');
+						return isValid;
+
+					}
+					const checkLoginRequiredFields = ()=> {
+
+						// Validate required fields
+						let isValid = true;
+
+
+						wrapper.find(".wholesalex-login-form .wsx-field-required input").each(function() {
+							if ($(this).val().trim() === "") {
+								let fieldName = $(this).attr("name");
+								if(fieldName) {
+									fieldName = fieldName.replace(/\[\]/g, '');
+								}
+								
+								if($(`.wsx-field-${fieldName}`).css('display') !== 'none') {
+									isValid = false;
+									$(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
+									$(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
+								}
 							} else {
-								$row.css('display', 'block');
+								// $(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').removeClass('wsx-field-warning');
+
+							}
+						});
+
+
+
+						return isValid;
+
+					}
+
+					function toggleRequiredAttribute() {
+						wrapper.find(".wsx-field-required").each(function() {
+						let fieldWrapper = $(this);
+						let fieldInput = fieldWrapper.find("input, select, textarea");
+
+						// Check for specific field types and handle accordingly
+						if (fieldInput.is(":file")) {
+							// For file inputs, consider them required if the wrapper is visible
+							if (fieldWrapper.css("display") === "none") {
+							fieldInput.removeAttr("required");
+							} else {
+							fieldInput.attr("required", "required");
+							}
+						} else {
+							// For other input types, toggle based on display style
+							if (fieldWrapper.css("display") === "none") {
+							fieldInput.removeAttr("required");
+							} else {
+							fieldInput.attr("required", "required");
 							}
 						}
-					});
-				}
-
-				
-
-				const handleCondition = ()=>{
-					const conditions = <?php echo wp_json_encode( $conditions ); // phpcs:ignore ?>
-
-					Object.keys(conditions).forEach(name => {
-							if(conditions[name] && (conditions[name]['tiers'] &&conditions[name]['tiers'][0]&& conditions[name]['tiers'][0]['field'] && conditions[name]['tiers'][0]['condition'])) {
-								let condition = conditions[name];
-								let tiers = condition['tiers'];
-								let status = condition['status'];
-								let relation = condition['relation'];
+						});
+					}
 
 
-								if(relation=='any') {
-									let _status = false;
-									for (let index = 0; index < tiers.length; index++) {
-										const element = tiers[index];
-										
-										if(element['condition']=='is') {
-											let val = $(".wsx-field *[name="+element['field']+"]").val();
-											if(val==element['value']) {
-												_status = true;
-											}
-										}
-										else if(element['condition']=='not_is') {
-											let val = $(".wsx-field *[name="+element['field']+"]").val();
-											
-											if(val!=element['value']) {
-												_status = true;
-											}
-										}
-										
-									}
-									if(_status) {
-										if(status=='hide') {
-											$(".wsx-field.wsx-field-"+name).hide();
-											// $(this).find('.wsx-field-required').prop('required','true');
+					const handleHiddenRow = ()=>{
+						wrapper.find('.wsx-reg-form-row').each(function () {
+							const $row = $(this);
+							const allChildrenHidden = $row.children().toArray().every(function (child) {
+								return $(child).css('display') === 'none';
+							});
 
-										} else {
-											$(".wsx-field.wsx-field-"+name).show();
-										}
-									} else {
-										if(status=='hide') {
-											$(".wsx-field.wsx-field-"+name).show();
-										} else {
-											$(".wsx-field.wsx-field-"+name).hide();
-										}
-									}
-
-								} else if(relation=='all') {
-									let _status = false;
-									tiers.forEach(element => {
-										if(element['condition']=='is') {
-											let val = $(".wsx-field *[name="+element['field']+"]").val();
-											if(val!=element['value']) {
-												_status = true;
-												return;
-											}
-										}
-										else if(element['condition']=='not_is') {
-											let val = $(".wsx-field *[name="+element['field']+"]").val();
-											if(val==element['value']) {
-												_status = true;
-												return;
-											}
-										}
-									});
-									if(_status) {
-										if(status=='hide') {
-											$(".wsx-field.wsx-field-"+name).show();
-										} else {
-											$(".wsx-field.wsx-field-"+name).hide();
-										}
-									} else {
-										if(status=='hide') {
-											$(".wsx-field.wsx-field-"+name).hide();
-										} else {
-											$(".wsx-field.wsx-field-"+name).show();
-										}	
-									}
+							if (allChildrenHidden) {
+								$row.css('display', 'none');
+							} else {
+								if ($row.hasClass('double-column')) {
+									$row.css('display', 'flex');
+								} else {
+									$row.css('display', 'block');
 								}
 							}
 						});
-				}
-				checkConfirmPassword();
-				checkConfirmEmail();
-				
-				
-				$(document).ready(function(){
+					}
+
+					
+
+					const handleCondition = ()=>{
+						const conditions = <?php echo wp_json_encode( $conditions ); // phpcs:ignore ?>
+
+						Object.keys(conditions).forEach(name => {
+								if(conditions[name] && (conditions[name]['tiers'] &&conditions[name]['tiers'][0]&& conditions[name]['tiers'][0]['field'] && conditions[name]['tiers'][0]['condition'])) {
+									let condition = conditions[name];
+									let tiers = condition['tiers'];
+									let status = condition['status'];
+									let relation = condition['relation'];
+
+
+									if(relation=='any') {
+										let _status = false;
+										for (let index = 0; index < tiers.length; index++) {
+											const element = tiers[index];
+											
+											if(element['condition']=='is') {
+												let val = $(".wsx-field *[name="+element['field']+"]").val();
+												if(val==element['value']) {
+													_status = true;
+												}
+											}
+											else if(element['condition']=='not_is') {
+												let val = $(".wsx-field *[name="+element['field']+"]").val();
+												
+												if(val!=element['value']) {
+													_status = true;
+												}
+											}
+											
+										}
+										if(_status) {
+											if(status=='hide') {
+												$(".wsx-field.wsx-field-"+name).hide();
+												// $(this).find('.wsx-field-required').prop('required','true');
+
+											} else {
+												$(".wsx-field.wsx-field-"+name).show();
+											}
+										} else {
+											if(status=='hide') {
+												$(".wsx-field.wsx-field-"+name).show();
+											} else {
+												$(".wsx-field.wsx-field-"+name).hide();
+											}
+										}
+
+									} else if(relation=='all') {
+										let _status = false;
+										tiers.forEach(element => {
+											if(element['condition']=='is') {
+												let val = $(".wsx-field *[name="+element['field']+"]").val();
+												if(val!=element['value']) {
+													_status = true;
+													return;
+												}
+											}
+											else if(element['condition']=='not_is') {
+												let val = $(".wsx-field *[name="+element['field']+"]").val();
+												if(val==element['value']) {
+													_status = true;
+													return;
+												}
+											}
+										});
+										if(_status) {
+											if(status=='hide') {
+												$(".wsx-field.wsx-field-"+name).show();
+											} else {
+												$(".wsx-field.wsx-field-"+name).hide();
+											}
+										} else {
+											if(status=='hide') {
+												$(".wsx-field.wsx-field-"+name).hide();
+											} else {
+												$(".wsx-field.wsx-field-"+name).show();
+											}	
+										}
+									}
+								}
+							});
+					}
+
+					const processRegistration = (formObject)=>{
+						const entries = Object.fromEntries(formObject.entries());
+
+						// Check if reCAPTCHA is empty
+						const recaptchaValue = entries['g-recaptcha-response'];
+
+						if (typeof recaptchaValue === 'string' && recaptchaValue.trim() === '') {
+							alert('Please complete the reCAPTCHA checkbox.');
+							return;
+						}
+						wrapper.find('.wholesalex_circular_loading__wrapper').show();
+						$.ajax({ 
+							url: wholesalex.ajax, 
+							type: 'POST', 
+							data: formObject, 
+							contentType: false,
+							processData: false,
+							success: function (response) { 
+								if(Object.keys(response['data']['error_messages']).length) {
+									const wc_notice = $('.woocommerce-notices-wrapper');
+									if(wc_notice) {
+										wc_notice.empty();
+									}
+									wrapper.find('.wholesalex-registration-form .wsx-form-field-warning-message').empty();
+									Object.keys(response['data']['error_messages']).map((err)=>{
+										wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.${err}`).append(response['data']['error_messages'][err]);
+										wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.${err}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
+
+										if(err=='recaptcha') {
+												if(wc_notice) {
+													wc_notice.append(response['data']['error_messages'][err]);
+												}
+											}
+									})
+								} else {
+									if(response['data']['redirect']) {
+										window.location.href = response['data']['redirect'];
+									}
+								}
+								wrapper.find('.wholesalex_circular_loading__wrapper').hide();
+							}, 
+							error: function (jqXHR, textStatus, errorThrown) { 
+								wrapper.find('.wholesalex_circular_loading__wrapper').hide();
+							} 
+						}); 
+					}
 					wrapper.find('#wholesalex_registration_role').change(controlRegistrationForm);
 
 					handleCondition();
@@ -1251,164 +1302,120 @@ class WHOLESALEX_Shortcodes {
 						fileLabel.empty(); // Make Label Empty
 						fileLabel.append(fileName);
 					});
-				});
+					checkConfirmPassword();
+					checkConfirmEmail();
 
-				const processRegistration = (formObject)=>{
-					const entries = Object.fromEntries(formObject.entries());
 
-					// Check if reCAPTCHA is empty
-					const recaptchaValue = entries['g-recaptcha-response'];
+					// Process Registration
+					wrapper.find('.wsx-register-btn').on('click',function(e){
+						// e.preventDefault();
 
-					if (typeof recaptchaValue === 'string' && recaptchaValue.trim() === '') {
-						alert('Please complete the reCAPTCHA checkbox.');
-						return;
-					}
-					wrapper.find('.wholesalex_circular_loading__wrapper').show();
-					$.ajax({ 
-						url: wholesalex.ajax, 
-						type: 'POST', 
-						data: formObject, 
-						contentType: false,
-						processData: false,
-						success: function (response) { 
-							if(Object.keys(response['data']['error_messages']).length) {
-								const wc_notice = $('.woocommerce-notices-wrapper');
-								if(wc_notice) {
-									wc_notice.empty();
-								}
-								wrapper.find('.wholesalex-registration-form .wsx-form-field-warning-message').empty();
-								Object.keys(response['data']['error_messages']).map((err)=>{
-									wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.${err}`).append(response['data']['error_messages'][err]);
-									wrapper.find(`.wholesalex-registration-form .wsx-form-field-warning-message.${err}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
+						if($(this).closest('form')[0].checkValidity()){
+							e.preventDefault();
+						}
 
-									if(err=='recaptcha') {
-											if(wc_notice) {
-												wc_notice.append(response['data']['error_messages'][err]);
-											}
-										}
-								})
-							} else {
-								if(response['data']['redirect']) {
-									window.location.href = response['data']['redirect'];
-								}
-							}
-							wrapper.find('.wholesalex_circular_loading__wrapper').hide();
-						}, 
-						error: function (jqXHR, textStatus, errorThrown) { 
-							wrapper.find('.wholesalex_circular_loading__wrapper').hide();
-						} 
-					}); 
-				}
+						if(!checkRequiredFields()) {
+							return;
+						}				
+						if(!checkPassWordRequiredFields()) {
+							return;
+						}				
+										
+						const formObject = new FormData(wrapper.find('.wholesalex-registration-form')[0]);
 
-				// Process Registration
-				wrapper.find('.wsx-register-btn').on('click',function(e){
-					// e.preventDefault();
-
-					if($(this).closest('form')[0].checkValidity()){
-						e.preventDefault();
-					}
-
-					if(!checkRequiredFields()) {
-						return;
-					}				
-					if(!checkPassWordRequiredFields()) {
-						return;
-					}				
+						
+						// process_registration
+						if (wholesalex.recaptcha_status === 'yes' && typeof grecaptcha !== 'undefined' ) {
+								let site_key      = "<?php echo esc_attr( wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' ) ); ?>";
+								grecaptcha.ready(function () {
+									try {
+										grecaptcha.execute(site_key, { action: 'submit' }).then(function (token) {
+											formObject.append('token',token);
+											processRegistration(formObject);
+										});
+									} catch (error) {
+										processRegistration(formObject);
+									}
 									
-					const formObject = new FormData(wrapper.find('.wholesalex-registration-form')[0]);
+								});
+								
+						} else {
+							processRegistration(formObject);
+						}
+					});
+
+					wrapper.find('.wholesalex-login-form').find('input, select').on('change input',function(e){
+						wrapper.find('.wholesalex-login-form .wsx-form-field').removeClass('wsx-field-warning');
+						wrapper.find('.wholesalex-login-form .wsx-form-field-warning-message').empty();
+					});
 
 					
-					// process_registration
-					if (wholesalex.recaptcha_status === 'yes' && typeof grecaptcha !== 'undefined' ) {
-							let site_key      = "<?php echo esc_attr( wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' ) ); ?>";
-							grecaptcha.ready(function () {
-								try {
-									grecaptcha.execute(site_key, { action: 'submit' }).then(function (token) {
-										formObject.append('token',token);
-										processRegistration(formObject);
-									});
-								} catch (error) {
-									processRegistration(formObject);
-								}
-								
-							});
-							
-					} else {
-						processRegistration(formObject);
-					}
-				});
 
-				wrapper.find('.wholesalex-login-form').find('input, select').on('change input',function(e){
-					wrapper.find('.wholesalex-login-form .wsx-form-field').removeClass('wsx-field-warning');
-					wrapper.find('.wholesalex-login-form .wsx-form-field-warning-message').empty();
-				});
+					// Process Login
+					wrapper.find('.wsx-login-btn').on('click',function(e){
+						if($(this).closest('form')[0].checkValidity()){
+							e.preventDefault();
+						}
 
-				
-
-				// Process Login
-				wrapper.find('.wsx-login-btn').on('click',function(e){
-					if($(this).closest('form')[0].checkValidity()){
-						e.preventDefault();
-					}
-
-					if(!checkLoginRequiredFields()) {
-						return;
-					}
-					const processLogin  = ()=>{
-						$.ajax({ 
-							url: wholesalex.ajax, 
-							type: 'POST', 
-							data: formObject, 
-							contentType: false,
-							processData: false,
-							success: function (response) { 
-								if(Object.keys(response['data']['error_messages']).length) {
-									const wc_notice = $('.woocommerce-notices-wrapper');
-									if(wc_notice) {
-										wc_notice.empty();
-									}
-									wrapper.find('.wholesalex-login-form .wsx-form-field-warning-message').empty();
-									Object.keys(response['data']['error_messages']).map((err)=>{
-										wrapper.find(`.wholesalex-login-form .wsx-form-field-warning-message.${err}`).append(response['data']['error_messages'][err]);
-										wrapper.find(`.wholesalex-login-form .wsx-form-field-warning-message.${err}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
-
-										if(err=='recaptcha') {
-											if(wc_notice) {
-												wc_notice.append(response['data']['error_messages'][err]);
-											}
+						if(!checkLoginRequiredFields()) {
+							return;
+						}
+						const processLogin  = ()=>{
+							$.ajax({ 
+								url: wholesalex.ajax, 
+								type: 'POST', 
+								data: formObject, 
+								contentType: false,
+								processData: false,
+								success: function (response) { 
+									if(Object.keys(response['data']['error_messages']).length) {
+										const wc_notice = $('.woocommerce-notices-wrapper');
+										if(wc_notice) {
+											wc_notice.empty();
 										}
-									})
-								} else {
-									if(response['data']['redirect']) {
-										window.location.href = response['data']['redirect'];
+										wrapper.find('.wholesalex-login-form .wsx-form-field-warning-message').empty();
+										Object.keys(response['data']['error_messages']).map((err)=>{
+											wrapper.find(`.wholesalex-login-form .wsx-form-field-warning-message.${err}`).append(response['data']['error_messages'][err]);
+											wrapper.find(`.wholesalex-login-form .wsx-form-field-warning-message.${err}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
+
+											if(err=='recaptcha') {
+												if(wc_notice) {
+													wc_notice.append(response['data']['error_messages'][err]);
+												}
+											}
+										})
+									} else {
+										if(response['data']['redirect']) {
+											window.location.href = response['data']['redirect'];
+										}
 									}
-								}
-							}, 
-							error: function (jqXHR, textStatus, errorThrown) { 
-							} 
-						});
-					}
-
-					const formObject = new FormData(wrapper.find('.wholesalex-login-form')[0]);
-						if (wholesalex.recaptcha_status === 'yes' && wholesalex.settings.recaptcha_version!="recaptcha_v2" && typeof grecaptcha !== 'undefined' ) {
-							let site_key      = "<?php echo esc_attr( wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' ) ); ?>";
-							grecaptcha.ready(function () {
-								try {
-									grecaptcha.execute(site_key, { action: 'submit' }).then(function (token) {
-										formObject.append('token',token);
-										processLogin();
-									});
-								} catch (error) {
-								}
-								
+								}, 
+								error: function (jqXHR, textStatus, errorThrown) { 
+								} 
 							});
-							processLogin();
-							
-					} else {
-						processLogin();
-					}
-				});
+						}
 
+						const formObject = new FormData(wrapper.find('.wholesalex-login-form')[0]);
+							if (wholesalex.recaptcha_status === 'yes' && wholesalex.settings.recaptcha_version!="recaptcha_v2" && typeof grecaptcha !== 'undefined' ) {
+								let site_key      = "<?php echo esc_attr( wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' ) ); ?>";
+								grecaptcha.ready(function () {
+									try {
+										grecaptcha.execute(site_key, { action: 'submit' }).then(function (token) {
+											formObject.append('token',token);
+											processLogin();
+										});
+									} catch (error) {
+									}
+									
+								});
+								processLogin();
+								
+						} else {
+							processLogin();
+						}
+					});
+
+				});
 				
 
 			})(jQuery);
@@ -1837,8 +1844,8 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<div class="wholesalex-field-wrap">
-										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
-										<label class="wsx-label wsx-label" for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
+										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $field['name'] . '_' . $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<label class="wsx-label wsx-label" for="<?php echo esc_attr( $field['name'] . '_' . $option['value'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 									</div>
 								<?php endforeach; ?>
 							</div>
@@ -1884,8 +1891,8 @@ class WHOLESALEX_Shortcodes {
 							<div class="wsx-field-content">
 								<?php foreach ( $field['option'] as $option ) : ?>
 									<div class="wholesalex-field-wrap">
-										<input class="wsx-radio" type="radio" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
-										<label class="wsx-label wsx-label" for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
+										<input class="wsx-radio" type="radio" id="<?php echo esc_attr( $field['name'] . '_' . $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<label class="wsx-label wsx-label" for="<?php echo esc_attr( $field['name'] . '_' . $option['value'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 									</div>
 								<?php endforeach; ?>
 							</div>

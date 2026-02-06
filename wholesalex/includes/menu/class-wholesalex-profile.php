@@ -120,7 +120,10 @@ class WHOLESALEX_Profile {
 				array(
 					'default'  => $this->get_profile_fields(),
 					'tiers'    => $__tiers,
-					'settings' => array_merge( $__user_settings, $__role_settings ),
+					'settings' => array_merge(
+						is_array( $__user_settings ) ? $__user_settings : array(),
+						is_array( $__role_settings ) ? $__role_settings : array()
+					),
 				)
 			);
 		} elseif ( 'post' === $type ) {
@@ -1043,8 +1046,8 @@ class WHOLESALEX_Profile {
 																	'products_not_in_list'  => __( 'Product not in list', 'wholesalex' ),
 																	'cat_in_list'           => __( 'Categories in list', 'wholesalex' ),
 																	'cat_not_in_list'       => __( 'Categories not in list', 'wholesalex' ),
-																	'attribute_in_list'     => __( 'Attribute in list', 'wholesalex' ),
-																	'attribute_not_in_list' => __( 'Attribute not in list', 'wholesalex' ),
+																	'attribute_in_list'     => __( 'Variations in list', 'wholesalex' ),
+																	'attribute_not_in_list' => __( 'Variations not in list', 'wholesalex' ),
 																),
 																'default' => '',
 																'label' => __( 'Product Filter', 'wholesalex' ),

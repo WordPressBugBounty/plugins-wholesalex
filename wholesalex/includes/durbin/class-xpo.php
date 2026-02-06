@@ -204,28 +204,13 @@ class Xpo {
 		$default_config = array(
 			'summer_db'  => array(
 				'source'   => 'db-wholesalex-notice-logo',
-				'medium'   => 'final-hour-sale',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			'summer_db2' => array(
-				'source'   => 'db-wholesalex-notice-text',
-				'medium'   => 'massive-sale',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			'summer_db3' => array(
-				'source'   => 'db-wholesalex-notice-logo',
-				'medium'   => 'flash-sale',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			'summer_db4' => array(
-				'source'   => 'db-wholesalex-notice-text',
-				'medium'   => 'exclusive-deals',
+				'medium'   => 'new-year-sale',
 				'campaign' => 'wholesalex-dashboard',
 			),
 		);
 
 		// Step 1: Get parameters.
-		$base_url      = $params['url'] ?? 'https://getwholesalex.com/pricing';
+		$base_url      =  'https://getwholesalex.com/pricing';
 		$utm_key       = $params['utmKey'] ?? null;
 		$affiliate     = $params['affiliate'] ?? apply_filters( 'wsx_affiliate_id', '' );
 		$hash          = $params['hash'] ?? 'pricing';
@@ -268,11 +253,6 @@ class Xpo {
 		if ( ! empty( $query ) ) {
 			$final_url .= '?' . http_build_query( $query );
 		}
-
-		// for wholesalex no hash.
-		// if ( $hash ) {
-		// $final_url .= '#' . $hash;
-		// }.
 
 		return $final_url;
 	}

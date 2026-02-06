@@ -88,7 +88,7 @@ class Notice {
 		$duration       = isset( $request_params['duration'] ) ? $request_params['duration'] : null;
 
 		if ( 'hello_bar' === $type ) {
-			Xpo::set_transient_without_cache( 'wsx_helloBar', 'hide', $duration );
+			Xpo::set_transient_without_cache( 'wsx_bf_helloBar', 'hide', $duration );
 		}
 
 		return new \WP_REST_Response(
@@ -164,10 +164,10 @@ class Notice {
 		$wsx_db_nonce   = wp_create_nonce( 'wsx-dashboard-nonce' );
 		$banner_notices = array(
 			array(
-				'key'        => 'wsx_summer_sale_25',
-				'start'      => '2025-06-23 00:00 Asia/Dhaka',
-				'end'        => '2025-07-06 23:59 Asia/Dhaka',
-				'banner_src' => WHOLESALEX_URL . 'assets/img/wholesale.png',
+				'key'        => 'wsx_new_year_26',
+				'start'      => '2026-01-01 00:00 Asia/Dhaka',
+				'end'        => '2026-01-06 23:59 Asia/Dhaka',
+				'banner_src' => WHOLESALEX_URL . 'assets/img/wholex1.png',
 				'url'        => Xpo::generate_utm_link(
 					array(
 						'utmKey' => 'summer_db',
@@ -176,10 +176,22 @@ class Notice {
 				'visibility' => ! Xpo::is_lc_active(),
 			),
 			array(
-				'key'        => 'wsx_summer_sale_25_V2',
-				'start'      => '2025-07-06 00:00 Asia/Dhaka',
-				'end'        => '2025-07-09 23:59 Asia/Dhaka',
-				'banner_src' => WHOLESALEX_URL . 'assets/img/wholesale_2.png',
+				'key'        => 'wsx_jan_campaign_26',
+				'start'      => '2026-01-17 00:00 Asia/Dhaka',
+				'end'        => '2026-01-22 23:59 Asia/Dhaka',
+				'banner_src' => WHOLESALEX_URL . 'assets/img/wholex2.png',
+				'url'        => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'summer_db',
+					)
+				),
+				'visibility' => ! Xpo::is_lc_active(),
+			),
+			array(
+				'key'        => 'wsx_feb_campaign_26',
+				'start'      => '2026-02-02 00:00 Asia/Dhaka',
+				'end'        => '2026-02-07 23:59 Asia/Dhaka',
+				'banner_src' => WHOLESALEX_URL . 'assets/img/wholex3.png',
 				'url'        => Xpo::generate_utm_link(
 					array(
 						'utmKey' => 'summer_db',
@@ -191,30 +203,30 @@ class Notice {
 
 		foreach ( $banner_notices as $key => $notice ) {
 			$notice_key = isset( $notice['key'] ) ? $notice['key'] : $this->notice_version;
+
 			if ( isset( $_GET['disable_wsx_notice'] ) && $notice_key === $_GET['disable_wsx_notice'] ) {
-				return;
-			}
+				continue;
+			} else {
+				$current_time = gmdate( 'U' );
+				$notice_start = gmdate( 'U', strtotime( $notice['start'] ) );
+				$notice_end   = gmdate( 'U', strtotime( $notice['end'] ) );
+				if ( $current_time >= $notice_start && $current_time <= $notice_end && $notice['visibility'] ) {
 
-			$current_time = gmdate( 'U' );
-			$notice_start = gmdate( 'U', strtotime( $notice['start'] ) );
-			$notice_end   = gmdate( 'U', strtotime( $notice['end'] ) );
-			if ( $current_time >= $notice_start && $current_time <= $notice_end && $notice['visibility'] ) {
+					$notice_transient = Xpo::get_transient_without_cache( 'wsx_get_pro_notice_' . $notice_key );
 
-				$notice_transient = Xpo::get_transient_without_cache( 'wsx_get_pro_notice_' . $notice_key );
-
-				if ( 'off' !== $notice_transient ) {
-					if ( ! $this->notice_js_css_applied ) {
-						$this->wsx_banner_notice_css();
-						$this->notice_js_css_applied = true;
-					}
-					$query_args = array(
-						'disable_wsx_notice' => $notice_key,
-						'wsx_db_nonce'       => $wsx_db_nonce,
-					);
-					if ( isset( $notice['repeat_interval'] ) && $notice['repeat_interval'] ) {
-						$query_args['wsx_interval'] = $notice['repeat_interval'];
-					}
-					?>
+					if ( 'off' !== $notice_transient ) {
+						if ( ! $this->notice_js_css_applied ) {
+							$this->wsx_banner_notice_css();
+							$this->notice_js_css_applied = true;
+						}
+						$query_args = array(
+							'disable_wsx_notice' => $notice_key,
+							'wsx_db_nonce'       => $wsx_db_nonce,
+						);
+						if ( isset( $notice['repeat_interval'] ) && $notice['repeat_interval'] ) {
+							$query_args['wsx_interval'] = $notice['repeat_interval'];
+						}
+						?>
 					<div class="wsx-notice-wrapper notice wc-install wsx-free-notice">
 						<div class="wc-install-body wsx-image-banner">
 							<a class="wc-dismiss-notice" href="
@@ -231,7 +243,8 @@ class Notice {
 							</a>
 						</div>
 					</div>
-					<?php
+						<?php
+					}
 				}
 			}
 		}
@@ -246,78 +259,60 @@ class Notice {
 
 		$content_notices = array(
 			array(
-				'key'                => 'wsx_dashboard_content_notice1',
-				'start'              => '2025-08-04 00:00 Asia/Dhaka',
-				'end'                => '2025-08-14 23:59 Asia/Dhaka',
+				'key'                => 'wsx_dashboard_content_notice_new_year',
+				'start'              => '2026-01-09 00:00 Asia/Dhaka',
+				'end'                => '2026-01-14 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
 					array(
 						'utmKey' => 'summer_db',
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( 'Final Hour Sales Alert:', 'wholesalex' ),
-				'content_subheading' => __( 'WholesaleX on Sale – Get %s on this B2B Wholesale Store-building Solution!', 'wholesalex' ),
-				'discount_content'   => 'up to 50% OFF',
+				'content_heading'    => __( 'New Year Sales Offers:', 'wholesalex' ),
+				'content_subheading' => __( 'WholesaleX offers are live – Enjoy %s on this B2B wholesale plugin for WooCommerce!', 'wholesalex' ),
+				'discount_content'   => 'up to 60% OFF',
 				'border_color'       => '#FEAD01',
-				'icon'               => WHOLESALEX_URL . 'assets/icons/logo_sm.svg',
+				'icon'               => WHOLESALEX_URL . 'assets/icons/60_blue.svg',
 				'button_text'        => __( 'Upgrade to Pro &nbsp;➣', 'wholesalex' ),
-				'is_discount_logo'   => false,
+				'is_discount_logo'   => true,
 				'background_color'   => '#FEAD01',
 			),
 			array(
-				'key'                => 'wsx_dashboard_content_notice2',
-				'start'              => '2025-08-18 00:00 Asia/Dhaka',
-				'end'                => '2025-08-29 23:59 Asia/Dhaka',
+				'key'                => 'wsx_dashboard_content_notice_jan_new_year',
+				'start'              => '2026-01-25 00:00 Asia/Dhaka',
+				'end'                => '2026-01-30 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'summer_db2',
+						'utmKey' => 'summer_db',
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( 'Massive Sales Alert:', 'wholesalex' ),
-				'content_subheading' => __( '<strong> WholesaleX </strong> on Sale - Enjoy %s on this B2B Wholesale Store-building Solution!', 'wholesalex' ),
-				'discount_content'   => 'up to 55% OFF',
+				'content_heading'    => __( 'New Year Sales Alert:', 'wholesalex' ),
+				'content_subheading' => __( 'WholesaleX is on Sale - Enjoy %s on this B2B wholesale plugin for WooCommerce!', 'wholesalex' ),
+				'discount_content'   => 'up to 60% OFF',
 				'border_color'       => '#000000',
-				'icon'               => WHOLESALEX_URL . 'assets/icons/55_orange.svg',
+				'icon'               => WHOLESALEX_URL . 'assets/icons/60_blue.svg',
 				'button_text'        => __( 'Claim Your Discount!', 'wholesalex' ),
 				'is_discount_logo'   => true,
 			),
 			array(
-				'key'                => 'wsx_dashboard_content_notice3',
-				'start'              => '2025-09-01 00:00 Asia/Dhaka',
-				'end'                => '2025-09-21 23:59 Asia/Dhaka',
+				'key'                => 'wsx_dashboard_content_notice_feb_new_year',
+				'start'              => '2026-02-10 00:00 Asia/Dhaka',
+				'end'                => '2026-02-15 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'summer_db3',
+						'utmKey' => 'summer_db',
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( 'Grab the Flash Sale Offer:', 'wholesalex' ),
-				'content_subheading' => __( 'Sale on WholesaleX - Enjoy %s on the complete B2B Wholesale Solution!', 'wholesalex' ),
-				'discount_content'   => 'up to 50% OFF',
+				'content_heading'    => __( 'Fresh New Year Deals:', 'wholesalex' ),
+				'content_subheading' => __( 'WholesaleX is on Sale - Enjoy %s  on this B2B wholesale plugin for WooCommerce!', 'wholesalex' ),
+				'discount_content'   => 'up to 60% OFF',
 				'border_color'       => '#6C6CFF',
 				'icon'               => WHOLESALEX_URL . 'assets/icons/logo_sm.svg',
 				'button_text'        => __( 'Upgrade to Pro &nbsp;➣', 'wholesalex' ),
 				'is_discount_logo'   => false,
 				'background_color'   => '#6C6CFF',
-			),
-			array(
-				'key'                => 'wsx_dashboard_content_notice4',
-				'start'              => '2025-09-21 00:00 Asia/Dhaka',
-				'end'                => '2025-09-30 23:59 Asia/Dhaka',
-				'url'                => Xpo::generate_utm_link(
-					array(
-						'utmKey' => 'summer_db4',
-					)
-				),
-				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( 'Exclusive Sale is Live:', 'wholesalex' ),
-				'content_subheading' => __( 'Sale on <strong> WholesaleX </strong> - Enjoy %s on the complete B2B Wholesale Solution!', 'wholesalex' ),
-				'discount_content'   => 'up to 55% OFF',
-				'border_color'       => '#000000',
-				'icon'               => WHOLESALEX_URL . 'assets/icons/55_green.svg',
-				'button_text'        => __( 'Claim Your Discount!', 'wholesalex' ),
-				'is_discount_logo'   => true,
 			),
 		);
 
@@ -326,7 +321,7 @@ class Notice {
 		foreach ( $content_notices as $key => $notice ) {
 			$notice_key = isset( $notice['key'] ) ? $notice['key'] : $this->notice_version;
 			if ( isset( $_GET['disable_wsx_notice'] ) && $notice_key === $_GET['disable_wsx_notice'] ) {
-				return;
+				continue;
 			}
 			$border_color = $notice['border_color'];
 
@@ -514,7 +509,7 @@ class Notice {
 				border: 1px solid #ccd0d4;
 				padding: 4px;
 				border-radius: 4px;
-				border-left: 3px solid #00a464;
+				border-left: 3px solid #6C6CFF;
 				line-height: 0;
 			}   
 			.wsx-free-notice.wc-install img {

@@ -1142,9 +1142,20 @@ class WHOLESALEX_Overview {
 	 */
 	public function go_pro_menu_page() {
 		if ( ! Xpo::is_lc_active() || Xpo::is_lc_expired() ) {
+
+			$now = new \DateTime( 'now', wp_timezone() );
+
+			$start_date = new \DateTime( '2026-01-01 00:00:00', wp_timezone() );
+			$end_date   = new \DateTime( '2026-02-15 23:59:59', wp_timezone() );
+
+			if ( $now >= $start_date && $now <= $end_date ) {
+				$button_text = esc_html__( 'New Year Sale!', 'wholesalex' );
+			} else {
+				$button_text = esc_html__( 'Upgrade to Pro', 'wholesalex' );
+			}
 			$title       = sprintf(
 				'<div class="wsx-d-flex wsx-item-center wsx-gap-8 wsx-color-lime "><div class="wsx-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="currentColor" viewBox="0 0 32 32"><path fill="currentColor" d="m3.488 13.184 6.272 6.112-1.472 8.608L16 23.84l7.712 4.064-1.472-8.608 6.272-6.112-8.64-1.248L16 4.128l-3.872 7.808z"/></svg></div>%s</div>',
-				Xpo::is_lc_expired() ? __( 'Renew License', 'revenue' ) : __( 'Upgrade to Pro', 'wholesalex' )
+				Xpo::is_lc_expired() ? __( 'Renew License', 'wholesalex' ) : $button_text
 			);
 
 			add_submenu_page(
@@ -1165,7 +1176,7 @@ class WHOLESALEX_Overview {
 	 */
 	public function go_pro_redirect() {
 		$license_key = Xpo::get_lc_key();
-		$pro_link    = ! Xpo::is_lc_expired() ? 'https://account.wpxpo.com/checkout/?edd_license_key=' . $license_key : Xpo::generate_utm_link( array( 'utmKey' => 'submenu' ) );
+		$pro_link    = Xpo::is_lc_expired() ? 'https://account.wpxpo.com/checkout/?edd_license_key=' . $license_key : Xpo::generate_utm_link( array( 'utmKey' => 'summer_db' ) );
 		if (isset($_GET['page']) && 'go_wholesalex_pro' === sanitize_text_field($_GET['page'])) { //phpcs:ignore
 			wp_redirect($pro_link); //phpcs:ignore
 			die();

@@ -32,8 +32,21 @@ class WHOLESALEX_Menu {
 		$upgrade_link = array();
 		$setting_link = array();
 		if ( ! defined( 'WHOLESALEX_PRO_VER' ) ) {
+			// Show a special BFCM banner between Nov 5 and Dec 10 (site timezone). Otherwise show a regular "Go Pro" link.
+			// Use month/day comparison so the banner works every year (site timezone).
+			$now = new \DateTime( 'now', wp_timezone() );
+
+			$start_date = new \DateTime( '2026-01-01 00:00:00', wp_timezone() );
+			$end_date   = new \DateTime( '2026-02-15 23:59:59', wp_timezone() );
+
+			if ( $now >= $start_date && $now <= $end_date ) {
+				$label = esc_html__( 'New Year Offer!', 'wholesalex' );
+			} else {
+				$label = esc_html__( 'Go Pro', 'wholesalex' );
+			}
+
 			$upgrade_link = array(
-				'wholesalex_pro' => '<a class="wsx-link" href="' . esc_url( 'https://getwholesalex.com/pricing/?utm_source=wholesalex-plugins&utm_medium=go_pro&utm_campaign=wholesalex-DB' ) . '" target="_blank"><span style="color: #e83838; font-weight: bold;">' . esc_html__( 'Go Pro', 'wholesalex' ) . '</span></a>',
+				'wholesalex_pro' => '<a class="wsx-link" href="' . esc_url( 'https://getwholesalex.com/pricing/?utm_source=wholesalex-plugins&utm_medium=go_pro&utm_campaign=wholesalex-DB' ) . '" target="_blank"><span style="color: #e83838; font-weight: bold;">' . $label . '</span></a>',
 			);
 		}
 		$setting_link['wholesalex_settings'] = '<a class="wsx-link" href="' . esc_url( admin_url( 'admin.php?page=wholesalex-settings' ) ) . '">' . esc_html__( 'Settings', 'wholesalex' ) . '</a>';

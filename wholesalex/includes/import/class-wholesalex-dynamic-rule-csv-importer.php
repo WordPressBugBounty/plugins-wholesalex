@@ -445,8 +445,8 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 				'products_not_in_list'  => __( 'Product not in list', 'wholesalex' ),
 				'cat_in_list'           => __( 'Categories in list', 'wholesalex' ),
 				'cat_not_in_list'       => __( 'Categories not in list', 'wholesalex' ),
-				'attribute_in_list'     => __( 'Attribute in list', 'wholesalex' ),
-				'attribute_not_in_list' => __( 'Attribute not in list', 'wholesalex' ),
+				'attribute_in_list'     => __( 'Variations in list', 'wholesalex' ),
+				'attribute_not_in_list' => __( 'Variations not in list', 'wholesalex' ),
 			),
 			'product_filter'
 		);

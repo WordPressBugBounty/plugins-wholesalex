@@ -1,10 +1,10 @@
-===  WholesaleX – Wholesale Plugin for WooCommerce (B2B Wholesale Prices, Order Form, Catalog Mode, Tiered Pricing) ===
+===  WholesaleX - B2B & Wholesale Plugin for WooCommerce with Wholesale Prices ===
 Contributors: wpxpo, anik4e, jakirhasan
 Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 5.0    
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.3
-Stable tag: 2.1.10
+Stable tag: 2.2.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -12,7 +12,7 @@ Best WooCommerce wholesale plugin with features like b2b wholesale prices, whole
 
 === Description ===
 
-🥇 Most **advanced** WooCommerce Wholesale Plugin.
+🥇 Most **advanced** Wholesale Plugin for WooCommerce.
 🎁 Fatured packed solution to create **B2B+B2C** hybrid stores. 
 💕 A plugin by WPXPO, **empowering 60K+** businesses.
 📞 **Dedicated support** team with **4.9/5** customer satisfaction on [Trustpilot](https://uk.trustpilot.com/review/wpxpo.com)!
@@ -20,15 +20,15 @@ Best WooCommerce wholesale plugin with features like b2b wholesale prices, whole
 😲 [Free Demo](https://trywholesalex.wpxpo.com/) | 🔥 [WholesaleX Pro](https://getwholesalex.com/) | 📃 [Documentation](https://getwholesalex.com/documentation/)
 
 
-## WholesaleX - The Ultimate WooCommerce Wholesale Plugin!
+## WholesaleX - The Ultimate Wholesale Plugin for WooCommerce
 
 WholesaleX is the most advanced WooCommerce wholesale plugin that comes with all the essential features that an ideal wholesaling store should have. However, it also comes with more effective features such as dynamic pricing & discounts, request a quote, buy x get y, etc, which are suitable for both woocommerce wholesale and retail stores.
 
 And with features like catalog mode, and logging in to view prices, you can manage both B2C and B2B customers in the same store. That’s why WholesaleX is the best WooCommerce Wholesale Plugin.
 
-Hear what reputed WordPress influencer and popular Plugins reviewer David Garray aka "Mr. Web," has to say about WholesaleX.
+WPGIZ made quite an in-depth review on WholesaleX. Here's what they have to say: 
 
-[youtube https://www.youtube.com/watch?v=AFYtmpJVxsA]
+[youtube https://www.youtube.com/watch?v=0NpWuk3EaeE]
 
 ✅ Dynamic Pricing and Discount Rules
 ✅ Tiered Pricing / Bulk Discount / Quantity Discount  
@@ -203,7 +203,7 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 
 == Screenshots ==
 
-1. WholesaleX Dashboard 
+1. WholesaleX Dashboard  
 2. User Roles
 3. Dynamic Rules Builder
 4. Registration Form Builder
@@ -212,22 +212,50 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 
 == Changelog ==
 
+= 2.2.5 – 23 December 2025 =
+Fix: Resolved an issue where the registration approval email link was not functioning correctly.
+Improvement: Enhanced the Buy X Get Y functionality for better reliability and behavior.
+
+= 2.2.4 – 17 December 2025 =
+* Fix: Resolved an issue with the Buy X Get One Free dynamic pricing rule.
+* Improvement: Improved compatibility with YITH Product Bundle.
+* Improvement: Fixed accessibility issues in checkbox and radio fields on the registration form.
+
+= 2.2.3 – 25 November 2025 =
+* Improvement: Added a filter to remove Guest and B2C users from the role-switching options.
+* Improvement: Enhanced the WholesaleX registration form for better usability.
+
+= 2.2.2 – 19 November 2025 =
+* New: Added brand name support to the dynamic rule product filter.
+* New: Added attribute support to the dynamic rule product filter.
+* Fix: Resolved the pending user registration warning issue.
+* Improvement: Enhanced compatibility with Product Extra Addons for both simple and variable products.
+
+= 2.2.1 – 06 November 2025 =
+* Improvement: Added compatibility with WPC Product Bundles plugin.
+* Improvement: Updated dynamic rules product attribute names to match variation selections.
+
+= 2.2.0 – 29 October 2025 =
+Fix: Resolved variable product pricing issue with WholesaleX role-based pricing.
+Fix: Corrected BOGO discount item quantity calculation issue.
+Fix: Addressed custom date warning appearing in the overview section.
+
 = 2.1.10 – 04 September 2025 =
-* Improvement – Optimized performance of quantity-based discount rule processing.
+* Improvement: Optimized performance of quantity-based discount rule processing.
 
 = 2.1.9 – 31 August 2025 =
-* Fix – Resolved console warning to improve frontend stability.
-* Improvement – Made the registration required field translatable for better localization support.
+* Fix: Resolved console warning to improve frontend stability.
+* Improvement: Made the registration required field translatable for better localization support.
 
 = 2.1.8 – 21 August 2025 =
-* Fix – Resolved display issue with WowStore Woo-Builder.
-* Fix – Resolved translation issue on the login page.
+* Fix: Resolved display issue with WowStore Woo-Builder.
+* Fix: Resolved translation issue on the login page.
 
 = 2.1.7 – 10 August 2025 =
-* Improvement – Enhanced product handling in dynamic rules; resolved search issue for attributes on simple products.
+* Improvement: Enhanced product handling in dynamic rules; resolved search issue for attributes on simple products.
 
 = 2.1.6 - 06 August 2025 =
-* Fix – Improved compatibility with YayMail for email display in the WooCommerce Emails list.
+* Fix: Improved compatibility with YayMail for email display in the WooCommerce Emails list.
 
 = 2.1.5 - 05 August 2025 =
 * Fix: Translation Issues on Role Switching Option is fixed.
@@ -306,7 +334,7 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 
 = 2.0.11 - 10 April 2025 =
 * Improvement: Resolved price conflict between WooCommerce and WholesaleX role-based pricing.
-* Improvement: Added Compatibility With WPC product bundles.
+* Improvement: Added Compatibility With YITH product bundles.
 * Improvement: Compatibility With woocommerce Product addons.
 * Improvement: Saving pagination state in dynamic rules page.
 * Fix : Fixed dynamic rules display issue.

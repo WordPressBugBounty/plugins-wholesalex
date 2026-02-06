@@ -28,6 +28,27 @@ class WHOLESALEX_RequstRoleChange {
 	}
 
 	/**
+	 *  Remove B2C and guest user roles from the roles array.
+	 *
+	 * @param array $roles The array of roles.
+	 * @param bool  $remove_b2c_guest Whether to remove B2C and guest roles.
+	 * @return array Filtered roles array.
+	 */
+	public function wholesalex_remove_b2c_guest_user_role( $roles, $remove_b2c_guest ) {
+
+		if ( $remove_b2c_guest ) {
+			return array_filter(
+				$roles,
+				function ( $role ) {
+					return ! in_array( $role['id'], array( 'wholesalex_b2c_users', 'wholesalex_guest' ), true );
+				}
+			);
+		}
+
+		return $roles;
+	}
+
+	/**
 	 * Request to change role
 	 */
 	public function request_to_change_role_action() {
@@ -64,6 +85,13 @@ class WHOLESALEX_RequstRoleChange {
 		);
 
 		$role_titles = array_values( array_filter( $role_titles ) );
+
+		// ADDED THIS FILTER TO REMOVE B2C AND GUEST USER ROLES IF ANYONE WANTS TO REMOVE.
+		$remove_b2c_guest = apply_filters( 'wsx_remove_b2c_guest_user_role', false );
+		if ( $remove_b2c_guest ) {
+			$role_titles = $this->wholesalex_remove_b2c_guest_user_role( $role_titles, true );
+		}
+
 		?>
 		<div style="margin-bottom: 30px;">
 			<h2 style="margin-bottom: 15px; font-size: 24px;"><?php echo esc_html__( 'Want to Switch Your User Role?', 'wholesalex' ); ?></h2>
