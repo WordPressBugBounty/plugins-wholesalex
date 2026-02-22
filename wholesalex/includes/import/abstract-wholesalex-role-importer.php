@@ -180,12 +180,13 @@ abstract class WHOLESALEX_Role_Importer implements WHOLESALEX_Importer_Interface
 			do_action( 'wholesalex_role_import_before_process_item', $data );
 			$data = apply_filters( 'wholesalex_role_import_process_item_data', $data );
 
-			$role     = wholesalex()->get_roles( 'by_id', $data['id'] );
-			$updating = false;
+			$existing_role = wholesalex()->get_roles( 'by_id', $data['id'] );
+			$updating      = false;
 
-			if ( ! empty( $role ) ) {
+			if ( ! empty( $existing_role ) ) {
 				$updating = true;
-				$role     = $data;
+				// Merge imported data with existing role data to preserve fields marked "Do not import".
+				$role = $this->merge_role_data( $existing_role, $data );
 			} else {
 				$role = $data;
 				// If role id is numeric, add a string prefix.
@@ -193,6 +194,12 @@ abstract class WHOLESALEX_Role_Importer implements WHOLESALEX_Importer_Interface
 					$role_id_prefix = apply_filters( 'wholesalex_role_importer_role_id_prefix', 'wholesalex_', $data );
 					$role['id']     = $role_id_prefix . $role['id'];
 				}
+			}
+
+			// Validate role data before saving.
+			$validation_error = $this->validate_role_data( $role, $updating );
+			if ( is_wp_error( $validation_error ) ) {
+				return $validation_error;
 			}
 
 			$role = apply_filters( 'wholesalex_role_import_pre_insert_role_data', $role, $data );
@@ -209,6 +216,81 @@ abstract class WHOLESALEX_Role_Importer implements WHOLESALEX_Importer_Interface
 		} catch ( Exception $e ) {
 			return new WP_Error( 'wholesalex_role_importer_error', $e->getMessage(), array( 'status' => $e->getCode() ) );
 		}
+	}
+
+	/**
+	 * Merge existing role data with imported data.
+	 * Only updates fields that are present in the imported data.
+	 * Preserves existing values for critical fields when imported value is empty.
+	 *
+	 * @param array $existing_role Existing role data.
+	 * @param array $imported_data Imported data from CSV.
+	 * @return array Merged role data.
+	 */
+	protected function merge_role_data( $existing_role, $imported_data ) {
+		$merged = $existing_role;
+
+		foreach ( $imported_data as $key => $value ) {
+			// For critical fields, only update if the imported value is not empty.
+			if ( $this->is_critical_field( $key ) ) {
+				if ( ! empty( $value ) || ( is_string( $value ) && strlen( trim( $value ) ) > 0 ) ) {
+					$merged[ $key ] = $value;
+				}
+				// Otherwise, keep the existing value.
+			} else {
+				// For non-critical fields, update with the imported value.
+				$merged[ $key ] = $value;
+			}
+		}
+
+		return $merged;
+	}
+
+	/**
+	 * Check if a field is critical and should not be overwritten with empty values.
+	 *
+	 * @param string $field_key Field key to check.
+	 * @return bool True if field is critical.
+	 */
+	protected function is_critical_field( $field_key ) {
+		$critical_fields = array(
+			'_role_title', // Role title is required to identify the role.
+			'id',          // ID is required for role identification.
+		);
+
+		return in_array( $field_key, $critical_fields, true );
+	}
+
+	/**
+	 * Validate role data before saving.
+	 * Ensures that critical fields are present and valid.
+	 *
+	 * @param array $role     The role data to validate.
+	 * @param bool  $updating Whether this is an update operation.
+	 * @return bool|WP_Error True if valid, WP_Error if validation fails.
+	 */
+	protected function validate_role_data( $role, $updating = false ) {
+		$role_id = isset( $role['id'] ) ? $role['id'] : '';
+
+		// Validate role ID.
+		if ( empty( $role_id ) ) {
+			return new WP_Error(
+				'wholesalex_role_importer_error',
+				__( 'Role ID is missing or invalid.', 'wholesalex' ),
+				array( 'id' => $role_id )
+			);
+		}
+
+		// Validate role title.
+		if ( empty( $role['_role_title'] ) || ( is_string( $role['_role_title'] ) && strlen( trim( $role['_role_title'] ) ) === 0 ) ) {
+			return new WP_Error(
+				'wholesalex_role_importer_error',
+				__( 'Role Title is missing. This field is required.', 'wholesalex' ),
+				array( 'id' => $role_id )
+			);
+		}
+
+		return true;
 	}
 
 

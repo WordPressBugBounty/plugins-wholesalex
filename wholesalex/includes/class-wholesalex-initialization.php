@@ -7,6 +7,7 @@
  * @package           WholesaleX
  */
 
+use WHOLESALEX\Notice;
 use WHOLESALEX\Scripts;
 use WHOLESALEX\Xpo;
 
@@ -90,12 +91,10 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-users.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-support.php';
 		require_once WHOLESALEX_PATH . 'includes/options/Addons.php';
-		// require_once WHOLESALEX_PATH . 'includes/Deactive.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-request-role-change.php';
 		require_once WHOLESALEX_PATH . 'includes/compatibility/woocommerce-bookings.php';
 		require_once WHOLESALEX_PATH . 'includes/compatibility/woo-product-bundles.php';
 		require_once WHOLESALEX_PATH . 'includes/compatibility/aeila_currency_switcher.php';
-
 		require_once WHOLESALEX_PATH . 'includes/durbin/class-durbin-client.php';
 		require_once WHOLESALEX_PATH . 'includes/durbin/class-our-plugins.php';
 		require_once WHOLESALEX_PATH . 'includes/durbin/class-xpo.php';
@@ -143,6 +142,7 @@ class WholesaleX_Initialization {
 		Scripts::register_backend_style();
 
 		wp_enqueue_style( 'wholesalex' );
+		wp_enqueue_style( 'wholesalex_public' );
 		wp_enqueue_script( 'wholesalex' );
 		$user_info     = get_userdata( get_current_user_id() );
 		$localize_data = array(
@@ -168,12 +168,13 @@ class WholesaleX_Initialization {
 			'i18n'                => array(
 				'smart_tags' => __( 'Available Smart Tags: ', 'wholesalex' ),
 			),
-			'helloBar'            => Xpo::get_transient_without_cache( 'wsx_bf_helloBar' ),
+			'helloBar'            => Notice::get_hellobar_config(),
 			'license'             => Xpo::get_lc_key(),
 			'userInfo'            => array(
 				'name'  => $user_info->first_name ? $user_info->first_name . ( $user_info->last_name ? ' ' . $user_info->last_name : '' ) : $user_info->user_login,
 				'email' => $user_info->user_email,
 			),
+			'is_rtl_support'      => is_rtl(),
 		);
 
 		wp_localize_script(
@@ -193,6 +194,7 @@ class WholesaleX_Initialization {
 		Scripts::register_frontend_scripts();
 		Scripts::register_fronend_style();
 		wp_enqueue_style( 'wholesalex' );
+		wp_enqueue_style( 'wholesalex_public' );
 		wp_enqueue_script( 'wholesalex' );
 
 		do_action( 'wholesalex_after_frontend_enqueue_scripts' );

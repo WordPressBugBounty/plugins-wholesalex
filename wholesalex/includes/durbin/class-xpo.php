@@ -202,7 +202,7 @@ class Xpo {
 
 	public static function generate_utm_link( $params ) {
 		$default_config = array(
-			'summer_db'  => array(
+			'summer_db' => array(
 				'source'   => 'db-wholesalex-notice-logo',
 				'medium'   => 'new-year-sale',
 				'campaign' => 'wholesalex-dashboard',
@@ -210,7 +210,7 @@ class Xpo {
 		);
 
 		// Step 1: Get parameters.
-		$base_url      =  'https://getwholesalex.com/pricing';
+		$base_url      = 'https://getwholesalex.com/pricing';
 		$utm_key       = $params['utmKey'] ?? null;
 		$affiliate     = $params['affiliate'] ?? apply_filters( 'wsx_affiliate_id', '' );
 		$hash          = $params['hash'] ?? 'pricing';
@@ -312,6 +312,8 @@ class Xpo {
 			case 'wow_addon':
 				$plugin_slug = 'product-addons';
 				break;
+			default:
+				return false;
 		}
 
 		if ( ! file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php' ) ) {

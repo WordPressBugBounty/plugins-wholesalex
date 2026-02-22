@@ -49,8 +49,6 @@ class WHOLESALEX_Overview {
 	public function wsx_translations_script_load() {
 		$scripts = array(
 			'wholesalex_overview',
-			'wholesalex_node_vendors',
-			'wholesalex_components',
 			'wholesalex_category',
 			'wholesalex_product',
 			'wholesalex_profile',
@@ -97,172 +95,50 @@ class WHOLESALEX_Overview {
 	 * @return void
 	 */
 	public function migration_tools_content() {
-		if ( method_exists( '\WholesaleXMigrationTool', 'migration_tools_content' ) && is_plugin_active( 'wholesalex-migration-tool/wholesalex-migration-tool.php' ) ) {
-			\WholesaleXMigrationTool::migration_tools_content();
-		} else {
-			$this->wholesalex_migration_tool_notice_js();
+		if ( method_exists( '\WholesaleXMigrationTool', 'get_tool_fields' ) && is_plugin_active( 'wholesalex-migration-tool/wholesalex-migration-tool.php' ) ) {
+			wp_enqueue_script( 'whx_migration_tools' );
+			wp_localize_script(
+				'whx_migration_tools',
+				'wholesalex_migration',
+				array(
+					'nonce'                           => wp_create_nonce( 'wholesalex-migration' ),
+					'fields'                          => \WholesaleXMigrationTool::get_tool_fields(),
+					'allow_wholesale_suite_migration' => ! wholesalex()->get_setting( 'wholesale_suite_migration_complete', false ),
+					'allow_b2bking_migration'         => ! wholesalex()->get_setting( 'b2bking_migration_complete', false ),
+					'migration_status'                => array(
+						'b2bking_migration'         => get_transient( 'wholesalex_b2bking_migrating' ) ? 'running' : ( wholesalex()->get_setting( 'b2bking_migration_complete' ) ? 'complete' : false ),
+						'wholesale_suite_migration' => get_transient( 'wholesalex_wholesalex_suite_migrating' ) ? 'running' : ( wholesalex()->get_setting( 'wholesale_suite_migration_complete' ) ? 'complete' : false ),
+					),
+					'stats'                           => array(
+						'b2bking_migration'         => get_transient( 'wholesalex_b2bking_migration_stats' ),
+						'wholesale_suite_migration' => get_transient( 'wholesalex_wholesale_suite_migration_stats' ),
+					),
+				)
+			);
 			?>
-
-			<div class="wsx-header-wrapper">
-				<div class="wsx-header wsx-migration-header">
-					<div class="wsx-logo">
-						<img src="<?php echo esc_url( WHOLESALEX_URL . '/assets/img/logo-option.svg' ); ?>" class="wsx-logo" />
-						<span class="wsx-version"><?php echo esc_html( 'v' . WHOLESALEX_VER ); ?></span>
-					</div>
-
-					<div class="wsx-header-content wsx-flex-wrap wsx-gap-12">
-						<span class="wsx-nav-link"> <?php echo esc_html( __( 'WholesaleX Migration Tool', 'wholesalex' ) ); ?> </span>
-
-						<div class="wsx-btn-group wsx-text-space-nowrap">
-
-							<?php if ( ! wholesalex()->is_pro_active() ) : ?>
-								<div class="wsx-btn wsx-bg-secondary wsx-btn-icon wsx-text-space-nowrap" data-target="">
-									<span class="wsx-icon  ">
-										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
-											<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-												stroke-width="1.5" d="m20.2 7.8-7.7 7.7-4-4-5.7 5.7"></path>
-											<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-												stroke-width="1.5" d="M15 7h6v6"></path>
-										</svg>
-									</span>Upgrade to Pro
-								</div>
-							<?php endif; ?>
-							<div class="wsx-dropdown">
-								<div class="wsx-icon wsx-color-tertiary wsx-header-action">
-									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-										<path fill="currentColor" fill-rule="evenodd"
-											d="M10.001 18.333a8.334 8.334 0 1 0 0-16.667 8.334 8.334 0 0 0 0 16.667ZM8.613 8.148c0-.238.078-.615.288-.906.175-.242.475-.482 1.1-.482.765 0 1.163.405 1.297.81.142.427.021.903-.422 1.198-.73.487-1.268.958-1.552 1.62-.25.584-.25 1.225-.249 1.826v.102h1.853c0-.759.016-1.005.1-1.198.062-.148.218-.371.876-.81a2.866 2.866 0 0 0 1.152-3.323c-.39-1.175-1.505-2.078-3.055-2.078-1.228 0-2.084.533-2.604 1.253a3.51 3.51 0 0 0-.636 1.988h1.852Zm2.314 6.945V13.24H9.074v1.852h1.854Z"
-											clip-rule="evenodd"></path>
-									</svg>
-								</div>
-								<div class="wsx-dropdown-content-wrapper wsx-modal-menu-wrapper">
-									<ul class="wsx-list wsx-d-flex wsx-flex-column wsx-gap-16">
-										<?php
-											$help_links = array(
-												array(
-													'iconClass' => 'dashicons-phone',
-													'label' => 'Get Supports',
-													'link' => 'https://getwholesalex.com/contact/?utm_source=wholesalex-menu&amp;utm_medium=features_page-support&amp;utm_campaign=wholesalex-DB',
-												),
-												array(
-													'iconClass' => 'dashicons-book',
-													'label' => 'Getting Started Guide',
-													'link' => 'https://getwholesalex.com/docs/wholesalex/getting-started/?utm_source=wholesalex-menu&amp;utm_medium=features_page-guide&amp;utm_campaign=wholesalex-DB',
-												),
-												array(
-													'iconClass' => 'dashicons-facebook-alt',
-													'label' => 'Join Community',
-													'https://www.facebook.com/groups/wholesalexcommunity',
-												),
-												array(
-													'iconClass' => 'dashicons-book',
-													'label' => 'Feature Request',
-													'link' => 'https://getwholesalex.com/roadmap/?utm_source=wholesalex-menu&amp;utm_medium=features_page-feature_request&amp;utm_campaign=wholesalex-DB',
-												),
-												array(
-													'iconClass' => 'dashicons-youtube',
-													'label' => 'YouTube Tutorials',
-													'link' => 'https://www.youtube.com/@WholesaleX',
-												),
-												array(
-													'iconClass' => 'dashicons-book',
-													'label' => 'Documentation',
-													'link' => 'https://getwholesalex.com/documentation/?utm_source=wholesalex-menu&amp;utm_medium=features_page-documentation&amp;utm_campaign=wholesalex-DB',
-												),
-												array(
-													'iconClass' => 'dashicons-edit',
-													'label' => 'What’s New',
-													'link' => 'https://getwholesalex.com/roadmap/?utm_source=wholesalex-menu&amp;utm_medium=features_page-what’s_new&amp;utm_campaign=wholesalex-DB',
-												),
-											);
-											foreach ( $help_links as $help ) {
-												?>
-												<li class="wsx-list-item">
-													<a href="<?php echo esc_url( $help['link'] ); ?>" class="wsx-link wsx-list-link wsx-d-flex wsx-item-center wsx-gap-8" target="_blank">
-														<span class="dashicons <?php echo esc_attr( $help['iconClass'] ); ?> wsx-list-icon"></span>
-														<span class="wsx-list-label"><?php echo esc_html( $help['label'] ); ?></span>
-													</a>
-												</li>
-												<?php
-											}
-											?>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="wsx-wrapper">
-				<div class="wsx-container">
-					<div class="wsx-card wsx-migration-card wc-install wsx-lg-p-32 wsx-gap-100 wsx-d-flex wsx-item-center wsx-lg-flex-column wsx-xl-gap-48 wsx-lg-text-center">
-						<div class="wsx-wrapper-box">
-							<div class="wsx-title wsx-font-28 wsx-mb-16">Migrate Your Data to WholesaleX</div>
-							<div class="wsx-font-20 wsx-lh-normal wsx-mb-48">To ensure a smooth transition and retain all your previous B2B data, you'll need to install our Migration Tool.</div>
-							<a class="wsx-link wsx-btn wsx-btn-icon wsx-migration-tool-btn" href="<?php echo esc_url( add_query_arg( array( 'action' => 'wholesalex_migration_tool_install' ), admin_url() ) ); ?>">
-								<span class="wsx-btn-loading-icon wsx-anim-rotation"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.34 17a4.773 4.773 0 0 1 1.458-6.34l.002-.002a4.778 4.778 0 0 1 5.484.094l3.432 2.496a4.778 4.778 0 0 0 5.485.094l.002-.002A4.77 4.77 0 0 0 20.66 7m-3.658 13.66a4.774 4.774 0 0 1-6.34-1.458l-.002-.003a4.778 4.778 0 0 1 .095-5.484l2.495-3.432a4.778 4.778 0 0 0 .094-5.484l-.004-.002A4.772 4.772 0 0 0 7 3.34m12.07 1.59c3.906 3.905 3.906 10.236 0 14.141-3.905 3.906-10.236 3.906-14.141 0-3.905-3.905-3.905-10.236 0-14.141 3.905-3.905 10.236-3.905 14.141 0Z"/></svg></span>
-								<span class="wsx-install-label"><?php echo esc_html_e( 'Install & Activate WholesaleX Migration Tool', 'wholesalex' ); ?></span>
-								<span  class="wsx-icon wsx-anim-icon-left"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M2 8h11.333m-4-4.667L14 8l-4.667 4.667"/></svg></span>
-							</a>
-						</div>
-						<div class="wsx-migration-tool-img">
-							<img src="<?php echo esc_url( WHOLESALEX_URL . '/assets/img/migration-image.png' ); ?>" alt="">
-						</div>
-					</div>
-				</div>
-			</div>
+			<div id="wholesalex_migration_tools_root"></div>
+			<?php
+		} else {
+			wp_enqueue_script( 'whx_migration_tools' );
+			wp_enqueue_style( 'whx_migration_tools' );
+			wp_localize_script(
+				'whx_migration_tools',
+				'wholesalex',
+				array(
+					'url'           => WHOLESALEX_URL,
+					'version'       => WHOLESALEX_VER,
+					'is_pro_active' => wholesalex()->is_pro_active(),
+					'ajax_url'      => admin_url( 'admin-ajax.php' ),
+				)
+			);
+			?>
+			<div id="wsx-migration-header"></div>
+			<div id="wsx-migration-body"></div>
 			<?php
 		}
 	}
 
-	/** Notice Script. */
-	public function wholesalex_migration_tool_notice_js() {
-		?>
-		<script type="text/javascript">
-			jQuery(document).ready(function($) {
-				'use strict';
-				$(document).on('click', '.wsx-migration-tool-btn', function(e) {
-					e.preventDefault();
-					const $that = $(this);
-					$.ajax({
-						type: 'POST',
-						url: ajaxurl,
-						data: {
-							install_plugin: 'wholesalex-migration-tool',
-							action: 'wholesalex_migration_tool_install'
-						},
-						beforeSend: function() {
-							$('.wsx-btn-loading-icon').addClass('loading');
-							$('.wsx-icon').css('display', 'block');
-						},
-						success: function(data) {
-							$('#installation-msg').html(data);
-							$('.wsx-install-label').text('Installing & Activating...');
-							$('.wsx-icon').css('display', 'none');
-						},
-						complete: function() {
-							location.reload();
-							$('.wsx-btn-loading-icon').removeClass('loading');
-						}
-					});
-				});
-				$('.wsx-header-action').on('click', function() {
-					const $menu = $('.wsx-modal-menu-wrapper');
-					if ($menu.css('display') === 'none') {
-						$menu.css('display', 'block');
-					} else {
-						$menu.css('display', 'none');
-					}
-				});
-
-			});
-		</script>
-		<?php
-	}
-
-
-	/** Install MIgration Tool Callback */
+	/** Install Migration Tool Callback */
 	public function install_callback() {
 		wholesalex()->wsx_migration_install_callback();
 	}
@@ -276,6 +152,7 @@ class WHOLESALEX_Overview {
 		$menu_access = wholesalex()->get_setting( '_settings_access_shop_manager_with_wxs_menu', '' );
 		return ( 'yes' === $menu_access ? 'manage_woocommerce' : 'manage_options' );
 	}
+
 	/**
 	 * Overview Menu callback
 	 *
@@ -316,7 +193,7 @@ class WHOLESALEX_Overview {
 				'menu_title' => __( 'Dynamic Rules', 'wholesalex' ),
 				'capability' => $manage_options_cap,
 				'slug'       => '/dynamic-rules',
-				'callback'   => array( $this, 'render_submenu_page' ),   // Single callback.
+				'callback'   => array( $this, 'render_submenu_page' ),
 				'identifier' => 'dynamic_rules',
 			),
 			array(
@@ -556,38 +433,54 @@ class WHOLESALEX_Overview {
 	 * @return void
 	 */
 	public function wholesalex_wp_dashboard_callback() {
+		// Calculate date range for last month.
 		$current_date            = new DateTime();
 		$first_day_of_last_month = $current_date->modify( 'first day of last month' )->format( 'Y-m-d' );
 		$last_day_of_last_month  = $current_date->modify( 'last day of this month' )->format( 'Y-m-d' );
-		$wsx_sales_summary       = $this->get_b2b_order_data( $first_day_of_last_month, $last_day_of_last_month );
-		$wsx_b2b_customer_count  = $this->get_b2b_customer_count( $first_day_of_last_month, $last_day_of_last_month );
+
+		// Get B2B statistics.
+		$wsx_sales_summary      = $this->get_b2b_order_data( $first_day_of_last_month, $last_day_of_last_month );
+		$wsx_b2b_customer_count = $this->get_b2b_customer_count( $first_day_of_last_month, $last_day_of_last_month );
+
+		// Enqueue React dashboard widget script and styles.
+		wp_enqueue_script( 'wholesalex_dashboard_widget' );
+		wp_enqueue_style( 'wholesalex_dashboard_widget' );
+
+		// Prepare data for React component.
+		$widget_data = array(
+			'data'    => array(
+				'salesSummary'  => array(
+					'total_orders'        => isset( $wsx_sales_summary['total_orders'] ) ? (int) $wsx_sales_summary['total_orders'] : 0,
+					'total_sales'         => isset( $wsx_sales_summary['total_sales'] ) ? $wsx_sales_summary['total_sales'] : '0',
+					'net_revenue'         => isset( $wsx_sales_summary['net_revenue'] ) ? $wsx_sales_summary['net_revenue'] : '0',
+					'gross_sales'         => isset( $wsx_sales_summary['gross_sales'] ) ? $wsx_sales_summary['gross_sales'] : '0',
+					'average_order_value' => isset( $wsx_sales_summary['average_order_value'] ) ? $wsx_sales_summary['average_order_value'] : '0',
+				),
+				'customerCount' => (int) $wsx_b2b_customer_count,
+				'translations'  => array(
+					'customerLabel'     => __( 'Customer No. (B2B)', 'wholesalex' ),
+					'totalOrderLabel'   => __( 'Total Order (B2B)', 'wholesalex' ),
+					'totalSaleLabel'    => __( 'Total Sale (B2B)', 'wholesalex' ),
+					'netRevenueLabel'   => __( 'Net Revenue (B2B)', 'wholesalex' ),
+					'grossSaleLabel'    => __( 'Gross Sale (B2B)', 'wholesalex' ),
+					'averageOrderLabel' => __( 'Average Order (B2B)', 'wholesalex' ),
+				),
+			),
+			'baseUrl' => WHOLESALEX_URL,
+			'nonce'   => wp_create_nonce( 'wholesalex_dashboard_widget' ),
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+		);
+
+		// Localize script with data.
+		wp_localize_script(
+			'wholesalex_dashboard_widget',
+			'wholesalexDashboardWidget',
+			$widget_data
+		);
+
+		// Render the container for React component.
 		?>
-
-		<div id="wholesalex-wp-dashboard" class="wsx-wrapper wsx-column-2 wsx-sm-column-1 wsx-gap-8">
-			<?php
-			$cards = array(
-				array( 'b2b_customer', WHOLESALEX_URL . '/assets/icons/dashboard-customer.svg', __( 'Customer No. (B2B)', 'wholesalex' ), $wsx_b2b_customer_count ),
-				array( 'b2b_total_order', WHOLESALEX_URL . '/assets/icons/dashboard-order.svg', __( 'Total Order (B2B)', 'wholesalex' ), $wsx_sales_summary['total_orders'] ),
-				array( 'b2b_total_sale', WHOLESALEX_URL . '/assets/icons/dashboard-sale.svg', __( 'Total Sale (B2B)', 'wholesalex' ), $wsx_sales_summary['total_sales'] ),
-				array( 'b2b_net_earning', WHOLESALEX_URL . '/assets/icons/dashboard-revenue.svg', __( 'Net Revenue (B2B)', 'wholesalex' ), $wsx_sales_summary['net_revenue'], true ),
-				array( 'b2b_gross_sale', WHOLESALEX_URL . '/assets/icons/dashboard-gross.svg', __( 'Gross Sale (B2B)', 'wholesalex' ), $wsx_sales_summary['gross_sales'], true ),
-				array( 'average_order_value_sale', WHOLESALEX_URL . '/assets/icons/dashboard-order-value.svg', __( 'Average Order (B2B)', 'wholesalex' ), $wsx_sales_summary['average_order_value'], true ),
-			);
-
-			foreach ( $cards as $card ) {
-				$is_img = isset( $card[4] ) && $card[4];
-				?>
-				<div class="wsx-card wsx-p-16 wsx-dashboard-sale-summary-card-<?php echo esc_attr( $card[0] ); ?>">
-					<div class="wsx-title-wrap">
-						<div class="wsx-font-14 wsx-font-medium"><?php echo esc_attr( $card[2] ); ?></div>
-					</div>
-					<div class="wsx-d-flex wsx-item-center wsx-gap-12">
-						<img class="wsx-icon" src="<?php echo esc_attr( $card[1] ); ?>">
-						<div class="wsx-title wsx-color-text-dark"><?php echo $card[3]; ?></div>
-					</div>
-				</div>
-			<?php } ?>
-		</div>
+		<div id="wholesalex-wp-dashboard-root"></div>
 		<?php
 	}
 
@@ -747,6 +640,13 @@ class WHOLESALEX_Overview {
 	public static function new_output( $dependency ) {
 
 		wp_enqueue_script( 'wholesalex_overview' );
+		wp_enqueue_style( 'wholesalex_overview' );
+		// Base styles for @wordpress/components used by DataViews.
+		wp_enqueue_style( 'wp-components' );
+		// DataViews package styles (vendored from node_modules into assets/css via Grunt).
+		if ( wp_style_is( 'wholesalex_dataviews', 'registered' ) ) {
+			wp_enqueue_style( 'wholesalex_dataviews' );
+		}
 		wp_localize_script(
 			'wholesalex_overview',
 			'wholesalex_overview',
@@ -762,6 +662,7 @@ class WHOLESALEX_Overview {
 			)
 		);
 		wp_enqueue_style( 'wholesalex' );
+		wp_enqueue_style( 'wholesalex_public' );
 		?>
 		<div id="wholesalex-overview"></div>
 		<?php
@@ -795,7 +696,13 @@ class WHOLESALEX_Overview {
 		 * @since 1.1.0 Enqueue Script (Reconfigure Build File)
 		 */
 		wp_enqueue_script( 'wholesalex_overview' );
-		wp_enqueue_style( 'wc-components' );
+		wp_enqueue_style( 'wholesalex_overview' );
+		// Base styles for @wordpress/components used by DataViews.
+		wp_enqueue_style( 'wp-components' );
+		// DataViews package styles (vendored from node_modules into assets/css via Grunt).
+		if ( wp_style_is( 'wholesalex_dataviews', 'registered' ) ) {
+			wp_enqueue_style( 'wholesalex_dataviews' );
+		}
 		$user_heading_data = array();
 
 		// Prepare as heading data.
@@ -1030,6 +937,7 @@ class WHOLESALEX_Overview {
 
 		wp_set_script_translations( 'wholesalex_overview', 'wholesalex', WHOLESALEX_PATH . 'languages/' );
 		wp_enqueue_style( 'wholesalex' );
+		wp_enqueue_style( 'wholesalex_public' );
 		?>
 		<div id="wholesalex-overview"></div>
 		<?php
@@ -1153,7 +1061,7 @@ class WHOLESALEX_Overview {
 			} else {
 				$button_text = esc_html__( 'Upgrade to Pro', 'wholesalex' );
 			}
-			$title       = sprintf(
+			$title = sprintf(
 				'<div class="wsx-d-flex wsx-item-center wsx-gap-8 wsx-color-lime "><div class="wsx-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="currentColor" viewBox="0 0 32 32"><path fill="currentColor" d="m3.488 13.184 6.272 6.112-1.472 8.608L16 23.84l7.712 4.064-1.472-8.608 6.272-6.112-8.64-1.248L16 4.128l-3.872 7.808z"/></svg></div>%s</div>',
 				Xpo::is_lc_expired() ? __( 'Renew License', 'wholesalex' ) : $button_text
 			);

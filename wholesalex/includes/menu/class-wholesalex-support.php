@@ -103,8 +103,7 @@ class WholesaleX_Support {
 	 */
 	public static function support_page_content() {
 		wp_enqueue_script( 'whx_support' );
-		wp_enqueue_script( 'wholesalex_node_vendors' );
-		wp_enqueue_script( 'wholesalex_components' );
+		wp_enqueue_style( 'whx_support' );
 
 		wp_localize_script(
 			'whx_support',

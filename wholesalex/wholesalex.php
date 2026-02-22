@@ -9,7 +9,7 @@
  * Plugin Name:             WholesaleX
  * Plugin URI:              https://getwholesalex.com/?utm_source=plugin_details&utm_medium=home_page&utm_campaign=wholesalex-DB
  * Description:             The WholesaleX plugin is a brand-new, highly-promising WooCommerce B2B solution to set up a conversion-focused B2B store for selling wholesale products. It offers everything required to operate an effective B2B store.
- * Version:                 2.2.5
+ * Version:                 2.3.0
  * Author:                  Wholesale Team
  * Author URI:              https://getwholesalex.com/
  * License:                 GPLv3
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin Defined.
-define( 'WHOLESALEX_VER', '2.2.5' );
+define( 'WHOLESALEX_VER', '2.3.0' );
 define( 'WHOLESALEX_URL', plugin_dir_url( __FILE__ ) );
 define( 'WHOLESALEX_BASE', plugin_basename( __FILE__ ) );
 define( 'WHOLESALEX_PATH', plugin_dir_path( __FILE__ ) );
@@ -89,16 +89,10 @@ function wholesalex_run() {
 	require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-setup-wizard.php';
 	new \WHOLESALEX\WHOLESALEX_Setup_Wizard();
 
-	include_once WHOLESALEX_PATH . 'includes/class-wholesalex-notice.php';
-	$notice = new \WHOLESALEX\WHOLESALEX_Notice();
+	// NOTICE DELETED FROM HERE.
 	if ( in_array( 'woocommerce/woocommerce.php', get_option( 'active_plugins', array() ), true ) ) {
 		include_once WHOLESALEX_PATH . 'includes/class-wholesalex-initialization.php';
 		new WholesaleX_Initialization();
-		$notice->promotion();
-	} elseif ( ! file_exists( WP_PLUGIN_DIR . '/woocommerce/woocommerce.php' ) ) {
-			$notice->install_notice();
-	} else {
-		$notice->active_notice();
 	}
 }
 

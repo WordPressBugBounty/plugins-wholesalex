@@ -9,15 +9,15 @@ $user_email = $user->user_email; //phpcs:ignore
 ?>
 
 <p>
-	<?php esc_html_x( 'You have a new customer registration.', 'New WholesaleX User Email (Admin)', 'wholesalex' ); ?>
+	<?php echo esc_html_x( 'You have a new customer registration.', 'New WholesaleX User Email (Admin)', 'wholesalex' ); ?>
 	<br /><br />
 	<?php
-	esc_html_x( 'Username: ', 'New WholesaleX User Email (Admin)', 'wholesalex' );
+	echo esc_html_x( 'Username: ', 'New WholesaleX User Email (Admin)', 'wholesalex' );
 	echo esc_html( $user_login );
 	?>
 	<br />
 	<?php
-	esc_html_x( 'Email: ', 'New WholesaleX User Email (Admin)', 'wholesalex' );
+	echo esc_html_x( 'Email: ', 'New WholesaleX User Email (Admin)', 'wholesalex' );
 	echo esc_html( $user_email );
 	?>
 </p>

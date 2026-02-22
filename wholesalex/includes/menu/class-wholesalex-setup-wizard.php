@@ -237,6 +237,7 @@ class WHOLESALEX_Setup_Wizard {
 
 		wp_enqueue_script( 'wholesalex_wizard' );
 		wp_enqueue_style( 'wholesalex' );
+		wp_enqueue_style( 'wholesalex_public' );
 
 		$localize_content = array(
 			'url'                  => WHOLESALEX_URL,

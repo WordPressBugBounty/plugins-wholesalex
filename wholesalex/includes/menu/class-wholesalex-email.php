@@ -131,8 +131,10 @@ class WHOLESALEX_Email {
 					$template_settings['enabled'] = $status;
 
 					update_option( $template_key_name, $template_settings );
-					$response['status'] = true;
-					$response['data']   = __( 'Success', 'wholesalex' );
+					$response['status']       = true;
+					$response['template_key'] = $template_name;
+					$response['enabled']      = $status;
+					$response['data']         = $status === 'yes' ? __( 'Successfully enabled', 'wholesalex' ) : __( 'Successfully disabled', 'wholesalex' );
 				}
 				break;
 			case 'save_template':
@@ -629,8 +631,8 @@ class WHOLESALEX_Email {
 	 */
 	public static function email_page_content() {
 		wp_enqueue_script( 'whx_email_templates' );
-		wp_enqueue_script( 'wholesalex_node_vendors' );
-		wp_enqueue_script( 'wholesalex_components' );
+		wp_enqueue_style( 'whx_email_templates' );
+
 		wp_localize_script(
 			'whx_email_templates',
 			'whx_email_templates',

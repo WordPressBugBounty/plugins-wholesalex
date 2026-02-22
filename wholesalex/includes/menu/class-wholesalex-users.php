@@ -150,8 +150,7 @@ class WHOLESALEX_Users {
 	 */
 	public static function users_page_content() {
 		wp_enqueue_script( 'whx_users' );
-		wp_enqueue_script( 'wholesalex_node_vendors' );
-		wp_enqueue_script( 'wholesalex_components' );
+		wp_enqueue_style( 'whx_users' );
 
 		$heading_data = array();
 
@@ -254,10 +253,15 @@ class WHOLESALEX_Users {
 		$roles        = get_option( '_wholesalex_roles', array() );
 		$roles_option = array( '' => __( '--Select Role--', 'wholesalex' ) );
 		foreach ( $roles as $role ) {
-			if ( 'wholesalex_guest' === $role['id'] ) {
+			if ( ! is_array( $role ) ) {
 				continue;
 			}
-			$roles_option[ $role['id'] ] = $role['_role_title'];
+			$role_id    = isset( $role['id'] ) ? $role['id'] : '';
+			$role_title = isset( $role['_role_title'] ) ? $role['_role_title'] : '';
+			if ( '' === $role_id || 'wholesalex_guest' === $role_id ) {
+				continue;
+			}
+			$roles_option[ $role_id ] = $role_title;
 		}
 		return $roles_option;
 	}
@@ -429,10 +433,15 @@ class WHOLESALEX_Users {
 		$roles        = get_option( '_wholesalex_roles', array() );
 		$roles_option = array();
 		foreach ( $roles as $role ) {
-			if ( 'wholesalex_guest' === $role['id'] ) {
+			if ( ! is_array( $role ) ) {
 				continue;
 			}
-			$roles_option[ 'change_role_to_' . $role['id'] ] = $role['_role_title'];
+			$role_id    = isset( $role['id'] ) ? $role['id'] : '';
+			$role_title = isset( $role['_role_title'] ) ? $role['_role_title'] : $role_id;
+			if ( '' === $role_id || 'wholesalex_guest' === $role_id ) {
+				continue;
+			}
+			$roles_option[ 'change_role_to_' . $role_id ] = $role_title;
 		}
 
 		$options_groups['roles_action'] = array(

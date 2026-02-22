@@ -470,7 +470,7 @@ class WHOLESALEX_Shortcodes {
 	private function render_registration_shortcode( $atts = array() ) {
 		$atts            = array_change_key_case( (array) $atts, CASE_LOWER );
 		$form_data       = WholesaleX_CommonUtils::get_new_form_builder_data();
-		$input_variation = $form_data['settings']['inputVariation'];
+		$input_variation = $form_data['settings']['inputStyle'];
 		$is_role_wise    = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' != $atts['registration_role'] && 'global' != $atts['registration_role'] ? $atts['registration_role'] : false;
 		$is_only_b2b     = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' == $atts['registration_role'] ? $atts['registration_role'] : false;
 		$wrapper         = wp_unique_id( 'whx_wrapper' );
@@ -514,7 +514,7 @@ class WHOLESALEX_Shortcodes {
 	private function render_login_registration_shortcode( $atts = array() ) {
 		$form_data = WholesaleX_CommonUtils::get_new_form_builder_data();
 
-		$input_variation = $form_data['settings']['inputVariation'];
+		$input_variation = $form_data['settings']['inputStyle'];
 
 		$is_role_wise = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' != $atts['registration_role'] && 'global' != $atts['registration_role'] ? $atts['registration_role'] : false;
 		$is_only_b2b  = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' == $atts['registration_role'] ? $atts['registration_role'] : false;
@@ -562,7 +562,7 @@ class WHOLESALEX_Shortcodes {
 	 */
 	private function render_login_shortcode() {
 		$form_data       = WholesaleX_CommonUtils::get_new_form_builder_data();
-		$input_variation = $form_data['settings']['inputVariation'];
+		$input_variation = $form_data['settings']['inputStyle'];
 
 		$wrapper = wp_unique_id( 'whx_wrapper' );
 
@@ -616,7 +616,7 @@ class WHOLESALEX_Shortcodes {
 				wc_add_notice( $__message_for_logged_in_user, 'error' );
 				wc_print_notices();
 				?>
-					<a class="wsx-link" href="<?php echo esc_url_raw( wp_logout_url( get_permalink() ) ); ?>"> <?php echo esc_html( wholesalex()->get_language_n_text( '_language_logout_to_see_this_form', __( 'Logout to See this form', 'wholesalex' ) ) ); ?></a>
+					<a href="<?php echo esc_url_raw( wp_logout_url( get_permalink() ) ); ?>"> <?php echo esc_html( wholesalex()->get_language_n_text( '_language_logout_to_see_this_form', __( 'Logout to See this form', 'wholesalex' ) ) ); ?></a>
 					</div>
 				<?php
 				return;
@@ -1548,6 +1548,7 @@ class WHOLESALEX_Shortcodes {
 			'--wsx-form-container-border-radius'         => isset( $style['sizeSpacing']['container']['main']['borderRadius'] ) ? $style['sizeSpacing']['container']['main']['borderRadius'] . 'px' : null,
 			'--wsx-form-container-padding'               => isset( $style['sizeSpacing']['container']['main']['padding'] ) ? $style['sizeSpacing']['container']['main']['padding'] . 'px' : null,
 			'--wsx-form-container-separator'             => isset( $style['sizeSpacing']['container']['main']['separator'] ) ? $style['sizeSpacing']['container']['main']['separator'] . 'px' : null,
+			'--wsx-form-container-separator-space'       => isset( $style['sizeSpacing']['container']['main']['separatorSpace'] ) ? $style['sizeSpacing']['container']['main']['separatorSpace'] . 'px' : '0px',
 
 			// Container - Sign In.
 			'--wsx-login-width'                          => isset( $style['sizeSpacing']['container']['signIn']['width'] ) ? $style['sizeSpacing']['container']['signIn']['width'] . 'px' : null,
@@ -3412,6 +3413,7 @@ class WHOLESALEX_Shortcodes {
 						break;
 				}
 				break;
+			case 'variation_9':
 			case 'variation_8':
 				switch ( $field['type'] ) {
 					case 'text':

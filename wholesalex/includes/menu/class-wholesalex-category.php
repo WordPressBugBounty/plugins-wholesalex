@@ -125,6 +125,7 @@ class WHOLESALEX_Category {
 	 */
 	public function category_content_html() {
 		wp_enqueue_script( 'wholesalex_category' );
+		wp_enqueue_style( 'wholesalex_category' );
 		wp_localize_script(
 			'wholesalex_category',
 			'wholesalex_category',
@@ -132,12 +133,12 @@ class WHOLESALEX_Category {
 				'visibility_settings' => wholesalex()->get_category_visibility_settings(),
 				'fields'              => $this->get_category_fields(),
 				'discounts'           => wholesalex()->get_category_discounts(),
-				'i18n'                => array(
-					// 'unlock'         => __( 'UNLOCK', 'wholesalex' ),
-					// 'unlock_heading' => __( 'Unlock All Features with', 'wholesalex' ),
-					// 'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
-					// 'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
-				),
+				// 'i18n'                => array(
+				// 	'unlock'         => __( 'UNLOCK', 'wholesalex' ),
+				// 	'unlock_heading' => __( 'Unlock All Features with', 'wholesalex' ),
+				// 	'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
+				// 	'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
+				// ),
 			),
 		);
 		wp_nonce_field( 'wholesalex_cat_add_update', '_wpnonce_add_update_cat' ); ?>
@@ -154,6 +155,7 @@ class WHOLESALEX_Category {
 	 */
 	public function category_content_edit_html( $term ) {
 		wp_enqueue_script( 'wholesalex_category' );
+		wp_enqueue_style( 'wholesalex_category' );
 		wp_localize_script(
 			'wholesalex_category',
 			'wholesalex_category',
@@ -161,12 +163,12 @@ class WHOLESALEX_Category {
 				'visibility_settings' => wholesalex()->get_category_visibility_settings(),
 				'fields'              => $this->get_category_fields(),
 				'discounts'           => array( $term->term_id => wholesalex()->get_category_discounts( $term->term_id ) ),
-				'i18n'                => array(
-					// 'unlock'         => __( 'UNLOCK', 'wholesalex' ),
-					// 'unlock_heading' => __( 'Unlock All Features with', 'wholesalex' ),
-					// 'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
-					// 'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
-				),
+				// 'i18n'                => array(
+				// 	'unlock'         => __( 'UNLOCK', 'wholesalex' ),
+				// 	'unlock_heading' => __( 'Unlock All Features with', 'wholesalex' ),
+				// 	'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
+				// 	'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
+				// ),
 			),
 		);
 		wp_nonce_field( 'wholesalex_cat_add_update', '_wpnonce_add_update_cat' );
@@ -294,7 +296,8 @@ class WHOLESALEX_Category {
 									'placeholder' => '',
 									'default'     => '',
 									/* translators: %s: WholesaleX Role Name */
-									'label'       => sprintf( __( ' %s Price', 'wholesalex' ), $role['name'] ),
+									'label'       => /*sprintf( __( ' %s Price', 'wholesalex' ), $role['name'] ),*/
+									__( 'Price', 'wholesalex' ),
 								),
 								'_min_quantity'    => array(
 									'type'        => 'number',
@@ -437,13 +440,13 @@ class WHOLESALEX_Category {
 				'quantity_based' => array(
 					'attr' => array(
 						'wholesalex_qb_pricing_switch'   => array(
-							'type'    => 'switch',
+							'type'    => 'slider',
 							'label'   => __( 'Quantity Based Pricing', 'wholesalex' ),
 							'desc'    => __( 'Enable Quantity Based Pricing', 'wholesalex' ),
 							'default' => 'no',
 						),
 						'wholesalex_cat_quantity_switch' => array(
-							'type'    => 'switch',
+							'type'    => 'slider',
 							'label'   => __( 'Apply Quantity Based Pricing in each product', 'wholesalex' ),
 							'desc'    => __( 'Enable Quantity Based Pricing on each product', 'wholesalex' ),
 							'default' => 'no',

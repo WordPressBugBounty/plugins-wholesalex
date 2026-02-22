@@ -25,8 +25,7 @@ class WholesaleX_Features {
 	 */
 	public static function feature_page_content() {
 		wp_enqueue_script( 'whx_features' );
-		wp_enqueue_script( 'wholesalex_node_vendors' );
-		wp_enqueue_script( 'wholesalex_components' );
+		wp_enqueue_style( 'whx_features' );
 
 		wp_localize_script(
 			'whx_features',

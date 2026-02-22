@@ -46,10 +46,10 @@ class WHOLESALEX_Menu {
 			}
 
 			$upgrade_link = array(
-				'wholesalex_pro' => '<a class="wsx-link" href="' . esc_url( 'https://getwholesalex.com/pricing/?utm_source=wholesalex-plugins&utm_medium=go_pro&utm_campaign=wholesalex-DB' ) . '" target="_blank"><span style="color: #e83838; font-weight: bold;">' . $label . '</span></a>',
+				'wholesalex_pro' => '<a href="' . esc_url( 'https://getwholesalex.com/pricing/?utm_source=wholesalex-plugins&utm_medium=go_pro&utm_campaign=wholesalex-DB' ) . '" target="_blank" style="color: #389e38;font-weight: bold;">' . $label . '</a>',
 			);
 		}
-		$setting_link['wholesalex_settings'] = '<a class="wsx-link" href="' . esc_url( admin_url( 'admin.php?page=wholesalex-settings' ) ) . '">' . esc_html__( 'Settings', 'wholesalex' ) . '</a>';
+		$setting_link['wholesalex_settings'] = '<a href="' . esc_url( admin_url( 'admin.php?page=wholesalex-settings' ) ) . '">' . esc_html__( 'Settings', 'wholesalex' ) . '</a>';
 		return array_merge( $setting_link, $links, $upgrade_link );
 	}
 
@@ -64,8 +64,8 @@ class WHOLESALEX_Menu {
 	public function plugin_settings_meta( $links, $file ) {
 		if ( strpos( $file, 'wholesalex.php' ) !== false ) {
 			$new_links = array(
-				'wholesalex_docs'    => '<a class="wsx-link" href="https://getwholesalex.com/documentation/?utm_source=wholesalex_plugin&utm_medium=support&utm_campaign=wholesalex-DB" target="_blank">' . esc_html__( 'Docs', 'wholesalex' ) . '</a>',
-				'wholesalex_support' => '<a class="wsx-link" href="' . esc_url( 'https://getwholesalex.com/contact/?utm_source=wholesalex_plugin&utm_medium=support&utm_campaign=wholesalex-DB' ) . '" target="_blank">' . esc_html__( 'Support', 'wholesalex' ) . '</a>',
+				'wholesalex_docs'    => '<a href="https://getwholesalex.com/documentation/?utm_source=wholesalex_plugin&utm_medium=support&utm_campaign=wholesalex-DB" target="_blank">' . esc_html__( 'Docs', 'wholesalex' ) . '</a>',
+				'wholesalex_support' => '<a href="' . esc_url( 'https://getwholesalex.com/contact/?utm_source=wholesalex_plugin&utm_medium=support&utm_campaign=wholesalex-DB' ) . '" target="_blank">' . esc_html__( 'Support', 'wholesalex' ) . '</a>',
 			);
 			$links     = array_merge( $links, $new_links );
 		}

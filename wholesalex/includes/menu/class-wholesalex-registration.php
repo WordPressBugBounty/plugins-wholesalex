@@ -85,11 +85,12 @@ class WHOLESALEX_Registration {
 		$slug = apply_filters( 'wholesalex_registration_form_builder_submenu_slug', 'wholesalex-registration' );
 
 		wp_enqueue_script( 'wholesalex_forms_block', WHOLESALEX_URL . 'assets/js/wholesalex_forms_block.js', array( 'wp-i18n', 'wp-element', 'wp-blocks', 'wp-components' ), WHOLESALEX_VER, true );
+		wp_enqueue_style( 'wholesalex_forms_block', WHOLESALEX_URL . 'assets/js/wholesalex_forms_block.css', array(), WHOLESALEX_VER );
 		wp_localize_script(
 			'wholesalex_forms_block',
 			'wholesalex_block_data',
 			array(
-				'form_builder_url' => menu_page_url( $slug, false ),
+				'form_builder_url' => admin_url( 'admin.php?page=wholesalex#/registration' ),
 				'url'              => WHOLESALEX_URL,
 			)
 		);
@@ -105,6 +106,7 @@ class WHOLESALEX_Registration {
 			'wholesalex/form',
 			array(
 				'editor_script'   => 'wholesalex_forms_block',
+				'editor_style'    => 'wholesalex_forms_block',
 				'render_callback' => array( $this, 'render_block' ),
 			)
 		);

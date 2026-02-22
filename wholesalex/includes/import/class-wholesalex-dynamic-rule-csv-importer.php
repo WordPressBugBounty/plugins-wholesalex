@@ -330,13 +330,11 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			),
 			'rule_type'
 		);
-		$rule_types = array_keys( $rule_types );
-		$value      = sanitize_text_field( $value );
-		if ( ! in_array( $value, $rule_types ) ) { //phpcs:ignore
-			$value = '';
-		}
 
-		return $value;
+		$value = sanitize_text_field( $value );
+
+		// Use flexible matching to handle variations.
+		return $this->flexible_field_matcher( $value, array_keys( $rule_types ) );
 	}
 
 
@@ -350,21 +348,96 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 		$rule_for = apply_filters(
 			'wholesalex_dynamic_rules_rule_for_options',
 			array(
-				'all_users'      => __( 'All Users', 'wholesalex' ),
-				'all_roles'      => __( 'All Roles', 'wholesalex' ),
+				''               => __( 'Select Users/Role...', 'wholesalex' ),
+				'all'            => __( 'All (Registered and Guest Users)', 'wholesalex' ),
+				'all_users'      => __( 'All Registered Users', 'wholesalex' ),
+				'all_roles'      => __( 'All B2B Roles', 'wholesalex' ),
 				'specific_users' => __( 'Specific Users', 'wholesalex' ),
 				'specific_roles' => __( 'Specific Roles', 'wholesalex' ),
 			),
 			'rule_for'
 		);
 
-		$rule_for = array_keys( $rule_for );
-		$value    = sanitize_text_field( $value );
-		if ( ! in_array( $value, $rule_for ) ) { //phpcs:ignore
-			$value = '';
+		$value = sanitize_text_field( $value );
+
+		// Normalize input value for flexible matching.
+		$normalized_value = strtolower( trim( $value ) );
+		$normalized_value = str_replace( array( ' ', '_', '-', '(', ')', ',' ), '', $normalized_value );
+
+		// Common variations mapping to the correct field values.
+		$variations = array(
+			'all'                => 'all',
+			'allusers'           => 'all',
+			'allregisteredusers' => 'all_users',
+			'allregistered'      => 'all_users',
+			'registeredusers'    => 'all_users',
+			'allb2broles'        => 'all_roles',
+			'allroles'           => 'all_roles',
+			'b2b'                => 'all_roles',
+			'b2broles'           => 'all_roles',
+			'specificusers'      => 'specific_users',
+			'specificuser'       => 'specific_users',
+			'specificroles'      => 'specific_roles',
+			'specificrole'       => 'specific_roles',
+		);
+
+		// Check if it's a direct match first.
+		$rule_for_keys = array_keys( $rule_for );
+		if ( in_array( $value, $rule_for_keys, true ) ) {
+			return $value;
 		}
 
-		return $value;
+		// Check variations.
+		if ( isset( $variations[ $normalized_value ] ) ) {
+			return $variations[ $normalized_value ];
+		}
+
+		// Check if the normalized value matches any valid key.
+		foreach ( $rule_for_keys as $valid_key ) {
+			if ( '' === $valid_key ) {
+				continue; // Skip empty option.
+			}
+			$normalized_key = str_replace( array( ' ', '_', '-', '(', ')', ',' ), '', strtolower( $valid_key ) );
+			if ( $normalized_value === $normalized_key ) {
+				return $valid_key;
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * Flexible field matcher for handling various input formats.
+	 * This method normalizes input and matches against valid keys, handling
+	 * common variations like spaces, underscores, hyphens, and case differences.
+	 *
+	 * @param string $value The input value to match.
+	 * @param array  $valid_keys Array of valid field keys.
+	 * @return string The matched valid key or empty string if no match.
+	 */
+	protected function flexible_field_matcher( $value, $valid_keys ) {
+		if ( empty( $value ) ) {
+			return '';
+		}
+
+		// Direct match (case-sensitive).
+		if ( in_array( $value, $valid_keys, true ) ) {
+			return $value;
+		}
+
+		// Normalize input value.
+		$normalized_value = strtolower( trim( $value ) );
+		$normalized_value = str_replace( array( ' ', '_', '-', '(', ')', '[', ']' ), '', $normalized_value );
+
+		// Check normalized match.
+		foreach ( $valid_keys as $valid_key ) {
+			$normalized_key = str_replace( array( ' ', '_', '-', '(', ')', '[', ']' ), '', strtolower( $valid_key ) );
+			if ( $normalized_value === $normalized_key ) {
+				return $valid_key;
+			}
+		}
+
+		// Return empty string if no match found.
+		return '';
 	}
 
 	/**
@@ -451,14 +524,10 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			'product_filter'
 		);
 
-		$product_filters = array_keys( $product_filters );
-
 		$value = sanitize_text_field( $value );
-		if ( ! in_array( $value, $product_filters ) ) { //phpcs:ignore
-			$value = '';
-		}
 
-		return $value;
+		// Use flexible matching to handle variations.
+		return $this->flexible_field_matcher( $value, array_keys( $product_filters ) );
 	}
 
 	/**

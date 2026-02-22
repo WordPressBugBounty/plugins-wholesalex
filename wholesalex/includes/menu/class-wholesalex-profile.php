@@ -204,6 +204,7 @@ class WHOLESALEX_Profile {
 				 * @since 1.1.0 Enqueue Script (Reconfigure Build File)
 				 */
 				wp_enqueue_script( 'wholesalex_profile' );
+				wp_enqueue_style( 'wholesalex_profile' );
 				wp_localize_script(
 					'wholesalex_profile',
 					'wholesalex_profile',
@@ -213,10 +214,10 @@ class WHOLESALEX_Profile {
 							'enter_more_character' => __( 'Enter 2 or more characters to search.', 'wholesalex' ),
 							'searching'            => __( 'Searching...', 'wholesalex' ),
 							'this_user'            => __( 'This User', 'wholesalex' ),
-							'unlock'               => __( 'UNLOCK', 'wholesalex' ),
-							'unlock_heading'       => __( 'Unlock All Features', 'wholesalex' ),
-							'unlock_desc'          => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
-							'upgrade_to_pro'       => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
+							// 'unlock'               => __( 'UNLOCK', 'wholesalex' ),
+							// 'unlock_heading'       => __( 'Unlock All Features', 'wholesalex' ),
+							// 'unlock_desc'          => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
+							// 'upgrade_to_pro'       => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
 						),
 					)
 				);
@@ -889,6 +890,7 @@ class WHOLESALEX_Profile {
 									'default'     => '',
 									'placeholder' => '',
 									'help'        => '',
+									'isFlexOne'   => 'yes',
 								),
 								'_wholesalex_profile_shipping_method_type' => array(
 									'type'        => 'select',
@@ -907,6 +909,7 @@ class WHOLESALEX_Profile {
 									'default'     => '',
 									'placeholder' => '',
 									'help'        => '',
+									'isFlexOne'   => 'yes',
 								),
 								'_wholesalex_profile_shipping_zone' => array(
 									'type'        => 'select',
@@ -928,6 +931,7 @@ class WHOLESALEX_Profile {
 									'is_ajax'     => true,
 									'ajax_action' => 'get_shipping_zones',
 									'ajax_search' => false,
+									'isFlexTwo'   => 'yes',
 								),
 								'_wholesalex_profile_shipping_zone_methods' => array(
 									'type'                 => 'multiselect',
@@ -950,6 +954,7 @@ class WHOLESALEX_Profile {
 									'is_ajax'              => true,
 									'ajax_action'          => 'get_shipping_methods',
 									'ajax_search'          => false,
+									'isFlexTwo'            => 'yes',
 								),
 							),
 						),
@@ -967,6 +972,7 @@ class WHOLESALEX_Profile {
 									'default'     => '',
 									'placeholder' => '',
 									'help'        => '',
+									'isFlexOne'   => 'yes',
 								),
 								'_wholesalex_profile_payment_gateways' => array(
 									'type'        => 'multiselect',
@@ -984,6 +990,7 @@ class WHOLESALEX_Profile {
 									'is_ajax'     => true,
 									'ajax_action' => 'get_payment_gateways',
 									'ajax_search' => false,
+									'isFlexOne'   => 'yes',
 								),
 							),
 						),
@@ -1164,14 +1171,15 @@ class WHOLESALEX_Profile {
 							'label' => sprintf( __( '%s User Settings', 'wholesalex' ), wholesalex()->get_plugin_name() ),
 							'attr'  => array(
 								'_wholesalex_role' => array(
-									'type'    => 'select',
+									'type'      => 'select',
 									/* translators: %s - Plugin Name */
-									'label'   => sprintf( __( '%s Role', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-									'options' =>
+									'label'     => sprintf( __( '%s Role', 'wholesalex' ), wholesalex()->get_plugin_name() ),
+									'options'   =>
 										/* translators: %s - Plugin Name */
 										array( '' => sprintf( __( '--Select %s Role--', 'wholesalex' ), wholesalex()->get_plugin_name() ) ) +
 										$__roles_options,
-									'default' => '',
+									'default'   => '',
+									'isFlexOne' => 'yes',
 								),
 								'__wholesalex_registration_role' => array(
 									'type'       => 'text',
@@ -1179,6 +1187,7 @@ class WHOLESALEX_Profile {
 									'label'      => __( 'Registration Role', 'wholesalex' ),
 									'value'      => '',
 									'default'    => '',
+									'isFlexOne'  => 'yes',
 								),
 								'_buttons'         => array(
 									'type'         => 'buttons',

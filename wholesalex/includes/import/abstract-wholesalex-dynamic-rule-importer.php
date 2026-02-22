@@ -179,12 +179,13 @@ abstract class WHOLESALEX_Dynamic_Rule_Importer implements WHOLESALEX_Importer_I
 			do_action( 'wholesalex_dynamic_rule_import_before_process_item', $data );
 			$data = apply_filters( 'wholesalex_dynamic_rule_import_process_item_data', $data );
 
-			$rule     = wholesalex()->get_dynamic_rules( $data['id'] );
-			$updating = false;
+			$existing_rule = wholesalex()->get_dynamic_rules( $data['id'] );
+			$updating      = false;
 
-			if ( ! empty( $rule ) ) {
+			if ( ! empty( $existing_rule ) ) {
 				$updating = true;
-				$rule     = $data;
+				// Only update fields that are present in the imported data.
+				$rule = $this->merge_rule_data( $existing_rule, $data );
 			} else {
 				$rule = $data;
 			}
@@ -217,6 +218,34 @@ abstract class WHOLESALEX_Dynamic_Rule_Importer implements WHOLESALEX_Importer_I
 		}
 	}
 
+	/**
+	 * Merge existing rule data with imported data.
+	 * Only updates fields that are present in the imported data.
+	 *
+	 * @param array $existing_rule Existing rule data.
+	 * @param array $imported_data Imported data from CSV.
+	 * @return array Merged rule data.
+	 */
+	protected function merge_rule_data( $existing_rule, $imported_data ) {
+		// Start with existing rule as base.
+		$merged = $existing_rule;
+
+		foreach ( $imported_data as $key => $value ) {
+			// Skip null values.
+			if ( is_null( $value ) ) {
+				continue;
+			}
+
+			// For arrays, do a smart merge - skip if it's an empty array.
+			if ( is_array( $value ) && empty( $value ) && isset( $merged[ $key ] ) && ! empty( $merged[ $key ] ) ) {
+				continue;
+			}
+
+			$merged[ $key ] = $value;
+		}
+
+		return $merged;
+	}
 
 
 

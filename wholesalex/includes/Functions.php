@@ -1872,11 +1872,11 @@ class Functions {
 		$badge_image = apply_filters(
 			'wholesalex_settings_product_tier_layouts',
 			array(
-				'style_one'   => WHOLESALEX_URL . '/assets/img/badge-style-one.png',
-				'style_two'   => WHOLESALEX_URL . '/assets/img/badge-style-two.png',
-				'style_three' => WHOLESALEX_URL . '/assets/img/badge-style-three.png',
-				'style_four'  => WHOLESALEX_URL . '/assets/img/badge-style-four.png',
-				'style_five'  => WHOLESALEX_URL . '/assets/img/badge-style-five.png',
+				'style_one'   => WHOLESALEX_URL . '/assets/img/badge-style-one.svg',
+				'style_two'   => WHOLESALEX_URL . '/assets/img/badge-style-two.svg',
+				'style_three' => WHOLESALEX_URL . '/assets/img/badge-style-three.svg',
+				'style_four'  => WHOLESALEX_URL . '/assets/img/badge-style-four.svg',
+				'style_five'  => WHOLESALEX_URL . '/assets/img/badge-style-five.svg',
 			)
 		);
 		return $badge_image;

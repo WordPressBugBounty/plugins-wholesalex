@@ -1,19 +1,19 @@
 ===  WholesaleX - B2B & Wholesale Plugin for WooCommerce with Wholesale Prices ===
 Contributors: wpxpo, anik4e, jakirhasan
 Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
-Requires at least: 5.0    
+Requires at least: 6.8    
 Tested up to: 6.9
-Requires PHP: 7.3
-Stable tag: 2.2.5
+Requires PHP: 7.4
+Stable tag: 2.3.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Best WooCommerce wholesale plugin with features like b2b wholesale prices, wholesale order form, tiered pricing, catalog mode, dynamic pricing, etc!
 
-=== Description ===
+=== Description === 
 
 🥇 Most **advanced** Wholesale Plugin for WooCommerce.
-🎁 Fatured packed solution to create **B2B+B2C** hybrid stores. 
+🎁 Fatured packed solution to create **B2B+B2C** hybrid stores.  
 💕 A plugin by WPXPO, **empowering 60K+** businesses.
 📞 **Dedicated support** team with **4.9/5** customer satisfaction on [Trustpilot](https://uk.trustpilot.com/review/wpxpo.com)!
 
@@ -44,13 +44,13 @@ WPGIZ made quite an in-depth review on WholesaleX. Here's what they have to say:
 ✅ Conversation
 ✅ WooCommerce Request a Quote
 ✅ Wholesale Wallet
-✅ WooCommerce Wholesale Subaccounts
+✅ WooCommerce Wholesale Subaccounts 
 
 
 [**Dynamic Rules for Wholesale Pricing and Discounts**](https://getwholesalex.com/dynamic-rules/)  
 
 Dynamic rules come with all essential wholesale pricing and discount criteria like quantity-based discounts, cart discounts, and more. Take a look at the following opportunities.
-
+ 
 ✔ Product Discount / Wholesale Pricing and Discount
 ✔ Quantity-Based Pricing / WooCommerce Tiered Pricing
 ✔ User Role Based Pricing
@@ -203,7 +203,7 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 
 == Screenshots ==
 
-1. WholesaleX Dashboard  
+1. WholesaleX Dashboard 
 2. User Roles
 3. Dynamic Rules Builder
 4. Registration Form Builder
@@ -212,9 +212,15 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 
 == Changelog ==
 
+= 2.3.0 – 22 February 2026 =
+* New: All React components are now built using WordPress components.
+* New: Profile, Single Product Page, and Category pages are now built with WordPress components.
+* Improvement: Enhanced shipping rule conditions.
+* Improvement: Updated wholesale-only regular price issue.
+
 = 2.2.5 – 23 December 2025 =
-Fix: Resolved an issue where the registration approval email link was not functioning correctly.
-Improvement: Enhanced the Buy X Get Y functionality for better reliability and behavior.
+* Fix: Resolved an issue where the registration approval email link was not functioning correctly.
+* Improvement: Enhanced the Buy X Get Y functionality for better reliability and behavior.
 
 = 2.2.4 – 17 December 2025 =
 * Fix: Resolved an issue with the Buy X Get One Free dynamic pricing rule.
@@ -236,9 +242,9 @@ Improvement: Enhanced the Buy X Get Y functionality for better reliability and b
 * Improvement: Updated dynamic rules product attribute names to match variation selections.
 
 = 2.2.0 – 29 October 2025 =
-Fix: Resolved variable product pricing issue with WholesaleX role-based pricing.
-Fix: Corrected BOGO discount item quantity calculation issue.
-Fix: Addressed custom date warning appearing in the overview section.
+* Fix: Resolved variable product pricing issue with WholesaleX role-based pricing.
+* Fix: Corrected BOGO discount item quantity calculation issue.
+* Fix: Addressed custom date warning appearing in the overview section.
 
 = 2.1.10 – 04 September 2025 =
 * Improvement: Optimized performance of quantity-based discount rule processing.

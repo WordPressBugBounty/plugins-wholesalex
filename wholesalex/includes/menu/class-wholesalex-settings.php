@@ -140,13 +140,13 @@ class Settings {
 			array(
 				'fields' => self::get_option_settings(),
 				'data'   => wholesalex()->get_setting(),
-				'i18n'   => array(
-					// 'settings'       => __( 'Settings', 'wholesalex' ),
-					// 'unlock'         => __( 'UNLOCK', 'wholesalex' ),
-					// 'unlock_heading' => __( 'Unlock All Features', 'wholesalex' ),
-					// 'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
-					// 'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
-				),
+				// 'i18n'   => array(
+				// 'settings'       => __( 'Settings', 'wholesalex' ),
+				// 'unlock'         => __( 'UNLOCK', 'wholesalex' ),
+				// 'unlock_heading' => __( 'Unlock All Features', 'wholesalex' ),
+				// 'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
+				// 'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
+				// ),
 			)
 		);
 
@@ -241,7 +241,6 @@ class Settings {
 					'attrGroupOne' => array(
 						'type'                             => 'general_one',
 						'_settings_show_table'             => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Show Tiered Pricing Table', 'wholesalex' ),
 							'desc'    => __( 'Product Single Page', 'wholesalex' ),
@@ -252,7 +251,6 @@ class Settings {
 							// 'popup_gif_link' => 'https://plugins.svn.wordpress.org/wholesalex/assets/Screenshot-1.jpg',
 						),
 						'b2b_stock_management_status'      => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Enable B2B Stock Management', 'wholesalex' ),
 							'desc'    => __( 'B2B Stock Management', 'wholesalex' ),
@@ -261,7 +259,6 @@ class Settings {
 							'tooltip' => 'Enabling this option will give a option on inventory tab on product page to manage b2b stock.',
 						),
 						'_settings_disable_coupon'         => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Disable Coupons', 'wholesalex' ),
 							'desc'    => __( 'Hide coupon form of cart and checkout pages from wholesale users.', 'wholesalex' ),
@@ -273,7 +270,6 @@ class Settings {
 							// 'popup_gif_link' => 'https://plugins.svn.wordpress.org/wholesalex/assets/Screenshot-1.jpg',
 						),
 						'_settings_hide_products_from_b2c' => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Hide All Products From B2C Users', 'wholesalex' ),
 							'desc'    => __( 'Click on the checkbox to hide all products from B2C users.', 'wholesalex' ),
@@ -285,7 +281,6 @@ class Settings {
 							// 'popup_gif_link' => 'https://plugins.svn.wordpress.org/wholesalex/assets/Screenshot-1.jpg',
 						),
 						'_settings_hide_all_products_from_guest' => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Hide All Products From Guest Users', 'wholesalex' ),
 							'desc'    => __( 'Click on the check box if you want to hide all products from guest users.', 'wholesalex' ),
@@ -297,7 +292,6 @@ class Settings {
 							// 'doc_link' => 'https://getwholesalex.com/pricing/?utm_source=wholesalex_plugin&utm_medium=support&utm_campaign=wholesalex-DB',
 						),
 						'_settings_private_store'          => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Make The Store Private', 'wholesalex' ),
 							'desc'    => __( 'Click the check box to make the store private from logged out users', 'wholesalex' ),
@@ -307,7 +301,6 @@ class Settings {
 							'doc'     => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
 						),
 						'_settings_allow_hidden_product_checkout' => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Allow Hidden Product to Checkout', 'wholesalex' ),
 							'desc'    => __( 'Click the check box if you want to allow hidden product to checkout', 'wholesalex' ),
@@ -317,7 +310,6 @@ class Settings {
 							// 'doc' => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
 						),
 						'_settings_allow_tax_with_cart_total_amount' => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'All Discount on Total Cart Amount Including Tax', 'wholesalex' ),
 							'desc'    => __( 'Click the check box if you want to allow Tax with Cart Total Amount', 'wholesalex' ),
@@ -327,7 +319,6 @@ class Settings {
 							// 'doc' => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
 						),
 						'_settings_access_shop_manager_with_wxs_menu' => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Allow Full Access to Shop Manager', 'wholesalex' ),
 							'desc'    => __( 'Check this box if you want to enable Full Access of WholesaleX to the Shop Manager', 'wholesalex' ),
@@ -349,7 +340,16 @@ class Settings {
 							'desc'    => __( 'Check this box if you want to enable an option for enables page visibility by group', 'wholesalex' ),
 							'help'    => '',
 							'default' => 'no',
-							'tooltip' => 'Enable/Disable WholesaleX pages for specific user groups.',
+							'tooltip' => __( 'Enable/Disable WholesaleX pages for specific user groups.', 'wholesalex' ),
+						),
+						'_settings_access_delete_wholesalex_plugin_data' => array(
+							'type'    => 'slider',
+							'danger'  => 'yes',
+							'default' => 'no',
+							'label'   => __( 'Enable Deletion of WholesaleX Plugin Data', 'wholesalex' ),
+							'desc'    => __( 'Enable this option to allow deleting WholesaleX plugin data when uninstalling the plugin.', 'wholesalex' ),
+							'help'    => __( 'Warning: All WholesaleX data will be permanently removed from the database upon uninstall. This cannot be undone.', 'wholesalex' ),
+							'tooltip' => __( 'Permanently delete all WholesaleX data on uninstall.', 'wholesalex' ),
 
 						),
 					),
@@ -449,7 +449,6 @@ class Settings {
 
 						),
 						'_settings_show_form_for_logged_in' => array(
-							// 'type'    => 'switch',
 							'type'    => 'slider',
 							'label'   => __( 'Show Registration Form For Logged In User', 'wholesalex' ),
 							'desc'    => __( 'Click on the check box if you want to show registration form logged in users.', 'wholesalex' ),
