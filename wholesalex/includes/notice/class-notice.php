@@ -180,8 +180,8 @@ class Notice {
 		$banner_notices = array(
 			array(
 				'key'                => 'wsx_flash_sale_2026_1',
-				'start'              => '2025-02-19 00:00 Asia/Dhaka',
-				'end'                => '2029-02-23 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
+				'start'              => '2026-02-19 00:00 Asia/Dhaka',
+				'end'                => '2026-02-23 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
 
 				'brand_color'        => '#6c6cff',
 

@@ -29,24 +29,61 @@ class WHOLESALEX_Menu {
 	 * @return ARRAY
 	 */
 	public function plugin_action_links_callback( $links ) {
+
+		$offer_config = array(
+			array(
+				'start'  => '2026-02-19 00:00 Asia/Dhaka',
+				'end'    => '2026-02-23 23:59 Asia/Dhaka',
+				'text'   => __(
+					'Flash Sale - Up to 50% OFF',
+					'wholesalex'
+				),
+				'utmKey' => 'flash_sale_meta',
+			),
+			array(
+				'start'  => '2026-02-25 00:00 Asia/Dhaka',
+				'end'    => '2026-03-01 23:59 Asia/Dhaka',
+				'text'   => __(
+					'Final Hour Sale - Up to 55% OFF',
+					'wholesalex'
+				),
+				'utmKey' => 'final_hour_meta',
+			),
+		);
+
 		$upgrade_link = array();
 		$setting_link = array();
-		if ( ! defined( 'WHOLESALEX_PRO_VER' ) ) {
-			// Show a special BFCM banner between Nov 5 and Dec 10 (site timezone). Otherwise show a regular "Go Pro" link.
-			// Use month/day comparison so the banner works every year (site timezone).
-			$now = new \DateTime( 'now', wp_timezone() );
-
-			$start_date = new \DateTime( '2026-01-01 00:00:00', wp_timezone() );
-			$end_date   = new \DateTime( '2026-02-15 23:59:59', wp_timezone() );
-
-			if ( $now >= $start_date && $now <= $end_date ) {
-				$label = esc_html__( 'New Year Offer!', 'wholesalex' );
+		if ( ! defined( 'WHOLESALEX_PRO_VER' ) || Xpo::is_lc_expired() ) {
+			if ( Xpo::is_lc_expired() ) {
+				$text = esc_html__( 'Renew License', 'wholesalex' );
+				$url  = 'https://account.wpxpo.com/checkout/?edd_license_key=' . Xpo::get_lc_key() . '&renew=1';
 			} else {
-				$label = esc_html__( 'Go Pro', 'wholesalex' );
+
+				$text = esc_html__( 'Go Pro', 'wholesalex' );
+				$url  = Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'plugin_meta',
+					)
+				);
+
+				foreach ( $offer_config as $offer ) {
+					$current_time = gmdate( 'U' );
+					$notice_start = gmdate( 'U', strtotime( $offer['start'] ) );
+					$notice_end   = gmdate( 'U', strtotime( $offer['end'] ) );
+					if ( $current_time >= $notice_start && $current_time <= $notice_end ) {
+						$url  = Xpo::generate_utm_link(
+							array(
+								'utmKey' => $offer['utmKey'],
+							)
+						);
+						$text = $offer['text'];
+						break;
+					}
+				}
 			}
 
 			$upgrade_link = array(
-				'wholesalex_pro' => '<a href="' . esc_url( 'https://getwholesalex.com/pricing/?utm_source=wholesalex-plugins&utm_medium=go_pro&utm_campaign=wholesalex-DB' ) . '" target="_blank" style="color: #389e38;font-weight: bold;">' . $label . '</a>',
+				'wholesalex_pro' => '<a href="' . esc_url( $url ) . '" target="_blank" style="color: #e83838;font-weight: bold;">' . $text . '</a>',
 			);
 		}
 		$setting_link['wholesalex_settings'] = '<a href="' . esc_url( admin_url( 'admin.php?page=wholesalex-settings' ) ) . '">' . esc_html__( 'Settings', 'wholesalex' ) . '</a>';
@@ -70,16 +107,5 @@ class WHOLESALEX_Menu {
 			$links     = array_merge( $links, $new_links );
 		}
 		return $links;
-	}
-
-	/**
-	 * Add menu page
-	 *
-	 * @since 1.0.0
-	 */
-	public function admin_menu_callback() {
-		require_once WHOLESALEX_PATH . 'includes/options/Addons.php';
-
-		new \WHOLESALEX\Addons();
 	}
 }

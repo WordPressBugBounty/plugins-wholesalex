@@ -87,7 +87,6 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-registration.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-orders.php';
 		require_once WHOLESALEX_PATH . 'includes/class-wholesalex-import-export.php';
-		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-features.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-users.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-support.php';
 		require_once WHOLESALEX_PATH . 'includes/options/Addons.php';
@@ -119,7 +118,6 @@ class WholesaleX_Initialization {
 		new \WHOLESALEX\WHOLESALEX_Email_Manager();
 		new \WHOLESALEX\WHOLESALEX_Orders();
 		new \WHOLESALEX\ImportExport();
-		new \WHOLESALEX\WholesaleX_Features();
 		new \WHOLESALEX\WholesaleX_Support();
 		new \WHOLESALEX\WHOLESALEX_Overview();
 		new \WHOLESALEX\WHOLESALEX_RequstRoleChange();

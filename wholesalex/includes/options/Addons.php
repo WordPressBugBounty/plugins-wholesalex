@@ -85,12 +85,6 @@ class Addons {
 					return wp_send_json( $response );
 				}
 
-				// if ( 'activate_plugin' === $request_for ) {
-				// 	$response['status'] = true;
-				// 	$response['data']   = $this->activate_only_plugin( $addon );
-				// 	return wp_send_json( $response );
-				// }
-
 				$addon_name  = isset( $post['addon'] ) ? sanitize_text_field( $post['addon'] ) : '';
 				$addon_value = isset( $post['status'] ) ? sanitize_text_field( $post['status'] ) : '';
 				if ( 'wsx_addon_dokan_integration' === $addon_name ) {
@@ -245,64 +239,6 @@ class Addons {
 
 		return $message;
 	}
-
-	// /**
-	//  * Activate Plugin Only (Without Installation)
-	//  *
-	//  * @param string $addon AddonId.
-	//  * @return string
-	//  */
-	// public function activate_only_plugin( $addon ) {
-	// 	$message            = '';
-	// 	$plugin_to_activate = '';
-
-	// 	switch ( $addon ) {
-	// 		case 'wsx_addon_dokan_integration':
-	// 			$plugin_to_activate = 'multi-vendor-marketplace-b2b-for-wholesalex-dokan/multi-vendor-marketplace-b2b-for-wholesalex-dokan.php';
-	// 			// Also activate dependency if not active.
-	// 			$plugin_file = 'dokan-lite/dokan.php';
-	// 			if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_file ) && ! is_plugin_active( $plugin_file ) ) {
-	// 				activate_plugin( $plugin_file );
-	// 			}
-	// 			break;
-	// 		case 'wsx_addon_wcfm_integration':
-	// 			$plugin_to_activate = 'wholesalex-wcfm-b2b-multivendor-marketplace/wholesalex-wcfm-b2b-multivendor-marketplace.php';
-	// 			// Also activate dependency if not active.
-	// 			$plugin_file = 'wc-multivendor-marketplace/wc-multivendor-marketplace.php';
-	// 			if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_file ) && ! is_plugin_active( $plugin_file ) ) {
-	// 				activate_plugin( $plugin_file );
-	// 			}
-	// 			break;
-	// 		case 'wsx_addon_migration_integration':
-	// 			$plugin_to_activate = 'wholesalex-migration-tool/wholesalex-migration-tool.php';
-	// 			break;
-	// 		default:
-	// 			return __( 'Invalid addon specified.', 'wholesalex' );
-	// 	}
-
-	// 	if ( ! file_exists( WP_PLUGIN_DIR . '/' . $plugin_to_activate ) ) {
-	// 		return __( 'Plugin not found. Please install it first.', 'wholesalex' );
-	// 	}
-
-	// 	// Ensure the is_plugin_active function is available.
-	// 	if ( ! function_exists( 'is_plugin_active' ) ) {
-	// 		include_once ABSPATH . 'wp-admin/includes/plugin.php';
-	// 	}
-
-	// 	if ( is_plugin_active( $plugin_to_activate ) ) {
-	// 		return __( 'Plugin is already active.', 'wholesalex' );
-	// 	}
-
-	// 	$activate_status = activate_plugin( $plugin_to_activate, '', false, true );
-
-	// 	if ( is_wp_error( $activate_status ) ) {
-	// 		$message = $activate_status->get_error_message();
-	// 	} else {
-	// 		$message = __( 'Successfully Activated', 'wholesalex' );
-	// 	}
-
-	// 	return $message;
-	// }
 
 	/**
 	 * Get All Addons
@@ -540,28 +476,5 @@ class Addons {
 			'is_dependency_active' => $this->check_required_plugins( 'migration' ),
 		);
 		return $config;
-	}
-
-	/**
-	 * Addons Page Content
-	 *
-	 * @return void
-	 */
-	public function addons_page_content() {
-		wp_enqueue_script( 'whx_addons' );
-		wp_enqueue_style( 'whx_addons' );
-
-		$setting_slug = apply_filters( 'wholesalex_settings_submenu_slug', 'wholesalex-settings' );
-		wp_localize_script(
-			'whx_addons',
-			'whx_addons',
-			array(
-				'addons'      => $this->get_addons(),
-				'setting_url' => menu_page_url( $setting_slug, false ),
-			)
-		);
-		?>
-			<div id="wholesalex_addons_root"> </div>
-		<?php
 	}
 }

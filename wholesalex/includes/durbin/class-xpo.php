@@ -210,7 +210,7 @@ class Xpo {
 		);
 
 		// Step 1: Get parameters.
-		$base_url      = 'https://getwholesalex.com/pricing';
+		$base_url      = 'https://getwholesalex.com/pricing/?utm_source=wholesalex-plugins&utm_medium=final-hour&utm_campaign=wholesalex-DB';
 		$utm_key       = $params['utmKey'] ?? null;
 		$affiliate     = $params['affiliate'] ?? apply_filters( 'wsx_affiliate_id', '' );
 		$hash          = $params['hash'] ?? 'pricing';

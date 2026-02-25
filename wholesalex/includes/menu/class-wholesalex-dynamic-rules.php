@@ -4026,6 +4026,8 @@ class WHOLESALEX_Dynamic_Rules {
 
 		if ( 'yes' === wholesalex()->get_setting( 'show_promotions_on_sp', 'no' ) ) {
 
+			$this->check_for_product_discounts( $product );
+
 			$this->check_for_cart_releated_discounts( $product, $cart_related_data );
 
 			$this->check_for_free_shipping( $product, $profile_shipping_data );
@@ -4736,12 +4738,51 @@ class WHOLESALEX_Dynamic_Rules {
 	}
 
 	/**
-	 * Compare by Priority Reverse.
+	 * Check for Product Discounts and populate rule data.
 	 *
-	 * @param object $product Product.
-	 * @param array  $profile_shipping_data Profile Shipping Data.
+	 * Iterates through valid product_discount rules and sets rule data
+	 * into $GLOBALS['wholesalex_rule_data'] for the given product so that
+	 * the single product page promo section can read and display them.
+	 *
+	 * @param object $product WC_Product object.
 	 * @return void
 	 */
+	public function check_for_product_discounts( $product ) {
+		$product_id   = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
+		$variation_id = $product->get_parent_id() ? $product->get_id() : 0;
+
+		if ( ! isset( $this->valid_dynamic_rules['product_discount'] ) || empty( $this->valid_dynamic_rules['product_discount'] ) ) {
+			return;
+		}
+
+		if ( 'yes' !== wholesalex()->get_setting( 'show_product_discounts_text', 'no' ) ) {
+			return;
+		}
+
+		foreach ( $this->valid_dynamic_rules['product_discount'] as $pd ) {
+			// Skip if already set for this product + rule.
+			if ( ! empty( wholesalex()->get_rule_data( $variation_id ? $variation_id : $product_id, 'product_discount', $pd['id'] ) ) ) {
+				continue;
+			}
+
+			if ( self::is_eligible_for_rule( $product_id, $variation_id, $pd['filter'] ) ) {
+				wholesalex()->set_rule_data(
+					$pd['id'],
+					$variation_id ? $variation_id : $product_id,
+					'product_discount',
+					array(
+						'value'               => $pd['rule']['_discount_amount'],
+						'type'                => $pd['rule']['_discount_type'],
+						'conditions'          => $pd['conditions'],
+						'who_priority'        => $pd['who_priority'],
+						'applied_on_priority' => $pd['applied_on_priority'],
+						'end_date'            => $pd['end_date'],
+					)
+				);
+			}
+		}
+	}
+
 	public function check_for_free_shipping( $product, $profile_shipping_data ) {
 		$product_id   = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
 		$variation_id = $product->get_parent_id() ? $product->get_id() : 0;

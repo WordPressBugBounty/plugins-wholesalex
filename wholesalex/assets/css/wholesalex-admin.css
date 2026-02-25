@@ -727,28 +727,6 @@ input:checked ~ .wsx-checkbox-mark:after {
 	margin: 0 auto;
 	padding: 42px 15px 100px;
 }
-.wsx-container-wrapper {
-	max-width: 1320px;
-	margin: 0 auto;
-	padding: 42px 15px 100px;
-	display: flex;
-	gap: 24px;
-}
-.wsx-container-wrapper .wsx-container-left {
-	flex-basis: 68%;
-}
-.wsx-container-wrapper .wsx-container-right {
-	flex-basis: 32%;
-}
-.wsx-container-wrapper .wsx-color-negative svg {
-	margin-bottom: -6px;
-}
-.wsx-container-left {
-	width: 100%;
-}
-.wsx-container-right {
-	width: 100%;
-}
 
 /* Header style */
 .wsx-header-wrapper {
@@ -2029,7 +2007,6 @@ select.wsx-select {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	min-height: 20px;
 	cursor: pointer;
 	width: fill-available;
 	width: -webkit-fill-available;
