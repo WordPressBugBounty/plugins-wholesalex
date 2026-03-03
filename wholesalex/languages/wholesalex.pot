@@ -9,7 +9,11 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2026-02-22T05:27:18+00:00\n"
+=======
+"POT-Creation-Date: 2026-02-26T09:17:12+00:00\n"
+>>>>>>> wp_components
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wholesalex\n"
@@ -17,12 +21,15 @@ msgstr ""
 #. Plugin Name of the plugin
 #: wholesalex.php
 #: includes/Functions.php:1820
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:166
+=======
+#: includes/menu/class-wholesalex-overview.php:167
+>>>>>>> wp_components
 #: assets/js/whx_cat.js:1
 #: assets/js/whx_migration_tools.js:1
 #: assets/js/whx_overview.js:1
-#: assets/js/whx_overview_dokan.js:181
-#: assets/js/whx_overview_wcfm.js:181
+#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "WholesaleX"
@@ -122,7 +129,7 @@ msgstr ""
 #: addons/recaptcha/init.php:23
 #: includes/menu/class-wholesalex-settings.php:1538
 #: includes/menu/class-wholesalex-setup-wizard.php:162
-#: includes/options/Addons.php:466
+#: includes/options/Addons.php:402
 msgid "reCAPTCHA"
 msgstr ""
 
@@ -175,6 +182,7 @@ msgstr ""
 msgid "Remember me"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/class-wholesalex-initialization.php:169
 msgid "Available Smart Tags: "
 msgstr ""
@@ -211,15 +219,70 @@ msgstr ""
 #: includes/class-wholesalex-menu.php:52
 #: includes/menu/class-wholesalex-overview.php:240
 #: includes/menu/class-wholesalex-overview.php:241
+=======
+#: includes/class-wholesalex-initialization.php:167
+msgid "Available Smart Tags: "
+msgstr ""
+
+#: includes/class-wholesalex-initialization.php:219
+msgid "You cannot register while you are logged in."
+msgstr ""
+
+#: includes/class-wholesalex-initialization.php:220
+#: includes/class-wholesalex-initialization.php:227
+msgid "is required"
+msgstr ""
+
+#: includes/class-wholesalex-initialization.php:221
+msgid "Register"
+msgstr ""
+
+#: includes/class-wholesalex-initialization.php:246
+msgid " Your account is already confirmed!. "
+msgstr ""
+
+#: includes/class-wholesalex-initialization.php:254
+msgid "<strong>Success:</strong> Your account is successfully confirmed. "
+msgstr ""
+
+#: includes/class-wholesalex-menu.php:37
+msgid "Flash Sale - Up to 50% OFF"
+msgstr ""
+
+#: includes/class-wholesalex-menu.php:46
+msgid "Final Hour Sale - Up to 55% OFF"
+msgstr ""
+
+#: includes/class-wholesalex-menu.php:58
+#: includes/menu/class-wholesalex-overview.php:1016
+msgid "Renew License"
+msgstr ""
+
+#: includes/class-wholesalex-menu.php:62
+msgid "Go Pro"
+msgstr ""
+
+#: includes/class-wholesalex-menu.php:89
+#: includes/menu/class-wholesalex-overview.php:241
+#: includes/menu/class-wholesalex-overview.php:242
+>>>>>>> wp_components
 #: assets/js/whx_overview.js:184
 msgid "Settings"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/class-wholesalex-menu.php:67
 msgid "Docs"
 msgstr ""
 
 #: includes/class-wholesalex-menu.php:68
+=======
+#: includes/class-wholesalex-menu.php:104
+msgid "Docs"
+msgstr ""
+
+#: includes/class-wholesalex-menu.php:105
+>>>>>>> wp_components
 msgid "Support"
 msgstr ""
 
@@ -529,7 +592,7 @@ msgstr ""
 #. translators: %1s Plugin Name
 #. translators: %s Plugin Name
 #: includes/class-wholesalex-request-api.php:43
-#: includes/options/Addons.php:160
+#: includes/options/Addons.php:154
 msgid "Please Set Site Key and Secret Key Before Enable Recaptcha (Path: Dashboard > %s > Settings > Recaptcha)"
 msgstr ""
 
@@ -966,11 +1029,18 @@ msgstr ""
 #: includes/export/class-wholesalex-dynamic-rule-exporter.php:48
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:255
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:339
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:978
 #: includes/menu/class-wholesalex-users.php:468
 #: assets/js/whx_overview.js:184
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: includes/menu/class-wholesalex-overview.php:928
+#: includes/menu/class-wholesalex-users.php:468
+#: assets/js/whx_overview.js:184
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Status"
 msgstr ""
 
@@ -985,8 +1055,12 @@ msgstr ""
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:257
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:341
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Type"
 msgstr ""
 
@@ -1157,8 +1231,12 @@ msgstr ""
 #: includes/export/class-wholesalex-dynamic-rule-exporter.php:169
 #: includes/export/class-wholesalex-roles-csv-exporter.php:141
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Untitled"
 msgstr ""
 
@@ -1246,8 +1324,12 @@ msgstr ""
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:457
 #: includes/import/class-wholesalex-role-csv-importer-controller.php:410
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Error Occured!"
 msgstr ""
 
@@ -1260,7 +1342,11 @@ msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:317
 #: includes/menu/class-wholesalex-dynamic-rules.php:1369
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4112
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4114
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:612
 #: includes/menu/class-wholesalex-settings.php:643
 #: includes/menu/class-wholesalex-settings.php:645
@@ -1508,8 +1594,12 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:1342
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Create Dynamic Rule"
 msgstr ""
 
@@ -1521,16 +1611,24 @@ msgstr ""
 #: includes/menu/class-wholesalex-dynamic-rules.php:1358
 #: assets/js/whx_all_products.js:1
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Rule Title"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:1364
 #: assets/js/whx_all_products.js:1
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Rule Type"
 msgstr ""
 
@@ -1539,7 +1637,11 @@ msgid "Choose Rule..."
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:1371
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4232
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4234
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:747
 #: includes/menu/class-wholesalex-settings.php:749
 msgid "Payment Method Discount"
@@ -1586,8 +1688,12 @@ msgstr ""
 #: includes/menu/class-wholesalex-profile.php:1019
 #: includes/menu/class-wholesalex-profile.php:1060
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Product Filter"
 msgstr ""
 
@@ -1746,7 +1852,11 @@ msgid "Shipping Zone Methods"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:1849
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4172
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4174
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:657
 #: includes/menu/class-wholesalex-settings.php:689
 #: includes/menu/class-wholesalex-settings.php:691
@@ -1891,13 +2001,19 @@ msgstr ""
 msgid "Pieces"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4118
 #: includes/menu/class-wholesalex-dynamic-rules.php:4238
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4120
+#: includes/menu/class-wholesalex-dynamic-rules.php:4240
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:1312
 #: includes/menu/class-wholesalex-settings.php:1314
 msgid "You can avail one of the following offers by completing the requirements."
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4134
 #: includes/menu/class-wholesalex-dynamic-rules.php:4193
 #: includes/menu/class-wholesalex-dynamic-rules.php:4253
@@ -1912,35 +2028,72 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4178
 #: includes/menu/class-wholesalex-dynamic-rules.php:4298
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4136
+#: includes/menu/class-wholesalex-dynamic-rules.php:4195
+#: includes/menu/class-wholesalex-dynamic-rules.php:4255
+msgid " % OFF"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:4138
+#: includes/menu/class-wholesalex-dynamic-rules.php:4197
+#: includes/menu/class-wholesalex-dynamic-rules.php:4257
+msgid " OFF"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:4180
+#: includes/menu/class-wholesalex-dynamic-rules.php:4300
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:1325
 #: includes/menu/class-wholesalex-settings.php:1327
 msgid "You can avail following offers by completing the requirements."
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4259
 msgid "Use "
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4292
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4261
+msgid "Use "
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:4294
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:867
 #: includes/menu/class-wholesalex-settings.php:869
 msgid "BOGO Discount"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4312
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4314
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:881
 #: includes/menu/class-wholesalex-settings.php:883
 msgid "Get 1 Free"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4318
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4320
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:894
 #: includes/menu/class-wholesalex-settings.php:896
 msgid "Buy at least {required_quantity} products"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4349
 #: includes/menu/class-wholesalex-dynamic-rules.php:4467
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4351
+#: includes/menu/class-wholesalex-dynamic-rules.php:4469
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:777
 #: includes/menu/class-wholesalex-settings.php:796
 #: includes/menu/class-wholesalex-settings.php:798
@@ -1949,41 +2102,69 @@ msgstr ""
 msgid "Free Shipping"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4383
 msgid "Promotions:"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4387
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4385
+msgid "Promotions:"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:4389
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:600
 #: includes/menu/class-wholesalex-settings.php:602
 msgid "Get exclusive offers"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4399
 msgid "Conditional Discount Offers"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4428
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4401
+msgid "Conditional Discount Offers"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:4430
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:1082
 #: includes/menu/class-wholesalex-settings.php:1084
 msgid "You can add minimum {minimum_qty} and maximum {maximum_qty} quantity of this product"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4436
 #: includes/menu/class-wholesalex-dynamic-rules.php:6254
 #: includes/menu/class-wholesalex-dynamic-rules.php:6322
 #: includes/menu/class-wholesalex-dynamic-rules.php:6388
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4438
+#: includes/menu/class-wholesalex-dynamic-rules.php:6295
+#: includes/menu/class-wholesalex-dynamic-rules.php:6363
+#: includes/menu/class-wholesalex-dynamic-rules.php:6429
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:1048
 #: includes/menu/class-wholesalex-settings.php:1050
 msgid "You have to add minimun {minimum_qty} quantity"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4444
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4446
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:1065
 #: includes/menu/class-wholesalex-settings.php:1067
 msgid "You can add maximum {maximum_qty} quantity"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4593
 msgid "Quantity: %s"
 msgstr ""
@@ -1993,27 +2174,51 @@ msgid "FREE"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4675
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4595
+msgid "Quantity: %s"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:4606
+msgid "FREE"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:4677
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:1152
 #: includes/menu/class-wholesalex-settings.php:1154
 msgid "Spend {min_value} to {max_value}"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4679
 msgid "Spend min {max_value}"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4682
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4681
+msgid "Spend min {max_value}"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:4684
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:1120
 #: includes/menu/class-wholesalex-settings.php:1122
 msgid "Spend upto {min_value}"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4692
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4694
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:1169
 #: includes/menu/class-wholesalex-settings.php:1171
 msgid "Add {min_value} to {max_value} product(s) to cart"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4695
 msgid "Buy minimum {max_value} product(s) to get the discount"
 msgstr ""
@@ -2023,20 +2228,40 @@ msgid "Don&apos;t buy more than {min_value} product(s) to get the discount"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4708
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4697
+msgid "Buy minimum {max_value} product(s) to get the discount"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:4699
+msgid "Don&apos;t buy more than {min_value} product(s) to get the discount"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:4710
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:1219
 #: includes/menu/class-wholesalex-settings.php:1221
 msgid "Add {min_value} to {max_value} {unit} to cart"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:4716
 msgid "Add min {max_value} {unit} to cart"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:4724
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:4718
+msgid "Add min {max_value} {unit} to cart"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:4726
+>>>>>>> wp_components
 msgid "Add up to {min_value} {unit} to cart"
 msgstr ""
 
 #. translators: %s: Plugin Name
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:5418
 msgid "%s Free Shipping"
 msgstr ""
@@ -2056,6 +2281,27 @@ msgid "Payment Discount!"
 msgstr ""
 
 #: includes/menu/class-wholesalex-dynamic-rules.php:6835
+=======
+#: includes/menu/class-wholesalex-dynamic-rules.php:5459
+msgid "%s Free Shipping"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:5928
+msgid "(BOGO Discounts)"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:5962
+#: includes/menu/class-wholesalex-dynamic-rules.php:5994
+msgid "Cart Discounts"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:6034
+#: includes/menu/class-wholesalex-dynamic-rules.php:6065
+msgid "Payment Discount!"
+msgstr ""
+
+#: includes/menu/class-wholesalex-dynamic-rules.php:6876
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:1372
 msgid "Login to see prices"
 msgstr ""
@@ -2450,6 +2696,7 @@ msgstr ""
 msgid "%s B2C"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:179
 #: includes/menu/class-wholesalex-overview.php:180
 msgid "Dashboard"
@@ -2457,11 +2704,21 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:192
 #: includes/menu/class-wholesalex-overview.php:193
+=======
+#: includes/menu/class-wholesalex-overview.php:180
+#: includes/menu/class-wholesalex-overview.php:181
+msgid "Dashboard"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:193
+#: includes/menu/class-wholesalex-overview.php:194
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-settings.php:587
 #: assets/js/whx_all_products.js:1
 msgid "Dynamic Rules"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:200
 #: includes/menu/class-wholesalex-overview.php:201
 msgid "User Roles"
@@ -2469,11 +2726,21 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:208
 #: includes/menu/class-wholesalex-overview.php:209
+=======
+#: includes/menu/class-wholesalex-overview.php:201
+#: includes/menu/class-wholesalex-overview.php:202
+msgid "User Roles"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:209
+#: includes/menu/class-wholesalex-overview.php:210
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-role.php:450
 #: assets/js/whx_overview.js:184
 msgid "Registration Form"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:216
 #: includes/menu/class-wholesalex-overview.php:217
 msgid "Addons"
@@ -2481,10 +2748,20 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:224
 #: includes/menu/class-wholesalex-overview.php:225
+=======
+#: includes/menu/class-wholesalex-overview.php:217
+#: includes/menu/class-wholesalex-overview.php:218
+msgid "Addons"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:225
+#: includes/menu/class-wholesalex-overview.php:226
+>>>>>>> wp_components
 #: assets/js/whx_all_products.js:1
 msgid "Users"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:232
 #: includes/menu/class-wholesalex-overview.php:233
 msgid "Emails"
@@ -2503,12 +2780,33 @@ msgstr ""
 #: includes/menu/class-wholesalex-overview.php:274
 #: includes/menu/class-wholesalex-overview.php:282
 #: includes/menu/class-wholesalex-overview.php:293
+=======
+#: includes/menu/class-wholesalex-overview.php:233
+#: includes/menu/class-wholesalex-overview.php:234
+msgid "Emails"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:252
+#: includes/menu/class-wholesalex-overview.php:253
+msgid "User Role Requests"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:263
+#: includes/menu/class-wholesalex-overview.php:264
+msgid "Features"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:275
+#: includes/menu/class-wholesalex-overview.php:283
+#: includes/menu/class-wholesalex-overview.php:294
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-setup-wizard.php:117
-#: includes/options/Addons.php:418
+#: includes/options/Addons.php:354
 msgid "Conversations"
 msgstr ""
 
 #. translators: %1$s: Menu title, %2$d: Pending conversation count.
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:284
 msgid "%1$s <span class=\"menu-counter\"><span>%2$d</span></span>"
 msgstr ""
@@ -2536,29 +2834,74 @@ msgstr ""
 #: includes/menu/class-wholesalex-overview.php:463
 #: assets/js/whx_overview.js:184
 msgid "Total Sale (B2B)"
+=======
+#: includes/menu/class-wholesalex-overview.php:285
+msgid "%1$s <span class=\"menu-counter\"><span>%2$d</span></span>"
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:464
+#: includes/menu/class-wholesalex-overview.php:298
+#: includes/menu/class-wholesalex-overview.php:299
+msgid "License"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:311
+#: includes/menu/class-wholesalex-overview.php:312
+msgid "Migration Tool"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:474
 #: assets/js/whx_overview.js:184
+msgid "Customer No. (B2B)"
+>>>>>>> wp_components
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:475
+#: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 msgid "Net Revenue (B2B)"
+=======
+msgid "Total Order (B2B)"
+>>>>>>> wp_components
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:465
+#: includes/menu/class-wholesalex-overview.php:476
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 msgid "Gross Sale (B2B)"
+=======
+msgid "Total Sale (B2B)"
+>>>>>>> wp_components
 msgstr ""
 
-#: includes/menu/class-wholesalex-overview.php:466
+#: includes/menu/class-wholesalex-overview.php:477
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 msgid "Average Order (B2B)"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:806
+=======
+msgid "Net Revenue (B2B)"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:478
+#: assets/js/whx_overview.js:184
+msgid "Gross Sale (B2B)"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:479
+#: assets/js/whx_overview.js:184
+msgid "Average Order (B2B)"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:757
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-role.php:191
 #: includes/menu/class-wholesalex-role.php:231
 msgid "New Role"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:875
 #: includes/menu/class-wholesalex-users.php:191
 #: assets/js/whx_overview.js:184
@@ -2568,10 +2911,21 @@ msgid "Select Status"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:898
+=======
+#: includes/menu/class-wholesalex-overview.php:826
+#: includes/menu/class-wholesalex-users.php:191
+#: assets/js/whx_overview.js:184
+#: assets/js/whx_overview_integration.js:181
+msgid "Select Status"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:849
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-registration.php:207
 msgid "No Mapping"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:899
 msgid "Billing\tFirst Name"
 msgstr ""
@@ -2626,47 +2980,129 @@ msgid "Name and Email"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:953
+=======
+#: includes/menu/class-wholesalex-overview.php:850
+msgid "Billing\tFirst Name"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:851
+msgid "Billing\tLast Name"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:852
+msgid "Billing\tCompany"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:853
+msgid "Billing\tAddress\t1"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:854
+msgid "Billing\tAddress\t2"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:855
+msgid "Billing\tCity"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:856
+msgid "Billing\tPost Code"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:857
+msgid "Billing\tCountry"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:858
+msgid "Billing\tState"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:859
+msgid "Billing\tEmail"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:860
+msgid "Billing\tPhone"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:861
+msgid "Custom User\tMeta Mapping"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:902
+#: includes/menu/class-wholesalex-overview.php:944
+msgid "Name and Email"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:903
+>>>>>>> wp_components
 #: assets/js/whx_overview.js:184
 msgid "Wallet Balance"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:954
+=======
+#: includes/menu/class-wholesalex-overview.php:904
+>>>>>>> wp_components
 msgid "Total Purchase"
 msgstr ""
 
 #. translators: %s - Plugin Name
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:956
+=======
+#: includes/menu/class-wholesalex-overview.php:906
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-profile.php:385
 #: includes/menu/class-wholesalex-profile.php:1176
 msgid "%s Role"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:975
 msgid "Order ID"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:976
+=======
+#: includes/menu/class-wholesalex-overview.php:925
+msgid "Order ID"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:926
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-role.php:424
 #: includes/menu/class-wholesalex-role.php:425
 #: assets/js/whx_overview.js:184
 msgid "Name"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:977
+=======
+#: includes/menu/class-wholesalex-overview.php:927
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-request-role-change.php:497
 #: includes/menu/class-wholesalex-users.php:466
 #: assets/js/whx_overview.js:184
 msgid "Date"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:979
 #: includes/menu/class-wholesalex-overview.php:997
+=======
+#: includes/menu/class-wholesalex-overview.php:929
+#: includes/menu/class-wholesalex-overview.php:947
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-request-role-change.php:504
 #: includes/menu/class-wholesalex-users.php:474
 #: assets/js/whx_overview.js:184
 msgid "Action"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:995
 msgid "Regi. Date"
 msgstr ""
@@ -2680,21 +3116,38 @@ msgid "New Year Sale!"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:1062
+=======
+#: includes/menu/class-wholesalex-overview.php:945
+msgid "Regi. Date"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:946
+msgid "Regi. Role"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:1010
+msgid "New Year Sale!"
+msgstr ""
+
+#: includes/menu/class-wholesalex-overview.php:1012
+>>>>>>> wp_components
 #: assets/js/whx_cat.js:1
 #: assets/js/whx_migration_tools.js:1
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_dokan.js:181
-#: assets/js/whx_overview_wcfm.js:181
+#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Upgrade to Pro"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-overview.php:1066
 msgid "Renew License"
 msgstr ""
 
+=======
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-profile.php:213
 msgid "No Data Found! Please try with another keyword."
 msgstr ""
@@ -3024,8 +3477,12 @@ msgstr ""
 #: includes/menu/class-wholesalex-request-role-change.php:496
 #: includes/menu/class-wholesalex-users.php:465
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Email"
 msgstr ""
 
@@ -3205,7 +3662,7 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-settings.php:224
 #: includes/menu/class-wholesalex-setup-wizard.php:70
-#: includes/options/Addons.php:368
+#: includes/options/Addons.php:304
 #: assets/js/whx_overview.js:184
 msgid "Bulk Order Form"
 msgstr ""
@@ -4143,8 +4600,12 @@ msgstr ""
 #: includes/menu/class-wholesalex-settings.php:1581
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Save Changes"
 msgstr ""
 
@@ -4169,7 +4630,7 @@ msgid "It helps the buyers to quickly order a large number of products. They can
 msgstr ""
 
 #: includes/menu/class-wholesalex-setup-wizard.php:86
-#: includes/options/Addons.php:384
+#: includes/options/Addons.php:320
 msgid "Subaccounts "
 msgstr ""
 
@@ -4178,7 +4639,7 @@ msgid "Let your registered users create subaccounts. So the subaccount holders w
 msgstr ""
 
 #: includes/menu/class-wholesalex-setup-wizard.php:101
-#: includes/options/Addons.php:400
+#: includes/options/Addons.php:336
 msgid "Request a Quote"
 msgstr ""
 
@@ -4187,10 +4648,14 @@ msgid "Let your buyers request a quote for their desired products. So you can se
 msgstr ""
 
 #: includes/menu/class-wholesalex-setup-wizard.php:108
-#: includes/options/Addons.php:407
+#: includes/options/Addons.php:343
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Conversation"
 msgstr ""
 
@@ -4199,7 +4664,7 @@ msgid "Enabling this feature will let your customers send messages to you from t
 msgstr ""
 
 #: includes/menu/class-wholesalex-setup-wizard.php:131
-#: includes/options/Addons.php:434
+#: includes/options/Addons.php:370
 #: assets/js/whx_overview.js:184
 msgid "WholesaleX Wallet"
 msgstr ""
@@ -4210,7 +4675,7 @@ msgid "Enable and configure it to let your buyers use the store wallet as a paym
 msgstr ""
 
 #: includes/menu/class-wholesalex-setup-wizard.php:147
-#: includes/options/Addons.php:451
+#: includes/options/Addons.php:387
 msgid "White Label"
 msgstr ""
 
@@ -4223,7 +4688,7 @@ msgid "Protect your website from suspicious login attempts with an added securit
 msgstr ""
 
 #: includes/menu/class-wholesalex-setup-wizard.php:175
-#: includes/options/Addons.php:480
+#: includes/options/Addons.php:416
 msgid "WholesaleX for Dokan"
 msgstr ""
 
@@ -4236,7 +4701,7 @@ msgid "This addon require Dokan plugin"
 msgstr ""
 
 #: includes/menu/class-wholesalex-setup-wizard.php:193
-#: includes/options/Addons.php:502
+#: includes/options/Addons.php:438
 msgid "WholesaleX for WCFM"
 msgstr ""
 
@@ -4319,64 +4784,72 @@ msgstr ""
 msgid "Transaction"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/options/Addons.php:172
+=======
+#: includes/options/Addons.php:166
+>>>>>>> wp_components
 msgid "Successfully Updated!"
 msgstr ""
 
-#: includes/options/Addons.php:176
+#: includes/options/Addons.php:170
 msgid "Update Failed!"
 msgstr ""
 
-#: includes/options/Addons.php:369
+#: includes/options/Addons.php:305
 msgid "Help buyers place large orders quickly. They can build purchase lists, update them at any time, and complete the order directly from their “My Account” page."
 msgstr ""
 
-#: includes/options/Addons.php:385
+#: includes/options/Addons.php:321
 msgid "Allow registered users to create subaccounts with customized permissions. Subaccount holders can perform allowed tasks on behalf of the main account owner."
 msgstr ""
 
-#: includes/options/Addons.php:401
+#: includes/options/Addons.php:337
 msgid "Allow buyers to request custom quotes for the products they want. You can set personalized pricing, negotiate, and finalize purchase terms with ease."
 msgstr ""
 
-#: includes/options/Addons.php:419
+#: includes/options/Addons.php:355
 msgid "Enable messaging so customers can communicate with one another directly from their “My Account” dashboard and keep all conversations centralized."
 msgstr ""
 
 #. translators: %s Plugin Name
-#: includes/options/Addons.php:436
+#: includes/options/Addons.php:372
 msgid "Activate a store wallet that buyers can use as a payment method. They can deposit, store a balance, and check out faster with wallet funds."
 msgstr ""
 
-#: includes/options/Addons.php:452
+#: includes/options/Addons.php:388
 msgid "Add your own branding while working on client sites using WholesaleX. Customize the plugin’s appearance to match your brand identity."
 msgstr ""
 
-#: includes/options/Addons.php:467
+#: includes/options/Addons.php:403
 msgid "Protect your website from suspicious login attempts by adding an extra layer of security with Google reCAPTCHA v3."
 msgstr ""
 
-#: includes/options/Addons.php:481
+#: includes/options/Addons.php:417
 msgid "Turn your store into a B2B multi-vendor marketplace. Create and manage wholesale discounts, dynamic rules, and user roles. Easily handle conversations between vendors and customers."
 msgstr ""
 
 #. Translators: %s is the name of the required plugin.
 #. Translators: %s is the name of the required plugin with an HTML link.
-#: includes/options/Addons.php:497
-#: includes/options/Addons.php:519
+#: includes/options/Addons.php:433
+#: includes/options/Addons.php:455
 msgid "This addon require %s plugin"
 msgstr ""
 
-#: includes/options/Addons.php:503
+#: includes/options/Addons.php:439
 msgid "Enable vendors to set wholesale prices and discounts in your WCFM-powered marketplace. Manage user conversations and streamline your B2B multi-vendor store operations."
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/options/Addons.php:523
+=======
+#: includes/options/Addons.php:459
+>>>>>>> wp_components
 #: assets/js/whx_migration_tools.js:1
 msgid "WholesaleX Migration Tool"
 msgstr ""
 
-#: includes/options/Addons.php:524
+#: includes/options/Addons.php:460
 msgid "Import your data from B2BKing and Wholesale Suite into WholesaleX with the built-in migration tool. Move everything over smoothly and continue selling without disruption."
 msgstr ""
 
@@ -4508,8 +4981,7 @@ msgstr ""
 #: assets/js/wholesalex_bulkorder.js:1
 #: assets/js/wholesalex_subaccount.js:1
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_dokan.js:181
-#: assets/js/whx_overview_wcfm.js:181
+#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_profile.js:1
 msgid "Cancel"
 msgstr ""
@@ -4557,16 +5029,24 @@ msgstr ""
 
 #: assets/js/whx_all_products.js:1
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Applied For"
 msgstr ""
 
 #. translators: 1: Filter name.
 #: assets/js/whx_all_products.js:1
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Edit"
 msgstr ""
 
@@ -4596,8 +5076,12 @@ msgstr ""
 
 #: assets/js/whx_all_products.js:1
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "No rules found"
 msgstr ""
 
@@ -4619,8 +5103,23 @@ msgstr ""
 
 #: assets/js/whx_cat.js:1
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_dokan.js:181
-#: assets/js/whx_overview_wcfm.js:181
+#: assets/js/whx_overview_integration.js:181
+#: assets/js/whx_product.js:1
+#: assets/js/whx_profile.js:1
+msgid "Quantity"
+msgstr ""
+
+#: assets/js/whx_cat.js:1
+#: assets/js/whx_overview.js:184
+#: assets/js/whx_overview_integration.js:181
+#: assets/js/whx_product.js:1
+#: assets/js/whx_profile.js:1
+msgid "Weight"
+msgstr ""
+
+#: assets/js/whx_cat.js:1
+#: assets/js/whx_overview.js:184
+#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Delete"
@@ -4628,8 +5127,7 @@ msgstr ""
 
 #: assets/js/whx_cat.js:1
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_dokan.js:181
-#: assets/js/whx_overview_wcfm.js:181
+#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Add New Condition"
@@ -4637,8 +5135,7 @@ msgstr ""
 
 #: assets/js/whx_cat.js:1
 #: assets/js/whx_overview.js:1
-#: assets/js/whx_overview_dokan.js:181
-#: assets/js/whx_overview_wcfm.js:181
+#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Unlock"
@@ -4646,8 +5143,7 @@ msgstr ""
 
 #: assets/js/whx_cat.js:1
 #: assets/js/whx_overview.js:1
-#: assets/js/whx_overview_dokan.js:181
-#: assets/js/whx_overview_wcfm.js:181
+#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Addons with"
@@ -4655,8 +5151,7 @@ msgstr ""
 
 #: assets/js/whx_cat.js:1
 #: assets/js/whx_overview.js:1
-#: assets/js/whx_overview_dokan.js:181
-#: assets/js/whx_overview_wcfm.js:181
+#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Pro"
@@ -4674,6 +5169,7 @@ msgid "Unable to load dashboard data. Please refresh the page."
 msgstr ""
 
 #: assets/js/whx_migration_tools.js:1
+<<<<<<< HEAD
 #: assets/js/whx_overview.js:1
 msgid "Flash Sale - Enjoy Up to 50% on"
 msgstr ""
@@ -4691,10 +5187,39 @@ msgstr ""
 #: assets/js/whx_migration_tools.js:1
 #: assets/js/whx_overview.js:1
 msgid "Close notification"
+=======
+msgid "Get Supports"
+msgstr ""
+
+#: assets/js/whx_migration_tools.js:1
+msgid "Getting Started Guide"
+msgstr ""
+
+#: assets/js/whx_migration_tools.js:1
+msgid "Join Community"
+msgstr ""
+
+#: assets/js/whx_migration_tools.js:1
+#: assets/js/whx_overview.js:184
+msgid "Feature Request"
+msgstr ""
+
+#: assets/js/whx_migration_tools.js:1
+msgid "YouTube Tutorials"
+msgstr ""
+
+#: assets/js/whx_migration_tools.js:1
+msgid "Documentation"
+msgstr ""
+
+#: assets/js/whx_migration_tools.js:1
+msgid "What's New"
+>>>>>>> wp_components
 msgstr ""
 
 #: assets/js/whx_migration_tools.js:1
 #: assets/js/whx_overview.js:1
+<<<<<<< HEAD
 msgid "More"
 msgstr ""
 
@@ -4705,6 +5230,8 @@ msgstr ""
 
 #: assets/js/whx_migration_tools.js:1
 #: assets/js/whx_overview.js:1
+=======
+>>>>>>> wp_components
 msgid "Help"
 msgstr ""
 
@@ -4738,9 +5265,37 @@ msgid "What's New"
 msgstr ""
 
 #: assets/js/whx_overview.js:1
+msgid "Flash Sale - Enjoy Up to 50% on"
+msgstr ""
+
+#: assets/js/whx_overview.js:1
+msgid "Final Hour Sale - Enjoy Up to 55% on"
+msgstr ""
+
+#: assets/js/whx_overview.js:1
+msgid "Grab Now"
+msgstr ""
+
+#: assets/js/whx_overview.js:1
+msgid "Close notification"
+msgstr ""
+
+#: assets/js/whx_overview.js:1
+msgid "More"
+msgstr ""
+
+#: assets/js/whx_overview.js:1
+msgid "Menu"
+msgstr ""
+
+#: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Saving…"
 msgstr ""
 
@@ -4788,8 +5343,12 @@ msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "The uploaded CSV file appears to be empty or invalid."
 msgstr ""
 
@@ -4811,85 +5370,133 @@ msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Please upload only CSV files."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Import failed. The uploaded file may have invalid format or incompatible data structure. Please verify your CSV file and try again."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Upload CSV"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "File size:"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Clear this file"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Drag and Drop File Here or"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Click to upload"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "You can upload only csv file format"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Update Existing Roles"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Selecting \"Update Existing Roles\" will only update existing roles. No new role will be added."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Continue"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Map CSV Fields to Roles"
 msgstr ""
 
@@ -4899,36 +5506,56 @@ msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Column name"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Map to field"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Do not import"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Run the importer"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Importing"
 msgstr ""
 
@@ -4938,8 +5565,12 @@ msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Import Complete!"
 msgstr ""
 
@@ -4961,41 +5592,65 @@ msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "View Error Logs"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Upload Another File"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Reason for failure"
 msgstr ""
 
 #. translators: 1: Filter name.
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Select Bulk Action"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Export Selected"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Duplicate of"
 msgstr ""
 
@@ -5012,8 +5667,12 @@ msgid "Duplicate Role"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Duplicate"
 msgstr ""
 
@@ -5022,20 +5681,32 @@ msgid "Delete Role"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Deselect all"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Select all"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Select row"
 msgstr ""
 
@@ -5060,14 +5731,22 @@ msgid "Approval Method"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Apply"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Import"
 msgstr ""
 
@@ -5084,22 +5763,19 @@ msgid "Selected Roles"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_dokan.js:181
-#: assets/js/whx_overview_wcfm.js:181
+#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_profile.js:1
 msgid "Confirm Delete"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_dokan.js:181
-#: assets/js/whx_overview_wcfm.js:181
+#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_profile.js:1
 msgid "Do You Want to delete"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_dokan.js:181
-#: assets/js/whx_overview_wcfm.js:181
+#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_profile.js:1
 msgid "Be careful, this procedure is irreversible. Do you want to proceed?"
 msgstr ""
@@ -5113,8 +5789,12 @@ msgid "Please Fill Role Name Field"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Please Select Properly!"
 msgstr ""
 
@@ -5123,20 +5803,32 @@ msgid "Please select role from the list and an action to perform bulk action."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Confirm Bulk Action"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Are you sure you want to"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "the selected"
 msgstr ""
 
@@ -5149,8 +5841,12 @@ msgid "roles"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Ok"
 msgstr ""
 
@@ -5235,6 +5931,25 @@ msgid "Sales Statistics"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
+=======
+msgid "No New Customer Found!"
+msgstr ""
+
+#: assets/js/whx_overview.js:184
+msgid "No New Order Found!"
+msgstr ""
+
+#: assets/js/whx_overview.js:184
+msgid "No New Registration Found!"
+msgstr ""
+
+#: assets/js/whx_overview.js:184
+msgid "No Data Found!"
+msgstr ""
+
+#: assets/js/whx_overview.js:184
+>>>>>>> wp_components
 msgid "New Messages"
 msgstr ""
 
@@ -5431,8 +6146,12 @@ msgid "Set Pending"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Bulk Actions"
 msgstr ""
 
@@ -5525,24 +6244,37 @@ msgid "Unlock full email access with WholesaleX Pro, giving you complete control
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Resolved"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Force Delete"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "User"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 msgid "Add New Conversation"
@@ -5551,216 +6283,369 @@ msgstr ""
 #: assets/js/whx_overview.js:184
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Select Type"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+msgid "Add New Conversation"
+msgstr ""
+
+#: assets/js/whx_overview.js:184
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Search Conversations"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+msgid "No conversations found"
+msgstr ""
+
+#: assets/js/whx_overview.js:184
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Selected Conversations"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Please select conversation from the list and an action to perform bulk action."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "conversation"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "conversations"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "The uploaded CSV file does not appear to be a valid dynamic rules import file. Please ensure you are uploading the correct file with dynamic rules-related columns."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Eror Occured!"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Import Dynamic Rules"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Select fields from your CSV file to map against dynamic rules fields, or to ignore during import."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Your Dynamic Rules are now being imported.."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Dynamic Rules Imported."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Dynamic Rules Updated."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Dynamic Rules Skipped."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Dynamic Rules Failed."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Dynamic Rule"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Please Fill All Fields."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Minimum Product Quantity Should Greater then Free Product Quantity."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Edit Rule"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Duplicate Rule"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Delete Rule"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Vendor #"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Untitled Rule"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Enable"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Disable"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Doc"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Tutorial"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Latest"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Oldest"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Search Rule"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Selected Rules"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Please select rule from the list and an action to perform bulk action."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Unlock all Features with"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Publish"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Draft"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
+=======
+#: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
 msgid "Please Fill The Rule Title."
 msgstr ""
 
@@ -6325,10 +7210,13 @@ msgid "Size"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 msgid "Weight"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+=======
+>>>>>>> wp_components
 msgid "Transform"
 msgstr ""
 

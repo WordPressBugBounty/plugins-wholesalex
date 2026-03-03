@@ -2509,6 +2509,7 @@ class WHOLESALEX_Dynamic_Rules {
 
 			.layout-vertical .wsx-price-table-body {
 				display: flex;
+				width: 100%;
 			}
 
 			.layout-vertical .wsx-price-table-header {

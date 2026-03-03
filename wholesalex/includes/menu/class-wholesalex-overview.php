@@ -53,7 +53,7 @@ class WHOLESALEX_Overview {
 			'wholesalex_product',
 			'wholesalex_profile',
 			'wholesalex-builder',
-			'whx_overview_integration',
+			'whx_integration',
 		);
 
 		foreach ( $scripts as $script ) {
@@ -161,7 +161,7 @@ class WHOLESALEX_Overview {
 	 */
 	public function overview_submenu_page_callback() {
 
-		$wholesalex_menu_icon = plugins_url( 'wholesalex/assets/img/icon-sm.svg' );
+		$wholesalex_menu_icon = plugins_url( 'wholesalex/assets/icons/icon-sm.svg' );
 		$wholesalex_menu_icon = apply_filters( 'wholesalex_menu_icon', $wholesalex_menu_icon );
 
 		$menu_name = apply_filters( 'wholesalex_plugin_menu_name', __( 'WholesaleX', 'wholesalex' ) );
@@ -378,6 +378,18 @@ class WHOLESALEX_Overview {
 			$end_date    = isset( $post['end_date'] ) ? sanitize_text_field( $post['end_date'] ) : '';
 			$period      = isset( $post['period'] ) ? sanitize_text_field( $post['period'] ) : 'day';
 			switch ( $request_for ) {
+				case 'overview_init':
+					// Batch endpoint: returns all non-date-dependent dashboard data in a single call.
+					$response['status'] = true;
+					$response['data']   = array(
+						'new_messages_count'      => $this->get_new_messages_count(),
+						'new_registrations_count' => $this->get_new_registrations_count(),
+						'recent_orders'           => $this->get_b2b_recent_orders( 10 ),
+						'pending_registrations'   => $this->get_pending_users( 10 ),
+						'top_customers'           => $this->get_top_customers( 10 ),
+						'b2b_customer_count'      => $this->get_b2b_customer_count( $start_date, $end_date ),
+					);
+					break;
 				case 'top_customers':
 					$response['status'] = true;
 					$response['data']   = $this->get_top_customers( 10 );
@@ -575,9 +587,11 @@ class WHOLESALEX_Overview {
 	 */
 	public static function new_output( $dependency ) {
 
-		wp_enqueue_script( 'whx_overview_integration' );
-		wp_enqueue_style( 'whx_overview_integration' );
-		// Base styles for @wordpress/components used by DataViews.
+		wp_enqueue_script( 'wp-api-fetch' );
+		wp_enqueue_script( 'wp-components' );
+		wp_enqueue_script( 'whx_integration' );
+		wp_enqueue_style( 'whx_integration' );
+		// Styles for @wordpress/components used by DataViews and Buttons.
 		wp_enqueue_style( 'wp-components' );
 		// DataViews package styles (vendored from node_modules into assets/css via Grunt).
 		if ( wp_style_is( 'wholesalex_dataviews', 'registered' ) ) {
@@ -585,7 +599,7 @@ class WHOLESALEX_Overview {
 		}
 
 		wp_localize_script(
-			'whx_overview_integration',
+			'whx_integration',
 			'wholesalex_overview',
 			apply_filters(
 				'wholesalex_overview_localize_integration_data',

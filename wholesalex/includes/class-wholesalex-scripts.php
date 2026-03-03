@@ -201,9 +201,9 @@ class Scripts {
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'whx_overview_integration' => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_overview_integration.js',
-					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_overview_integration.asset.php',
+				'whx_integration' => array(
+					'src'       => WHOLESALEX_URL . 'assets/js/whx_integration.js',
+					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_integration.asset.php',
 					'deps'      => array(),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,

@@ -107,7 +107,7 @@ table.wsx-table {
 	margin: 0;
 	position: relative;
 	max-width: unset;
-	background: transparent url(../img/angle-down-16.svg) no-repeat right 14px
+	background: transparent url(../icons/angle-down-16.svg) no-repeat right 14px
 		top 55%;
 	background-size: 16px 16px;
 	padding: 0 32px 0 8px;
@@ -271,18 +271,21 @@ textarea.wsx-br-md {
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
+	flex-wrap: wrap;
+	margin-bottom: 26px;
 }
 
 .wsx-new-sub-account .wsx-sub-account-heading {
 	padding-bottom: 20px;
-	border-bottom: 1px solid var(--color-border-primary);
 	margin-bottom: 32px;
+	border-bottom: 1px solid var(--color-border-primary);
 }
 
 .wsx-sub-account-controller {
 	display: flex;
 	align-items: center;
 	gap: 16px;
+	flex-wrap: wrap;
 }
 
 .wsx-sub-account-form {
@@ -292,25 +295,18 @@ textarea.wsx-br-md {
 	background-color: var(--color-base-three);
 }
 
-.wsx-sub-account-form input,
-.wsx-sub-account-form input[type="text"] {
+.wsx-sub-account-form :is(input, input[type="text"]) {
 	border-radius: var(--border-radius-md);
 	border-color: var(--color-border-tertiary);
 	background-color: var(--color-base-one);
 }
 
-.wsx-sub-account-form input:focus,
-.wsx-sub-account-form input[type="text"]:focus {
+.wsx-sub-account-form :is(input, input[type="text"]):focus {
 	border: 1px solid var(--color-primary);
 	background-color: var(--color-base-one);
 }
 
 /* Table Style */
-
-.wsx-account-table-container {
-	overflow: auto;
-}
-
 .wsx-account-table-container table.wsx-table {
 	border: none;
 	border-collapse: collapse;
@@ -386,7 +382,7 @@ textarea.wsx-br-md {
 	align-items: center;
 	justify-content: space-between;
 	white-space: nowrap;
-	margin-top: 32px;
+	margin-top: 24px;
 }
 .wsx-pagination-wrapper .wsx-btn,
 .wsx-pagination-wrapper .page-numbers {
@@ -478,7 +474,8 @@ select.wsx-pagination-option-list:focus {
 	color: var(--color-base-one);
 }
 .wsx-modal-wrapper .wsx-modal-sm {
-	max-width: 364px;
+	max-width: 500px;
+	width: 95%;
 }
 .wsx-modal-header {
 	display: flex;
@@ -506,8 +503,10 @@ select.wsx-pagination-option-list:focus {
 	color: var(--color-negative);
 }
 .wsx-modal-body {
-	font-size: 12px;
+	font-size: 16px;
+	line-height: 24px;
 	color: var(--color-text-body);
+	margin-top: 8px;
 	margin-bottom: 32px;
 }
 .wsx-modal-footer {
@@ -933,7 +932,7 @@ select.wsx-pagination-option-list:focus {
 	left: 4px;
 	bottom: 4px;
 	right: 4px;
-	background: url("../img/white-tick.svg") center / cover no-repeat;
+	background: url("../icons/white-tick.svg") center / cover no-repeat;
 	display: none;
 }
 input:checked ~ .wsx-checkbox-mark {
@@ -1067,7 +1066,7 @@ input:checked ~ .wsx-checkbox-mark:after {
 
 .wsx-btn.disable {
 	cursor: not-allowed;
-	opacity: 0.4;
+	opacity: 0.6;
 	pointer-events: none;
 }
 
@@ -1125,6 +1124,8 @@ input:checked ~ .wsx-checkbox-mark:after {
 	background-color: var(--color-base-two);
 	padding: 30px;
 	cursor: pointer;
+	font-size: 20px;
+	font-weight: 500;
 }
 .wsx-btn-wallet.active {
 	color: var(--color-text-reverse);
@@ -1138,14 +1139,16 @@ input:checked ~ .wsx-checkbox-mark:after {
 	border: 12px solid var(--color-primary);
 	transform: rotate(45deg);
 }
-.wsx-btn-wallet.wallet_submit_btn {
+.wsx-btn-wallet.wallet_submit_btn,
+.wsx-btn-wallet.wallet_request_btn {
 	width: fit-content;
 	color: var(--color-text-reverse);
 	background-color: var(--color-tertiary);
 	padding: var(--btn-vertical-padding) var(--btn-horizontal-padding);
 	min-width: 260px;
 }
-.wsx-btn-wallet.wallet_submit_btn:hover {
+.wsx-btn-wallet.wallet_submit_btn:hover,
+.wsx-btn-wallet.wallet_request_btn:hover {
 	background-color: var(--color-primary);
 }
 
@@ -1172,11 +1175,12 @@ input:checked ~ .wsx-checkbox-mark:after {
 .wsx-dropdown-content-wrapper {
 	position: absolute;
 	z-index: 9;
-	padding: 24px;
+	padding: 12px;
 	border-radius: var(--border-radius-lg);
 	background-color: var(--color-base-one);
 	box-shadow: 0px 2px 4px 0 var(--color-shadow-primary);
 	white-space: nowrap;
+	width: fit-content;
 }
 .wsx-dropdown {
 	position: relative;
@@ -1538,6 +1542,7 @@ a.wsx-quote-item-link:hover {
 .wsx-slider,
 label.wsx-slider {
 	display: flex;
+	gap: 12px;
 	align-items: center;
 }
 .wsx-slider-input {

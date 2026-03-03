@@ -222,7 +222,7 @@ class WHOLESALEX_Profile {
 					)
 				);
 				?>
-				<div id="_wholesalex_edit_profile" class="wsx-profile-settings-wrapper"></div>
+				<div id="_wholesalex_edit_profile" style="margin: 50px 0;"></div>
 				<?php
 			}
 		}
@@ -655,7 +655,7 @@ class WHOLESALEX_Profile {
 													break;
 												}
 												?>
-													<select class="wsx-select" name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" class="regular-text" style="width: 25em;">
+													<select name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" class="regular-text" style="width: 25em;">
 														<?php
 														if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
 															$selected = get_user_meta( $user->ID, $field['name'], true );
@@ -686,9 +686,9 @@ class WHOLESALEX_Profile {
 												foreach ( $field['option'] as $option ) :
 													?>
 													<div>
-														<input class="wsx-checkbox" type="checkbox" name="<?php echo esc_attr( $field_name ) . '[]'; ?>" id="<?php echo esc_attr( $option['value'] ); ?>" value=<?php echo esc_attr( $option['value'] ); ?> class="regular-text" <?php checked( in_array( $option['value'], $__selected_values ), 1, true ); //phpcs:ignore ?> />
+														<input type="checkbox" name="<?php echo esc_attr( $field_name ) . '[]'; ?>" id="<?php echo esc_attr( $option['value'] ); ?>" value=<?php echo esc_attr( $option['value'] ); ?> class="regular-text" <?php checked( in_array( $option['value'], $__selected_values ), 1, true ); //phpcs:ignore ?> />
 
-														<label class="wsx-label" for=<?php echo esc_attr( $option['value'] ); ?> > <?php echo esc_html( $option['name'] ); ?>  </label>
+														<label for=<?php echo esc_attr( $option['value'] ); ?> > <?php echo esc_html( $option['name'] ); ?>  </label>
 													</div>
 
 													<?php
@@ -708,9 +708,9 @@ class WHOLESALEX_Profile {
 												foreach ( $field['option'] as $option ) :
 													?>
 													<div>
-														<input class="wsx-radio" type="radio" name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $option['value'] ); ?>" value=<?php echo esc_attr( $option['value'] ); ?> class="regular-text" <?php checked( $__selected_value === $option['value'], 1, true ); ?> />
+														<input type="radio" name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $option['value'] ); ?>" value=<?php echo esc_attr( $option['value'] ); ?> class="regular-text" <?php checked( $__selected_value === $option['value'], 1, true ); ?> />
 
-														<label class="wsx-label" for=<?php echo esc_attr( $option['value'] ); ?> > <?php echo esc_html( $option['name'] ); ?>  </label>
+														<label for=<?php echo esc_attr( $option['value'] ); ?> > <?php echo esc_html( $option['name'] ); ?>  </label>
 													</div>
 
 													<?php
@@ -730,12 +730,12 @@ class WHOLESALEX_Profile {
 														<?php
 													} else {
 														?>
-													<input type='text' class="wsx-input wholesalex_download_file_not_exist" readonly value="<?php esc_html_e( 'The file does not exist.', 'wholesalex' ); ?>"/>
+													<input type='text' class="regular-text wholesalex_download_file_not_exist" readonly disabled value="<?php esc_html_e( 'File does not exist.', 'wholesalex' ); ?>"/>
 														<?php
 													}
 												} else {
 													?>
-													<input type='text' class="wsx-input wholesalex_download_file_not_exist" readonly value="<?php esc_html_e( 'The file does not exist.', 'wholesalex' ); ?>"/>
+													<input type='text' class="regular-text wholesalex_download_file_not_exist" readonly disabled value="<?php esc_html_e( 'File does not exist.', 'wholesalex' ); ?>"/>
 													<?php
 												}
 												?>
@@ -749,7 +749,7 @@ class WHOLESALEX_Profile {
 													$__value = get_user_meta( $user->ID, 'wholesalex_cf_' . $field['name'], true );
 												}
 												?>
-												<textarea class="wsx-textarea " name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" value="<?php echo esc_attr( $__value ); ?>"><?php echo esc_attr( $__value ); ?></textarea>
+												<textarea name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" value="<?php echo esc_attr( $__value ); ?>"><?php echo esc_attr( $__value ); ?></textarea>
 												<?php
 												break;
 
@@ -762,7 +762,7 @@ class WHOLESALEX_Profile {
 												}
 
 												?>
-												<input type=<?php echo esc_attr( $field['type'] ); ?> name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" value="<?php echo esc_attr( $__value ); ?>" class="wsx-input regular-text" />
+												<input type=<?php echo esc_attr( $field['type'] ); ?> name="<?php echo esc_attr( $field_name ); ?>" id="<?php echo esc_attr( $field_name ); ?>" value="<?php echo esc_attr( $__value ); ?>" class="regular-text" />
 												<?php
 												break;
 										}

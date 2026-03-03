@@ -1518,7 +1518,7 @@ class Functions {
 		?>
 		<div id="wholesalex-pro-popup" class="wholesalex-popup-container popup-center display-none">
 			<div class="wholesalex-unlock-popup wholesalex-unlock-modal">
-				<img src="<?php echo esc_url( WHOLESALEX_URL ) . 'assets/img/unlock.svg'; ?>" alt="Unlock Icon"/>
+				<img src="<?php echo esc_url( WHOLESALEX_URL ) . 'assets/icons/unlock.svg'; ?>" alt="Unlock Icon"/>
 				<h4 class="wholesalex-md-heading wholesalex-mt25"><?php echo esc_html( $heading ); ?></h4>
 				<?php
 				if ( $subheading ) {
@@ -1872,11 +1872,11 @@ class Functions {
 		$badge_image = apply_filters(
 			'wholesalex_settings_product_tier_layouts',
 			array(
-				'style_one'   => WHOLESALEX_URL . '/assets/img/badge-style-one.svg',
-				'style_two'   => WHOLESALEX_URL . '/assets/img/badge-style-two.svg',
-				'style_three' => WHOLESALEX_URL . '/assets/img/badge-style-three.svg',
-				'style_four'  => WHOLESALEX_URL . '/assets/img/badge-style-four.svg',
-				'style_five'  => WHOLESALEX_URL . '/assets/img/badge-style-five.svg',
+				'style_one'   => WHOLESALEX_URL . '/assets/icons/badge-style-one.svg',
+				'style_two'   => WHOLESALEX_URL . '/assets/icons/badge-style-two.svg',
+				'style_three' => WHOLESALEX_URL . '/assets/icons/badge-style-three.svg',
+				'style_four'  => WHOLESALEX_URL . '/assets/icons/badge-style-four.svg',
+				'style_five'  => WHOLESALEX_URL . '/assets/icons/badge-style-five.svg',
 			)
 		);
 		return $badge_image;

@@ -159,7 +159,7 @@ class WholesaleX_Initialization {
 			'pro_ver'             => wholesalex()->is_pro_active() ? WHOLESALEX_PRO_VER : '',
 			'settings'            => wholesalex()->get_setting(),
 			'license_status'      => wholesalex()->is_pro_enabled() ? wholesalex()->get_license_status() : '',
-			'logo_url'            => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/img/logo-option.svg' ),
+			'logo_url'            => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/icons/logo-option.svg' ),
 			'plugin_name'         => wholesalex()->get_plugin_name(),
 			'whitelabel_enabled'  => 'yes' == wholesalex()->get_setting( 'wsx_addon_whitelabel' ) && function_exists( 'wholesalex_whitelabel_init' ),
 			'is_admin_interface'  => is_admin(),
@@ -212,7 +212,7 @@ class WholesaleX_Initialization {
 					'is_pro_active'      => wholesalex()->is_pro_active(),
 					'pro_ver'            => wholesalex()->is_pro_active() ? WHOLESALEX_PRO_VER : '',
 					'settings'           => wholesalex()->get_setting(),
-					'logo_url'           => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/img/logo-option.svg' ),
+					'logo_url'           => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/icons/logo-option.svg' ),
 					'plugin_name'        => wholesalex()->get_plugin_name(),
 					'is_admin_interface' => is_admin(),
 					'i18n'               => array(
