@@ -103,7 +103,7 @@ class WHOLESALEX_Role {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => 'Invalid roles',
+					'message' => __( 'Invalid roles', 'wholesalex' ),
 				),
 				400
 			);
@@ -113,7 +113,7 @@ class WHOLESALEX_Role {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => 'No roles found',
+					'message' => __( 'No roles found', 'wholesalex' ),
 				),
 				400
 			);

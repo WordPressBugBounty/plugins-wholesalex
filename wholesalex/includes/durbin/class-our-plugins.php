@@ -24,7 +24,7 @@ class OurPlugins {
 		$plugin = isset( $_POST['plugin'] ) ? $_POST['plugin'] : '';
 
 		if ( ! wp_verify_nonce( $nonce, 'wholesalex-registration' ) || ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'message' => 'No plugin specified' ) );
+			wp_send_json_error( array( 'message' => __( 'No plugin specified', 'wholesalex' ) ) );
 
 		}
 

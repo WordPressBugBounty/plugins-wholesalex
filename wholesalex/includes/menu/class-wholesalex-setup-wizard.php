@@ -400,7 +400,7 @@ class WHOLESALEX_Setup_Wizard {
 		$plugin_status = isset( $_POST['plugin_status'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin_status'] ) ) : 'b2b';
 
 		wholesalex()->set_setting( '_settings_status', $plugin_status );
-		wp_send_json_success( 'Updated' );
+		wp_send_json_success( __( 'Updated', 'wholesalex' ) );
 	}
 
 	/**
@@ -533,7 +533,7 @@ class WHOLESALEX_Setup_Wizard {
 			}
 		}
 
-		wp_send_json_success( 'Success' );
+		wp_send_json_success( __( 'Success', 'wholesalex' ) );
 	}
 
 	/**

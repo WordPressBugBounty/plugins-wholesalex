@@ -398,7 +398,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 			$this->file    = $file;
 			$response_data = array(
 				'status'  => true,
-				'message' => 'Success',
+				'message' => __( 'Success', 'wholesalex' ),
 			);
 			$args          = array(
 				'lines'              => 1,

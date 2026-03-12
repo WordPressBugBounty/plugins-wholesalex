@@ -295,18 +295,39 @@ textarea.wsx-br-md {
 	background-color: var(--color-base-three);
 }
 
-.wsx-sub-account-form :is(input, input[type="text"]) {
+.wsx-sub-account-form select,
+.wsx-sub-account-form textarea,
+.wsx-sub-account-form
+	:is(
+		input,
+		input[type="text"],
+		input[type="email"],
+		input[type="password"],
+		input[type="number"]
+	) {
 	border-radius: var(--border-radius-md);
 	border-color: var(--color-border-tertiary);
 	background-color: var(--color-base-one);
 }
 
-.wsx-sub-account-form :is(input, input[type="text"]):focus {
+.wsx-sub-account-form select:focus,
+.wsx-sub-account-form textarea:focus,
+.wsx-sub-account-form
+	:is(
+		input,
+		input[type="text"],
+		input[type="email"],
+		input[type="password"],
+		input[type="number"]
+	):focus {
 	border: 1px solid var(--color-primary);
 	background-color: var(--color-base-one);
 }
 
 /* Table Style */
+.wsx-account-table-container {
+	overflow-x: auto;
+}
 .wsx-account-table-container table.wsx-table {
 	border: none;
 	border-collapse: collapse;
@@ -344,6 +365,13 @@ textarea.wsx-br-md {
 .wsx-account-table-container table.wsx-table tbody td {
 	border-width: 1px;
 	padding: 10px 16px;
+	white-space: nowrap;
+}
+.wsx-account-table-container table.wsx-table tbody td.amount {
+	text-align: end;
+}
+.wsx-account-table-container table.wsx-table tbody td.details {
+	white-space: normal;
 }
 
 .wsx-account-table-container table.wsx-table thead {
@@ -381,8 +409,12 @@ textarea.wsx-br-md {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	gap: 20px;
 	white-space: nowrap;
 	margin-top: 24px;
+}
+.wsx-pagination-wrapper .wsx-btn-group {
+	gap: 12px;
 }
 .wsx-pagination-wrapper .wsx-btn,
 .wsx-pagination-wrapper .page-numbers {
@@ -1372,15 +1404,6 @@ input:checked ~ .wsx-checkbox-mark:after {
 	background-color: var(--color-base-one, #ffffff);
 }
 
-.wsx-reply-lists-container {
-	font-family: var(--body-font-family);
-	font-size: 14px;
-	padding: 20px;
-	border-bottom: 1px solid var(--color-border-primary);
-	display: flex;
-	flex-direction: column;
-	gap: 30px;
-}
 .wsx-reply-lists {
 	margin-bottom: 30px;
 }

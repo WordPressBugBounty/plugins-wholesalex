@@ -207,6 +207,26 @@ class Xpo {
 				'medium'   => 'new-year-sale',
 				'campaign' => 'wholesalex-dashboard',
 			),
+			'spring_sale'       => array(
+				'source'   => 'db-wholesalex-notice',
+				'medium'   => 'spring-sale',
+				'campaign' => 'wholesalex-dashboard',
+			),
+			'content_notice'    => array(
+				'source'   => 'db-wholesalex-notice',
+				'medium'   => 'spring-sale',
+				'campaign' => 'wholesalex-dashboard',
+			),
+			'img_banner_notice' => array(
+				'source'   => 'db-wholesalex-banner',
+				'medium'   => 'spring-sale',
+				'campaign' => 'wholesalex-dashboard',
+			),
+			'plugin_meta'       => array(
+				'source'   => 'db-wholesalex-plugin',
+				'medium'   => 'plugin-meta',
+				'campaign' => 'wholesalex-dashboard',
+			),
 		);
 
 		// Step 1: Get parameters.

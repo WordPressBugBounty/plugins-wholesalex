@@ -450,7 +450,7 @@ class WHOLESALEX_RequstRoleChange {
 
 		$user = get_user_by( 'id', $user_id );
 		if ( ! $user ) {
-			return new WP_Error( 'rest_user_not_found', 'User not found', array( 'status' => 404 ) );
+			return new WP_Error( 'rest_user_not_found', __( 'User not found', 'wholesalex' ), array( 'status' => 404 ) );
 		}
 
 		// Store role change request in user meta.
@@ -468,7 +468,7 @@ class WHOLESALEX_RequstRoleChange {
 		wp_send_json_success(
 			array(
 				'status'  => 'success',
-				'message' => 'Role change request has been submitted.',
+				'message' => __( 'Role change request has been submitted.', 'wholesalex' ),
 			)
 		);
 	}

@@ -2471,8 +2471,8 @@ class WHOLESALEX_Product {
 		<optgroup label="<?php echo esc_html( $optiongroup_label ); ?>">
 		<?php
 		foreach ( $wholesalex_roles as $role ) {
-			$option_name_base = $role['name'] . ' ' . __( 'Base Price' );
-			$option_name_sale = $role['name'] . ' ' . __( 'Sale Price' );
+			$option_name_base = $role['name'] . ' ' . __( 'Base Price', 'wholesalex' );
+			$option_name_sale = $role['name'] . ' ' . __( 'Sale Price', 'wholesalex' );
 
 			$option_value_base = 'wholesalex_product_price_' . $role['value'] . '_base';
 			$option_value_sale = 'wholesalex_product_price_' . $role['value'] . '_sale';
@@ -2526,6 +2526,6 @@ class WHOLESALEX_Product {
 				}
 			}
 		}
-		wp_send_json_success( 'Success' );
+		wp_send_json_success( __( 'Success', 'wholesalex' ) );
 	}
 }

@@ -191,6 +191,9 @@ input[type="number"].wsx-input.wsx-bg-base1 {
 	display: flex;
 	flex-direction: column;
 	gap: 30px;
+	max-height: 50vh;
+	overflow-y: auto;
+	overflow-x: clip;
 }
 .wsx-reply-meta {
 	display: flex;

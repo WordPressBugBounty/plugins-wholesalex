@@ -2,7 +2,11 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
+<<<<<<< HEAD
 "Project-Id-Version: WholesaleX 2.3.0\n"
+=======
+"Project-Id-Version: WholesaleX 2.3.2\n"
+>>>>>>> wp_components
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wholesalex\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -10,9 +14,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 <<<<<<< HEAD
+<<<<<<< HEAD
 "POT-Creation-Date: 2026-02-22T05:27:18+00:00\n"
 =======
 "POT-Creation-Date: 2026-02-26T09:17:12+00:00\n"
+>>>>>>> wp_components
+=======
+"POT-Creation-Date: 2026-03-12T03:53:39+00:00\n"
 >>>>>>> wp_components
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
@@ -27,9 +35,12 @@ msgstr ""
 #: includes/menu/class-wholesalex-overview.php:167
 >>>>>>> wp_components
 #: assets/js/whx_cat.js:1
+<<<<<<< HEAD
 #: assets/js/whx_migration_tools.js:1
+=======
+#: assets/js/whx_integration.js:181
+>>>>>>> wp_components
 #: assets/js/whx_overview.js:1
-#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "WholesaleX"
@@ -151,8 +162,8 @@ msgstr ""
 
 #: includes/class-wholesalex-activator.php:64
 #: includes/class-wholesalex-activator.php:65
-#: includes/menu/class-wholesalex-dynamic-rules.php:2116
-#: includes/menu/class-wholesalex-dynamic-rules.php:2118
+#: includes/dynamic-rules/class-dynamic-rules.php:1006
+#: includes/dynamic-rules/class-dynamic-rules.php:1008
 #: includes/menu/class-wholesalex-settings.php:501
 #: includes/menu/class-wholesalex-settings.php:503
 #: includes/menu/class-wholesalex-settings.php:508
@@ -182,6 +193,7 @@ msgstr ""
 msgid "Remember me"
 msgstr ""
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: includes/class-wholesalex-initialization.php:169
 msgid "Available Smart Tags: "
@@ -220,6 +232,12 @@ msgstr ""
 #: includes/menu/class-wholesalex-overview.php:240
 #: includes/menu/class-wholesalex-overview.php:241
 =======
+=======
+#: includes/class-wholesalex-import-export.php:450
+msgid "You must upload a valid csv file to import users"
+msgstr ""
+
+>>>>>>> wp_components
 #: includes/class-wholesalex-initialization.php:167
 msgid "Available Smart Tags: "
 msgstr ""
@@ -246,23 +264,19 @@ msgid "<strong>Success:</strong> Your account is successfully confirmed. "
 msgstr ""
 
 #: includes/class-wholesalex-menu.php:37
-msgid "Flash Sale - Up to 50% OFF"
+msgid "Spring Sale - Up to 55% OFF"
 msgstr ""
 
-#: includes/class-wholesalex-menu.php:46
-msgid "Final Hour Sale - Up to 55% OFF"
-msgstr ""
-
-#: includes/class-wholesalex-menu.php:58
+#: includes/class-wholesalex-menu.php:49
 #: includes/menu/class-wholesalex-overview.php:1016
 msgid "Renew License"
 msgstr ""
 
-#: includes/class-wholesalex-menu.php:62
+#: includes/class-wholesalex-menu.php:53
 msgid "Go Pro"
 msgstr ""
 
-#: includes/class-wholesalex-menu.php:89
+#: includes/class-wholesalex-menu.php:80
 #: includes/menu/class-wholesalex-overview.php:241
 #: includes/menu/class-wholesalex-overview.php:242
 >>>>>>> wp_components
@@ -270,6 +284,7 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: includes/class-wholesalex-menu.php:67
 msgid "Docs"
@@ -283,6 +298,13 @@ msgstr ""
 
 #: includes/class-wholesalex-menu.php:105
 >>>>>>> wp_components
+=======
+#: includes/class-wholesalex-menu.php:95
+msgid "Docs"
+msgstr ""
+
+#: includes/class-wholesalex-menu.php:96
+>>>>>>> wp_components
 msgid "Support"
 msgstr ""
 
@@ -293,7 +315,7 @@ msgstr ""
 
 #: includes/class-wholesalex-product.php:275
 #: includes/class-wholesalex-product.php:428
-#: includes/menu/class-wholesalex-dynamic-rules.php:1774
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:803
 #: includes/menu/class-wholesalex-profile.php:869
 #: includes/menu/class-wholesalex-profile.php:887
 #: includes/menu/class-wholesalex-profile.php:969
@@ -302,7 +324,7 @@ msgstr ""
 
 #: includes/class-wholesalex-product.php:276
 #: includes/class-wholesalex-product.php:429
-#: includes/menu/class-wholesalex-dynamic-rules.php:1775
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:804
 #: includes/menu/class-wholesalex-profile.php:870
 #: includes/menu/class-wholesalex-profile.php:888
 #: includes/menu/class-wholesalex-profile.php:970
@@ -443,22 +465,24 @@ msgid "Specific Register Users"
 msgstr ""
 
 #: includes/class-wholesalex-product.php:1560
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:477
 #: includes/menu/class-wholesalex-category.php:362
-#: includes/menu/class-wholesalex-dynamic-rules.php:1447
 msgid "Choose Roles..."
 msgstr ""
 
 #: includes/class-wholesalex-product.php:1567
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:461
 #: includes/menu/class-wholesalex-category.php:369
-#: includes/menu/class-wholesalex-dynamic-rules.php:1431
 msgid "Choose Users..."
 msgstr ""
 
 #: includes/class-wholesalex-product.php:1604
+#: includes/class-wholesalex-product.php:2474
 msgid "Base Price"
 msgstr ""
 
 #: includes/class-wholesalex-product.php:1609
+#: includes/class-wholesalex-product.php:2475
 #: includes/menu/class-wholesalex-settings.php:202
 msgid "Sale Price"
 msgstr ""
@@ -467,12 +491,12 @@ msgstr ""
 #: includes/class-wholesalex-product.php:1633
 #: includes/class-wholesalex-product.php:1682
 #: includes/class-wholesalex-product.php:1696
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:687
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:734
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:888
 #: includes/menu/class-wholesalex-category.php:277
 #: includes/menu/class-wholesalex-category.php:292
 #: includes/menu/class-wholesalex-category.php:471
-#: includes/menu/class-wholesalex-dynamic-rules.php:1658
-#: includes/menu/class-wholesalex-dynamic-rules.php:1705
-#: includes/menu/class-wholesalex-dynamic-rules.php:1860
 #: includes/menu/class-wholesalex-profile.php:1016
 #: includes/menu/class-wholesalex-profile.php:1031
 msgid "Discount Type"
@@ -525,25 +549,25 @@ msgstr ""
 
 #: includes/class-wholesalex-product.php:1630
 #: includes/class-wholesalex-product.php:1694
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:691
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:738
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:892
 #: includes/menu/class-wholesalex-category.php:289
 #: includes/menu/class-wholesalex-category.php:406
 #: includes/menu/class-wholesalex-category.php:476
-#: includes/menu/class-wholesalex-dynamic-rules.php:1662
-#: includes/menu/class-wholesalex-dynamic-rules.php:1709
-#: includes/menu/class-wholesalex-dynamic-rules.php:1864
 #: includes/menu/class-wholesalex-profile.php:1028
 msgid "Fixed Price"
 msgstr ""
 
 #: includes/class-wholesalex-product.php:1641
 #: includes/class-wholesalex-product.php:1702
-#: includes/menu/class-wholesalex-dynamic-rules.php:1661
-#: includes/menu/class-wholesalex-dynamic-rules.php:1668
-#: includes/menu/class-wholesalex-dynamic-rules.php:1708
-#: includes/menu/class-wholesalex-dynamic-rules.php:1715
-#: includes/menu/class-wholesalex-dynamic-rules.php:1863
-#: includes/menu/class-wholesalex-dynamic-rules.php:1870
-#: includes/menu/class-wholesalex-dynamic-rules.php:2040
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:690
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:697
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:737
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:744
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:891
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:898
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1068
 #: includes/menu/class-wholesalex-profile.php:1017
 #: includes/menu/class-wholesalex-profile.php:1037
 #: assets/js/whx_overview.js:184
@@ -575,9 +599,9 @@ msgid "%s Rules"
 msgstr ""
 
 #: includes/class-wholesalex-product.php:2145
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:403
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:913
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:321
-#: includes/menu/class-wholesalex-dynamic-rules.php:1373
-#: includes/menu/class-wholesalex-dynamic-rules.php:1885
 msgid "BOGO Discounts (Buy X Get One Free)"
 msgstr ""
 
@@ -587,6 +611,15 @@ msgstr ""
 
 #: includes/class-wholesalex-product.php:2469
 msgid "Rolewise Pricing"
+msgstr ""
+
+#: includes/class-wholesalex-product.php:2529
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:401
+#: includes/import/class-wholesalex-role-csv-importer-controller.php:354
+#: includes/menu/class-wholesalex-email.php:163
+#: includes/menu/class-wholesalex-email.php:166
+#: includes/menu/class-wholesalex-setup-wizard.php:536
+msgid "Success"
 msgstr ""
 
 #. translators: %1s Plugin Name
@@ -711,6 +744,744 @@ msgstr ""
 
 #: includes/deactive/class-deactive.php:124
 msgid "Skip & Deactivate"
+msgstr ""
+
+#: includes/durbin/class-our-plugins.php:27
+msgid "No plugin specified"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:372
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Create Dynamic Rule"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:377
+msgid "New Dynamic Rule"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:387
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:388
+#: assets/js/whx_all_products.js:1
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Rule Title"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:394
+#: assets/js/whx_all_products.js:1
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Rule Type"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:398
+msgid "Choose Rule..."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:399
+#: includes/dynamic-rules/class-dynamic-rules.php:2514
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:317
+#: includes/menu/class-wholesalex-settings.php:612
+#: includes/menu/class-wholesalex-settings.php:643
+#: includes/menu/class-wholesalex-settings.php:645
+msgid "Product Discount"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:400
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:318
+msgid "Cart Discount "
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:401
+#: includes/dynamic-rules/class-dynamic-rules.php:2575
+#: includes/menu/class-wholesalex-settings.php:747
+#: includes/menu/class-wholesalex-settings.php:749
+msgid "Payment Method Discount"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:402
+msgid "Required Quantity for Payment Method"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:404
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:842
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:322
+msgid "Shipping Rule"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:405
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:989
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:323
+#: includes/menu/class-wholesalex-settings.php:1052
+#: includes/menu/class-wholesalex-settings.php:1086
+msgid "Minimum Order Quantity"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:406
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:789
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:324
+msgid "Tax Rule"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:407
+msgid "Checkout Restriction (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:408
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:325
+msgid "Quantity Based Discount (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:409
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:326
+msgid "Extra Charge (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:410
+msgid "Buy X Get Y Free (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:411
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:328
+msgid "Maximum Order Quantity (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:412
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:329
+msgid "Restrict Product Visibility (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:413
+msgid "Hidden Price (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:414
+msgid "Non Purchasable (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:423
+#: includes/menu/class-wholesalex-role.php:431
+msgid "Save"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:435
+msgid "Select User/Role"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:439
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:351
+msgid "Select Users/Role..."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:440
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:352
+msgid "All (Registered and Guest Users)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:441
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:353
+msgid "All Registered Users"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:442
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:354
+msgid "All B2B Roles"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:443
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:355
+msgid "Specific Users"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:444
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:356
+msgid "Specific Roles"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:452
+msgid "Select Users"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:468
+msgid "Select Roles"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:492
+#: includes/menu/class-wholesalex-profile.php:1019
+#: includes/menu/class-wholesalex-profile.php:1060
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Product Filter"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:496
+#: includes/menu/class-wholesalex-profile.php:1050
+msgid "Choose Filter..."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:497
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:516
+#: includes/menu/class-wholesalex-profile.php:1051
+msgid "All Products"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:498
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:517
+#: includes/menu/class-wholesalex-profile.php:1052
+msgid "Product in list"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:499
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:518
+#: includes/menu/class-wholesalex-profile.php:1053
+msgid "Product not in list"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:500
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:519
+#: includes/menu/class-wholesalex-profile.php:1054
+msgid "Categories in list"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:501
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:520
+#: includes/menu/class-wholesalex-profile.php:1055
+msgid "Categories not in list"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:502
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:521
+#: includes/menu/class-wholesalex-profile.php:1056
+msgid "Variations in list"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:503
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:522
+#: includes/menu/class-wholesalex-profile.php:1057
+msgid "Variations not in list"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:504
+msgid "Brand in list (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:505
+msgid "Brand not in list (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:506
+msgid "Attribute in list (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:507
+msgid "Attribute not in list (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:514
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:530
+msgid "Select Multiple Products"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:523
+#: includes/menu/class-wholesalex-profile.php:1071
+msgid "Choose Products to apply discounts"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:539
+#: includes/menu/class-wholesalex-profile.php:1086
+msgid "Choose Products that wont apply discounts"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:546
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:562
+msgid "Select Multiple Categories"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:555
+#: includes/menu/class-wholesalex-profile.php:1101
+msgid "Choose Categories to apply discounts"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:571
+#: includes/menu/class-wholesalex-profile.php:1116
+msgid "Choose Categories that wont apply discounts"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:578
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:594
+msgid "Select Multiple Variations"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:587
+#: includes/menu/class-wholesalex-profile.php:1131
+msgid "Choose Product Variations to apply discounts"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:603
+#: includes/menu/class-wholesalex-profile.php:1146
+msgid "Choose Product Variations that wont apply discounts"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:610
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:626
+msgid "Select Multiple Brands"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:619
+msgid "Choose Brands to apply discounts"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:635
+msgid "Choose Brands that wont apply discounts"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:642
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:658
+msgid "Select Multiple Attributes"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:651
+msgid "Choose Attributes to apply discounts"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:667
+msgid "Choose Attributes that wont apply discounts"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:676
+msgid "Manage Discount"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:689
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:736
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:890
+msgid "Percentage"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:704
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:751
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:905
+msgid "Discount name(optional)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:706
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:753
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:907
+msgid "Add discount name here"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:712
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:319
+msgid "Payment Discount"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:723
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:770
+#: includes/menu/class-wholesalex-profile.php:979
+msgid "Payment Gateways"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:759
+msgid "Payment Order Quantity"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:781
+msgid "Order Quantity"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:800
+msgid "Tax Exempted?"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:802
+msgid "Choose Tax Exempted Status..."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:817
+msgid "Tax Class Mapping"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:824
+msgid "Country(optional)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:853
+#: includes/menu/class-wholesalex-profile.php:916
+msgid "Shipping Zone"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:864
+#: includes/menu/class-wholesalex-profile.php:938
+msgid "Shipping Zone Methods"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:877
+#: includes/dynamic-rules/rules/class-rule-cart-discount.php:106
+#: includes/menu/class-wholesalex-settings.php:657
+#: includes/menu/class-wholesalex-settings.php:689
+#: includes/menu/class-wholesalex-settings.php:691
+msgid "Cart Discount"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:924
+msgid "Product Quantity (X)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:931
+msgid "Restrict Free Quantity"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:932
+msgid "Restrict to one free product per order"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:935
+msgid "Enabling this option will restrict shoppers from availing of more than one product by adding the required number of products more than one time to the cart."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:939
+msgid "Enable Discount Badge"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:940
+msgid "Enable Discount Badge (Both Shop & Product Page)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:943
+msgid "Enable \"Offer Badge\" on Product Image for both the shop page and the single product page"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:947
+msgid "Badge Label Text"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:954
+msgid "Badge Background Color"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:961
+msgid "Badge Text Color"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:970
+msgid "Choose Badge Position..."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:971
+#: assets/js/whx_overview.js:184
+msgid "Left"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:972
+#: assets/js/whx_overview.js:184
+msgid "Right"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:981
+msgid "Badge Style"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1000
+msgid "Minimum Product Quantity"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1007
+msgid "Disable Quantity in Shop & Product Page"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1008
+msgid "Disable Minimum Product Limit in Shop & Product Page"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1011
+msgid "Enabling it will disable the minimum order restriction from shop and product pages. So the buyers can add any number of products to the cart. However, they will be restricted in the checkout process."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1015
+msgid "Step"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1023
+msgid "Conditions: (optional)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1037
+msgid "Choose Conditions..."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1038
+msgid "Cart - Total Quantity"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1039
+msgid "Cart - Total Value"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1040
+msgid "Cart - Total Weight"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1041
+msgid "Lifetime Order Count (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1042
+msgid "Lifetime Purchase (Pro)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1054
+msgid "Choose Operators..."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1055
+msgid "Less than (<)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1056
+msgid "Less than or equal (<=)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1057
+msgid "Greater than or equal (>=)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1058
+msgid "Greater than (>)"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1077
+msgid "Date & Limit Rule"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1082
+#: includes/export/class-wholesalex-dynamic-rule-exporter.php:76
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:283
+#: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:367
+msgid "Start Date"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1090
+msgid "End Data"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:183
+#: includes/menu/class-wholesalex-request-role-change.php:338
+#: includes/menu/class-wholesalex-users.php:386
+msgid "Invalid request type."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:280
+msgid "Missing rule ID."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:294
+msgid "Rule deleted successfully."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:303
+msgid "Missing rule data."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:311
+msgid "Invalid rule data."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:322
+msgid "Rule activated successfully."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:322
+msgid "Rule deactivated successfully."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:337
+msgid "Rule saved successfully."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:359
+msgid "Invalid data."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:394
+msgid "Done"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:430
+msgid "Missing rules_per_page."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:1749
+#: includes/menu/class-wholesalex-settings.php:1372
+msgid "Login to see prices"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2406
+msgid "Pieces"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2520
+#: includes/dynamic-rules/class-dynamic-rules.php:2581
+#: includes/menu/class-wholesalex-settings.php:1312
+#: includes/menu/class-wholesalex-settings.php:1314
+msgid "You can avail one of the following offers by completing the requirements."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2535
+#: includes/dynamic-rules/class-dynamic-rules.php:2595
+#: includes/dynamic-rules/rules/class-rule-cart-discount.php:126
+msgid " % OFF"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2537
+#: includes/dynamic-rules/class-dynamic-rules.php:2597
+#: includes/dynamic-rules/rules/class-rule-cart-discount.php:128
+msgid " OFF"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2601
+msgid "Use "
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2634
+#: includes/menu/class-wholesalex-settings.php:867
+#: includes/menu/class-wholesalex-settings.php:869
+msgid "BOGO Discount"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2640
+#: includes/dynamic-rules/rules/class-rule-cart-discount.php:112
+#: includes/menu/class-wholesalex-settings.php:1325
+#: includes/menu/class-wholesalex-settings.php:1327
+msgid "You can avail following offers by completing the requirements."
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2654
+#: includes/menu/class-wholesalex-settings.php:881
+#: includes/menu/class-wholesalex-settings.php:883
+msgid "Get 1 Free"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2660
+#: includes/menu/class-wholesalex-settings.php:894
+#: includes/menu/class-wholesalex-settings.php:896
+msgid "Buy at least {required_quantity} products"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2690
+#: includes/dynamic-rules/class-dynamic-rules.php:2808
+#: includes/menu/class-wholesalex-settings.php:777
+#: includes/menu/class-wholesalex-settings.php:796
+#: includes/menu/class-wholesalex-settings.php:798
+#: includes/menu/class-wholesalex-settings.php:809
+#: includes/menu/class-wholesalex-settings.php:811
+msgid "Free Shipping"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2724
+msgid "Promotions:"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2728
+#: includes/menu/class-wholesalex-settings.php:600
+#: includes/menu/class-wholesalex-settings.php:602
+msgid "Get exclusive offers"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2740
+msgid "Conditional Discount Offers"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2769
+#: includes/menu/class-wholesalex-settings.php:1082
+#: includes/menu/class-wholesalex-settings.php:1084
+msgid "You can add minimum {minimum_qty} and maximum {maximum_qty} quantity of this product"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2777
+#: includes/dynamic-rules/rules/class-rule-min-order-qty.php:159
+#: includes/dynamic-rules/rules/class-rule-min-order-qty.php:222
+#: includes/dynamic-rules/rules/class-rule-min-order-qty.php:284
+#: includes/menu/class-wholesalex-settings.php:1048
+#: includes/menu/class-wholesalex-settings.php:1050
+msgid "You have to add minimun {minimum_qty} quantity"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2785
+#: includes/menu/class-wholesalex-settings.php:1065
+#: includes/menu/class-wholesalex-settings.php:1067
+msgid "You can add maximum {maximum_qty} quantity"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2922
+msgid "Quantity: %s"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2929
+msgid "FREE"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2976
+#: includes/menu/class-wholesalex-settings.php:1152
+#: includes/menu/class-wholesalex-settings.php:1154
+msgid "Spend {min_value} to {max_value}"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2980
+msgid "Spend min {max_value}"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2983
+#: includes/menu/class-wholesalex-settings.php:1120
+#: includes/menu/class-wholesalex-settings.php:1122
+msgid "Spend upto {min_value}"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2993
+#: includes/menu/class-wholesalex-settings.php:1169
+#: includes/menu/class-wholesalex-settings.php:1171
+msgid "Add {min_value} to {max_value} product(s) to cart"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2996
+msgid "Buy minimum {max_value} product(s) to get the discount"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:2998
+msgid "Don&apos;t buy more than {min_value} product(s) to get the discount"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:3009
+#: includes/menu/class-wholesalex-settings.php:1219
+#: includes/menu/class-wholesalex-settings.php:1221
+msgid "Add {min_value} to {max_value} {unit} to cart"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:3017
+msgid "Add min {max_value} {unit} to cart"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules.php:3025
+msgid "Add up to {min_value} {unit} to cart"
+msgstr ""
+
+#: includes/dynamic-rules/rules/class-rule-buy-x-get-one.php:102
+msgid "(BOGO Discounts)"
+msgstr ""
+
+#: includes/dynamic-rules/rules/class-rule-cart-discount.php:179
+#: includes/dynamic-rules/rules/class-rule-cart-discount.php:210
+msgid "Cart Discounts"
+msgstr ""
+
+#: includes/dynamic-rules/rules/class-rule-payment-discount.php:49
+#: includes/dynamic-rules/rules/class-rule-payment-discount.php:79
+msgid "Payment Discount!"
+msgstr ""
+
+#. translators: %s: Plugin Name
+#: includes/dynamic-rules/rules/class-rule-shipping.php:36
+msgid "%s Free Shipping"
 msgstr ""
 
 #: includes/emails/class-wholesalex-new-user-approval-require.php:69
@@ -1021,7 +1792,7 @@ msgstr ""
 #: includes/import/class-wholesalex-role-csv-importer-controller.php:255
 #: includes/import/class-wholesalex-role-csv-importer-controller.php:315
 #: includes/menu/class-wholesalex-request-role-change.php:493
-#: includes/menu/class-wholesalex-users.php:462
+#: includes/menu/class-wholesalex-users.php:464
 #: assets/js/whx_overview.js:184
 msgid "ID"
 msgstr ""
@@ -1037,9 +1808,13 @@ msgstr ""
 #: assets/js/whx_overview_wcfm.js:181
 =======
 #: includes/menu/class-wholesalex-overview.php:928
-#: includes/menu/class-wholesalex-users.php:468
+#: includes/menu/class-wholesalex-users.php:470
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 #: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
+=======
 >>>>>>> wp_components
 msgid "Status"
 msgstr ""
@@ -1054,12 +1829,16 @@ msgstr ""
 #: includes/export/class-wholesalex-dynamic-rule-exporter.php:50
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:257
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:341
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
 #: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
+=======
 >>>>>>> wp_components
 msgid "Type"
 msgstr ""
@@ -1214,13 +1993,6 @@ msgstr ""
 msgid "Usages Limit"
 msgstr ""
 
-#: includes/export/class-wholesalex-dynamic-rule-exporter.php:76
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:283
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:367
-#: includes/menu/class-wholesalex-dynamic-rules.php:2054
-msgid "Start Date"
-msgstr ""
-
 #: includes/export/class-wholesalex-dynamic-rule-exporter.php:77
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:284
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:368
@@ -1230,12 +2002,16 @@ msgstr ""
 
 #: includes/export/class-wholesalex-dynamic-rule-exporter.php:169
 #: includes/export/class-wholesalex-roles-csv-exporter.php:141
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
 #: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
+=======
 >>>>>>> wp_components
 msgid "Untitled"
 msgstr ""
@@ -1323,23 +2099,26 @@ msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:457
 #: includes/import/class-wholesalex-role-csv-importer-controller.php:410
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
 #: assets/js/whx_overview_integration.js:181
 >>>>>>> wp_components
+=======
+>>>>>>> wp_components
 msgid "Error Occured!"
 msgstr ""
 
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:539
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:553
-#: includes/menu/class-wholesalex-dynamic-rules.php:671
-#: includes/menu/class-wholesalex-dynamic-rules.php:1287
 msgid "New Rule"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:317
 #: includes/menu/class-wholesalex-dynamic-rules.php:1369
 <<<<<<< HEAD
@@ -1363,124 +2142,14 @@ msgstr ""
 msgid "Payment Discount"
 msgstr ""
 
+=======
+>>>>>>> wp_components
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:320
 msgid "Payment Order Quantity "
 msgstr ""
 
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:322
-#: includes/menu/class-wholesalex-dynamic-rules.php:1374
-#: includes/menu/class-wholesalex-dynamic-rules.php:1814
-msgid "Shipping Rule"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:323
-#: includes/menu/class-wholesalex-dynamic-rules.php:1375
-#: includes/menu/class-wholesalex-dynamic-rules.php:1961
-#: includes/menu/class-wholesalex-settings.php:1052
-#: includes/menu/class-wholesalex-settings.php:1086
-msgid "Minimum Order Quantity"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:324
-#: includes/menu/class-wholesalex-dynamic-rules.php:1376
-#: includes/menu/class-wholesalex-dynamic-rules.php:1760
-msgid "Tax Rule"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:325
-#: includes/menu/class-wholesalex-dynamic-rules.php:1378
-msgid "Quantity Based Discount (Pro)"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:326
-#: includes/menu/class-wholesalex-dynamic-rules.php:1379
-msgid "Extra Charge (Pro)"
-msgstr ""
-
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:327
 msgid "Buy X Get Y (Pro)"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:328
-#: includes/menu/class-wholesalex-dynamic-rules.php:1381
-msgid "Maximum Order Quantity (Pro)"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:329
-#: includes/menu/class-wholesalex-dynamic-rules.php:1382
-msgid "Restrict Product Visibility (Pro)"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:351
-#: includes/menu/class-wholesalex-dynamic-rules.php:1409
-msgid "Select Users/Role..."
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:352
-#: includes/menu/class-wholesalex-dynamic-rules.php:1410
-msgid "All (Registered and Guest Users)"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:353
-#: includes/menu/class-wholesalex-dynamic-rules.php:1411
-msgid "All Registered Users"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:354
-#: includes/menu/class-wholesalex-dynamic-rules.php:1412
-msgid "All B2B Roles"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:355
-#: includes/menu/class-wholesalex-dynamic-rules.php:1413
-msgid "Specific Users"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:356
-#: includes/menu/class-wholesalex-dynamic-rules.php:1414
-msgid "Specific Roles"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:516
-#: includes/menu/class-wholesalex-dynamic-rules.php:1468
-#: includes/menu/class-wholesalex-profile.php:1051
-msgid "All Products"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:517
-#: includes/menu/class-wholesalex-dynamic-rules.php:1469
-#: includes/menu/class-wholesalex-profile.php:1052
-msgid "Product in list"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:518
-#: includes/menu/class-wholesalex-dynamic-rules.php:1470
-#: includes/menu/class-wholesalex-profile.php:1053
-msgid "Product not in list"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:519
-#: includes/menu/class-wholesalex-dynamic-rules.php:1471
-#: includes/menu/class-wholesalex-profile.php:1054
-msgid "Categories in list"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:520
-#: includes/menu/class-wholesalex-dynamic-rules.php:1472
-#: includes/menu/class-wholesalex-profile.php:1055
-msgid "Categories not in list"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:521
-#: includes/menu/class-wholesalex-dynamic-rules.php:1473
-#: includes/menu/class-wholesalex-profile.php:1056
-msgid "Variations in list"
-msgstr ""
-
-#: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:522
-#: includes/menu/class-wholesalex-dynamic-rules.php:1474
-#: includes/menu/class-wholesalex-profile.php:1057
-msgid "Variations not in list"
 msgstr ""
 
 #. translators: %d: dynamic_rule ID
@@ -1568,6 +2237,7 @@ msgstr ""
 msgid "10"
 msgstr ""
 
+<<<<<<< HEAD
 #: includes/menu/class-wholesalex-dynamic-rules.php:757
 msgid "Successfully Deleted."
 msgstr ""
@@ -2306,17 +2976,14 @@ msgstr ""
 msgid "Login to see prices"
 msgstr ""
 
+=======
+>>>>>>> wp_components
 #: includes/menu/class-wholesalex-email.php:137
 msgid "Successfully enabled"
 msgstr ""
 
 #: includes/menu/class-wholesalex-email.php:137
 msgid "Successfully disabled"
-msgstr ""
-
-#: includes/menu/class-wholesalex-email.php:163
-#: includes/menu/class-wholesalex-email.php:166
-msgid "Success"
 msgstr ""
 
 #: includes/menu/class-wholesalex-email.php:212
@@ -2850,12 +3517,14 @@ msgid "Migration Tool"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:474
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
 msgid "Customer No. (B2B)"
 >>>>>>> wp_components
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:475
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
 msgid "Net Revenue (B2B)"
@@ -2865,6 +3534,7 @@ msgid "Total Order (B2B)"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:476
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
 msgid "Gross Sale (B2B)"
@@ -2874,6 +3544,7 @@ msgid "Total Sale (B2B)"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:477
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
 msgid "Average Order (B2B)"
@@ -2885,11 +3556,13 @@ msgid "Net Revenue (B2B)"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:478
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
 msgid "Gross Sale (B2B)"
 msgstr ""
 
 #: includes/menu/class-wholesalex-overview.php:479
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
 msgid "Average Order (B2B)"
 msgstr ""
@@ -2914,8 +3587,8 @@ msgstr ""
 =======
 #: includes/menu/class-wholesalex-overview.php:826
 #: includes/menu/class-wholesalex-users.php:191
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_integration.js:181
 msgid "Select Status"
 msgstr ""
 
@@ -3084,7 +3757,7 @@ msgstr ""
 #: includes/menu/class-wholesalex-overview.php:927
 >>>>>>> wp_components
 #: includes/menu/class-wholesalex-request-role-change.php:497
-#: includes/menu/class-wholesalex-users.php:466
+#: includes/menu/class-wholesalex-users.php:468
 #: assets/js/whx_overview.js:184
 msgid "Date"
 msgstr ""
@@ -3097,7 +3770,7 @@ msgstr ""
 #: includes/menu/class-wholesalex-overview.php:947
 >>>>>>> wp_components
 #: includes/menu/class-wholesalex-request-role-change.php:504
-#: includes/menu/class-wholesalex-users.php:474
+#: includes/menu/class-wholesalex-users.php:476
 #: assets/js/whx_overview.js:184
 msgid "Action"
 msgstr ""
@@ -3132,10 +3805,10 @@ msgstr ""
 #: includes/menu/class-wholesalex-overview.php:1012
 >>>>>>> wp_components
 #: assets/js/whx_cat.js:1
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_migration_tools.js:1
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Upgrade to Pro"
@@ -3158,7 +3831,6 @@ msgid "Enter 2 or more characters to search."
 msgstr ""
 
 #: includes/menu/class-wholesalex-profile.php:215
-#: assets/js/wholesalex_bulkorder.js:1
 msgid "Searching..."
 msgstr ""
 
@@ -3217,7 +3889,12 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-profile.php:733
 #: includes/menu/class-wholesalex-profile.php:738
-msgid "The file does not exist."
+msgid "File does not exist."
+msgstr ""
+
+#: includes/menu/class-wholesalex-profile.php:807
+#: includes/menu/class-wholesalex-role.php:348
+msgid "Choose Shipping Zone..."
 msgstr ""
 
 #. translators: %s - Plugin Name
@@ -3436,13 +4113,13 @@ msgid "Invalid request. Please refresh the page and try again."
 msgstr ""
 
 #: includes/menu/class-wholesalex-request-role-change.php:311
-#: includes/menu/class-wholesalex-users.php:332
-#: includes/menu/class-wholesalex-users.php:353
+#: includes/menu/class-wholesalex-users.php:334
+#: includes/menu/class-wholesalex-users.php:355
 msgid "Invalid Action!"
 msgstr ""
 
 #: includes/menu/class-wholesalex-request-role-change.php:315
-#: includes/menu/class-wholesalex-users.php:336
+#: includes/menu/class-wholesalex-users.php:338
 msgid "Invalid User ID!"
 msgstr ""
 
@@ -3458,30 +4135,37 @@ msgstr ""
 msgid "Request has been rejected."
 msgstr ""
 
-#: includes/menu/class-wholesalex-request-role-change.php:338
-#: includes/menu/class-wholesalex-users.php:384
-msgid "Invalid request type."
+#: includes/menu/class-wholesalex-request-role-change.php:453
+msgid "User not found"
+msgstr ""
+
+#: includes/menu/class-wholesalex-request-role-change.php:471
+msgid "Role change request has been submitted."
 msgstr ""
 
 #: includes/menu/class-wholesalex-request-role-change.php:494
-#: includes/menu/class-wholesalex-users.php:463
+#: includes/menu/class-wholesalex-users.php:465
 msgid "Username"
 msgstr ""
 
 #: includes/menu/class-wholesalex-request-role-change.php:495
-#: includes/menu/class-wholesalex-users.php:464
+#: includes/menu/class-wholesalex-users.php:466
 #: assets/js/whx_overview.js:184
 msgid "Full Name"
 msgstr ""
 
 #: includes/menu/class-wholesalex-request-role-change.php:496
-#: includes/menu/class-wholesalex-users.php:465
+#: includes/menu/class-wholesalex-users.php:467
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
 #: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
+=======
 >>>>>>> wp_components
 msgid "Email"
 msgstr ""
@@ -3494,6 +4178,20 @@ msgstr ""
 #: includes/menu/class-wholesalex-request-role-change.php:499
 #: assets/js/whx_overview.js:184
 msgid "Requested Role"
+msgstr ""
+
+#: includes/menu/class-wholesalex-role.php:106
+msgid "Invalid roles"
+msgstr ""
+
+#: includes/menu/class-wholesalex-role.php:116
+#: assets/js/whx_overview.js:184
+msgid "No roles found"
+msgstr ""
+
+#: includes/menu/class-wholesalex-role.php:181
+#: includes/menu/class-wholesalex-settings.php:115
+msgid "Successfully Saved."
 msgstr ""
 
 #: includes/menu/class-wholesalex-role.php:181
@@ -3663,6 +4361,7 @@ msgstr ""
 #: includes/menu/class-wholesalex-settings.php:224
 #: includes/menu/class-wholesalex-setup-wizard.php:70
 #: includes/options/Addons.php:304
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
 msgid "Bulk Order Form"
 msgstr ""
@@ -4598,13 +5297,17 @@ msgid "Set minimum allowed score for reCAPTCHA. Default Range: 0.0 - 1.00"
 msgstr ""
 
 #: includes/menu/class-wholesalex-settings.php:1581
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:1
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
 #: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
+=======
 >>>>>>> wp_components
 msgid "Save Changes"
 msgstr ""
@@ -4649,12 +5352,16 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-setup-wizard.php:108
 #: includes/options/Addons.php:343
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
 #: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
+=======
 >>>>>>> wp_components
 msgid "Conversation"
 msgstr ""
@@ -4665,6 +5372,7 @@ msgstr ""
 
 #: includes/menu/class-wholesalex-setup-wizard.php:131
 #: includes/options/Addons.php:370
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
 msgid "WholesaleX Wallet"
 msgstr ""
@@ -4713,6 +5421,10 @@ msgstr ""
 msgid "This addon require WCFM – Frontend Manager plugin"
 msgstr ""
 
+#: includes/menu/class-wholesalex-setup-wizard.php:403
+msgid "Updated"
+msgstr ""
+
 #: includes/menu/class-wholesalex-setup-wizard.php:437
 msgid "Plugin Activate Successfully"
 msgstr ""
@@ -4743,50 +5455,96 @@ msgstr ""
 msgid "New Support Ticket is not Created Due to Some Issues."
 msgstr ""
 
+#: includes/menu/class-wholesalex-users.php:124
+msgid "Invalid data"
+msgstr ""
+
+#: includes/menu/class-wholesalex-users.php:143
+msgid "Filters saved successfully"
+msgstr ""
+
 #: includes/menu/class-wholesalex-users.php:254
 msgid "--Select Role--"
 msgstr ""
 
-#: includes/menu/class-wholesalex-users.php:344
-#: includes/menu/class-wholesalex-users.php:375
+#: includes/menu/class-wholesalex-users.php:346
+#: includes/menu/class-wholesalex-users.php:377
 msgid "Successfully Deleted"
 msgstr ""
 
-#: includes/menu/class-wholesalex-users.php:344
-#: includes/menu/class-wholesalex-users.php:379
+#: includes/menu/class-wholesalex-users.php:346
+#: includes/menu/class-wholesalex-users.php:381
 msgid "Successfully Updated"
 msgstr ""
 
-#: includes/menu/class-wholesalex-users.php:359
+#: includes/menu/class-wholesalex-users.php:361
 msgid "Invalid User IDs!"
 msgstr ""
 
-#: includes/menu/class-wholesalex-users.php:365
+#: includes/menu/class-wholesalex-users.php:367
 msgid "One or more User IDs are invalid."
 msgstr ""
 
-#: includes/menu/class-wholesalex-users.php:377
+#: includes/menu/class-wholesalex-users.php:379
 msgid "Role Successfully Changed."
 msgstr ""
 
-#: includes/menu/class-wholesalex-users.php:448
+#: includes/menu/class-wholesalex-users.php:450
 msgid "Change Role To "
 msgstr ""
 
-#: includes/menu/class-wholesalex-users.php:467
+#: includes/menu/class-wholesalex-users.php:469
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
 msgid "Role"
 msgstr ""
 
-#: includes/menu/class-wholesalex-users.php:469
+#: includes/menu/class-wholesalex-users.php:471
 #: assets/js/whx_overview.js:184
 msgid "Transaction"
 msgstr ""
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #: includes/options/Addons.php:172
 =======
+=======
+#: includes/notice/class-notice.php:308
+msgid "Close Banner"
+msgstr ""
+
+#: includes/notice/class-notice.php:357
+#: includes/notice/class-notice.php:375
+msgid "Spring Sale:"
+msgstr ""
+
+#: includes/notice/class-notice.php:358
+#: includes/notice/class-notice.php:376
+msgid "Enjoy upto %s off on WholesaleX Pro."
+msgstr ""
+
+#: includes/notice/class-notice.php:362
+#: includes/notice/class-notice.php:380
+msgid "Upgrade Now →"
+msgstr ""
+
+#: includes/notice/class-notice.php:742
+msgid "Want to help make Wholesalex even more awesome?"
+msgstr ""
+
+#: includes/notice/class-notice.php:744
+msgid "Allow us to collect diagnostic data and usage information. see "
+msgstr ""
+
+#: includes/notice/class-notice.php:745
+msgid "what we collect."
+msgstr ""
+
+#: includes/notice/class-notice.php:763
+msgid "Accept & Close"
+msgstr ""
+
+>>>>>>> wp_components
 #: includes/options/Addons.php:166
 >>>>>>> wp_components
 msgid "Successfully Updated!"
@@ -4973,15 +5731,21 @@ msgctxt "WholesaleX Registration Pending (Customer)"
 msgid "We have received your registration request. Our team will review your information, and you will receive another email once your Request has been approved/rejected."
 msgstr ""
 
+#. translators: 1: first item, 2: last item, 3: total items, 4: item label
+#. translators: %s type of the request.
 #: assets/js/wholesalex_bulkorder.js:1
+#: assets/js/wholesalex_conversation_account.js:4
 #: assets/js/wholesalex_subaccount.js:1
+#: assets/js/wholesalex_wallet.js:10
 msgid "OK"
 msgstr ""
 
 #: assets/js/wholesalex_bulkorder.js:1
+#: assets/js/wholesalex_conversation_account.js:4
 #: assets/js/wholesalex_subaccount.js:1
+#: assets/js/wholesalex_wallet.js:10
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_profile.js:1
 msgid "Cancel"
 msgstr ""
@@ -4991,11 +5755,15 @@ msgid "Remove product"
 msgstr ""
 
 #: assets/js/wholesalex_bulkorder.js:1
+msgid "Searching…"
+msgstr ""
+
+#: assets/js/wholesalex_bulkorder.js:1
 msgid "No products found. Try a different keyword."
 msgstr ""
 
 #: assets/js/wholesalex_bulkorder.js:1
-msgid "Type to search for products..."
+msgid "Type to search for products…"
 msgstr ""
 
 #: assets/js/wholesalex_bulkorder.js:1
@@ -5016,6 +5784,10 @@ msgid "Tags"
 msgstr ""
 
 #: assets/js/wholesalex_bulkorder.js:1
+msgid "Invalid Input"
+msgstr ""
+
+#: assets/js/wholesalex_bulkorder.js:1
 msgid "Please enter a valid number"
 msgstr ""
 
@@ -5027,25 +5799,49 @@ msgstr ""
 msgid "Delete this product."
 msgstr ""
 
-#: assets/js/whx_all_products.js:1
+#: assets/js/wholesalex_forms_block.js:1
 #: assets/js/whx_overview.js:184
+msgid "required"
+msgstr ""
+
+#: assets/js/wholesalex_forms_block.js:1
+msgid "Customize Form"
+msgstr ""
+
+#: assets/js/wholesalex_forms_block.js:1
+msgid "WholesaleX Form"
+msgstr ""
+
+#: assets/js/wholesalex_forms_block.js:1
+msgid "With Login"
+msgstr ""
+
+#: assets/js/whx_all_products.js:1
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
 #: assets/js/whx_overview_integration.js:181
 >>>>>>> wp_components
+=======
+>>>>>>> wp_components
 msgid "Applied For"
 msgstr ""
 
-#. translators: 1: Filter name.
 #: assets/js/whx_all_products.js:1
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
 #: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
+=======
 >>>>>>> wp_components
 msgid "Edit"
 msgstr ""
@@ -5075,12 +5871,16 @@ msgid "User Name"
 msgstr ""
 
 #: assets/js/whx_all_products.js:1
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
 #: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
+=======
 >>>>>>> wp_components
 msgid "No rules found"
 msgstr ""
@@ -5102,56 +5902,56 @@ msgid "Variations"
 msgstr ""
 
 #: assets/js/whx_cat.js:1
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Quantity"
 msgstr ""
 
 #: assets/js/whx_cat.js:1
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Weight"
 msgstr ""
 
 #: assets/js/whx_cat.js:1
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Delete"
 msgstr ""
 
 #: assets/js/whx_cat.js:1
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Add New Condition"
 msgstr ""
 
 #: assets/js/whx_cat.js:1
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:1
-#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Unlock"
 msgstr ""
 
 #: assets/js/whx_cat.js:1
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:1
-#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Addons with"
 msgstr ""
 
 #: assets/js/whx_cat.js:1
+#: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:1
-#: assets/js/whx_overview_integration.js:181
 #: assets/js/whx_product.js:1
 #: assets/js/whx_profile.js:1
 msgid "Pro"
@@ -5166,6 +5966,795 @@ msgstr ""
 
 #: assets/js/whx_dashboard_widget.js:1
 msgid "Unable to load dashboard data. Please refresh the page."
+msgstr ""
+
+#. translators: 1: Filter name.
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Edit this conversation"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Mark as Resolved"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Resolved"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Delete this conversation"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Force Delete"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Deselect all"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Select all"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Select row"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "User"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Apply"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Select Type"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Add New Conversation"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Search Conversations"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "No conversations found"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Selected Conversations"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+#: assets/js/whx_profile.js:1
+msgid "Confirm Delete"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+#: assets/js/whx_profile.js:1
+msgid "Do You Want to delete"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+#: assets/js/whx_profile.js:1
+msgid "Be careful, this procedure is irreversible. Do you want to proceed?"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Please Select Properly!"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Please select conversation from the list and an action to perform bulk action."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Confirm Bulk Action"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Are you sure you want to"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "the selected"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "conversation"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "conversations"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Ok"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "The uploaded CSV file appears to be empty or invalid."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "The uploaded CSV file does not appear to be a valid dynamic rules import file. Please ensure you are uploading the correct file with dynamic rules-related columns."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Eror Occured!"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Import Dynamic Rules"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Please upload only CSV files."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Import failed. The uploaded file may have invalid format or incompatible data structure. Please verify your CSV file and try again."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Upload CSV"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "File size:"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Clear this file"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Drag and Drop File Here or"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Click to upload"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "You can upload only csv file format"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Update Existing Roles"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Selecting \"Update Existing Roles\" will only update existing roles. No new role will be added."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Continue"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Map CSV Fields to Roles"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Select fields from your CSV file to map against dynamic rules fields, or to ignore during import."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Column name"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Map to field"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Do not import"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Run the importer"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Importing"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Your Dynamic Rules are now being imported.."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Import Complete!"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Dynamic Rules Imported."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Dynamic Rules Updated."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Dynamic Rules Skipped."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Dynamic Rules Failed."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "View Error Logs"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Upload Another File"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Dynamic Rule"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:4
+#: assets/js/whx_overview.js:184
+msgid "Reason for failure"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Please Fill All Fields."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Minimum Product Quantity Should Greater then Free Product Quantity."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Duplicate of"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Edit Rule"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Duplicate Rule"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Duplicate"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Delete Rule"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Vendor #"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Untitled Rule"
+msgstr ""
+
+#. translators: 1: Filter name.
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Select Bulk Action"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Enable"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Disable"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Export Selected"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Doc"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Tutorial"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Latest"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Oldest"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Import"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Search Rule"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Selected Rules"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Please select rule from the list and an action to perform bulk action."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Sun"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Mon"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Tue"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Wed"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Thu"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Fri"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Sat"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Warning: Month cannot go higher than 12"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Warning: Day cannot go higher than 31"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Close calendar"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Open calendar"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "mm"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "dd"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "yyyy"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Unlock all Features with"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Publish"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Draft"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Please Fill The Rule Title."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:1
+#: assets/js/whx_overview.js:184
+msgid "Saving…"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "From"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "To"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Presets"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Custom"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Date Range"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Update"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "MM/DD/YYYY"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Today"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Yesterday"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Week to date"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Last week"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Month to date"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Last month"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Quarter to date"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Last quarter"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Year to date"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Last year"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Please Select Valid Date Range!"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Please select both a start date and an end date."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Sales Statistics"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "No New Customer Found!"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "No New Order Found!"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "No New Registration Found!"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "No Data Found!"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "New Messages"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "View All"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "New Registrations"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Approve"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Pro Features"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "WholesaleX Community"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Join WholesaleX Community"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Join the Facebook community of WholesaleX to stay up-to-date and share your thoughts and feedback."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_migration_tools.js:1
+#: assets/js/whx_overview.js:184
+msgid "Feature Request"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Request a Feature"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Can’t find your desired feature? Let us know your requirements. We will definitely take them into our consideration."
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "News, Tips & Updates"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Full Access to Dynamic Rules"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Multiple Pricing Tiers"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Request A Quote"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Subaccounts"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "And Much More!"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Unlock the full potential of WholesaleX to create and manage WooCommerce B2B or B2B+B2C stores with ease!"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Getting Started Guides"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "How to Create the Dynamic Rules"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "How to Create User Roles"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "How to Create a Registration Form"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "WholesaleX Blog"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Sales Summary (B2B)"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "than last week"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Top Customers"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Recent Orders"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Pending Registrations"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "View Order"
+msgstr ""
+
+#: assets/js/whx_integration.js:181
+#: assets/js/whx_overview.js:184
+msgid "Review"
 msgstr ""
 
 #: assets/js/whx_migration_tools.js:1
@@ -5248,11 +6837,6 @@ msgid "Join Community"
 msgstr ""
 
 #: assets/js/whx_migration_tools.js:1
-#: assets/js/whx_overview.js:184
-msgid "Feature Request"
-msgstr ""
-
-#: assets/js/whx_migration_tools.js:1
 msgid "YouTube Tutorials"
 msgstr ""
 
@@ -5265,11 +6849,7 @@ msgid "What's New"
 msgstr ""
 
 #: assets/js/whx_overview.js:1
-msgid "Flash Sale - Enjoy Up to 50% on"
-msgstr ""
-
-#: assets/js/whx_overview.js:1
-msgid "Final Hour Sale - Enjoy Up to 55% on"
+msgid "Spring Sale - Enjoy Up to 55% on"
 msgstr ""
 
 #: assets/js/whx_overview.js:1
@@ -5289,6 +6869,7 @@ msgid "Menu"
 msgstr ""
 
 #: assets/js/whx_overview.js:1
+<<<<<<< HEAD
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
@@ -5300,11 +6881,30 @@ msgid "Saving…"
 msgstr ""
 
 #: assets/js/whx_overview.js:1
+=======
+>>>>>>> wp_components
 msgid "View Demo"
 msgstr ""
 
 #: assets/js/whx_overview.js:1
+msgid "View Documentation"
+msgstr ""
+
+#: assets/js/whx_overview.js:1
+msgid "Watch Video"
+msgstr ""
+
+#: assets/js/whx_overview.js:1
+msgid "Addon Settings"
+msgstr ""
+
+#: assets/js/whx_overview.js:1
 msgid "View Pro"
+msgstr ""
+
+#: assets/js/whx_overview.js:1
+#: assets/js/whx_overview.js:184
+msgid "How Add Conditions in Custom Fields"
 msgstr ""
 
 #: assets/js/whx_overview.js:1
@@ -5342,6 +6942,7 @@ msgid "Unlock this Features with Lifetime"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
+<<<<<<< HEAD
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
@@ -5353,6 +6954,8 @@ msgid "The uploaded CSV file appears to be empty or invalid."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
+=======
+>>>>>>> wp_components
 msgid "The uploaded CSV file does not appear to be a valid role import file. Please ensure you are uploading the correct file with role-related columns."
 msgstr ""
 
@@ -5369,6 +6972,7 @@ msgid "Import User Roles"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
+<<<<<<< HEAD
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
@@ -5501,10 +7105,13 @@ msgid "Map CSV Fields to Roles"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
+=======
+>>>>>>> wp_components
 msgid "Select fields from your CSV file to map against role fields, or to ignore during import."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
+<<<<<<< HEAD
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
@@ -5560,10 +7167,13 @@ msgid "Importing"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
+=======
+>>>>>>> wp_components
 msgid "Your roles are now being imported.."
 msgstr ""
 
 #: assets/js/whx_overview.js:4
+<<<<<<< HEAD
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
@@ -5575,6 +7185,8 @@ msgid "Import Complete!"
 msgstr ""
 
 #: assets/js/whx_overview.js:4
+=======
+>>>>>>> wp_components
 msgid "Role Imported."
 msgstr ""
 
@@ -5590,6 +7202,7 @@ msgstr ""
 msgid "Role Failed."
 msgstr ""
 
+<<<<<<< HEAD
 #: assets/js/whx_overview.js:4
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
@@ -5654,6 +7267,8 @@ msgstr ""
 msgid "Duplicate of"
 msgstr ""
 
+=======
+>>>>>>> wp_components
 #: assets/js/whx_overview.js:184
 msgid "Succesfully Saved."
 msgstr ""
@@ -5668,6 +7283,7 @@ msgstr ""
 
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
@@ -5677,10 +7293,13 @@ msgid "Duplicate"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+=======
+>>>>>>> wp_components
 msgid "Delete Role"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
@@ -5711,6 +7330,8 @@ msgid "Select row"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+=======
+>>>>>>> wp_components
 msgid "Role Name"
 msgstr ""
 
@@ -5732,6 +7353,7 @@ msgstr ""
 
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
@@ -5751,33 +7373,13 @@ msgid "Import"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+=======
+>>>>>>> wp_components
 msgid "Search Role"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
-msgid "No roles found"
-msgstr ""
-
-#: assets/js/whx_overview.js:184
 msgid "Selected Roles"
-msgstr ""
-
-#: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_integration.js:181
-#: assets/js/whx_profile.js:1
-msgid "Confirm Delete"
-msgstr ""
-
-#: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_integration.js:181
-#: assets/js/whx_profile.js:1
-msgid "Do You Want to delete"
-msgstr ""
-
-#: assets/js/whx_overview.js:184
-#: assets/js/whx_overview_integration.js:181
-#: assets/js/whx_profile.js:1
-msgid "Be careful, this procedure is irreversible. Do you want to proceed?"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
@@ -5790,6 +7392,7 @@ msgstr ""
 
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
@@ -5799,10 +7402,13 @@ msgid "Please Select Properly!"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+=======
+>>>>>>> wp_components
 msgid "Please select role from the list and an action to perform bulk action."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
@@ -5833,6 +7439,8 @@ msgid "the selected"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+=======
+>>>>>>> wp_components
 msgid "role"
 msgstr ""
 
@@ -5841,6 +7449,7 @@ msgid "roles"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
@@ -6066,6 +7675,8 @@ msgid "Review"
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+=======
+>>>>>>> wp_components
 msgid "Users Updated"
 msgstr ""
 
@@ -6147,10 +7758,13 @@ msgstr ""
 
 #: assets/js/whx_overview.js:184
 <<<<<<< HEAD
+<<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
 =======
 #: assets/js/whx_overview_integration.js:181
+>>>>>>> wp_components
+=======
 >>>>>>> wp_components
 msgid "Bulk Actions"
 msgstr ""
@@ -6244,6 +7858,7 @@ msgid "Unlock full email access with WholesaleX Pro, giving you complete control
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+<<<<<<< HEAD
 <<<<<<< HEAD
 #: assets/js/whx_overview_dokan.js:181
 #: assets/js/whx_overview_wcfm.js:181
@@ -6650,6 +8265,8 @@ msgid "Please Fill The Rule Title."
 msgstr ""
 
 #: assets/js/whx_overview.js:184
+=======
+>>>>>>> wp_components
 msgid "Restrict Guest Access"
 msgstr ""
 
@@ -7035,6 +8652,10 @@ msgstr ""
 
 #: assets/js/whx_overview.js:184
 msgid "Required in Billing"
+msgstr ""
+
+#: assets/js/whx_overview.js:184
+msgid "Delete Field"
 msgstr ""
 
 #: assets/js/whx_overview.js:184

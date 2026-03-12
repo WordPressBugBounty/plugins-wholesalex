@@ -447,7 +447,7 @@ class ImportExport {
 
 		$response = array(
 			'log'             => '',
-			'message'         => 'You must upload a valid csv file to import users',
+			'message'         => __( 'You must upload a valid csv file to import users', 'wholesalex' ),
 			'insert_count'    => 0,
 			'update_count'    => 0,
 			'skipped_count'   => 0,

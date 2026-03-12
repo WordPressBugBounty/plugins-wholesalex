@@ -121,7 +121,7 @@ class WHOLESALEX_Users {
 		$filters = $request->get_param( 'filters' );
 
 		if ( empty( $filters ) || ! is_array( $filters ) ) {
-			return new \WP_REST_Response( array( 'message' => 'Invalid data' ), 400 );
+			return new \WP_REST_Response( array( 'message' => __( 'Invalid data', 'wholesalex' ) ), 400 );
 		}
 
 		// Retrieve the existing settings.
@@ -140,7 +140,7 @@ class WHOLESALEX_Users {
 		// Save updated settings to the database.
 		update_option( 'wholesalex_settings', $existing_settings );
 
-		return new \WP_REST_Response( array( 'message' => 'Filters saved successfully' ), 200 );
+		return new \WP_REST_Response( array( 'message' => __( 'Filters saved successfully', 'wholesalex' ) ), 200 );
 	}
 
 	/**
@@ -318,9 +318,11 @@ class WHOLESALEX_Users {
 				$user_status    = isset( $post['status'] ) ? sanitize_text_field( $post['status'] ) : '';
 				$user_role      = isset( $post['role'] ) ? sanitize_text_field( $post['role'] ) : '';
 				$search_query   = isset( $post['search'] ) ? sanitize_text_field( $post['search'] ) : '';
+					$sort_field     = isset( $post['sortField'] ) ? sanitize_text_field( $post['sortField'] ) : 'ID';
+					$sort_direction = isset( $post['sortDirection'] ) ? sanitize_text_field( $post['sortDirection'] ) : 'desc';
 
 				$response['status'] = true;
-				$response['data']   = $this->get_wholesale_users( $items_per_page, $page, $user_status, $search_query, $user_role );
+					$response['data']   = $this->get_wholesale_users( $items_per_page, $page, $user_status, $search_query, $user_role, $sort_field, $sort_direction );
 				break;
 
 			case 'update_status':
@@ -484,9 +486,22 @@ class WHOLESALEX_Users {
 	 * @param string  $status Account Status.
 	 * @param string  $search_query Search Query.
 	 * @param string  $role User Role.
+	 * @param string  $sort_field Sort field.
+	 * @param string  $sort_direction Sort direction.
 	 * @return array
 	 */
-	public function get_wholesale_users( $user_per_page = -1, $page = 1, $status = '', $search_query = '', $role = '' ) {
+	public function get_wholesale_users( $user_per_page = -1, $page = 1, $status = '', $search_query = '', $role = '', $sort_field = 'ID', $sort_direction = 'desc' ) {
+		$normalized_sort_field = strtolower( (string) $sort_field );
+		$orderby_map           = array(
+			'id'                => 'ID',
+			'user_id'           => 'ID',
+			'full_name'         => 'display_name',
+			'email'             => 'email',
+			'registration_date' => 'registered',
+		);
+		$orderby              = isset( $orderby_map[ $normalized_sort_field ] ) ? $orderby_map[ $normalized_sort_field ] : 'ID';
+		$order                = ( 'asc' === strtolower( (string) $sort_direction ) ) ? 'ASC' : 'DESC';
+
 		$user_fields = array( 'ID', 'user_login', 'display_name', 'user_email', 'user_registered' );
 		$meta_query  = array(
 			'relation' => 'OR',
@@ -539,8 +554,8 @@ class WHOLESALEX_Users {
 
 		$args = array(
 			'meta_query'  => $meta_query,
-			'orderby'     => 'registered',
-			'order'       => 'DESC',
+			'orderby'     => $orderby,
+			'order'       => $order,
 			'number'      => $user_per_page,
 			'paged'       => $page,
 			'fields'      => 'all',

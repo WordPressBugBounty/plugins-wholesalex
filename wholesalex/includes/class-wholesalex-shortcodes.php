@@ -1149,7 +1149,12 @@ class WHOLESALEX_Shortcodes {
 						});
 					}
 
-					
+
+					const getConditionFieldValue = (fieldName) => {
+						const $radio = wrapper.find("input[type='radio'][name='" + fieldName + "']:checked");
+						if ($radio.length) return $radio.val();
+						return wrapper.find(".wsx-field *[name='" + fieldName + "']").not("input[type='radio']").val() || '';
+					};
 
 					const handleCondition = ()=>{
 						const conditions = <?php echo wp_json_encode( $conditions ); // phpcs:ignore ?>
@@ -1168,13 +1173,13 @@ class WHOLESALEX_Shortcodes {
 											const element = tiers[index];
 											
 											if(element['condition']=='is') {
-												let val = $(".wsx-field *[name="+element['field']+"]").val();
+												let val = getConditionFieldValue(element['field']);
 												if(val==element['value']) {
 													_status = true;
 												}
 											}
 											else if(element['condition']=='not_is') {
-												let val = $(".wsx-field *[name="+element['field']+"]").val();
+												let val = getConditionFieldValue(element['field']);
 												
 												if(val!=element['value']) {
 													_status = true;
@@ -1184,17 +1189,16 @@ class WHOLESALEX_Shortcodes {
 										}
 										if(_status) {
 											if(status=='hide') {
-												$(".wsx-field.wsx-field-"+name).hide();
-												// $(this).find('.wsx-field-required').prop('required','true');
+												wrapper.find(".wsx-field.wsx-field-"+name).hide();
 
 											} else {
-												$(".wsx-field.wsx-field-"+name).show();
+												wrapper.find(".wsx-field.wsx-field-"+name).show();
 											}
 										} else {
 											if(status=='hide') {
-												$(".wsx-field.wsx-field-"+name).show();
+												wrapper.find(".wsx-field.wsx-field-"+name).show();
 											} else {
-												$(".wsx-field.wsx-field-"+name).hide();
+												wrapper.find(".wsx-field.wsx-field-"+name).hide();
 											}
 										}
 
@@ -1202,14 +1206,14 @@ class WHOLESALEX_Shortcodes {
 										let _status = false;
 										tiers.forEach(element => {
 											if(element['condition']=='is') {
-												let val = $(".wsx-field *[name="+element['field']+"]").val();
+												let val = getConditionFieldValue(element['field']);
 												if(val!=element['value']) {
 													_status = true;
 													return;
 												}
 											}
 											else if(element['condition']=='not_is') {
-												let val = $(".wsx-field *[name="+element['field']+"]").val();
+												let val = getConditionFieldValue(element['field']);
 												if(val==element['value']) {
 													_status = true;
 													return;
@@ -1218,15 +1222,15 @@ class WHOLESALEX_Shortcodes {
 										});
 										if(_status) {
 											if(status=='hide') {
-												$(".wsx-field.wsx-field-"+name).show();
+												wrapper.find(".wsx-field.wsx-field-"+name).show();
 											} else {
-												$(".wsx-field.wsx-field-"+name).hide();
+												wrapper.find(".wsx-field.wsx-field-"+name).hide();
 											}
 										} else {
 											if(status=='hide') {
-												$(".wsx-field.wsx-field-"+name).hide();
+												wrapper.find(".wsx-field.wsx-field-"+name).hide();
 											} else {
-												$(".wsx-field.wsx-field-"+name).show();
+												wrapper.find(".wsx-field.wsx-field-"+name).show();
 											}	
 										}
 									}
