@@ -74,7 +74,7 @@ if ( ! class_exists( 'WHOLESALEX\WholesaleX_User_Profile_Update_Notification_Ema
 
 			// Call parent constructor.
 			parent::__construct();
-			add_action( 'wholesalex_user_profile_update_notify_notification', array( $this, 'user_profile_update_notify' ), 10, 2 );
+			add_action( 'wholesalex_user_profile_update_notify', array( $this, 'user_profile_update_notify' ), 10, 2 );
 		}
 
 		/**

@@ -1709,7 +1709,7 @@ class Dynamic_Rules {
 
 		add_filter( 'woocommerce_get_variation_prices_hash', array( $this, 'variation_price_hash' ), 9, 2 );
 		add_filter( 'woocommerce_get_price_html', array( $this, 'woocommerce_get_price_html' ), 9, 2 );
-		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_cart_price' ) );
+		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_cart_price' ), 5 );
 		add_filter( 'woocommerce_cart_item_price', array( $this, 'set_cart_item_price_to_display' ), 10, 2 );
 	}
 

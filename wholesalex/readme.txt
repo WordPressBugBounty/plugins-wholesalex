@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 6.8    
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.3.3
+Stable tag: 2.3.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -211,6 +211,12 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.3.4 – 31 March 2026 =
+* Improvement: Dynamic rules are now displayed for brands and attributes in the product list.
+* Fix: Resolved an issue with profile notification emails.
+* Fix: Fixed disappearing issue in role-based pricing on the single product page.
+* Fix: Resolved duplicate rule issue.
 
 = 2.3.3 – 12 March 2026 =
 * Improvement: Refactored Dynamic Rules with a new folder structure and separated files for each rule.

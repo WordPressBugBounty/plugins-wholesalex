@@ -368,6 +368,17 @@ class WHOLESALEX_Profile {
 
 		if ( isset( $_POST['action'] ) && 'createuser' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) {
 			update_user_meta( $user_id, '__wholesalex_status', 'active' );
+		} else {
+			$updated_fields = array();
+			if ( isset( $_POST['wholesalex_profile_tiers'] ) && ! empty( $_POST['wholesalex_profile_tiers'] ) ) {
+				$updated_fields[] = __( 'Discounts', 'wholesalex' );
+			}
+			if ( isset( $_POST['wholesalex_profile_settings'] ) && ! empty( $_POST['wholesalex_profile_settings'] ) ) {
+				$updated_fields[] = __( 'Profile Settings', 'wholesalex' );
+			}
+			if ( ! empty( $updated_fields ) ) {
+				do_action( 'wholesalex_user_profile_update_notify', $user_id, $updated_fields );
+			}
 		}
 	}
 

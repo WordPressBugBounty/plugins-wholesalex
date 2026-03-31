@@ -2095,6 +2095,120 @@ class WHOLESALEX_Product {
 								}
 							}
 							break;
+						case 'brand_in_list':
+							if ( ! isset( $discount['brand_in_list'] ) ) {
+								break;
+							}
+							$__brand_tax_list = array( 'product_brand', 'pwb-brand', 'yith_product_brand' );
+							$__brand_tax      = '';
+							foreach ( $__brand_tax_list as $__bt ) {
+								if ( taxonomy_exists( $__bt ) ) {
+									$__brand_tax = $__bt;
+									break;
+								}
+							}
+							if ( $__brand_tax ) {
+								$__brand_term_ids = array_map( 'intval', wc_get_product_term_ids( 0 === $__parent_id ? $__product_id : $__parent_id, $__brand_tax ) );
+								foreach ( $discount['brand_in_list'] as $list ) {
+									if ( isset( $list['value'] ) && in_array( (int) $list['value'], $__brand_term_ids, true ) ) {
+										$__has_discount = true;
+										$__for          = 'brand';
+										$__src_id       = $list['value'];
+										break;
+									}
+								}
+							}
+							break;
+						case 'brand_not_in_list':
+							if ( ! isset( $discount['brand_not_in_list'] ) ) {
+								break;
+							}
+							$__brand_tax_list2 = array( 'product_brand', 'pwb-brand', 'yith_product_brand' );
+							$__brand_tax2      = '';
+							foreach ( $__brand_tax_list2 as $__bt2 ) {
+								if ( taxonomy_exists( $__bt2 ) ) {
+									$__brand_tax2 = $__bt2;
+									break;
+								}
+							}
+							if ( $__brand_tax2 ) {
+								$__brand_term_ids2 = array_map( 'intval', wc_get_product_term_ids( 0 === $__parent_id ? $__product_id : $__parent_id, $__brand_tax2 ) );
+								$__flag            = true;
+								foreach ( $discount['brand_not_in_list'] as $list ) {
+									if ( isset( $list['value'] ) && in_array( (int) $list['value'], $__brand_term_ids2, true ) ) {
+										$__flag = false;
+										break;
+									}
+								}
+								if ( $__flag ) {
+									$__has_discount = true;
+									$__for          = 'brand';
+									$__src_id       = isset( $__brand_term_ids2[0] ) ? $__brand_term_ids2[0] : '';
+								}
+							}
+							break;
+						case 'att_in_list':
+							if ( ! isset( $discount['att_in_list'] ) ) {
+								break;
+							}
+							$__att_product    = wc_get_product( $__product_id );
+							$__att_attrs      = $__att_product ? $__att_product->get_attributes() : array();
+							$__att_reg        = wc_get_attribute_taxonomies();
+							$__att_tax_id_map = array();
+							foreach ( $__att_reg as $__att_reg_item ) {
+								$__att_tax_id_map[ wc_attribute_taxonomy_name( $__att_reg_item->attribute_name ) ] = (int) $__att_reg_item->attribute_id;
+							}
+							$__product_att_ids = array();
+							foreach ( $__att_attrs as $__att_attr ) {
+								if ( is_object( $__att_attr ) && method_exists( $__att_attr, 'is_taxonomy' ) && $__att_attr->is_taxonomy() ) {
+									$__att_tax_name = $__att_attr->get_taxonomy();
+									if ( isset( $__att_tax_id_map[ $__att_tax_name ] ) ) {
+										$__product_att_ids[] = $__att_tax_id_map[ $__att_tax_name ];
+									}
+								}
+							}
+							foreach ( $discount['att_in_list'] as $list ) {
+								if ( isset( $list['value'] ) && in_array( (int) $list['value'], $__product_att_ids, true ) ) {
+									$__has_discount = true;
+									$__for          = 'attribute';
+									$__src_id       = $list['value'];
+									break;
+								}
+							}
+							break;
+						case 'att_not_in_list':
+							if ( ! isset( $discount['att_not_in_list'] ) ) {
+								break;
+							}
+							$__att2_product    = wc_get_product( $__product_id );
+							$__att2_attrs      = $__att2_product ? $__att2_product->get_attributes() : array();
+							$__att2_reg        = wc_get_attribute_taxonomies();
+							$__att2_tax_id_map = array();
+							foreach ( $__att2_reg as $__att2_reg_item ) {
+								$__att2_tax_id_map[ wc_attribute_taxonomy_name( $__att2_reg_item->attribute_name ) ] = (int) $__att2_reg_item->attribute_id;
+							}
+							$__product_att2_ids = array();
+							foreach ( $__att2_attrs as $__att2_attr ) {
+								if ( is_object( $__att2_attr ) && method_exists( $__att2_attr, 'is_taxonomy' ) && $__att2_attr->is_taxonomy() ) {
+									$__att2_tax_name = $__att2_attr->get_taxonomy();
+									if ( isset( $__att2_tax_id_map[ $__att2_tax_name ] ) ) {
+										$__product_att2_ids[] = $__att2_tax_id_map[ $__att2_tax_name ];
+									}
+								}
+							}
+							$__flag = true;
+							foreach ( $discount['att_not_in_list'] as $list ) {
+								if ( isset( $list['value'] ) && in_array( (int) $list['value'], $__product_att2_ids, true ) ) {
+									$__flag = false;
+									break;
+								}
+							}
+							if ( $__flag ) {
+								$__has_discount = true;
+								$__for          = 'attribute';
+								$__src_id       = '';
+							}
+							break;
 					}
 				}
 				if ( ! $__has_discount ) {

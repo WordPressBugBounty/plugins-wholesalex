@@ -77,7 +77,7 @@ class WHOLESALEX_Menu {
 				'wholesalex_pro' => '<a href="' . esc_url( $url ) . '" target="_blank" style="color: #e83838;font-weight: bold;">' . $text . '</a>',
 			);
 		}
-		$setting_link['wholesalex_settings'] = '<a href="' . esc_url( admin_url( 'admin.php?page=wholesalex-settings' ) ) . '">' . esc_html__( 'Settings', 'wholesalex' ) . '</a>';
+		$setting_link['wholesalex_settings'] = '<a href="' . esc_url( admin_url( 'admin.php?page=wholesalex#/settings' ) ) . '">' . esc_html__( 'Settings', 'wholesalex' ) . '</a>';
 		return array_merge( $setting_link, $links, $upgrade_link );
 	}
 
