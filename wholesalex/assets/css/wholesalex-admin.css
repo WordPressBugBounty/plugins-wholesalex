@@ -3370,3 +3370,8 @@ select.wsx-select {
 .dataviews-pagination .components-input-control__backdrop {
 	border: 1px solid var(--wp-components-color-gray-600, #949494) !important;
 }
+
+.wsx-product-icon svg {
+	width: 100%;
+	height: 32px;
+}

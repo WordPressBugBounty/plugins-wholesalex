@@ -100,6 +100,7 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/deactive/class-deactive.php';
 		require_once WHOLESALEX_PATH . 'includes/notice/class-notice.php';
 		require_once WHOLESALEX_PATH . 'includes/class-wholesalex-common-utils.php';
+		require_once WHOLESALEX_PATH . 'includes/class-wow-shipping-promotion.php';
 
 		new \WHOLESALEX\WHOLESALEX_Role();
 		new \WHOLESALEX\WHOLESALEX_Registration();
@@ -126,6 +127,7 @@ class WholesaleX_Initialization {
 
 		new \WHOLESALEX\Deactive();
 		new \WHOLESALEX\Notice();
+		new \WHOLESALEX\WowShippingPromotion();
 		new \WHOLESALEX\OurPlugins();
 
 		add_action( 'template_redirect', array( $this, 'wholesalex_process_user_email_confirmation' ) );
@@ -159,7 +161,7 @@ class WholesaleX_Initialization {
 			'pro_ver'             => wholesalex()->is_pro_active() ? WHOLESALEX_PRO_VER : '',
 			'settings'            => wholesalex()->get_setting(),
 			'license_status'      => wholesalex()->is_pro_enabled() ? wholesalex()->get_license_status() : '',
-			'logo_url'            => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/icons/logo-option.svg' ),
+			'logo_url'            => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/icons/wholesalex-logo.svg' ),
 			'plugin_name'         => wholesalex()->get_plugin_name(),
 			'whitelabel_enabled'  => 'yes' == wholesalex()->get_setting( 'wsx_addon_whitelabel' ) && function_exists( 'wholesalex_whitelabel_init' ),
 			'is_admin_interface'  => is_admin(),
@@ -212,7 +214,7 @@ class WholesaleX_Initialization {
 					'is_pro_active'      => wholesalex()->is_pro_active(),
 					'pro_ver'            => wholesalex()->is_pro_active() ? WHOLESALEX_PRO_VER : '',
 					'settings'           => wholesalex()->get_setting(),
-					'logo_url'           => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/icons/logo-option.svg' ),
+					'logo_url'           => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/icons/wholesalex-logo.svg' ),
 					'plugin_name'        => wholesalex()->get_plugin_name(),
 					'is_admin_interface' => is_admin(),
 					'i18n'               => array(

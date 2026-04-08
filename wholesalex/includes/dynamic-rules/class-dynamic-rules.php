@@ -807,11 +807,14 @@ class Dynamic_Rules {
 				$cart_qty = wholesalex()->cart_count( $product_id );
 			}
 
+			// NOTE:Product Discount and Quantity based discount Merged here. If a product_discount was already applied
+			$tier_base_price = ( 'product_discount' === $applied_discount_src && $sale_price ) ? (float) $sale_price : $base_price;
+
 			$tier_res = array();
 			foreach ( $priority as $pr ) {
-				$tier_res = $this->get_priority_wise_tier_price( $pr, $data, $product_id, $parent_id, $base_price, $cart_qty, true );
+				$tier_res = $this->get_priority_wise_tier_price( $pr, $data, $product_id, $parent_id, $tier_base_price, $cart_qty, true );
 				if ( ! empty( $tier_res['tiers'] ) && ! isset( $this->active_tiers[ $product_id ] ) ) {
-					$tier_res['base_price']            = $base_price;
+					$tier_res['base_price']            = $tier_base_price;
 					$this->active_tiers[ $product_id ] = $tier_res;
 				}
 				if ( $tier_res['price'] && $tier_res['src'] && 0.00 != $tier_res['price'] ) {
@@ -820,7 +823,7 @@ class Dynamic_Rules {
 				}
 			}
 			if ( isset( $tier_res['tiers'] ) && ! empty( $tier_res['tiers'] ) && $tier_res['price'] ) {
-				$tier_res['base_price']            = $base_price;
+				$tier_res['base_price']            = $tier_base_price;
 				$this->active_tiers[ $product_id ] = $tier_res;
 			}
 		}
@@ -3163,7 +3166,7 @@ class Dynamic_Rules {
 	 * @param WC_Product $product          The current product being rendered on the single product page.
 	 * @param array      $cart_related_data Associative array of cart-related rule sets, keyed by rule type
 	 *                                      (e.g. 'cart_discount', 'payment_discount', 'buy_x_get_one').
-	 *                                     
+	 *
 	 * @return void
 	 */
 	public function check_for_cart_releated_discounts( $product, $cart_related_data ) {
