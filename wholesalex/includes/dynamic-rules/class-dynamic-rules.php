@@ -63,7 +63,11 @@ class Dynamic_Rules {
 		// No hook registration needed here.
 
 		// Order / Cart session hooks.
+		// Classic checkout (shortcode-based) fires woocommerce_checkout_create_order.
 		add_action( 'woocommerce_checkout_create_order', array( $this, 'add_custom_meta_on_wholesale_order' ), 10 );
+		// WooCommerce Blocks / Store API checkout never fires woocommerce_checkout_create_order;
+		// it uses woocommerce_store_api_checkout_update_order_meta instead.
+		add_action( 'woocommerce_store_api_checkout_update_order_meta', array( $this, 'add_custom_meta_on_wholesale_order' ), 10 );
 		add_action( 'woocommerce_update_cart_action_cart_updated', array( $this, 'update_discounted_product' ) );
 
 		// PPOM compatibility.
@@ -396,6 +400,17 @@ class Dynamic_Rules {
 		if ( is_admin() || null === WC()->session ) {
 			return;
 		}
+
+		// order_type is resolved from the current user's role and does not require the session.
+		$__user_role = wholesalex()->get_current_user_role();
+		$order_type  = in_array( $__user_role, array( '', 'wholesalex_guest', 'wholesalex_b2c_users' ), true ) ? 'b2c' : 'b2b';
+		$order->update_meta_data( '__wholesalex_order_type', $order_type );
+
+		// Everything below this point requires an active WC session (discount tracking).
+		if ( null === WC()->session ) {
+			return;
+		}
+
 		$__discounted_product = WC()->session->get( '__wholesalex_discounted_products' );
 		$__dynamic_rule_id    = WC()->session->get( '__wholesalex_used_dynamic_rule' );
 		if ( ! empty( $__dynamic_rule_id ) ) {
@@ -898,17 +913,26 @@ class Dynamic_Rules {
 				break;
 			case 'dynamic_rule':
 				$dynamic_rule_tiers = array();
+				$display_tiers      = array();
 				if ( ! empty( $data['quantity_based'] ) ) {
 					foreach ( $data['quantity_based'] as $qbd ) {
+						$is_eligible = Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $parent_id ? $parent_id : $product_id, $product_id, $qbd['filter'] );
+						// Always collect tiers for table display from eligible products,
+						// regardless of conditions (the table is informational).
+						if ( $is_eligible ) {
+							$display_tiers = array_merge( $display_tiers, $qbd['rule']['tiers'] );
+						}
 						if ( isset( $qbd['conditions'] ) && ! Dynamic_Rules_Condition_Engine::check_rule_conditions( $qbd['conditions'], $qbd['filter'] ) ) {
 							continue;
 						}
-						if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $parent_id ? $parent_id : $product_id, $product_id, $qbd['filter'] ) ) {
+						if ( $is_eligible ) {
 							$dynamic_rule_tiers = array_merge( $dynamic_rule_tiers, $qbd['rule']['tiers'] );
 						}
 					}
 				}
-				$active_tier = $dynamic_rule_tiers;
+				// Use display_tiers (all product-eligible tiers) so the tier table
+				// always renders; price calculation still uses condition-gated tiers.
+				$active_tier = ! empty( $display_tiers ) ? $display_tiers : $dynamic_rule_tiers;
 				$res         = $this->calculate_tier_pricing( $dynamic_rule_tiers, $base_price, $cart_qty );
 				if ( $res ) {
 					$tier_res = array(
@@ -1573,6 +1597,11 @@ class Dynamic_Rules {
 					if ( ! ( $product_id && 'yes' === wholesalex()->get_single_product_setting( $product_id, '_settings_show_tierd_pricing_table' ) ) ) {
 						return;
 					}
+					// Ensure active_tiers is populated even if price filters haven't fired yet
+					// (e.g. themes/page-builders that render the form before the price).
+					if ( ! isset( $this->active_tiers[ $product_id ] ) ) {
+						$product->get_sale_price();
+					}
 					$tiers          = isset( $this->active_tiers[ $product_id ] ) ? $this->active_tiers[ $product_id ] : array( 'tiers' => array() );
 					$tiers['tiers'] = $this->filter_empty_tier( $tiers['tiers'] );
 					$table_data     = false;
@@ -1596,6 +1625,10 @@ class Dynamic_Rules {
 					$product_id   = $product->get_id();
 					if ( ! ( $product_id && 'yes' === wholesalex()->get_single_product_setting( $product_id, '_settings_show_tierd_pricing_table' ) ) ) {
 						return $variation_data;
+					}
+					// Ensure active_tiers is populated even if price filters haven't fired yet.
+					if ( ! isset( $this->active_tiers[ $variation_id ] ) ) {
+						$variation->get_sale_price();
 					}
 					$tiers = isset( $this->active_tiers[ $variation_id ] ) ? $this->active_tiers[ $variation_id ] : array();
 					if ( isset( $tiers['tiers'] ) ) {
@@ -1956,6 +1989,10 @@ class Dynamic_Rules {
 		}
 		if ( ! ( $product_id && 'yes' === wholesalex()->get_single_product_setting( $product_id, '_settings_show_tierd_pricing_table' ) ) ) {
 			return;
+		}
+		// Ensure active_tiers is populated even if price filters haven't fired yet.
+		if ( ! isset( $this->active_tiers[ $product_id ] ) ) {
+			$product->get_sale_price();
 		}
 		$tiers          = isset( $this->active_tiers[ $product_id ] ) ? $this->active_tiers[ $product_id ] : array( 'tiers' => array() );
 		$tiers['tiers'] = $this->filter_empty_tier( $tiers['tiers'] );

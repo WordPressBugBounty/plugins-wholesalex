@@ -4,8 +4,8 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 6.8    
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.3.5
-License: GPLv3
+Stable tag: 2.3.6
+License: GPLv3 
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Best WooCommerce wholesale plugin with features like b2b wholesale prices, wholesale order form, tiered pricing, catalog mode, dynamic pricing, etc!
@@ -126,6 +126,9 @@ Other Amazing Plugins
 
 Thank you for considering WholesaleX - the ultimate WooCommerce wholesale plugin. Take a look at our other WordPress and WooCommerce Plugins.
 
+🚚 [WowShipping 🔥](https://wordpress.org/plugins/wow-table-rate-shipping/): The smartest way to manage WooCommerce shipping with 30+ table rate conditions with integrations with popular shipping carriers, including DHL, UPS, USPS, Sendle, and More.
+
+➕ [WowAddons 🔥](https://wordpress.org/plugins/product-addons/): The best product addons plugin for WooCommerce with 25+ extra options, custom fields, and conditional logic, allowing you to sell customizable products with ease.
 
 💝 [WowStore](https://wordpress.org/plugins/product-blocks/): The ultimate solution for building and managing eCommerce sites. Packed with features to enhance conversions and boost sales, it streamlines your store’s performance.
 
@@ -134,8 +137,6 @@ Thank you for considering WholesaleX - the ultimate WooCommerce wholesale plugin
 🧲 [WowOptin](https://wordpress.org/plugins/optin/): A cutting-edge plugin for creating opt-ins and popups to capture leads and drive sales. It’s Canva-like builder ensures quick, customized designs to meet your goals.
 
 📃 [PostX](https://wordpress.org/plugins/ultimate-post/): The top plugin for creating news, magazine, or blog sites. With PostX, build professional websites in three easy steps, enjoying complete customization freedom.
-
-➕ [WowAddons](https://wordpress.org/plugins/product-addons/): The most advanced product addons plugin for WooCommerce that helps you add extra fields & options to product pages with ease.
 
 
 = Author =
@@ -211,6 +212,9 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.3.6 – 15 April 2026 =
+* Fix: Fixed overview section data update issue to ensure real-time consistency.
 
 = 2.3.5 – 08 April 2026 =
 * Fix: Fixed an issue where product discount and quantity-based discount rules were incorrectly combined.
