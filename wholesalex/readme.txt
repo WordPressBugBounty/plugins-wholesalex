@@ -4,8 +4,8 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 6.8    
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.3.6
-License: GPLv3 
+Stable tag: 2.3.7
+License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Best WooCommerce wholesale plugin with features like b2b wholesale prices, wholesale order form, tiered pricing, catalog mode, dynamic pricing, etc!
@@ -212,6 +212,11 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.3.7 – 06 May 2026 =
+* Improvement: Updated WholesaleX B2B and B2C stock status handling for variable products.
+* Fix: Resolved compatibility issues with preload payment gateways caused by third-party plugin conflicts.
+* Compatibility: Improved WooCommerce Gift Card plugin compatibility and addressed related issues.
 
 = 2.3.6 – 15 April 2026 =
 * Fix: Fixed overview section data update issue to ensure real-time consistency.

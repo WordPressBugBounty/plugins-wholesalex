@@ -66,9 +66,10 @@ class Notice {
 	 */
 	public static function get_hellobar_config() {
 		return array(
-			'wsx_helloBar_spring_sale_2026_1' => Xpo::get_transient_without_cache( 'wsx_helloBar_spring_sale_2026_1' ),
-			'wsx_helloBar_spring_sale_2026_2' => Xpo::get_transient_without_cache( 'wsx_helloBar_spring_sale_2026_2' ),
-			'wsx_helloBar_spring_sale_2026_3' => Xpo::get_transient_without_cache( 'wsx_helloBar_spring_sale_2026_3' ),
+			'wsx_helloBar_flash_sale_2026' => Xpo::get_transient_without_cache( 'wsx_helloBar_flash_sale_2026' ),
+			'wsx_helloBar_surprise_sale_2026' => Xpo::get_transient_without_cache( 'wsx_helloBar_surprise_sale_2026' ),
+			'wsx_helloBar_massive_sale_2026' => Xpo::get_transient_without_cache( 'wsx_helloBar_massive_sale_2026' ),
+			'wsx_helloBar_final_hour_sale_2026' => Xpo::get_transient_without_cache( 'wsx_helloBar_final_hour_sale_2026' ),
 		);
 	}
 
@@ -164,21 +165,80 @@ class Notice {
 		$wsx_db_nonce   = wp_create_nonce( 'wsx-nonce' );
 		$banner_notices = array(
 			array(
-				'key'                => 'wsx_banner_spring_sale_2026_1',
-				'start'              => '2026-04-05 00:00 Asia/Dhaka',
-				'end'                => '2026-04-14 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
+				'key'                => 'wsx_banner_flash_sale_2026_1',
+				'start'              => '2026-05-18 00:00 Asia/Dhaka', //testing purpose
+				'end'                => '2026-05-21 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
 
 				'brand_color'        => '#6c6cff',
-
-				'left_image'         => WHOLESALEX_URL . 'assets/img/banners/spring_sale/left_image.png',
-				'right_image'        => WHOLESALEX_URL . 'assets/img/banners/spring_sale/right_image.png',
-				'bg_image'           => WHOLESALEX_URL . 'assets/img/banners/spring_sale/bg.png',
+				'left_image'         => WHOLESALEX_URL . 'assets/img/banners/flash_sale/left_image.png',
+				'right_image'        => WHOLESALEX_URL . 'assets/img/banners/flash_sale/right_image.png',
+				'bg_image'           => WHOLESALEX_URL . 'assets/img/banners/flash_sale/bg.png',
 				'text'               => 'Hurry Before It Ends!',
 				'countdown_duration' => 259200, // Duration in seconds.
-				'countdown_color'    => '#FD284B',
+				'countdown_color'    => '#3CF357',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'spring_sale',
+						'utmKey' => 'flash_sale',
+					)
+				),
+
+				'visibility'         => ! Xpo::is_lc_active(),
+			),
+			array(
+				'key'                => 'wsx_banner_surprise_sale_2026_2',
+				'start'              => '2026-05-29 00:00 Asia/Dhaka', //testing purpose
+				'end'                => '2026-06-01 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
+
+				'brand_color'        => '#6c6cff',
+				'left_image'         => WHOLESALEX_URL . 'assets/img/banners/surprise_sale/left_image.png',
+				'right_image'        => WHOLESALEX_URL . 'assets/img/banners/flash_sale/right_image.png',
+				'bg_image'           => WHOLESALEX_URL . 'assets/img/banners/flash_sale/bg.png',
+				'text'               => 'Hurry Before It Ends!',
+				'countdown_duration' => 259200, // Duration in seconds.
+				'countdown_color'    => '#3CF357',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'surprise_sale',
+					)
+				),
+
+				'visibility'         => ! Xpo::is_lc_active(),
+			),
+			array(
+				'key'                => 'wsx_banner_massive_sale_2026_1',
+				'start'              => '2026-06-17 00:00 Asia/Dhaka', //testing purpose
+				'end'                => '2026-06-20 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
+
+				'brand_color'        => '#6c6cff',
+				'left_image'         => WHOLESALEX_URL . 'assets/img/banners/massive_sale/left_image.png',
+				'right_image'        => WHOLESALEX_URL . 'assets/img/banners/flash_sale/right_image.png',
+				'bg_image'           => WHOLESALEX_URL . 'assets/img/banners/flash_sale/bg.png',
+				'text'               => 'Hurry Before It Ends!',
+				'countdown_duration' => 259200, // Duration in seconds.
+				'countdown_color'    => '#3CF357',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'massive_sale',
+					)
+				),
+
+				'visibility'         => ! Xpo::is_lc_active(),
+			),
+			array(
+				'key'                => 'wsx_banner_final_hour_sale_2026_2',
+				'start'              => '2026-06-28 00:00 Asia/Dhaka', //testing purpose
+				'end'                => '2026-06-30 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
+
+				'brand_color'        => '#6c6cff',
+				'left_image'         => WHOLESALEX_URL . 'assets/img/banners/final_hour_sale/left_image.png',
+				'right_image'        => WHOLESALEX_URL . 'assets/img/banners/flash_sale/right_image.png',
+				'bg_image'           => WHOLESALEX_URL . 'assets/img/banners/flash_sale/bg.png',
+				'text'               => 'Hurry Before It Ends!',
+				'countdown_duration' => 259200, // Duration in seconds.
+				'countdown_color'    => '#3CF357',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'final_hour_sale',
 					)
 				),
 
@@ -255,7 +315,7 @@ class Notice {
 						justify-content: center;
 						font-weight: 700;
 						font-size: 28px;
-						color: #333333;
+						color: #ffffff;
 						line-height: 32px;
 						text-align: center;
 					}
@@ -345,38 +405,146 @@ class Notice {
 
 		$content_notices = array(
 			array(
-				'key'                => 'wsx_dashboard_content_notice_spring_sale_v1',
-				'start'              => '2026-03-16 00:00 Asia/Dhaka',
-				'end'                => '2026-03-25 23:59 Asia/Dhaka',
+				'key'                => 'wsx_dashboard_content_notice_flash_sale_2026_1',
+				'start'              => '2026-05-07 00:00 Asia/Dhaka',
+				'end'                => '2026-05-12 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'content_notice',
+						'utmKey' => 'flash_sale',
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( 'Spring Sale:', 'wholesalex' ),
+				'content_heading'    => __( 'Flash Sale:', 'wholesalex' ),
 				'content_subheading' => __( 'Enjoy %s off on WholesaleX Pro.', 'wholesalex' ),
-				'discount_content'   => ' up to 55% OFF',
+				'discount_content'   => ' up to 50% OFF',
 				'border_color'       => '#6c6cff',
-				'icon'               => WHOLESALEX_URL . 'assets/img/banners/logo.svg',
+				'icon'               => WHOLESALEX_URL . 'assets/img/banners/wholesalex_logo.svg',
+				'button_text'        => __( 'Upgrade Now →', 'wholesalex' ),
+				'is_discount_logo'   => false,
+			),
+			array(
+				'key'                => 'wsx_dashboard_content_notice_flash_sale_2026_2',
+				'start'              => '2026-05-13 00:00 Asia/Dhaka',
+				'end'                => '2026-05-17 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'flash_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Surprise Sale:', 'wholesalex' ),
+				'content_subheading' => __( 'Enjoy %s off on WholesaleX Pro.', 'wholesalex' ),
+				'discount_content'   => ' up to 50% OFF',
+				'border_color'       => '#6c6cff',
+				'icon'               => WHOLESALEX_URL . 'assets/img/banners/wholesalex_discount2.svg',
 				'button_text'        => __( 'Upgrade Now →', 'wholesalex' ),
 				'is_discount_logo'   => true,
 			),
 			array(
-				'key'                => 'wsx_dashboard_content_notice_spring_sale_v2',
-				'start'              => '2026-03-26 00:00 Asia/Dhaka',
-				'end'                => '2026-04-04 23:59 Asia/Dhaka',
+				'key'                => 'wsx_dashboard_content_notice_surprise_sale_2026_1',
+				'start'              => '2026-05-22 00:00 Asia/Dhaka',
+				'end'                => '2026-05-25 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'content_notice',
+						'utmKey' => 'surprise_sale',
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( 'Spring Sale:', 'wholesalex' ),
+				'content_heading'    => __( 'Surprise Sale:', 'wholesalex' ),
 				'content_subheading' => __( 'Enjoy %s off on WholesaleX Pro.', 'wholesalex' ),
 				'discount_content'   => ' up to 55% OFF',
 				'border_color'       => '#6c6cff',
-				'icon'               => WHOLESALEX_URL . 'assets/img/banners/discount.svg',
+				'icon'               => WHOLESALEX_URL . 'assets/img/banners/wholesalex_logo.svg',
+				'button_text'        => __( 'Upgrade Now →', 'wholesalex' ),
+				'is_discount_logo'   => false,
+			),
+			array(
+				'key'                => 'wsx_dashboard_content_notice_surprise_sale_2026_2',
+				'start'              => '2026-05-26 00:00 Asia/Dhaka',
+				'end'                => '2026-05-28 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'surprise_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Surprise Sale:', 'wholesalex' ),
+				'content_subheading' => __( 'Enjoy %s off on WholesaleX Pro.', 'wholesalex' ),
+				'discount_content'   => ' up to 55% OFF',
+				'border_color'       => '#6c6cff',
+				'icon'               => WHOLESALEX_URL . 'assets/img/banners/wholesalex_discount.svg',
+				'button_text'        => __( 'Upgrade Now →', 'wholesalex' ),
+				'is_discount_logo'   => true,
+			),
+			array(
+				'key'                => 'wsx_dashboard_content_notice_massive_sale_2026_1',
+				'start'              => '2026-06-02 00:00 Asia/Dhaka',
+				'end'                => '2026-06-10 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'massive_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Massive Sale:', 'wholesalex' ),
+				'content_subheading' => __( 'Enjoy %s off on WholesaleX Pro.', 'wholesalex' ),
+				'discount_content'   => ' up to 55% OFF',
+				'border_color'       => '#6c6cff',
+				'icon'               => WHOLESALEX_URL . 'assets/img/banners/wholesalex_logo.svg',
+				'button_text'        => __( 'Upgrade Now →', 'wholesalex' ),
+				'is_discount_logo'   => false,
+			),
+			array(
+				'key'                => 'wsx_dashboard_content_notice_massive_sale_2026_2',
+				'start'              => '2026-06-11 00:00 Asia/Dhaka',
+				'end'                => '2026-06-16 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'massive_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Massive Sale:', 'wholesalex' ),
+				'content_subheading' => __( 'Enjoy %s off on WholesaleX Pro.', 'wholesalex' ),
+				'discount_content'   => ' up to 55% OFF',
+				'border_color'       => '#6c6cff',
+				'icon'               => WHOLESALEX_URL . 'assets/img/banners/wholesalex_discount.svg',
+				'button_text'        => __( 'Upgrade Now →', 'wholesalex' ),
+				'is_discount_logo'   => true,
+			),
+			array(
+				'key'                => 'wsx_dashboard_content_notice_final_hour_sale_2026_1',
+				'start'              => '2026-06-21 00:00 Asia/Dhaka',
+				'end'                => '2026-06-24 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'final_hour_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Final Hour Sale:', 'wholesalex' ),
+				'content_subheading' => __( 'Enjoy %s off on WholesaleX Pro.', 'wholesalex' ),
+				'discount_content'   => ' up to 55% OFF',
+				'border_color'       => '#6c6cff',
+				'icon'               => WHOLESALEX_URL . 'assets/img/banners/wholesalex_logo.svg',
+				'button_text'        => __( 'Upgrade Now →', 'wholesalex' ),
+				'is_discount_logo'   => false,
+			),
+			array(
+				'key'                => 'wsx_dashboard_content_notice_final_hour_sale_2026_2',
+				'start'              => '2026-06-25 00:00 Asia/Dhaka',
+				'end'                => '2026-06-27 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'final_hour_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Final Hour Sale:', 'wholesalex' ),
+				'content_subheading' => __( 'Enjoy %s off on WholesaleX Pro.', 'wholesalex' ),
+				'discount_content'   => ' up to 55% OFF',
+				'border_color'       => '#6c6cff',
+				'icon'               => WHOLESALEX_URL . 'assets/img/banners/wholesalex_discount.svg',
 				'button_text'        => __( 'Upgrade Now →', 'wholesalex' ),
 				'is_discount_logo'   => true,
 			),

@@ -206,46 +206,181 @@ class WHOLESALEX_Product {
 	public function admin_stock_html( $stock_html, $product ) {
 		$product_id = $product->get_id();
 
-		$separate_b2b_stock_status = get_post_meta( $product_id, 'wholesalex_b2b_separate_stock_status', true );
-		$b2b_stock                 = get_post_meta( $product_id, 'wholesalex_b2b_stock', true );
-		$b2b_backorders            = get_post_meta( $product_id, 'wholesalex_b2b_backorders', true );
-		$stock_status              = get_post_meta( $product_id, 'wholesalex_b2b_stock_status', true );
+		$parent_manages_stock = ( 'yes' === get_post_meta( $product_id, '_manage_stock', true ) );
 
-		if ( $product->is_on_backorder() ) {
+		// -----------------------------------------------------------------------
+		if ( $product->is_type( 'variable' ) && ! $parent_manages_stock ) {
+			$b2c_status = $this->get_b2c_variable_aggregate_status( $product );
+		} else {
+			$b2c_status = get_post_meta( $product_id, '_stock_status', true );
+			$b2c_status = $b2c_status ? $b2c_status : 'instock';
+		}
+
+		if ( 'onbackorder' === $b2c_status ) {
 			$stock_html = '<mark class="onbackorder">' . __( 'On backorder', 'woocommerce' ) . '</mark>';
-		} elseif ( $product->is_in_stock() ) {
-			$stock_html = '<mark class="instock">' . __( 'In stock', 'woocommerce' ) . '</mark>';
-		} else {
+		} elseif ( 'outofstock' === $b2c_status ) {
 			$stock_html = '<mark class="outofstock">' . __( 'Out of stock', 'woocommerce' ) . '</mark>';
-		}
-
-		if ( $product->managing_stock() ) {
-			$stock_html .= ' (' . wc_stock_amount( $product->get_stock_quantity() ) . ')';
-		}
-
-		$b2b_stock_html = '';
-
-		$backorder_status = $product->managing_stock() && ( 'yes' === $b2b_backorders || 'notify' === $b2b_backorders ) && intval( $b2b_stock ) <= 0;
-
-		if ( 'onbackorder' === $stock_status || $backorder_status ) {
-			$b2b_stock_html = '<mark class="onbackorder">' . __( 'On backorder', 'woocommerce' ) . '</mark>';
-		} elseif ( 'outofstock' !== $stock_status ) {
-			$b2b_stock_html = '<mark class="instock">' . __( 'In stock', 'woocommerce' ) . '</mark>';
 		} else {
-			$b2b_stock_html = '<mark class="outofstock">' . __( 'Out of stock', 'woocommerce' ) . '</mark>';
+			$stock_html = '<mark class="instock">' . __( 'In stock', 'woocommerce' ) . '</mark>';
 		}
 
-		if ( $product->managing_stock() && 'outofstock' !== $stock_status ) {
-			if ( 'yes' === $separate_b2b_stock_status ) {
-				$b2b_stock_html .= ' (' . wc_stock_amount( $b2b_stock ) . ')';
+		if ( $parent_manages_stock ) {
+			$stock_html .= ' (' . wc_stock_amount( get_post_meta( $product_id, '_stock', true ) ) . ')';
+		}
+
+
+		if ( $product->is_type( 'variable' ) && ! $parent_manages_stock ) {
+			$b2b_stock_html = $this->get_b2b_variable_aggregate_stock_html( $product );
+		} else {
+			$b2b_stock   = get_post_meta( $product_id, 'wholesalex_b2b_stock', true );
+			$b2b_backorders = get_post_meta( $product_id, 'wholesalex_b2b_backorders', true );
+			$stock_status   = get_post_meta( $product_id, 'wholesalex_b2b_stock_status', true );
+			$separate       = get_post_meta( $product_id, 'wholesalex_b2b_separate_stock_status', true );
+
+			if ( $parent_manages_stock ) {
+				// When stock is managed, derive status from quantity (wholesalex_b2b_stock_status
+				// is hidden/not saved for variable products).
+				if ( 'yes' === $separate ) {
+					$b2b_qty = intval( $b2b_stock );
+				} else {
+					$b2b_qty = intval( get_post_meta( $product_id, '_stock', true ) );
+				}
+
+				if ( $b2b_qty > 0 ) {
+					$stock_status = 'instock';
+				} elseif ( 'yes' === $b2b_backorders || 'notify' === $b2b_backorders ) {
+					$stock_status = 'onbackorder';
+				} else {
+					$stock_status = 'outofstock';
+				}
+			}
+
+			if ( empty( $stock_status ) ) {
+				$stock_status = 'instock';
+			}
+
+			if ( 'onbackorder' === $stock_status ) {
+				$b2b_stock_html = '<mark class="onbackorder">' . __( 'On backorder', 'woocommerce' ) . '</mark>';
+			} elseif ( 'outofstock' === $stock_status ) {
+				$b2b_stock_html = '<mark class="outofstock">' . __( 'Out of stock', 'woocommerce' ) . '</mark>';
 			} else {
-				$b2b_stock_html .= ' (' . wc_stock_amount( $product->get_stock_quantity() ) . ')';
+				$b2b_stock_html = '<mark class="instock">' . __( 'In stock', 'woocommerce' ) . '</mark>';
+			}
+
+			// Append quantity badge when stock is managed and product is not out-of-stock.
+			if ( $parent_manages_stock && 'outofstock' !== $stock_status ) {
+				$display_qty = ( 'yes' === $separate ) ? $b2b_stock : get_post_meta( $product_id, '_stock', true );
+				$b2b_stock_html .= ' (' . wc_stock_amount( $display_qty ) . ')';
 			}
 		}
 
 		$output = sprintf( '<span> <strong>B2C:</strong> %s <br/> <strong>B2B:</strong> %s </span>', $stock_html, $b2b_stock_html );
 
 		return $output;
+	}
+
+	/**
+	 * Aggregate B2C stock status across all variations of a variable product by
+	 * reading each variation's raw _stock_status post meta directly.
+	 *
+	 * The parent variable product's _stock_status is a derived value synced by
+	 * WooCommerce via get_stock_status() calls on each variation.  When the B2B
+	 * stock filter is active during that sync (REST, frontend AJAX, cron) it
+	 * writes a wrong "outofstock" into the parent meta.  Reading the variation
+	 * meta directly avoids that corruption because WooCommerce's data-store
+	 * setter writes _stock_status without going through any filter.
+	 *
+	 * @param WC_Product_Variable $product Parent variable product.
+	 * @return string 'instock' | 'onbackorder' | 'outofstock'
+	 */
+	private function get_b2c_variable_aggregate_status( $product ) {
+		$variation_ids = $product->get_children();
+		$any_instock   = false;
+		$any_backorder = false;
+
+		foreach ( $variation_ids as $variation_id ) {
+			$var_manage_stock = get_post_meta( $variation_id, '_manage_stock', true );
+
+			if ( 'yes' === $var_manage_stock ) {
+				// Variation manages its own stock. Derive B2C status from the raw
+				// _stock quantity rather than _stock_status, because _stock_status
+				// may have been corrupted by WooCommerce writing back a B2B-filtered
+				// value (B2B qty 0 → "outofstock") during a sync that ran outside
+				// the is_admin() guard (REST, cron, frontend AJAX). _stock is written
+				// directly by the data-store setter and is never filtered.
+				$var_qty        = intval( get_post_meta( $variation_id, '_stock', true ) );
+				$var_backorders = get_post_meta( $variation_id, '_backorders', true );
+
+				if ( $var_qty > 0 ) {
+					$any_instock = true;
+					break; // one in-stock variation is enough.
+				} elseif ( 'no' !== $var_backorders ) {
+					$any_backorder = true;
+				}
+			} else {
+				// No variation-level stock management; status is set manually.
+				$var_status = get_post_meta( $variation_id, '_stock_status', true );
+				if ( 'instock' === $var_status ) {
+					$any_instock = true;
+					break;
+				} elseif ( 'onbackorder' === $var_status ) {
+					$any_backorder = true;
+				}
+			}
+		}
+
+		if ( $any_instock ) {
+			return 'instock';
+		} elseif ( $any_backorder ) {
+			return 'onbackorder';
+		}
+		return 'outofstock';
+	}
+
+	/**
+	 * Aggregate B2B stock status across all variations of a variable product.
+	 * Called from admin_stock_html when the parent product does not manage stock
+	 * (i.e. each variation manages its own stock).
+	 *
+	 * @param WC_Product_Variable $product Parent variable product.
+	 * @return string HTML mark for B2B stock status.
+	 */
+	private function get_b2b_variable_aggregate_stock_html( $product ) {
+		$variation_ids   = $product->get_children();
+		$b2b_any_instock   = false;
+		$b2b_any_backorder = false;
+
+		foreach ( $variation_ids as $variation_id ) {
+			$separate = get_post_meta( $variation_id, 'wholesalex_b2b_variable_separate_stock_status', true );
+
+			if ( 'yes' !== $separate ) {
+				// No separate B2B stock: B2B mirrors the native variation stock status.
+				$var_status = get_post_meta( $variation_id, '_stock_status', true );
+				if ( 'instock' === $var_status ) {
+					$b2b_any_instock = true;
+				} elseif ( 'onbackorder' === $var_status ) {
+					$b2b_any_backorder = true;
+				}
+				continue;
+			}
+
+			$var_b2b_qty    = intval( get_post_meta( $variation_id, 'wholesalex_b2b_variable_stock', true ) );
+			$var_backorders = get_post_meta( $variation_id, 'wholesalex_b2b_variable_backorders', true );
+
+			if ( $var_b2b_qty > 0 ) {
+				$b2b_any_instock = true;
+			} elseif ( 'yes' === $var_backorders || 'notify' === $var_backorders ) {
+				$b2b_any_backorder = true;
+			}
+		}
+
+		if ( $b2b_any_instock ) {
+			return '<mark class="instock">' . __( 'In stock', 'woocommerce' ) . '</mark>';
+		} elseif ( $b2b_any_backorder ) {
+			return '<mark class="onbackorder">' . __( 'On backorder', 'woocommerce' ) . '</mark>';
+		} else {
+			return '<mark class="outofstock">' . __( 'Out of stock', 'woocommerce' ) . '</mark>';
+		}
 	}
 
 	/**
@@ -603,8 +738,10 @@ class WHOLESALEX_Product {
 
 		if ( wholesalex()->is_active_b2b_user() ) {
 
-			if ( $product->get_manage_stock() ) {
-				// Manage Stock Enabled.
+			$manage_stock = $product->get_manage_stock();
+
+			if ( true === $manage_stock ) {
+				// Variation manages its own stock.
 
 				if ( ! intval( $product->get_stock_quantity() ) ) {
 					$stock_status = 'outofstock';
@@ -612,6 +749,25 @@ class WHOLESALEX_Product {
 
 				if ( 'no' !== $product->get_backorders() ) {
 					$stock_status = 'instock'; // For allowing backorder.
+				}
+			} elseif ( 'parent' === $manage_stock ) {
+				// Variation inherits stock from the parent product.
+				// Read B2B stock settings directly from the parent to avoid incorrectly
+				// using per-variation meta that is never set for parent-managed variations.
+				$parent_id                 = $product->get_parent_id();
+				$separate_b2b_stock_status = get_post_meta( $parent_id, 'wholesalex_b2b_separate_stock_status', true );
+
+				if ( 'yes' === $separate_b2b_stock_status ) {
+					$b2b_qty        = intval( get_post_meta( $parent_id, 'wholesalex_b2b_stock', true ) );
+					$b2b_backorders = get_post_meta( $parent_id, 'wholesalex_b2b_backorders', true );
+
+					if ( $b2b_qty > 0 ) {
+						$stock_status = 'instock';
+					} elseif ( 'yes' === $b2b_backorders || 'notify' === $b2b_backorders ) {
+						$stock_status = 'onbackorder';
+					} else {
+						$stock_status = 'outofstock';
+					}
 				}
 			} else {
 				// Manage Stock Disabled.
@@ -637,7 +793,7 @@ class WHOLESALEX_Product {
 			$product_id   = $product->get_id();
 			$manage_stock = $product->get_manage_stock();
 
-			if ( $manage_stock ) { // The variation manages its own stock.
+			if ( true === $manage_stock ) { // The variation manages its own stock.
 				$separate_b2b_stock_status = get_post_meta( $product_id, 'wholesalex_b2b_variable_separate_stock_status', true );
 				if ( 'yes' === $separate_b2b_stock_status ) {
 					$quantity = get_post_meta( $product_id, 'wholesalex_b2b_variable_stock', true );
@@ -664,8 +820,16 @@ class WHOLESALEX_Product {
 	public function b2b_variation_get_backorders( $status, $product ) {
 
 		if ( wholesalex()->is_active_b2b_user() ) {
-			$product_id = $product->get_id();
-			$status     = get_post_meta( $product_id, 'wholesalex_b2b_variable_backorders', true );
+			if ( 'parent' === $product->get_manage_stock() ) {
+				// For parent-managed variations, inherit B2B backorders from the parent product.
+				$b2b_backorders = get_post_meta( $product->get_parent_id(), 'wholesalex_b2b_backorders', true );
+			} else {
+				$b2b_backorders = get_post_meta( $product->get_id(), 'wholesalex_b2b_variable_backorders', true );
+			}
+			// Only override if explicitly configured; empty means fall back to native WooCommerce setting.
+			if ( ! empty( $b2b_backorders ) ) {
+				$status = $b2b_backorders;
+			}
 		}
 		return $status;
 	}
@@ -924,8 +1088,20 @@ class WHOLESALEX_Product {
 			// Update the database.
 			$new_stock = $this->update_product_stock( $product_id_with_stock, $stock_quantity, $operation );
 
-			// Update the product object.
-			$data_store->read_stock_quantity( $product_with_stock, $new_stock );
+			// Only sync the product object's native stock_quantity when the native _stock meta was
+			// actually updated. When separate B2B stock is enabled, update_product_stock writes to
+			// wholesalex_b2b_stock / wholesalex_b2b_variable_stock instead of _stock, so passing the
+			// B2B quantity to read_stock_quantity would corrupt the native _stock on save().
+			if ( $product_with_stock->is_type( 'variation' ) ) {
+				$is_separate_b2b_stock = 'yes' === get_post_meta( $product_id_with_stock, 'wholesalex_b2b_variable_separate_stock_status', true );
+			} else {
+				$is_separate_b2b_stock = 'yes' === get_post_meta( $product_id_with_stock, 'wholesalex_b2b_separate_stock_status', true );
+			}
+
+			if ( ! $is_separate_b2b_stock ) {
+				// Update the product object with the new native stock quantity.
+				$data_store->read_stock_quantity( $product_with_stock, $new_stock );
+			}
 
 			// If this is not being called during an update routine, save the product so stock status etc is in sync, and caches are cleared.
 			if ( ! $updating ) {
@@ -1193,9 +1369,23 @@ class WHOLESALEX_Product {
 			return;
 		}
 
-		$nonce = isset( $_POST['meta-box-order-nonce'] ) ? sanitize_key( $_POST['meta-box-order-nonce'] ) : '';
+		$is_nonce_verify = false;
 
-		if ( ! wp_verify_nonce( $nonce, 'meta-box-order' ) ) {
+		$nonce = isset( $_POST['meta-box-order-nonce'] ) ? sanitize_key( $_POST['meta-box-order-nonce'] ) : '';
+		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'meta-box-order' ) ) {
+			$is_nonce_verify = true;
+		}
+
+		// Fallback: verify using the standard WooCommerce product meta nonce.
+		// This resolves conflicts with plugins (e.g. WooCommerce Gift Cards) that override the 'security' POST field.
+		if ( ! $is_nonce_verify ) {
+			$nonce = isset( $_POST['woocommerce_meta_nonce'] ) ? sanitize_key( $_POST['woocommerce_meta_nonce'] ) : '';
+			if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'woocommerce_save_data' ) ) {
+				$is_nonce_verify = true;
+			}
+		}
+
+		if ( ! $is_nonce_verify ) {
 			return;
 		}
 
@@ -1316,13 +1506,29 @@ class WHOLESALEX_Product {
 	 */
 	public function wholesalex_product_meta_save( $post_id ) {
 
-		$nonce = isset( $_POST['security'] ) ? sanitize_key( $_POST['security'] ) : '';
-		if ( empty( $nonce ) ) {
-			$nonce = isset( $_POST['meta-box-order-nonce'] ) ? sanitize_key( $_POST['meta-box-order-nonce'] ) : '';
-		}
 		$is_nonce_verify = false;
-		if ( wp_verify_nonce( $nonce, 'save-variations' ) || wp_verify_nonce( $nonce, 'meta-box-order' ) ) {
+
+		// Check variation save nonce.
+		$nonce = isset( $_POST['security'] ) ? sanitize_key( $_POST['security'] ) : '';
+		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'save-variations' ) ) {
 			$is_nonce_verify = true;
+		}
+
+		// Check meta-box-order nonce.
+		if ( ! $is_nonce_verify ) {
+			$nonce = isset( $_POST['meta-box-order-nonce'] ) ? sanitize_key( $_POST['meta-box-order-nonce'] ) : '';
+			if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'meta-box-order' ) ) {
+				$is_nonce_verify = true;
+			}
+		}
+
+		// Fallback: verify using the standard WooCommerce product meta nonce (always present on product edit pages).
+		// This resolves conflicts with plugins (e.g. WooCommerce Gift Cards) that override the 'security' POST field.
+		if ( ! $is_nonce_verify ) {
+			$nonce = isset( $_POST['woocommerce_meta_nonce'] ) ? sanitize_key( $_POST['woocommerce_meta_nonce'] ) : '';
+			if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'woocommerce_save_data' ) ) {
+				$is_nonce_verify = true;
+			}
 		}
 
 		if ( $is_nonce_verify && isset( $_POST[ 'wholesalex_single_product_tiers_' . $post_id . '_simple' ] ) ) {

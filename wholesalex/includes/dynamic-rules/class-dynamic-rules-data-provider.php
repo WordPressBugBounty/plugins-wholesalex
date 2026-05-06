@@ -244,21 +244,68 @@ class Dynamic_Rules_Data_Provider {
 	/**
 	 * Get Payment Gateways.
 	 *
+	 * Returns all enabled payment gateways for use in admin rule configuration.
+	 *
+	 * The WC_Payment_Gateways singleton can be initialised before payment extension
+	 * plugins (e.g. Mollie, Stripe) have had a chance to register their gateways via
+	 * the `woocommerce_payment_gateways` filter.  This is particularly common in the
+	 * WP REST API context where certain admin hooks do not fire.  To work around this,
+	 * we re-apply the filter at call-time and merge any newly-discovered gateways with
+	 * those already cached in the singleton, so that extension gateways are always
+	 * present in the list regardless of initialisation order.
+	 *
 	 * @return array
 	 */
 	public function get_payment_gateways() {
 		$__final = array();
-		if ( function_exists( 'WC' ) && ! is_null( WC()->payment_gateways ) ) {
-			$__gateways = WC()->payment_gateways->payment_gateways();
-			foreach ( $__gateways as $gateway ) {
-				if ( 'yes' === $gateway->enabled ) {
-					$__final[] = array(
-						'value' => $gateway->id,
-						'name'  => $gateway->title,
-					);
+
+		if ( ! function_exists( 'WC' ) ) {
+			return $__final;
+		}
+
+		// Pull the already-instantiated gateways from the WC singleton.
+		$gateways = WC()->payment_gateways->payment_gateways();
+
+		// Build a quick lookup of class names already present in the singleton so we
+		// can avoid creating duplicate instances.
+		$existing_by_class = array();
+		foreach ( $gateways as $gw ) {
+			$existing_by_class[ get_class( $gw ) ] = true;
+		}
+
+		// Re-apply the filter with an empty seed array.  At this point in a REST API
+		// request all plugin hooks are guaranteed to be registered, so the result will
+		// contain any extension gateways that were not present when the singleton was
+		// first created.
+		$registered = apply_filters( 'woocommerce_payment_gateways', array() );
+
+		foreach ( $registered as $entry ) {
+			if ( is_string( $entry ) ) {
+				// Skip classes already in the singleton or that do not exist.
+				if ( isset( $existing_by_class[ $entry ] ) || ! class_exists( $entry ) ) {
+					continue;
+				}
+				$instance = new $entry();
+				if ( is_a( $instance, 'WC_Payment_Gateway' ) && ! isset( $gateways[ $instance->id ] ) ) {
+					$gateways[ $instance->id ] = $instance;
+				}
+			} elseif ( is_object( $entry ) && is_a( $entry, 'WC_Payment_Gateway' ) ) {
+				$class_name = get_class( $entry );
+				if ( ! isset( $existing_by_class[ $class_name ] ) && ! isset( $gateways[ $entry->id ] ) ) {
+					$gateways[ $entry->id ] = $entry;
 				}
 			}
 		}
+
+		foreach ( $gateways as $gateway ) {
+			if ( 'yes' === $gateway->enabled ) {
+				$__final[] = array(
+					'value' => $gateway->id,
+					'name'  => $gateway->title,
+				);
+			}
+		}
+
 		return $__final;
 	}
 
@@ -354,6 +401,33 @@ class Dynamic_Rules_Data_Provider {
 	}
 
 	/**
+	 * Get Payment Gateway Options.
+	 *
+	 * Called from get_dynamic_rules_field() which is invoked during PHP page
+	 * rendering (wp_localize_script) where WP_ADMIN is set and every payment
+	 * plugin hook is active.  This avoids the REST-API context issue where
+	 * is_admin() returns false and some gateways are never registered.
+	 *
+	 * @return array  Array of {value, name} objects for MultiSelect.
+	 */
+	public static function get_payment_gateway_options() {
+		$options = array();
+		if ( ! function_exists( 'WC' ) ) {
+			return $options;
+		}
+		$available = WC()->payment_gateways->payment_gateways();
+		foreach ( $available as $gateway ) {
+			if ( 'yes' === $gateway->enabled ) {
+				$options[] = array(
+					'value' => $gateway->id,
+					'name'  => $gateway->get_title(),
+				);
+			}
+		}
+		return $options;
+	}
+
+	/**
 	 * Get Dynamic Rules Field Definitions.
 	 *
 	 * Returns the full field schema used to render the dynamic rules admin UI.
@@ -361,6 +435,9 @@ class Dynamic_Rules_Data_Provider {
 	 * @return array
 	 */
 	public static function get_dynamic_rules_field() {
+		// Load payment gateways once here, matching the User Roles approach.
+		$payment_gateway_options = self::get_payment_gateway_options();
+
 		return apply_filters(
 			'wholesalex_dynamic_rules_field',
 			array(
@@ -721,11 +798,11 @@ class Dynamic_Rules_Data_Provider {
 								'_payment_gateways' => array(
 									'type'        => 'multiselect',
 									'label'       => __( 'Payment Gateways', 'wholesalex' ),
-									'options'     => array(),
+									'options'     => $payment_gateway_options,
 									'default'     => '',
 									'placeholder' => '',
 									'help'        => '',
-									'is_ajax'     => true,
+									'is_ajax'     => false,
 									'ajax_action' => 'get_payment_gateways',
 									'ajax_search' => false,
 								),
@@ -768,11 +845,11 @@ class Dynamic_Rules_Data_Provider {
 								'_payment_gateways' => array(
 									'type'        => 'multiselect',
 									'label'       => __( 'Payment Gateways', 'wholesalex' ),
-									'options'     => array(),
+									'options'     => $payment_gateway_options,
 									'default'     => '',
 									'placeholder' => '',
 									'help'        => '',
-									'is_ajax'     => true,
+									'is_ajax'     => false,
 									'ajax_action' => 'get_payment_gateways',
 									'ajax_search' => false,
 								),

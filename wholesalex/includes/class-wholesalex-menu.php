@@ -32,10 +32,37 @@ class WHOLESALEX_Menu {
 
 		$offer_config = array(
 			array(
-				'start'  => '2026-03-16 00:00 Asia/Dhaka',
-				'end'    => '2026-04-14 23:59 Asia/Dhaka',
+				'start'  => '2026-05-07 00:00 Asia/Dhaka',
+				'end'    => '2026-05-21 23:59 Asia/Dhaka',
 				'text'   => __(
-					'Spring Sale - Up to 55% OFF',
+					'Flash Sale - Up to 50% OFF',
+					'wholesalex'
+				),
+				'utmKey' => 'plugin_meta',
+			),
+			array(
+				'start'  => '2026-05-22 00:00 Asia/Dhaka',
+				'end'    => '2026-06-01 23:59 Asia/Dhaka',
+				'text'   => __(
+					'Surprise Sale - Up to 55% OFF',
+					'wholesalex'
+				),
+				'utmKey' => 'plugin_meta',
+			),
+			array(
+				'start'  => '2026-06-02 00:00 Asia/Dhaka',
+				'end'    => '2026-06-20 23:59 Asia/Dhaka',
+				'text'   => __(
+					'Massive Sale - Up to 55% OFF',
+					'wholesalex'
+				),
+				'utmKey' => 'plugin_meta',
+			),
+			array(
+				'start'  => '2026-06-21 00:00 Asia/Dhaka',
+				'end'    => '2026-06-30 23:59 Asia/Dhaka',
+				'text'   => __(
+					'Final Hour Sale - Up to 55% OFF',
 					'wholesalex'
 				),
 				'utmKey' => 'plugin_meta',

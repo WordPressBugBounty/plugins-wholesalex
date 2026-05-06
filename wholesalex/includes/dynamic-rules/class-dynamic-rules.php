@@ -1042,6 +1042,9 @@ class Dynamic_Rules {
 		if ( ! $is_wholesalex_sale_price_applied ) {
 			$sale_text = '';
 		}
+		if ( ! empty( $sale_text ) ) {
+			$sale_text = '<span class="wholesalex-sale-text">' . $sale_text . '</span> ';
+		}
 		if ( ! is_admin() ) {
 			if ( 'yes' === (string) $__hide_wholesale_price && 'yes' === (string) $__hide_regular_price ) {
 				return apply_filters( 'wholesalex_regular_sale_price_hidden_text', wholesalex()->get_language_n_text( '_language_price_is_hidden', 'Price is hidden!' ) );
