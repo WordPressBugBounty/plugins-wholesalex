@@ -175,6 +175,18 @@ class WHOLESALEX_Role {
 					$_flag = false;
 				}
 			}
+			// Before saving, record all currently-available WTRS instance IDs as "seen" for
+			// this role. This allows the UI to auto-check newly added WTRS methods while
+			// permanently respecting any methods the admin has explicitly deselected.
+			if ( $_flag && ! ( isset( $post['delete'] ) && $post['delete'] ) ) {
+				$_current_wtrs = self::get_current_wtrs_instance_ids();
+				if ( ! empty( $_current_wtrs ) ) {
+					$_prev_seen                  = isset( $_role['_wtrs_seen_methods'] )
+						? array_values( array_filter( (array) $_role['_wtrs_seen_methods'] ) )
+						: array();
+					$_role['_wtrs_seen_methods'] = array_values( array_unique( array_merge( $_prev_seen, $_current_wtrs ) ) );
+				}
+			}
 			$_flag && wholesalex()->set_roles( $_id, $_role, ( isset( $post['delete'] ) && $post['delete'] ) ? 'delete' : '' );
 			wp_send_json_success(
 				array(
@@ -192,6 +204,7 @@ class WHOLESALEX_Role {
 					),
 				);
 			}
+			self::inject_wtrs_shipping_methods( $__roles );
 			$data            = array();
 			$data['default'] = self::get_role_fields();
 			$data['value']   = $__roles;
@@ -207,6 +220,73 @@ class WHOLESALEX_Role {
 
 			}
 		}
+	}
+
+	/**
+	 * Returns all currently enabled WTRS (WoW Table Rate Shipping) instance IDs
+	 * across every WooCommerce shipping zone including Rest of World.
+	 *
+	 * @return string[]
+	 */
+	private static function get_current_wtrs_instance_ids(): array {
+		$ids        = array();
+		$data_store = \WC_Data_Store::load( 'shipping-zone' );
+		foreach ( $data_store->get_zones() as $zone_raw ) {
+			$zone = new \WC_Shipping_Zone( $zone_raw );
+			foreach ( $zone->get_shipping_methods() as $method ) {
+				if ( $method->is_enabled() && 'wtrs_wc_method' === $method->id ) {
+					$ids[] = strval( $method->get_instance_id() );
+				}
+			}
+		}
+		$rot = new \WC_Shipping_Zone( 0 );
+		foreach ( $rot->get_shipping_methods() as $method ) {
+			if ( $method->is_enabled() && 'wtrs_wc_method' === $method->id ) {
+				$ids[] = strval( $method->get_instance_id() );
+			}
+		}
+		return $ids;
+	}
+
+	/**
+	 * Auto-check WTRS shipping methods that are new to a role (never seen before).
+	 *
+	 * Logic:
+	 * - "seen" = WTRS instance IDs recorded in _wtrs_seen_methods when the role was
+	 *   last saved. Any seen ID that is absent from _shipping_methods was explicitly
+	 *   deselected by the admin and must NOT be re-checked.
+	 * - IDs not in "seen" are brand-new methods the admin has never had a chance to
+	 *   act on, so they default to checked.
+	 * - Nothing is persisted here; _wtrs_seen_methods is written at save time.
+	 *
+	 * @param array $roles Roles array passed by reference.
+	 * @return void
+	 */
+	public static function inject_wtrs_shipping_methods( array &$roles ) {
+		$wtrs_ids = self::get_current_wtrs_instance_ids();
+
+		if ( empty( $wtrs_ids ) ) {
+			return;
+		}
+
+		foreach ( $roles as &$role ) {
+			// IDs that were present last time this role was saved — the admin has
+			// already made a deliberate choice (checked or unchecked) about these.
+			$seen = isset( $role['_wtrs_seen_methods'] )
+				? array_values( array_filter( (array) $role['_wtrs_seen_methods'] ) )
+				: array();
+
+			// Only auto-check IDs the admin has never seen for this role.
+			$to_add = array_diff( $wtrs_ids, $seen );
+
+			if ( ! empty( $to_add ) ) {
+				$existing                  = isset( $role['_shipping_methods'] )
+					? array_values( array_filter( (array) $role['_shipping_methods'] ) )
+					: array();
+				$role['_shipping_methods'] = array_values( array_unique( array_merge( $existing, $to_add ) ) );
+			}
+		}
+		unset( $role );
 	}
 
 	/**
@@ -232,6 +312,8 @@ class WHOLESALEX_Role {
 				),
 			);
 		}
+		self::inject_wtrs_shipping_methods( $__roles );
+
 			wp_localize_script(
 				'wholesalex_roles',
 				'whx_roles',
@@ -240,46 +322,6 @@ class WHOLESALEX_Role {
 					'data'   => $__roles,
 					'nonce'  => wp_create_nonce( 'whx-export-roles' ),
 					'i18n'   => array(
-						// 'user_roles'                  => __( 'User Roles', 'wholesalex' ),
-						// 'no_shipping_zone_found'      => __( 'No Shipping Zones Found!', 'wholesalex' ),
-						// 'please_fill_role_name_field' => __( 'Please Fill Role Name Field', 'wholesalex' ),
-						// 'successfully_deleted'        => __( 'Succesfully Deleted.', 'wholesalex' ),
-						// 'successfully_saved'          => __( 'Succesfully Saved.', 'wholesalex' ),
-						// 'add_new_b2b_role'            => __( 'Add New B2B Role', 'wholesalex' ),
-						// 'import'                      => __( 'Import', 'wholesalex' ),
-						// 'export'                      => __( 'Export', 'wholesalex' ),
-						// 'b2b_role'                    => __( 'B2B Role: ', 'wholesalex' ),
-						// 'untitled_role'               => __( 'Untitled Role', 'wholesalex' ),
-						// 'delete_this_role'            => __( 'Delete this Role.', 'wholesalex' ),
-						// 'duplicate_role'              => __( 'Duplicate Role.', 'wholesalex' ),
-						// 'untitled'                    => __( 'Untitled', 'wholesalex' ),
-						// 'duplicate_of'                => __( 'Duplicate of ', 'wholesalex' ),
-						// 'show_hide_role_details'      => __( 'Show/Hide Role Details.', 'wholesalex' ),
-						// 'csv_fields_to_roles'         => __( 'Map CSV Fields to Roles', 'wholesalex' ),
-						// 'select_field_from_csv_file'  => __( 'Select fields from your CSV file to map against role fields, or to ignore during import.', 'wholesalex' ),
-						// 'column_name'                 => __( 'Column name', 'wholesalex' ),
-						// 'map_to_field'                => __( 'Map to field', 'wholesalex' ),
-						// 'do_not_import'               => __( 'Do not import', 'wholesalex' ),
-						// 'run_the_importer'            => __( 'Run the importer', 'wholesalex' ),
-						// 'importing'                   => __( 'Importing', 'wholesalex' ),
-						// 'your_roles_are_now_being_imported' => __( 'Your roles are now being imported..', 'wholesalex' ),
-						// 'upload_csv'                  => __( 'Upload CSV', 'wholesalex' ),
-						// 'you_can_upload_only_csv_file_format' => __( 'You can upload only csv file format', 'wholesalex' ),
-						// 'update_existing_roles'       => __( 'Update Existing Roles', 'wholesalex' ),
-						// 'update_existing_roles_help_message' => __( 'Selecting "Update Existing Roles" will only update existing roles. No new role will be added.', 'wholesalex' ),
-						// 'continue'                    => __( 'Continue', 'wholesalex' ),
-						// 'error_occured'               => __( 'Eror Occured!', 'wholesalex' ),
-						// 'import_complete'             => __( 'Import Complete!', 'wholesalex' ),
-						// 'role_imported'               => __( ' Role Imported.', 'wholesalex' ),
-						// 'role_updated'                => __( ' Role Updated.', 'wholesalex' ),
-						// 'role_skipped'                => __( ' Role Skipped.', 'wholesalex' ),
-						// 'role_failed'                 => __( ' Role Failed.', 'wholesalex' ),
-						// 'view_error_logs'             => __( ' View Error Logs', 'wholesalex' ),
-						// 'role'                        => __( 'Role', 'wholesalex' ),
-						// 'reason_for_failure'          => __( 'Reason for failure', 'wholesalex' ),
-						// 'import_user_roles'           => __( 'Import User Roles', 'wholesalex' ),
-						// 'b2c_users'                   => __( 'B2C Users', 'wholesalex' ),
-						// 'guest_users'                 => __( 'Guest Users', 'wholesalex' ),
 					),
 				)
 			);
@@ -317,6 +359,7 @@ class WHOLESALEX_Role {
 			$zone_name             = $zone->get_zone_name();
 			$zone_shipping_methods = $zone->get_shipping_methods();
 			$shipping_methods      = array();
+			$zone_wtrs_defaults    = array( '' );
 
 			foreach ( $zone_shipping_methods as $key => $method ) {
 				if ( $method->is_enabled() ) {
@@ -328,6 +371,9 @@ class WHOLESALEX_Role {
 						'name'  => $method_title,
 					);
 					$__shipping_method_options[ $zone_id . ':' . $method_instance_id ] = $zone_name . ' : ' . $method_title;
+					if ( 'wtrs_wc_method' === $method->id ) {
+						$zone_wtrs_defaults[] = strval( $method_instance_id );
+					}
 				}
 			}
 
@@ -339,7 +385,7 @@ class WHOLESALEX_Role {
 						'type'    => 'checkbox',
 						'label'   => '',
 						'options' => $shipping_methods,
-						'default' => array( '' ),
+						'default' => $zone_wtrs_defaults,
 						'help'    => __( 'If no methods are selected, all methods are available for this role.', 'wholesalex' ),
 					),
 				),
@@ -361,6 +407,7 @@ class WHOLESALEX_Role {
 		$zone_shipping_methods = $rest_of_the_world->get_shipping_methods();
 		$shipping_methods      = array();
 		$has_enabled_method    = false;
+		$rot_wtrs_defaults     = array( '' );
 
 		foreach ( $zone_shipping_methods as $key => $method ) {
 			if ( $method->is_enabled() ) {
@@ -373,6 +420,9 @@ class WHOLESALEX_Role {
 				);
 				$__shipping_method_options[ $zone_id . ':' . $method_instance_id ] = $zone_name . ' : ' . $method_title;
 				$has_enabled_method = true;
+				if ( 'wtrs_wc_method' === $method->id ) {
+					$rot_wtrs_defaults[] = strval( $method_instance_id );
+				}
 			}
 		}
 
@@ -385,7 +435,7 @@ class WHOLESALEX_Role {
 						'type'    => 'checkbox',
 						'label'   => '',
 						'options' => $shipping_methods,
-						'default' => array( '' ),
+						'default' => $rot_wtrs_defaults,
 						'help'    => __( 'If no methods are selected, all methods are available for this role.', 'wholesalex' ),
 					),
 				),

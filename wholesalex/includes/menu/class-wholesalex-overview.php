@@ -759,6 +759,10 @@ class WHOLESALEX_Overview {
 			);
 		}
 
+		// Auto-check any WTRS shipping methods the admin has never seen before for each role.
+		// Respects explicit deselections — see WHOLESALEX_Role::inject_wtrs_shipping_methods().
+		\WHOLESALEX\WHOLESALEX_Role::inject_wtrs_shipping_methods( $__roles );
+
 		wp_localize_script(
 			'wholesalex_overview',
 			'wholesalex_overview',

@@ -950,6 +950,101 @@ class WHOLESALEX_Registration {
 	}
 
 	/**
+	 * Get existing public registration role IDs from role select options.
+	 *
+	 * @param array $options Role select options.
+	 * @return array
+	 */
+	private function get_registration_role_ids_from_options( $options ) {
+		$role_ids       = array();
+		$existing_roles = wholesalex()->get_roles( 'ids' );
+
+		foreach ( (array) $options as $option ) {
+			if ( empty( $option['value'] ) || 'wholesalex_guest' === $option['value'] ) {
+				continue;
+			}
+
+			$role_id = sanitize_text_field( $option['value'] );
+			if ( in_array( $role_id, $existing_roles, true ) ) {
+				$role_ids[] = $role_id;
+			}
+		}
+
+		return array_values( array_unique( $role_ids ) );
+	}
+
+	/**
+	 * Get roles allowed by the WooCommerce registration form configuration.
+	 *
+	 * @return array
+	 */
+	private function get_woo_registration_allowed_roles() {
+		if ( empty( $this->woo_custom_fields ) ) {
+			$this->set_custom_fields();
+		}
+
+		foreach ( $this->woo_custom_fields as $field ) {
+			if ( isset( $field['name'] ) && 'wholesalex_registration_role' === $field['name'] ) {
+				$options = isset( $field['option'] ) ? $field['option'] : array();
+				return $this->get_registration_role_ids_from_options( $options );
+			}
+		}
+
+		return array();
+	}
+
+	/**
+	 * Get the signed role allow-list submitted by the WholesaleX registration form.
+	 *
+	 * @return array|null Array of allowed role IDs, or null when the context is missing/invalid.
+	 */
+	private function get_posted_registration_allowed_roles() {
+		$allowed_roles_value = isset( $_POST['wholesalex_registration_allowed_roles'] ) ? sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_allowed_roles'] ) ) : '';
+		$nonce               = isset( $_POST['wholesalex_registration_allowed_roles_nonce'] ) ? sanitize_key( wp_unslash( $_POST['wholesalex_registration_allowed_roles_nonce'] ) ) : '';
+
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'wholesalex-registration-role|' . $allowed_roles_value ) ) {
+			return null;
+		}
+
+		$options = array_map(
+			function ( $role_id ) {
+				return array(
+					'value' => sanitize_text_field( $role_id ),
+				);
+			},
+			array_filter( array_map( 'trim', explode( ',', $allowed_roles_value ) ) )
+		);
+
+		return $this->get_registration_role_ids_from_options( $options );
+	}
+
+	/**
+	 * Validate a public registration role request.
+	 *
+	 * @param string     $role_id       Requested WholesaleX role ID.
+	 * @param array|null $allowed_roles Allowed role IDs for the current form.
+	 * @return bool
+	 */
+	private function is_registration_role_allowed( $role_id, $allowed_roles ) {
+		if ( empty( $role_id ) ) {
+			return true;
+		}
+
+		$role_id        = sanitize_text_field( $role_id );
+		$existing_roles = wholesalex()->get_roles( 'ids' );
+
+		if ( 'wholesalex_guest' === $role_id || ! in_array( $role_id, $existing_roles, true ) ) {
+			return false;
+		}
+
+		if ( ! is_array( $allowed_roles ) ) {
+			return false;
+		}
+
+		return in_array( $role_id, $allowed_roles, true );
+	}
+
+	/**
 	 * Password and Confirm Password Validation
 	 *
 	 * @param WP_Error $validation_error Validation Error.
@@ -969,6 +1064,9 @@ class WHOLESALEX_Registration {
 		}
 
 		$is_rolewise = isset( $_POST['wholesalex_registration_role'] ) ? sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_role'] ) ) : false;
+		if ( $is_rolewise && ! $this->is_registration_role_allowed( $is_rolewise, $this->get_woo_registration_allowed_roles() ) ) {
+			return new WP_Error( '201', __( 'Invalid registration role selected.', 'wholesalex' ) );
+		}
 
 		foreach ( $this->woo_custom_fields as $field ) {
 
@@ -1056,7 +1154,8 @@ class WHOLESALEX_Registration {
 		if ( empty( $this->woo_custom_fields ) ) {
 			return;
 		}
-		$files = array();
+		$files                      = array();
+		$allowed_registration_roles = $this->get_woo_registration_allowed_roles();
 		foreach ( $this->woo_custom_fields as $field ) {
 			if ( isset( $_POST[ $field['name'] ] ) && ! empty( $_POST[ $field['name'] ] ) ) {
 				$value = '';
@@ -1088,6 +1187,9 @@ class WHOLESALEX_Registration {
 				if ( '' != $value ) {
 					$key = $field['name'];
 					if ( 'wholesalex_registration_role' === $key ) {
+						if ( ! $this->is_registration_role_allowed( $value, $allowed_registration_roles ) ) {
+							continue;
+						}
 						$key = '__wholesalex_registration_role';
 					}
 					if ( 'user_confirm_pass' !== $key && 'user_confirm_email' !== $key ) {
@@ -1145,6 +1247,9 @@ class WHOLESALEX_Registration {
 
 		if ( isset( $_POST['wholesalex_registration_role'] ) && ! empty( $_POST['wholesalex_registration_role'] ) ) {
 			$regi_role            = sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_role'] ) );
+			if ( ! $this->is_registration_role_allowed( $regi_role, $allowed_registration_roles ) ) {
+				return;
+			}
 			$__user_status_option = apply_filters( 'wholesalex_registration_form_user_status_option', 'admin_approve', $user_id, $regi_role );
 
 			do_action( 'wholesalex_registration_form_user_status_' . $__user_status_option, $user_id, $regi_role );
@@ -1329,11 +1434,9 @@ class WHOLESALEX_Registration {
 						}
 					}
 
-					if ( ! $__registration_role ) {
-						if ( ( isset( $_POST['wholesalex_registration_role'] ) && ! empty( $_POST['wholesalex_registration_role'] ) ) ) {
-							$usermeta['__wholesalex_registration_role'] = sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_role'] ) );
-							$__registration_role                        = $usermeta['__wholesalex_registration_role'];
-						}
+					if ( ! $this->is_registration_role_allowed( $__registration_role, $this->get_posted_registration_allowed_roles() ) ) {
+						$data['error_messages']['wholesalex_registration_role'] = __( 'Invalid registration role selected.', 'wholesalex' );
+						throw new \Exception();
 					}
 
 					$registered_user_id = wc_create_new_customer( $user_email, $user_name, $password, $userdata );

@@ -2224,6 +2224,25 @@ class Dynamic_Rules {
 		<?php
 	}
 
+	/**
+	 * Get tier prices adjusted for the current WooCommerce tax display mode.
+	 *
+	 * @param \WC_Product  $product Product object.
+	 * @param string|float $regular_price Base regular price.
+	 * @param string|float $sale_price Tier sale price.
+	 * @return array
+	 */
+	private function get_tier_display_prices( $product, $regular_price, $sale_price ) {
+		$display_regular_price = wc_get_price_to_display( $product, array( 'price' => (float) $regular_price ) );
+		$display_sale_price    = wc_get_price_to_display( $product, array( 'price' => (float) $sale_price ) );
+
+		return array(
+			'regular_price' => $display_regular_price,
+			'sale_price'    => $display_sale_price,
+			'discount'      => max( 0, (float) $display_regular_price - (float) $display_sale_price ),
+		);
+	}
+
 	public function wholesalex_price_table_generator( $regular_price, $product ) {
 		if ( class_exists( 'Aelia_Integration_Helper' ) && \Aelia_Integration_Helper::aelia_currency_switcher_active() ) {
 			$active_currency = get_woocommerce_currency();
@@ -2355,8 +2374,9 @@ class Dynamic_Rules {
 						$__current_tier = $quantity_prices[ $i ];
 						$__next_tier    = ( ( $__tier_size ) - 1 !== $i ) ? $quantity_prices[ $i + 1 ] : '';
 						$__sale_price   = wholesalex()->calculate_sale_price( $__current_tier, $regular_price );
-						$__discount     = floatval( $regular_price ) - floatval( $__sale_price );
-						$__sale_price   = wc_get_price_to_display( $product, array( 'price' => $__sale_price ) );
+						$__prices       = $this->get_tier_display_prices( $product, $regular_price, $__sale_price );
+						$__discount     = $__prices['discount'];
+						$__sale_price   = $__prices['sale_price'];
 						?>
 						<div <?php echo isset( $__current_tier['_min_quantity'] ) && is_numeric( $__current_tier['_min_quantity'] ) ? 'data-min="' . esc_attr( $__current_tier['_min_quantity'] ) . '"' : ''; ?>
 							class="wsx-price-table-row <?php echo esc_attr( ( ! empty( $__current_tier['_id'] ) && $__current_tier['_id'] == $active_tier ) ? 'active' : '' ); ?>">
@@ -2421,8 +2441,10 @@ class Dynamic_Rules {
 					$__current_tier = $quantity_prices[ $i ];
 					$__next_tier    = ( ( $__tier_size ) - 1 !== $i ) ? $quantity_prices[ $i + 1 ] : '';
 					$__sale_price   = wholesalex()->calculate_sale_price( $__current_tier, floatval( $regular_price ) );
-					$__discount     = floatval( $regular_price ) - floatval( $__sale_price );
-					$__sale_price   = wc_get_price_to_display( $product, array( 'price' => $__sale_price ) );
+					$__prices       = $this->get_tier_display_prices( $product, $regular_price, $__sale_price );
+					$__discount     = $__prices['discount'];
+					$__sale_price   = $__prices['sale_price'];
+					$__discount_pct = (float) $__prices['regular_price'] ? -round( ( (float) $__discount / (float) $__prices['regular_price'] ) * 100.00, 2 ) : 0;
 					$__quantities   = '';
 					if ( isset( $__current_tier['_min_quantity'] ) ) {
 						if ( ! empty( $__next_tier ) ) {
@@ -2436,7 +2458,7 @@ class Dynamic_Rules {
 							<div class="wsx-price-classical-price">
 							<?php
 							if ( $__show_discount_amount && 'layout_three' !== $tier_layout ) {
-								echo '<div class="wsx-price-classical-text">' . wp_kses_post( $__wc_currency . ' ' . wc_price( $__sale_price ) . '</div><div class="wsx-price-classical-tag">' . -round( ( (float) $__discount / (float) $regular_price ) * 100.00, 2 ) . '% </div>' );
+								echo '<div class="wsx-price-classical-text">' . wp_kses_post( $__wc_currency . ' ' . wc_price( $__sale_price ) . '</div><div class="wsx-price-classical-tag">' . esc_html( $__discount_pct ) . '% </div>' );
 							} else {
 								echo '<div class="wsx-price-classical-text">' . wp_kses_post( $__wc_currency . ' ' . wc_price( $__sale_price ) . '</div>' );
 							}

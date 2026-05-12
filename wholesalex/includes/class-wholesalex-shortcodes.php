@@ -291,6 +291,47 @@ class WHOLESALEX_Shortcodes {
 	}
 
 	/**
+	 * Get public registration role IDs from role select options.
+	 *
+	 * @param array $options Role select options.
+	 * @return array
+	 */
+	private function get_registration_role_ids_from_options( $options ) {
+		$role_ids       = array();
+		$existing_roles = wholesalex()->get_roles( 'ids' );
+
+		foreach ( (array) $options as $option ) {
+			if ( empty( $option['value'] ) || 'wholesalex_guest' === $option['value'] ) {
+				continue;
+			}
+
+			$role_id = sanitize_text_field( $option['value'] );
+			if ( in_array( $role_id, $existing_roles, true ) ) {
+				$role_ids[] = $role_id;
+			}
+		}
+
+		return array_values( array_unique( $role_ids ) );
+	}
+
+	/**
+	 * Render a signed allow-list for the roles this form is allowed to submit.
+	 *
+	 * @param array $allowed_roles Allowed registration role IDs.
+	 * @return void
+	 */
+	private function render_registration_role_context_fields( $allowed_roles ) {
+		$allowed_roles = array_values( array_unique( array_filter( (array) $allowed_roles ) ) );
+		sort( $allowed_roles );
+
+		$allowed_roles_value = implode( ',', $allowed_roles );
+		?>
+		<input type="hidden" name="wholesalex_registration_allowed_roles" value="<?php echo esc_attr( $allowed_roles_value ); ?>" />
+		<input type="hidden" name="wholesalex_registration_allowed_roles_nonce" value="<?php echo esc_attr( wp_create_nonce( 'wholesalex-registration-role|' . $allowed_roles_value ) ); ?>" />
+		<?php
+	}
+
+	/**
 	 * Generate Form Field
 	 *
 	 * @param mixed $row row.
@@ -350,6 +391,7 @@ class WHOLESALEX_Shortcodes {
 	 * @param string $role The role for the form.
 	 */
 	private function render_form( $type, $form_data, $input_variation, $is_rolewise = false, $is_only_b2b = false, $role = '' ) {
+		$this->registration_form_felds_name = array();
 		$default_form      = WholesaleX_CommonUtils::get_empty_form();
 		$initial_form_data = WholesaleX_CommonUtils::get_default_registration_form_fields();
 		if ( 'registration' === $type ) {
@@ -418,13 +460,23 @@ class WHOLESALEX_Shortcodes {
 			$this->render_columns( $row, $is_rolewise, $input_variation, $is_only_b2b );
 		}
 		if ( 'registration' === $type ) {
+			$allowed_registration_roles = array();
 			if ( $is_rolewise ) {
+				$role_content = wholesalex()->get_roles( 'by_id', $role );
+				if ( ! empty( $role_content ) && 'wholesalex_guest' !== $role ) {
+					$allowed_registration_roles = array( $role );
+				}
 				?>
 				<input type="hidden" name="wholesalex_registration_role" value="<?php echo esc_attr( $role ); ?>">
 				<?php
 			} elseif ( ! in_array( 'wholesalex_registration_role', $this->registration_form_felds_name, true ) ) {
-				$this->render_columns( $this->get_select_role_field( $is_only_b2b ), $is_rolewise, $input_variation );
+				$select_role_field          = $this->get_select_role_field( $is_only_b2b );
+				$allowed_registration_roles = $this->get_registration_role_ids_from_options( $select_role_field['columns'][0]['option'] );
+				$this->render_columns( $select_role_field, $is_rolewise, $input_variation );
+			} else {
+				$allowed_registration_roles = $this->get_registration_role_ids_from_options( $this->get_select_role_field( $is_only_b2b )['columns'][0]['option'] );
 			}
+			$this->render_registration_role_context_fields( $allowed_registration_roles );
 		}
 		?>
 		</div>
