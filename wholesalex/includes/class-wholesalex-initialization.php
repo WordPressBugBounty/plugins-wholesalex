@@ -101,6 +101,8 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/notice/class-notice.php';
 		require_once WHOLESALEX_PATH . 'includes/class-wholesalex-common-utils.php';
 		require_once WHOLESALEX_PATH . 'includes/class-wow-shipping-promotion.php';
+		require_once WHOLESALEX_PATH . 'includes/class-wow-revenue-promotion.php';
+		require_once WHOLESALEX_PATH . 'includes/class-wow-addons-promotion.php';
 
 		new \WHOLESALEX\WHOLESALEX_Role();
 		new \WHOLESALEX\WHOLESALEX_Registration();
@@ -128,6 +130,8 @@ class WholesaleX_Initialization {
 		new \WHOLESALEX\Deactive();
 		new \WHOLESALEX\Notice();
 		new \WHOLESALEX\WowShippingPromotion();
+		new \WHOLESALEX\WowRevenuePromotion();
+		new \WHOLESALEX\WowAddonsPromotion();
 		new \WHOLESALEX\OurPlugins();
 
 		add_action( 'template_redirect', array( $this, 'wholesalex_process_user_email_confirmation' ) );

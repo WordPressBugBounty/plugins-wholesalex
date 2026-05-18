@@ -384,6 +384,20 @@ class Dynamic_Rules {
 
 	// ─── Session / Order Helpers ─────────────────────────────────
 
+	/**
+	 * Resolve the WholesaleX order type from a WholesaleX user role.
+	 *
+	 * @param string $__user_role WholesaleX user role.
+	 * @return string
+	 */
+	public function get_order_type_from_user_role( $__user_role ) {
+		if ( 'wholesalex_guest' === $__user_role ) {
+			return 'guest';
+		}
+
+		return in_array( $__user_role, array( '', 'wholesalex_b2c_users' ), true ) ? 'b2c' : 'b2b';
+	}
+
 	public function set_discounted_product( $product_id ) {
 		if ( is_admin() || null === WC()->session ) {
 			return;
@@ -397,13 +411,13 @@ class Dynamic_Rules {
 	}
 
 	public function add_custom_meta_on_wholesale_order( $order ) {
-		if ( is_admin() || null === WC()->session ) {
+		if ( is_admin() ) {
 			return;
 		}
 
 		// order_type is resolved from the current user's role and does not require the session.
 		$__user_role = wholesalex()->get_current_user_role();
-		$order_type  = in_array( $__user_role, array( '', 'wholesalex_guest', 'wholesalex_b2c_users' ), true ) ? 'b2c' : 'b2b';
+		$order_type  = $this->get_order_type_from_user_role( $__user_role );
 		$order->update_meta_data( '__wholesalex_order_type', $order_type );
 
 		// Everything below this point requires an active WC session (discount tracking).
@@ -441,7 +455,7 @@ class Dynamic_Rules {
 			$order->update_meta_data( '__wholesalex_discounted_products', array_unique( $__ordered_discounted_product ) );
 		}
 		$__user_role = wholesalex()->get_current_user_role();
-		$order_type  = in_array( $__user_role, array( '', 'wholesalex_guest', 'wholesalex_b2c_users' ), true ) ? 'b2c' : 'b2b';
+		$order_type  = $this->get_order_type_from_user_role( $__user_role );
 		$order->update_meta_data( '__wholesalex_order_type', $order_type );
 		WC()->session->set( '__wholesalex_discounted_products', array() );
 	}

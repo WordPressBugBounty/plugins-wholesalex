@@ -45,6 +45,9 @@ class WHOLESALEX_Orders {
 		if ( 'wholesalex_order_type' === $column ) {
 			$order      = wc_get_order( $order_id );
 			$order_type = $order->get_meta( '__wholesalex_order_type' );
+			if ( 'b2c' === $order_type && 0 === $order->get_user_id() ) {
+				$order_type = 'guest';
+			}
 			if ( 'b2b' === $order_type ) {
 				/* translators: %s: Plugin Name */
 				$__custom_meta_value = apply_filters( 'wholesalex_order_meta_b2b_value', sprintf( __( '%s B2B', 'wholesalex' ), wholesalex()->get_plugin_name() ) );
@@ -52,6 +55,10 @@ class WHOLESALEX_Orders {
 			} elseif ( 'b2c' === $order_type ) {
 				/* translators: %s: Plugin Name */
 				$__custom_meta_value = apply_filters( 'wholesalex_order_meta_b2c_value', sprintf( __( '%s B2C', 'wholesalex' ), wholesalex()->get_plugin_name() ) );
+				echo esc_html( $__custom_meta_value );
+			} elseif ( 'guest' === $order_type ) {
+				/* translators: %s: Plugin Name */
+				$__custom_meta_value = apply_filters( 'wholesalex_order_meta_guest_value', sprintf( __( '%s Guest', 'wholesalex' ), wholesalex()->get_plugin_name() ) );
 				echo esc_html( $__custom_meta_value );
 			}
 		}
