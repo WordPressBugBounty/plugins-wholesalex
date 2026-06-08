@@ -309,6 +309,8 @@ class Xpo {
 				'wow_revenue'  => file_exists( WP_PLUGIN_DIR . '/revenue/revenue.php' ),
 				'wholesale_x'  => file_exists( WP_PLUGIN_DIR . '/wholesalex/wholesalex.php' ),
 				'wow_addon'    => file_exists( WP_PLUGIN_DIR . '/product-addons/product-addons.php' ),
+				'wow_invoice'  => file_exists( WP_PLUGIN_DIR . '/wow-pdf-invoices-packing-slips/wow-pdf-invoices-packing-slips.php' ),
+
 			),
 			'products_active' => array(
 				'wow_shipping' => defined( 'WTRS_VER' ),
@@ -318,6 +320,7 @@ class Xpo {
 				'wow_revenue'  => defined( 'REVENUE_VER' ),
 				'wholesale_x'  => defined( 'WHOLESALEX_VER' ),
 				'wow_addon'    => defined( 'PRAD_VER' ),
+				'wow_invoice'  => defined( 'WINV_VER' ),
 			),
 		);
 	}
@@ -353,6 +356,9 @@ class Xpo {
 			case 'wow_addon':
 				$plugin_slug = 'product-addons';
 				break;
+			case 'wow_invoice':
+				$plugin_slug = 'wow-pdf-invoices-packing-slips';
+				break;
 			default:
 				return false;
 		}
@@ -376,14 +382,15 @@ class Xpo {
 	 * @param string $slug   The plugin slug (typically the directory name of the plugin).
 	 */
 	public static function plugin_install( $plugin, $slug ) {
-		include ABSPATH . 'wp-admin/includes/plugin-install.php';
-		include ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
 		if ( ! class_exists( 'Plugin_Upgrader' ) ) {
-			include ABSPATH . 'wp-admin/includes/class-plugin-upgrader.php';
+			require_once ABSPATH . 'wp-admin/includes/class-plugin-upgrader.php';
 		}
 		if ( ! class_exists( 'WP_Ajax_Upgrader_Skin' ) ) {
-			include ABSPATH . 'wp-admin/includes/class-wp-ajax-upgrader-skin.php';
+			require_once ABSPATH . 'wp-admin/includes/class-wp-ajax-upgrader-skin.php';
 		}
 
 		$api = plugins_api(
@@ -408,7 +415,7 @@ class Xpo {
 		);
 
 		if ( is_wp_error( $api ) ) {
-			wp_die( $api ); //phpcs:ignore
+			wp_send_json_error( array( 'message' => $api->get_error_message() ) );
 		}
 
 		$upgrader       = new \Plugin_Upgrader( new \WP_Ajax_Upgrader_Skin( compact( 'title', 'url', 'nonce', 'plugin', 'api' ) ) );

@@ -2175,6 +2175,56 @@ class WHOLESALEX_Product {
 									}
 								}
 								break;
+							case 'brand_in_list':
+								if ( ! isset( $discount['brand_in_list'] ) ) {
+									break;
+								}
+								$__profile_brand_tax_list = array( 'product_brand', 'pwb-brand', 'yith_product_brand' );
+								$__profile_brand_tax      = '';
+								foreach ( $__profile_brand_tax_list as $__pbt ) {
+									if ( taxonomy_exists( $__pbt ) ) {
+										$__profile_brand_tax = $__pbt;
+										break;
+									}
+								}
+								if ( $__profile_brand_tax ) {
+									$__profile_brand_term_ids = array_map( 'intval', wc_get_product_term_ids( 0 === $__parent_id ? $product_id : $__parent_id, $__profile_brand_tax ) );
+									foreach ( $discount['brand_in_list'] as $list ) {
+										if ( isset( $list['value'] ) && in_array( (int) $list['value'], $__profile_brand_term_ids, true ) ) {
+											$__has_discount = true;
+											$this->rule_on_message( $product_id, 'Profile', $user_id );
+											break;
+										}
+									}
+								}
+								break;
+							case 'brand_not_in_list':
+								if ( ! isset( $discount['brand_not_in_list'] ) ) {
+									break;
+								}
+								$__profile_brand_tax_list2 = array( 'product_brand', 'pwb-brand', 'yith_product_brand' );
+								$__profile_brand_tax2      = '';
+								foreach ( $__profile_brand_tax_list2 as $__pbt2 ) {
+									if ( taxonomy_exists( $__pbt2 ) ) {
+										$__profile_brand_tax2 = $__pbt2;
+										break;
+									}
+								}
+								if ( $__profile_brand_tax2 ) {
+									$__profile_brand_term_ids2 = array_map( 'intval', wc_get_product_term_ids( 0 === $__parent_id ? $product_id : $__parent_id, $__profile_brand_tax2 ) );
+									$__flag                    = true;
+									foreach ( $discount['brand_not_in_list'] as $list ) {
+										if ( isset( $list['value'] ) && in_array( (int) $list['value'], $__profile_brand_term_ids2, true ) ) {
+											$__flag = false;
+											break;
+										}
+									}
+									if ( $__flag ) {
+										$__has_discount = true;
+										$this->rule_on_message( $product_id, 'Profile', $user_id );
+									}
+								}
+								break;
 						}
 					}
 				}

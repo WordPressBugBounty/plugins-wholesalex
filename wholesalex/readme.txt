@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 6.8    
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.3.9
+Stable tag: 2.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -122,9 +122,11 @@ You can explore more about WholesaleX from the following video:
 
 [youtube https://www.youtube.com/watch?v=Zvfxpu8Gtd0]
 
-Other Amazing Plugins
+## Other Amazing Plugins
 
 Thank you for considering WholesaleX - the ultimate WooCommerce wholesale plugin. Take a look at our other WordPress and WooCommerce Plugins.
+
+📄 [WowInvoice](https://wordpress.org/plugins/wow-pdf-invoices-packing-slips/) A flexible PDF invoices & packing slips plugin for WooCommerce to simplify document generation and improve your store’s workflow.
 
 🚚 [WowShipping 🔥](https://wordpress.org/plugins/wow-table-rate-shipping/): The smartest way to manage WooCommerce shipping with 30+ table rate conditions with integrations with popular shipping carriers, including DHL, UPS, USPS, Sendle, and More.
 
@@ -212,6 +214,11 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.4.0 – 08 June 2026 =
+* New: Added brand filter support on the customer profile page for brand-based product browsing.
+* Improvement: Updated plugin installation function for improved reliability.
+* Fix: Prevented WholesaleX activation when WooCommerce is not installed.
 
 = 2.3.9 – 18 May 2026 =
 * Improvement: Refactored the Dynamic Rules edit and save workflow for improved maintainability and stability.

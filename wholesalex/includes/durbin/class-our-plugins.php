@@ -21,7 +21,7 @@ class OurPlugins {
 	public function wsx_install_plugin_callback() {
 
 		$nonce  = isset( $_POST['wpnonce'] ) ? sanitize_key( wp_unslash( $_POST['wpnonce'] ) ) : '';
-		$plugin = isset( $_POST['plugin'] ) ? $_POST['plugin'] : '';
+		$plugin = isset( $_POST['plugin'] ) ? sanitize_key( wp_unslash( $_POST['plugin'] ) ) : '';
 
 		if ( ! wp_verify_nonce( $nonce, 'wholesalex-registration' ) || ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( array( 'message' => __( 'No plugin specified', 'wholesalex' ) ) );
