@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
-"Project-Id-Version: WholesaleX 2.3.9\n"
+"Project-Id-Version: WholesaleX 2.4.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wholesalex\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-08T08:08:45+00:00\n"
+"POT-Creation-Date: 2026-06-09T05:13:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wholesalex\n"
@@ -249,7 +249,7 @@ msgstr ""
 
 #: includes/class-wholesalex-product.php:410
 #: includes/class-wholesalex-product.php:563
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:880
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:947
 #: includes/menu/class-wholesalex-profile.php:880
 #: includes/menu/class-wholesalex-profile.php:898
 #: includes/menu/class-wholesalex-profile.php:980
@@ -258,7 +258,7 @@ msgstr ""
 
 #: includes/class-wholesalex-product.php:411
 #: includes/class-wholesalex-product.php:564
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:881
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:948
 #: includes/menu/class-wholesalex-profile.php:881
 #: includes/menu/class-wholesalex-profile.php:899
 #: includes/menu/class-wholesalex-profile.php:981
@@ -399,13 +399,13 @@ msgid "Specific Register Users"
 msgstr ""
 
 #: includes/class-wholesalex-product.php:1766
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:554
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:587
 #: includes/menu/class-wholesalex-category.php:362
 msgid "Choose Roles..."
 msgstr ""
 
 #: includes/class-wholesalex-product.php:1773
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:538
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:571
 #: includes/menu/class-wholesalex-category.php:369
 msgid "Choose Users..."
 msgstr ""
@@ -425,9 +425,9 @@ msgstr ""
 #: includes/class-wholesalex-product.php:1839
 #: includes/class-wholesalex-product.php:1888
 #: includes/class-wholesalex-product.php:1902
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:764
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:811
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:965
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:831
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:878
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1032
 #: includes/menu/class-wholesalex-category.php:277
 #: includes/menu/class-wholesalex-category.php:292
 #: includes/menu/class-wholesalex-category.php:471
@@ -483,9 +483,9 @@ msgstr ""
 
 #: includes/class-wholesalex-product.php:1836
 #: includes/class-wholesalex-product.php:1900
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:768
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:815
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:969
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:835
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:882
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1036
 #: includes/menu/class-wholesalex-category.php:289
 #: includes/menu/class-wholesalex-category.php:406
 #: includes/menu/class-wholesalex-category.php:476
@@ -495,13 +495,13 @@ msgstr ""
 
 #: includes/class-wholesalex-product.php:1847
 #: includes/class-wholesalex-product.php:1908
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:767
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:774
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:814
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:821
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:968
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:975
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1145
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:834
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:841
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:881
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:888
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1035
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1042
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1212
 #: includes/menu/class-wholesalex-profile.php:1028
 #: includes/menu/class-wholesalex-profile.php:1048
 #: assets/js/whx_overview.js:184
@@ -533,8 +533,8 @@ msgid "%s Rules"
 msgstr ""
 
 #: includes/class-wholesalex-product.php:2515
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:480
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:990
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:513
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1057
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:321
 msgid "BOGO Discounts (Buy X Get One Free)"
 msgstr ""
@@ -705,37 +705,37 @@ msgstr ""
 msgid "No plugin specified"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:449
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:482
 #: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
 msgid "Create Dynamic Rule"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:454
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:487
 msgid "New Dynamic Rule"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:464
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:465
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:497
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:498
 #: assets/js/whx_all_products.js:1
 #: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
 msgid "Rule Title"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:471
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:504
 #: assets/js/whx_all_products.js:1
 #: assets/js/whx_integration.js:181
 #: assets/js/whx_overview.js:184
 msgid "Rule Type"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:475
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:508
 msgid "Choose Rule..."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:476
-#: includes/dynamic-rules/class-dynamic-rules.php:2590
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:509
+#: includes/dynamic-rules/class-dynamic-rules.php:2596
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:317
 #: includes/menu/class-wholesalex-settings.php:612
 #: includes/menu/class-wholesalex-settings.php:643
@@ -743,126 +743,126 @@ msgstr ""
 msgid "Product Discount"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:477
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:510
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:318
 msgid "Cart Discount "
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:478
-#: includes/dynamic-rules/class-dynamic-rules.php:2651
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:511
+#: includes/dynamic-rules/class-dynamic-rules.php:2657
 #: includes/menu/class-wholesalex-settings.php:747
 #: includes/menu/class-wholesalex-settings.php:749
 msgid "Payment Method Discount"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:479
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:512
 msgid "Required Quantity for Payment Method"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:481
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:919
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:514
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:986
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:322
 msgid "Shipping Rule"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:482
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1066
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:515
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1133
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:323
 #: includes/menu/class-wholesalex-settings.php:1052
 #: includes/menu/class-wholesalex-settings.php:1086
 msgid "Minimum Order Quantity"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:483
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:866
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:516
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:933
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:324
 msgid "Tax Rule"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:484
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:517
 msgid "Checkout Restriction (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:485
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:518
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:325
 msgid "Quantity Based Discount (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:486
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:519
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:326
 msgid "Extra Charge (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:487
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:520
 msgid "Buy X Get Y Free (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:488
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:521
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:328
 msgid "Maximum Order Quantity (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:489
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:522
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:329
 msgid "Restrict Product Visibility (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:490
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:523
 msgid "Hidden Price (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:491
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:524
 msgid "Non Purchasable (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:500
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:533
 #: includes/menu/class-wholesalex-role.php:481
 msgid "Save"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:512
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:545
 msgid "Select User/Role"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:516
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:549
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:351
 msgid "Select Users/Role..."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:517
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:550
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:352
 msgid "All (Registered and Guest Users)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:518
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:551
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:353
 msgid "All Registered Users"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:519
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:552
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:354
 msgid "All B2B Roles"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:520
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:553
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:355
 msgid "Specific Users"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:521
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:554
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:356
 msgid "Specific Roles"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:529
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:562
 msgid "Select Users"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:545
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:578
 msgid "Select Roles"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:569
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:602
 #: includes/menu/class-wholesalex-profile.php:1030
 #: includes/menu/class-wholesalex-profile.php:1073
 #: assets/js/whx_integration.js:181
@@ -870,210 +870,231 @@ msgstr ""
 msgid "Product Filter"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:573
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:606
 #: includes/menu/class-wholesalex-profile.php:1061
 msgid "Choose Filter..."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:574
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:607
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:516
 #: includes/menu/class-wholesalex-profile.php:1062
 msgid "All Products"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:575
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:608
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:517
 #: includes/menu/class-wholesalex-profile.php:1063
 msgid "Product in list"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:576
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:609
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:518
 #: includes/menu/class-wholesalex-profile.php:1064
 msgid "Product not in list"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:577
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:610
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:519
 #: includes/menu/class-wholesalex-profile.php:1065
 msgid "Categories in list"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:578
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:611
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:520
 #: includes/menu/class-wholesalex-profile.php:1066
 msgid "Categories not in list"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:579
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:612
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:521
 #: includes/menu/class-wholesalex-profile.php:1067
 msgid "Variations in list"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:580
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:613
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:522
 #: includes/menu/class-wholesalex-profile.php:1068
 msgid "Variations not in list"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:581
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:614
 msgid "Brand in list (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:582
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:615
 msgid "Brand not in list (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:583
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:616
 msgid "Attribute in list (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:584
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:617
 msgid "Attribute not in list (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:591
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:607
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:618
+msgid "SKU in list"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:619
+msgid "SKU not in list"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:626
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:642
 msgid "Select Multiple Products"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:600
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:635
 #: includes/menu/class-wholesalex-profile.php:1084
 msgid "Choose Products to apply discounts"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:616
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:651
 #: includes/menu/class-wholesalex-profile.php:1099
 msgid "Choose Products that wont apply discounts"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:623
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:639
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:658
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:674
 msgid "Select Multiple Categories"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:632
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:667
 #: includes/menu/class-wholesalex-profile.php:1114
 msgid "Choose Categories to apply discounts"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:648
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:683
 #: includes/menu/class-wholesalex-profile.php:1129
 msgid "Choose Categories that wont apply discounts"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:655
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:671
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:690
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:706
 msgid "Select Multiple Variations"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:664
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:699
 #: includes/menu/class-wholesalex-profile.php:1144
 msgid "Choose Product Variations to apply discounts"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:680
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:715
 #: includes/menu/class-wholesalex-profile.php:1159
 msgid "Choose Product Variations that wont apply discounts"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:687
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:703
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:722
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:738
 msgid "Select Multiple Brands"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:696
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:731
 #: includes/menu/class-wholesalex-profile.php:1174
 msgid "Choose Brands to apply discounts"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:712
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:747
 #: includes/menu/class-wholesalex-profile.php:1189
 msgid "Choose Brands that wont apply discounts"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:719
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:735
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:754
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:770
 msgid "Select Multiple Attributes"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:728
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:763
 msgid "Choose Attributes to apply discounts"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:744
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:779
 msgid "Choose Attributes that wont apply discounts"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:753
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:786
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:802
+msgid "Select Multiple SKUs"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:795
+msgid "Search SKUs to apply discounts"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:811
+msgid "Search SKUs that won't apply discounts"
+msgstr ""
+
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:820
 msgid "Manage Discount"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:766
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:813
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:967
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:833
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:880
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1034
 msgid "Percentage"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:781
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:828
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:982
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:848
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:895
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1049
 msgid "Discount name(optional)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:783
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:830
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:984
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:850
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:897
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1051
 msgid "Add discount name here"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:789
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:856
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer.php:319
 msgid "Payment Discount"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:800
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:847
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:867
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:914
 #: includes/menu/class-wholesalex-profile.php:990
 msgid "Payment Gateways"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:836
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:903
 msgid "Payment Order Quantity"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:858
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:925
 msgid "Order Quantity"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:877
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:944
 msgid "Tax Exempted?"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:879
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:946
 msgid "Choose Tax Exempted Status..."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:894
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:961
 msgid "Tax Class Mapping"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:901
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:968
 msgid "Country(optional)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:930
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:997
 #: includes/menu/class-wholesalex-profile.php:927
 msgid "Shipping Zone"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:941
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1008
 #: includes/menu/class-wholesalex-profile.php:949
 msgid "Shipping Zone Methods"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:954
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1021
 #: includes/dynamic-rules/rules/class-rule-cart-discount.php:106
 #: includes/menu/class-wholesalex-settings.php:657
 #: includes/menu/class-wholesalex-settings.php:689
@@ -1081,144 +1102,144 @@ msgstr ""
 msgid "Cart Discount"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1001
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1068
 msgid "Product Quantity (X)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1008
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1075
 msgid "Restrict Free Quantity"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1009
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1076
 msgid "Restrict to one free product per order"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1012
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1079
 msgid "Enabling this option will restrict shoppers from availing of more than one product by adding the required number of products more than one time to the cart."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1016
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1083
 msgid "Enable Discount Badge"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1017
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1084
 msgid "Enable Discount Badge (Both Shop & Product Page)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1020
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1087
 msgid "Enable \"Offer Badge\" on Product Image for both the shop page and the single product page"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1024
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1091
 msgid "Badge Label Text"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1031
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1098
 msgid "Badge Background Color"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1038
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1105
 msgid "Badge Text Color"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1047
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1114
 msgid "Choose Badge Position..."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1048
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1115
 #: assets/js/whx_overview.js:184
 msgid "Left"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1049
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1116
 #: assets/js/whx_overview.js:184
 msgid "Right"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1058
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1125
 msgid "Badge Style"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1077
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1144
 msgid "Minimum Product Quantity"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1084
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1151
 msgid "Disable Quantity in Shop & Product Page"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1085
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1152
 msgid "Disable Minimum Product Limit in Shop & Product Page"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1088
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1155
 msgid "Enabling it will disable the minimum order restriction from shop and product pages. So the buyers can add any number of products to the cart. However, they will be restricted in the checkout process."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1092
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1159
 msgid "Step"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1100
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1167
 msgid "Conditions: (optional)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1114
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1181
 msgid "Choose Conditions..."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1115
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1182
 msgid "Cart - Total Quantity"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1116
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1183
 msgid "Cart - Total Value"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1117
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1184
 msgid "Cart - Total Weight"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1118
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1185
 msgid "Lifetime Order Count (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1119
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1186
 msgid "Lifetime Purchase (Pro)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1131
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1198
 msgid "Choose Operators..."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1132
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1199
 msgid "Less than (<)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1133
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1200
 msgid "Less than or equal (<=)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1134
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1201
 msgid "Greater than or equal (>=)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1135
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1202
 msgid "Greater than (>)"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1154
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1221
 msgid "Date & Limit Rule"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1159
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1226
 #: includes/export/class-wholesalex-dynamic-rule-exporter.php:76
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:283
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:367
 msgid "Start Date"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1167
+#: includes/dynamic-rules/class-dynamic-rules-data-provider.php:1234
 #: includes/export/class-wholesalex-dynamic-rule-exporter.php:77
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:284
 #: includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php:368
@@ -1232,105 +1253,105 @@ msgstr ""
 msgid "Invalid request type."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:280
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:283
 msgid "Missing rule ID."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:294
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:297
 msgid "Rule deleted successfully."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:303
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:306
 msgid "Missing rule data."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:311
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:314
 msgid "Invalid rule data."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:322
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:325
 msgid "Rule activated successfully."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:322
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:325
 msgid "Rule deactivated successfully."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:337
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:340
 msgid "Rule saved successfully."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:359
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:362
 msgid "Invalid data."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:394
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:397
 msgid "Done"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:430
+#: includes/dynamic-rules/class-dynamic-rules-rest-api.php:433
 msgid "Missing rules_per_page."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:1799
+#: includes/dynamic-rules/class-dynamic-rules.php:1805
 #: includes/menu/class-wholesalex-settings.php:1372
 msgid "Login to see prices"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2482
+#: includes/dynamic-rules/class-dynamic-rules.php:2488
 msgid "Pieces"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2596
-#: includes/dynamic-rules/class-dynamic-rules.php:2657
+#: includes/dynamic-rules/class-dynamic-rules.php:2602
+#: includes/dynamic-rules/class-dynamic-rules.php:2663
 #: includes/menu/class-wholesalex-settings.php:1312
 #: includes/menu/class-wholesalex-settings.php:1314
 msgid "You can avail one of the following offers by completing the requirements."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2611
-#: includes/dynamic-rules/class-dynamic-rules.php:2671
+#: includes/dynamic-rules/class-dynamic-rules.php:2617
+#: includes/dynamic-rules/class-dynamic-rules.php:2677
 #: includes/dynamic-rules/rules/class-rule-cart-discount.php:126
 msgid " % OFF"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2613
-#: includes/dynamic-rules/class-dynamic-rules.php:2673
+#: includes/dynamic-rules/class-dynamic-rules.php:2619
+#: includes/dynamic-rules/class-dynamic-rules.php:2679
 #: includes/dynamic-rules/rules/class-rule-cart-discount.php:128
 msgid " OFF"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2677
+#: includes/dynamic-rules/class-dynamic-rules.php:2683
 msgid "Use "
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2710
+#: includes/dynamic-rules/class-dynamic-rules.php:2716
 #: includes/menu/class-wholesalex-settings.php:867
 #: includes/menu/class-wholesalex-settings.php:869
 msgid "BOGO Discount"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2716
+#: includes/dynamic-rules/class-dynamic-rules.php:2722
 #: includes/dynamic-rules/rules/class-rule-cart-discount.php:112
 #: includes/menu/class-wholesalex-settings.php:1325
 #: includes/menu/class-wholesalex-settings.php:1327
 msgid "You can avail following offers by completing the requirements."
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2730
+#: includes/dynamic-rules/class-dynamic-rules.php:2736
 #: includes/menu/class-wholesalex-settings.php:881
 #: includes/menu/class-wholesalex-settings.php:883
 msgid "Get 1 Free"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2736
+#: includes/dynamic-rules/class-dynamic-rules.php:2742
 #: includes/menu/class-wholesalex-settings.php:894
 #: includes/menu/class-wholesalex-settings.php:896
 msgid "Buy at least {required_quantity} products"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2766
-#: includes/dynamic-rules/class-dynamic-rules.php:2884
+#: includes/dynamic-rules/class-dynamic-rules.php:2772
+#: includes/dynamic-rules/class-dynamic-rules.php:2890
 #: includes/menu/class-wholesalex-settings.php:777
 #: includes/menu/class-wholesalex-settings.php:796
 #: includes/menu/class-wholesalex-settings.php:798
@@ -1339,27 +1360,27 @@ msgstr ""
 msgid "Free Shipping"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2800
+#: includes/dynamic-rules/class-dynamic-rules.php:2806
 msgid "Promotions:"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2804
+#: includes/dynamic-rules/class-dynamic-rules.php:2810
 #: includes/menu/class-wholesalex-settings.php:600
 #: includes/menu/class-wholesalex-settings.php:602
 msgid "Get exclusive offers"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2816
+#: includes/dynamic-rules/class-dynamic-rules.php:2822
 msgid "Conditional Discount Offers"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2845
+#: includes/dynamic-rules/class-dynamic-rules.php:2851
 #: includes/menu/class-wholesalex-settings.php:1082
 #: includes/menu/class-wholesalex-settings.php:1084
 msgid "You can add minimum {minimum_qty} and maximum {maximum_qty} quantity of this product"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2853
+#: includes/dynamic-rules/class-dynamic-rules.php:2859
 #: includes/dynamic-rules/rules/class-rule-min-order-qty.php:159
 #: includes/dynamic-rules/rules/class-rule-min-order-qty.php:222
 #: includes/dynamic-rules/rules/class-rule-min-order-qty.php:284
@@ -1368,61 +1389,61 @@ msgstr ""
 msgid "You have to add minimun {minimum_qty} quantity"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2861
+#: includes/dynamic-rules/class-dynamic-rules.php:2867
 #: includes/menu/class-wholesalex-settings.php:1065
 #: includes/menu/class-wholesalex-settings.php:1067
 msgid "You can add maximum {maximum_qty} quantity"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:2998
+#: includes/dynamic-rules/class-dynamic-rules.php:3004
 msgid "Quantity: %s"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:3005
+#: includes/dynamic-rules/class-dynamic-rules.php:3011
 msgid "FREE"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:3052
+#: includes/dynamic-rules/class-dynamic-rules.php:3058
 #: includes/menu/class-wholesalex-settings.php:1152
 #: includes/menu/class-wholesalex-settings.php:1154
 msgid "Spend {min_value} to {max_value}"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:3056
+#: includes/dynamic-rules/class-dynamic-rules.php:3062
 msgid "Spend min {max_value}"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:3059
+#: includes/dynamic-rules/class-dynamic-rules.php:3065
 #: includes/menu/class-wholesalex-settings.php:1120
 #: includes/menu/class-wholesalex-settings.php:1122
 msgid "Spend upto {min_value}"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:3069
+#: includes/dynamic-rules/class-dynamic-rules.php:3075
 #: includes/menu/class-wholesalex-settings.php:1169
 #: includes/menu/class-wholesalex-settings.php:1171
 msgid "Add {min_value} to {max_value} product(s) to cart"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:3072
+#: includes/dynamic-rules/class-dynamic-rules.php:3078
 msgid "Buy minimum {max_value} product(s) to get the discount"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:3074
+#: includes/dynamic-rules/class-dynamic-rules.php:3080
 msgid "Don&apos;t buy more than {min_value} product(s) to get the discount"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:3085
+#: includes/dynamic-rules/class-dynamic-rules.php:3091
 #: includes/menu/class-wholesalex-settings.php:1219
 #: includes/menu/class-wholesalex-settings.php:1221
 msgid "Add {min_value} to {max_value} {unit} to cart"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:3093
+#: includes/dynamic-rules/class-dynamic-rules.php:3099
 msgid "Add min {max_value} {unit} to cart"
 msgstr ""
 
-#: includes/dynamic-rules/class-dynamic-rules.php:3101
+#: includes/dynamic-rules/class-dynamic-rules.php:3107
 msgid "Add up to {min_value} {unit} to cart"
 msgstr ""
 

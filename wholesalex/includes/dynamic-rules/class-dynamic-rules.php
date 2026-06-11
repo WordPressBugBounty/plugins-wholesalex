@@ -79,6 +79,15 @@ class Dynamic_Rules {
 
 		// Main dispatch.
 		add_action( 'wp_loaded', array( $this, 'get_valid_dynamic_rules' ) );
+		add_action( 'rest_api_init', array( $this, 'get_valid_dynamic_rules_for_rest' ), 1 );
+
+		// Admin order item AJAX runs as the store manager/admin. Use the selected
+		// order customer so manual orders receive that customer's B2B pricing.
+		add_filter( 'wholesalex_set_current_user', array( $this, 'set_admin_order_customer_as_current_user' ) );
+		add_filter( 'wholesalex_dynamic_rule_user_id', array( $this, 'set_admin_order_customer_as_current_user' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_order_pricing_context_script' ), 99 );
+		add_action( 'woocommerce_ajax_order_items_added', array( $this, 'apply_admin_order_customer_pricing_to_added_items' ), 1, 2 );
+		add_action( 'woocommerce_before_save_order_item', array( $this, 'apply_admin_order_customer_pricing_before_item_save' ), 5 );
 
 		// WooCommerce Blocks.
 		add_action( 'woocommerce_blocks_loaded', array( $this, 'action_after_woo_block_loaded' ) );
@@ -666,6 +675,307 @@ class Dynamic_Rules {
 		return get_post_meta( $product->get_id(), $user_id . '_sale_price', true );
 	}
 
+	/**
+	 * Load price rules for REST requests.
+	 *
+	 * REST callbacks can run before `wp_loaded`, so product price endpoints may
+	 * otherwise read catalog prices before WholesaleX price filters are registered.
+	 *
+	 * @return void
+	 */
+	public function get_valid_dynamic_rules_for_rest() {
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			$this->get_valid_dynamic_rules();
+		}
+	}
+
+	/**
+	 * Resolve the customer selected on the WooCommerce admin order screen.
+	 *
+	 * WooCommerce's add/recalculate order item requests are authenticated as the
+	 * admin user, but the pricing context should be the order customer.
+	 *
+	 * @param int|string $user_id Current resolved user ID.
+	 * @return int|string
+	 */
+	public function set_admin_order_customer_as_current_user( $user_id ) {
+		if ( ! is_admin() || ! wp_doing_ajax() ) {
+			return $user_id;
+		}
+
+		$action = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( '' === $action || 0 !== strpos( $action, 'woocommerce_' ) ) {
+			return $user_id;
+		}
+
+		$order_customer_id = $this->get_admin_order_request_customer_id();
+		return $order_customer_id ? $order_customer_id : $user_id;
+	}
+
+	/**
+	 * Pass the selected admin order customer into WooCommerce order-item AJAX.
+	 *
+	 * WooCommerce does not include the unsaved `#customer_user` value when adding
+	 * products to a manual order. Without this bridge PHP only sees the admin user.
+	 *
+	 * @return void
+	 */
+	public function enqueue_admin_order_pricing_context_script() {
+		if ( ! is_admin() || ! function_exists( 'get_current_screen' ) ) {
+			return;
+		}
+
+		$screen = get_current_screen();
+		if ( ! $screen ) {
+			return;
+		}
+
+		$is_order_screen = in_array( $screen->id, array( 'shop_order', 'woocommerce_page_wc-orders', 'admin_page_wc-orders' ), true ) || 'shop_order' === $screen->post_type;
+		if ( ! $is_order_screen || ! wp_script_is( 'wc-admin-order-meta-boxes', 'enqueued' ) ) {
+			return;
+		}
+
+		wp_add_inline_script(
+			'wc-admin-order-meta-boxes',
+			"jQuery(function($){\n" .
+			"\tvar addCustomerContext=function(event,data){\n" .
+			"\t\tvar customerId=$('#customer_user').val();\n" .
+			"\t\tif(customerId){data.customer_user=customerId;}\n" .
+			"\t\treturn data;\n" .
+			"\t};\n" .
+			"\t$('#woocommerce-order-items')\n" .
+			"\t\t.on('woocommerce_order_meta_box_add_items_ajax_data',addCustomerContext)\n" .
+			"\t\t.on('woocommerce_order_meta_box_recalculate_ajax_data',addCustomerContext)\n" .
+			"\t\t.on('woocommerce_order_meta_box_save_line_items_ajax_data',addCustomerContext);\n" .
+			"});"
+		);
+	}
+
+	/**
+	 * Re-price newly added manual order items for the selected order customer.
+	 *
+	 * @param array    $added_items Added order items.
+	 * @param WC_Order $order       Order object.
+	 * @return void
+	 */
+	public function apply_admin_order_customer_pricing_to_added_items( $added_items, $order ) {
+		if ( ! is_admin() || ! wp_doing_ajax() || ! $order instanceof \WC_Order ) {
+			return;
+		}
+
+		$customer_id = $this->get_admin_order_request_customer_id();
+		if ( ! $customer_id ) {
+			$customer_id = absint( $order->get_customer_id( 'edit' ) );
+		}
+		if ( ! $customer_id ) {
+			return;
+		}
+
+		$force_customer = function () use ( $customer_id ) {
+			return $customer_id;
+		};
+
+		add_filter( 'wholesalex_set_current_user', $force_customer, 1 );
+		add_filter( 'wholesalex_dynamic_rule_user_id', $force_customer, 1 );
+		$this->get_valid_dynamic_rules( $customer_id );
+
+		foreach ( $added_items as $item ) {
+			if ( ! $item instanceof \WC_Order_Item_Product ) {
+				continue;
+			}
+
+			$product = $item->get_product();
+			if ( ! $product ) {
+				continue;
+			}
+
+			$quantity   = max( 1, (int) $item->get_quantity() );
+			$unit_price = $this->get_admin_order_customer_unit_price( $product, $order, $customer_id, $quantity );
+			if ( false === $unit_price ) {
+				continue;
+			}
+
+			$line_total = wc_format_decimal( $unit_price * $quantity );
+			$item->set_subtotal( $line_total );
+			$item->set_total( $line_total );
+			$item->save();
+		}
+
+		remove_filter( 'wholesalex_set_current_user', $force_customer, 1 );
+		remove_filter( 'wholesalex_dynamic_rule_user_id', $force_customer, 1 );
+
+		$order->calculate_totals( false );
+		$order->save();
+	}
+
+	/**
+	 * Re-price manual order items when the admin clicks Recalculate.
+	 *
+	 * @param WC_Order_Item $item Order item.
+	 * @return void
+	 */
+	public function apply_admin_order_customer_pricing_before_item_save( $item ) {
+		if ( ! is_admin() || ! wp_doing_ajax() || ! $item instanceof \WC_Order_Item_Product ) {
+			return;
+		}
+
+		$action = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( 'woocommerce_calc_line_taxes' !== $action ) {
+			return;
+		}
+
+		$order = wc_get_order( $item->get_order_id() );
+		if ( ! $order ) {
+			return;
+		}
+
+		$customer_id = $this->get_admin_order_request_customer_id();
+		if ( ! $customer_id ) {
+			$customer_id = absint( $order->get_customer_id( 'edit' ) );
+		}
+		if ( ! $customer_id ) {
+			return;
+		}
+
+		$force_customer = function () use ( $customer_id ) {
+			return $customer_id;
+		};
+		add_filter( 'wholesalex_set_current_user', $force_customer, 1 );
+		add_filter( 'wholesalex_dynamic_rule_user_id', $force_customer, 1 );
+		$this->get_valid_dynamic_rules( $customer_id );
+
+		$product = $item->get_product();
+		if ( $product ) {
+			$quantity   = max( 1, (int) $item->get_quantity() );
+			$unit_price = $this->get_admin_order_customer_unit_price( $product, $order, $customer_id, $quantity );
+			if ( false !== $unit_price ) {
+				$line_total = wc_format_decimal( $unit_price * $quantity );
+				$item->set_subtotal( $line_total );
+				$item->set_total( $line_total );
+			}
+		}
+
+		remove_filter( 'wholesalex_set_current_user', $force_customer, 1 );
+		remove_filter( 'wholesalex_dynamic_rule_user_id', $force_customer, 1 );
+	}
+
+	/**
+	 * Get a tax-exclusive unit price for an admin-created order item.
+	 *
+	 * @param WC_Product $product     Product object.
+	 * @param WC_Order   $order       Order object.
+	 * @param int        $customer_id Customer ID.
+	 * @param int        $quantity    Line quantity.
+	 * @return float|false
+	 */
+	private function get_admin_order_customer_unit_price( $product, $order, $customer_id, $quantity ) {
+		$product_id = $product->get_id();
+		$parent_id  = $product->get_parent_id();
+
+		$force_customer = function () use ( $customer_id ) {
+			return $customer_id;
+		};
+		$product_count  = function ( $count, $count_product_id ) use ( $product_id, $parent_id, $quantity ) {
+			$count_product_id = absint( $count_product_id );
+			if ( in_array( $count_product_id, array_filter( array( $product_id, $parent_id ) ), true ) ) {
+				return $quantity;
+			}
+			return $count;
+		};
+		$category_count = function ( $count, $cat_id ) use ( $product_id, $parent_id, $quantity ) {
+			$term_product_id = $parent_id ? $parent_id : $product_id;
+			if ( has_term( absint( $cat_id ), 'product_cat', $term_product_id ) ) {
+				return max( (int) $count, $quantity );
+			}
+			return $count;
+		};
+
+		add_filter( 'wholesalex_set_current_user', $force_customer, 1 );
+		add_filter( 'wholesalex_dynamic_rule_user_id', $force_customer, 1 );
+		add_filter( 'wholesalex_cart_count', $product_count, 20, 2 );
+		add_filter( 'wholesalex_category_cart_count', $category_count, 20, 2 );
+
+		$priced_product = wc_get_product( $product_id );
+		$price          = false;
+		if ( $priced_product ) {
+			$price = $priced_product->get_sale_price();
+			if ( '' === $price || null === $price || false === $price ) {
+				$price = $priced_product->get_regular_price();
+			}
+		}
+		$unit_price = $priced_product ? wc_get_price_excluding_tax(
+			$priced_product,
+			array(
+				'qty'   => 1,
+				'price' => $price,
+				'order' => $order,
+			)
+		) : false;
+
+		remove_filter( 'wholesalex_set_current_user', $force_customer, 1 );
+		remove_filter( 'wholesalex_dynamic_rule_user_id', $force_customer, 1 );
+		remove_filter( 'wholesalex_cart_count', $product_count, 20 );
+		remove_filter( 'wholesalex_category_cart_count', $category_count, 20 );
+
+		return is_numeric( $unit_price ) ? (float) $unit_price : false;
+	}
+
+	/**
+	 * Get the selected customer from an admin order AJAX request.
+	 *
+	 * @return int
+	 */
+	private function get_admin_order_request_customer_id() {
+		$request_customer_id = $this->get_customer_id_from_request_values( $_REQUEST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( $request_customer_id ) {
+			return $request_customer_id;
+		}
+
+		$order_id = 0;
+		foreach ( array( 'order_id', 'post_id', 'id' ) as $key ) {
+			if ( isset( $_REQUEST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$order_id = absint( wp_unslash( $_REQUEST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				break;
+			}
+		}
+
+		if ( ! $order_id ) {
+			return 0;
+		}
+
+		$order = wc_get_order( $order_id );
+		if ( ! $order ) {
+			return 0;
+		}
+
+		return absint( $order->get_customer_id( 'edit' ) );
+	}
+
+	/**
+	 * Extract customer ID from raw request data or serialized order form data.
+	 *
+	 * @param array $values Request values.
+	 * @return int
+	 */
+	private function get_customer_id_from_request_values( $values ) {
+		foreach ( array( 'customer_user', '_customer_user', 'customer_id', 'user_id' ) as $key ) {
+			if ( isset( $values[ $key ] ) ) {
+				$customer_id = absint( wp_unslash( $values[ $key ] ) );
+				if ( $customer_id ) {
+					return $customer_id;
+				}
+			}
+		}
+
+		if ( empty( $values['data'] ) || ! is_string( $values['data'] ) ) {
+			return 0;
+		}
+
+		$parsed_data = array();
+		wp_parse_str( wp_unslash( $values['data'] ), $parsed_data );
+		return $this->get_customer_id_from_request_values( $parsed_data );
+	}
+
 	public function get_role_regular_price( $product, $user_id = '' ) {
 		return get_post_meta( $product->get_id(), $user_id . '_base_price', true );
 	}
@@ -1103,7 +1413,7 @@ class Dynamic_Rules {
 	// ─── Main Dispatch: get_valid_dynamic_rules ──────────────────
 
 	public function get_valid_dynamic_rules( $user_id = '' ) {
-		if ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+		if ( is_admin() && ! wp_doing_ajax() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
 			return;
 		}
 

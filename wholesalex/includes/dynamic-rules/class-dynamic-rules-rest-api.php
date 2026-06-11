@@ -131,7 +131,7 @@ class Dynamic_Rules_Rest_Api {
 	 * @return bool
 	 */
 	public function dynamic_rule_restapi_permission() {
-		return current_user_can( 'manage_options' );
+		return current_user_can( apply_filters( 'wholesalex_capability_access', 'manage_options' ) );
 	}
 
 	// ─── Main Handler: /dynamic_rule_action ──────────────────────
