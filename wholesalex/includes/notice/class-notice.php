@@ -13,8 +13,21 @@ class Notice {
 	 * Notice Constructor
 	 */
 
-	private $notice_version        = 'v233';
+	private $notice_version        = 'v241';
 	private $notice_js_css_applied = false;
+	/**
+	 * Notice Priority
+	 *
+	 * @var string $plugin_notice_priority
+	 */
+	private $plugin_notice_priority = 3;
+	
+	/**
+	 * Notice Priority
+	 *
+	 * @var string $plugin_notice_priority_key
+	 */
+	private $plugin_notice_priority_key = 'wholesalex';
 	public function __construct() {
 		add_action( 'admin_notices', array( $this, 'admin_notices_callback' ) );
 		add_action( 'admin_init', array( $this, 'set_dismiss_notice_callback' ) );
@@ -24,6 +37,38 @@ class Notice {
 
 		// Woocommerce Install Action.
 		add_action( 'wp_ajax_wsx_install', array( $this, 'install_activate_plugin' ) );
+		add_filter('xpo_active_notice_lists', array( $this, 'handle_xpo_active_notice_lists' ), 99, 1 );
+	}
+
+
+	/**
+	 * Handle Plugin Notice for all plugins
+	 * @param array $active_lists Lists of all active plugin notice.
+	 * @return array
+	 */
+	public function handle_xpo_active_notice_lists( $active_lists ) {
+		
+		if ( $this->wsx_dashboard_banner_notice(true) || $this->wsx_dashboard_content_notice(true) ) {
+			$active_lists[$this->plugin_notice_priority_key] = $this->plugin_notice_priority;
+		}
+
+		return $active_lists;
+	}
+
+	/**
+	 * Handle Plugin Notice for all plugins
+	 * @return bool
+	 */
+	public function is_available_for_notice() {
+		$active_notices = apply_filters( 'xpo_active_notice_lists', array() );
+
+		if ( empty( $active_notices ) ) {
+			return true;
+		}
+
+		asort( $active_notices );
+
+		return array_key_first( $active_notices ) === $this->plugin_notice_priority_key;
 	}
 
 	/**
@@ -152,8 +197,10 @@ class Notice {
 	 * @return void
 	 */
 	public function wsx_dashboard_notice_callback() {
-		$this->wsx_dashboard_banner_notice();
-		$this->wsx_dashboard_content_notice();
+		if ( $this->is_available_for_notice() ) {
+			$this->wsx_dashboard_banner_notice();
+			$this->wsx_dashboard_content_notice();
+		}
 	}
 
 	/**
@@ -161,7 +208,7 @@ class Notice {
 	 *
 	 * @return void
 	 */
-	public function wsx_dashboard_banner_notice() {
+	public function wsx_dashboard_banner_notice($return_bool=false) {
 		$wsx_db_nonce   = wp_create_nonce( 'wsx-nonce' );
 		$banner_notices = array(
 			array(
@@ -263,6 +310,10 @@ class Notice {
 					continue;
 				}
 
+				if ( $return_bool ) { // Early return for Other plugin notice.
+					return true;
+				}
+
 				if ( ! $this->notice_js_css_applied ) {
 					$this->wsx_banner_notice_js();
 					$this->notice_js_css_applied = true;
@@ -278,7 +329,6 @@ class Notice {
 				<style type="text/css">
 					.wsx-notice-wrapper.wsx-banner-notice {
 						height: auto !important;
-						min-height: 90px;
 						padding: 0 !important;
 						position: relative;
 						box-sizing: border-box;
@@ -297,7 +347,7 @@ class Notice {
 						display: flex;
 						justify-content: space-between;
 						align-items: center;
-						max-width: 1358px;
+						max-width: 700px;
 						margin: 0 auto;
 						padding: 10px 16px;
 						gap: 16px;
@@ -306,6 +356,7 @@ class Notice {
 						display: block;
 						max-width: 100%;
 						height: auto;
+						max-height: 32px;
 					}
 					.wsx-notice-wrapper.wsx-banner-notice .wsx-banner-main {
 						display: flex;
@@ -314,15 +365,23 @@ class Notice {
 						align-items: center;
 						justify-content: center;
 						font-weight: 700;
-						font-size: 28px;
+						font-size: 18px;
 						color: #ffffff;
-						line-height: 32px;
+						line-height: 1.2;
 						text-align: center;
 					}
 
 					@media screen and (max-width: 1100px) {
-						.wsx-notice-wrapper.wsx-banner-notice .wsx-banner-content {
+						/* .wsx-notice-wrapper.wsx-banner-notice .wsx-banner-content {
 							flex-direction: column;
+						} */
+						.wsx-notice-wrapper.wsx-banner-notice .wsx-banner-content .wsx-banner-main-text {
+							display: none;
+						}
+					}
+					@media screen and (max-width: 490px) {
+						.wsx-notice-wrapper.wsx-banner-notice {
+							display: none;
 						}
 					}
 					@media screen and (max-width: 782px) {
@@ -401,7 +460,7 @@ class Notice {
 	 *
 	 * @return void
 	 */
-	public function wsx_dashboard_content_notice() {
+	public function wsx_dashboard_content_notice($return_bool=false) {
 
 		$content_notices = array(
 			array(
@@ -567,6 +626,10 @@ class Notice {
 					$notice_transient = Xpo::get_transient_without_cache( 'wsx_get_pro_notice_' . $notice_key );
 
 					if ( 'off' !== $notice_transient ) {
+
+						if ( $return_bool ) { // Early return for Other plugin notice.
+							return true;
+						}
 
 						$query_args = array(
 							'disable_wsx_notice' => $notice_key,

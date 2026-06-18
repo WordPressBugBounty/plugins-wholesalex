@@ -1531,6 +1531,8 @@ class Dynamic_Rules {
 				$exclude_brands     = array();
 				$exclude_variations = array();
 				$exclude_attributes = array();
+				$include_skus       = array();
+				$exclude_skus       = array();
 				$is_all_products    = false;
 
 				$is_dynamic_rules_apply_in_backend = apply_filters( 'is_dynamic_rules_work_in_backend', true );
@@ -1594,11 +1596,13 @@ class Dynamic_Rules {
 						'include_brands'     => $include_brands,
 						'include_cats'       => $include_cats,
 						'include_variations' => $include_variations,
+						'include_skus'       => $include_skus,
 						'exclude_products'   => $exclude_products,
 						'exclude_attributes' => $exclude_attributes,
 						'exclude_brands'     => $exclude_brands,
 						'exclude_cats'       => $exclude_cats,
 						'exclude_variations' => $exclude_variations,
+						'exclude_skus'       => $exclude_skus,
 						'is_all_products'    => $is_all_products,
 					),
 					'rule'                => $frule,
@@ -1632,11 +1636,13 @@ class Dynamic_Rules {
 					'include_brands'     => $include_brands,
 					'include_attributes' => $include_attributes,
 					'include_variations' => $include_variations,
+					'include_skus'       => $include_skus,
 					'exclude_products'   => $exclude_products,
 					'exclude_cats'       => $exclude_cats,
 					'exclude_brands'     => $exclude_brands,
 					'exclude_attributes' => $exclude_attributes,
 					'exclude_variations' => $exclude_variations,
+					'exclude_skus'       => $exclude_skus,
 					'is_all_products'    => $is_all_products,
 				);
 				$idx                 = md5( serialize( $user_profile_filter ) );

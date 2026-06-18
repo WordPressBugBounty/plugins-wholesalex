@@ -242,6 +242,46 @@ class Dynamic_Rules_Data_Provider {
 	}
 
 	/**
+	 * Get Products by SKU.
+	 *
+	 * @param string $search Search Keyword (matched against SKU).
+	 * @return array
+	 */
+	public function get_skus( $search = '' ) {
+		global $wpdb;
+		$like    = '%' . $wpdb->esc_like( $search ) . '%';
+		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT pm.meta_value AS sku
+				 FROM {$wpdb->postmeta} pm
+				 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+				 WHERE pm.meta_key = '_sku'
+				   AND pm.meta_value LIKE %s
+				   AND pm.meta_value != ''
+				   AND p.post_type IN ('product', 'product_variation')
+				   AND p.post_status = 'publish'
+				 GROUP BY pm.meta_value
+				 ORDER BY pm.meta_value ASC
+				 LIMIT 30",
+				$like
+			)
+		);
+		$__final = array();
+		foreach ( $results as $row ) {
+			$sku = trim( (string) $row->sku );
+			if ( '' === $sku ) {
+				continue;
+			}
+
+			$__final[] = array(
+				'value' => 'sku:' . $sku,
+				'name'  => $sku,
+			);
+		}
+		return $__final;
+	}
+
+	/**
 	 * Get Payment Gateways.
 	 *
 	 * Returns all enabled payment gateways for use in admin rule configuration.
@@ -582,6 +622,8 @@ class Dynamic_Rules_Data_Provider {
 											'pro_brand_not_in_list' => __( 'Brand not in list (Pro)', 'wholesalex' ),
 											'pro_att_in_list' => __( 'Attribute in list (Pro)', 'wholesalex' ),
 											'pro_att_not_in_list' => __( 'Attribute not in list (Pro)', 'wholesalex' ),
+											'sku_in_list'     => __( 'SKU in list', 'wholesalex' ),
+											'sku_not_in_list' => __( 'SKU not in list', 'wholesalex' ),
 										),
 										'product_filter'
 									),
@@ -745,6 +787,38 @@ class Dynamic_Rules_Data_Provider {
 									'default'     => array(),
 									'is_ajax'     => true,
 									'ajax_action' => 'get_attributes',
+									'ajax_search' => true,
+								),
+								'sku_in_list'           => array(
+									'label'       => __( 'Select Multiple SKUs', 'wholesalex' ),
+									'type'        => 'multiselect',
+									'depends_on'  => array(
+										array(
+											'key'   => '_product_filter',
+											'value' => 'sku_in_list',
+										),
+									),
+									'options'     => array(),
+									'placeholder' => apply_filters( 'wholesalex_dynamic_rules_sku_in_list_placeholder', __( 'Search SKUs to apply discounts', 'wholesalex' ) ),
+									'default'     => array(),
+									'is_ajax'     => true,
+									'ajax_action' => 'get_skus',
+									'ajax_search' => true,
+								),
+								'sku_not_in_list'       => array(
+									'label'       => __( 'Select Multiple SKUs', 'wholesalex' ),
+									'type'        => 'multiselect',
+									'depends_on'  => array(
+										array(
+											'key'   => '_product_filter',
+											'value' => 'sku_not_in_list',
+										),
+									),
+									'options'     => array(),
+									'placeholder' => apply_filters( 'wholesalex_dynamic_rules_sku_not_in_list_placeholder', __( "Search SKUs that won't apply discounts", 'wholesalex' ) ),
+									'default'     => array(),
+									'is_ajax'     => true,
+									'ajax_action' => 'get_skus',
 									'ajax_search' => true,
 								),
 							),

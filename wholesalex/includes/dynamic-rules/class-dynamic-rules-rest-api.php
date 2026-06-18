@@ -242,6 +242,9 @@ class Dynamic_Rules_Rest_Api {
 			case 'get_shipping_methods':
 				$data = $this->data_provider->get_shipping_methods( $depends );
 				break;
+			case 'get_skus':
+				$data = $this->data_provider->get_skus( $query );
+				break;
 			case 'get_shipping_country':
 			case 'shipping_country':
 				$data = $this->data_provider->get_shipping_country( $query );

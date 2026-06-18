@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 6.8    
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.4.1
+Stable tag: 2.4.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -214,6 +214,9 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.4.2 – 18 June 2026 =
+* New: Added SKU-based product filtering support in Dynamic Rules.
 
 = 2.4.1 – 11 June 2026 =
 * Fix: Resolved the admin backorder compatibility issue with Dynamic Rules.
