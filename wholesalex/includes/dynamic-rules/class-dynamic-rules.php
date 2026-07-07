@@ -3299,26 +3299,46 @@ class Dynamic_Rules {
 	}
 
 	public function bxgy_free_items_template( $min_purchase_text, $free_items, $free_item_quantity ) {
+		if ( empty( $free_items ) || ! is_array( $free_items ) ) {
+			return;
+		}
+
+		$free_item_quantity = max( 1, absint( $free_item_quantity ) );
+		$free_products      = array();
+
+		foreach ( $free_items as $item ) {
+			$free_item_id = isset( $item['value'] ) ? absint( $item['value'] ) : 0;
+			$product      = $free_item_id ? wc_get_product( $free_item_id ) : false;
+
+			if ( ! $product instanceof \WC_Product ) {
+				continue;
+			}
+
+			$free_products[] = $product;
+		}
+
+		if ( empty( $free_products ) ) {
+			return;
+		}
 		?>
 		<div class="wholesalex_free_items wsx-single-product-discount-card">
 			<div class="wsx-bxgy-min-purchase-text"> <?php echo esc_html( $min_purchase_text ); ?> </div>
 			<?php
-			foreach ( $free_items as $item ) {
-				$free_item_id = $item['value'];
-				$product      = wc_get_product( $free_item_id );
-				$image        = wp_get_attachment_image_src( get_post_thumbnail_id( $free_item_id ), 'thumbnail' );
+			foreach ( $free_products as $product ) {
+				$image = wp_get_attachment_image_src( get_post_thumbnail_id( $product->get_id() ), 'thumbnail' );
+				$image = $image ? $image[0] : wc_placeholder_img_src( 'thumbnail' );
 				?>
 				<div class="wsx-bxgy-free-promo-card">
-					<img src="<?php echo esc_url( $image[0] ); ?>">
+					<img src="<?php echo esc_url( $image ); ?>">
 					<div class="wsx-bxgy-free-item-meta">
 						<div class="wsx-bxgy-free-item-title"><?php echo esc_html( $product->get_title() ); ?> </div>
 						<?php if ( $free_item_quantity > 1 ) { ?>
 							<div class="wsx-bxgy-free-item-qty">
-								<?php printf( __( 'Quantity: %s', 'wholesalex' ), $free_item_quantity ); ?>
+								<?php printf( esc_html__( 'Quantity: %s', 'wholesalex' ), esc_html( $free_item_quantity ) ); ?>
 							</div>
 						<?php } ?>
 						<div class="wsx-bxgy-free-item-price">
-							<?php echo wc_price( $product->get_price( 'edit' ) * esc_html( $free_item_quantity ) ); ?>
+							<?php echo wp_kses_post( wc_price( (float) $product->get_price( 'edit' ) * $free_item_quantity ) ); ?>
 						</div>
 					</div>
 					<div class="wsx-free-item-tag"><?php echo esc_html__( 'FREE', 'wholesalex' ); ?> </div>

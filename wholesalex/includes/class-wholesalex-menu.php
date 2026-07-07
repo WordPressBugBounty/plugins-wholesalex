@@ -67,6 +67,15 @@ class WHOLESALEX_Menu {
 				),
 				'utmKey' => 'plugin_meta',
 			),
+			array(
+				'start'  => '2026-07-06 00:00 Asia/Dhaka',
+				'end'    => '2026-08-01 23:59 Asia/Dhaka',
+				'text'   => __(
+					'Summer Sale - Up to 55% OFF',
+					'wholesalex'
+				),
+				'utmKey' => 'plugin_meta',
+			),
 		);
 
 		$upgrade_link = array();

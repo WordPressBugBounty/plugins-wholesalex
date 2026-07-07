@@ -222,27 +222,11 @@ class Xpo {
 				'medium'   => 'plugin-meta',
 				'campaign' => 'wholesalex-dashboard',
 			),
-			'flash_sale'       => array(
+			'summer_db'        => array(
 				'source'   => 'db-wholesalex-notice',
-				'medium'   => 'flash-sale',
+				'medium'   => 'summer-sale',
 				'campaign' => 'wholesalex-dashboard',
 			),
-			'surprise_sale'       => array(
-				'source'   => 'db-wholesalex-notice',
-				'medium'   => 'surprise-sale',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			'massive_sale'       => array(
-				'source'   => 'db-wholesalex-notice',
-				'medium'   => 'massive-sale',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			'final_hour_sale'       => array(
-				'source'   => 'db-wholesalex-notice',
-				'medium'   => 'final-hour-sale',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			
 		);
 
 		// Step 1: Get parameters.

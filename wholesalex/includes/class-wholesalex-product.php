@@ -1350,7 +1350,7 @@ class WHOLESALEX_Product {
 			),
 		);
 		?>
-		<div class="panel woocommerce_options_panel" id="wsx_tab_data"></div>
+		<div class="panel woocommerce_options_panel wsx-product-tab-panel" id="wsx_tab_data"></div>
 		<?php
 	}
 

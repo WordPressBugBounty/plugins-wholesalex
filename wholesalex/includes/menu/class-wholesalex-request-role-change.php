@@ -381,6 +381,7 @@ class WHOLESALEX_RequstRoleChange {
 					'full_name'      => $user->display_name,
 					'current_role'   => $request_data['prev_role'],
 					'requested_role' => $this->get_role_title( $request_data['selected_role'] ),
+					'requested_date' => isset( $request_data['date'] ) ? $request_data['date'] : '',
 					'status'         => $request_data['status'],
 				);
 
@@ -416,6 +417,10 @@ class WHOLESALEX_RequstRoleChange {
 	public function get_role_title( $id ) {
 		$__roles = $GLOBALS['wholesalex_roles'];
 
+		if ( ! isset( $__roles[ $id ]['_role_title'] ) ) {
+			return $id;
+		}
+
 		$get_role = $__roles[ $id ];
 
 		return $get_role['_role_title'];
@@ -443,27 +448,45 @@ class WHOLESALEX_RequstRoleChange {
 	 */
 	public function role_change_restapi_action( $data ) {
 		$user_id       = get_current_user_id();
-		$name          = sanitize_text_field( $data['name'] );
-		$prev_role     = sanitize_text_field( $data['prev_role'] );
-		$selected_role = sanitize_text_field( $data['selected_role'] );
-		$email         = sanitize_email( $data['email'] );
+		$params        = $data->get_params();
+		$name          = isset( $params['name'] ) ? sanitize_text_field( $params['name'] ) : '';
+		$prev_role     = isset( $params['prev_role'] ) ? sanitize_text_field( $params['prev_role'] ) : '';
+		$selected_role = isset( $params['selected_role'] ) ? sanitize_text_field( $params['selected_role'] ) : '';
+		$email         = isset( $params['email'] ) ? sanitize_email( $params['email'] ) : '';
 
 		$user = get_user_by( 'id', $user_id );
 		if ( ! $user ) {
-			return new WP_Error( 'rest_user_not_found', __( 'User not found', 'wholesalex' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'rest_user_not_found', __( 'User not found', 'wholesalex' ), array( 'status' => 404 ) );
+		}
+
+		$roles        = $GLOBALS['wholesalex_roles'];
+		$current_role = wholesalex()->get_current_user_role();
+
+		if ( empty( $selected_role ) || ! isset( $roles[ $selected_role ] ) ) {
+			return new \WP_Error( 'rest_invalid_role', __( 'Please select a valid role.', 'wholesalex' ), array( 'status' => 400 ) );
+		}
+
+		if ( $selected_role === $current_role ) {
+			return new \WP_Error( 'rest_same_role', __( 'You are already assigned to this role.', 'wholesalex' ), array( 'status' => 400 ) );
+		}
+
+		$existing_request = get_user_meta( $user_id, 'wsx_change_role_request', true );
+		if ( is_array( $existing_request ) && isset( $existing_request['status'] ) && 'pending' === $existing_request['status'] ) {
+			return new \WP_Error( 'rest_request_exists', __( 'You have already submitted a role change request.', 'wholesalex' ), array( 'status' => 409 ) );
 		}
 
 		// Store role change request in user meta.
 		$request_data = array(
-			'name'          => $name,
-			'prev_role'     => $prev_role,
+			'name'          => $name ? $name : $user->display_name,
+			'prev_role'     => $prev_role ? $prev_role : $this->get_role_title( $current_role ),
 			'selected_role' => $selected_role,
-			'email'         => $email,
+			'email'         => $email ? $email : $user->user_email,
 			'status'        => 'pending',
 			'date'          => current_time( 'mysql' ),
 		);
 
 		update_user_meta( $user_id, 'wsx_change_role_request', $request_data );
+		$this->send_role_change_request_notification( $user_id, $request_data );
 
 		wp_send_json_success(
 			array(
@@ -471,6 +494,43 @@ class WHOLESALEX_RequstRoleChange {
 				'message' => __( 'Role change request has been submitted.', 'wholesalex' ),
 			)
 		);
+	}
+
+	/**
+	 * Notify site admins when a user requests a WholesaleX role change.
+	 *
+	 * @param int   $user_id User ID.
+	 * @param array $request_data Request data.
+	 * @return void
+	 */
+	private function send_role_change_request_notification( $user_id, $request_data ) {
+		$admin_email = get_option( 'admin_email' );
+		if ( ! is_email( $admin_email ) ) {
+			return;
+		}
+
+		$requested_role = $this->get_role_title( $request_data['selected_role'] );
+		$manage_url     = admin_url( 'admin.php?page=wholesalex#/user_role_change_requests' );
+		$subject        = sprintf(
+			/* translators: %s: Site title. */
+			__( '[%s] New WholesaleX role change request', 'wholesalex' ),
+			wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES )
+		);
+		$message        = sprintf(
+			/* translators: 1: User name, 2: User email, 3: Previous role, 4: Requested role, 5: Admin URL. */
+			__( "A user requested a WholesaleX role change.\n\nName: %1\$s\nEmail: %2\$s\nCurrent role: %3\$s\nRequested role: %4\$s\n\nReview the request here: %5\$s", 'wholesalex' ),
+			$request_data['name'],
+			$request_data['email'],
+			$request_data['prev_role'],
+			$requested_role,
+			$manage_url
+		);
+
+		$recipient = \apply_filters( 'wholesalex_role_change_request_notification_recipient', $admin_email, $user_id, $request_data );
+		$subject   = \apply_filters( 'wholesalex_role_change_request_notification_subject', $subject, $user_id, $request_data );
+		$message   = \apply_filters( 'wholesalex_role_change_request_notification_message', $message, $user_id, $request_data );
+
+		\wp_mail( $recipient, $subject, $message );
 	}
 
 	/**
