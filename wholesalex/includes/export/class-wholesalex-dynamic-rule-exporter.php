@@ -94,10 +94,11 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 		$this->total_rows = count( $rules );
 		$this->row_data   = array();
 
-		$exported_ids = isset( $_GET['exported_ids'] ) ? explode( ',', sanitize_text_field( $_GET['exported_ids'] ) ) : array(); // Convert string back to array for specific user role export
+		$exported_ids = isset( $_GET['exported_ids'] ) ? array_map( 'strval', explode( ',', sanitize_text_field( wp_unslash( $_GET['exported_ids'] ) ) ) ) : array(); // Convert string back to array for specific user role export.
+		$export_all   = isset( $_GET['export_all'] ) && 'yes' === sanitize_text_field( wp_unslash( $_GET['export_all'] ) );
 
 		foreach ( $rules as $rule ) {
-			if ( in_array( $rule['id'], $exported_ids, true ) ) {
+			if ( $export_all || in_array( (string) $rule['id'], $exported_ids, true ) ) {
 				$this->row_data[] = $this->generate_row_data( $rule );
 			}
 		}

@@ -214,6 +214,10 @@ class ImportExport {
 		$search_query       = isset( $_POST['getSearchValue'] ) ? sanitize_text_field( wp_unslash( $_POST['getSearchValue'] ) ) : '';
 		$user_role          = isset( $_POST['getFilterRole'] ) ? sanitize_text_field( wp_unslash( $_POST['getFilterRole'] ) ) : '';
 		$selected_user_ids  = isset( $_POST['getSelectedUserIds'] ) ? sanitize_text_field( wp_unslash( $_POST['getSelectedUserIds'] ) ) : array();
+		$export_all         = isset( $_POST['exportAll'] ) && 'yes' === sanitize_text_field( wp_unslash( $_POST['exportAll'] ) );
+		if ( $export_all ) {
+			$selected_user_ids = '';
+		}
 		$selected_user_data = $this->get_wholesale_users( -1, 1, $user_status, $search_query, $user_role, $selected_user_ids );
 		$exportable_columns = isset( $_POST['columns'] ) ? json_decode( sanitize_text_field( wp_unslash( $_POST['columns'] ) ), true ) : array();
 
@@ -816,7 +820,7 @@ class ImportExport {
 	 */
 	public function export_roles() {
 		$nonce_value = isset( $_GET['nonce'] ) ? sanitize_key( wp_unslash( $_GET['nonce'] ) ) : '';
-		if ( ! wp_verify_nonce( $nonce_value, 'whx-export-roles' ) ) {
+		if ( ! wp_verify_nonce( $nonce_value, 'whx-export-roles' ) || ! $this->export_import_allowed() ) {
 			return;
 		}
 		if ( isset( $_GET['action'] ) && sanitize_text_field( wp_unslash( $_GET['action'] ) ) === 'export-roles-csv' ) { // WPCS: input var ok, sanitization ok.
@@ -836,7 +840,7 @@ class ImportExport {
 	 */
 	public function export_dynamic_rules() {
 		$nonce_value = isset( $_GET['nonce'] ) ? sanitize_key( wp_unslash( $_GET['nonce'] ) ) : '';
-		if ( ! wp_verify_nonce( $nonce_value, 'whx-export-dynamic-rules' ) ) {
+		if ( ! wp_verify_nonce( $nonce_value, 'whx-export-dynamic-rules' ) || ! $this->export_import_allowed() ) {
 			return;
 		}
 		if ( isset( $_GET['action'] ) && sanitize_text_field( wp_unslash( $_GET['action'] ) ) === 'export-dynamic-rule-csv' ) { // WPCS: input var ok, sanitization ok.

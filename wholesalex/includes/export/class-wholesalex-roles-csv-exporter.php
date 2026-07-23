@@ -61,14 +61,18 @@ class WHOLESALEX_Role_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 */
 	public function prepare_data_to_export() {
 
-		$roles = get_option( '_wholesalex_roles' );
+		$roles = get_option( '_wholesalex_roles', array() );
+		if ( ! is_array( $roles ) ) {
+			$roles = array();
+		}
 
 		$this->total_rows = count( $roles );
 		$this->row_data   = array();
 
-		$exported_ids = isset( $_GET['exported_ids'] ) ? explode( ',', sanitize_text_field( $_GET['exported_ids'] ) ) : array(); // Convert string back to array for specific user role export
+		$exported_ids = isset( $_GET['exported_ids'] ) ? array_map( 'strval', explode( ',', sanitize_text_field( wp_unslash( $_GET['exported_ids'] ) ) ) ) : array(); // Convert string back to array for specific user role export.
+		$export_all   = isset( $_GET['export_all'] ) && 'yes' === sanitize_text_field( wp_unslash( $_GET['export_all'] ) );
 		foreach ( $roles as $role ) {
-			if ( in_array( $role['id'], $exported_ids ) ) {
+			if ( $export_all || in_array( (string) $role['id'], $exported_ids, true ) ) {
 				$this->row_data[] = $this->generate_row_data( $role );
 			}
 		}

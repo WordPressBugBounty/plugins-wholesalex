@@ -43,6 +43,21 @@ class Xpo {
 	}
 
 	/**
+	 * Gets the checkout URL used to renew an expired license.
+	 *
+	 * @return string
+	 */
+	public static function get_lc_renewal_url() {
+		return add_query_arg(
+			array(
+				'edd_license_key' => self::get_lc_key(),
+				'renew'           => 1,
+			),
+			'https://account.wpxpo.com/checkout/'
+		);
+	}
+
+	/**
 	 * Get Option Value bypassing cache
 	 * Inspired By WordPress Core get_option
 	 *
@@ -220,6 +235,11 @@ class Xpo {
 			'plugin_meta'       => array(
 				'source'   => 'db-wholesalex-plugin',
 				'medium'   => 'plugin-meta',
+				'campaign' => 'wholesalex-dashboard',
+			),
+			'plugin_meta_summer_db' => array(
+				'source'   => 'db-wholesalex-plugin-meta',
+				'medium'   => 'summer-sale',
 				'campaign' => 'wholesalex-dashboard',
 			),
 			'summer_db'        => array(

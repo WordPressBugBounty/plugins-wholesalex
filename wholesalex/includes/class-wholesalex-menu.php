@@ -32,49 +32,13 @@ class WHOLESALEX_Menu {
 
 		$offer_config = array(
 			array(
-				'start'  => '2026-05-07 00:00 Asia/Dhaka',
-				'end'    => '2026-05-21 23:59 Asia/Dhaka',
-				'text'   => __(
-					'Flash Sale - Up to 50% OFF',
-					'wholesalex'
-				),
-				'utmKey' => 'plugin_meta',
-			),
-			array(
-				'start'  => '2026-05-22 00:00 Asia/Dhaka',
-				'end'    => '2026-06-01 23:59 Asia/Dhaka',
-				'text'   => __(
-					'Surprise Sale - Up to 55% OFF',
-					'wholesalex'
-				),
-				'utmKey' => 'plugin_meta',
-			),
-			array(
-				'start'  => '2026-06-02 00:00 Asia/Dhaka',
-				'end'    => '2026-06-20 23:59 Asia/Dhaka',
-				'text'   => __(
-					'Massive Sale - Up to 55% OFF',
-					'wholesalex'
-				),
-				'utmKey' => 'plugin_meta',
-			),
-			array(
-				'start'  => '2026-06-21 00:00 Asia/Dhaka',
-				'end'    => '2026-06-30 23:59 Asia/Dhaka',
-				'text'   => __(
-					'Final Hour Sale - Up to 55% OFF',
-					'wholesalex'
-				),
-				'utmKey' => 'plugin_meta',
-			),
-			array(
 				'start'  => '2026-07-06 00:00 Asia/Dhaka',
-				'end'    => '2026-08-01 23:59 Asia/Dhaka',
+				'end'    => '2026-08-16 23:59 Asia/Dhaka',
 				'text'   => __(
 					'Summer Sale - Up to 55% OFF',
 					'wholesalex'
 				),
-				'utmKey' => 'plugin_meta',
+				'utmKey' => 'plugin_meta_summer_db',
 			),
 		);
 
@@ -82,8 +46,8 @@ class WHOLESALEX_Menu {
 		$setting_link = array();
 		if ( ! defined( 'WHOLESALEX_PRO_VER' ) || Xpo::is_lc_expired() ) {
 			if ( Xpo::is_lc_expired() ) {
-				$text = esc_html__( 'Renew License', 'wholesalex' );
-				$url  = 'https://account.wpxpo.com/checkout/?edd_license_key=' . Xpo::get_lc_key() . '&renew=1';
+				$text = esc_html__( 'Renew Now', 'wholesalex' );
+				$url  = Xpo::get_lc_renewal_url();
 			} else {
 
 				$text = esc_html__( 'Go Pro', 'wholesalex' );

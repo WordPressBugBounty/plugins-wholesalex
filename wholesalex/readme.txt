@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 6.8    
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.4.4
+Stable tag: 2.4.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -214,6 +214,9 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Product Single Frontend
 
 == Changelog ==
+
+= 2.4.5 – 23 July 2026 =
+* Improvement: Added "Export All" functionality for Dynamic Rules, Users, and User Roles.
 
 = 2.4.4 – 19 July 2026 =
 * Improvement: Updated the Bulk Order settings layout and shortcode options.

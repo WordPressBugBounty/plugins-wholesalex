@@ -13,7 +13,7 @@ class Notice {
 	 * Notice Constructor
 	 */
 
-	private $notice_version        = 'v241';
+	private $notice_version        = 'v243';
 	private $notice_js_css_applied = false;
 	/**
 	 * Notice Priority
@@ -500,6 +500,24 @@ class Notice {
 				'button_text'        => __( 'Upgrade Now!', 'wholesalex' ),
 				'is_discount_logo'   => true,
 			),
+			array(
+				'key'                => 'wsx_dashboard_content_notice_summer_sale_2026_vv3',
+				'start'              => '2026-08-02 00:00 Asia/Dhaka',
+				'end'                => '2026-08-08 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'summer_db',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( '', 'wholesalex' ),
+				'content_subheading' => __( 'WholesaleX Summer Sale Offer is Live - Enjoy up to %s on WholesaleX Pro.', 'wholesalex' ),
+				'discount_content'   => '  55% OFF',
+				'border_color'       => '#6c6cff',
+				'icon'               => WHOLESALEX_URL . 'assets/img/banners/discount.svg',
+				'button_text'        => __( 'Upgrade Now!', 'wholesalex' ),
+				'is_discount_logo'   => true,
+			),
 
 		);
 
@@ -692,6 +710,19 @@ class Notice {
 				'key'        => 'wsx_summer_sale_2612',
 				'start'      => '2026-07-20 00:00 Asia/Dhaka', // format YY-MM-DD always set time 00:00 and zone Asia/Dhaka
 				'end'        => '2026-08-01 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka
+				'banner_src' => WHOLESALEX_URL . 'assets/img/banners/summer_sale/summer_sale_26.png',
+				'url'        => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'summer_db',
+					)
+				),
+				'close_color' => '#000000',
+				'visibility' => ! Xpo::is_lc_active(),
+			),
+			array(
+				'key'        => 'wsx_summer_sale_2615',
+				'start'      => '2026-08-09 00:00 Asia/Dhaka', // format YY-MM-DD always set time 00:00 and zone Asia/Dhaka
+				'end'        => '2026-08-16 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka
 				'banner_src' => WHOLESALEX_URL . 'assets/img/banners/summer_sale/summer_sale_26.png',
 				'url'        => Xpo::generate_utm_link(
 					array(
