@@ -247,6 +247,7 @@ class Xpo {
 				'medium'   => 'summer-sale',
 				'campaign' => 'wholesalex-dashboard',
 			),
+			
 		);
 
 		// Step 1: Get parameters.

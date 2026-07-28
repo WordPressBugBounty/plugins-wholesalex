@@ -34,6 +34,7 @@ class WHOLESALEX_Overview {
 		add_action( 'admin_menu', array( $this, 'overview_submenu_page_callback' ), 1 );
 		add_action( 'rest_api_init', array( $this, 'overview_callback' ) );
 		add_action( 'admin_menu', array( $this, 'go_pro_menu_page' ), 99999 );
+		add_action( 'admin_head', array( $this, 'admin_menu_active_styles' ) );
 
 		add_filter( 'wholesalex_capability_access', array( $this, 'wholesalex_menus_access' ) );
 		global $wpdb;
@@ -161,7 +162,7 @@ class WHOLESALEX_Overview {
 	 */
 	public function overview_submenu_page_callback() {
 
-		$wholesalex_menu_icon = plugins_url( 'wholesalex/assets/icons/icon-sm.svg' );
+		$wholesalex_menu_icon = plugins_url( 'wholesalex/assets/icons/wholesaleX.svg' );
 		$wholesalex_menu_icon = apply_filters( 'wholesalex_menu_icon', $wholesalex_menu_icon );
 
 		$menu_name = apply_filters( 'wholesalex_plugin_menu_name', __( 'WholesaleX', 'wholesalex' ) );
@@ -177,8 +178,8 @@ class WHOLESALEX_Overview {
 		);
 		add_submenu_page(
 			$menu_slug,
-			__( 'Dashboard', 'wholesalex' ),
-			__( 'Dashboard', 'wholesalex' ),
+			__( 'Overview', 'wholesalex' ),
+			__( 'Overview', 'wholesalex' ),
 			apply_filters( 'wholesalex_capability_access', 'manage_options' ),
 			$menu_slug,
 			array( $this, 'output' ),
@@ -188,21 +189,15 @@ class WHOLESALEX_Overview {
 		$manage_options_cap             = apply_filters( 'wholesalex_capability_access', 'manage_options' );
 		$is_white_label_enabled         = wholesalex()->get_setting( 'wsx_addon_whitelabel' );
 		$is_role_switcher_option_enable = wholesalex()->get_setting( '_settings_role_switcher_option', '' );
+		$dynamic_rules_access           = wholesalex()->get_dynamic_rules_access();
 		$submenus                       = array(
-			array(
-				'title'      => __( 'Dynamic Rules', 'wholesalex' ),
-				'menu_title' => __( 'Dynamic Rules', 'wholesalex' ),
-				'capability' => $manage_options_cap,
-				'slug'       => '/dynamic-rules',
-				'callback'   => array( $this, 'render_submenu_page' ),
-				'identifier' => 'dynamic_rules',
-			),
 			array(
 				'title'      => __( 'User Roles', 'wholesalex' ),
 				'menu_title' => __( 'User Roles', 'wholesalex' ),
 				'capability' => $manage_options_cap,
 				'slug'       => '/user-role',
-				'callback'   => array( $this, 'render_submenu_page' ),
+				'menu_slug'  => 'wholesalex_role',
+				'callback'   => array( $this, 'output' ),
 				'identifier' => 'user_roles',
 			),
 			array(
@@ -210,7 +205,8 @@ class WHOLESALEX_Overview {
 				'menu_title' => __( 'Registration Form', 'wholesalex' ),
 				'capability' => $manage_options_cap,
 				'slug'       => '/registration',
-				'callback'   => array( $this, 'render_submenu_page' ),
+				'menu_slug'  => 'wholesalex-registration',
+				'callback'   => array( $this, 'output' ),
 				'identifier' => 'registration',
 			),
 			array(
@@ -218,7 +214,8 @@ class WHOLESALEX_Overview {
 				'menu_title' => __( 'Addons', 'wholesalex' ),
 				'capability' => $manage_options_cap,
 				'slug'       => '/addons',
-				'callback'   => array( $this, 'render_submenu_page' ),
+				'menu_slug'  => 'wholesalex-addons',
+				'callback'   => array( $this, 'output' ),
 				'identifier' => 'addons',
 			),
 			array(
@@ -226,26 +223,53 @@ class WHOLESALEX_Overview {
 				'menu_title' => __( 'Users', 'wholesalex' ),
 				'capability' => $manage_options_cap,
 				'slug'       => '/users',
-				'callback'   => array( $this, 'render_submenu_page' ),
+				'menu_slug'  => 'wholesalex-users',
+				'callback'   => array( $this, 'output' ),
 				'identifier' => 'users',
-			),
-			array(
-				'title'      => __( 'Emails', 'wholesalex' ),
-				'menu_title' => __( 'Emails', 'wholesalex' ),
-				'capability' => $manage_options_cap,
-				'slug'       => '/emails',
-				'callback'   => array( $this, 'render_submenu_page' ),
-				'identifier' => 'emails',
 			),
 			array(
 				'title'      => __( 'Settings', 'wholesalex' ),
 				'menu_title' => __( 'Settings', 'wholesalex' ),
 				'capability' => $manage_options_cap,
 				'slug'       => '/settings',
-				'callback'   => array( $this, 'render_submenu_page' ),
+				'menu_slug'  => 'wholesalex-settings',
+				'callback'   => array( $this, 'output' ),
 				'identifier' => 'settings',
 			),
+			array(
+				'title'      => __( 'Wpxpo Plugins', 'wholesalex' ),
+				'menu_title' => __( 'WPXPO Plugins', 'wholesalex' ),
+				'capability' => $manage_options_cap,
+				'slug'       => '/our-products',
+				'menu_slug'  => 'wholesalex-our-products',
+				'callback'   => array( $this, 'output' ),
+				'identifier' => 'wpxpo_plugins',
+			),
+			array(
+				'title'      => __( 'Analytics', 'wholesalex' ),
+				'menu_title' => __( 'Analytics', 'wholesalex' ),
+				'capability' => $manage_options_cap,
+				'slug'       => '/analytics',
+				'menu_slug'  => 'wholesalex-analytics',
+				'callback'   => array( $this, 'output' ),
+				'identifier' => 'analytics',
+			),
 		);
+
+		if ( ! empty( $dynamic_rules_access['can_view'] ) ) {
+			array_unshift(
+				$submenus,
+				array(
+					'title'      => __( 'Dynamic Rules', 'wholesalex' ),
+					'menu_title' => __( 'Dynamic Rules', 'wholesalex' ),
+					'capability' => $manage_options_cap,
+					'slug'       => '/dynamic-rules',
+					'menu_slug'  => 'wholesalex_dynamic_rules',
+					'callback'   => array( $this, 'output' ),
+					'identifier' => 'dynamic_rules',
+				)
+			);
+		}
 
 		if ( 'yes' === $is_role_switcher_option_enable ) {
 			$submenus[] = array(
@@ -253,21 +277,10 @@ class WHOLESALEX_Overview {
 				'menu_title' => __( 'User Role Requests', 'wholesalex' ),
 				'capability' => $manage_options_cap,
 				'slug'       => '/user_role_change_requests',
-				'callback'   => array( $this, 'render_submenu_page' ),
+				'menu_slug'  => 'wholesalex-user-role-requests',
+				'callback'   => array( $this, 'output' ),
 				'identifier' => 'user-role-request',
 			);
-		}
-
-		if ( 'yes' !== $is_white_label_enabled ) {
-			$pro_submenu = array(
-				'title'      => __( 'Features', 'wholesalex' ),
-				'menu_title' => __( 'Features', 'wholesalex' ),
-				'capability' => $manage_options_cap,
-				'slug'       => '/features',
-				'callback'   => array( $this, 'render_submenu_page' ),
-				'identifier' => 'features',
-			);
-			array_splice( $submenus, 8, 0, array( $pro_submenu ) );
 		}
 
 		// If Pro plugin is active, add the Pro submenu in the second position.
@@ -285,12 +298,13 @@ class WHOLESALEX_Overview {
 				'menu_title' => $__pending_conversation ? sprintf( __( '%1$s <span class="menu-counter"><span>%2$d</span></span>', 'wholesalex' ), $menu_title, $__pending_conversation ) : $menu_title,
 				'capability' => $manage_options_cap,
 				'slug'       => '/conversation',
-				'callback'   => array( $this, 'render_submenu_page' ),
+				'menu_slug'  => 'wholesalex-conversation',
+				'callback'   => array( $this, 'output' ),
 				'identifier' => 'conversation',
 			);
 			array_splice( $submenus, 3, 0, array( $pro_submenu ) );
 		}
-		if ( file_exists( WP_PLUGIN_DIR . '/wholesalex-pro/wholesalex-pro.php' ) ) {
+		if ( file_exists( WP_PLUGIN_DIR . '/wholesalex-pro/wholesalex-pro.php' ) && function_exists( 'wholesalex_pro' ) ) {
 			$menu_title = apply_filters( 'wholesalex_addon_conversation_title', __( 'Conversations', 'wholesalex' ) );
 			$status     = apply_filters( 'wholesalex_show_license_page', true );
 			if ( $status && 'yes' !== $is_white_label_enabled ) {
@@ -299,7 +313,8 @@ class WHOLESALEX_Overview {
 					'menu_title' => __( 'License', 'wholesalex' ),
 					'capability' => $manage_options_cap,
 					'slug'       => '/license',
-					'callback'   => array( $this, 'render_submenu_page' ),
+					'menu_slug'  => 'wholesalex-license',
+					'callback'   => array( $this, 'output' ),
 					'identifier' => 'license',
 				);
 				array_splice( $submenus, 10, 0, array( $pro_submenu ) );
@@ -318,16 +333,377 @@ class WHOLESALEX_Overview {
 			array_splice( $submenus, 11, 0, array( $pro_submenu ) );
 		}
 
+		array_splice(
+			$submenus,
+			0,
+			0,
+			array(
+				array(
+					'title'      => __( 'Wholesale Pricing', 'wholesalex' ),
+					'menu_title' => __( 'Wholesale Pricing', 'wholesalex' ),
+					'capability' => $manage_options_cap,
+					'slug'       => '/wholesale-pricing',
+					'menu_slug'  => 'wholesalex_wholesale_pricing',
+					'callback'   => array( $this, 'output' ),
+					'identifier' => 'wholesale_pricing',
+				),
+			)
+		);
+
 		foreach ( $submenus as $submenu ) {
+			$submenu_slug = isset( $submenu['menu_slug'] ) ? $submenu['menu_slug'] : $submenu['slug'];
 			add_submenu_page(
 				wholesalex()->get_menu_slug(),
 				$submenu['title'],
 				$submenu['menu_title'],
 				$submenu['capability'],
-				'wholesalex-migration' !== $submenu['slug'] ? wholesalex()->get_menu_slug() . '#' . $submenu['slug'] : $submenu['slug'],
+				'wholesalex-migration' !== $submenu['slug'] ? $submenu_slug : $submenu['slug'],
 				$submenu['callback']
 			);
 		}
+	}
+
+	/**
+	 * Get admin page slugs and the matching React routes.
+	 *
+	 * Real page slugs let WordPress mark the selected submenu on the PHP side.
+	 * The route value is used to bootstrap the hash router after the page loads.
+	 *
+	 * @return array
+	 */
+	private function get_spa_admin_routes() {
+		$menu_slug = apply_filters( 'wholesalex_plugin_menu_slug', 'wholesalex' );
+
+		return apply_filters(
+			'wholesalex_spa_admin_routes',
+			array(
+				$menu_slug                       => '/overview',
+				'wholesalex_wholesale_pricing'   => '/wholesale-pricing',
+				'wholesalex_dynamic_rules'       => '/dynamic-rules',
+				'wholesalex_role'                => '/user-role',
+				'wholesalex-registration'        => '/registration',
+				'wholesalex-conversation'        => '/conversation',
+				'wholesalex-addons'              => '/addons',
+				'wholesalex-users'               => '/users',
+				'wholesalex-settings'            => '/settings',
+				'wholesalex-our-products'        => '/our-products',
+				'wholesalex-analytics'           => '/analytics',
+				'wholesalex-license'             => '/license',
+				'wholesalex-user-role-requests'  => '/user_role_change_requests',
+			)
+		);
+	}
+
+	/**
+	 * Get SPA route prefixes and their matching WordPress admin page slugs.
+	 *
+	 * @return array
+	 */
+	private function get_spa_route_pages() {
+		$route_pages = array_flip( $this->get_spa_admin_routes() );
+
+		$route_pages['/edit-wholesale-price'] = isset( $route_pages['/wholesale-pricing'] )
+			? $route_pages['/wholesale-pricing']
+			: 'wholesalex_wholesale_pricing';
+
+		return apply_filters( 'wholesalex_spa_route_pages', $route_pages );
+	}
+
+	/**
+	 * Get SPA route prefixes and their matching document titles.
+	 *
+	 * WordPress renders the admin title once during the PHP request. The
+	 * WholesaleX admin app updates routes with history.pushState, so keep the
+	 * browser title in sync from the same route metadata used for menu syncing.
+	 *
+	 * @return array
+	 */
+	private function get_spa_route_titles() {
+		return apply_filters(
+			'wholesalex_spa_route_titles',
+			array(
+				'/overview'                  => __( 'Overview', 'wholesalex' ),
+				'/wholesale-pricing'        => __( 'Wholesale Pricing', 'wholesalex' ),
+				'/edit-wholesale-price'     => __( 'Wholesale Pricing', 'wholesalex' ),
+				'/dynamic-rules'            => __( 'Dynamic Rules', 'wholesalex' ),
+				'/user-role'                => __( 'User Roles', 'wholesalex' ),
+				'/registration'             => __( 'Registration Form', 'wholesalex' ),
+				'/conversation'             => __( 'Conversations', 'wholesalex' ),
+				'/addons'                   => __( 'Addons', 'wholesalex' ),
+				'/users'                    => __( 'Users', 'wholesalex' ),
+				'/settings'                 => __( 'Settings', 'wholesalex' ),
+				'/our-products'             => __( 'Wpxpo Plugins', 'wholesalex' ),
+				'/analytics'                => __( 'Analytics', 'wholesalex' ),
+				'/license'                  => __( 'License', 'wholesalex' ),
+				'/user_role_change_requests' => __( 'User Role Requests', 'wholesalex' ),
+			)
+		);
+	}
+
+	/**
+	 * Get the current admin page's React route.
+	 *
+	 * @return string
+	 */
+	private function get_current_spa_route() {
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$routes = $this->get_spa_admin_routes();
+
+		return isset( $routes[ $page ] ) ? $routes[ $page ] : '';
+	}
+
+	/**
+	 * Ensure the selected PHP submenu opens the matching React route.
+	 *
+	 * @return void
+	 */
+	private function bootstrap_spa_route() {
+		$route = $this->get_current_spa_route();
+
+		if ( ! $route ) {
+			return;
+		}
+
+		$route_to_page = $this->get_spa_route_pages();
+
+		?>
+		<script>
+			( function () {
+				var currentRoute = '<?php echo esc_js( $route ); ?>';
+				var routeToPage = <?php echo wp_json_encode( $route_to_page ); ?>;
+				var routePrefixes = Object.keys( routeToPage ).sort( function ( a, b ) {
+					return b.length - a.length;
+				} );
+
+				function normalizeRoute( hash ) {
+					var route = ( hash || '' ).toString().replace( /^#/, '' );
+					route = route.split( '?' )[ 0 ].split( '&' )[ 0 ];
+
+					if ( ! route || route === '/' ) {
+						return '/overview';
+					}
+
+					if ( route.charAt( 0 ) !== '/' ) {
+						route = '/' + route;
+					}
+
+					return route.replace( /\/+$/, '' ) || '/overview';
+				}
+
+				function getRoutePage( route ) {
+					for ( var i = 0; i < routePrefixes.length; i++ ) {
+						var routePrefix = routePrefixes[ i ];
+
+						if (
+							route === routePrefix ||
+							( routePrefix !== '/overview' && route.indexOf( routePrefix + '/' ) === 0 )
+						) {
+							return routeToPage[ routePrefix ];
+						}
+					}
+
+					return '';
+				}
+
+				if ( window.location.hash ) {
+					var hashRoute = normalizeRoute( window.location.hash );
+					var hashPage = getRoutePage( hashRoute );
+
+					if ( hashPage ) {
+						var hashUrl = new URL( window.location.href );
+						hashUrl.searchParams.set( 'page', hashPage );
+						window.history.replaceState( null, '', hashUrl.toString() );
+						return;
+					}
+				}
+
+				if ( currentRoute && currentRoute !== '/overview' ) {
+					window.history.replaceState(
+						null,
+						'',
+						window.location.pathname + window.location.search + '#' + currentRoute
+					);
+				}
+			}() );
+		</script>
+		<?php
+	}
+
+	/**
+	 * Style and sync the selected WholesaleX submenu like the native hover state.
+	 *
+	 * @return void
+	 */
+	public function admin_menu_active_styles() {
+		if ( ! $this->get_current_spa_route() ) {
+			return;
+		}
+
+		$route_to_page = $this->get_spa_route_pages();
+		$route_titles  = $this->get_spa_route_titles();
+
+		?>
+		<style>
+			#adminmenu #toplevel_page_wholesalex .wp-submenu a:hover,
+			#adminmenu #toplevel_page_wholesalex .wp-submenu a:focus,
+			#adminmenu #toplevel_page_wholesalex .wp-submenu li.current a,
+			#adminmenu #toplevel_page_wholesalex .wp-submenu a.current {
+				color: #72aee6;
+				position: relative;
+				font-weight: 600;
+			}
+
+			#adminmenu #toplevel_page_wholesalex .wp-submenu a:hover::before,
+			#adminmenu #toplevel_page_wholesalex .wp-submenu a:focus::before,
+			#adminmenu #toplevel_page_wholesalex .wp-submenu li.current a::before,
+			#adminmenu #toplevel_page_wholesalex .wp-submenu a.current::before {
+				content: "";
+				position: absolute;
+				inset-block: 6px;
+				inset-inline-start: 0;
+				width: 3px;
+				background: currentColor;
+				border-radius: 999px;
+			}
+		</style>
+		<script>
+			( function () {
+				var routeToPage = <?php echo wp_json_encode( $route_to_page ); ?>;
+				var routeTitles = <?php echo wp_json_encode( $route_titles ); ?>;
+				var routePrefixes = Object.keys( routeToPage ).sort( function ( a, b ) {
+					return b.length - a.length;
+				} );
+				var titlePrefixes = Object.keys( routeTitles ).sort( function ( a, b ) {
+					return b.length - a.length;
+				} );
+				var menuSelector = '#toplevel_page_wholesalex';
+				var titleSuffix = getTitleSuffix();
+
+				function normalizeRoute( hash ) {
+					var route = ( hash || window.location.hash || '' ).toString().replace( /^#/, '' );
+					route = route.split( '?' )[ 0 ].split( '&' )[ 0 ];
+
+					if ( ! route || route === '/' ) {
+						return '/overview';
+					}
+
+					if ( route.charAt( 0 ) !== '/' ) {
+						route = '/' + route;
+					}
+
+					return route.replace( /\/+$/, '' ) || '/overview';
+				}
+
+				function getRoutePage( route ) {
+					for ( var i = 0; i < routePrefixes.length; i++ ) {
+						var routePrefix = routePrefixes[ i ];
+
+						if (
+							route === routePrefix ||
+							( routePrefix !== '/overview' && route.indexOf( routePrefix + '/' ) === 0 )
+						) {
+							return routeToPage[ routePrefix ];
+						}
+					}
+
+					return '';
+				}
+
+				function getRouteTitle( route ) {
+					for ( var i = 0; i < titlePrefixes.length; i++ ) {
+						var routePrefix = titlePrefixes[ i ];
+
+						if (
+							route === routePrefix ||
+							( routePrefix !== '/overview' && route.indexOf( routePrefix + '/' ) === 0 )
+						) {
+							return routeTitles[ routePrefix ];
+						}
+					}
+
+					return '';
+				}
+
+				function getTitleSuffix() {
+					var title = document.title || '';
+					var separators = [ ' ‹ ', ' &lsaquo; ', ' — ', ' - ' ];
+
+					for ( var i = 0; i < separators.length; i++ ) {
+						var separator = separators[ i ];
+						var index = title.indexOf( separator );
+
+						if ( index > -1 ) {
+							return title.substring( index );
+						}
+					}
+
+					return ' ‹ <?php echo esc_js( get_bloginfo( 'name' ) ); ?>';
+				}
+
+				function syncWholesaleXTitle() {
+					var routeTitle = getRouteTitle( normalizeRoute() );
+
+					if ( routeTitle ) {
+						document.title = routeTitle + titleSuffix;
+					}
+				}
+
+				function getLinkPage( link ) {
+					try {
+						return new URL( link.getAttribute( 'href' ) || '', window.location.href ).searchParams.get( 'page' ) || '';
+					} catch ( error ) {
+						return '';
+					}
+				}
+
+				function syncWholesaleXMenu() {
+					var menuRoot = document.querySelector( menuSelector );
+					if ( ! menuRoot ) {
+						return;
+					}
+
+					var activePage = getRoutePage( normalizeRoute() );
+					var menuTop = menuRoot.querySelector( 'a.menu-top' );
+					var links = menuRoot.querySelectorAll( '.wp-submenu a' );
+
+					menuRoot.classList.add( 'wp-has-current-submenu', 'wp-menu-open' );
+					menuRoot.classList.remove( 'wp-not-current-submenu' );
+
+					if ( menuTop ) {
+						menuTop.classList.add( 'wp-has-current-submenu', 'wp-menu-open' );
+						menuTop.classList.remove( 'wp-not-current-submenu' );
+					}
+
+					for ( var i = 0; i < links.length; i++ ) {
+						var link = links[ i ];
+						var item = link.parentNode;
+						var isActive = activePage && getLinkPage( link ) === activePage;
+
+						link.classList.toggle( 'current', isActive );
+						if ( item ) {
+							item.classList.toggle( 'current', isActive );
+						}
+
+						if ( isActive ) {
+							link.setAttribute( 'aria-current', 'page' );
+						} else {
+							link.removeAttribute( 'aria-current' );
+						}
+					}
+				}
+
+				syncWholesaleXMenu();
+				syncWholesaleXTitle();
+				window.addEventListener( 'hashchange', syncWholesaleXMenu );
+				window.addEventListener( 'hashchange', syncWholesaleXTitle );
+				window.addEventListener( 'popstate', syncWholesaleXTitle );
+				document.addEventListener( 'DOMContentLoaded', function () {
+					syncWholesaleXMenu();
+					syncWholesaleXTitle();
+				} );
+			}() );
+		</script>
+		<?php
 	}
 
 	/**
@@ -570,11 +946,49 @@ class WHOLESALEX_Overview {
 	 * @return array
 	 */
 	public static function get_dynamic_rules_localize_data( $dependency ) {
+		$rules = $dependency == 'integration' ? array_values( wholesalex()->get_dynamic_rules_by_user_id() ) : \WHOLESALEX\WHOLESALEX_Dynamic_Rules::dynamic_rules_get();
+
 		return array(
-			'whx_dr_fields'   => \WHOLESALEX\WHOLESALEX_Dynamic_Rules::get_dynamic_rules_field(),
-			'whx_dr_rule'     => $dependency == 'integration' ? array_values( wholesalex()->get_dynamic_rules_by_user_id() ) : \WHOLESALEX\WHOLESALEX_Dynamic_Rules::dynamic_rules_get(),
-			'whx_dr_nonce'    => wp_create_nonce( 'whx-export-dynamic-rules' ),
-			'whx_dr_currency' => get_woocommerce_currency_symbol(),
+			'whx_dr_fields'        => \WHOLESALEX\WHOLESALEX_Dynamic_Rules::get_dynamic_rules_field(),
+			'whx_dr_rule'          => $rules,
+			'whx_dr_nonce'         => wp_create_nonce( 'whx-export-dynamic-rules' ),
+			'whx_dr_currency'      => get_woocommerce_currency_symbol(),
+			'dynamic_rules_access' => wholesalex()->get_dynamic_rules_access( $rules ),
+		);
+	}
+
+	/**
+	 * Get data required by the Wholesale Pricing integration routes.
+	 *
+	 * @return array
+	 */
+	public static function get_wholesale_pricing_integration_data() {
+		$roles     = array_values( wholesalex()->get_roles() );
+		$b2b_roles = array_map(
+			static function ( $role ) {
+				return array(
+					'value' => $role['value'],
+					'name'  => $role['name'],
+				);
+			},
+			wholesalex()->get_roles( 'b2b_roles_option' )
+		);
+		$context = \WHOLESALEX\Wholesale_Pricing::get_manager_context();
+
+		return array(
+			'whx_wholesale_pricing_rules'          => \WHOLESALEX\Wholesale_Pricing::get_rules_for_current_manager(),
+			'whx_wholesale_pricing_nonce'          => wp_create_nonce( 'whx-export-wholesale-pricing' ),
+			'whx_roles_fields'                     => \WHOLESALEX\WHOLESALEX_Role::get_role_fields(),
+			'whx_roles_data'                       => $roles,
+			'b2b_roles'                            => $b2b_roles,
+			'product_list'                         => array(),
+			'wsx_wizard_url'                       => WHOLESALEX_URL,
+			'wholesale_pricing_is_vendor'          => $context['is_vendor'],
+			'wholesale_pricing_allow_role_create'  => ! $context['is_vendor'],
+			'wholesale_pricing_can_import'         => ! $context['is_vendor'],
+			'wholesale_pricing_allowed_rule_types' => $context['is_vendor']
+				? apply_filters( 'wholesalex_vendor_wholesale_pricing_rule_types', array( 'wholesale_pricing' ) )
+				: array( 'wholesale_pricing', 'product_discount', 'cart_discount', 'bogo_discount', 'buy_x_get_y' ),
 		);
 	}
 
@@ -607,7 +1021,7 @@ class WHOLESALEX_Overview {
 					'wholesalex_overview_localize_integration_data',
 					array_merge(
 						self::get_dynamic_rules_localize_data( $dependency ),
-						array()
+						self::get_wholesale_pricing_integration_data()
 					)
 				)
 			)
@@ -781,6 +1195,7 @@ class WHOLESALEX_Overview {
 						'wsx_wizard_addons'                => $this->get_addons(),
 						'wsx_wizard_setting_url'           => menu_page_url( 'wholesalex-settings', false ) ? menu_page_url( 'wholesalex-settings', false ) : get_dashboard_url(),
 						'wsx_wizard_dashboard_url'         => menu_page_url( 'wholesalex', false ) ? menu_page_url( 'wholesalex', false ) : get_dashboard_url(),
+						'spa_route_pages'                  => $this->get_spa_route_pages(),
 						'wsx_wizard_site_name'             => get_bloginfo( 'name' ),
 						// 'wsx_wizard___wholesalex_initial_setup' => get_option( '__wholesalex_initial_setup', false ),
 						'wsx_wizard___wholesalex_initial_setup' => 1,
@@ -883,6 +1298,14 @@ class WHOLESALEX_Overview {
 						'whx_roles_fields'                 => \WHOLESALEX\WHOLESALEX_Role::get_role_fields(),
 						'whx_roles_data'                   => $__roles,
 						'whx_roles_nonce'                  => wp_create_nonce( 'whx-export-roles' ),
+						'whx_tax_classes'                  => \WHOLESALEX\Dynamic_Rules::get_tax_classes(),
+
+						/**
+						 * Wholesale Pricing Rules – seeded for instant first render.
+						 * WholesalePricingContext reads this via wholesalex_overview.whx_wholesale_pricing_rules
+						 */
+						'whx_wholesale_pricing_rules'      => \WHOLESALEX\Wholesale_Pricing::get_rules_for_js(),
+						'whx_wholesale_pricing_nonce'      => wp_create_nonce( 'whx-export-wholesale-pricing' ),
 					),
 					self::get_dynamic_rules_localize_data( 'wholesalex' )
 				),
@@ -892,6 +1315,7 @@ class WHOLESALEX_Overview {
 		wp_set_script_translations( 'wholesalex_overview', 'wholesalex', WHOLESALEX_PATH . 'languages/' );
 		wp_enqueue_style( 'wholesalex' );
 		wp_enqueue_style( 'wholesalex_public' );
+		$this->bootstrap_spa_route();
 		?>
 		<div id="wholesalex-overview"></div>
 		<?php
@@ -1017,7 +1441,7 @@ class WHOLESALEX_Overview {
 			}
 			$title = sprintf(
 				'<div class="wsx-d-flex wsx-item-center wsx-gap-8 wsx-color-lime "><div class="wsx-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="currentColor" viewBox="0 0 32 32"><path fill="currentColor" d="m3.488 13.184 6.272 6.112-1.472 8.608L16 23.84l7.712 4.064-1.472-8.608 6.272-6.112-8.64-1.248L16 4.128l-3.872 7.808z"/></svg></div>%s</div>',
-				Xpo::is_lc_expired() ? __( 'Renew License', 'wholesalex' ) : $button_text
+				Xpo::is_lc_expired() ? __( 'Renew Now', 'wholesalex' ) : $button_text
 			);
 
 			add_submenu_page(
@@ -1037,8 +1461,7 @@ class WHOLESALEX_Overview {
 	 * @since 1.1.2
 	 */
 	public function go_pro_redirect() {
-		$license_key = Xpo::get_lc_key();
-		$pro_link    = Xpo::is_lc_expired() ? 'https://account.wpxpo.com/checkout/?edd_license_key=' . $license_key : Xpo::generate_utm_link( array( 'utmKey' => 'summer_db' ) );
+		$pro_link = Xpo::is_lc_expired() ? Xpo::get_lc_renewal_url() : Xpo::generate_utm_link( array( 'utmKey' => 'summer_db' ) );
 		if (isset($_GET['page']) && 'go_wholesalex_pro' === sanitize_text_field($_GET['page'])) { //phpcs:ignore
 			wp_redirect($pro_link); //phpcs:ignore
 			die();

@@ -61,79 +61,399 @@ class Dynamic_Rules_Data_Provider {
 	 * Get Products.
 	 *
 	 * @param string $search Search Keyword.
+	 * @param int    $limit  Maximum number of products to return.
 	 * @return array
 	 */
-	public function get_products( $search = '' ) {
+	public function get_products( $search = '', $limit = 20 ) {
 		$__final               = array();
 		$__search              = $search;
 		$is_search_has_numeric = preg_match( '/\d+/', $__search );
+		$limit                 = $this->normalize_result_limit( $limit );
+		$query_limit           = $this->get_multilingual_query_limit( $limit );
+		$author_id             = absint( apply_filters( 'wholesalex_dynamic_rules_product_author', 0 ) );
 
 		global $wpdb;
+		$sql  = "SELECT ID, post_title FROM $wpdb->posts
+			WHERE post_type = %s
+			AND post_status = %s";
+		$args = array( 'product', 'publish' );
+
+		if ( $author_id ) {
+			$sql   .= ' AND post_author = %d';
+			$args[] = $author_id;
+		}
+
+		$sql   .= ' AND (post_title LIKE %s' . ( $is_search_has_numeric ? ' OR ID = %d' : '' ) . ') LIMIT %d';
+		$args[] = '%' . $wpdb->esc_like( $__search ) . '%';
+		if ( $is_search_has_numeric ) {
+			$args[] = (int) $__search;
+		}
+		$args[] = $query_limit;
+
 		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				"SELECT ID, post_title FROM $wpdb->posts
-                WHERE post_type = %s
-                AND post_status = %s
-                AND (post_title LIKE %s" . ( $is_search_has_numeric ? ' OR ID = %d' : '' ) . ')
-                LIMIT 20',
-				...array_filter(
-					array(
-						'product',
-						'publish',
-						'%' . $wpdb->esc_like( $__search ) . '%',
-						$is_search_has_numeric ? (int) $__search : null,
-					),
-					function ( $v ) {
-						return null !== $v;
-					}
-				)
-			)
+			$wpdb->prepare( $sql, ...$args )
 		);
 
 		foreach ( $results as $result ) {
-			$title     = $result->post_title;
-			$__final[] = array(
+			$title   = $result->post_title;
+			$product = wc_get_product( (int) $result->ID );
+			$price   = $product ? $product->get_price( 'edit' ) : '';
+			$regular = $product ? $product->get_regular_price( 'edit' ) : '';
+			$sale    = $product ? $product->get_sale_price( 'edit' ) : '';
+			$image   = '';
+
+			if ( $product ) {
+				$image_id = $product->get_image_id();
+				$image    = $image_id ? wp_get_attachment_image_url( $image_id, 'thumbnail' ) : '';
+			}
+
+			$item = array(
 				'value' => (int) $result->ID,
 				'name'  => $title . ' (' . $result->ID . ')',
 			);
+
+			if ( '' !== $price ) {
+				$item['price'] = (float) $price;
+			}
+			if ( '' !== $regular ) {
+				$item['regular_price'] = (float) $regular;
+			}
+			if ( '' !== $sale ) {
+				$item['sale_price'] = (float) $sale;
+			}
+			if ( $image ) {
+				$item['image'] = esc_url_raw( $image );
+			}
+
+			$__final[] = $item;
 		}
 
-		return $__final;
+		return $this->collapse_translated_select_options( $__final, 'post', 'product', $limit );
+	}
+
+	/**
+	 * Get products constrained to one or more product categories.
+	 *
+	 * @param string       $search     Search keyword.
+	 * @param array|string $categories Selected category IDs.
+	 * @param int          $limit      Maximum number of products to return.
+	 * @return array
+	 */
+	public function get_products_by_categories( $search = '', $categories = array(), $limit = 20 ) {
+		$category_ids = $this->expand_translated_term_ids(
+			$this->normalize_select_ids( $categories ),
+			array( 'product_cat' )
+		);
+
+		if ( empty( $category_ids ) ) {
+			return array();
+		}
+
+		$args = array(
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => $this->get_multilingual_query_limit( $limit ),
+			'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+				array(
+					'taxonomy' => 'product_cat',
+					'field'    => 'term_id',
+					'terms'    => $category_ids,
+				),
+			),
+		);
+		$author_id = absint( apply_filters( 'wholesalex_dynamic_rules_product_author', 0 ) );
+		if ( $author_id ) {
+			$args['author'] = $author_id;
+		}
+
+		if ( '' !== $search ) {
+			if ( preg_match( '/^\d+$/', $search ) ) {
+				$args['p'] = absint( $search );
+			} else {
+				$args['s'] = $search;
+			}
+		}
+
+		$query    = new \WP_Query( $args );
+		$products = array();
+
+		foreach ( $query->posts as $product ) {
+			$products[] = array(
+				'value' => (int) $product->ID,
+				'name'  => $product->post_title . ' (' . $product->ID . ')',
+			);
+		}
+
+		return $this->collapse_translated_select_options( $products, 'post', 'product', $limit );
+	}
+
+	/**
+	 * Normalize plain IDs, comma-separated IDs, or MultiSelect value objects.
+	 *
+	 * @param mixed $items Selected values.
+	 * @return array<int>
+	 */
+	private function normalize_select_ids( $items ) {
+		if ( is_string( $items ) ) {
+			$items = array_filter( array_map( 'trim', explode( ',', $items ) ) );
+		}
+
+		if ( ! is_array( $items ) ) {
+			return array();
+		}
+
+		$ids = array();
+		foreach ( $items as $item ) {
+			if ( is_array( $item ) ) {
+				$item = isset( $item['value'] ) ? $item['value'] : 0;
+			}
+
+			$id = absint( $item );
+			if ( $id ) {
+				$ids[] = $id;
+			}
+		}
+
+		return array_values( array_unique( $ids ) );
 	}
 
 	/**
 	 * Get WooCommerce Categories.
 	 *
 	 * @param string $search Search Keyword.
+	 * @param int    $limit  Maximum number of categories to return.
 	 * @return array
 	 */
-	public function get_categories( $search = '' ) {
+	public function get_categories( $search = '', $limit = 20 ) {
 		$__final = array();
 		$args    = array(
 			'taxonomy'   => 'product_cat',
 			'hide_empty' => false,
-			'number'     => 20,
+			'number'     => $this->get_multilingual_query_limit( $limit ),
 		);
 		if ( '' !== $search ) {
 			$args['search'] = $search;
 		}
 		$__categories = get_terms( $args );
+		if ( is_wp_error( $__categories ) ) {
+			return array();
+		}
 		foreach ( $__categories as $category ) {
 			$__final[] = array(
 				'value' => $category->term_id,
 				'name'  => $category->name,
 			);
 		}
-		return $__final;
+		return $this->collapse_translated_select_options( $__final, 'term', 'product_cat', $limit );
+	}
+
+	/**
+	 * Normalize AJAX result limits.
+	 *
+	 * @param int|string $limit Requested limit.
+	 * @return int
+	 */
+	private function normalize_result_limit( $limit ) {
+		$limit = absint( $limit );
+
+		if ( $limit <= 0 ) {
+			return 20;
+		}
+
+		return min( $limit, 20 );
+	}
+
+	/**
+	 * Query extra rows before translated duplicates are collapsed.
+	 *
+	 * @param int $limit Public response limit.
+	 * @return int
+	 */
+	private function get_multilingual_query_limit( $limit ) {
+		return min( max( $this->normalize_result_limit( $limit ) * 5, 20 ), 100 );
+	}
+
+	/**
+	 * Collapse translated product/category/brand options into one selectable row.
+	 *
+	 * @param array  $items       Select options.
+	 * @param string $object_type Object kind: post or term.
+	 * @param string $subtype     Post type or taxonomy.
+	 * @param int    $limit       Public response limit.
+	 * @return array
+	 */
+	private function collapse_translated_select_options( array $items, $object_type, $subtype, $limit ) {
+		$limit = $this->normalize_result_limit( $limit );
+
+		if ( ! apply_filters( 'wholesalex_collapse_multilingual_select_options', true, $items, $object_type, $subtype ) ) {
+			return array_slice( $items, 0, $limit );
+		}
+
+		$seen     = array();
+		$filtered = array();
+
+		foreach ( $items as $item ) {
+			$item_id = absint( isset( $item['value'] ) ? $item['value'] : 0 );
+
+			if ( ! $item_id ) {
+				continue;
+			}
+
+			$group_key = 'post' === $object_type
+				? $this->get_post_translation_group_key( $item_id, $subtype )
+				: $this->get_term_translation_group_key( $item_id, $subtype );
+
+			if ( isset( $seen[ $group_key ] ) ) {
+				continue;
+			}
+
+			$seen[ $group_key ] = true;
+			$filtered[]         = $item;
+
+			if ( count( $filtered ) >= $limit ) {
+				break;
+			}
+		}
+
+		return $filtered;
+	}
+
+	/**
+	 * Build a stable translation-group key for a post option.
+	 *
+	 * @param int    $post_id   Post ID.
+	 * @param string $post_type Post type.
+	 * @return string
+	 */
+	private function get_post_translation_group_key( $post_id, $post_type ) {
+		$ids = $this->get_translated_post_ids( array( $post_id ), $post_type );
+		sort( $ids, SORT_NUMERIC );
+
+		return 'post:' . $post_type . ':' . implode( ',', $ids );
+	}
+
+	/**
+	 * Build a stable translation-group key for a term option.
+	 *
+	 * @param int    $term_id  Term ID.
+	 * @param string $taxonomy Taxonomy.
+	 * @return string
+	 */
+	private function get_term_translation_group_key( $term_id, $taxonomy ) {
+		$ids = $this->expand_translated_term_ids( array( $term_id ), array( $taxonomy ) );
+		sort( $ids, SORT_NUMERIC );
+
+		return 'term:' . $taxonomy . ':' . implode( ',', $ids );
+	}
+
+	/**
+	 * Expand post IDs with Polylang/WPML translations.
+	 *
+	 * @param array  $post_ids  Post IDs.
+	 * @param string $post_type Post type.
+	 * @return array
+	 */
+	private function get_translated_post_ids( array $post_ids, $post_type = 'product' ) {
+		$post_ids = array_values( array_unique( array_filter( array_map( 'absint', $post_ids ) ) ) );
+		$expanded = $post_ids;
+
+		foreach ( $post_ids as $post_id ) {
+			if ( function_exists( 'pll_get_post_translations' ) ) {
+				$translations = pll_get_post_translations( $post_id );
+
+				if ( is_array( $translations ) ) {
+					$expanded = array_merge( $expanded, array_map( 'absint', $translations ) );
+				}
+			}
+
+			$expanded = array_merge(
+				$expanded,
+				$this->get_wpml_object_translation_ids( $post_id, $post_type )
+			);
+		}
+
+		return array_values( array_unique( array_filter( $expanded ) ) );
+	}
+
+	/**
+	 * Expand term IDs with Polylang/WPML translations.
+	 *
+	 * @param array $term_ids   Term IDs.
+	 * @param array $taxonomies Allowed taxonomies.
+	 * @return array
+	 */
+	private function expand_translated_term_ids( array $term_ids, array $taxonomies ) {
+		$term_ids   = array_values( array_unique( array_filter( array_map( 'absint', $term_ids ) ) ) );
+		$taxonomies = array_values( array_filter( $taxonomies, 'taxonomy_exists' ) );
+		$expanded   = $term_ids;
+
+		if ( empty( $term_ids ) || empty( $taxonomies ) ) {
+			return $term_ids;
+		}
+
+		foreach ( $term_ids as $term_id ) {
+			$term = get_term( $term_id );
+
+			if ( ! $term instanceof \WP_Term || ! in_array( $term->taxonomy, $taxonomies, true ) ) {
+				continue;
+			}
+
+			if ( function_exists( 'pll_get_term_translations' ) ) {
+				$translations = pll_get_term_translations( $term_id );
+
+				if ( is_array( $translations ) ) {
+					$expanded = array_merge( $expanded, array_map( 'absint', $translations ) );
+				}
+			}
+
+			$expanded = array_merge(
+				$expanded,
+				$this->get_wpml_object_translation_ids( $term_id, $term->taxonomy )
+			);
+		}
+
+		return array_values( array_unique( array_filter( $expanded ) ) );
+	}
+
+	/**
+	 * Get translated object IDs from WPML when available.
+	 *
+	 * @param int    $object_id   Source object ID.
+	 * @param string $object_type Post type or taxonomy.
+	 * @return array
+	 */
+	private function get_wpml_object_translation_ids( $object_id, $object_type ) {
+		if ( false === has_filter( 'wpml_object_id' ) || false === has_filter( 'wpml_active_languages' ) ) {
+			return array();
+		}
+
+		$languages = apply_filters( 'wpml_active_languages', null, array( 'skip_missing' => 0 ) );
+
+		if ( empty( $languages ) || ! is_array( $languages ) ) {
+			return array();
+		}
+
+		$translations = array();
+
+		foreach ( array_keys( $languages ) as $language_code ) {
+			$translated_id = apply_filters( 'wpml_object_id', absint( $object_id ), $object_type, false, $language_code );
+
+			if ( $translated_id ) {
+				$translations[] = absint( $translated_id );
+			}
+		}
+
+		return array_values( array_unique( array_filter( $translations ) ) );
 	}
 
 	/**
 	 * Get WooCommerce Brands.
 	 *
 	 * @param string $search Search Keyword.
+	 * @param int    $limit  Maximum number of brands to return.
 	 * @return array
 	 */
-	public function get_brands( $search = '' ) {
+	public function get_brands( $search = '', $limit = 20 ) {
 		$__final    = array();
 		$taxonomies = array( 'product_brand', 'pwb-brand', 'yith_product_brand' );
 		$taxonomy   = '';
@@ -149,30 +469,36 @@ class Dynamic_Rules_Data_Provider {
 		$args = array(
 			'taxonomy'   => $taxonomy,
 			'hide_empty' => false,
-			'number'     => 20,
+			'number'     => $this->get_multilingual_query_limit( $limit ),
 		);
 		if ( '' !== $search ) {
 			$args['search'] = $search;
 		}
 		$__brands = get_terms( $args );
+		if ( is_wp_error( $__brands ) ) {
+			return array();
+		}
 		foreach ( $__brands as $brand ) {
 			$__final[] = array(
 				'value' => $brand->term_id,
 				'name'  => $brand->name,
 			);
 		}
-		return $__final;
+		return $this->collapse_translated_select_options( $__final, 'term', $taxonomy, $limit );
 	}
 
 	/**
 	 * Get WooCommerce Attributes.
 	 *
 	 * @param string $search Search Keyword.
+	 * @param int    $limit  Maximum number of attributes to return.
 	 * @return array
 	 */
-	public function get_attributes( $search = '' ) {
+	public function get_attributes( $search = '', $limit = 20 ) {
 		$__final      = array();
 		$__attributes = wc_get_attribute_taxonomies();
+		$limit        = $this->normalize_result_limit( $limit );
+
 		foreach ( $__attributes as $attribute ) {
 			if ( '' !== $search ) {
 				if ( false !== strpos( $attribute->attribute_label, $search ) || false !== strpos( $attribute->attribute_name, $search ) ) {
@@ -188,7 +514,7 @@ class Dynamic_Rules_Data_Provider {
 				);
 			}
 		}
-		return $__final;
+		return array_slice( $__final, 0, $limit );
 	}
 
 	/**
@@ -196,15 +522,20 @@ class Dynamic_Rules_Data_Provider {
 	 *
 	 * @param string      $search Search Keyword.
 	 * @param int|boolean $product_id Product ID.
+	 * @param int         $limit Maximum number of variations to return.
 	 * @return array
 	 */
-	public function get_variation_products( $search = '', $product_id = false ) {
+	public function get_variation_products(
+		$search = '',
+		$product_id = false,
+		$limit = 20
+	) {
 		$__final = array();
 
 		$args = array(
 			'post_type'   => 'product_variation',
 			'post_status' => 'publish',
-			'numberposts' => 20,
+			'numberposts' => $this->normalize_result_limit( $limit ),
 		);
 
 		if ( '' !== $search ) {
@@ -231,12 +562,13 @@ class Dynamic_Rules_Data_Provider {
 	 * Get Products with Variations.
 	 *
 	 * @param string $search Search Keyword.
+	 * @param int    $limit  Maximum number of products or variations to return.
 	 * @return array
 	 */
-	public function get_products_with_variations( $search = '' ) {
-		$products = $this->get_products( $search );
+	public function get_products_with_variations( $search = '', $limit = 20 ) {
+		$products = $this->get_products( $search, $limit );
 		if ( empty( $products ) ) {
-			return $this->get_variation_products( $search );
+			return $this->get_variation_products( $search, false, $limit );
 		}
 		return $products;
 	}
@@ -245,11 +577,13 @@ class Dynamic_Rules_Data_Provider {
 	 * Get Products by SKU.
 	 *
 	 * @param string $search Search Keyword (matched against SKU).
+	 * @param int    $limit  Maximum number of SKUs to return.
 	 * @return array
 	 */
-	public function get_skus( $search = '' ) {
+	public function get_skus( $search = '', $limit = 30 ) {
 		global $wpdb;
 		$like    = '%' . $wpdb->esc_like( $search ) . '%';
+		$limit   = $this->normalize_result_limit( $limit );
 		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
 				"SELECT pm.meta_value AS sku
@@ -262,8 +596,9 @@ class Dynamic_Rules_Data_Provider {
 				   AND p.post_status = 'publish'
 				 GROUP BY pm.meta_value
 				 ORDER BY pm.meta_value ASC
-				 LIMIT 30",
-				$like
+				 LIMIT %d",
+				$like,
+				$limit
 			)
 		);
 		$__final = array();

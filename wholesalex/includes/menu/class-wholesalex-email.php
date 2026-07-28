@@ -410,8 +410,7 @@ class WHOLESALEX_Email {
 
 				),
 				'wholesalex_conversation_email'          => array(
-					'enabled'            => 'yes',
-					'recipient'          => get_option( 'admin_email' ),
+					'enabled'            => 'no',
 					'subject'            => __( 'User Send Message Notification', 'wholesalex' ),
 					'heading'            => __( 'User Send Message', 'wholesalex' ),
 					'additional_content' => '',
@@ -443,8 +442,7 @@ class WHOLESALEX_Email {
 
 				),
 				'wholesalex_conversation_reply_email'    => array(
-					'enabled'            => 'yes',
-					'recipient'          => get_option( 'admin_email' ),
+					'enabled'            => 'no',
 					'subject'            => __( 'User reply Message Notification', 'wholesalex' ),
 					'heading'            => __( 'User reply Message to the you', 'wholesalex' ),
 					'additional_content' => '',

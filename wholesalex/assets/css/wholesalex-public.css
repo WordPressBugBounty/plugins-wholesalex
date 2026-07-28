@@ -88,6 +88,197 @@
 	display: flex;
 }
 
+/* Buy X Get Y single product free-items preview */
+.wholesalex_free_items.wsx-bxgy-free-items {
+	margin: 0 0 20px;
+	padding: 0;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	background: #ffffff;
+	color: #1d2327;
+	overflow: hidden;
+	box-sizing: border-box;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-min-purchase-text {
+	margin: 0;
+	padding: 14px 16px;
+	border-bottom: 1px solid #dcdcde;
+	color: #1d2327;
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1.35;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-free-promo-card {
+	display: grid;
+	grid-template-columns: 74px minmax(0, 1fr);
+	gap: 14px;
+	align-items: center;
+	margin: 0;
+	padding: 14px 16px;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	box-sizing: border-box;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items
+	.wsx-bxgy-free-promo-card
+	+ .wsx-bxgy-free-promo-card {
+	border-top: 1px solid #dcdcde;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-free-item-thumb {
+	position: relative;
+	width: 74px;
+	height: 74px;
+	border-radius: 4px;
+	background: #f6f7f7;
+	overflow: visible;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-free-item-thumb img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	border-radius: inherit;
+	object-fit: contain;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-free-item-qty-badge {
+	position: absolute;
+	top: -10px;
+	right: -10px;
+	z-index: 2;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 30px;
+	height: 30px;
+	padding: 0 8px;
+	border-radius: 999px;
+	background: #1d2327;
+	color: #ffffff;
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1;
+	box-sizing: border-box;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-free-item-meta {
+	min-width: 0;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-free-item-title {
+	margin: 0;
+	color: #1d2327;
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1.35;
+	overflow-wrap: anywhere;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-free-item-price {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 6px;
+	color: #1d2327;
+	font-size: 15px;
+	line-height: 1.2;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-free-item-regular-price {
+	color: #646970;
+	text-decoration: line-through;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items
+	.wsx-bxgy-free-item-regular-price
+	.amount {
+	color: inherit;
+	text-decoration: inherit;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-free-item-free-price {
+	color: #1d2327;
+	font-weight: 700;
+}
+
+.wholesalex_free_items.wsx-bxgy-free-items .wsx-free-item-tag,
+.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-free-item-qty {
+	display: none;
+}
+
+@media (max-width: 480px) {
+	.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-free-promo-card {
+		grid-template-columns: 64px minmax(0, 1fr);
+		gap: 12px;
+	}
+
+	.wholesalex_free_items.wsx-bxgy-free-items .wsx-bxgy-free-item-thumb {
+		width: 64px;
+		height: 64px;
+	}
+}
+
+.single-product .price .wsx-wholesale-regular-price,
+.single-product
+	.wp-block-woocommerce-product-price
+	.wsx-wholesale-regular-price {
+	display: block !important;
+	margin-bottom: 4px;
+}
+
+.single-product .price .wsx-wholesale-price-wrap,
+.single-product .wp-block-woocommerce-product-price .wsx-wholesale-price-wrap {
+	display: block !important;
+	clear: both;
+	text-decoration: none;
+}
+
+.single-product .price .wsx-wholesale-price-wrap::before,
+.single-product
+	.wp-block-woocommerce-product-price
+	.wsx-wholesale-price-wrap::before {
+	content: "";
+	display: block;
+}
+
+.single-product .price .wsx-wholesale-price,
+.single-product .wp-block-woocommerce-product-price .wsx-wholesale-price {
+	display: inline-flex !important;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 4px;
+	color: inherit;
+	font-size: 15px;
+	font-weight: 500;
+	line-height: 1.2;
+}
+
+.single-product .price .wsx-wholesale-price-amount,
+.single-product
+	.wp-block-woocommerce-product-price
+	.wsx-wholesale-price-amount {
+	font-size: 20px !important;
+	font-weight: 900 !important;
+	line-height: 1.1;
+}
+
+.single-product .price .wsx-wholesale-price-amount .woocommerce-Price-amount,
+.single-product
+	.wp-block-woocommerce-product-price
+	.wsx-wholesale-price-amount
+	.woocommerce-Price-amount {
+	font-size: inherit !important;
+	font-weight: inherit !important;
+	line-height: inherit !important;
+}
+
 /* Default Style */
 a.wsx-link {
 	text-decoration: none;
@@ -305,6 +496,10 @@ textarea.wsx-br-md {
 		input[type="password"],
 		input[type="number"]
 	) {
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	padding: 8px 12px;
 	border-radius: var(--border-radius-md);
 	border-color: var(--color-border-tertiary);
 	background-color: var(--color-base-one);

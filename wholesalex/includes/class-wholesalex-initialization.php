@@ -82,6 +82,26 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-email.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-email-manager.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-dynamic-rules.php';
+		require_once WHOLESALEX_PATH . 'includes/user-roles/class-payment-method.php';
+		require_once WHOLESALEX_PATH . 'includes/user-roles/class-shipping-method.php';
+		require_once WHOLESALEX_PATH . 'includes/user-roles/class-product-visibility.php';
+		require_once WHOLESALEX_PATH . 'includes/user-roles/class-price-visibility.php';
+		require_once WHOLESALEX_PATH . 'includes/user-roles/class-cart-to-quote.php';
+		require_once WHOLESALEX_PATH . 'includes/user-roles/class-tax-rules.php';
+		require_once WHOLESALEX_PATH . 'includes/user-roles/class-non-purchasable.php';
+		require_once WHOLESALEX_PATH . 'includes/user-roles/class-checkout-restriction.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/class-wholesale-pricing.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/rules/class-product-discount.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/class-import-wholesalepricing.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/class-wholesale-pricing-rest-api.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/rules/class-wholesale-pricing-condition-engine.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/rules/class-rule-regular-discount.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/rules/class-rule-tiered-discount.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/rules/class-rule-cart-discount.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/rules/class-rule-bogo-discount.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/rules/class-rule-bxgy-discount.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/rules/class-wholesale-pricing-rule-engine.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/compatibility/wowaddons/class-wowaddons-compatibility.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-settings.php';
 		require_once WHOLESALEX_PATH . 'includes/class-wholesalex-scripts.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-registration.php';
@@ -106,7 +126,21 @@ class WholesaleX_Initialization {
 
 		new \WHOLESALEX\WHOLESALEX_Role();
 		new \WHOLESALEX\WHOLESALEX_Registration();
+		new \WHOLESALEX\User_Roles_Payment_Method();
+		new \WHOLESALEX\User_Roles_Shipping_Method();
+		new \WHOLESALEX\User_Roles_Tax_Rules();
+		new \WHOLESALEX\User_Roles_Cart_To_Quote();
+		if ( wholesalex()->is_pro_active() ) {
+			new \WHOLESALEX\User_Roles_Product_Visibility();
+			new \WHOLESALEX\User_Roles_Price_Visibility();
+			new \WHOLESALEX\User_Roles_Non_Purchasable();
+			new \WHOLESALEX\User_Roles_Checkout_Restriction();
+		}
 		new \WHOLESALEX\WHOLESALEX_Dynamic_Rules();
+		new \WHOLESALEX\Import_Wholesale_Pricing();
+		new \WHOLESALEX\Wholesale_Pricing_Rest_Api();
+		new \WHOLESALEX\Wholesale_Pricing_Rule_Engine();
+		new \WHOLESALEX\Wholesale_Pricing_WowAddons_Compatibility();
 
 		new \WHOLESALEX\Addons();
 		new \WHOLESALEX\WHOLESALEX_Users();
@@ -155,6 +189,7 @@ class WholesaleX_Initialization {
 			'ajax'                => admin_url( 'admin-ajax.php' ),
 			'wholesalex_roles'    => get_option( '_wholesalex_roles' ),
 			'currency_symbol'     => get_woocommerce_currency_symbol(),
+			'currency_pos'        => get_option( 'woocommerce_currency_pos', 'left' ),
 			'current_version'     => WHOLESALEX_VER,
 			'wallet_status'       => wholesalex()->get_setting( 'wsx_addon_wallet' ),
 			'conversation_status' => wholesalex()->get_setting( 'wsx_addon_conversation' ),
@@ -165,8 +200,11 @@ class WholesaleX_Initialization {
 			'pro_ver'             => wholesalex()->is_pro_active() ? WHOLESALEX_PRO_VER : '',
 			'settings'            => wholesalex()->get_setting(),
 			'license_status'      => wholesalex()->is_pro_enabled() ? wholesalex()->get_license_status() : '',
+			'is_lc_expired'       => Xpo::is_lc_expired(),
+			'renewal_url'         => Xpo::get_lc_renewal_url(),
 			'logo_url'            => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/icons/wholesalex-logo.svg' ),
 			'plugin_name'         => wholesalex()->get_plugin_name(),
+			'dynamic_rules_access' => wholesalex()->get_dynamic_rules_access(),
 			'whitelabel_enabled'  => 'yes' == wholesalex()->get_setting( 'wsx_addon_whitelabel' ) && function_exists( 'wholesalex_whitelabel_init' ),
 			'is_admin_interface'  => is_admin(),
 			'i18n'                => array(

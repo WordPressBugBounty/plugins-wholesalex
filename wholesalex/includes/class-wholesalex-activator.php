@@ -21,8 +21,19 @@ class Activator {
 		if ( ! get_option( 'wholesalex_settings' ) ) {
 			$this->init_set_data();
 		}
-		if ( ! get_option( '_wholesalex_roles' ) ) {
-			$this->init_roles();
+		$had_roles            = (bool) get_option( '_wholesalex_roles' );
+		$created_roles        = $this->init_roles();
+		$default_b2b_role_id  = apply_filters( 'wholesalex_default_b2b_role_id', 'wholesalex_b2b_wholesale' );
+		$default_role_ids     = array_keys( wholesalex()->get_default_roles() );
+		$role_ids             = wholesalex()->get_roles( 'ids' );
+		$has_only_defaults    = empty( array_diff( $role_ids, $default_role_ids ) );
+		$has_default_b2b_role = ! empty( wholesalex()->get_roles( 'by_id', $default_b2b_role_id ) );
+		$should_assign_admins = 'yes' !== get_option( '_wholesalex_default_admin_role_assigned' )
+			&& $has_default_b2b_role
+			&& ( ! $had_roles || in_array( $default_b2b_role_id, $created_roles, true ) || $has_only_defaults );
+
+		if ( $should_assign_admins ) {
+			$this->assign_admin_wholesale_role();
 		}
 
 		add_action( 'activated_plugin', array( $this, 'activation_redirect' ) );
@@ -95,30 +106,21 @@ class Activator {
 	 * Initial Role.
 	 * After plugin activation default role is create.
 	 *
-	 * @return void
+	 * @return array Role IDs created during this call.
 	 */
 	public function init_roles() {
-		$__inital_roles =
-			apply_filters(
-				'wholesalex_initial_roles',
-				array(
-					'wholesalex_b2c_users' => array(
-						'id'          => 'wholesalex_b2c_users',
-						'_role_title' => __( 'B2C Users', 'wholesalex' ),
-						'removeable'  => false,
-					),
-					'wholesalex_guest'     => array(
-						'id'          => 'wholesalex_guest',
-						'_role_title' => __( 'Guest Users', 'wholesalex' ),
-						'removeable'  => false,
-					),
-				)
-			);
-		foreach ( $__inital_roles as $role ) {
-			if ( empty( wholesalex()->get_roles( 'by_id', $role['id'] ) ) ) {
-				wholesalex()->set_roles( $role['id'], $role );
-			}
-		}
+		return wholesalex()->ensure_default_roles();
+	}
+
+	/**
+	 * Assign all administrator users to the B2B Wholesale Role if they do not
+	 * already have a WholesaleX role assigned.
+	 *
+	 * @return void
+	 */
+	public function assign_admin_wholesale_role() {
+		$default_b2b_role_id = apply_filters( 'wholesalex_default_b2b_role_id', 'wholesalex_b2b_wholesale' );
+		wholesalex()->assign_admin_wholesale_role( $default_b2b_role_id );
 	}
 
 	/**

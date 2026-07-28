@@ -65,6 +65,7 @@ class Dynamic_Rules {
 		// Order / Cart session hooks.
 		// Classic checkout (shortcode-based) fires woocommerce_checkout_create_order.
 		add_action( 'woocommerce_checkout_create_order', array( $this, 'add_custom_meta_on_wholesale_order' ), 10 );
+		add_action( 'woocommerce_store_api_checkout_update_order_meta', array( $this, 'add_custom_meta_on_wholesale_order' ), 10 );
 		// WooCommerce Blocks / Store API checkout never fires woocommerce_checkout_create_order;
 		// it uses woocommerce_store_api_checkout_update_order_meta instead.
 		add_action( 'woocommerce_store_api_checkout_update_order_meta', array( $this, 'add_custom_meta_on_wholesale_order' ), 10 );
@@ -98,7 +99,7 @@ class Dynamic_Rules {
 		// BOGO badges - delegate to Rule_Buy_X_Get_One.
 		add_filter( 'wopb_after_loop_image', array( $this->rule_buy_x_get_one, 'wopb_wholesalex_bogo_display_sale_badge' ), 10 );
 		add_action( 'woocommerce_before_shop_loop_item_title', array( $this->rule_buy_x_get_one, 'wholesalex_bogo_display_sale_badge' ), 10 );
-		add_action( 'woocommerce_before_single_product', array( $this->rule_buy_x_get_one, 'wholesalex_bogo_single_page_display_sale_badge' ), 10 );
+		add_action( 'wholesalex_after_frontend_enqueue_scripts', array( $this->rule_buy_x_get_one, 'wholesalex_bogo_single_page_display_sale_badge' ), 10 );
 		add_action( 'wp_head', array( $this->rule_buy_x_get_one, 'wholesalex_bogo_badge_add_custom_css' ) );
 
 		// Price table JS.
@@ -424,6 +425,15 @@ class Dynamic_Rules {
 			return;
 		}
 
+		$__user_role = wholesalex()->get_current_user_role();
+		$order_type  = $this->get_order_type_from_user_role( $__user_role );
+		$order->update_meta_data( '__wholesalex_order_type', $order_type );
+
+		if ( null === WC()->session ) {
+			return;
+		}
+
+
 		// order_type is resolved from the current user's role and does not require the session.
 		$__user_role = wholesalex()->get_current_user_role();
 		$order_type  = $this->get_order_type_from_user_role( $__user_role );
@@ -463,9 +473,6 @@ class Dynamic_Rules {
 		if ( ! empty( $__ordered_discounted_product ) ) {
 			$order->update_meta_data( '__wholesalex_discounted_products', array_unique( $__ordered_discounted_product ) );
 		}
-		$__user_role = wholesalex()->get_current_user_role();
-		$order_type  = $this->get_order_type_from_user_role( $__user_role );
-		$order->update_meta_data( '__wholesalex_order_type', $order_type );
 		WC()->session->set( '__wholesalex_discounted_products', array() );
 	}
 
@@ -1337,10 +1344,64 @@ class Dynamic_Rules {
 
 	// ─── Price Display ───────────────────────────────────────────
 
-	public function variation_price_hash( $hash, $product ) {
+	public function variation_price_hash( $hash, $product, $for_display = false ) {
 		$user_id = apply_filters( 'wholesalex_set_current_user', get_current_user_id() );
-		$hash[]  = apply_filters( 'wholesalex_variation_prices_hash', strval( $user_id ) . strval( floor( time() / 60 ) ), $product );
+		$context = array(
+			'user_id'     => (string) $user_id,
+			'role_id'     => (string) wholesalex()->get_user_role( $user_id ),
+			'rules'       => md5( wp_json_encode( $this->valid_dynamic_rules ) ),
+			'cart'        => $this->get_variation_price_cart_hash(),
+			'currency'    => function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : get_option( 'woocommerce_currency' ),
+			'tax_display' => function_exists( 'get_option' ) ? get_option( 'woocommerce_tax_display_shop' ) : '',
+			'for_display' => (bool) $for_display,
+		);
+		$hash[]  = apply_filters( 'wholesalex_variation_prices_hash', md5( wp_json_encode( $context ) ), $product, $context );
 		return $hash;
+	}
+
+	/**
+	 * Return a stable cart fingerprint for cart-sensitive variation pricing.
+	 *
+	 * WooCommerce stores all variation price hash variants inside one product
+	 * transient, so this must change only when cart values that can affect
+	 * Dynamic Rules pricing change.
+	 *
+	 * @return string
+	 */
+	private function get_variation_price_cart_hash() {
+		if ( ! function_exists( 'WC' ) || ! WC()->cart || WC()->cart->is_empty() ) {
+			return '';
+		}
+
+		$cart_items = array();
+		foreach ( WC()->cart->get_cart() as $cart_item ) {
+			$product_id   = isset( $cart_item['product_id'] ) ? absint( $cart_item['product_id'] ) : 0;
+			$variation_id = isset( $cart_item['variation_id'] ) ? absint( $cart_item['variation_id'] ) : 0;
+			$key          = $product_id . ':' . $variation_id;
+
+			if ( ! isset( $cart_items[ $key ] ) ) {
+				$cart_items[ $key ] = array(
+					'product_id'    => $product_id,
+					'variation_id'  => $variation_id,
+					'quantity'      => 0,
+					'line_subtotal' => 0.0,
+				);
+			}
+
+			$cart_items[ $key ]['quantity']      += isset( $cart_item['quantity'] ) ? absint( $cart_item['quantity'] ) : 0;
+			$cart_items[ $key ]['line_subtotal'] += isset( $cart_item['line_subtotal'] ) ? (float) $cart_item['line_subtotal'] : 0.0;
+		}
+
+		ksort( $cart_items, SORT_STRING );
+
+		foreach ( $cart_items as $key => $cart_item ) {
+			$cart_items[ $key ]['line_subtotal'] = wc_format_decimal(
+				$cart_item['line_subtotal'],
+				function_exists( 'wc_get_price_decimals' ) ? wc_get_price_decimals() : 2
+			);
+		}
+
+		return md5( wp_json_encode( $cart_items ) );
 	}
 
 	public function format_sale_price( $regular_price, $sale_price, $is_wholesalex_sale_price_applied ) {
@@ -1365,9 +1426,6 @@ class Dynamic_Rules {
 		}
 		if ( ! $is_wholesalex_sale_price_applied ) {
 			$sale_text = '';
-		}
-		if ( ! empty( $sale_text ) ) {
-			$sale_text = '<span class="wholesalex-sale-text">' . $sale_text . '</span> ';
 		}
 		if ( ! is_admin() ) {
 			if ( 'yes' === (string) $__hide_wholesale_price && 'yes' === (string) $__hide_regular_price ) {
@@ -2076,7 +2134,7 @@ class Dynamic_Rules {
 			2
 		);
 
-		add_filter( 'woocommerce_get_variation_prices_hash', array( $this, 'variation_price_hash' ), 9, 2 );
+		add_filter( 'woocommerce_get_variation_prices_hash', array( $this, 'variation_price_hash' ), 9, 3 );
 		add_filter( 'woocommerce_get_price_html', array( $this, 'woocommerce_get_price_html' ), 9, 2 );
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_cart_price' ), 5 );
 		add_filter( 'woocommerce_cart_item_price', array( $this, 'set_cart_item_price_to_display' ), 10, 2 );
@@ -3231,29 +3289,64 @@ class Dynamic_Rules {
 						$heading_text = false;
 
 						if ( ! empty( $include_products ) && in_array( $product_id, $include_products, true ) ) {
-							$heading_text = sprintf( 'Buy %s Quantity to Get These Item Free!', $rule['min_purchase_count'] );
+							$heading_text = sprintf(
+								/* translators: 1: minimum quantity to buy, 2: free product quantity. */
+								__( 'Buy %1$s, Get %2$s Free', 'wholesalex' ),
+								$rule['min_purchase_count'],
+								$rule['free_item_quantity']
+							);
 						} elseif ( ! empty( $exclude_products ) && ! in_array( $product_id, $exclude_products, true ) ) {
-							$heading_text = sprintf( 'Buy %s Quantity to Get These Item Free!', $rule['min_purchase_count'] );
+							$heading_text = sprintf(
+								/* translators: 1: minimum quantity to buy, 2: free product quantity. */
+								__( 'Buy %1$s, Get %2$s Free', 'wholesalex' ),
+								$rule['min_purchase_count'],
+								$rule['free_item_quantity']
+							);
 						} elseif ( ! empty( $include_cats ) && array_intersect( $cats, $include_cats ) ) {
 							$cat_names = array();
 							foreach ( $include_cats as $cat_id ) {
 								$term        = get_term_by( 'id', $cat_id, 'product_cat' );
 								$cat_names[] = $term->name;
 							}
-							$heading_text = sprintf( 'Buy %s Quantity From %s Categories to Get These Item Free!', $rule['min_purchase_count'], implode( ',', $cat_names ) );
+							$heading_text = sprintf(
+								/* translators: 1: minimum quantity to buy, 2: free product quantity. */
+								__( 'Buy %1$s, Get %2$s Free', 'wholesalex' ),
+								$rule['min_purchase_count'],
+								$rule['free_item_quantity']
+							);
 						} elseif ( ! empty( $exclude_cats ) && ! array_intersect( $cats, $exclude_cats ) ) {
 							$cat_names = array();
 							foreach ( $exclude_cats as $cat_id ) {
 								$term        = get_term_by( 'id', $cat_id, 'product_cat' );
 								$cat_names[] = $term->name;
 							}
-							$heading_text = sprintf( 'Buy %s Quantity Excluding These %s Categories to Get These Item Free!', $rule['min_purchase_count'], implode( ',', $cat_names ) );
+							$heading_text = sprintf(
+								/* translators: 1: minimum quantity to buy, 2: free product quantity. */
+								__( 'Buy %1$s, Get %2$s Free', 'wholesalex' ),
+								$rule['min_purchase_count'],
+								$rule['free_item_quantity']
+							);
 						} elseif ( ! empty( $include_variations ) && in_array( $variation_id, $include_variations, true ) ) {
-							$heading_text = sprintf( 'Buy %s Quantity to Get These Item Free!', $rule['min_purchase_count'] );
+							$heading_text = sprintf(
+								/* translators: 1: minimum quantity to buy, 2: free product quantity. */
+								__( 'Buy %1$s, Get %2$s Free', 'wholesalex' ),
+								$rule['min_purchase_count'],
+								$rule['free_item_quantity']
+							);
 						} elseif ( ! empty( $exclude_variations ) && ! in_array( $variation_id, $exclude_variations, true ) ) {
-							$heading_text = sprintf( 'Buy %s Quantity to Get These Item Free!', $rule['min_purchase_count'] );
+							$heading_text = sprintf(
+								/* translators: 1: minimum quantity to buy, 2: free product quantity. */
+								__( 'Buy %1$s, Get %2$s Free', 'wholesalex' ),
+								$rule['min_purchase_count'],
+								$rule['free_item_quantity']
+							);
 						} elseif ( $is_all_products ) {
-							$heading_text = sprintf( 'Buy %s Quantity From All Products to Get These Item Free!', $rule['min_purchase_count'] );
+							$heading_text = sprintf(
+								/* translators: 1: minimum quantity to buy, 2: free product quantity. */
+								__( 'Buy %1$s, Get %2$s Free', 'wholesalex' ),
+								$rule['min_purchase_count'],
+								$rule['free_item_quantity']
+							);
 						}
 
 						if ( $heading_text ) {
@@ -3321,27 +3414,30 @@ class Dynamic_Rules {
 			return;
 		}
 		?>
-		<div class="wholesalex_free_items wsx-single-product-discount-card">
+		<div class="wholesalex_free_items wsx-single-product-discount-card wsx-bxgy-free-items">
 			<div class="wsx-bxgy-min-purchase-text"> <?php echo esc_html( $min_purchase_text ); ?> </div>
 			<?php
 			foreach ( $free_products as $product ) {
-				$image = wp_get_attachment_image_src( get_post_thumbnail_id( $product->get_id() ), 'thumbnail' );
-				$image = $image ? $image[0] : wc_placeholder_img_src( 'thumbnail' );
+				$image_id = $product->get_image_id();
+				$image    = $image_id ? wp_get_attachment_image_url( $image_id, 'thumbnail' ) : '';
+				$image    = $image ? $image : wc_placeholder_img_src( 'thumbnail' );
 				?>
 				<div class="wsx-bxgy-free-promo-card">
-					<img src="<?php echo esc_url( $image ); ?>">
+					<div class="wsx-bxgy-free-item-thumb">
+						<img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $product->get_title() ); ?>">
+						<?php if ( $free_item_quantity > 1 ) { ?>
+							<span class="wsx-bxgy-free-item-qty-badge"><?php echo esc_html( 'x' . $free_item_quantity ); ?></span>
+						<?php } ?>
+					</div>
 					<div class="wsx-bxgy-free-item-meta">
 						<div class="wsx-bxgy-free-item-title"><?php echo esc_html( $product->get_title() ); ?> </div>
-						<?php if ( $free_item_quantity > 1 ) { ?>
-							<div class="wsx-bxgy-free-item-qty">
-								<?php printf( esc_html__( 'Quantity: %s', 'wholesalex' ), esc_html( $free_item_quantity ) ); ?>
-							</div>
-						<?php } ?>
 						<div class="wsx-bxgy-free-item-price">
-							<?php echo wp_kses_post( wc_price( (float) $product->get_price( 'edit' ) * $free_item_quantity ) ); ?>
+							<span class="wsx-bxgy-free-item-regular-price">
+								<?php echo wp_kses_post( wc_price( (float) $product->get_price( 'edit' ) * $free_item_quantity ) ); ?>
+							</span>
+							<span class="wsx-bxgy-free-item-free-price"><?php echo esc_html__( 'FREE', 'wholesalex' ); ?></span>
 						</div>
 					</div>
-					<div class="wsx-free-item-tag"><?php echo esc_html__( 'FREE', 'wholesalex' ); ?> </div>
 				</div>
 				<?php
 			}

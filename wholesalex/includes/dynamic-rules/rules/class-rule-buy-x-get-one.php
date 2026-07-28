@@ -74,24 +74,15 @@ class Rule_Buy_X_Get_One {
 							$price = $cart_item['data']->get_regular_price();
 						}
 
-						$cart = WC()->cart;
-						if ( 'incl' === $cart->get_tax_price_display_mode() ) {
-							$price = wc_get_price_excluding_tax(
-								$cart_item['data'],
-								array(
-									'qty'   => $free_quantity,
-									'price' => $price,
-								)
-							);
-						} else {
-							$price = wc_get_price_including_tax(
-								$cart_item['data'],
-								array(
-									'qty'   => $free_quantity,
-									'price' => $price,
-								)
-							);
-						}
+						// WooCommerce stores fee totals excluding tax.
+						// Tax display mode should not inflate BOGO discounts.
+						$price = wc_get_price_excluding_tax(
+							$cart_item['data'],
+							array(
+								'qty'   => $free_quantity,
+								'price' => $price,
+							)
+						);
 						$smart_tags         = array(
 							'{product_title}' => $cart_item['data']->get_title(),
 							'{x}'             => $min_qty,
@@ -122,7 +113,7 @@ class Rule_Buy_X_Get_One {
 	public function register_badge_hooks() {
 		add_filter( 'wopb_after_loop_image', array( $this, 'wopb_wholesalex_bogo_display_sale_badge' ), 10 );
 		add_action( 'woocommerce_before_shop_loop_item_title', array( $this, 'wholesalex_bogo_display_sale_badge' ), 10 );
-		add_action( 'woocommerce_before_single_product', array( $this, 'wholesalex_bogo_single_page_display_sale_badge' ), 10 );
+		add_action( 'wholesalex_after_frontend_enqueue_scripts', array( $this, 'wholesalex_bogo_single_page_display_sale_badge' ), 10 );
 		add_action( 'wp_head', array( $this, 'wholesalex_bogo_badge_add_custom_css' ) );
 	}
 
@@ -158,9 +149,9 @@ class Rule_Buy_X_Get_One {
 	public function wholesalex_bogo_display_markup_css_generate( $bogo_badge_dynamic_rule ) {
 		foreach ( $bogo_badge_dynamic_rule as $badge_dynamic_rule ) {
 			$badge_roles            = $badge_dynamic_rule['rule'];
-			$badge_label_text_color = isset( $badge_roles['_product_badge_text_color'] ) ? $badge_roles['_product_badge_text_color'] : '';
-			$badge_style            = isset( $badge_roles['_product_badge_styles'] ) ? $badge_roles['_product_badge_styles'] : '';
-			$badge_label_bg_color   = isset( $badge_roles['_product_badge_bg_color'] ) ? $badge_roles['_product_badge_bg_color'] : '';
+			$badge_label_text_color = isset( $badge_roles['_product_badge_text_color'] ) ? $badge_roles['_product_badge_text_color'] : '#ffffff';
+			$badge_style            = isset( $badge_roles['_product_badge_styles'] ) ? $badge_roles['_product_badge_styles'] : 'style_one';
+			$badge_label_bg_color   = isset( $badge_roles['_product_badge_bg_color'] ) ? $badge_roles['_product_badge_bg_color'] : '#5a40e8';
 			$badge_position         = isset( $badge_roles['_product_badge_position'] ) ? $badge_roles['_product_badge_position'] : 'right';
 
 			?>
@@ -244,13 +235,17 @@ class Rule_Buy_X_Get_One {
 	/**
 	 * Generate HTML Markup For Showing Badge.
 	 *
-	 * @param array $bogo_badge_dynamic_rule The dynamic rule for the BOGO badge.
-	 * @param bool  $is_single Whether it is a single product page.
+	 * @param array       $bogo_badge_dynamic_rule The dynamic rule for the BOGO badge.
+	 * @param bool        $is_single Whether it is a single product page.
+	 * @param \WC_Product $product   Product to render. Defaults to the global product.
 	 * @return string|void
 	 */
-	public function wholesalex_bogo_display_markup( $bogo_badge_dynamic_rule, $is_single ) {
-		global $product;
-		if ( ! isset( $product ) && ! is_a( $product, 'WC_Product' ) ) {
+	public function wholesalex_bogo_display_markup( $bogo_badge_dynamic_rule, $is_single, $product = null ) {
+		if ( ! $product instanceof \WC_Product ) {
+			$product = isset( $GLOBALS['product'] ) ? $GLOBALS['product'] : null;
+		}
+
+		if ( ! $product instanceof \WC_Product ) {
 			return;
 		}
 		ob_start();
@@ -259,9 +254,9 @@ class Rule_Buy_X_Get_One {
 			$bogo_badge_filter = $badge_dynamic_rule['filter'];
 			$enable_bogo_badge = isset( $bogo_badge_type['_buy_x_get_product_badge_enable'] ) ? $bogo_badge_type['_buy_x_get_product_badge_enable'] : '';
 			if ( 'yes' === $enable_bogo_badge ) {
-				$badge_label            = $bogo_badge_type['_product_badge_label'];
-				$badge_label_bg_color   = $bogo_badge_type['_product_badge_bg_color'];
-				$badge_label_text_color = $bogo_badge_type['_product_badge_text_color'];
+				$badge_label            = isset( $bogo_badge_type['_product_badge_label'] ) ? $bogo_badge_type['_product_badge_label'] : __( 'BOGO Free', 'wholesalex' );
+				$badge_label_bg_color   = isset( $bogo_badge_type['_product_badge_bg_color'] ) ? $bogo_badge_type['_product_badge_bg_color'] : '#5a40e8';
+				$badge_label_text_color = isset( $bogo_badge_type['_product_badge_text_color'] ) ? $bogo_badge_type['_product_badge_text_color'] : '#ffffff';
 				if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $product->get_parent_id() ? $product->get_parent_id() : $product->get_id(), $product->get_id(), $bogo_badge_filter ) ) {
 					if ( isset( $badge_label ) ) :
 						?>
@@ -310,13 +305,26 @@ class Rule_Buy_X_Get_One {
 	 * Dynamic Bogo Badge For Single Product.
 	 */
 	public function wholesalex_bogo_single_page_display_sale_badge() {
+		if ( ! is_product() ) {
+			return;
+		}
+
+		$product = wc_get_product( get_queried_object_id() );
+
+		if ( ! $product instanceof \WC_Product ) {
+			return;
+		}
+
 		$localized_content = array();
 		if ( wholesalex()->get_setting( 'bogo_discount_bogo_badge_enable', 'yes' ) === 'yes' && isset( $this->valid_dynamic_rules['buy_x_get_one'] ) && ! empty( $this->valid_dynamic_rules['buy_x_get_one'] ) ) {
-			$localized_content['buy_x_get_one'] = $this->wholesalex_bogo_display_markup( $this->valid_dynamic_rules['buy_x_get_one'], true );
+			$localized_content['buy_x_get_one'] = $this->wholesalex_bogo_display_markup( $this->valid_dynamic_rules['buy_x_get_one'], true, $product );
 		}
 		if ( wholesalex()->is_pro_active() && wholesalex()->get_setting( '_settings_show_bxgy_free_products_badge', 'yes' ) === 'yes' && isset( $this->valid_dynamic_rules['buy_x_get_y'] ) && ! empty( $this->valid_dynamic_rules['buy_x_get_y'] ) ) {
-			$localized_content['buy_x_get_y'] = $this->wholesalex_bogo_display_markup( $this->valid_dynamic_rules['buy_x_get_y'], true );
+			$localized_content['buy_x_get_y'] = $this->wholesalex_bogo_display_markup( $this->valid_dynamic_rules['buy_x_get_y'], true, $product );
 		}
-		wp_localize_script( 'wholesalex', 'wholesalex_bogo_single', array( 'content' => $localized_content ) );
+
+		if ( ! empty( array_filter( $localized_content ) ) ) {
+			wp_localize_script( 'wholesalex', 'wholesalex_bogo_single', array( 'content' => $localized_content ) );
+		}
 	}
 }

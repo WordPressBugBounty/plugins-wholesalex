@@ -1,3 +1,67 @@
+/* Hide WordPress admin chrome ONLY when the WholesaleX React route enters builder mode.
+   White label changes the WP menu slug, so scope to our stable backend body class. */
+body.wholesalex_backend_body.wsx-builder-mode #adminmenumain,
+body.wholesalex_backend_body.wsx-builder-mode #wpadminbar,
+body.wholesalex_backend_body.wsx-builder-mode #wpfooter {
+	display: none !important;
+}
+
+body.wholesalex_backend_body.wsx-builder-mode #wpcontent,
+body.wholesalex_backend_body.wsx-builder-mode #wpfooter {
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+}
+
+/* Remove all margins/padding in builder mode */
+html.wsx-builder-mode,
+html.wp-toolbar.wsx-builder-mode,
+html body.wholesalex_backend_body.wsx-builder-mode,
+body.wholesalex_backend_body.wsx-builder-mode,
+html.wp-toolbar body.wholesalex_backend_body.wsx-builder-mode {
+	margin: 0 !important;
+	padding: 0 !important;
+	padding-top: 0 !important;
+}
+
+body.wholesalex_backend_body.wsx-builder-mode #wpwrap {
+	padding-top: 0 !important;
+	margin-top: 0 !important;
+}
+
+body.wholesalex_backend_body.wsx-builder-mode #wpcontent {
+	padding-top: 0 !important;
+	margin-top: 0 !important;
+}
+
+body.wholesalex_backend_body.wsx-builder-mode #wpbody-content {
+	padding-bottom: 0 !important;
+	padding-top: 0 !important;
+}
+
+body.wholesalex_backend_body.wsx-builder-mode #wpbody-content > * {
+	margin-top: 0 !important;
+}
+
+body.wholesalex_backend_body.wsx-builder-mode #wholesalex-overview,
+body.wholesalex_backend_body.wsx-builder-mode #wholesalex-react-root {
+	margin-top: 0 !important;
+	padding-top: 0 !important;
+}
+
+body.wholesalex_backend_body.wsx-builder-mode .wsx-container {
+	padding-top: 0 !important;
+	margin-top: 0 !important;
+}
+
+/* Loading state for the WholesaleX React app only.
+   Keep the WordPress admin chrome visible so core can measure and scroll the menu. */
+body.wholesalex_backend_body:not(.wsx-loaded) #wholesalex-overview,
+body.wholesalex_backend_body:not(.wsx-loaded) #wholesalex-react-root {
+	visibility: hidden;
+}
+
 :root {
 	/* color variables */
 	--color-primary: #6c6cff;
@@ -25,6 +89,7 @@
 	--color-base-one: #ffffff;
 	--color-base-two: #e7e7ff;
 	--color-base-three: #f4f4ff;
+	--wsx-admin-page-background: #ededee;
 
 	--color-text-dark: #07050b;
 	--color-text-medium: #343a46;
@@ -120,7 +185,7 @@ table.wsx-table {
 
 .wholesalex_backend_body #wpcontent {
 	padding-left: 0;
-	background-color: var(--color-base-three);
+	background-color: var(--wsx-admin-page-background);
 }
 
 .woocommerce_options_panel input[type="number"].wsx-input,
@@ -3309,6 +3374,9 @@ select.wsx-select {
 	.components-flex {
 	padding: 6px 7px;
 }
+.wsx-multiselect-component.components-form-token-field__input-container input[type=text].components-form-token-field__input {
+	height: 26px;
+}
 /* FormTokenField's absolute suggestions list */
 .wsx-multiselect-component .components-form-token-field__suggestions-list {
 	position: absolute !important;
@@ -3348,7 +3416,7 @@ select.wsx-select {
 /* DataViews Table styles */
 .dataviews-view-table
 	col[class^="dataviews-view-table__col-"]:not(
-		.dataviews-view-table__col-first-data
+		.dataviews-view-table__col-__select
 	) {
 	width: auto !important;
 }

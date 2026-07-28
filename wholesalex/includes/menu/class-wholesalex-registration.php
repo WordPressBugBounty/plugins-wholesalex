@@ -90,7 +90,7 @@ class WHOLESALEX_Registration {
 			'wholesalex_forms_block',
 			'wholesalex_block_data',
 			array(
-				'form_builder_url' => admin_url( 'admin.php?page=wholesalex#/registration' ),
+				'form_builder_url' => admin_url( 'admin.php?page=wholesalex-registration' ),
 				'url'              => WHOLESALEX_URL,
 			)
 		);
@@ -298,11 +298,25 @@ class WHOLESALEX_Registration {
 		if ( 'post' === $type ) {
 
 			if ( isset( $post['data'] ) ) {
-				update_option( 'wholesalex_registration_form', sanitize_text_field( wp_unslash( $post['data'] ) ) );
+				$form_data = $this->sanitize_form_builder_payload( $post['data'] );
+
+				if ( is_wp_error( $form_data ) ) {
+					wp_send_json_error(
+						array(
+							'message' => $form_data->get_error_message(),
+						)
+					);
+				}
+
+				update_option( 'wholesalex_registration_form', $form_data );
 
 				$GLOBALS['wholesalex_registration_fields'] = WholesaleX_CommonUtils::get_form_fields();
 
-				wp_send_json_success();
+				wp_send_json_success(
+					array(
+						'form_data' => $form_data,
+					)
+				);
 			} else {
 				wp_send_json_error();
 			}
@@ -312,10 +326,52 @@ class WHOLESALEX_Registration {
 			wp_send_json_success(
 				array(
 					'roles'     => $__roles_options,
-					'form_data' => array(),
+					'form_data' => get_option( 'wholesalex_registration_form' ),
 				)
 			);
 		}
+	}
+
+	/**
+	 * Sanitize form builder payload before saving.
+	 *
+	 * @param string $payload JSON payload.
+	 * @return string|WP_Error
+	 */
+	private function sanitize_form_builder_payload( $payload ) {
+		$decoded = json_decode( wp_unslash( $payload ), true );
+
+		if ( ! is_array( $decoded ) ) {
+			return new WP_Error( 'invalid_form_builder_payload', __( 'Invalid registration form data.', 'wholesalex' ) );
+		}
+
+		$decoded = $this->sanitize_form_builder_value( $decoded );
+
+		return wp_json_encode( $decoded );
+	}
+
+	/**
+	 * Recursively sanitize form builder values while preserving arrays and scalar types.
+	 *
+	 * @param mixed $value Value.
+	 * @return mixed
+	 */
+	private function sanitize_form_builder_value( $value ) {
+		if ( is_array( $value ) ) {
+			$sanitized = array();
+			foreach ( $value as $key => $item ) {
+				$sanitized_key               = is_string( $key ) ? sanitize_text_field( $key ) : $key;
+				$sanitized[ $sanitized_key ] = $this->sanitize_form_builder_value( $item );
+			}
+
+			return $sanitized;
+		}
+
+		if ( is_bool( $value ) || is_int( $value ) || is_float( $value ) || null === $value ) {
+			return $value;
+		}
+
+		return sanitize_text_field( $value );
 	}
 
 
@@ -623,24 +679,52 @@ class WHOLESALEX_Registration {
 	}
 
 	/**
+	 * Normalize registration role options for WooCommerce registration output.
+	 *
+	 * @param array $options Role select options.
+	 * @return array
+	 */
+	private function normalize_woo_registration_role_options( $options ) {
+		$normalized = array();
+		$seen       = array();
+
+		foreach ( (array) $options as $option ) {
+			if ( ! isset( $option['value'] ) || '' === $option['value'] || 'wholesalex_guest' === $option['value'] ) {
+				continue;
+			}
+
+			$value = sanitize_text_field( $option['value'] );
+			if ( isset( $seen[ $value ] ) ) {
+				continue;
+			}
+
+			$seen[ $value ] = true;
+			$normalized[]   = array(
+				'value' => $value,
+				'name'  => isset( $option['name'] ) ? WholesaleX_CommonUtils::translate_form_builder_default_text( $option['name'] ) : $value,
+			);
+		}
+
+		return $normalized;
+	}
+
+	/**
 	 * Generate custom Fields for displaying on woo registration form
 	 *
 	 * @param array $field Field.
 	 * @return void
 	 */
 	public function generate_field_for_woo_registration( $field ) {
+		$field       = WholesaleX_CommonUtils::translate_form_builder_field( $field );
 		$depends     = $this->check_depends( $field );
 		$is_required = isset( $field['required'] ) ? $field['required'] : false;
 
 		// Check to Guest User Shouldn't Be Show In WooCommerce Registration Form.
 		if ( 'select' === $field['type'] && 'wholesalex_registration_role' === $field['name'] ) {
-			$filtered_role_options = array_filter(
-				$field['option'],
-				function ( $item ) {
-					return 'wholesalex_guest' !== $item['value'];
-				}
-			);
-			$field['option']       = $filtered_role_options;
+			$field['option'] = $this->normalize_woo_registration_role_options( isset( $field['option'] ) ? $field['option'] : array() );
+			if ( empty( $field['option'] ) ) {
+				$field['option'] = $this->normalize_woo_registration_role_options( wholesalex()->get_roles( 'roles_option' ) );
+			}
 		}
 		switch ( $field['type'] ) {
 			case 'text':
@@ -746,6 +830,7 @@ class WHOLESALEX_Registration {
 				<?php
 				break;
 			case 'select':
+				$selected_value = isset( $_POST[ $field['name'] ] ) ? sanitize_text_field( wp_unslash( $_POST[ $field['name'] ] ) ) : '';
 				?>
 					<p data-wsx-exclude="<?php echo esc_attr( $depends ); ?>" class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide wholesalex-custom-field wsx-field" style="<?php echo esc_attr( $depends ? 'display: none;' : '' ); ?>">
 						<?php
@@ -772,13 +857,12 @@ class WHOLESALEX_Registration {
 								echo 'required';}
 							?>
 													>
-							<option value="" disabled <?php echo empty( $_POST[ $field['name'] ] ) ? 'selected' : ''; ?>>Please select</option>
+							<option value="" disabled <?php selected( $selected_value, '' ); ?>><?php esc_html_e( 'Please select', 'wholesalex' ); ?></option>
 
 							<?php
 							foreach ( $field['option'] as $option ) {
-								$selected = ( isset( $_POST[ $field['name'] ] ) && $_POST[ $field['name'] ] == $option['value'] ) ? 'selected' : '';
 								?>
-								<option value="<?php echo esc_attr( $option['value'] ); ?>" <?php echo $selected; ?>>
+								<option value="<?php echo esc_attr( $option['value'] ); ?>" <?php selected( $selected_value, $option['value'] ); ?>>
 									<?php echo esc_html( $option['name'] ); ?>
 								</option>
 								<?php

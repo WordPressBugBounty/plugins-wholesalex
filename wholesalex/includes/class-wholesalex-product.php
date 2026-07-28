@@ -217,11 +217,11 @@ class WHOLESALEX_Product {
 		}
 
 		if ( 'onbackorder' === $b2c_status ) {
-			$stock_html = '<mark class="onbackorder">' . __( 'On backorder', 'woocommerce' ) . '</mark>';
+			$stock_html = '<mark class="onbackorder">' . __( 'On backorder', 'wholesalex' ) . '</mark>';
 		} elseif ( 'outofstock' === $b2c_status ) {
-			$stock_html = '<mark class="outofstock">' . __( 'Out of stock', 'woocommerce' ) . '</mark>';
+			$stock_html = '<mark class="outofstock">' . __( 'Out of stock', 'wholesalex' ) . '</mark>';
 		} else {
-			$stock_html = '<mark class="instock">' . __( 'In stock', 'woocommerce' ) . '</mark>';
+			$stock_html = '<mark class="instock">' . __( 'In stock', 'wholesalex' ) . '</mark>';
 		}
 
 		if ( $parent_manages_stock ) {
@@ -260,11 +260,11 @@ class WHOLESALEX_Product {
 			}
 
 			if ( 'onbackorder' === $stock_status ) {
-				$b2b_stock_html = '<mark class="onbackorder">' . __( 'On backorder', 'woocommerce' ) . '</mark>';
+				$b2b_stock_html = '<mark class="onbackorder">' . __( 'On backorder', 'wholesalex' ) . '</mark>';
 			} elseif ( 'outofstock' === $stock_status ) {
-				$b2b_stock_html = '<mark class="outofstock">' . __( 'Out of stock', 'woocommerce' ) . '</mark>';
+				$b2b_stock_html = '<mark class="outofstock">' . __( 'Out of stock', 'wholesalex' ) . '</mark>';
 			} else {
-				$b2b_stock_html = '<mark class="instock">' . __( 'In stock', 'woocommerce' ) . '</mark>';
+				$b2b_stock_html = '<mark class="instock">' . __( 'In stock', 'wholesalex' ) . '</mark>';
 			}
 
 			// Append quantity badge when stock is managed and product is not out-of-stock.
@@ -375,11 +375,11 @@ class WHOLESALEX_Product {
 		}
 
 		if ( $b2b_any_instock ) {
-			return '<mark class="instock">' . __( 'In stock', 'woocommerce' ) . '</mark>';
+			return '<mark class="instock">' . __( 'In stock', 'wholesalex' ) . '</mark>';
 		} elseif ( $b2b_any_backorder ) {
-			return '<mark class="onbackorder">' . __( 'On backorder', 'woocommerce' ) . '</mark>';
+			return '<mark class="onbackorder">' . __( 'On backorder', 'wholesalex' ) . '</mark>';
 		} else {
-			return '<mark class="outofstock">' . __( 'Out of stock', 'woocommerce' ) . '</mark>';
+			return '<mark class="outofstock">' . __( 'Out of stock', 'wholesalex' ) . '</mark>';
 		}
 	}
 
@@ -882,7 +882,7 @@ class WHOLESALEX_Product {
 
 			if ( is_wp_error( $new_stock ) ) {
 				/* translators: %s item name. */
-				$order->add_order_note( sprintf( __( 'Unable to reduce stock for item %s.', 'woocommerce' ), $item_name ) );
+				$order->add_order_note( sprintf( __( 'Unable to reduce stock for item %s.', 'wholesalex' ), $item_name ) );
 				continue;
 			}
 
@@ -948,7 +948,7 @@ class WHOLESALEX_Product {
 			}
 		}
 
-		$order->add_order_note( __( 'Stock levels reduced:', 'woocommerce' ) . ' ' . implode( ', ', $order_notes ) . ' ' . __( 'Wholesale Customer', 'wholesalex' ) );
+		$order->add_order_note( __( 'Stock levels reduced:', 'wholesalex' ) . ' ' . implode( ', ', $order_notes ) . ' ' . __( 'Wholesale Customer', 'wholesalex' ) );
 	}
 
 	/**
@@ -1229,7 +1229,7 @@ class WHOLESALEX_Product {
 
 			if ( is_wp_error( $new_stock ) ) {
 				/* translators: %s item name. */
-				$order->add_order_note( sprintf( __( 'Unable to restore stock for item %s.', 'woocommerce' ), $item_name ) );
+				$order->add_order_note( sprintf( __( 'Unable to restore stock for item %s.', 'wholesalex' ), $item_name ) );
 				continue;
 			}
 
@@ -1240,7 +1240,7 @@ class WHOLESALEX_Product {
 		}
 
 		if ( $changes ) {
-			$order->add_order_note( __( 'Stock levels increased:', 'woocommerce' ) . ' ' . implode( ', ', $changes ) . ' ' . __( 'Wholesale Customer', 'wholesalex' ) );
+			$order->add_order_note( __( 'Stock levels increased:', 'wholesalex' ) . ' ' . implode( ', ', $changes ) . ' ' . __( 'Wholesale Customer', 'wholesalex' ) );
 		}
 
 		do_action( 'woocommerce_restore_order_stock', $order );
@@ -1350,7 +1350,7 @@ class WHOLESALEX_Product {
 			),
 		);
 		?>
-		<div class="panel woocommerce_options_panel wsx-product-tab-panel" id="wsx_tab_data"></div>
+		<div class="panel woocommerce_options_panel" id="wsx_tab_data"></div>
 		<?php
 	}
 
@@ -1578,18 +1578,8 @@ class WHOLESALEX_Product {
 		$product_cat = $q->get( 'product_cat' );
 
 		if ( 'product' === $post_type || ( '' !== $product_cat && ! $is_admin_dashboard ) ) {
-			$__role = wholesalex()->get_current_user_role();
-			if ( 'wholesalex_guest' === $__role ) {
-				$__hide_for_guest_global = apply_filters( 'wholesalex_hide_all_products_for_guest', wholesalex()->get_setting( '_settings_hide_all_products_from_guest' ) );
-				if ( 'yes' === $__hide_for_guest_global ) {
-					$q->set( 'post__in', (array) array( '9999999' ) );
-				}
-			}
-			if ( 'wholesalex_b2c_users' === $__role ) {
-				$__hide_for_b2c_global = apply_filters( 'wholesalex_hide_all_products_for_b2c', wholesalex()->get_setting( '_settings_hide_products_from_b2c' ) );
-				if ( 'yes' === $__hide_for_b2c_global ) {
-					$q->set( 'post__in', (array) array( '9999999' ) );
-				}
+			if ( $this->hide_all_products_for_current_role() ) {
+				$q->set( 'post__in', (array) array( '9999999' ) );
 			}
 			$existing_ids = isset( $q->query['post__not_in'] ) ? (array) $q->query['post__not_in'] : array();
 			$hidden_ids   = (array) wholesalex()->hidden_product_ids();
@@ -1607,20 +1597,7 @@ class WHOLESALEX_Product {
 	 */
 	public function redirect_from_hidden_products() {
 		if ( is_product() ) {
-			$__role      = wholesalex()->get_current_user_role();
-			$__is_hidden = false;
-			if ( 'wholesalex_guest' === $__role ) {
-				$__hide_for_guest_global = apply_filters( 'wholesalex_hide_all_products_for_guest', wholesalex()->get_setting( '_settings_hide_all_products_from_guest' ) );
-				if ( 'yes' === $__hide_for_guest_global ) {
-					$__is_hidden = true;
-				}
-			}
-			if ( 'wholesalex_b2c_users' === $__role ) {
-				$__hide_for_b2c_global = apply_filters( 'wholesalex_hide_all_products_for_b2c', wholesalex()->get_setting( '_settings_hide_products_from_b2c' ) );
-				if ( 'yes' === $__hide_for_b2c_global ) {
-					$__is_hidden = true;
-				}
-			}
+			$__is_hidden = $this->hide_all_products_for_current_role();
 			$__id = get_the_ID();
 			if ( in_array( $__id, wholesalex()->hidden_product_ids(), true ) || $__is_hidden ) {
 				/* translators: %s: Product Name */
@@ -1647,20 +1624,7 @@ class WHOLESALEX_Product {
 		if ( $allow_hidden_product_to_checkout ) {
 			return;
 		}
-		$__role      = wholesalex()->get_current_user_role();
-		$__is_hidden = false;
-		if ( 'wholesalex_guest' === $__role ) {
-			$__hide_for_guest_global = apply_filters( 'wholesalex_hide_all_products_for_guest', wholesalex()->get_setting( '_settings_hide_all_products_from_guest' ) );
-			if ( 'yes' === $__hide_for_guest_global ) {
-				$__is_hidden = true;
-			}
-		}
-		if ( 'wholesalex_b2c_users' === $__role ) {
-			$__hide_for_b2c_global = apply_filters( 'wholesalex_hide_all_products_for_b2c', wholesalex()->get_setting( '_settings_hide_products_from_b2c' ) );
-			if ( 'yes' === $__hide_for_b2c_global ) {
-				$__is_hidden = true;
-			}
-		}
+		$__is_hidden = $this->hide_all_products_for_current_role();
 
 		$__hide_regular_price = wholesalex()->get_setting( '_settings_hide_retail_price' ) ?? '';
 
@@ -1688,6 +1652,38 @@ class WHOLESALEX_Product {
 				wc_add_notice( sprintf( __( 'Sorry, you are not allowed to checkout %s product.', 'wholesalex' ), get_the_title( $__product_id ) ), 'error' );
 			}
 		}
+	}
+
+	/**
+	 * Check whether the current role should be blocked from all products.
+	 *
+	 * The Private Store setting is the current UI control for hiding products
+	 * from Guest/B2C customers. The older role-specific settings and filters are
+	 * still honored for backward compatibility.
+	 *
+	 * @return bool
+	 */
+	private function hide_all_products_for_current_role() {
+		$__role                  = wholesalex()->get_current_user_role();
+		$__private_store_enabled = 'yes' === wholesalex()->get_setting( '_settings_private_store' );
+
+		if ( 'wholesalex_guest' === $__role ) {
+			$__hide_for_guest_global = $__private_store_enabled
+				? 'yes'
+				: wholesalex()->get_setting( '_settings_hide_all_products_from_guest' );
+			$__hide_for_guest_global = apply_filters( 'wholesalex_hide_all_products_for_guest', $__hide_for_guest_global );
+			return 'yes' === $__hide_for_guest_global;
+		}
+
+		if ( 'wholesalex_b2c_users' === $__role ) {
+			$__hide_for_b2c_global = $__private_store_enabled
+				? 'yes'
+				: wholesalex()->get_setting( '_settings_hide_products_from_b2c' );
+			$__hide_for_b2c_global = apply_filters( 'wholesalex_hide_all_products_for_b2c', $__hide_for_b2c_global );
+			return 'yes' === $__hide_for_b2c_global;
+		}
+
+		return false;
 	}
 
 	/**

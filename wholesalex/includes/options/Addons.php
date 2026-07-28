@@ -345,7 +345,7 @@ class Addons {
 			'moreFeature'            => 'https://getwholesalex.com/request-a-quote/?utm_source=wholesalex-menu&utm_medium=addons-more_features&utm_campaign=wholesalex-DB',
 			'video'                  => 'https://www.youtube.com/embed/jOIdNj18OEI',
 			'status'                 => wholesalex()->get_setting( 'wsx_addon_raq' ),
-			'setting_id'             => '#conversation',
+			'setting_id'             => '#raq',
 			'lock_status'            => ! ( wholesalex()->is_pro_active() ),
 			'is_conversation_active' => wholesalex()->get_setting( 'wsx_addon_conversation' ),
 		);

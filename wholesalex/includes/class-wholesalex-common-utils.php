@@ -16,6 +16,223 @@ defined( 'ABSPATH' ) || exit;
  * WholesaleX_Initialization Class
  */
 class WholesaleX_CommonUtils {
+	/**
+	 * Builder-only helper text for the registration role field.
+	 *
+	 * @return string
+	 */
+	public static function get_registration_role_builder_help_message() {
+		return __( 'This field will only be shown on the Global Registration Form.', 'wholesalex' );
+	}
+
+	/**
+	 * Translate built-in form builder text without changing custom text.
+	 *
+	 * @param mixed $text Text to translate.
+	 * @return mixed
+	 */
+	public static function translate_form_builder_default_text( $text ) {
+		if ( ! is_string( $text ) || '' === $text ) {
+			return $text;
+		}
+
+		$translations = apply_filters(
+			'wholesalex_form_builder_default_text_map',
+			array(
+				'Please select'   => __( 'Please select', 'wholesalex' ),
+				'Select Role'     => __( 'Select Role', 'wholesalex' ),
+				'Select Roles'    => __( 'Select Roles', 'wholesalex' ),
+				'Select Registration Roles' => __( 'Select Registration Roles', 'wholesalex' ),
+				'Select Option'   => __( 'Select Option', 'wholesalex' ),
+				'Username'        => __( 'Username', 'wholesalex' ),
+				'Username or Email' => __( 'Username or Email', 'wholesalex' ),
+				'Email'           => __( 'Email', 'wholesalex' ),
+				'Password'        => __( 'Password', 'wholesalex' ),
+				'Confirm Password' => __( 'Confirm Password', 'wholesalex' ),
+				'First Name'      => __( 'First Name', 'wholesalex' ),
+				'Last Name'       => __( 'Last Name', 'wholesalex' ),
+				'User Bio'        => __( 'User Bio', 'wholesalex' ),
+				'Nickname'        => __( 'Nickname', 'wholesalex' ),
+				'Display Name'    => __( 'Display Name', 'wholesalex' ),
+				'Website'         => __( 'Website', 'wholesalex' ),
+				'Confirm Email'   => __( 'Confirm Email', 'wholesalex' ),
+				'Term and Condition' => __( 'Term and Condition', 'wholesalex' ),
+				'Remember me'     => __( 'Remember me', 'wholesalex' ),
+				'Register'        => __( 'Register', 'wholesalex' ),
+				'Log in'          => __( 'Log in', 'wholesalex' ),
+				'Login'           => __( 'Login', 'wholesalex' ),
+				'Sign In to Your Account' => __( 'Sign In to Your Account', 'wholesalex' ),
+				"Don't have an account? Sign up now!" => __( "Don't have an account? Sign up now!", 'wholesalex' ),
+				'Text'            => __( 'Text', 'wholesalex' ),
+				'Text Area'       => __( 'Text Area', 'wholesalex' ),
+				'Radio'           => __( 'Radio', 'wholesalex' ),
+				'Checkbox'        => __( 'Checkbox', 'wholesalex' ),
+				'File'            => __( 'File', 'wholesalex' ),
+				'Select'          => __( 'Select', 'wholesalex' ),
+				'Number'          => __( 'Number', 'wholesalex' ),
+				'Date'            => __( 'Date', 'wholesalex' ),
+				'Value 1'         => __( 'Value 1', 'wholesalex' ),
+				'Value 2'         => __( 'Value 2', 'wholesalex' ),
+				'Value 3'         => __( 'Value 3', 'wholesalex' ),
+				'I agree to the Terms and Conditions {Privacy Policy}' => __( 'I agree to the Terms and Conditions {Privacy Policy}', 'wholesalex' ),
+			)
+		);
+
+		return isset( $translations[ $text ] ) ? $translations[ $text ] : $text;
+	}
+
+	/**
+	 * Translate built-in default labels/options in a form-builder field.
+	 *
+	 * @param array $field Form field.
+	 * @return array
+	 */
+	public static function translate_form_builder_field( $field ) {
+		if ( ! is_array( $field ) ) {
+			return $field;
+		}
+
+		if (
+			isset( $field['name'], $field['help_message'] )
+			&& 'wholesalex_registration_role' === $field['name']
+			&& in_array(
+				$field['help_message'],
+				array(
+					'This field will only be shown on the Global Registration Form.',
+					self::get_registration_role_builder_help_message(),
+				),
+				true
+			)
+		) {
+			unset( $field['help_message'] );
+		}
+
+		foreach ( array( 'label', 'placeholder', 'help_message', 'default_text', 'password_strength_message' ) as $key ) {
+			if ( isset( $field[ $key ] ) ) {
+				$field[ $key ] = self::translate_form_builder_default_text( $field[ $key ] );
+			}
+		}
+
+		if ( isset( $field['option'] ) && is_array( $field['option'] ) ) {
+			foreach ( $field['option'] as $index => $option ) {
+				if ( isset( $option['name'] ) ) {
+					$field['option'][ $index ]['name'] = self::translate_form_builder_default_text( $option['name'] );
+				}
+			}
+		}
+
+		return $field;
+	}
+
+	/**
+	 * Get Form Builder Theme Appearance Colors
+	 *
+	 * @param string $theme Theme key.
+	 * @return array
+	 */
+	public static function get_form_builder_theme_appearance_colors( $theme = 'classic' ) {
+		$themes = array(
+			'classic' => array(
+				'signup' => array(
+					'primaryColor'    => '#111111',
+					'textPrimary'     => '#111111',
+					'textSecondary'   => '#707070',
+					'background'      => '#ffffff',
+					'borderColor'     => '#e0e0e0',
+					'inputBackground' => '#ffffff',
+					'buttonText'      => '#ffffff',
+					'link'            => '#6c6cff',
+					'containerColor'  => '#ffffff',
+				),
+				'login'  => array(
+					'primaryColor'    => '#111111',
+					'textPrimary'     => '#111111',
+					'textSecondary'   => '#707070',
+					'background'      => '#ffffff',
+					'borderColor'     => '#e0e0e0',
+					'inputBackground' => '#ffffff',
+					'buttonText'      => '#ffffff',
+					'link'            => '#6c6cff',
+					'containerColor'  => '#ffffff',
+				),
+			),
+			'purple'  => array(
+				'signup' => array(
+					'primaryColor'    => '#6c6cff',
+					'textPrimary'     => '#ffffff',
+					'textSecondary'   => '#d8d8ff',
+					'background'      => '#6c6cff',
+					'borderColor'     => '#8d8dff',
+					'inputBackground' => '#8484ff',
+					'buttonText'      => '#6c6cff',
+					'link'            => '#d8d8ff',
+					'containerColor'  => '#ffffff',
+				),
+				'login'  => array(
+					'primaryColor'    => '#6c6cff',
+					'textPrimary'     => '#6c6cff',
+					'textSecondary'   => '#6c6e77',
+					'background'      => '#ffffff',
+					'borderColor'     => '#d6d6ff',
+					'inputBackground' => '#d6d6ff',
+					'buttonText'      => '#ffffff',
+					'link'            => '#6c6cff',
+					'containerColor'  => '#ffffff',
+				),
+			),
+			'blue'    => array(
+				'signup' => array(
+					'primaryColor'    => '#0051d4',
+					'textPrimary'     => '#ffffff',
+					'textSecondary'   => '#9dc2ff',
+					'background'      => '#0051d4',
+					'borderColor'     => '#ffffff',
+					'inputBackground' => '#296ddb',
+					'buttonText'      => '#ffffff',
+					'link'            => '#d7e6ff',
+					'containerColor'  => '#ffffff',
+				),
+				'login'  => array(
+					'primaryColor'    => '#0051d4',
+					'textPrimary'     => '#ffffff',
+					'textSecondary'   => '#9dc2ff',
+					'background'      => '#0051d4',
+					'borderColor'     => '#ffffff',
+					'inputBackground' => '#296ddb',
+					'buttonText'      => '#ffffff',
+					'link'            => '#d7e6ff',
+					'containerColor'  => '#ffffff',
+				),
+			),
+			'black'   => array(
+				'signup' => array(
+					'primaryColor'    => '#141516',
+					'textPrimary'     => '#f5f5f5',
+					'textSecondary'   => '#c8c8d6',
+					'background'      => '#141516',
+					'borderColor'     => '#343a46',
+					'inputBackground' => '#222222',
+					'buttonText'      => '#141516',
+					'link'            => '#c8c8d6',
+					'containerColor'  => '#f4f4f4',
+				),
+				'login'  => array(
+					'primaryColor'    => '#141516',
+					'textPrimary'     => '#141516',
+					'textSecondary'   => '#656565',
+					'background'      => '#ffffff',
+					'borderColor'     => '#656565',
+					'inputBackground' => '#ededed',
+					'buttonText'      => '#ffffff',
+					'link'            => '#141516',
+					'containerColor'  => '#f4f4f4',
+				),
+			),
+		);
+
+		return isset( $themes[ $theme ] ) ? $themes[ $theme ] : $themes['classic'];
+	}
+
 		/**
 		 * Get Empty Form
 		 *
@@ -27,8 +244,8 @@ class WholesaleX_CommonUtils {
 			array(
 				'isShowFormTitle'   => true,
 				'isHideDescription' => false,
-				'title'             => 'Register',
-				'description'       => "Don't have an account? Sign up now!",
+				'title'             => __( 'Register', 'wholesalex' ),
+				'description'       => __( "Don't have an account? Sign up now!", 'wholesalex' ),
 				'styles'            =>
 				array(
 					'title'       =>
@@ -53,8 +270,8 @@ class WholesaleX_CommonUtils {
 			array(
 				'isShowFormTitle'   => true,
 				'isHideDescription' => false,
-				'title'             => 'Login',
-				'description'       => 'Sign In to Your Account',
+				'title'             => __( 'Login', 'wholesalex' ),
+				'description'       => __( 'Sign In to Your Account', 'wholesalex' ),
 				'styles'            =>
 				array(
 					'title'       =>
@@ -96,7 +313,7 @@ class WholesaleX_CommonUtils {
 								'label'          => __( 'Username or email address', 'wholesalex' ),
 								'name'           => 'username',
 								'isLabelHide'    => false,
-								'placeholder'    => 'Username or Email',
+								'placeholder'    => __( 'Username or Email', 'wholesalex' ),
 								'columnPosition' => 'left',
 								'parent'         => 'login_row_1',
 								'isRequired'     => true,
@@ -116,7 +333,7 @@ class WholesaleX_CommonUtils {
 								'label'          => __( 'Password', 'wholesalex' ),
 								'name'           => 'password',
 								'isLabelHide'    => false,
-								'placeholder'    => 'Password',
+								'placeholder'    => __( 'Password', 'wholesalex' ),
 								'columnPosition' => 'left',
 								'parent'         => 'login_row_2',
 								'isRequired'     => true,
@@ -156,11 +373,11 @@ class WholesaleX_CommonUtils {
 			'registrationFields'     => self::get_default_registration_form_fields(),
 			'registrationFormButton' =>
 			array(
-				'title' => 'Register',
+				'title' => __( 'Register', 'wholesalex' ),
 			),
 			'loginFormButton'        =>
 			array(
-				'title' => 'Log in',
+				'title' => __( 'Log in', 'wholesalex' ),
 			),
 			'style'                  =>
 			array(
@@ -347,6 +564,13 @@ class WholesaleX_CommonUtils {
 						),
 					),
 				),
+				'appearance'  =>
+				array(
+					'advancedColors' => self::get_form_builder_theme_appearance_colors( 'classic' ),
+					'container'      => array(
+						'color' => '#ffffff',
+					),
+				),
 			),
 		);
 		return $default_form;
@@ -388,7 +612,7 @@ class WholesaleX_CommonUtils {
 				if ( ! isset( $field['option'] ) ) {
 					$field['option'] = array(
 						array(
-							'name'  => 'Select Option',
+							'name'  => __( 'Select Option', 'wholesalex' ),
 							'value' => '',
 						),
 					);
@@ -428,7 +652,7 @@ class WholesaleX_CommonUtils {
 						array(
 							'status'         => true,
 							'type'           => 'text',
-							'label'          => 'Username',
+							'label'          => __( 'Username', 'wholesalex' ),
 							'name'           => 'user_login',
 							'isLabelHide'    => false,
 							'placeholder'    => '',
@@ -460,7 +684,7 @@ class WholesaleX_CommonUtils {
 					array(
 						'status'         => true,
 						'type'           => 'email',
-						'label'          => 'Email',
+						'label'          => __( 'Email', 'wholesalex' ),
 						'name'           => 'user_email',
 						'isLabelHide'    => false,
 						'placeholder'    => '',
@@ -491,7 +715,7 @@ class WholesaleX_CommonUtils {
 					array(
 						'status'         => true,
 						'type'           => 'password',
-						'label'          => 'Password',
+						'label'          => __( 'Password', 'wholesalex' ),
 						'name'           => 'user_pass',
 						'isLabelHide'    => false,
 						'placeholder'    => '',
@@ -538,6 +762,7 @@ class WholesaleX_CommonUtils {
 				if ( isset( $row['columns'] ) && is_array( $row['columns'] ) ) {
 					foreach ( $row['columns'] as $field ) {
 						if ( ( isset( $field['status'] ) && $field['status'] ) ) {
+							$field = self::translate_form_builder_field( $field );
 							if ( isset( $field['isAddToWooCommerceRegistration'] ) && $field['isAddToWooCommerceRegistration'] ) {
 								$woo_custom_fields[] = $field;
 							}

@@ -45,6 +45,15 @@ class WHOLESALEX_Orders {
 		if ( 'wholesalex_order_type' === $column ) {
 			$order      = wc_get_order( $order_id );
 			$order_type = $order->get_meta( '__wholesalex_order_type' );
+			if ( empty( $order_type ) ) {
+				$customer_id = $order->get_user_id();
+				if ( $customer_id ) {
+					$user_role  = get_user_meta( $customer_id, '__wholesalex_role', true );
+					$order_type = in_array( $user_role, array( '', 'wholesalex_guest', 'wholesalex_b2c_users' ), true ) ? 'b2c' : 'b2b';
+				} else {
+					$order_type = 'guest';
+				}
+			}
 			if ( 'b2c' === $order_type && 0 === $order->get_user_id() ) {
 				$order_type = 'guest';
 			}

@@ -23,16 +23,9 @@ $base_lighter_20 = wc_hex_lighter( $base, 20 );
 $base_lighter_40 = wc_hex_lighter( $base, 40 );
 $text_lighter_20 = wc_hex_lighter( $text, 20 );
 $text_lighter_40 = wc_hex_lighter( $text, 40 );
-$email_heading   = isset( $email_heading ) ? $email_heading : ( isset( $subject ) ? $subject : '' );
 
 ?>
-<!DOCTYPE html>
-<html <?php language_attributes(); ?>>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=<?php bloginfo( 'charset' ); ?>" />
-		<meta content="width=device-width, initial-scale=1.0" name="viewport">
-		<title><?php echo esc_html( get_bloginfo( 'name', 'display' ) ); ?></title>
-		<style type="text/css"> 
+<style type="text/css"> 
 				body{
 					background-color: <?php echo esc_attr( $bg ); ?>;
 					padding: 0;
@@ -240,7 +233,14 @@ $email_heading   = isset( $email_heading ) ? $email_heading : ( isset( $subject 
 						font-size: 10px !important;
 					}
 				}
-		</style>
+			</style>
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=<?php bloginfo( 'charset' ); ?>" />
+		<meta content="width=device-width, initial-scale=1.0" name="viewport">
+		<title><?php echo esc_html( get_bloginfo( 'name', 'display' ) ); ?></title>
+		
 	</head>
 	<body <?php echo is_rtl() ? 'rightmargin' : 'leftmargin'; ?>="0" marginwidth="0" topmargin="0" marginheight="0" offset="0">
 		<table width="100%" id="outer_wrapper">

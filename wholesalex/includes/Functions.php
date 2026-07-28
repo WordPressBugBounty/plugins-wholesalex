@@ -39,6 +39,9 @@ class Functions {
 		if ( ! isset( $GLOBALS['wholesalex_dynamic_rules'] ) ) {
 			$GLOBALS['wholesalex_dynamic_rules'] = get_option( '__wholesalex_dynamic_rules', array() );
 		}
+		if ( ! isset( $GLOBALS['wholesalex_pricing_rules'] ) ) {
+			$GLOBALS['wholesalex_pricing_rules'] = get_option( '__wholesalex_pricing_rules', array() );
+		}
 		if ( ! isset( $GLOBALS['wholesalex_roles'] ) ) {
 			$GLOBALS['wholesalex_roles'] = get_option( '_wholesalex_roles', array() );
 		}
@@ -55,7 +58,6 @@ class Functions {
 			$GLOBALS['wholesalex_profile_discounts'] = get_option( '__wholesalex_profile_discounts', array() );
 		}
 
-		$this->update_single_product_database();
 	}
 
 	/**
@@ -187,6 +189,135 @@ class Functions {
 	}
 
 	/**
+	 * Get the built-in WholesaleX roles that must exist on every site.
+	 *
+	 * @return array
+	 */
+	public function get_default_roles() {
+		return apply_filters(
+			'wholesalex_initial_roles',
+			array(
+				'wholesalex_b2c_users'    => array(
+					'id'          => 'wholesalex_b2c_users',
+					'_role_title' => __( 'B2C Users', 'wholesalex' ),
+					'removeable'  => false,
+				),
+				'wholesalex_guest'        => array(
+					'id'          => 'wholesalex_guest',
+					'_role_title' => __( 'Guest Users', 'wholesalex' ),
+					'removeable'  => false,
+				),
+				'wholesalex_b2b_wholesale' => array(
+					'id'          => 'wholesalex_b2b_wholesale',
+					'_role_title' => __( 'Wholesale User', 'wholesalex' ),
+					'removeable'  => true,
+				),
+			)
+		);
+	}
+
+	/**
+	 * Get roles that are required system roles and cannot be deleted.
+	 *
+	 * @return array
+	 */
+	public function get_protected_role_ids() {
+		return apply_filters(
+			'wholesalex_protected_role_ids',
+			array(
+				'wholesalex_b2c_users',
+				'wholesalex_guest',
+			)
+		);
+	}
+
+	/**
+	 * Check whether a WholesaleX role may be deleted.
+	 *
+	 * @param string $role_id Role ID.
+	 * @return bool
+	 */
+	public function is_deletable_role( $role_id ) {
+		$role_id = sanitize_key( $role_id );
+		if ( empty( $role_id ) ) {
+			return false;
+		}
+
+		return ! in_array( $role_id, $this->get_protected_role_ids(), true );
+	}
+
+	/**
+	 * Ensure default WholesaleX roles exist in both plugin data and WP roles.
+	 *
+	 * @return array Role IDs created in plugin role data during this call.
+	 */
+	public function ensure_default_roles() {
+		$roles         = get_option( '_wholesalex_roles', array() );
+		$roles         = is_array( $roles ) ? $roles : array();
+		$created_roles = array();
+		$updated       = false;
+		$deleted_roles = get_option( '_wholesalex_deleted_default_roles', array() );
+		$deleted_roles = is_array( $deleted_roles ) ? $deleted_roles : array();
+
+		foreach ( $this->get_default_roles() as $role_id => $default_role ) {
+			if ( empty( $default_role['id'] ) || empty( $default_role['_role_title'] ) ) {
+				continue;
+			}
+
+			$role_id = sanitize_key( $default_role['id'] );
+			if ( empty( $role_id ) ) {
+				continue;
+			}
+			$default_role['id'] = $role_id;
+			if (
+				'wholesalex_b2b_wholesale' === $role_id
+				&& in_array( $role_id, $deleted_roles, true )
+			) {
+				continue;
+			}
+
+			if ( empty( $roles[ $role_id ] ) || ! is_array( $roles[ $role_id ] ) ) {
+				$roles[ $role_id ] = $default_role;
+				$created_roles[]   = $role_id;
+				$updated           = true;
+			} else {
+				if ( empty( $roles[ $role_id ]['id'] ) ) {
+					$roles[ $role_id ]['id'] = $role_id;
+					$updated                 = true;
+				}
+				if ( empty( $roles[ $role_id ]['_role_title'] ) ) {
+					$roles[ $role_id ]['_role_title'] = $default_role['_role_title'];
+					$updated                          = true;
+				}
+				if (
+					'wholesalex_b2b_wholesale' === $role_id
+					&& 'B2B: Wholesale Role' === $roles[ $role_id ]['_role_title']
+				) {
+					$roles[ $role_id ]['_role_title'] = $default_role['_role_title'];
+					$updated                          = true;
+				}
+				if ( ! array_key_exists( 'removeable', $roles[ $role_id ] ) ) {
+					$roles[ $role_id ]['removeable'] = false;
+					$updated                         = true;
+				}
+			}
+
+			if ( ! wp_roles()->is_role( $role_id ) ) {
+				add_role( $role_id, $roles[ $role_id ]['_role_title'], array( 'read' => true ) );
+			}
+		}
+
+		if ( $updated ) {
+			update_option( '_wholesalex_roles', wholesalex()->sanitize( $roles ) );
+			$GLOBALS['wholesalex_roles'] = get_option( '_wholesalex_roles', array() );
+		} else {
+			$GLOBALS['wholesalex_roles'] = $roles;
+		}
+
+		return $created_roles;
+	}
+
+	/**
 	 * Get All Users
 	 *
 	 * @since 1.0.0
@@ -249,6 +380,112 @@ class Functions {
 		update_user_meta( $user_id, '__wholesalex_role', $new_role_id );
 
 		do_action( 'wholesalex_user_role_updated', $user_id, $prev_role_id, $new_role_id );
+	}
+
+	/**
+	 * Assign administrator users to the default B2B role when they do not have a
+	 * WholesaleX role yet.(Fresh Installation)
+	 *
+	 * @param string $role_id Role ID.
+	 * @return void
+	 */
+	public function assign_admin_wholesale_role( $role_id = 'wholesalex_b2b_wholesale' ) {
+		if ( empty( wholesalex()->get_roles( 'by_id', $role_id ) ) ) {
+			return;
+		}
+
+		$admin_users = get_users(
+			array(
+				'role'   => 'administrator',
+				'fields' => array( 'ID' ),
+			)
+		);
+
+		foreach ( $admin_users as $admin ) {
+			$existing_role = get_user_meta( $admin->ID, '__wholesalex_role', true );
+			if ( empty( $existing_role ) ) {
+				wholesalex()->change_role( $admin->ID, $role_id );
+			}
+		}
+
+		update_option( '_wholesalex_default_admin_role_assigned', 'yes' );
+	}
+
+	/**
+	 * Remove a WholesaleX role from users that currently have it.
+	 *
+	 * @param string $role_id Role ID.
+	 * @return void
+	 */
+	public function unassign_users_from_role( $role_id ) {
+		$current_role_users = get_users(
+			array(
+				'fields'     => array( 'ID' ),
+				'meta_key'   => '__wholesalex_role', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value' => $role_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+			)
+		);
+		$registration_role_users = get_users(
+			array(
+				'fields'     => array( 'ID' ),
+				'meta_key'   => '__wholesalex_registration_role', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value' => $role_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+			)
+		);
+		$user_ids                = array_unique(
+			array_merge(
+				wp_list_pluck( $current_role_users, 'ID' ),
+				wp_list_pluck( $registration_role_users, 'ID' )
+			)
+		);
+
+		foreach ( $user_ids as $user_id ) {
+			$wp_user = new WP_User( $user_id );
+			$wp_user->remove_role( $role_id );
+			$wp_user->remove_cap( $role_id );
+			delete_user_meta( $user_id, '__wholesalex_role' );
+			delete_user_meta( $user_id, '__wholesalex_registration_role' );
+		}
+	}
+
+	/**
+	 * Delete a B2B WholesaleX role and clean related user assignments.
+	 *
+	 * @param string $role_id Role ID.
+	 * @return bool
+	 */
+	public function delete_role( $role_id ) {
+		$role_id = sanitize_key( $role_id );
+		if ( ! $this->is_deletable_role( $role_id ) ) {
+			return false;
+		}
+
+		$roles = get_option( '_wholesalex_roles', array() );
+		$roles = is_array( $roles ) ? $roles : array();
+		if ( empty( $roles[ $role_id ] ) ) {
+			return false;
+		}
+
+		unset( $roles[ $role_id ] );
+		update_option( '_wholesalex_roles', $roles );
+		$GLOBALS['wholesalex_roles'] = $roles;
+
+		if ( wp_roles()->is_role( $role_id ) ) {
+			remove_role( $role_id );
+		}
+
+		$this->unassign_users_from_role( $role_id );
+
+		if ( array_key_exists( $role_id, $this->get_default_roles() ) ) {
+			$deleted_roles = get_option( '_wholesalex_deleted_default_roles', array() );
+			$deleted_roles = is_array( $deleted_roles ) ? $deleted_roles : array();
+			if ( ! in_array( $role_id, $deleted_roles, true ) ) {
+				$deleted_roles[] = $role_id;
+				update_option( '_wholesalex_deleted_default_roles', $deleted_roles );
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -351,10 +588,6 @@ class Functions {
 	 * @since 1.1.5 Updated Meta key on single product discounts
 	 */
 	public function get_single_product_discount( $id = '' ) {
-		$is_db_updated = get_option( '__wholesalex_database_update_v2', false );
-		if ( ! $is_db_updated ) {
-			$this->update_single_product_database();
-		}
 
 		$data     = array();
 		$role_ids = wholesalex()->get_roles( 'ids' );
@@ -384,36 +617,7 @@ class Functions {
 		}
 	}
 
-	/**
-	 * Update Single Product Rolewise Price
-	 *
-	 * @return void
-	 */
-	public function update_single_product_database() {
 
-		if ( ! get_option( '__wholesalex_single_product_db_update_v2', false ) && is_array( $GLOBALS['wholesalex_single_product_discounts'] ) ) {
-			$data = $GLOBALS['wholesalex_single_product_discounts'];
-
-			foreach ( $data as $id => $discounts ) {
-
-				foreach ( $discounts as $role_name => $value ) {
-					if ( isset( $value['wholesalex_base_price'] ) ) {
-						$meta_name = $role_name . '_base_price';
-						update_post_meta( $id, $meta_name, $value['wholesalex_base_price'] );
-					}
-					if ( isset( $value['wholesalex_sale_price'] ) ) {
-						$meta_name = $role_name . '_sale_price';
-						update_post_meta( $id, $meta_name, $value['wholesalex_sale_price'] );
-					}
-					if ( isset( $value['tiers'] ) ) {
-						$meta_name = $role_name . '_tiers';
-						update_post_meta( $id, $meta_name, $value['tiers'] );
-					}
-				}
-			}
-			update_option( '__wholesalex_single_product_db_update_v2', true );
-		}
-	}
 	/**
 	 * Save Category Visibiltiy Settings
 	 *
@@ -532,6 +736,42 @@ class Functions {
 	}
 
 	/**
+	 * Get the current Dynamic Rules access policy.
+	 *
+	 * Dynamic Rules are legacy-edit-only from v3.0.0 onward:
+	 * stores with saved rules can view and maintain them, while stores without
+	 * saved rules should not see the Dynamic Rules workflow.
+	 *
+	 * @param array|null $rules Optional rules to evaluate, useful for scoped integrations.
+	 * @return array
+	 */
+	public function get_dynamic_rules_access( $rules = null ) {
+		$rules     = is_array( $rules ) ? $rules : $this->get_dynamic_rules();
+		$has_rules = ! empty( $rules );
+
+		return apply_filters(
+			'wholesalex_dynamic_rules_access',
+			array(
+				'has_rules'  => $has_rules,
+				'can_view'   => $has_rules,
+				'can_create' => false,
+				'mode'       => $has_rules ? 'edit_only' : 'hidden',
+			),
+			$rules
+		);
+	}
+
+	/**
+	 * Whether the current request may create a new Dynamic Rule.
+	 *
+	 * @return bool
+	 */
+	public function can_create_dynamic_rules() {
+		$access = $this->get_dynamic_rules_access();
+		return ! empty( $access['can_create'] );
+	}
+
+	/**
 	 * Get Dynamic Rules
 	 *
 	 * @return boolean
@@ -590,6 +830,10 @@ class Functions {
 		if ( '' !== $_id && ! empty( $_rule ) ) {
 
 			$__rules          = wholesalex()->get_dynamic_rules();
+			$is_existing_rule = isset( $__rules[ $_id ] );
+			if ( 'delete' !== $_type && ! $is_existing_rule && ! wholesalex()->can_create_dynamic_rules() ) {
+				return false;
+			}
 			$__for_all        = ( ( 'all_users' === $_rule['_rule_for'] ) || ( 'all_roles' === $_rule['_rule_for'] ) ) ? true : false;
 			$__previous_count = ( isset( $__rules[ $_id ]['limit']['usages_count'] ) && ! empty( $__rules[ $_id ]['limit']['usages_count'] ) ) ? $__rules[ $_id ]['limit']['usages_count'] : '';
 			$__usages_count   = isset( $_rule['limit']['usages_count'] ) ? (int) $_rule['limit']['usages_count'] : ( $__previous_count ? $__previous_count : '' );
@@ -619,6 +863,7 @@ class Functions {
 			$GLOBALS['wholesalex_dynamic_rules'] = $__rules;
 
 			do_action( 'wholesalex_dynamic_rules_updated', $_id );
+			return true;
 		}
 	}
 	/**
@@ -631,6 +876,10 @@ class Functions {
 	 */
 	public function set_roles( $_id = '', $_role = array(), $_type = '' ) {
 		if ( '' !== $_id && ! empty( $_role ) ) {
+			if ( 'delete' === $_type ) {
+				return $this->delete_role( $_id );
+			}
+
 			$__roles = $GLOBALS['wholesalex_roles'];
 			if ( isset( $__roles[ $_id ] ) && ! empty( $__roles[ $_id ] ) ) {
 				// update.
@@ -640,14 +889,17 @@ class Functions {
 				$__roles[ $_id ] = wholesalex()->sanitize( $_role );
 				add_role( $_id, $_role['_role_title'], array( 'read' => true ) );
 			}
-			if ( 'delete' === $_type ) {
-				unset( $__roles[ $_id ] );
-				if ( wp_roles()->is_role( $_id ) ) {
-					remove_role( $_id );
-				}
+
+			$deleted_roles = get_option( '_wholesalex_deleted_default_roles', array() );
+			$deleted_roles = is_array( $deleted_roles ) ? $deleted_roles : array();
+			if ( in_array( $_id, $deleted_roles, true ) ) {
+				$deleted_roles = array_values( array_diff( $deleted_roles, array( $_id ) ) );
+				update_option( '_wholesalex_deleted_default_roles', $deleted_roles );
 			}
+
 			update_option( '_wholesalex_roles', $__roles );
 			$GLOBALS['wholesalex_roles'] = $__roles;
+			return true;
 		}
 	}
 
@@ -1621,15 +1873,19 @@ class Functions {
 			case 'wholesalex-addons':
 			case 'wholesalex_role':
 			case 'wholesalex-email':
+			case 'wholesalex_wholesale_pricing':
+			case 'wholesalex-wholesale-pricing':
 			case 'wholesalex_dynamic_rules':
 			case 'wholesalex-registration':
 			case 'wsx_conversation':
 			case 'wholesalex':
 			case 'wholesalex-setup-wizard':
-			case 'wholesalex-features':
+			case 'wholesalex-analytics':
 			case 'wholesalex-help':
 			case 'wholesalex-conversation':
 			case 'wholesalex-license':
+			case 'wholesalex-our-products':
+			case 'wholesalex-user-role-requests':
 			case 'wholesalex-setup-wizard':
 			case 'wholesalex-support':
 			case 'wholesalex-migration':

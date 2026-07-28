@@ -131,7 +131,17 @@ class Dynamic_Rules_Rest_Api {
 	 * @return bool
 	 */
 	public function dynamic_rule_restapi_permission() {
-		return current_user_can( apply_filters( 'wholesalex_capability_access', 'manage_options' ) );
+		$allowed = (bool) apply_filters(
+			'dynamic_rules_restapi_permission_callback',
+			current_user_can( 'manage_options' )
+		);
+
+		if ( ! $allowed && class_exists( '\WHOLESALEX\Wholesale_Pricing' ) ) {
+			$context = Wholesale_Pricing::get_manager_context();
+			$allowed = $context['is_vendor'] && $context['can_manage'];
+		}
+
+		return $allowed;
 	}
 
 	// ─── Main Handler: /dynamic_rule_action ──────────────────────
@@ -201,6 +211,7 @@ class Dynamic_Rules_Rest_Api {
 		$ajax_action = sanitize_text_field( $post['ajax_action'] );
 		$query       = isset( $post['query'] ) ? sanitize_text_field( $post['query'] ) : '';
 		$depends     = isset( $post['depends'] ) ? $post['depends'] : '';
+		$limit       = isset( $post['limit'] ) ? absint( $post['limit'] ) : 20;
 
 		$data = array();
 
@@ -209,23 +220,38 @@ class Dynamic_Rules_Rest_Api {
 				$data = $this->data_provider->get_users( $query );
 				break;
 			case 'get_products':
-				$data = $this->data_provider->get_products( $query );
+				$data = $this->data_provider->get_products( $query, $limit );
+				break;
+			case 'get_products_by_categories':
+				$data = $this->data_provider->get_products_by_categories( $query, $depends, $limit );
 				break;
 			case 'get_categories':
-				$data = $this->data_provider->get_categories( $query );
+				$data = $this->data_provider->get_categories( $query, $limit );
 				break;
 			case 'get_brands':
-				$data = $this->data_provider->get_brands( $query );
+				$data = $this->data_provider->get_brands( $query, $limit );
 				break;
 			case 'get_attributes':
-				$data = $this->data_provider->get_attributes( $query );
+				$data = $this->data_provider->get_attributes( $query, $limit );
 				break;
 			case 'get_variation_products':
-				$data = $this->data_provider->get_variation_products( $query, $depends ? $depends : false );
+				$data = $this->data_provider->get_variation_products(
+					$query,
+					$depends ? $depends : false,
+					$limit
+				);
 				break;
 			case 'productsWithVariation':
 			case 'get_products_with_variations':
-				$data = $this->data_provider->get_products_with_variations( $query );
+				$data = $this->data_provider->get_products_with_variations( $query, $limit );
+				break;
+			case 'get_bxgy_free_products':
+				if ( ! class_exists( __NAMESPACE__ . '\Wholesale_Pricing_Bxgy_Discount' ) && defined( 'WHOLESALEX_PATH' ) ) {
+					require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/rules/class-rule-bxgy-discount.php';
+				}
+				$data = class_exists( __NAMESPACE__ . '\Wholesale_Pricing_Bxgy_Discount' )
+					? ( new Wholesale_Pricing_Bxgy_Discount() )->get_free_product_picker_options( $query, $limit )
+					: array();
 				break;
 			case 'get_payment_gateways':
 				$data = $this->data_provider->get_payment_gateways();
@@ -243,7 +269,10 @@ class Dynamic_Rules_Rest_Api {
 				$data = $this->data_provider->get_shipping_methods( $depends );
 				break;
 			case 'get_skus':
-				$data = $this->data_provider->get_skus( $query );
+				$data = $this->data_provider->get_skus(
+					$query,
+					isset( $post['limit'] ) ? $limit : 30
+				);
 				break;
 			case 'get_shipping_country':
 			case 'shipping_country':
@@ -330,6 +359,14 @@ class Dynamic_Rules_Rest_Api {
 		}
 
 		// Full save.
+		$existing = wholesalex()->get_dynamic_rules( $rule_id );
+		if ( empty( $existing ) && ! wholesalex()->can_create_dynamic_rules() ) {
+			return array(
+				'success' => false,
+				'data'    => array( 'message' => __( 'Creating new Dynamic Rules is not available.', 'wholesalex' ) ),
+			);
+		}
+
 		$data        = apply_filters( 'wholesalex_dynamic_rule_data_before_save', $data );
 		$is_frontend = isset( $post['isFrontend'] ) ? (bool) $post['isFrontend'] : false;
 		wholesalex()->set_dynamic_rules( $rule_id, $data, '', $is_frontend );

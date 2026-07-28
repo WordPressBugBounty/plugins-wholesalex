@@ -35,6 +35,8 @@ function wholesalex_uninstall_plugin_data_remove() {
 	$option_keys = array(
 		'wholesalex_settings',
 		'wholesalex_installation_date',
+		'_wholesalex_default_admin_role_assigned',
+		'_wholesalex_deleted_default_roles',
 		'__wholesalex_customer_import_export_stats',
 		'wholesalex_notice',
 		'__wholesalex_single_product_settings',
