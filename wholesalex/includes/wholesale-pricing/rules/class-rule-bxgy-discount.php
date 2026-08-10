@@ -86,23 +86,76 @@ class Wholesale_Pricing_Bxgy_Discount {
 	/**
 	 * Get products that can be used as Buy X Get Y free items.
 	 *
-	 * Variable parent products cannot be added directly as a free cart line, so
-	 * this returns simple products and in-stock variations only.
+	 * Variable parent products cannot be added directly as a free cart line.
+	 * They are returned as informational group rows followed by every selectable,
+	 * in-stock variation.
 	 *
 	 * @param string $search Search keyword.
-	 * @param int    $limit  Maximum number of products or variations to return.
+	 * @param int    $limit  Maximum number of top-level results to return.
 	 * @return array
 	 */
 	public function get_free_product_picker_options( $search = '', $limit = 20 ): array {
-		$final  = array();
-		$limit  = $this->normalize_picker_result_limit( $limit );
-		$search = trim( (string) $search );
-		$ids    = $this->get_free_product_picker_candidate_ids( $search, $limit );
+		$final                  = array();
+		$handled_variable_ids   = array();
+		$seen_values            = array();
+		$top_level_result_count = 0;
+		$limit                  = $this->normalize_picker_result_limit( $limit );
+		$search                 = trim( (string) $search );
+		$ids                    = $this->get_free_product_picker_candidate_ids( $search, $limit );
 
 		foreach ( $ids as $product_id ) {
 			$product = wc_get_product( $product_id );
 
-			if ( ! $product instanceof \WC_Product || ! $this->is_free_product_picker_selectable( $product ) ) {
+			if ( ! $product instanceof \WC_Product ) {
+				continue;
+			}
+
+			if ( $product->is_type( 'variable' ) || $product->is_type( 'variation' ) ) {
+				$parent = $product->is_type( 'variable' ) ? $product : wc_get_product( $product->get_parent_id() );
+				if ( ! $parent instanceof \WC_Product_Variable ) {
+					continue;
+				}
+
+				$parent_id = $parent->get_id();
+				if ( isset( $handled_variable_ids[ $parent_id ] ) ) {
+					continue;
+				}
+				$handled_variable_ids[ $parent_id ] = true;
+
+				$variation_options = $this->get_free_product_picker_variable_options( $parent, $search );
+				if ( empty( $variation_options ) ) {
+					continue;
+				}
+
+				$group = array(
+					'value'           => 'variable:' . $parent_id,
+					'product_id'      => $parent_id,
+					'name'            => $parent->get_name(),
+					'is_group'        => true,
+					'variation_count' => count( $variation_options ),
+				);
+				if ( '' !== $search ) {
+					$group['suggestion_name'] = $search . ' ' . $group['name'];
+				}
+				$final[] = $group;
+
+				foreach ( $variation_options as $item ) {
+					$value = (string) $item['value'];
+					if ( isset( $seen_values[ $value ] ) ) {
+						continue;
+					}
+					$seen_values[ $value ] = true;
+					$final[]               = $item;
+				}
+
+				++$top_level_result_count;
+				if ( $top_level_result_count >= $limit ) {
+					break;
+				}
+				continue;
+			}
+
+			if ( ! $this->is_free_product_picker_selectable( $product ) ) {
 				continue;
 			}
 
@@ -111,15 +164,51 @@ class Wholesale_Pricing_Bxgy_Discount {
 					continue;
 				}
 
-				$final[] = $item;
-
-				if ( count( $final ) >= $limit ) {
-					break 2;
+				$value = (string) $item['value'];
+				if ( isset( $seen_values[ $value ] ) ) {
+					continue;
 				}
+				$seen_values[ $value ] = true;
+				$final[]               = $item;
+				++$top_level_result_count;
+				break;
+			}
+
+			if ( $top_level_result_count >= $limit ) {
+				break;
 			}
 		}
 
 		return $final;
+	}
+
+	/**
+	 * Get every selectable child of a matched variable product.
+	 *
+	 * @param \WC_Product_Variable $parent Variable parent product.
+	 * @param string               $search Current search term.
+	 * @return array
+	 */
+	private function get_free_product_picker_variable_options( \WC_Product_Variable $parent, string $search ): array {
+		$options = array();
+
+		foreach ( $parent->get_children() as $variation_id ) {
+			$variation = wc_get_product( $variation_id );
+			if ( ! $variation instanceof \WC_Product_Variation || ! $this->is_free_product_picker_selectable( $variation ) ) {
+				continue;
+			}
+
+			foreach ( $this->get_free_product_picker_options_for_product( $variation ) as $item ) {
+				$item['parent_id']    = $parent->get_id();
+				$item['is_variation'] = true;
+				if ( '' !== $search ) {
+					$item['suggestion_name'] = $search . ' ' . $item['name'];
+				}
+				$options[] = $item;
+			}
+		}
+
+		return $options;
 	}
 
 	/**

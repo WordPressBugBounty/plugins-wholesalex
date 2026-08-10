@@ -559,6 +559,172 @@ class Dynamic_Rules_Data_Provider {
 	}
 
 	/**
+	 * Get variations grouped below their non-selectable variable parent.
+	 *
+	 * This picker is used by role restrictions. Only variation IDs are returned
+	 * as selectable values so runtime rules can match the exact cart/product
+	 * variation without treating its parent product as selected.
+	 *
+	 * @param string $search Search keyword.
+	 * @param int    $limit  Maximum number of variable parent groups.
+	 * @return array
+	 */
+	public function get_role_restriction_variations( $search = '', $limit = 20 ) {
+		$search     = trim( (string) $search );
+		$limit      = $this->normalize_result_limit( $limit );
+		$parent_ids = $this->get_role_restriction_variation_parent_ids( $search, $limit );
+		$options    = array();
+
+		foreach ( $parent_ids as $parent_id ) {
+			$parent = wc_get_product( $parent_id );
+			if ( ! $parent instanceof \WC_Product_Variable ) {
+				continue;
+			}
+
+			$variations = array();
+			foreach ( $parent->get_children() as $variation_id ) {
+				$variation = wc_get_product( $variation_id );
+				if ( ! $variation instanceof \WC_Product_Variation || 'publish' !== $variation->get_status() ) {
+					continue;
+				}
+
+				$item = array(
+					'value'        => $variation->get_id(),
+					'product_id'   => $variation->get_id(),
+					'parent_id'    => $parent->get_id(),
+					'name'         => $this->get_role_restriction_variation_label( $variation, $parent ),
+					'is_variation' => true,
+				);
+
+				if ( '' !== $search ) {
+					$item['suggestion_name'] = $search . ' ' . $item['name'];
+				}
+
+				$variations[] = $item;
+			}
+
+			if ( empty( $variations ) ) {
+				continue;
+			}
+
+			$group = array(
+				'value'           => 'variable:' . $parent->get_id(),
+				'product_id'      => $parent->get_id(),
+				'name'            => $parent->get_name(),
+				'is_group'        => true,
+				'variation_count' => count( $variations ),
+			);
+
+			if ( '' !== $search ) {
+				$group['suggestion_name'] = $search . ' ' . $group['name'];
+			}
+
+			$options[] = $group;
+			$options   = array_merge( $options, $variations );
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Find variable parents by parent/variation title, variation ID or attribute.
+	 *
+	 * @param string $search Search keyword.
+	 * @param int    $limit  Maximum number of parents.
+	 * @return array
+	 */
+	private function get_role_restriction_variation_parent_ids( $search, $limit ) {
+		global $wpdb;
+
+		$author_id = absint( apply_filters( 'wholesalex_dynamic_rules_product_author', 0 ) );
+		$sql       = "SELECT parent.ID
+			FROM $wpdb->posts parent
+			INNER JOIN $wpdb->posts variation
+				ON variation.post_parent = parent.ID
+				AND variation.post_type = 'product_variation'
+				AND variation.post_status = 'publish'
+			LEFT JOIN $wpdb->postmeta variation_attr
+				ON variation_attr.post_id = variation.ID
+				AND variation_attr.meta_key LIKE 'attribute_%'
+			LEFT JOIN $wpdb->postmeta variation_sku
+				ON variation_sku.post_id = variation.ID
+				AND variation_sku.meta_key = '_sku'
+			WHERE parent.post_type = 'product'
+			AND parent.post_status = 'publish'";
+		$args      = array();
+
+		if ( $author_id ) {
+			$sql   .= ' AND parent.post_author = %d';
+			$args[] = $author_id;
+		}
+
+		$sql .= ' GROUP BY parent.ID, parent.post_title';
+
+		if ( '' !== $search ) {
+			$terms  = array_values( array_filter( array_map( 'trim', (array) preg_split( '/[\s,_-]+/', $search ) ) ) );
+			$having = array();
+			foreach ( $terms as $term ) {
+				$having[] = 'SUM(CASE WHEN parent.post_title LIKE %s OR variation.post_title LIKE %s OR CAST(variation.ID AS CHAR) = %s OR variation_attr.meta_value LIKE %s OR variation_sku.meta_value LIKE %s THEN 1 ELSE 0 END) > 0';
+				$like     = '%' . $wpdb->esc_like( $term ) . '%';
+				$args[]   = $like;
+				$args[]   = $like;
+				$args[]   = $term;
+				$args[]   = $like;
+				$args[]   = $like;
+			}
+
+			if ( ! empty( $having ) ) {
+				$sql .= ' HAVING ' . implode( ' AND ', $having );
+			}
+		}
+
+		$sql   .= ' ORDER BY parent.post_title ASC LIMIT %d';
+		$args[] = $limit;
+
+		return array_values(
+			array_filter(
+				array_map(
+					'absint',
+					$wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+						$wpdb->prepare( $sql, ...$args )
+					)
+				)
+			)
+		);
+	}
+
+	/**
+	 * Build a readable child-variation label.
+	 *
+	 * @param \WC_Product_Variation $variation Variation product.
+	 * @param \WC_Product_Variable  $parent    Parent product.
+	 * @return string
+	 */
+	private function get_role_restriction_variation_label( $variation, $parent ) {
+		$attributes = array();
+
+		foreach ( $variation->get_variation_attributes() as $taxonomy => $value ) {
+			if ( '' === (string) $value ) {
+				continue;
+			}
+
+			$taxonomy = str_replace( 'attribute_', '', $taxonomy );
+			if ( taxonomy_exists( $taxonomy ) ) {
+				$term = get_term_by( 'slug', $value, $taxonomy );
+				if ( $term && ! is_wp_error( $term ) ) {
+					$value = $term->name;
+				}
+			}
+
+			$attributes[] = rawurldecode( wp_strip_all_tags( (string) $value ) );
+		}
+
+		$label = implode( ' - ', array_filter( array_merge( array( $parent->get_name() ), $attributes ) ) );
+
+		return $label . ' (' . $variation->get_id() . ')';
+	}
+
+	/**
 	 * Get Products with Variations.
 	 *
 	 * @param string $search Search Keyword.

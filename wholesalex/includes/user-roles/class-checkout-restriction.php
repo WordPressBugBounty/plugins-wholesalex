@@ -37,7 +37,6 @@ class User_Roles_Checkout_Restriction {
 		add_action( 'woocommerce_check_cart_items', array( $this, 'validate_cart_items' ), 9 );
 		add_action( 'woocommerce_proceed_to_checkout', array( $this, 'maybe_remove_checkout_button' ), 1 );
 		add_filter( 'woocommerce_order_button_html', array( $this, 'maybe_remove_checkout_order_button' ), 20 );
-		add_action( 'woocommerce_before_cart', array( $this, 'render_promotional_texts' ), 12 );
 	}
 
 	/**
@@ -80,27 +79,6 @@ class User_Roles_Checkout_Restriction {
 	public function maybe_remove_checkout_order_button( $button ) {
 		$validation = $this->get_validation_result();
 		return empty( $validation['is_valid'] ) ? '' : $button;
-	}
-
-	/**
-	 * Render optional promotional text on the cart page.
-	 *
-	 * @return void
-	 */
-	public function render_promotional_texts() {
-		if ( ! is_cart() ) {
-			return;
-		}
-
-		$rule = $this->get_rule();
-		if ( empty( $rule ) || empty( $rule['promotions']['enabled'] ) ) {
-			return;
-		}
-
-		$messages = $this->get_promotion_messages( $rule );
-		foreach ( $messages as $message ) {
-			wc_print_notice( $message, 'notice' );
-		}
 	}
 
 	/**
@@ -204,43 +182,6 @@ class User_Roles_Checkout_Restriction {
 	}
 
 	/**
-	 * Build promotional messages for active checkout limits.
-	 *
-	 * @param array $rule Checkout rule.
-	 * @return array
-	 */
-	private function get_promotion_messages( array $rule ) {
-		$cart_totals = $this->get_matching_cart_totals( $rule );
-		$messages    = array();
-
-		if ( ! empty( $rule['quantity']['enabled'] ) ) {
-			$template = ! empty( $rule['promotions']['quantity_text'] ) ? $rule['promotions']['quantity_text'] : __( 'Add {min_quantity} to {max_quantity} product(s) to checkout.', 'wholesalex' );
-			$messages[] = $this->replace_smart_tags(
-				$template,
-				array(
-					'{min_quantity}'  => isset( $rule['quantity']['min'] ) ? absint( $rule['quantity']['min'] ) : 0,
-					'{max_quantity}'  => isset( $rule['quantity']['max'] ) ? absint( $rule['quantity']['max'] ) : 0,
-					'{cart_quantity}' => $cart_totals['quantity'],
-				)
-			);
-		}
-
-		if ( ! empty( $rule['order_value']['enabled'] ) ) {
-			$template = ! empty( $rule['promotions']['order_value_text'] ) ? $rule['promotions']['order_value_text'] : __( 'Spend {min_value} to {max_value} to checkout.', 'wholesalex' );
-			$messages[] = $this->replace_smart_tags(
-				$template,
-				array(
-					'{min_value}'  => wc_price( isset( $rule['order_value']['min'] ) ? (float) $rule['order_value']['min'] : 0 ),
-					'{max_value}'  => wc_price( isset( $rule['order_value']['max'] ) ? (float) $rule['order_value']['max'] : 0 ),
-					'{cart_value}' => wc_price( $cart_totals['subtotal'] ),
-				)
-			);
-		}
-
-		return array_values( array_filter( $messages ) );
-	}
-
-	/**
 	 * Normalize checkout restriction rule for the current role.
 	 *
 	 * @return array
@@ -281,12 +222,17 @@ class User_Roles_Checkout_Restriction {
 				'max_message' => isset( $data['order_value']['max_message'] ) ? $data['order_value']['max_message'] : ( isset( $restrictions['_max_order_value_warning'] ) ? $restrictions['_max_order_value_warning'] : '' ),
 			),
 			'warning'          => isset( $data['warning'] ) ? (string) $data['warning'] : ( isset( $restrictions['_checkout_warning'] ) ? (string) $restrictions['_checkout_warning'] : '' ),
-			'promotions'       => array(
-				'enabled'          => $this->is_truthy( isset( $data['promotions']['enabled'] ) ? $data['promotions']['enabled'] : ( isset( $restrictions['show_promotions_on_sp'] ) ? $restrictions['show_promotions_on_sp'] : false ) ),
-				'quantity_text'    => isset( $data['promotions']['quantity_text'] ) ? $data['promotions']['quantity_text'] : ( isset( $restrictions['only_total_cart_quantity_promo_text'] ) ? $restrictions['only_total_cart_quantity_promo_text'] : '' ),
-				'order_value_text' => isset( $data['promotions']['order_value_text'] ) ? $data['promotions']['order_value_text'] : ( isset( $restrictions['only_total_cart_value_promo_text'] ) ? $restrictions['only_total_cart_value_promo_text'] : '' ),
-			),
 		);
+
+		// Selection-based filters are incomplete until at least one target is
+		// chosen. Ignore stale or crafted enabled flags so an empty selection
+		// cannot block checkout with a minimum quantity or order value.
+		if (
+			'all_products' !== $rule['filter'] &&
+			empty( $this->get_selected_ids( $rule['products'] ) )
+		) {
+			return $this->rule;
+		}
 
 		$this->rule = $rule;
 		return $this->rule;
@@ -390,6 +336,8 @@ class User_Roles_Checkout_Restriction {
 				return true;
 			case 'specific_products':
 				return ! empty( array_intersect( $product_ids, $selected_ids ) );
+			case 'specific_variations':
+				return $variation_id && in_array( $variation_id, $selected_ids, true );
 			case 'categories':
 				return ! empty( $selected_ids ) && ! empty( array_intersect( wc_get_product_term_ids( $product_id, 'product_cat' ), $selected_ids ) );
 			case 'brands':
@@ -408,17 +356,18 @@ class User_Roles_Checkout_Restriction {
 	 */
 	private function normalize_product_filter( $filter ) {
 		$map = array(
-			'all'              => 'all_products',
-			'cat_in_list'      => 'categories',
-			'brand_in_list'    => 'brands',
-			'products_in_list' => 'specific_products',
+			'all'               => 'all_products',
+			'cat_in_list'       => 'categories',
+			'brand_in_list'     => 'brands',
+			'products_in_list'  => 'specific_products',
+			'attribute_in_list' => 'specific_variations',
 		);
 
 		if ( isset( $map[ $filter ] ) ) {
 			return $map[ $filter ];
 		}
 
-		return in_array( $filter, array( 'all_products', 'specific_products', 'categories', 'brands' ), true ) ? $filter : 'specific_products';
+		return in_array( $filter, array( 'all_products', 'specific_products', 'specific_variations', 'categories', 'brands' ), true ) ? $filter : 'specific_products';
 	}
 
 	/**

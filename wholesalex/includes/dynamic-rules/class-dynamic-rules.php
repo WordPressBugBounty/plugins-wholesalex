@@ -1969,7 +1969,7 @@ class Dynamic_Rules {
 	// ─── Handle Discounts (Price Filter Registration) ────────────
 
 	public function handle_discounts( $data ) {
-		$global_show_tier_table = wholesalex()->get_setting( '_settings_show_table', 'yes' );
+		$global_show_tier_table = wholesalex()->get_setting( '_settings_show_tierd_pricing_table', 'yes' );
 
 		if ( 'yes' === $global_show_tier_table ) {
 			$tier_position = 'before';
@@ -2125,6 +2125,10 @@ class Dynamic_Rules {
 		add_filter(
 			'woocommerce_variation_prices_price',
 			function ( $price, $product ) use ( $data ) {
+				// if price is not set then return the price as it is, this will avoid the issue of showing 0 price for variable products when no price is set.
+				if ( '' === $price ) {
+					return $price;
+				}
 				$sale_price          = floatval( $this->calculate_sale_price( '', $product, $data ) );
 				$regular_price       = floatval( $this->calculate_regular_price( $price, $product, $data ) );
 				$to_be_display_price = $sale_price ? $sale_price : $regular_price;

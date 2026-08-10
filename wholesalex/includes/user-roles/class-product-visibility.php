@@ -32,6 +32,7 @@ class User_Roles_Product_Visibility {
 		add_filter( 'woocommerce_shortcode_products_query', array( $this, 'filter_product_query_args' ) );
 		add_filter( 'woocommerce_product_data_store_cpt_get_products_query', array( $this, 'filter_product_query_args' ) );
 		add_filter( 'woocommerce_product_is_visible', array( $this, 'filter_product_visibility' ), 10, 2 );
+		add_filter( 'woocommerce_variation_is_visible', array( $this, 'filter_variation_visibility' ), 10, 2 );
 		add_filter( 'woocommerce_related_products', array( $this, 'filter_related_products' ) );
 		add_action( 'template_redirect', array( $this, 'redirect_from_hidden_products' ), 8 );
 		add_action( 'woocommerce_check_cart_items', array( $this, 'prevent_checkout_hidden_products' ), 8 );
@@ -105,6 +106,17 @@ class User_Roles_Product_Visibility {
 	}
 
 	/**
+	 * Hide an individually selected variation without hiding its parent product.
+	 *
+	 * @param bool $visible      Variation visibility status.
+	 * @param int  $variation_id Variation ID.
+	 * @return bool
+	 */
+	public function filter_variation_visibility( $visible, $variation_id ) {
+		return $this->is_product_hidden( $variation_id ) ? false : $visible;
+	}
+
+	/**
 	 * Remove role-hidden products from related product lists.
 	 *
 	 * @param array $product_ids Product IDs.
@@ -158,10 +170,10 @@ class User_Roles_Product_Visibility {
 		}
 
 		foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-			$product_id = ! empty( $cart_item['variation_id'] ) ? wp_get_post_parent_id( $cart_item['variation_id'] ) : $cart_item['product_id'];
+			$product_id = ! empty( $cart_item['variation_id'] ) ? $cart_item['variation_id'] : $cart_item['product_id'];
 			$product_id = (int) $product_id;
 
-			if ( in_array( $product_id, $hidden_ids, true ) ) {
+			if ( $this->is_product_hidden( $product_id ) ) {
 				WC()->cart->remove_cart_item( $cart_item_key );
 				/* translators: %s: Product name. */
 				wc_add_notice( sprintf( __( 'Sorry, you are not allowed to checkout %s product.', 'wholesalex' ), get_the_title( $product_id ) ), 'error' );
@@ -256,6 +268,16 @@ class User_Roles_Product_Visibility {
 				break;
 			case 'specific_products':
 				$product_ids = $selected_ids;
+				break;
+			case 'specific_variations':
+				$product_ids = array_values(
+					array_filter(
+						$selected_ids,
+						function ( $product_id ) {
+							return 'product_variation' === get_post_type( $product_id );
+						}
+					)
+				);
 				break;
 			case 'categories':
 				$product_ids = empty( $selected_ids ) ? array() : $this->query_product_ids(
@@ -359,17 +381,18 @@ class User_Roles_Product_Visibility {
 	 */
 	private function normalize_product_filter( $filter ) {
 		$map = array(
-			'all'              => 'all_products',
-			'cat_in_list'      => 'categories',
-			'brand_in_list'    => 'brands',
-			'products_in_list' => 'specific_products',
+			'all'               => 'all_products',
+			'cat_in_list'       => 'categories',
+			'brand_in_list'     => 'brands',
+			'products_in_list'  => 'specific_products',
+			'attribute_in_list' => 'specific_variations',
 		);
 
 		if ( isset( $map[ $filter ] ) ) {
 			return $map[ $filter ];
 		}
 
-		return in_array( $filter, array( 'all_products', 'specific_products', 'categories', 'brands' ), true ) ? $filter : 'specific_products';
+		return in_array( $filter, array( 'all_products', 'specific_products', 'specific_variations', 'categories', 'brands' ), true ) ? $filter : 'specific_products';
 	}
 
 	/**

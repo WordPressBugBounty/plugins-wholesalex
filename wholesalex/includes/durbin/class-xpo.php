@@ -247,6 +247,11 @@ class Xpo {
 				'medium'   => 'summer-sale',
 				'campaign' => 'wholesalex-dashboard',
 			),
+			'submenu_upgrade'   => array(
+				'source'   => 'db-wholesalex-sub-menu',
+				'medium'   => 'upgrade',
+				'campaign' => 'wholesalex-dashboard',
+			),
 			
 		);
 

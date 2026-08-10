@@ -30,6 +30,98 @@ class User_Roles_Tax_Rules {
 		add_filter( 'woocommerce_product_get_tax_class', array( $this, 'filter_product_tax_class' ), 20, 2 );
 		add_filter( 'woocommerce_product_variation_get_tax_class', array( $this, 'filter_product_tax_class' ), 20, 2 );
 		add_filter( 'woocommerce_package_rates', array( $this, 'maybe_zero_shipping_taxes' ), 20, 2 );
+		add_filter( 'woocommerce_order_is_vat_exempt', array( $this, 'filter_order_tax_exempt' ), 20, 2 );
+		add_action( 'woocommerce_checkout_create_order', array( $this, 'maybe_mark_order_tax_exempt' ), 20 );
+		add_action( 'woocommerce_store_api_checkout_update_order_meta', array( $this, 'maybe_mark_order_tax_exempt' ), 20 );
+		add_action( 'woocommerce_order_item_after_calculate_taxes', array( $this, 'maybe_zero_order_item_taxes' ), 20, 2 );
+	}
+
+	/**
+	 * Keep an all-products exemption active when WooCommerce recalculates an order.
+	 *
+	 * @param bool      $is_exempt Existing VAT-exempt status.
+	 * @param \WC_Order $order Order object.
+	 * @return bool
+	 */
+	public function filter_order_tax_exempt( $is_exempt, $order ) {
+		if ( $is_exempt || $this->is_admin_request() || ! $order instanceof \WC_Order || ! $this->is_full_order_tax_exempt( $order ) ) {
+			return $is_exempt;
+		}
+
+		$order->update_meta_data( 'is_vat_exempt', 'yes' );
+		return true;
+	}
+
+	/**
+	 * Persist an all-products exemption on newly created orders.
+	 *
+	 * @param \WC_Order $order Order object.
+	 * @return void
+	 */
+	public function maybe_mark_order_tax_exempt( $order ) {
+		if ( $this->is_admin_request() || ! $order instanceof \WC_Order || ! $this->is_full_order_tax_exempt( $order ) ) {
+			return;
+		}
+
+		$order->update_meta_data( 'is_vat_exempt', 'yes' );
+	}
+
+	/**
+	 * Check whether the current role rule exempts the complete order.
+	 *
+	 * @param \WC_Order|null $order Order object.
+	 * @return bool
+	 */
+	private function is_full_order_tax_exempt( $order = null ) {
+		$rule = $this->get_rule();
+		if ( empty( $rule ) || 'yes' !== $rule['tax_exempted'] || 'all_products' !== $rule['filter'] ) {
+			return false;
+		}
+
+		if ( ! $order instanceof \WC_Order ) {
+			return true;
+		}
+
+		foreach ( $order->get_items( 'line_item' ) as $item ) {
+			$product = $item->get_product();
+			if ( ! $product || ! $this->product_matches_rule( $product, $rule ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Keep scoped exemptions intact when WooCommerce recalculates order taxes.
+	 *
+	 * @param \WC_Order_Item $item Order item.
+	 * @param array          $calculate_tax_for Tax location.
+	 * @return void
+	 */
+	public function maybe_zero_order_item_taxes( $item, $calculate_tax_for ) {
+		if ( ! $item instanceof \WC_Order_Item_Product || $this->is_admin_request() ) {
+			return;
+		}
+
+		if ( $this->is_product_tax_exempt( $item->get_product() ) ) {
+			$item->set_taxes( false );
+		}
+	}
+
+	/**
+	 * Check whether the current role rule exempts a product.
+	 *
+	 * @param \WC_Product|false $product Product object.
+	 * @return bool
+	 */
+	private function is_product_tax_exempt( $product ) {
+		if ( ! $product instanceof \WC_Product ) {
+			return false;
+		}
+
+		$rule = $this->get_rule();
+		return ! empty( $rule ) && 'yes' === $rule['tax_exempted'] && $this->product_matches_rule( $product, $rule );
 	}
 
 	/**
@@ -50,7 +142,7 @@ class User_Roles_Tax_Rules {
 		}
 
 		if ( 'yes' === $rule['tax_exempted'] ) {
-			return 'Zero Rate';
+			return 'zero-rate';
 		}
 
 		if ( 'no' === $rule['tax_exempted'] && '' !== $rule['tax_class'] ) {
@@ -132,7 +224,7 @@ class User_Roles_Tax_Rules {
 			return $this->rule;
 		}
 
-		if ( 'specific_products' === $rule['filter'] && empty( $this->get_selected_ids( $rule['products'] ) ) ) {
+		if ( in_array( $rule['filter'], array( 'specific_products', 'specific_variations' ), true ) && empty( $this->get_selected_ids( $rule['products'] ) ) ) {
 			return $this->rule;
 		}
 
@@ -232,6 +324,8 @@ class User_Roles_Tax_Rules {
 				return true;
 			case 'specific_products':
 				return ! empty( array_intersect( $product_ids, $selected_ids ) );
+			case 'specific_variations':
+				return $variation_id && in_array( $variation_id, $selected_ids, true );
 			case 'categories':
 				return ! empty( $selected_ids ) && ! empty( array_intersect( wc_get_product_term_ids( $product_id, 'product_cat' ), $selected_ids ) );
 			case 'brands':
@@ -250,17 +344,18 @@ class User_Roles_Tax_Rules {
 	 */
 	private function normalize_product_filter( $filter ) {
 		$map = array(
-			'all'              => 'all_products',
-			'cat_in_list'      => 'categories',
-			'brand_in_list'    => 'brands',
-			'products_in_list' => 'specific_products',
+			'all'               => 'all_products',
+			'cat_in_list'       => 'categories',
+			'brand_in_list'     => 'brands',
+			'products_in_list'  => 'specific_products',
+			'attribute_in_list' => 'specific_variations',
 		);
 
 		if ( isset( $map[ $filter ] ) ) {
 			return $map[ $filter ];
 		}
 
-		return in_array( $filter, array( 'all_products', 'specific_products', 'categories', 'brands' ), true ) ? $filter : 'specific_products';
+		return in_array( $filter, array( 'all_products', 'specific_products', 'specific_variations', 'categories', 'brands' ), true ) ? $filter : 'specific_products';
 	}
 
 	/**

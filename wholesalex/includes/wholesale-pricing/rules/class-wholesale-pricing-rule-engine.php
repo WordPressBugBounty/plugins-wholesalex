@@ -1333,7 +1333,7 @@ class Wholesale_Pricing_Rule_Engine {
 	}
 
 	/**
-	 * Validate add-to-cart quantity restrictions.
+	 * Validate add-to-cart quantity and product-value restrictions.
 	 *
 	 * @param bool $passed       Current validation status.
 	 * @param int  $product_id   Product ID.
@@ -1352,15 +1352,26 @@ class Wholesale_Pricing_Rule_Engine {
 			return $passed;
 		}
 
-		$restriction = $this->get_product_quantity_restriction( $product );
+		$requested_quantity = absint( $quantity );
+		$restriction        = $this->get_product_quantity_restriction( $product );
 
-		if ( empty( $restriction ) ) {
+		if ( ! empty( $restriction ) ) {
+			$new_quantity = $this->get_cart_quantity( $product, $restriction['rule'] ) + $requested_quantity;
+			$passed       = $this->validate_quantity_against_restriction( $passed, $product, $restriction, $new_quantity );
+		}
+
+		if ( ! $passed ) {
+			return false;
+		}
+
+		$value_quantity    = $this->get_cart_quantity( $product, array( 'restrictions' => array() ) ) + $requested_quantity;
+		$value_restriction = $this->get_product_value_restriction( $product, $value_quantity );
+
+		if ( empty( $value_restriction ) ) {
 			return $passed;
 		}
 
-		$new_quantity = $this->get_cart_quantity( $product, $restriction['rule'] ) + absint( $quantity );
-
-		return $this->validate_quantity_against_restriction( $passed, $product, $restriction, $new_quantity );
+		return $this->validate_value_against_restriction( $passed, $product, $value_restriction, $value_quantity );
 	}
 
 	/**
@@ -1377,20 +1388,31 @@ class Wholesale_Pricing_Rule_Engine {
 			return $passed;
 		}
 
-		$restriction = $this->get_product_quantity_restriction( $values['data'] );
+		$requested_quantity = absint( $quantity );
+		$restriction        = $this->get_product_quantity_restriction( $values['data'] );
 
-		if ( empty( $restriction ) ) {
+		if ( ! empty( $restriction ) ) {
+			$rule              = isset( $restriction['rule'] ) ? $restriction['rule'] : array();
+			$updated_quantity  = $this->get_cart_quantity_for_update( $values['data'], $rule, $cart_item_key, $requested_quantity );
+			$passed            = $this->validate_quantity_against_restriction( $passed, $values['data'], $restriction, $updated_quantity );
+		}
+
+		if ( ! $passed ) {
+			return false;
+		}
+
+		$value_quantity    = $this->get_cart_quantity_for_update( $values['data'], array( 'restrictions' => array() ), $cart_item_key, $requested_quantity );
+		$value_restriction = $this->get_product_value_restriction( $values['data'], $value_quantity );
+
+		if ( empty( $value_restriction ) ) {
 			return $passed;
 		}
 
-		$rule     = isset( $restriction['rule'] ) ? $restriction['rule'] : array();
-		$quantity = $this->get_cart_quantity_for_update( $values['data'], $rule, $cart_item_key, absint( $quantity ) );
-
-		return $this->validate_quantity_against_restriction( $passed, $values['data'], $restriction, $quantity );
+		return $this->validate_value_against_restriction( $passed, $values['data'], $value_restriction, $value_quantity );
 	}
 
 	/**
-	 * Validate cart-level quantity and order value restrictions before checkout.
+	 * Validate product-level quantity and order value restrictions before checkout.
 	 *
 	 * @return void
 	 */
@@ -1406,14 +1428,7 @@ class Wholesale_Pricing_Rule_Engine {
 				continue;
 			}
 
-			$restrictions = $rule['restrictions'];
-
-			if ( ! empty( $restrictions['enable_value_limits'] ) ) {
-				$subtotal = $this->get_eligible_cart_subtotal( $rule['filter'] );
-				$this->maybe_add_amount_notice( $shown_notices, $rule, $subtotal );
-			}
-
-			if ( ! $this->rule_uses_quantity_limits( $rule ) ) {
+			if ( ! $this->rule_uses_quantity_limits( $rule ) && ! $this->rule_uses_value_limits( $rule ) ) {
 				continue;
 			}
 
@@ -1428,7 +1443,15 @@ class Wholesale_Pricing_Rule_Engine {
 					continue;
 				}
 
-				$this->maybe_add_quantity_notice( $shown_notices, $rule, $product, $this->get_cart_quantity( $product, $rule ) );
+				$quantity = $this->get_cart_quantity( $product, $rule );
+
+				if ( $this->rule_uses_value_limits( $rule ) ) {
+					$this->maybe_add_amount_notice( $shown_notices, $rule, $product, $quantity );
+				}
+
+				if ( $this->rule_uses_quantity_limits( $rule ) ) {
+					$this->maybe_add_quantity_notice( $shown_notices, $rule, $product, $quantity );
+				}
 			}
 		}
 	}
@@ -2104,10 +2127,10 @@ class Wholesale_Pricing_Rule_Engine {
 	/**
 	 * Build a temporary cart context for product-page price previews.
 	 *
-	 * Regular min/max rules constrain the single-product quantity input before
-	 * add-to-cart. In that display context, a cart-quantity condition can be
-	 * evaluated against the minimum valid quantity instead of an empty cart.
-	 * Cart totals pass an explicit quantity and do not use this preview context.
+	 * Regular min/max rules are evaluated before add-to-cart. In that display
+	 * context, cart conditions can use the quantity required by a quantity or
+	 * product-value limit instead of an empty cart. Cart totals pass an explicit
+	 * quantity and do not use this preview context.
 	 *
 	 * @param array            $rule               Normalized rule.
 	 * @param \WC_Product|null $product            Product object.
@@ -2116,7 +2139,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return array
 	 */
 	private function get_condition_preview_context( array $rule, ?\WC_Product $product, ?int $quantity, bool $preview_conditions ): array {
-		if ( ! $preview_conditions || ! $product instanceof \WC_Product || null === $quantity || ! $this->rule_uses_quantity_limits( $rule ) ) {
+		if ( ! $preview_conditions || ! $product instanceof \WC_Product || null === $quantity || ( ! $this->rule_uses_quantity_limits( $rule ) && ! $this->rule_uses_value_limits( $rule ) ) ) {
 			return array();
 		}
 
@@ -2124,16 +2147,16 @@ class Wholesale_Pricing_Rule_Engine {
 			return array();
 		}
 
-		$product_id   = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
-		$variation_id = $product->get_parent_id() ? $product->get_id() : 0;
-		$base_price   = $this->get_base_price( $product );
+		$product_id    = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
+		$variation_id  = $product->get_parent_id() ? $product->get_id() : 0;
+		$product_value = $this->get_product_value( $product, $quantity, $rule );
 
 		return array(
 			'preview_cart_item' => array(
 				'product_id'     => $product_id,
 				'variation_id'   => $variation_id,
 				'quantity'       => $quantity,
-				'line_subtotal'  => $base_price > 0 ? $base_price * $quantity : 0,
+				'line_subtotal'  => $product_value,
 				'data'           => $product,
 			),
 		);
@@ -2149,19 +2172,16 @@ class Wholesale_Pricing_Rule_Engine {
 	 */
 	private function restrictions_pass_for_pricing( array $rule, \WC_Product $product, ?int $quantity ): bool {
 		$restrictions = $rule['restrictions'];
+		$qty          = null === $quantity ? $this->get_cart_quantity( $product, $rule ) : $quantity;
 
 		if ( $this->rule_uses_quantity_limits( $rule ) ) {
-			$qty = null === $quantity ? $this->get_cart_quantity( $product, $rule ) : $quantity;
-
 			if ( ! $this->quantity_is_inside_limits( $restrictions, $qty ) ) {
 				return false;
 			}
 		}
 
-		if ( ! empty( $restrictions['enable_value_limits'] ) ) {
-			$subtotal = $this->get_eligible_cart_subtotal( $rule['filter'] );
-
-			if ( ! $this->amount_is_inside_limits( $restrictions, $subtotal ) ) {
+		if ( $this->rule_uses_value_limits( $rule ) ) {
+			if ( ! $this->amount_is_inside_limits( $restrictions, $this->get_product_value( $product, $qty, $rule ) ) ) {
 				return false;
 			}
 		}
@@ -2413,31 +2433,24 @@ class Wholesale_Pricing_Rule_Engine {
 	}
 
 	/**
-	 * Get eligible cart subtotal for a product filter.
+	 * Get a product line's value at the rule's wholesale price.
 	 *
-	 * @param array $filter Runtime product filter.
+	 * Calculate the regular discount directly instead of reading get_price().
+	 * The latter is filtered by this engine and would recursively re-enter the
+	 * restriction check. If a rule cannot produce a valid wholesale price, fall
+	 * back to its base price so malformed rules do not make products unbuyable.
+	 *
+	 * @param \WC_Product $product  Product object.
+	 * @param int         $quantity Product quantity.
+	 * @param array       $rule     Normalized wholesale-pricing rule.
 	 * @return float
 	 */
-	private function get_eligible_cart_subtotal( array $filter ): float {
-		if ( ! WC()->cart ) {
-			return 0.0;
-		}
+	private function get_product_value( \WC_Product $product, int $quantity, array $rule ): float {
+		$base_price      = $this->get_base_price( $product );
+		$wholesale_price = $this->calculate_regular_price( $rule, $product, $base_price );
+		$unit_price      = false === $wholesale_price ? $base_price : (float) $wholesale_price;
 
-		$subtotal = 0.0;
-
-		foreach ( WC()->cart->get_cart() as $cart_item ) {
-			if ( empty( $cart_item['data'] ) || ! $cart_item['data'] instanceof \WC_Product ) {
-				continue;
-			}
-
-			if ( ! Wholesale_Pricing_Condition_Engine::product_ids_match_filter( (int) $cart_item['product_id'], (int) $cart_item['variation_id'], $filter ) ) {
-				continue;
-			}
-
-			$subtotal += isset( $cart_item['line_subtotal'] ) ? (float) $cart_item['line_subtotal'] : ( (float) $cart_item['data']->get_price('edit') * absint( $cart_item['quantity'] ) );
-		}
-
-		return $subtotal;
+		return $unit_price * max( 0, $quantity );
 	}
 
 	/**
@@ -2472,6 +2485,39 @@ class Wholesale_Pricing_Rule_Engine {
 	}
 
 	/**
+	 * Find the highest-priority order-value restriction for a product.
+	 *
+	 * @param \WC_Product $product  Product object.
+	 * @param int         $quantity Resulting product quantity.
+	 * @return array|false
+	 */
+	private function get_product_value_restriction( \WC_Product $product, int $quantity ) {
+		foreach ( $this->valid_rules as $rule ) {
+			if (
+				! $this->rule_uses_value_limits( $rule ) ||
+				! $this->is_product_eligible_for_rule( $product, $rule ) ||
+				! $this->conditions_pass( $rule, $product, $quantity, $this->can_preview_conditions_for_request() )
+			) {
+				continue;
+			}
+
+			$restrictions = $rule['restrictions'];
+
+			return array(
+				'min'     => isset( $restrictions['min_amount'] ) ? (float) $restrictions['min_amount'] : 0.0,
+				'max'     => isset( $restrictions['max_amount'] ) ? (float) $restrictions['max_amount'] : 0.0,
+				'message' => array(
+					'min' => isset( $restrictions['min_amount_message'] ) ? $restrictions['min_amount_message'] : '',
+					'max' => isset( $restrictions['max_amount_message'] ) ? $restrictions['max_amount_message'] : '',
+				),
+				'rule'    => $rule,
+			);
+		}
+
+		return false;
+	}
+
+	/**
 	 * Tiered pricing owns its quantity ranges through tiers, so rule-level
 	 * min/max quantity restrictions only apply to regular wholesale discounts.
 	 *
@@ -2483,24 +2529,46 @@ class Wholesale_Pricing_Rule_Engine {
 	}
 
 	/**
+	 * Order-value restrictions are available only for regular wholesale pricing.
+	 *
+	 * @param array $rule Normalized rule.
+	 * @return bool
+	 */
+	private function rule_uses_value_limits( array $rule ): bool {
+		return 'regular' === ( $rule['discount_type'] ?? 'regular' ) && ! empty( $rule['restrictions']['enable_value_limits'] );
+	}
+
+	/**
 	 * Return a sensible quantity when pricing is rendered before a shopper has
-	 * selected a quantity. Regular min/max discounts should preview from their
-	 * minimum valid quantity instead of failing against a default quantity of 1.
+	 * selected a quantity. Regular min/max discounts should preview from the
+	 * quantity needed to satisfy their minimum limits instead of failing against
+	 * a default quantity of 1.
 	 *
 	 * @param \WC_Product $product Product object.
 	 * @param array       $rule    Normalized rule.
 	 * @return int
 	 */
 	private function get_display_quantity_for_rule( \WC_Product $product, array $rule ): int {
+		$display_quantity = max( 1, $this->get_cart_quantity( $product, $rule ) );
+
 		if ( $this->rule_uses_quantity_limits( $rule ) ) {
 			$min = isset( $rule['restrictions']['min_quantity'] ) ? absint( $rule['restrictions']['min_quantity'] ) : 0;
 
 			if ( $min > 0 ) {
-				return $min;
+				$display_quantity = max( $display_quantity, $min );
 			}
 		}
 
-		return max( 1, $this->get_cart_quantity( $product, $rule ) );
+		if ( $this->rule_uses_value_limits( $rule ) ) {
+			$minimum_amount = isset( $rule['restrictions']['min_amount'] ) ? (float) $rule['restrictions']['min_amount'] : 0.0;
+			$unit_price     = $this->get_product_value( $product, 1, $rule );
+
+			if ( $minimum_amount > 0 && $unit_price > 0 ) {
+				$display_quantity = max( $display_quantity, (int) ceil( $minimum_amount / $unit_price ) );
+			}
+		}
+
+		return $display_quantity;
 	}
 
 	/**
@@ -2520,6 +2588,27 @@ class Wholesale_Pricing_Rule_Engine {
 
 		if ( $restriction['max'] > 0 && $quantity > $restriction['max'] ) {
 			wc_add_notice( $this->get_quantity_notice( $product, $restriction, 'max' ), 'error' );
+			return false;
+		}
+
+		return $passed;
+	}
+
+	/**
+	 * Validate a product's base-price value against min/max restrictions.
+	 *
+	 * @param bool        $passed      Current validation state.
+	 * @param \WC_Product $product     Product object.
+	 * @param array       $restriction Restriction data.
+	 * @param int         $quantity    Resulting product quantity.
+	 * @return bool
+	 */
+	private function validate_value_against_restriction( bool $passed, \WC_Product $product, array $restriction, int $quantity ): bool {
+		$product_value = $this->get_product_value( $product, $quantity, $restriction['rule'] );
+
+		if ( ! $this->amount_is_inside_limits( $restriction, $product_value ) ) {
+			$type = $restriction['min'] > 0 && $product_value < $restriction['min'] ? 'min' : 'max';
+			wc_add_notice( $this->get_amount_notice( $product, $restriction, $type, $product_value ), 'error' );
 			return false;
 		}
 
@@ -2565,31 +2654,65 @@ class Wholesale_Pricing_Rule_Engine {
 	/**
 	 * Add order amount notices when restrictions fail.
 	 *
-	 * @param array $shown_notices Notice de-duplication map.
-	 * @param array $rule          Normalized rule.
-	 * @param float $subtotal      Eligible cart subtotal.
+	 * @param array       $shown_notices Notice de-duplication map.
+	 * @param array       $rule          Normalized rule.
+	 * @param \WC_Product $product       Product object.
+	 * @param int         $quantity      Product quantity.
 	 * @return void
 	 */
-	private function maybe_add_amount_notice( array &$shown_notices, array $rule, float $subtotal ): void {
+	private function maybe_add_amount_notice( array &$shown_notices, array $rule, \WC_Product $product, int $quantity ): void {
 		$restrictions = $rule['restrictions'];
-		$min          = isset( $restrictions['min_amount'] ) ? (float) $restrictions['min_amount'] : 0.0;
-		$max          = isset( $restrictions['max_amount'] ) ? (float) $restrictions['max_amount'] : 0.0;
+		$restriction  = array(
+			'min'     => isset( $restrictions['min_amount'] ) ? (float) $restrictions['min_amount'] : 0.0,
+			'max'     => isset( $restrictions['max_amount'] ) ? (float) $restrictions['max_amount'] : 0.0,
+			'message' => array(
+				'min' => isset( $restrictions['min_amount_message'] ) ? $restrictions['min_amount_message'] : '',
+				'max' => isset( $restrictions['max_amount_message'] ) ? $restrictions['max_amount_message'] : '',
+			),
+			'rule'    => $rule,
+		);
+		$product_value = $this->get_product_value( $product, $quantity, $rule );
 
-		if ( $min > 0 && $subtotal < $min ) {
-			$key = $rule['id'] . ':amount_min';
-			if ( empty( $shown_notices[ $key ] ) ) {
-				$message = ! empty( $restrictions['min_amount_message'] ) ? $restrictions['min_amount_message'] : __( 'Minimum order amount for this wholesale price is {minimum_amount}.', 'wholesalex' );
-				wc_add_notice( $this->replace_smart_tags( $message, array( '{minimum_amount}' => wc_price( $min ) ) ), 'error' );
-				$shown_notices[ $key ] = true;
-			}
-		} elseif ( $max > 0 && $subtotal > $max ) {
-			$key = $rule['id'] . ':amount_max';
-			if ( empty( $shown_notices[ $key ] ) ) {
-				$message = ! empty( $restrictions['max_amount_message'] ) ? $restrictions['max_amount_message'] : __( 'Maximum order amount for this wholesale price is {maximum_amount}.', 'wholesalex' );
-				wc_add_notice( $this->replace_smart_tags( $message, array( '{maximum_amount}' => wc_price( $max ) ) ), 'error' );
-				$shown_notices[ $key ] = true;
-			}
+		if ( $restriction['min'] > 0 && $product_value < $restriction['min'] ) {
+			$type = 'min';
+		} elseif ( $restriction['max'] > 0 && $product_value > $restriction['max'] ) {
+			$type = 'max';
+		} else {
+			return;
 		}
+
+		$key = $rule['id'] . ':amount_' . $type . ':' . $product->get_id();
+		if ( empty( $shown_notices[ $key ] ) ) {
+			wc_add_notice( $this->get_amount_notice( $product, $restriction, $type, $product_value ), 'error' );
+			$shown_notices[ $key ] = true;
+		}
+	}
+
+	/**
+	 * Build an order-value restriction notice.
+	 *
+	 * @param \WC_Product $product       Product object.
+	 * @param array       $restriction   Restriction data.
+	 * @param string      $type          min|max.
+	 * @param float       $product_value Current product value.
+	 * @return string
+	 */
+	private function get_amount_notice( \WC_Product $product, array $restriction, string $type, float $product_value ): string {
+		if ( 'min' === $type ) {
+			$message = ! empty( $restriction['message']['min'] ) ? $restriction['message']['min'] : __( 'You must spend at least {minimum_amount} on this product to add it to your cart.', 'wholesalex' );
+		} else {
+			$message = ! empty( $restriction['message']['max'] ) ? $restriction['message']['max'] : __( 'You can spend up to {maximum_amount} on this product.', 'wholesalex' );
+		}
+
+		return $this->replace_smart_tags(
+			$message,
+			array(
+				'{minimum_amount}' => wc_price( $restriction['min'] ),
+				'{maximum_amount}' => wc_price( $restriction['max'] ),
+				'{product_value}'  => wc_price( $product_value ),
+				'{product_title}'  => $product->get_name(),
+			)
+		);
 	}
 
 	/**
@@ -2667,8 +2790,8 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return bool
 	 */
 	private function amount_is_inside_limits( array $restrictions, float $amount ): bool {
-		$min = isset( $restrictions['min_amount'] ) ? (float) $restrictions['min_amount'] : 0.0;
-		$max = isset( $restrictions['max_amount'] ) ? (float) $restrictions['max_amount'] : 0.0;
+		$min = isset( $restrictions['min_amount'] ) ? (float) $restrictions['min_amount'] : ( isset( $restrictions['min'] ) ? (float) $restrictions['min'] : 0.0 );
+		$max = isset( $restrictions['max_amount'] ) ? (float) $restrictions['max_amount'] : ( isset( $restrictions['max'] ) ? (float) $restrictions['max'] : 0.0 );
 
 		if ( $min > 0 && $amount < $min ) {
 			return false;

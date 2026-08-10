@@ -1461,7 +1461,7 @@ class WHOLESALEX_Overview {
 	 * @since 1.1.2
 	 */
 	public function go_pro_redirect() {
-		$pro_link = Xpo::is_lc_expired() ? Xpo::get_lc_renewal_url() : Xpo::generate_utm_link( array( 'utmKey' => 'summer_db' ) );
+		$pro_link = Xpo::is_lc_expired() ? Xpo::get_lc_renewal_url() : Xpo::generate_utm_link( array( 'utmKey' => 'submenu_upgrade' ) );
 		if (isset($_GET['page']) && 'go_wholesalex_pro' === sanitize_text_field($_GET['page'])) { //phpcs:ignore
 			wp_redirect($pro_link); //phpcs:ignore
 			die();

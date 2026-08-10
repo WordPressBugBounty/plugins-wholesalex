@@ -217,6 +217,8 @@ class User_Roles_Non_Purchasable {
 				return true;
 			case 'specific_products':
 				return ! empty( array_intersect( $product_ids, $selected_ids ) );
+			case 'specific_variations':
+				return $variation_id && in_array( $variation_id, $selected_ids, true );
 			case 'categories':
 				return ! empty( $selected_ids ) && ! empty( array_intersect( wc_get_product_term_ids( $product_id, 'product_cat' ), $selected_ids ) );
 			case 'brands':
@@ -235,17 +237,18 @@ class User_Roles_Non_Purchasable {
 	 */
 	private function normalize_product_filter( $filter ) {
 		$map = array(
-			'all'              => 'all_products',
-			'cat_in_list'      => 'categories',
-			'brand_in_list'    => 'brands',
-			'products_in_list' => 'specific_products',
+			'all'               => 'all_products',
+			'cat_in_list'       => 'categories',
+			'brand_in_list'     => 'brands',
+			'products_in_list'  => 'specific_products',
+			'attribute_in_list' => 'specific_variations',
 		);
 
 		if ( isset( $map[ $filter ] ) ) {
 			return $map[ $filter ];
 		}
 
-		return in_array( $filter, array( 'all_products', 'specific_products', 'categories', 'brands' ), true ) ? $filter : 'specific_products';
+		return in_array( $filter, array( 'all_products', 'specific_products', 'specific_variations', 'categories', 'brands' ), true ) ? $filter : 'specific_products';
 	}
 
 	/**

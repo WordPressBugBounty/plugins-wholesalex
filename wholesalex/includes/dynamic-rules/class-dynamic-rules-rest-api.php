@@ -241,6 +241,9 @@ class Dynamic_Rules_Rest_Api {
 					$limit
 				);
 				break;
+			case 'get_role_restriction_variations':
+				$data = $this->data_provider->get_role_restriction_variations( $query, $limit );
+				break;
 			case 'productsWithVariation':
 			case 'get_products_with_variations':
 				$data = $this->data_provider->get_products_with_variations( $query, $limit );
