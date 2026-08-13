@@ -74,13 +74,28 @@ class WHOLESALEX_Profile {
 				array(
 					'methods'             => 'POST',
 					'callback'            => array( $this, 'profile_action_callback' ),
-					'permission_callback' => function () {
-						return current_user_can( 'manage_options' ) || current_user_can( 'manage_woocommerce' );
-					},
+					'permission_callback' => array( $this, 'profile_action_permission' ),
 					'args'                => array(),
 				),
 			)
 		);
+	}
+
+	/**
+	 * Check whether the current user can access a WholesaleX user profile.
+	 *
+	 * Shop managers are allowed when the WholesaleX full-access setting changes
+	 * the plugin capability to manage_woocommerce. WordPress and WooCommerce still
+	 * decide whether the current user may edit the requested account.
+	 *
+	 * @param \WP_REST_Request $request REST request.
+	 * @return bool
+	 */
+	public function profile_action_permission( $request ) {
+		$capability = apply_filters( 'wholesalex_capability_access', 'manage_options' );
+		$user_id    = absint( $request->get_param( 'user_id' ) );
+
+		return $user_id && current_user_can( $capability ) && current_user_can( 'edit_user', $user_id );
 	}
 
 	/**
@@ -133,7 +148,9 @@ class WHOLESALEX_Profile {
 				case 'approve_user':
 				case 'active_user':
 					update_user_meta( $user_id, '__wholesalex_status', 'active' );
-					wholesalex()->change_role( $user_id, $__user_role );
+					if ( $this->is_assignable_profile_role( $__user_role ) ) {
+						wholesalex()->change_role( $user_id, $__user_role );
+					}
 					do_action( 'wholesalex_set_status_active', $user_id, '' );
 					break;
 				case 'reject_user':
@@ -262,7 +279,10 @@ class WHOLESALEX_Profile {
 
 			do_action( 'wholesalex_before_save_profile_settings', $user_id, $__settings );
 
-			if ( isset( $__settings['_wholesalex_role'] ) && ! empty( $__settings['_wholesalex_role'] ) ) {
+			if (
+				isset( $__settings['_wholesalex_role'] ) &&
+				$this->is_assignable_profile_role( $__settings['_wholesalex_role'] )
+			) {
 				$previous_role = get_user_meta( $user_id, '__wholesalex_role', true );
 				$updated_role  = $__settings['_wholesalex_role'];
 				/**
@@ -861,6 +881,7 @@ class WHOLESALEX_Profile {
 	public function get_profile_fields() {
 		// Roles Options.
 		$__roles_options = wholesalex()->get_roles( 'mapped_roles' );
+		unset( $__roles_options['wholesalex_guest'] );
 
 		return apply_filters(
 			'wholesalex_profile_fields',
@@ -1247,6 +1268,25 @@ class WHOLESALEX_Profile {
 				),
 			),
 		);
+	}
+
+	/**
+	 * Check whether a role can be assigned to a registered user from a profile.
+	 *
+	 * Guest is a virtual role for logged-out visitors and must not be assigned
+	 * to a WordPress user account.
+	 *
+	 * @param string $role_id WholesaleX role ID.
+	 * @return bool
+	 */
+	private function is_assignable_profile_role( $role_id ) {
+		if ( ! is_string( $role_id ) ) {
+			return false;
+		}
+
+		$role_id = sanitize_key( $role_id );
+
+		return 'wholesalex_guest' !== $role_id && in_array( $role_id, wholesalex()->get_roles( 'ids' ), true );
 	}
 
 	/**

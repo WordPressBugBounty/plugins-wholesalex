@@ -2867,7 +2867,18 @@ class WHOLESALEX_Product {
 		$product_id  = absint( sanitize_text_field( wp_unslash( $_POST['product_id'] ) ) );
 		$bulk_action = sanitize_text_field( wp_unslash( $_POST['bulk_action'] ) );
 		$data        = ! empty( $_POST['data'] ) ? wc_clean( wp_unslash( $_POST['data'] ) ) : array();
-		$variations  = array();
+		$value       = isset( $data['value'] ) ? wc_format_decimal( $data['value'] ) : '';
+
+		if ( ! $product_id || ! current_user_can( 'edit_post', $product_id ) ) {
+			wp_die( -1 );
+		}
+
+		if ( '' === $value || ! is_numeric( $value ) || (float) $value < 0 ) {
+			wp_send_json_error(
+				array( 'message' => __( 'Please provide a valid variation price.', 'wholesalex' ) ),
+				400
+			);
+		}
 
 		$variations = get_posts(
 			array(
@@ -2878,20 +2889,42 @@ class WHOLESALEX_Product {
 				'post_status'    => array( 'publish', 'private' ),
 			)
 		);
+		if ( empty( $variations ) ) {
+			wp_send_json_error(
+				array( 'message' => __( 'No variations were found to update.', 'wholesalex' ) ),
+				404
+			);
+		}
 
 		$wholesalex_roles = wholesalex()->get_roles( 'b2b_roles_option' );
+		$matched_action    = false;
 
 		foreach ( $wholesalex_roles as $role ) {
 			if ( 'wholesalex_product_price_' . $role['value'] . '_base' === $bulk_action ) {
+				$matched_action = true;
 				foreach ( $variations as $variation_id ) {
-					wholesalex()->save_single_product_discount( $variation_id, array( $role['value'] => array( 'wholesalex_base_price' => $data['value'] ) ) );
+					wholesalex()->save_single_product_discount( $variation_id, array( $role['value'] => array( 'wholesalex_base_price' => $value ) ) );
 				}
 			} elseif ( 'wholesalex_product_price_' . $role['value'] . '_sale' === $bulk_action ) {
+				$matched_action = true;
 				foreach ( $variations as $variation_id ) {
-					wholesalex()->save_single_product_discount( $variation_id, array( $role['value'] => array( 'wholesalex_sale_price' => $data['value'] ) ) );
+					wholesalex()->save_single_product_discount( $variation_id, array( $role['value'] => array( 'wholesalex_sale_price' => $value ) ) );
 				}
 			}
 		}
-		wp_send_json_success( __( 'Success', 'wholesalex' ) );
+
+		if ( ! $matched_action ) {
+			wp_send_json_error(
+				array( 'message' => __( 'The selected WholesaleX pricing action is invalid.', 'wholesalex' ) ),
+				400
+			);
+		}
+
+		wp_send_json_success(
+			array(
+				'message'       => __( 'Variation prices updated successfully.', 'wholesalex' ),
+				'updated_count' => count( $variations ),
+			)
+		);
 	}
 }

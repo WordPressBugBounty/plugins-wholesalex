@@ -11,8 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use WC_Shipping_Rate;
-
 /**
  * Handles role-level shipping method rules.
  */
@@ -64,8 +62,9 @@ class User_Roles_Shipping_Method {
 	/**
 	 * Apply role-level shipping method permissions to package rates.
 	 *
-	 * This runs before dynamic shipping rules so WooCommerce methods selected
-	 * for the role are present when the existing role permission filter runs.
+	 * Free shipping is only filtered here. WooCommerce remains responsible for
+	 * making the rate available after evaluating its minimum amount, coupon, and
+	 * other native requirements.
 	 *
 	 * @param array $package_rates Package rates.
 	 * @param array $package Package data.
@@ -111,8 +110,8 @@ class User_Roles_Shipping_Method {
 				continue;
 			}
 
+			// Never recreate a free shipping rate rejected by WooCommerce.
 			if ( 'free_shipping' === $method->id ) {
-				$package_rates[ $this->get_rate_id( $method ) ] = $this->create_free_shipping_rate( $method );
 				continue;
 			}
 
@@ -151,33 +150,6 @@ class User_Roles_Shipping_Method {
 		}
 
 		return $package_rates;
-	}
-
-	/**
-	 * Create a role-allowed free shipping rate.
-	 *
-	 * @param object $method Free shipping method instance.
-	 * @return WC_Shipping_Rate
-	 */
-	private function create_free_shipping_rate( $method ) {
-		return new WC_Shipping_Rate(
-			$this->get_rate_id( $method ),
-			$method->get_title(),
-			0,
-			array(),
-			'free_shipping',
-			(int) $method->get_instance_id()
-		);
-	}
-
-	/**
-	 * Get a stable WooCommerce rate id for a shipping method instance.
-	 *
-	 * @param object $method Shipping method instance.
-	 * @return string
-	 */
-	private function get_rate_id( $method ) {
-		return $method->id . ':' . $method->get_instance_id();
 	}
 
 	/**

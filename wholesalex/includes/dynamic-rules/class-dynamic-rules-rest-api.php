@@ -131,9 +131,10 @@ class Dynamic_Rules_Rest_Api {
 	 * @return bool
 	 */
 	public function dynamic_rule_restapi_permission() {
+		$capability = apply_filters( 'wholesalex_capability_access', 'manage_options' );
 		$allowed = (bool) apply_filters(
 			'dynamic_rules_restapi_permission_callback',
-			current_user_can( 'manage_options' )
+			current_user_can( $capability )
 		);
 
 		if ( ! $allowed && class_exists( '\WHOLESALEX\Wholesale_Pricing' ) ) {

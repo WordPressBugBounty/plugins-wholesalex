@@ -33,6 +33,7 @@ class WHOLESALEX_Role {
 		 * @since 1.0.4
 		 */
 		add_filter( 'woocommerce_coupons_enabled', array( $this, 'hide_coupon_fields' ) );
+		add_filter( 'wholesalex_user_subaccount_create_permission', array( $this, 'restrict_subaccount_creation' ), 10, 2 );
 
 		/**
 		 * Auto Role Migration
@@ -818,19 +819,97 @@ class WHOLESALEX_Role {
 	 * @since 1.0.4
 	 */
 	public function hide_coupon_fields( $enabled ) {
-		$status = 'no';
-		if ( is_user_logged_in() ) {
-			$__role_id      = wholesalex()->get_current_user_role();
-			$__role_content = wholesalex()->get_roles( 'by_id', $__role_id );
-			if ( isset( $__role_content['_disable_coupon'] ) && ! empty( $__role_content['_disable_coupon'] ) ) {
-				$status = $__role_content['_disable_coupon'];
-			}
+		if ( ! is_user_logged_in() ) {
+			return $enabled;
+		}
 
-			if ( isset( $__role_id ) && ! empty( $__role_id ) && 'yes' === $status ) {
-				return false;
+		$user_id      = (int) apply_filters( 'wholesalex_set_current_user', get_current_user_id() );
+		$restrictions = $this->get_general_restrictions_for_user( $user_id );
+		if ( $this->is_user_excluded_from_general_restrictions( $user_id, $restrictions ) ) {
+			return $enabled;
+		}
+
+		if ( $this->is_truthy( isset( $restrictions['_disable_coupon'] ) ? $restrictions['_disable_coupon'] : false ) ) {
+			return false;
+		}
+
+		return $enabled;
+	}
+
+	/**
+	 * Restrict subaccount creation for users whose role enables the general restriction.
+	 *
+	 * @param bool $has_permission Existing permission status.
+	 * @param int  $user_id User attempting to create a subaccount.
+	 * @return bool
+	 */
+	public function restrict_subaccount_creation( $has_permission, $user_id ) {
+		if ( ! $has_permission ) {
+			return false;
+		}
+
+		$user_id      = (int) apply_filters( 'wholesalex_set_current_user', absint( $user_id ) );
+		$restrictions = $this->get_general_restrictions_for_user( $user_id );
+		if ( $this->is_user_excluded_from_general_restrictions( $user_id, $restrictions ) ) {
+			return true;
+		}
+
+		return ! $this->is_truthy( isset( $restrictions['_restrict_subaccount'] ) ? $restrictions['_restrict_subaccount'] : false );
+	}
+
+	/**
+	 * Get general restrictions for a user, including legacy top-level role fields.
+	 *
+	 * @param int $user_id User ID.
+	 * @return array
+	 */
+	private function get_general_restrictions_for_user( $user_id ) {
+		$role_id      = wholesalex()->get_user_role( $user_id );
+		$role_content = wholesalex()->get_roles( 'by_id', $role_id );
+		$restrictions = isset( $role_content['_restrictions'] ) && is_array( $role_content['_restrictions'] )
+			? $role_content['_restrictions']
+			: array();
+
+		foreach ( array( '_disable_coupon', '_restrict_subaccount', '_exclude_users' ) as $key ) {
+			if ( ! array_key_exists( $key, $restrictions ) && array_key_exists( $key, $role_content ) ) {
+				$restrictions[ $key ] = $role_content[ $key ];
 			}
 		}
-		return $enabled;
+
+		return $restrictions;
+	}
+
+	/**
+	 * Check whether a user is excluded from the role's general restrictions.
+	 *
+	 * @param int   $user_id User ID.
+	 * @param array $restrictions Role restrictions.
+	 * @return bool
+	 */
+	private function is_user_excluded_from_general_restrictions( $user_id, array $restrictions ) {
+		if ( empty( $restrictions['_exclude_users'] ) || ! is_array( $restrictions['_exclude_users'] ) ) {
+			return false;
+		}
+
+		$excluded_user_ids = array();
+		foreach ( $restrictions['_exclude_users'] as $item ) {
+			$value = is_array( $item ) && isset( $item['value'] ) ? $item['value'] : $item;
+			if ( is_numeric( $value ) || is_string( $value ) ) {
+				$excluded_user_ids[] = (int) preg_replace( '/[^0-9]/', '', (string) $value );
+			}
+		}
+
+		return in_array( (int) $user_id, array_filter( array_unique( $excluded_user_ids ) ), true );
+	}
+
+	/**
+	 * Normalize bool-like role values.
+	 *
+	 * @param mixed $value Role setting value.
+	 * @return bool
+	 */
+	private function is_truthy( $value ) {
+		return true === $value || 1 === $value || '1' === $value || 'yes' === $value;
 	}
 
 	/**

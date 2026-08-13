@@ -437,6 +437,7 @@ class Wholesale_Pricing_Rest_Api
         return array(
             'value' => $product->get_id(),
             'name' => $product->get_name(),
+            'permalink' => esc_url_raw($product->get_permalink()),
             'description' => wp_trim_words(wp_strip_all_tags($description), 24, '&hellip;'),
             'regular_price' => '' === $regular_price ? null : (float) $regular_price,
             'price' => '' === $price ? null : (float) $price,
