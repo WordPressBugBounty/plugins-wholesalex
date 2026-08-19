@@ -21,6 +21,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Rule_Payment_Gateway {
 
 	/**
+	 * Keep WholesaleX workflow gateways from being removed by role/profile rules.
+	 *
+	 * Workflow-only gateways still need to pass through this filter when
+	 * WooCommerce has made them available. Their own availability callbacks
+	 * remain responsible for deciding whether they can be used.
+	 *
+	 * @param array $filtered_gateways Gateways allowed by WholesaleX rules.
+	 * @param array $all_gateways      Gateways received from WooCommerce.
+	 * @return array
+	 */
+	private function preserve_workflow_gateways( $filtered_gateways, $all_gateways ) {
+		$workflow_gateway_ids = apply_filters(
+			'wholesalex_payment_rule_exempt_gateway_ids',
+			array(
+				'wholesalex_subaccount_order_approval',
+			)
+		);
+
+		foreach ( $all_gateways as $gateway_id => $gateway ) {
+			if ( in_array( $gateway_id, $workflow_gateway_ids, true ) ) {
+				$filtered_gateways[ $gateway_id ] = $gateway;
+			}
+		}
+
+		return $filtered_gateways;
+	}
+
+	/**
 	 * Handle Payment Gateway.
 	 * Priority: User Profile >> Role > Dynamic Rule.
 	 *
@@ -44,7 +72,7 @@ class Rule_Payment_Gateway {
 					}
 
 					if ( ! empty( $allowed_gateways ) ) {
-						return $allowed_gateways;
+						return $this->preserve_workflow_gateways( $allowed_gateways, $gateways );
 					}
 				}
 
@@ -83,7 +111,7 @@ class Rule_Payment_Gateway {
 						}
 					}
 
-					return $allowed_gateways;
+					return $this->preserve_workflow_gateways( $allowed_gateways, $gateways );
 				}
 
 				$allowed_gateways = array();
@@ -94,7 +122,7 @@ class Rule_Payment_Gateway {
 					}
 				}
 
-				return $allowed_gateways;
+				return $this->preserve_workflow_gateways( $allowed_gateways, $gateways );
 			}
 		);
 	}

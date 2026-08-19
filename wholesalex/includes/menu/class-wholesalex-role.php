@@ -405,7 +405,8 @@ class WHOLESALEX_Role {
 		$payment_gateways           = array();
 		foreach ( $available_payment_gateways as $key => $gateway ) {
 			if ( 'yes' === $gateway->enabled ) {
-				$payment_gateways[ $key ] = $gateway->get_title();
+				$gateway_title = trim( (string) $gateway->get_title() );
+				$payment_gateways[ $key ] = '' !== $gateway_title ? $gateway_title : $gateway->get_method_title();
 			}
 		}
 		$__shipping_sections = array();

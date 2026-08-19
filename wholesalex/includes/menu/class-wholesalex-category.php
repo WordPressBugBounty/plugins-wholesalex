@@ -209,7 +209,7 @@ class WHOLESALEX_Category {
 		if ( is_product() && function_exists( 'wc_get_product_term_ids' ) ) {
 			$cats = wc_get_product_term_ids( get_the_ID(), 'product_cat' );
 			if ( array_intersect( $cats, wholesalex()->hidden_ids( 'category' ) ) ) {
-				/* translators: %s: Product Name */
+				/* translators: %s: Product name. */
 				wc_add_notice( sprintf( __( 'Sorry, you are not allowed to see %s product.', 'wholesalex' ), get_the_title( get_the_ID() ) ), 'notice' );
 				$redirect_url = get_permalink( get_option( 'woocommerce_shop_page_id' ) );
 				wp_safe_redirect( $redirect_url );
@@ -239,7 +239,7 @@ class WHOLESALEX_Category {
 			if ( array_intersect( $cats, wholesalex()->hidden_ids( 'category' ) ) ) {
 				// Remove Hidden Product From Cart.
 				WC()->cart->remove_cart_item( $key );
-				/* translators: %s: Product Name */
+				/* translators: %s: Product name. */
 				wc_add_notice( sprintf( __( 'Sorry, you are not allowed to checkout %s product.', 'wholesalex' ), get_the_title( $product_id ) ), 'error' );
 			}
 		}

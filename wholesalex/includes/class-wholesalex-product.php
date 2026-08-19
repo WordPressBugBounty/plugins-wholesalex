@@ -1600,7 +1600,7 @@ class WHOLESALEX_Product {
 			$__is_hidden = $this->hide_all_products_for_current_role();
 			$__id = get_the_ID();
 			if ( in_array( $__id, wholesalex()->hidden_product_ids(), true ) || $__is_hidden ) {
-				/* translators: %s: Product Name */
+				/* translators: %s: Product name. */
 				wc_add_notice( sprintf( __( 'Sorry, you are not allowed to see %s product.', 'wholesalex' ), get_the_title( get_the_ID() ) ), 'notice' );
 				$previous_url = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
 				$redirect_url = ! empty( $previous_url ) ? $previous_url : home_url();
@@ -1648,7 +1648,7 @@ class WHOLESALEX_Product {
 			if ( in_array( $__product_id, wholesalex()->hidden_product_ids(), true ) || $__is_hidden ) {
 				// Remove Hidden Product From Cart.
 				WC()->cart->remove_cart_item( $key );
-				/* translators: %s: Product Name */
+				/* translators: %s: Product name. */
 				wc_add_notice( sprintf( __( 'Sorry, you are not allowed to checkout %s product.', 'wholesalex' ), get_the_title( $__product_id ) ), 'error' );
 			}
 		}

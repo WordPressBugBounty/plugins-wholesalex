@@ -1287,7 +1287,7 @@ class WHOLESALEX_Overview {
 						 * Setting Translation Start
 						 */
 						'whx_settings_fields'              => \WHOLESALEX\Settings::get_option_settings(),
-						'whx_settings_data'                => wholesalex()->get_setting(),
+						'whx_settings_data'                => \WHOLESALEX\Settings::get_admin_settings_data(),
 						/**
 						 * Setting Translation Stop
 						 */

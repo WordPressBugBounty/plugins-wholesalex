@@ -13,6 +13,23 @@ namespace WHOLESALEX;
  */
 class Settings {
 	/**
+	 * Return settings with runtime migrations applied for the admin UI.
+	 *
+	 * The drag list reads its items from the saved value rather than the field's
+	 * options. Normalizing here makes newly introduced priority sources visible
+	 * immediately without overwriting the stored custom order.
+	 *
+	 * @return array
+	 */
+	public static function get_admin_settings_data() {
+		$settings = wholesalex()->get_setting();
+		$settings = is_array( $settings ) ? $settings : array();
+		$settings['_settings_quantity_based_discount_priority'] = wholesalex()->get_quantity_based_discount_priorities();
+
+		return $settings;
+	}
+
+	/**
 	 * Setup class.
 	 *
 	 * @since v.1.0.0
@@ -116,7 +133,7 @@ class Settings {
 		} elseif ( 'get' === $type ) {
 			$data            = array();
 			$data['default'] = $this->get_option_settings();
-			$data['value']   = wholesalex()->get_setting();
+				$data['value']   = self::get_admin_settings_data();
 			wp_send_json_success( $data );
 		}
 	}
@@ -139,7 +156,7 @@ class Settings {
 			'whx_settings',
 			array(
 				'fields' => self::get_option_settings(),
-				'data'   => wholesalex()->get_setting(),
+					'data'   => self::get_admin_settings_data(),
 				// 'i18n'   => array(
 				// 'settings'       => __( 'Settings', 'wholesalex' ),
 				// 'unlock'         => __( 'UNLOCK', 'wholesalex' ),
@@ -172,7 +189,12 @@ class Settings {
 		}
 		$my_account_id = get_option( 'woocommerce_myaccount_page_id' );
 
-		$weight_unit = get_option( 'woocommerce_weight_unit' );
+		$weight_unit          = get_option( 'woocommerce_weight_unit' );
+		$dynamic_rules_access = wholesalex()->get_dynamic_rules_access();
+		$pricing_priorities   = array( 'profile', 'single_product', 'category', 'wholesale_pricing' );
+		if ( ! empty( $dynamic_rules_access['can_view'] ) ) {
+			$pricing_priorities[] = 'dynamic_rule';
+		}
 		$settings_fields = apply_filters(
 			'wholesalex_setting_fields',
 			array(
@@ -376,8 +398,8 @@ class Settings {
 							'type'    => 'dragList',
 							'label'   => __( 'Pricing / Discount Priority', 'wholesalex' ),
 							'desc'    => __( 'Set the priority to declare which will be applied if discounts are assigned in multiple ways.', 'wholesalex' ),
-							'options' => array( 'profile', 'single_product', 'category', 'dynamic_rule' ),
-							'default' => array( 'profile', 'single_product', 'category', 'dynamic_rule' ),
+							'options' => wholesalex()->get_quantity_based_discount_priorities(),
+							'default' => $pricing_priorities,
 							'tooltip' => 'Decide and select which pricing will be applicable if the prices are set in multiple ways.',
 							'doc'     => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
 						),
@@ -1553,7 +1575,6 @@ class Settings {
 			),
 		);
 
-		$dynamic_rules_access = wholesalex()->get_dynamic_rules_access();
 		if ( empty( $dynamic_rules_access['can_view'] ) ) {
 			unset(
 				$settings_fields['dynamic_rules'],

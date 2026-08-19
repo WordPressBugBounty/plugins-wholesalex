@@ -104,6 +104,27 @@ class Dynamic_Rules {
 
 		// Price table JS.
 		add_action( 'wp_enqueue_scripts', array( $this, 'wholesalex_enqueue_price_table_js' ) );
+
+		// Share the legacy resolver's selected tier source with Wholesale Pricing
+		// so only the winning engine changes the cart price and renders a table.
+		add_filter( 'wholesalex_active_tier_data', array( $this, 'get_active_tier_data' ), 10, 2 );
+	}
+
+	/**
+	 * Return the tier candidate selected by the shared pricing priority order.
+	 *
+	 * @param array           $tier_data Existing tier data.
+	 * @param int|\WC_Product $product Product object or ID.
+	 * @return array
+	 */
+	public function get_active_tier_data( $tier_data, $product ) {
+		$product_id = $product instanceof \WC_Product ? $product->get_id() : absint( $product );
+
+		if ( isset( $this->active_tiers[ $product_id ] ) ) {
+			return $this->active_tiers[ $product_id ];
+		}
+
+		return is_array( $tier_data ) ? $tier_data : array();
 	}
 
 	/**
@@ -155,6 +176,23 @@ class Dynamic_Rules {
 
 	public function compare_by_priority_reverse( $a, $b ) {
 		return Dynamic_Rules_Condition_Engine::compare_by_priority_reverse( $a, $b );
+	}
+
+	/**
+	 * Check whether one configured pricing source has priority over another.
+	 *
+	 * A source that is not available for the current store must not participate in
+	 * priority comparisons. For example, new stores do not have dynamic rules in
+	 * their pricing priority configuration.
+	 *
+	 * @param array  $flipped_priority Pricing source names mapped to their positions.
+	 * @param string $source           Pricing source to check.
+	 * @param string $other_source     Pricing source to compare against.
+	 * @return bool
+	 */
+	private function has_higher_pricing_priority( $flipped_priority, $source, $other_source ) {
+		return isset( $flipped_priority[ $source ], $flipped_priority[ $other_source ] )
+			&& $flipped_priority[ $source ] < $flipped_priority[ $other_source ];
 	}
 
 	public static function has_limit( $__limits, $rule_id = 0 ) {
@@ -987,6 +1025,37 @@ class Dynamic_Rules {
 		return get_post_meta( $product->get_id(), $user_id . '_base_price', true );
 	}
 
+	/**
+	 * Get the schedule status of a native WooCommerce sale.
+	 *
+	 * Read the unfiltered product values so WholesaleX price filters cannot make
+	 * an expired native sale appear active while evaluating its schedule.
+	 *
+	 * @param \WC_Product $product Product object.
+	 * @return string One of active, pending, expired, or an empty string.
+	 */
+	private function get_native_sale_schedule_status( $product ) {
+		$sale_price = $product->get_sale_price( 'edit' );
+
+		if ( '' === $sale_price || null === $sale_price ) {
+			return '';
+		}
+
+		$now       = time();
+		$sale_from = $product->get_date_on_sale_from( 'edit' );
+		$sale_to   = $product->get_date_on_sale_to( 'edit' );
+
+		if ( $sale_from && $sale_from->getTimestamp() > $now ) {
+			return 'pending';
+		}
+
+		if ( $sale_to && $sale_to->getTimestamp() < $now ) {
+			return 'expired';
+		}
+
+		return 'active';
+	}
+
 	public function calculate_regular_price( $regular_price, $product, $data ) {
 		if ( isset( $data['role_id'] ) && ! empty( $data['role_id'] ) && $data['eligible'] ) {
 			$rrp           = get_post_meta( $product->get_id(), $data['role_id'] . '_base_price', true );
@@ -1026,16 +1095,19 @@ class Dynamic_Rules {
 		$parent_id     = $product->get_parent_id();
 		$product_id    = $product->get_id();
 		$regular_price = $product->get_regular_price();
-		$sale_from     = get_post_meta( $product->get_id(), '_sale_price_dates_from', true );
-		$current_time  = current_time( 'timestamp' );
 
 		$current_role       = wholesalex()->get_current_user_role();
 		$role_sale_price    = floatval( $this->get_role_base_sale_price( $product, $current_role ) );
 		$role_regular_price = floatval( $this->get_role_regular_price( $product, $current_role ) );
 		$has_rolewise_price = $role_sale_price || $role_regular_price;
+		$sale_schedule      = $this->get_native_sale_schedule_status( $product );
 
-		if ( $sale_from > $current_time && ! $has_rolewise_price ) {
+		if ( 'pending' === $sale_schedule && ! $has_rolewise_price ) {
 			return $regular_price;
+		}
+
+		if ( 'expired' === $sale_schedule && ! $has_rolewise_price ) {
+			$sale_price = false;
 		}
 
 		if ( ! $role_sale_price && $role_regular_price ) {
@@ -1059,7 +1131,7 @@ class Dynamic_Rules {
 
 		if ( $data['eligible'] ) {
 			$priority         = wholesalex()->get_quantity_based_discount_priorities();
-			$flipped_priority = array_flip( wholesalex()->get_quantity_based_discount_priorities() );
+			$flipped_priority = array_flip( $priority );
 			if ( isset( $data['role_id'] ) && ! empty( $data['role_id'] ) ) {
 				if ( 'is_regular_price' === $is_regular_price ) {
 					if ( $role_sale_price ) {
@@ -1076,7 +1148,7 @@ class Dynamic_Rules {
 
 			$applied_discount_src = '';
 
-			if ( $flipped_priority['dynamic_rule'] < $flipped_priority['single_product'] ) {
+			if ( $this->has_higher_pricing_priority( $flipped_priority, 'dynamic_rule', 'single_product' ) ) {
 				if ( ! empty( $data['product_discount'] ) ) {
 					foreach ( $data['product_discount'] as $pd ) {
 						if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $parent_id ? $parent_id : $product_id, $product_id, $pd['filter'] ) ) {
@@ -1107,7 +1179,7 @@ class Dynamic_Rules {
 				if ( '' === $applied_discount_src && $rrs ) {
 					$sale_price = floatval( $rrs );
 				}
-			} elseif ( ! $rrs && ! empty( $data['product_discount'] ) ) {
+			} elseif ( isset( $flipped_priority['dynamic_rule'] ) && ! $rrs && ! empty( $data['product_discount'] ) ) {
 				foreach ( $data['product_discount'] as $pd ) {
 					if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $parent_id ? $parent_id : $product_id, $product_id, $pd['filter'] ) ) {
 						if ( ! empty( $pd['conditions']['tiers'] ) ) {
@@ -1157,20 +1229,29 @@ class Dynamic_Rules {
 			$tier_base_price = ( 'product_discount' === $applied_discount_src && $sale_price ) ? (float) $sale_price : $base_price;
 
 			$tier_res = array();
+			unset( $this->active_tiers[ $product_id ] );
 			foreach ( $priority as $pr ) {
 				$tier_res = $this->get_priority_wise_tier_price( $pr, $data, $product_id, $parent_id, $tier_base_price, $cart_qty, true );
-				if ( ! empty( $tier_res['tiers'] ) && ! isset( $this->active_tiers[ $product_id ] ) ) {
-					$tier_res['base_price']            = $tier_base_price;
+				$tier_res['tiers'] = isset( $tier_res['tiers'] ) ? $this->filter_empty_tier( $tier_res['tiers'] ) : array();
+
+				// Priority belongs to the first eligible source that has tiers, not
+				// to the first source whose minimum quantity is currently reached.
+				// Otherwise a lower-priority source can replace both the table and
+				// price while the higher-priority source is only in preview state.
+				if ( ! empty( $tier_res['tiers'] ) ) {
+					// A source may resolve a more specific pre-tier base (for example,
+					// Wholesale Pricing stacks its tier on its regular wholesale price).
+					// Preserve that value instead of replacing it with the catalog base.
+					if ( ! isset( $tier_res['base_price'] ) || ! is_numeric( $tier_res['base_price'] ) || (float) $tier_res['base_price'] <= 0 ) {
+						$tier_res['base_price'] = $tier_base_price;
+					}
 					$this->active_tiers[ $product_id ] = $tier_res;
-				}
-				if ( $tier_res['price'] && $tier_res['src'] && 0.00 != $tier_res['price'] ) {
-					$sale_price = $tier_res['price'];
+
+					if ( ! empty( $tier_res['src'] ) && false !== $tier_res['price'] && 0.00 !== (float) $tier_res['price'] ) {
+						$sale_price = $tier_res['price'];
+					}
 					break;
 				}
-			}
-			if ( isset( $tier_res['tiers'] ) && ! empty( $tier_res['tiers'] ) && $tier_res['price'] ) {
-				$tier_res['base_price']            = $tier_base_price;
-				$this->active_tiers[ $product_id ] = $tier_res;
 			}
 		}
 
@@ -1273,6 +1354,18 @@ class Dynamic_Rules {
 						'id'    => $res['id'],
 					);
 				}
+				break;
+			case 'wholesale_pricing':
+				$tier_res = apply_filters(
+					'wholesalex_wholesale_pricing_tier_result',
+					$tier_res,
+					$product_id,
+					$parent_id,
+					$base_price,
+					$cart_qty,
+					$first_tier
+				);
+				$active_tier = isset( $tier_res['tiers'] ) && is_array( $tier_res['tiers'] ) ? $tier_res['tiers'] : array();
 				break;
 			case 'profile':
 				if ( isset( $data['user_profile'] ) ) {
@@ -1996,6 +2089,9 @@ class Dynamic_Rules {
 					$tiers          = isset( $this->active_tiers[ $product_id ] ) ? $this->active_tiers[ $product_id ] : array( 'tiers' => array() );
 					$tiers['tiers'] = $this->filter_empty_tier( $tiers['tiers'] );
 					$table_data     = false;
+					if ( 'wholesale_pricing_tier' === ( $tiers['src'] ?? '' ) ) {
+						return;
+					}
 					if ( ! empty( $tiers['tiers'] ) ) {
 						$table_data = $this->quantity_based_pricing_table( '', $product_id, $data );
 					}
@@ -2024,6 +2120,9 @@ class Dynamic_Rules {
 					$tiers = isset( $this->active_tiers[ $variation_id ] ) ? $this->active_tiers[ $variation_id ] : array();
 					if ( isset( $tiers['tiers'] ) ) {
 						$tiers['tiers'] = $this->filter_empty_tier( $tiers['tiers'] );
+					}
+					if ( 'wholesale_pricing_tier' === ( $tiers['src'] ?? '' ) ) {
+						return $variation_data;
 					}
 					if ( ! empty( $tiers ) ) {
 						$tier_table                           = $this->quantity_based_pricing_table( '', $variation_id, $data );
@@ -2159,14 +2258,12 @@ class Dynamic_Rules {
 		do_action( 'wholesalex_dynamic_rule_get_price_html' );
 
 		$regular_price      = $product->get_regular_price();
-		$sale_from          = get_post_meta( $product->get_id(), '_sale_price_dates_from', true );
-		$current_time       = current_time( 'timestamp' );
 		$current_role       = wholesalex()->get_current_user_role();
 		$role_sale_price    = floatval( $this->get_role_base_sale_price( $product, $current_role ) );
 		$role_regular_price = floatval( $this->get_role_regular_price( $product, $current_role ) );
 		$has_rolewise_price = $role_sale_price || $role_regular_price;
 
-		if ( $sale_from > $current_time && ! $has_rolewise_price ) {
+		if ( 'pending' === $this->get_native_sale_schedule_status( $product ) && ! $has_rolewise_price ) {
 			return '<span class="scheduled-sale-price">' . wc_price( $regular_price ) . '</span>';
 		}
 
@@ -2473,7 +2570,7 @@ class Dynamic_Rules {
 			$flipped_priority     = array_flip( wholesalex()->get_quantity_based_discount_priorities() );
 			$rrs                  = ( isset( $discount_data['role_id'] ) && ! empty( $discount_data['role_id'] ) ) ? get_post_meta( $id, $discount_data['role_id'] . '_sale_price', true ) : false;
 			$applied_discount_src = '';
-			if ( $flipped_priority['dynamic_rule'] < $flipped_priority['single_product'] ) {
+			if ( $this->has_higher_pricing_priority( $flipped_priority, 'dynamic_rule', 'single_product' ) ) {
 				if ( ! empty( $discount_data['product_discount'] ) ) {
 					foreach ( $discount_data['product_discount'] as $pd ) {
 						if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $parent_id ? $parent_id : $id, $id, $pd['filter'] ) ) {
@@ -2486,7 +2583,7 @@ class Dynamic_Rules {
 				}
 				if ( '' === $applied_discount_src && $rrs ) {
 					$product_price = floatval( $rrs ); }
-			} elseif ( ! $rrs && ! empty( $discount_data['product_discount'] ) ) {
+			} elseif ( isset( $flipped_priority['dynamic_rule'] ) && ! $rrs && ! empty( $discount_data['product_discount'] ) ) {
 				foreach ( $discount_data['product_discount'] as $pd ) {
 					if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $parent_id ? $parent_id : $id, $id, $pd['filter'] ) ) {
 						if ( isset( $pd['conditions'] ) && ! Dynamic_Rules_Condition_Engine::check_rule_conditions( $pd['conditions'], $pd['filter'] ) ) {
@@ -2503,7 +2600,7 @@ class Dynamic_Rules {
 			$flipped_priority     = array_flip( wholesalex()->get_quantity_based_discount_priorities() );
 			$rrs                  = ( isset( $discount_data['role_id'] ) && ! empty( $discount_data['role_id'] ) ) ? get_post_meta( $id, $discount_data['role_id'] . '_regular_price', true ) : false;
 			$applied_discount_src = '';
-			if ( $flipped_priority['dynamic_rule'] < $flipped_priority['single_product'] ) {
+			if ( $this->has_higher_pricing_priority( $flipped_priority, 'dynamic_rule', 'single_product' ) ) {
 				if ( ! empty( $discount_data['product_discount'] ) ) {
 					foreach ( $discount_data['product_discount'] as $pd ) {
 						if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $parent_id ? $parent_id : $id, $id, $pd['filter'] ) ) {
@@ -2516,7 +2613,7 @@ class Dynamic_Rules {
 				}
 				if ( '' === $applied_discount_src && $rrs ) {
 					$product_price = floatval( $rrs ); }
-			} elseif ( ! $rrs && ! empty( $discount_data['product_discount'] ) ) {
+			} elseif ( isset( $flipped_priority['dynamic_rule'] ) && ! $rrs && ! empty( $discount_data['product_discount'] ) ) {
 				foreach ( $discount_data['product_discount'] as $pd ) {
 					if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $parent_id ? $parent_id : $id, $id, $pd['filter'] ) ) {
 						if ( isset( $pd['conditions'] ) && ! Dynamic_Rules_Condition_Engine::check_rule_conditions( $pd['conditions'], $pd['filter'] ) ) {

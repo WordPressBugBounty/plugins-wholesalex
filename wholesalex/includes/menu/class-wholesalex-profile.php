@@ -268,6 +268,7 @@ class WHOLESALEX_Profile {
 		if ( isset( $_POST['wholesalex_profile_tiers'] ) && ! empty( $_POST['wholesalex_profile_tiers'] ) ) {
 
 			$__tiers = wholesalex()->sanitize( json_decode( wp_unslash( $_POST['wholesalex_profile_tiers'] ), true ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$__tiers = $this->enforce_profile_tier_entitlements( $__tiers );
 
 			update_user_meta( $user_id, '__wholesalex_profile_discounts', $__tiers );
 		}
@@ -402,6 +403,34 @@ class WHOLESALEX_Profile {
 		}
 	}
 
+	/**
+	 * Prevent profile-only Pro product filters from being saved without a license.
+	 *
+	 * @param mixed $tiers Sanitized profile tier data.
+	 * @return mixed
+	 */
+	private function enforce_profile_tier_entitlements( $tiers ) {
+		if ( wholesalex()->is_pro_active() || ! is_array( $tiers ) ) {
+			return $tiers;
+		}
+
+		if ( empty( $tiers['_profile_discounts']['tiers'] ) || ! is_array( $tiers['_profile_discounts']['tiers'] ) ) {
+			return $tiers;
+		}
+
+		$pro_filters = array( 'brand_in_list', 'sku_in_list', 'att_in_list' );
+		foreach ( $tiers['_profile_discounts']['tiers'] as &$tier ) {
+			if ( ! is_array( $tier ) || ! in_array( $tier['_product_filter'] ?? '', $pro_filters, true ) ) {
+				continue;
+			}
+
+			$tier['_product_filter'] = '';
+			unset( $tier['brand_in_list'], $tier['sku_in_list'], $tier['att_in_list'] );
+		}
+		unset( $tier );
+
+		return $tiers;
+	}
 
 	/**
 	 * Add WholesaleX Role Column In All Users Page
@@ -881,7 +910,26 @@ class WHOLESALEX_Profile {
 	public function get_profile_fields() {
 		// Roles Options.
 		$__roles_options = wholesalex()->get_roles( 'mapped_roles' );
+		$is_pro_active    = wholesalex()->is_pro_active();
 		unset( $__roles_options['wholesalex_guest'] );
+
+		$product_filter_options = array(
+			''                  => __( 'Choose Filter...', 'wholesalex' ),
+			'all_products'      => __( 'All Products', 'wholesalex' ),
+			'products_in_list'  => __( 'Specific Products', 'wholesalex' ),
+			'cat_in_list'       => __( 'Specific Categories', 'wholesalex' ),
+			'attribute_in_list' => __( 'Specific Variations', 'wholesalex' ),
+		);
+
+		if ( $is_pro_active ) {
+			$product_filter_options['brand_in_list'] = __( 'Specific Brands', 'wholesalex' );
+			$product_filter_options['sku_in_list']   = __( 'Specific SKU', 'wholesalex' );
+			$product_filter_options['att_in_list']   = __( 'Specific Attributes', 'wholesalex' );
+		} else {
+			$product_filter_options['pro_brand_in_list'] = __( 'Specific Brands (Pro)', 'wholesalex' );
+			$product_filter_options['pro_sku_in_list']   = __( 'Specific SKU (Pro)', 'wholesalex' );
+			$product_filter_options['pro_att_in_list']   = __( 'Specific Attributes (Pro)', 'wholesalex' );
+		}
 
 		return apply_filters(
 			'wholesalex_profile_fields',
@@ -1078,18 +1126,7 @@ class WHOLESALEX_Profile {
 															'type'    => 'filter',
 															'_product_filter'       => array(
 																'type'    => 'select',
-																'options' => array(
-																	''                      => __( 'Choose Filter...', 'wholesalex' ),
-																	'all_products'          => __( 'All Products', 'wholesalex' ),
-																	'products_in_list'      => __( 'Product in list', 'wholesalex' ),
-																	'products_not_in_list'  => __( 'Product not in list', 'wholesalex' ),
-																	'cat_in_list'           => __( 'Categories in list', 'wholesalex' ),
-																	'cat_not_in_list'       => __( 'Categories not in list', 'wholesalex' ),
-																	'attribute_in_list'     => __( 'Variations in list', 'wholesalex' ),
-																	'attribute_not_in_list' => __( 'Variations not in list', 'wholesalex' ),
-																	'brand_in_list'         => __( 'Brand in list', 'wholesalex' ),
-																	'brand_not_in_list'     => __( 'Brand not in list', 'wholesalex' ),
-																),
+																'options' => $product_filter_options,
 																'default' => '',
 																'label' => __( 'Product Filter', 'wholesalex' ),
 															),
@@ -1103,21 +1140,6 @@ class WHOLESALEX_Profile {
 																),
 																'options'     => array(),
 																'placeholder' => __( 'Choose Products to apply discounts', 'wholesalex' ),
-																'default'     => array(),
-																'is_ajax'     => true,
-																'ajax_action' => 'get_products',
-																'ajax_search' => true,
-															),
-															'products_not_in_list'  => array(
-																'type'        => 'multiselect',
-																'depends_on'  => array(
-																	array(
-																		'key'   => '_product_filter',
-																		'value' => 'products_not_in_list',
-																	),
-																),
-																'options'     => array(),
-																'placeholder' => __( 'Choose Products that wont apply discounts', 'wholesalex' ),
 																'default'     => array(),
 																'is_ajax'     => true,
 																'ajax_action' => 'get_products',
@@ -1138,21 +1160,6 @@ class WHOLESALEX_Profile {
 																'ajax_action' => 'get_categories',
 																'ajax_search' => true,
 															),
-															'cat_not_in_list'       => array(
-																'type'        => 'multiselect',
-																'depends_on'  => array(
-																	array(
-																		'key'   => '_product_filter',
-																		'value' => 'cat_not_in_list',
-																	),
-																),
-																'options'     => array(),
-																'placeholder' => __( 'Choose Categories that wont apply discounts', 'wholesalex' ),
-																'default'     => array(),
-																'is_ajax'     => true,
-																'ajax_action' => 'get_categories',
-																'ajax_search' => true,
-															),
 															'attribute_in_list'     => array(
 																'type'        => 'multiselect',
 																'depends_on'  => array(
@@ -1163,21 +1170,6 @@ class WHOLESALEX_Profile {
 																),
 																'options'     => array(),
 																'placeholder' => __( 'Choose Product Variations to apply discounts', 'wholesalex' ),
-																'default'     => array(),
-																'is_ajax'     => true,
-																'ajax_action' => 'get_variation_products',
-																'ajax_search' => true,
-															),
-															'attribute_not_in_list' => array(
-																'type'        => 'multiselect',
-																'depends_on'  => array(
-																	array(
-																		'key'   => '_product_filter',
-																		'value' => 'attribute_not_in_list',
-																	),
-																),
-																'options'     => array(),
-																'placeholder' => __( 'Choose Product Variations that wont apply discounts', 'wholesalex' ),
 																'default'     => array(),
 																'is_ajax'     => true,
 																'ajax_action' => 'get_variation_products',
@@ -1198,19 +1190,34 @@ class WHOLESALEX_Profile {
 																'ajax_action' => 'get_brands',
 																'ajax_search' => true,
 															),
-															'brand_not_in_list'     => array(
+															'sku_in_list'           => array(
 																'type'        => 'multiselect',
 																'depends_on'  => array(
 																	array(
 																		'key'   => '_product_filter',
-																		'value' => 'brand_not_in_list',
+																		'value' => 'sku_in_list',
 																	),
 																),
 																'options'     => array(),
-																'placeholder' => __( 'Choose Brands that wont apply discounts', 'wholesalex' ),
+																'placeholder' => __( 'Search SKUs to apply discounts', 'wholesalex' ),
 																'default'     => array(),
 																'is_ajax'     => true,
-																'ajax_action' => 'get_brands',
+																'ajax_action' => 'get_skus',
+																'ajax_search' => true,
+															),
+															'att_in_list'           => array(
+																'type'        => 'multiselect',
+																'depends_on'  => array(
+																	array(
+																		'key'   => '_product_filter',
+																		'value' => 'att_in_list',
+																	),
+																),
+																'options'     => array(),
+																'placeholder' => __( 'Choose Attributes to apply discounts', 'wholesalex' ),
+																'default'     => array(),
+																'is_ajax'     => true,
+																'ajax_action' => 'get_attributes',
 																'ajax_search' => true,
 															),
 														),

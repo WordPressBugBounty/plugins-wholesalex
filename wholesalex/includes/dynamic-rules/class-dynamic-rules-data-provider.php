@@ -959,9 +959,10 @@ class Dynamic_Rules_Data_Provider {
 		$available = WC()->payment_gateways->payment_gateways();
 		foreach ( $available as $gateway ) {
 			if ( 'yes' === $gateway->enabled ) {
+				$gateway_title = trim( (string) $gateway->get_title() );
 				$options[] = array(
 					'value' => $gateway->id,
-					'name'  => $gateway->get_title(),
+					'name'  => '' !== $gateway_title ? $gateway_title : $gateway->get_method_title(),
 				);
 			}
 		}

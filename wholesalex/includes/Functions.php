@@ -1095,17 +1095,38 @@ class Functions {
 	 * @since 1.2.4 Settings Default Value Added
 	 */
 	public function get_quantity_based_discount_priorities() {
-		$__priorities = wholesalex()->get_setting( '_settings_quantity_based_discount_priority', array( 'profile', 'single_product', 'category', 'dynamic_rule' ) );
+		$dynamic_rules_access = $this->get_dynamic_rules_access();
+		$default_priorities   = array( 'profile', 'single_product', 'category', 'wholesale_pricing' );
 
-		if ( ! isset( $__priorities ) || empty( $__priorities ) ) {
-			$__priorities = array(
-				'single_product',
-				'profile',
-				'category',
-				'dynamic_rule',
-			);
+		if ( ! empty( $dynamic_rules_access['can_view'] ) ) {
+			$default_priorities[] = 'dynamic_rule';
 		}
-		return $__priorities;
+
+		$priorities = wholesalex()->get_setting( '_settings_quantity_based_discount_priority', $default_priorities );
+		$priorities = is_array( $priorities ) ? array_values( array_unique( $priorities ) ) : array();
+		$allowed    = array( 'profile', 'single_product', 'category', 'wholesale_pricing' );
+
+		if ( ! empty( $dynamic_rules_access['can_view'] ) ) {
+			$allowed[] = 'dynamic_rule';
+		}
+
+		$priorities = array_values( array_intersect( $priorities, $allowed ) );
+
+		// Preserve existing custom ordering and migrate Wholesale Pricing directly
+		// before the legacy Dynamic Rule source.
+		if ( ! in_array( 'wholesale_pricing', $priorities, true ) ) {
+			$dynamic_rule_position = array_search( 'dynamic_rule', $priorities, true );
+			$insert_at             = false === $dynamic_rule_position ? count( $priorities ) : $dynamic_rule_position;
+			array_splice( $priorities, $insert_at, 0, array( 'wholesale_pricing' ) );
+		}
+
+		foreach ( $allowed as $source ) {
+			if ( ! in_array( $source, $priorities, true ) ) {
+				$priorities[] = $source;
+			}
+		}
+
+		return $priorities;
 	}
 
 	/**

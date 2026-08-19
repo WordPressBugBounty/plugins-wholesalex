@@ -140,6 +140,41 @@ class Wholesale_Pricing_Rule_Engine {
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_cart_item_prices' ), 999 );
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'sync_bxgy_free_cart_items' ), 1000 );
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'set_bxgy_free_cart_item_prices' ), 1001 );
+		add_filter( 'wholesalex_wholesale_pricing_tier_result', array( $this, 'provide_priority_tier_result' ), 10, 6 );
+	}
+
+	/**
+	 * Supply Wholesale Pricing tiers to the shared legacy priority resolver.
+	 *
+	 * @param array $result Existing priority result.
+	 * @param int   $product_id Product or variation ID.
+	 * @param int   $parent_id Parent product ID.
+	 * @param float $base_price Tier calculation base price.
+	 * @param int   $quantity Current cart quantity.
+	 * @param bool  $first_tier Whether inactive tiers should be exposed for display.
+	 * @return array
+	 */
+	public function provide_priority_tier_result( $result, $product_id, $parent_id, $base_price, $quantity, $first_tier = false ): array {
+		$product = wc_get_product( $product_id );
+
+		if ( ! $product instanceof \WC_Product ) {
+			return is_array( $result ) ? $result : array();
+		}
+
+		$tier_data = $this->get_tier_price_data( $product, max( 0, absint( $quantity ) ), (float) $base_price );
+
+		if ( false === $tier_data ) {
+			return is_array( $result ) ? $result : array();
+		}
+
+		return array(
+			'src'               => 'wholesale_pricing_tier',
+			'price'             => $tier_data['price'],
+			'tiers'             => $tier_data['tiers'],
+			'id'                => ! empty( $tier_data['tier']['_id'] ) ? $tier_data['tier']['_id'] : '',
+			'base_price'        => $tier_data['base_price'],
+			'wholesale_rule_id' => $tier_data['rule']['id'],
+		);
 	}
 
 	/**
@@ -268,6 +303,11 @@ class Wholesale_Pricing_Rule_Engine {
 	 */
 	public function filter_price( $price, $product ) {
 		if ( ! $product instanceof \WC_Product || apply_filters( 'wholesalex_ignore_wholesale_pricing', false, $product, 'price' ) ) {
+			return $price;
+		}
+
+		$active_tier_data = apply_filters( 'wholesalex_active_tier_data', array(), $product );
+		if ( ! empty( $active_tier_data['src'] ) && 'wholesale_pricing_tier' !== $active_tier_data['src'] ) {
 			return $price;
 		}
 
@@ -650,6 +690,11 @@ class Wholesale_Pricing_Rule_Engine {
 			return $sale_price;
 		}
 
+		$active_tier_data = apply_filters( 'wholesalex_active_tier_data', array(), $product );
+		if ( ! empty( $active_tier_data['src'] ) && 'wholesale_pricing_tier' !== $active_tier_data['src'] ) {
+			return $sale_price;
+		}
+
 		if ( isset( $this->cart_tier_prices[ $product->get_id() ] ) ) {
 			return $this->cart_tier_prices[ $product->get_id() ];
 		}
@@ -668,6 +713,11 @@ class Wholesale_Pricing_Rule_Engine {
 	 */
 	public function filter_variation_price( $price, $product ) {
 		if ( ! $product instanceof \WC_Product || apply_filters( 'wholesalex_ignore_wholesale_pricing', false, $product, 'variation_price' ) ) {
+			return $price;
+		}
+
+		$active_tier_data = apply_filters( 'wholesalex_active_tier_data', array(), $product );
+		if ( ! empty( $active_tier_data['src'] ) && 'wholesale_pricing_tier' !== $active_tier_data['src'] ) {
 			return $price;
 		}
 
@@ -697,6 +747,11 @@ class Wholesale_Pricing_Rule_Engine {
 		}
 
 		if ( ! $product instanceof \WC_Product || apply_filters( 'wholesalex_ignore_wholesale_pricing', false, $product, 'price_html' ) ) {
+			return $price_html;
+		}
+
+		$active_tier_data = apply_filters( 'wholesalex_active_tier_data', array(), $product );
+		if ( ! empty( $active_tier_data['src'] ) && 'wholesale_pricing_tier' !== $active_tier_data['src'] ) {
 			return $price_html;
 		}
 
@@ -1042,10 +1097,33 @@ class Wholesale_Pricing_Rule_Engine {
 				continue;
 			}
 
-			// Remove any legacy session value so stale base prices from
-			// previous requests can never influence tier calculation.
+			$active_tier_data = apply_filters( 'wholesalex_active_tier_data', array(), $cart_item['data'] );
+			if ( ! empty( $active_tier_data['src'] ) && 'wholesale_pricing_tier' !== $active_tier_data['src'] ) {
+				continue;
+			}
+
+			// Remove any legacy session value so stale base prices from previous
+			// requests can never influence tier calculation.
 			if ( isset( $cart->cart_contents[ $cart_item_key ]['_wsx_wholesale_pricing_tier_base_price'] ) ) {
 				unset( $cart->cart_contents[ $cart_item_key ]['_wsx_wholesale_pricing_tier_base_price'] );
+			}
+
+			// The shared priority resolver has already calculated this source's
+			// quantity-aware price from its stable pre-tier base. Recalculating from
+			// the mutated cart product would compound the tier on every pricing pass
+			// (for example 8.64 -> 6.91 -> 5.53 for a 20% tier).
+			if (
+				'wholesale_pricing_tier' === ( $active_tier_data['src'] ?? '' ) &&
+				array_key_exists( 'price', $active_tier_data ) &&
+				false !== $active_tier_data['price'] &&
+				is_numeric( $active_tier_data['price'] )
+			) {
+				$resolved_tier_price = max( 0, (float) $active_tier_data['price'] );
+				$cart_item['data']->set_price( $resolved_tier_price );
+				$this->cart_tier_prices[ $cart_item['data']->get_id() ] = $resolved_tier_price;
+				$cart->cart_contents[ $cart_item_key ]['_wsx_wholesale_pricing_tier_applied'] = true;
+				$this->set_discounted_product( $cart_item['data']->get_id() );
+				continue;
 			}
 
 			$tier_base_price = $this->get_cart_item_tier_base_price( $cart_item );
@@ -1566,6 +1644,72 @@ class Wholesale_Pricing_Rule_Engine {
 	}
 
 	/**
+	 * Return the winning Wholesale Pricing tier candidate for a product.
+	 *
+	 * Active tier prices retain the new engine's existing lowest-price behavior.
+	 * When no tier is active yet, the first eligible rule supplies the preview
+	 * table so the shared source priority can still select one table.
+	 *
+	 * @param \WC_Product $product Product object.
+	 * @param int         $quantity Quantity context.
+	 * @param float|null  $preferred_base_price Base selected by the legacy resolver.
+	 * @return array|false
+	 */
+	private function get_tier_price_data( \WC_Product $product, int $quantity, ?float $preferred_base_price = null ) {
+		$this->load_valid_rules();
+
+		$base_price = $this->get_base_price( $product );
+		if ( $base_price <= 0 ) {
+			return false;
+		}
+
+		$preview    = false;
+		$best_price = false;
+
+		foreach ( $this->valid_rules as $rule ) {
+			if ( 'tiered' !== ( $rule['discount_type'] ?? '' ) ) {
+				continue;
+			}
+
+			$can_preview = $this->is_product_eligible_for_rule( $product, $rule ) && $this->conditions_pass( $rule );
+			$can_price   = $this->can_rule_price_product( $rule, $product, max( 1, $quantity ) );
+			if ( ! $can_preview && ! $can_price ) {
+				continue;
+			}
+
+			$tiers = $this->tiered_discount->get_tiers( $rule );
+			if ( empty( $tiers ) ) {
+				continue;
+			}
+
+			$effective_base = $this->get_tier_base_price( $product, $rule, $base_price, max( 1, $quantity ), $preferred_base_price );
+			$calculation    = $can_price
+				? $this->tiered_discount->calculate( $rule, $product, $effective_base, $quantity )
+				: array(
+					'price' => false,
+					'tier'  => false,
+				);
+			$candidate      = array(
+				'price'      => $calculation['price'],
+				'tier'       => $calculation['tier'],
+				'tiers'      => $tiers,
+				'rule'       => $rule,
+				'base_price' => $effective_base,
+			);
+
+			if ( false === $preview && $can_preview ) {
+				$preview = $candidate;
+			}
+
+			if ( false !== $calculation['price'] && ( false === $best_price || (float) $calculation['price'] < (float) $best_price['price'] ) ) {
+				$best_price = $candidate;
+			}
+		}
+
+		return false !== $best_price ? $best_price : $preview;
+	}
+
+	/**
 	 * Calculate a non-tiered price with its dedicated rule handler.
 	 *
 	 * @param array       $rule       Normalized runtime rule.
@@ -1611,28 +1755,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return float
 	 */
 	private function get_tier_base_price( \WC_Product $product, array $tier_rule, float $base_price, int $quantity, ?float $preferred_base_price = null ): float {
-		$tier_base_price = $base_price;
-
-		if (
-			null !== $preferred_base_price &&
-			$preferred_base_price > 0 &&
-			$preferred_base_price < $tier_base_price &&
-			! $this->is_sale_price_base_for_regular_discount( $product, $preferred_base_price ) &&
-			! $this->price_matches_rule_tier( $tier_rule, $base_price, $preferred_base_price )
-		) {
-			$tier_base_price = $preferred_base_price;
-		}
-
-		$existing_price  = $this->get_existing_wholesale_price( $product );
-
-		if (
-			$existing_price > 0 &&
-			$existing_price < $tier_base_price &&
-			! $this->is_sale_price_base_for_regular_discount( $product, $existing_price ) &&
-			! $this->price_matches_rule_tier( $tier_rule, $base_price, $existing_price )
-		) {
-			$tier_base_price = $existing_price;
-		}
+		$base_candidates = array( $base_price );
 
 		foreach ( $this->valid_rules as $rule ) {
 			if ( 'regular' !== ( $rule['discount_type'] ?? '' ) ) {
@@ -1657,10 +1780,31 @@ class Wholesale_Pricing_Rule_Engine {
 
 			$regular_price = (float) $regular_price;
 
-			if ( $regular_price > 0 && $regular_price < $tier_base_price ) {
-				$tier_base_price = $regular_price;
+			if ( $regular_price > 0 ) {
+				$base_candidates[] = $regular_price;
 			}
 		}
+
+		if (
+			null !== $preferred_base_price &&
+			$preferred_base_price > 0 &&
+			! $this->is_sale_price_base_for_regular_discount( $product, $preferred_base_price ) &&
+			! $this->price_matches_rule_tier( $tier_rule, $base_candidates, $preferred_base_price )
+		) {
+			$base_candidates[] = $preferred_base_price;
+		}
+
+		$existing_price = $this->get_existing_wholesale_price( $product );
+
+		if (
+			$existing_price > 0 &&
+			! $this->is_sale_price_base_for_regular_discount( $product, $existing_price ) &&
+			! $this->price_matches_rule_tier( $tier_rule, $base_candidates, $existing_price )
+		) {
+			$base_candidates[] = $existing_price;
+		}
+
+		$tier_base_price = min( $base_candidates );
 
 		return apply_filters(
 			'wholesalex_wholesale_pricing_tier_base_price',
@@ -1676,20 +1820,28 @@ class Wholesale_Pricing_Rule_Engine {
 	 * Check whether a candidate base is already a tier result for this rule.
 	 *
 	 * @param array $tier_rule       Tiered runtime rule.
-	 * @param float $base_price      Product base price.
+	 * @param array $base_prices     Valid pre-tier base-price candidates.
 	 * @param float $candidate_price Candidate tier base price.
 	 * @return bool
 	 */
-	private function price_matches_rule_tier( array $tier_rule, float $base_price, float $candidate_price ): bool {
-		if ( $base_price <= 0 || $candidate_price <= 0 ) {
+	private function price_matches_rule_tier( array $tier_rule, array $base_prices, float $candidate_price ): bool {
+		if ( $candidate_price <= 0 ) {
 			return false;
 		}
 
-		foreach ( $this->tiered_discount->get_tiers( $tier_rule ) as $tier ) {
-			$tier_price = self::calculate_discounted_price( $tier, $base_price );
+		$tiers = $this->tiered_discount->get_tiers( $tier_rule );
 
-			if ( false !== $tier_price && abs( (float) $tier_price - $candidate_price ) < 0.0001 ) {
-				return true;
+		foreach ( $base_prices as $base_price ) {
+			if ( ! is_numeric( $base_price ) || (float) $base_price <= 0 ) {
+				continue;
+			}
+
+			foreach ( $tiers as $tier ) {
+				$tier_price = self::calculate_discounted_price( $tier, (float) $base_price );
+
+				if ( false !== $tier_price && abs( (float) $tier_price - $candidate_price ) < 0.0001 ) {
+					return true;
+				}
 			}
 		}
 
@@ -1732,28 +1884,33 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return string
 	 */
 	private function get_tier_table_markup( \WC_Product $product ): string {
+		$active_tier_data = apply_filters( 'wholesalex_active_tier_data', array(), $product );
+		if ( ! empty( $active_tier_data['src'] ) && 'wholesale_pricing_tier' !== $active_tier_data['src'] ) {
+			return '';
+		}
+
+		$base_price = $this->get_base_price( $product );
+		if ( $base_price <= 0 ) {
+			return '';
+		}
+
+		$cart_quantity = 0;
 		foreach ( $this->valid_rules as $rule ) {
-			if ( 'tiered' !== $rule['discount_type'] || ! $this->is_product_eligible_for_rule( $product, $rule ) || ! $this->conditions_pass( $rule ) ) {
-				continue;
-			}
-
-			$base_price = $this->get_base_price( $product );
-
-			if ( $base_price <= 0 ) {
-				return '';
-			}
-
-			$cart_quantity  = $this->get_cart_quantity( $product, $rule );
-			$table_quantity = max( 1, $cart_quantity );
-			$tier_base_price = $this->get_tier_base_price( $product, $rule, $base_price, $table_quantity );
-			$markup          = $this->tiered_discount->render_table( $rule, $product, $tier_base_price, $cart_quantity );
-
-			if ( '' !== $markup ) {
-				return '<div class="wsx-wholesale-pricing-rule-' . esc_attr( $rule['id'] ) . '">' . $markup . '</div>';
+			if ( 'tiered' === ( $rule['discount_type'] ?? '' ) ) {
+				$cart_quantity = max( $cart_quantity, $this->get_cart_quantity( $product, $rule ) );
 			}
 		}
 
-		return '';
+		$preferred_base = ! empty( $active_tier_data['base_price'] ) ? (float) $active_tier_data['base_price'] : $base_price;
+		$tier_data      = $this->get_tier_price_data( $product, $cart_quantity, $preferred_base );
+		if ( false === $tier_data ) {
+			return '';
+		}
+
+		$rule   = $tier_data['rule'];
+		$markup = $this->tiered_discount->render_table( $rule, $product, $tier_data['base_price'], $cart_quantity );
+
+		return '' === $markup ? '' : '<div class="wsx-wholesale-pricing-rule-' . esc_attr( $rule['id'] ) . '">' . $markup . '</div>';
 	}
 
 	/**
