@@ -1984,7 +1984,7 @@ class Settings {
 	public function save_visibility_meta_box_data( $post_id ) {
 		if (
 			! isset( $_POST['visibility_meta_box_nonce'] ) ||
-			! wp_verify_nonce( wp_unslash( $_POST['visibility_meta_box_nonce'] ), 'save_visibility_meta_box' )
+			! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['visibility_meta_box_nonce'] ) ), 'save_visibility_meta_box' )
 		) {
 			return;
 		}
@@ -2046,8 +2046,20 @@ class Settings {
 				return;
 			}
 
-			$current_user = wp_get_current_user();
-			$has_access   = false;
+			// Users who can edit the page must be able to load front-end previews.
+			if ( current_user_can( 'edit_post', $post->ID ) ) {
+				return;
+			}
+
+			$redirect_url     = esc_url_raw( apply_filters( 'wholesalex_no_access_redirection_url', get_permalink( wc_get_page_id( 'myaccount' ) ) ) );
+			$redirect_page_id = url_to_postid( $redirect_url );
+
+			// Never apply the restriction to its destination, otherwise it redirects to itself.
+			if ( $redirect_page_id && (int) $post->ID === $redirect_page_id ) {
+				return;
+			}
+
+			$has_access = false;
 
 			// Check guest.
 			if ( ! is_user_logged_in() && ! empty( $visibility['guest'] ) ) {
@@ -2076,13 +2088,16 @@ class Settings {
 			}
 
 			if ( ! $has_access ) {
-				wp_redirect(
+				$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '/';
+
+				wp_safe_redirect(
 					add_query_arg(
 						'redirect_to',
-						urlencode( $_SERVER['REQUEST_URI'] ),
-						apply_filters( 'wholesalex_no_access_redirection_url', get_permalink( wc_get_page_id( 'myaccount' ) ) )
+						$request_uri,
+						$redirect_url
 					)
 				);
+				exit;
 			}
 		}
 	}

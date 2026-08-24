@@ -2,9 +2,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
-do_action( 'woocommerce_email_header', $email_heading, $email );
-$user       = get_user_by( 'login', $user_login );
-$user_email = $user->user_email; //phpcs:ignore
+do_action( 'woocommerce_email_header', $email_heading, $email ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WooCommerce.
+$wholesalex_user = get_user_by( 'login', $user_login );
+$user_email      = $wholesalex_user->user_email; //phpcs:ignore
 
 ?>
 
@@ -30,4 +30,4 @@ if ( $additional_content ) {
 	echo wp_kses_post( wpautop( wptexturize( $additional_content ) ) );
 }
 
-do_action( 'woocommerce_email_footer', $email );
+do_action( 'woocommerce_email_footer', $email ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WooCommerce.

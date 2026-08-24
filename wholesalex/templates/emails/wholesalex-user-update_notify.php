@@ -2,19 +2,19 @@
 
 defined( 'ABSPATH' ) || exit;
 
-do_action( 'woocommerce_email_header', $email_heading, $email );
-$user                 = get_user_by( 'login', $user_login );
-$user_email = $user->user_email; //phpcs:ignore
-$updated_profile_data = implode( ', ', $updated_data );
+do_action( 'woocommerce_email_header', $email_heading, $email ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WooCommerce.
+$wholesalex_user                 = get_user_by( 'login', $user_login );
+$user_email                      = $wholesalex_user->user_email; //phpcs:ignore
+$wholesalex_updated_profile_data = implode( ', ', $updated_data );
 
 ?>
 
 <p>
 	<?php /* translators: %1$s is a URL, %2$s is a user login name */ ?>
-	<p> <?php printf( 'Hello <a class="wsx-link" href="%1$s">%2$s</a>', esc_url( admin_url( 'user-edit.php?user_id=' . $user->ID ) ), esc_html( $user_login ) ); ?> </p><!-- phpcs:ignore -->
-	<?php /* translators: 1: User Profile URL, 2: Username */ ?>
-	<p><?php printf( esc_html_x( 'Please note that the admin(s) made changes to your User Data: %s', 'wholesalex' ), $updated_profile_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
-	<p><?php printf( esc_html_x( 'Please review these changes immediately.', 'wholesalex' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+	<p> <?php printf( 'Hello <a class="wsx-link" href="%1$s">%2$s</a>', esc_url( admin_url( 'user-edit.php?user_id=' . $wholesalex_user->ID ) ), esc_html( $user_login ) ); ?> </p><!-- phpcs:ignore -->
+	<?php /* translators: %s: Updated user profile data. */ ?>
+	<p><?php printf( esc_html__( 'Please note that the admin(s) made changes to your User Data: %s', 'wholesalex' ), $wholesalex_updated_profile_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+	<p><?php echo esc_html__( 'Please review these changes immediately.', 'wholesalex' ); ?></p>
 
 </p>
 <?php
@@ -26,4 +26,4 @@ if ( $additional_content ) {
 	echo wp_kses_post( wpautop( wptexturize( $additional_content ) ) );
 }
 
-do_action( 'woocommerce_email_footer', $email );
+do_action( 'woocommerce_email_footer', $email ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WooCommerce.

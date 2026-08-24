@@ -542,7 +542,20 @@ class WHOLESALEX_Setup_Wizard {
 	 * @return void
 	 */
 	public function wsx_wizard_update() {
+		check_ajax_referer( 'wholesalex-setup-wizard', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'You are not allowed to update the setup wizard.', 'wholesalex' ),
+				),
+				403
+			);
+		}
+
 		update_option( '__wholesalex_initial_setup', true );
+
+		wp_send_json_success();
 	}
 
 	/**

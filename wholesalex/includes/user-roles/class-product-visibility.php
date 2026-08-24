@@ -85,7 +85,7 @@ class User_Roles_Product_Visibility {
 		}
 
 		$existing_ids                = isset( $query_args['post__not_in'] ) ? (array) $query_args['post__not_in'] : array();
-		$query_args['post__not_in'] = array_values( array_unique( array_merge( $existing_ids, $hidden_ids ) ) );
+		$query_args['post__not_in'] = array_values( array_unique( array_merge( $existing_ids, $hidden_ids ) ) ); // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Role-hidden products must be excluded from third-party product queries.
 
 		return $query_args;
 	}

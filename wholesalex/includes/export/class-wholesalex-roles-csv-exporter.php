@@ -69,8 +69,9 @@ class WHOLESALEX_Role_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 		$this->total_rows = count( $roles );
 		$this->row_data   = array();
 
-		$exported_ids = isset( $_GET['exported_ids'] ) ? array_map( 'strval', explode( ',', sanitize_text_field( wp_unslash( $_GET['exported_ids'] ) ) ) ) : array(); // Convert string back to array for specific user role export.
-		$export_all   = isset( $_GET['export_all'] ) && 'yes' === sanitize_text_field( wp_unslash( $_GET['export_all'] ) );
+		// These read-only filters are authorized by the WooCommerce exporter request that invokes this callback.
+		$exported_ids = isset( $_GET['exported_ids'] ) ? array_map( 'strval', explode( ',', sanitize_text_field( wp_unslash( $_GET['exported_ids'] ) ) ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Export selection does not change application state.
+		$export_all   = isset( $_GET['export_all'] ) && 'yes' === sanitize_text_field( wp_unslash( $_GET['export_all'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Export selection does not change application state.
 		foreach ( $roles as $role ) {
 			if ( $export_all || in_array( (string) $role['id'], $exported_ids, true ) ) {
 				$this->row_data[] = $this->generate_row_data( $role );

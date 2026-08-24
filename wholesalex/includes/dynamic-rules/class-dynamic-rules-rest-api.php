@@ -133,7 +133,7 @@ class Dynamic_Rules_Rest_Api {
 	public function dynamic_rule_restapi_permission() {
 		$capability = apply_filters( 'wholesalex_capability_access', 'manage_options' );
 		$allowed = (bool) apply_filters(
-			'dynamic_rules_restapi_permission_callback',
+			'dynamic_rules_restapi_permission_callback', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Preserve the established public filter for backward compatibility.
 			current_user_can( $capability )
 		);
 

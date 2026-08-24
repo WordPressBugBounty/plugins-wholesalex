@@ -39,12 +39,13 @@ class DurbinClient {
 
 		if ( self::DEACTIVATE_ACTION === $action_type ) {
 
-			$id = isset( $_POST['cause_id'] ) ? sanitize_key( wp_unslash( $_POST['cause_id'] ) ) : null;
+			// Deactive::send_plugin_data() verifies the dedicated AJAX nonce before calling this method.
+			$id = isset( $_POST['cause_id'] ) ? sanitize_key( wp_unslash( $_POST['cause_id'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification occurs in the AJAX callback.
 
 			if ( ! empty( $id ) ) {
 				$data['feedback'] = array(
 					'id'      => $id,
-					'details' => isset( $_POST['cause_details'] ) ? sanitize_text_field( wp_unslash( $_POST['cause_details'] ) ) : null,
+					'details' => isset( $_POST['cause_details'] ) ? sanitize_text_field( wp_unslash( $_POST['cause_details'] ) ) : null, // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification occurs in the AJAX callback.
 				);
 			}
 		}

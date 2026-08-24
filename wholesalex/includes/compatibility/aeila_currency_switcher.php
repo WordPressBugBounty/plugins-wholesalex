@@ -8,7 +8,7 @@ if ( ! class_exists( 'Aelia_Integration_Helper' ) ) {
 	/**
 	 * Aelia Currency Switcher helper class.
 	 */
-	class Aelia_Integration_Helper {
+	class Aelia_Integration_Helper { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Preserve the established compatibility helper class name.
 
 		/**
 		 * Shop's base currency. Used for caching.
@@ -37,7 +37,7 @@ if ( ! class_exists( 'Aelia_Integration_Helper' ) ) {
 		 * @return bool
 		 */
 		public static function aelia_currency_switcher_active() {
-			return in_array( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true );
+			return in_array( 'woocommerce-aelia-currencyswitcher/woocommerce-aelia-currencyswitcher.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- active_plugins is a WordPress core filter.
 		}
 
 		/**
@@ -48,7 +48,7 @@ if ( ! class_exists( 'Aelia_Integration_Helper' ) ) {
 		 * @return array An array of currency codes.
 		 */
 		public static function enabled_currencies() {
-			return apply_filters( 'wc_aelia_cs_enabled_currencies', array( self::get_shop_base_currency() ) );
+			return apply_filters( 'wc_aelia_cs_enabled_currencies', array( self::get_shop_base_currency() ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by Aelia Currency Switcher.
 		}
 
 		/**
@@ -73,7 +73,7 @@ if ( ! class_exists( 'Aelia_Integration_Helper' ) ) {
 				$default_currency = self::get_shop_base_currency();
 			}
 
-			return apply_filters( 'wc_aelia_cs_product_base_currency', $default_currency, $product_id );
+			return apply_filters( 'wc_aelia_cs_product_base_currency', $default_currency, $product_id ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by Aelia Currency Switcher.
 		}
 
 		/**
@@ -118,7 +118,7 @@ if ( ! class_exists( 'Aelia_Integration_Helper' ) ) {
 		 * @return float The amount converted to the target destination currency.
 		 */
 		public static function convert( $amount, $to_currency, $from_currency = null ) {
-			return apply_filters( 'wc_aelia_cs_convert', $amount, $from_currency, $to_currency );
+			return apply_filters( 'wc_aelia_cs_convert', $amount, $from_currency, $to_currency ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by Aelia Currency Switcher.
 		}
 	}
 

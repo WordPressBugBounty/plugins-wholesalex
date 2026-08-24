@@ -87,7 +87,7 @@ class WHOLESALEX_RequstRoleChange {
 		$role_titles = array_values( array_filter( $role_titles ) );
 
 		// ADDED THIS FILTER TO REMOVE B2C AND GUEST USER ROLES IF ANYONE WANTS TO REMOVE.
-		$remove_b2c_guest = apply_filters( 'wsx_remove_b2c_guest_user_role', false );
+		$remove_b2c_guest = apply_filters( 'wsx_remove_b2c_guest_user_role', false ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Preserve the existing WSX-prefixed public filter for backward compatibility.
 		if ( $remove_b2c_guest ) {
 			$role_titles = $this->wholesalex_remove_b2c_guest_user_role( $role_titles, true );
 		}
@@ -361,7 +361,7 @@ class WHOLESALEX_RequstRoleChange {
 		// Get all users with the meta key 'wsx_change_role_request'.
 		$users = get_users(
 			array(
-				'meta_key'     => 'wsx_change_role_request',
+				'meta_key'     => 'wsx_change_role_request', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Role-change requests are persisted as user metadata.
 				'meta_compare' => 'EXISTS',
 			)
 		);

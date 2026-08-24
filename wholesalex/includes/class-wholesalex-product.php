@@ -1032,7 +1032,7 @@ class WHOLESALEX_Product {
 
 		$sql = apply_filters( 'woocommerce_update_product_stock_query', $sql, $product_id_with_stock, $new_stock, $operation );
 
-		$wpdb->query( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
+		$wpdb->query( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- SQL is prepared above, then intentionally passed through WooCommerce's trusted stock-query filter.
 
 		// Cache delete is required (not only) to set correct data for lookup table (which reads from cache).
 		// Sometimes I wonder if it shouldn't be part of update_lookup_table.
@@ -2059,7 +2059,7 @@ class WHOLESALEX_Product {
 			$users = get_users(
 				array(
 					'fields'   => 'ids',
-					'meta_key' => '__wholesalex_profile_discounts',
+					'meta_key' => '__wholesalex_profile_discounts', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- The feature must locate users that have profile-level discounts.
 				)
 			);
 
@@ -2866,8 +2866,9 @@ class WHOLESALEX_Product {
 
 		$product_id  = absint( sanitize_text_field( wp_unslash( $_POST['product_id'] ) ) );
 		$bulk_action = sanitize_text_field( wp_unslash( $_POST['bulk_action'] ) );
-		$data        = ! empty( $_POST['data'] ) ? wc_clean( wp_unslash( $_POST['data'] ) ) : array();
-		$value       = isset( $data['value'] ) ? wc_format_decimal( $data['value'] ) : '';
+		$value       = isset( $_POST['data']['value'] ) && ! is_array( $_POST['data']['value'] )
+			? wc_format_decimal( sanitize_text_field( wp_unslash( $_POST['data']['value'] ) ) )
+			: '';
 
 		if ( ! $product_id || ! current_user_can( 'edit_post', $product_id ) ) {
 			wp_die( -1 );

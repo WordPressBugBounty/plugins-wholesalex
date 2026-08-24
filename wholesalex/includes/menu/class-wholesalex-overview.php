@@ -131,6 +131,7 @@ class WHOLESALEX_Overview {
 					'version'       => WHOLESALEX_VER,
 					'is_pro_active' => wholesalex()->is_pro_active(),
 					'ajax_url'      => admin_url( 'admin-ajax.php' ),
+					'nonce'         => wp_create_nonce( 'wholesalex-migration-tool-install' ),
 				)
 			);
 			?>
@@ -915,7 +916,7 @@ class WHOLESALEX_Overview {
 
 		// User query arguments.
 		$args = array(
-			'meta_query'  => $meta_query,
+			'meta_query'  => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- B2B customer classification is stored as user metadata.
 			'count_total' => true, // Only retrieve the count.
 		);
 
@@ -1482,7 +1483,7 @@ class WHOLESALEX_Overview {
 		$active_user_query = new WP_User_Query(
 			array(
 				'fields'     => array( 'display_name', 'user_email', 'ID' ),
-				'meta_query' => array(
+				'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Dashboard customers are selected by WholesaleX role and status metadata.
 					'relation' => 'AND',
 					array(
 						'key'     => '__wholesalex_status',
@@ -1533,7 +1534,7 @@ class WHOLESALEX_Overview {
 			'limit'      => 10,
 			'orderby'    => 'date',
 			'order'      => 'DESC',
-			'meta_query' => array(
+			'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- B2B order type is stored in order metadata.
 				array(
 					'key'     => '__wholesalex_order_type',
 					'value'   => 'b2b',
@@ -1572,8 +1573,8 @@ class WHOLESALEX_Overview {
 	public function get_pending_users( $limit = 10 ) {
 		$pending_user_query = new WP_User_Query(
 			array(
-				'meta_key'     => '__wholesalex_status',
-				'meta_value'   => 'pending',
+				'meta_key'     => '__wholesalex_status', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Registration status is stored as user metadata.
+				'meta_value'   => 'pending', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Required status value for the pending-user dashboard list.
 				'meta_compare' => '=',
 				'fields'       => array( 'display_name', 'user_email', 'ID', 'user_registered' ),
 				'count_total'  => true,
@@ -1603,8 +1604,8 @@ class WHOLESALEX_Overview {
 	public function get_new_registrations_count() {
 		$pending_user_query = new WP_User_Query(
 			array(
-				'meta_key'     => '__wholesalex_status',
-				'meta_value'   => 'pending',
+				'meta_key'     => '__wholesalex_status', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Registration status is stored as user metadata.
+				'meta_value'   => 'pending', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Required status value for the registration count.
 				'meta_compare' => '=',
 				'fields'       => array( 'display_name', 'user_email', 'ID', 'user_registered' ),
 				'count_total'  => true,
@@ -1624,8 +1625,8 @@ class WHOLESALEX_Overview {
 			array(
 				'post_type'    => 'wsx_conversation',
 				'post_status'  => 'publish',
-				'meta_key'     => '__conversation_status',
-				'meta_value'   => 'open',
+				'meta_key'     => '__conversation_status', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Conversation status is stored as post metadata.
+				'meta_value'   => 'open', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Required status value for the unread-message count.
 				'meta_compare' => '=',
 			)
 		);
@@ -1735,8 +1736,8 @@ class WHOLESALEX_Overview {
 		$args = array(
 			'status'     => array( 'wc-completed', 'wc-refunded' ),
 			'date_paid'  => $start_date . '...' . $end_date,
-			'meta_key'   => '__wholesalex_order_type',
-			'meta_value' => 'b2b',
+			'meta_key'   => '__wholesalex_order_type', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- B2B order type is stored in order metadata.
+			'meta_value' => 'b2b', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Dashboard metrics must include only B2B orders.
 			'limit'      => -1,
 		);
 
@@ -1795,8 +1796,8 @@ class WHOLESALEX_Overview {
 		$prev_args = array(
 			'status'     => array( 'wc-completed', 'wc-refunded' ),
 			'date_paid'  => $prev_start_date . '...' . $prev_end_date,
-			'meta_key'   => '__wholesalex_order_type',
-			'meta_value' => 'b2b',
+			'meta_key'   => '__wholesalex_order_type', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- B2B order type is stored in order metadata.
+			'meta_value' => 'b2b', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Previous-period metrics must include only B2B orders.
 			'limit'      => -1,
 		);
 

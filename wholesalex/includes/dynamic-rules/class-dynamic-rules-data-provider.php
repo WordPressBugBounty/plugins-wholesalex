@@ -90,8 +90,8 @@ class Dynamic_Rules_Data_Provider {
 		}
 		$args[] = $query_limit;
 
-		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare( $sql, ...$args )
+		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Query uses trusted WordPress table names, static clauses, and prepared placeholders for every value.
+			$wpdb->prepare( $sql, ...$args ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query clauses are static and all values use placeholders.
 		);
 
 		foreach ( $results as $result ) {
@@ -427,7 +427,7 @@ class Dynamic_Rules_Data_Provider {
 			return array();
 		}
 
-		$languages = apply_filters( 'wpml_active_languages', null, array( 'skip_missing' => 0 ) );
+		$languages = apply_filters( 'wpml_active_languages', null, array( 'skip_missing' => 0 ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WPML.
 
 		if ( empty( $languages ) || ! is_array( $languages ) ) {
 			return array();
@@ -436,7 +436,7 @@ class Dynamic_Rules_Data_Provider {
 		$translations = array();
 
 		foreach ( array_keys( $languages ) as $language_code ) {
-			$translated_id = apply_filters( 'wpml_object_id', absint( $object_id ), $object_type, false, $language_code );
+			$translated_id = apply_filters( 'wpml_object_id', absint( $object_id ), $object_type, false, $language_code ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WPML.
 
 			if ( $translated_id ) {
 				$translations[] = absint( $translated_id );
@@ -685,8 +685,8 @@ class Dynamic_Rules_Data_Provider {
 			array_filter(
 				array_map(
 					'absint',
-					$wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-						$wpdb->prepare( $sql, ...$args )
+					$wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Query uses trusted WordPress table names, static clauses, and prepared placeholders for every value.
+						$wpdb->prepare( $sql, ...$args ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query clauses are static and all values use placeholders.
 					)
 				)
 			)
@@ -818,7 +818,7 @@ class Dynamic_Rules_Data_Provider {
 		// request all plugin hooks are guaranteed to be registered, so the result will
 		// contain any extension gateways that were not present when the singleton was
 		// first created.
-		$registered = apply_filters( 'woocommerce_payment_gateways', array() );
+		$registered = apply_filters( 'woocommerce_payment_gateways', array() ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WooCommerce.
 
 		foreach ( $registered as $entry ) {
 			if ( is_string( $entry ) ) {

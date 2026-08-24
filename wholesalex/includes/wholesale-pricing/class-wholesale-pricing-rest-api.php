@@ -253,7 +253,7 @@ class Wholesale_Pricing_Rest_Api
             $base_args['s'] = $search;
         }
         if (!empty($exclude_ids)) {
-            $base_args['post__not_in'] = $exclude_ids;
+            $base_args['post__not_in'] = $exclude_ids; // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- The REST selector must honor products explicitly excluded by the client.
         }
 
         $ids = array();

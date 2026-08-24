@@ -176,7 +176,7 @@ class ImportExport {
 		}
 
 		$args = array(
-			'meta_query' => $meta_query,
+			'meta_query' => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Export filtering depends on WholesaleX role and status metadata.
 			'orderby'    => 'registered',
 			'order'      => 'DESC',
 			'number'     => $user_per_page,

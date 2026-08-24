@@ -133,11 +133,11 @@ class WHOLESALEX_Role_CSV_Importer_Controller {
 		add_action( 'wp_ajax_wholesalex_do_ajax_role_import', array( $this, 'do_ajax_role_import' ) );
 
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
-		$this->file               = isset( $_REQUEST['file'] ) ? wc_clean( wp_unslash( $_REQUEST['file'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$this->update_existing    = isset( $_REQUEST['update_existing'] ) ? 'yes' === wc_clean( $_REQUEST['update_existing'] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$this->delimiter          = ! empty( $_REQUEST['delimiter'] ) ? wc_clean( wp_unslash( $_REQUEST['delimiter'] ) ) : ','; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$this->map_preferences    = isset( $_REQUEST['map_preferences'] ) ? (bool) wc_clean( $_REQUEST['map_preferences'] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$this->character_encoding = isset( $_REQUEST['character_encoding'] ) ? wc_clean( wp_unslash( $_REQUEST['character_encoding'] ) ) : 'UTF-8'; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$this->file               = isset( $_REQUEST['file'] ) && is_string( $_REQUEST['file'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['file'] ) ) : '';
+		$this->update_existing    = isset( $_REQUEST['update_existing'] ) && is_string( $_REQUEST['update_existing'] ) ? 'yes' === sanitize_text_field( wp_unslash( $_REQUEST['update_existing'] ) ) : false;
+		$this->delimiter          = isset( $_REQUEST['delimiter'] ) && is_string( $_REQUEST['delimiter'] ) && '' !== $_REQUEST['delimiter'] ? sanitize_text_field( wp_unslash( $_REQUEST['delimiter'] ) ) : ',';
+		$this->map_preferences    = isset( $_REQUEST['map_preferences'] ) && is_string( $_REQUEST['map_preferences'] ) ? (bool) sanitize_text_field( wp_unslash( $_REQUEST['map_preferences'] ) ) : false;
+		$this->character_encoding = isset( $_REQUEST['character_encoding'] ) && is_string( $_REQUEST['character_encoding'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['character_encoding'] ) ) : 'UTF-8';
 
 		if ( $this->map_preferences ) {
 			add_filter( 'wholesalex_csv_role_import_mapped_columns', array( $this, 'auto_map_user_preferences' ), 9999 );
@@ -357,7 +357,7 @@ class WHOLESALEX_Role_CSV_Importer_Controller {
 				'lines'              => 1,
 				'delimiter'          => $this->delimiter,
 				'character_encoding' => $this->character_encoding,
-				'update_existing'    => isset( $_POST['update_existing'] ) && 'yes' === wc_clean( $_POST['update_existing'] ),
+				'update_existing'    => isset( $_POST['update_existing'] ) && is_string( $_POST['update_existing'] ) && 'yes' === sanitize_text_field( wp_unslash( $_POST['update_existing'] ) ),
 			);
 
 			$importer                         = self::get_importer( $this->file, $args );
@@ -380,7 +380,7 @@ class WHOLESALEX_Role_CSV_Importer_Controller {
 	 * @return void
 	 */
 	public function handle_import() {
-		if ( ! ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'wholesalex-registration' ) ) ) {
+		if ( ! ( isset( $_POST['nonce'] ) && is_string( $_POST['nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), 'wholesalex-registration' ) ) ) {
 			return;
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -390,7 +390,7 @@ class WHOLESALEX_Role_CSV_Importer_Controller {
 			'status'  => false,
 			'message' => '',
 		);
-		$this->file    = isset( $_POST['file'] ) ? sanitize_text_field( $_POST['file'] ) : '';
+		$this->file    = isset( $_POST['file'] ) && is_string( $_POST['file'] ) ? sanitize_text_field( wp_unslash( $_POST['file'] ) ) : '';
 
 		if ( ! self::is_file_valid_csv( $this->file ) ) {
 			$response_data['message'] = __( 'Invalid file type. The importer supports CSV and TXT file formats.', 'wholesalex' );
@@ -429,7 +429,7 @@ class WHOLESALEX_Role_CSV_Importer_Controller {
 	 * @return void
 	 */
 	public function do_ajax_role_import() {
-		if ( ! ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'wholesalex-registration' ) ) ) {
+		if ( ! ( isset( $_POST['nonce'] ) && is_string( $_POST['nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), 'wholesalex-registration' ) ) ) {
 			return;
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -437,13 +437,13 @@ class WHOLESALEX_Role_CSV_Importer_Controller {
 		}
 
 		include_once WHOLESALEX_PATH . 'includes/import/class-wholesalex-role-csv-importer.php';
-		$file   = wc_clean( wp_unslash( $_POST['file'] ) ); // phpcs:ignore 
+		$file   = isset( $_POST['file'] ) && is_string( $_POST['file'] ) ? sanitize_text_field( wp_unslash( $_POST['file'] ) ) : '';
 		$params = array(
-			'delimiter'          => ! empty( $_POST['delimiter'] ) ? wc_clean( wp_unslash( $_POST['delimiter'] ) ) : ',', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			'start_pos'          => isset( $_POST['position'] ) ? absint( wc_clean( $_POST['position'] ) ) : 0, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			'delimiter'          => isset( $_POST['delimiter'] ) && is_string( $_POST['delimiter'] ) && '' !== $_POST['delimiter'] ? sanitize_text_field( wp_unslash( $_POST['delimiter'] ) ) : ',',
+			'start_pos'          => isset( $_POST['position'] ) && ! is_array( $_POST['position'] ) ? absint( wp_unslash( $_POST['position'] ) ) : 0,
 			'mapping'            => isset( $_POST['mapping'] ) ? (array) wc_clean( wp_unslash( $_POST['mapping'] ) ) : array(), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			'update_existing'    => isset( $_POST['update_existing'] ) ? 'yes' === wc_clean( $_POST['update_existing'] ) : false, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			'character_encoding' => isset( $_POST['character_encoding'] ) ? wc_clean( wp_unslash( $_POST['character_encoding'] ) ) : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			'update_existing'    => isset( $_POST['update_existing'] ) && is_string( $_POST['update_existing'] ) ? 'yes' === sanitize_text_field( wp_unslash( $_POST['update_existing'] ) ) : false,
+			'character_encoding' => isset( $_POST['character_encoding'] ) && is_string( $_POST['character_encoding'] ) ? sanitize_text_field( wp_unslash( $_POST['character_encoding'] ) ) : '',
 
 			/**
 			 * Batch size for the wholesalex role import process.

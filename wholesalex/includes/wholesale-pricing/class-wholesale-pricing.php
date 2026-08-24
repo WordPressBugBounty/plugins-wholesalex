@@ -150,7 +150,7 @@ class Wholesale_Pricing {
 		$rules = get_option( self::OPTION_KEY, array() );
 		$rules = is_array( $rules ) ? $rules : array();
 
-		$GLOBALS[ self::GLOBAL_KEY ] = $rules;
+		$GLOBALS[ self::GLOBAL_KEY ] = $rules; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- GLOBAL_KEY contains the WholesaleX-prefixed cache key.
 		return $rules;
 	}
 
@@ -191,7 +191,7 @@ class Wholesale_Pricing {
 		$rules[ $id ] = $data;
 
 		update_option( self::OPTION_KEY, $rules, false ); // autoload=false
-		$GLOBALS[ self::GLOBAL_KEY ] = $rules;
+		$GLOBALS[ self::GLOBAL_KEY ] = $rules; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- GLOBAL_KEY contains the WholesaleX-prefixed cache key.
 
 		/**
 		 * Fires after a wholesale-pricing rule is saved.
@@ -220,7 +220,7 @@ class Wholesale_Pricing {
 		unset( $rules[ $id ] );
 
 		update_option( self::OPTION_KEY, $rules, false );
-		$GLOBALS[ self::GLOBAL_KEY ] = $rules;
+		$GLOBALS[ self::GLOBAL_KEY ] = $rules; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- GLOBAL_KEY contains the WholesaleX-prefixed cache key.
 
 		/**
 		 * Fires after a wholesale-pricing rule is deleted.

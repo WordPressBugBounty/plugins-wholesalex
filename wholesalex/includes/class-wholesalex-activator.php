@@ -134,7 +134,8 @@ class Activator {
 		if ( wp_doing_ajax() ) {
 			return;
 		}
-		if ( wp_doing_ajax() || is_network_admin() || isset( $_GET['activate-multi'] ) || isset( $_POST['action'] ) && 'activate-selected' == $_POST['action'] ) {
+		// The activated_plugin hook runs only after WordPress has authorized the activation request.
+		if ( wp_doing_ajax() || is_network_admin() || isset( $_GET['activate-multi'] ) || ( isset( $_POST['action'] ) && is_string( $_POST['action'] ) && 'activate-selected' === sanitize_key( wp_unslash( $_POST['action'] ) ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.NonceVerification.Missing -- Core owns activation nonce verification; values are read only to control the redirect.
 			return;
 		}
 		if ( 'wholesalex/wholesalex.php' === $plugin ) {

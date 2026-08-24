@@ -45,11 +45,11 @@ class WowShippingPromotion {
 			return;
 		}
 
-		$GLOBALS['wtrs_promotion'] = array(
+		$GLOBALS['wtrs_promotion'] = array( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared promotion-library global; its external key cannot be renamed here.
 			'init' => true,
 		);
 
-		$hooks = apply_filters( 'wtrs_promotion_hooks', array() );
+		$hooks = apply_filters( 'wtrs_promotion_hooks', array() ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook belongs to the shared promotion library.
 
 		if ( ! is_array( $hooks ) ) {
 			return;
@@ -521,7 +521,7 @@ class WowShippingPromotion {
 	 * @return void
 	 */
 	private function render_promotion_notice( $id, $type, $message, $style = '', $inline = true, $button_labels = array() ) {
-		$GLOBALS['wtrs_promotion'][ $type ] = true;
+		$GLOBALS['wtrs_promotion'][ $type ] = true; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared promotion-library global; its external key cannot be renamed here.
 
 		$button_labels = wp_parse_args(
 			is_array( $button_labels ) ? $button_labels : array(),

@@ -502,7 +502,7 @@ class WHOLESALEX_Shortcodes {
 			?>
 			<div class="wsx-reg-form-row ">
 				<div class="wholesalex-registration-form-column left wsx-field woocommerce-LostPassword lost_password"> 
-					<a class="wsx-link" href="<?php echo esc_url( wp_lostpassword_url() ); ?>"><?php esc_html_e( 'Lost your password?', 'woocommerce' ); ?></a>
+					<a class="wsx-link" href="<?php echo esc_url( wp_lostpassword_url() ); ?>"><?php esc_html_e( 'Lost your password?', 'wholesalex' ); ?></a>
 				</div>
 			</div>
 			<?php
@@ -3953,7 +3953,7 @@ class WHOLESALEX_Shortcodes {
 
 		$output = ob_get_clean();
 
-		echo apply_filters( 'wholesalex_registration_form_field', $output, $field['type'], $field['name'], $input_variation, $field );
+		echo apply_filters( 'wholesalex_registration_form_field', $output, $field['type'], $field['name'], $input_variation, $field ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Field markup is escaped during generation and intentionally remains filterable.
 	}
 
 	/**
@@ -4039,7 +4039,7 @@ class WHOLESALEX_Shortcodes {
 								<?php
 								if ( isset( $value['isRequiredInBilling'] ) && $value['isRequiredInBilling'] ) {
 									?>
-										<span class="optional"><?php echo esc_html__( 'optional', 'woocommerce' ); ?></span>
+										<span class="optional"><?php echo esc_html__( 'optional', 'wholesalex' ); ?></span>
 										<?php
 								}
 								?>
@@ -4150,7 +4150,7 @@ class WHOLESALEX_Shortcodes {
 				}
 				// Check if the field data is posted and not empty, then sanitize and update post meta.
 				if ( isset( $_POST[ $field['name'] ] ) && ! empty( $_POST[ $field['name'] ] ) ) { // phpcs:ignore
-					$sanitized_value = $this->sanitize_field_data( $field, sanitize_text_field( $_POST[ $field['name'] ] ) );
+					$sanitized_value = $this->sanitize_field_data( $field, sanitize_text_field( wp_unslash( $_POST[ $field['name'] ] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verifies the checkout nonce before this callback.
 					update_post_meta( $order_id, 'wholesalex_cf_' . $field['name'], $sanitized_value );
 				}
 			}

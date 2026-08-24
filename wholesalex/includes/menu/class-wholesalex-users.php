@@ -553,7 +553,7 @@ class WHOLESALEX_Users {
 		}
 
 		$args = array(
-			'meta_query'  => $meta_query,
+			'meta_query'  => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- The admin user list filters on WholesaleX role and status metadata.
 			'orderby'     => $orderby,
 			'order'       => $order,
 			'number'      => $user_per_page,

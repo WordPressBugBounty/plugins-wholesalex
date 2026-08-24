@@ -123,11 +123,12 @@ class Import_Wholesale_Pricing {
 	 * @return string|WP_Error
 	 */
 	protected function handle_upload() {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- The AJAX handler verifies the nonce and capability before calling this method.
 		if ( ! isset( $_FILES['import'] ) ) {
 			return new WP_Error( 'wholesalex_wholesale_pricing_import_empty', __( 'File is empty. Please upload a CSV file.', 'wholesalex' ) );
 		}
 
-		$file_name = isset( $_FILES['import']['name'] ) ? wc_clean( wp_unslash( $_FILES['import']['name'] ) ) : '';
+		$file_name = isset( $_FILES['import']['name'] ) && is_string( $_FILES['import']['name'] ) ? sanitize_file_name( $_FILES['import']['name'] ) : '';
 		if ( ! $this->is_valid_csv( $file_name ) ) {
 			return new WP_Error( 'wholesalex_wholesale_pricing_import_invalid', __( 'Invalid file type. The importer supports CSV and TXT file formats.', 'wholesalex' ) );
 		}
@@ -160,6 +161,7 @@ class Import_Wholesale_Pricing {
 		$id = wp_insert_attachment( $attachment, $upload['file'] );
 		wp_schedule_single_event( time() + DAY_IN_SECONDS, 'importer_scheduled_cleanup', array( $id ) );
 
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		return $upload['file'];
 	}
 
@@ -602,6 +604,7 @@ class Import_Wholesale_Pricing {
 			);
 		}
 
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- The nonce and capability were verified by is_request_allowed() above.
 		$this->file = isset( $_POST['file'] ) ? sanitize_text_field( wp_unslash( $_POST['file'] ) ) : '';
 		if ( ! is_file( $this->file ) || ! $this->is_valid_csv( $this->file ) ) {
 			wp_send_json(
@@ -623,6 +626,7 @@ class Import_Wholesale_Pricing {
 
 		$mapping_from = wc_clean( wp_unslash( $_POST['map_from'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$mapping_to   = wc_clean( wp_unslash( $_POST['map_to'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 		update_user_option( get_current_user_id(), self::MAPPING_OPTION, $mapping_to );
 
@@ -655,7 +659,8 @@ class Import_Wholesale_Pricing {
 			);
 		}
 
-		$file = isset( $_POST['file'] ) ? wc_clean( wp_unslash( $_POST['file'] ) ) : '';
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- The nonce and capability were verified by is_request_allowed() above.
+		$file = isset( $_POST['file'] ) && is_string( $_POST['file'] ) ? sanitize_text_field( wp_unslash( $_POST['file'] ) ) : '';
 		if ( ! is_file( $file ) || ! $this->is_valid_csv( $file ) ) {
 			wp_send_json(
 				array(
@@ -666,6 +671,7 @@ class Import_Wholesale_Pricing {
 		}
 
 		$mapping = isset( $_POST['mapping'] ) ? (array) wc_clean( wp_unslash( $_POST['mapping'] ) ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 		$from    = isset( $mapping['from'] ) && is_array( $mapping['from'] ) ? array_values( $mapping['from'] ) : array();
 		$to      = isset( $mapping['to'] ) && is_array( $mapping['to'] ) ? array_values( $mapping['to'] ) : array();
 

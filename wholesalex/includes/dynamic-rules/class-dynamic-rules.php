@@ -105,6 +105,11 @@ class Dynamic_Rules {
 		// Price table JS.
 		add_action( 'wp_enqueue_scripts', array( $this, 'wholesalex_enqueue_price_table_js' ) );
 
+		// Astra renders its mini-cart in a separate AJAX fragment request. Register
+		// this compatibility filter before pricing rules are loaded on wp_loaded so
+		// it is also available during fragment-only requests.
+		add_filter( 'woocommerce_widget_cart_item_quantity', array( $this, 'filter_astra_mini_cart_item_quantity' ), 999, 3 );
+
 		// Share the legacy resolver's selected tier source with Wholesale Pricing
 		// so only the winning engine changes the cart price and renders a table.
 		add_filter( 'wholesalex_active_tier_data', array( $this, 'get_active_tier_data' ), 10, 2 );
@@ -569,7 +574,7 @@ class Dynamic_Rules {
 	// ─── Plugin Compatibility Helpers ────────────────────────────
 
 	public function is_enable_subscriptions_product_woo( $product ) {
-		if ( in_array( 'woocommerce-all-products-for-subscriptions/woocommerce-all-products-for-subscriptions.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+		if ( in_array( 'woocommerce-all-products-for-subscriptions/woocommerce-all-products-for-subscriptions.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- active_plugins is a WordPress core filter.
 			if ( class_exists( 'WCS_ATT_Product_Schemes' ) ) {
 				if ( \WCS_ATT_Product_Schemes::get_subscription_schemes( $product ) ) {
 					return true;
@@ -608,7 +613,7 @@ class Dynamic_Rules {
 	}
 
 	public function modify_wopb_query_args( $query_args ) {
-		$query_args['post__not_in'] = isset( $query_args['post__not_in'] ) ? array_merge( $query_args['post__not_in'], (array) wholesalex()->hidden_product_ids() ) : (array) wholesalex()->hidden_product_ids();
+		$query_args['post__not_in'] = isset( $query_args['post__not_in'] ) ? array_merge( $query_args['post__not_in'], (array) wholesalex()->hidden_product_ids() ) : (array) wholesalex()->hidden_product_ids(); // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Hidden products must be excluded from the third-party query.
 		return $query_args;
 	}
 
@@ -630,7 +635,7 @@ class Dynamic_Rules {
 		$args  = array(
 			'post_type'      => 'product',
 			'posts_per_page' => -1,
-			'meta_query'     => array(
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Bundle membership is stored only in YITH product metadata.
 				array(
 					'key'     => '_yith_wcpb_bundle_data',
 					'value'   => '"' . $product_id . '"',
@@ -1686,7 +1691,7 @@ class Dynamic_Rules {
 				$exclude_skus       = array();
 				$is_all_products    = false;
 
-				$is_dynamic_rules_apply_in_backend = apply_filters( 'is_dynamic_rules_work_in_backend', true );
+					$is_dynamic_rules_apply_in_backend = apply_filters( 'is_dynamic_rules_work_in_backend', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Preserve the established public filter for backward compatibility.
 				if ( ! is_admin() && '' !== $is_dynamic_rules_apply_in_backend ) {
 					extract( Dynamic_Rules_Condition_Engine::get_filtered_rules( $discount ) );
 				} elseif ( is_admin() && $is_dynamic_rules_apply_in_backend ) {
@@ -2100,7 +2105,7 @@ class Dynamic_Rules {
 					}
 					do_action( 'wholesalex_tier_pricing_table', $product );
 					if ( $table_data ) {
-						echo $table_data;
+						echo wp_kses( $table_data, $this->get_price_table_allowed_html() );
 					}
 				},
 				10
@@ -2272,7 +2277,8 @@ class Dynamic_Rules {
 			$lvp_sp = wholesalex()->get_setting( '_settings_login_to_view_price_product_page' );
 			if ( ( is_product() && 'yes' === $lvp_sp ) || ( ! is_product() && 'yes' === $lvp_pl ) ) {
 				$lvp_url = wholesalex()->get_setting( '_settings_login_to_view_price_login_url', get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
-				$lvp_url = esc_url( add_query_arg( 'redirect', isset( $_SERVER['REQUEST_URI'] ) ? esc_url( $_SERVER['REQUEST_URI'] ) : '', $lvp_url ) );
+				$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+				$lvp_url     = esc_url( add_query_arg( 'redirect', $request_uri, $lvp_url ) );
 				$this->make_product_non_purchasable_and_remove_add_to_cart( $product );
 				return '<div><a class="wsx-link" href="' . $lvp_url . '">' . esc_html( wholesalex()->get_language_n_text( '_language_login_to_see_prices', __( 'Login to see prices', 'wholesalex' ) ) ) . '</a></div>';
 			}
@@ -2380,6 +2386,82 @@ class Dynamic_Rules {
 		return $price;
 	}
 
+	/**
+	 * Keep Astra's classic mini-cart unit price in sync with the calculated line.
+	 *
+	 * Astra rebuilds the header mini-cart through an AJAX fragment. WooCommerce's
+	 * mini-cart template reads WC_Product::get_price() before WholesaleX's tier
+	 * resolver (which filters the sale price) has necessarily run in that request.
+	 * The product can therefore render at its retail price even though the cart
+	 * line and subtotal were calculated with the correct quantity tier.
+	 *
+	 * @param string $html          Existing mini-cart quantity HTML.
+	 * @param array  $cart_item     WooCommerce cart item.
+	 * @param string $cart_item_key WooCommerce cart item key.
+	 * @return string
+	 */
+	public function filter_astra_mini_cart_item_quantity( $html, $cart_item, $cart_item_key ) {
+		if ( ! defined( 'ASTRA_THEME_VERSION' ) && ! class_exists( 'Astra_Woocommerce' ) ) {
+			return $html;
+		}
+
+		// Astra Pro's quantity-input mini-cart already displays a line subtotal,
+		// not the "quantity x unit price" markup affected by this issue.
+		if ( false !== strpos( $html, 'ast-mini-cart-price-wrap' ) ) {
+			return $html;
+		}
+		if ( false !== strpos( $html, 'wholesalex-role-price-hidden-text' ) ) {
+			return $html;
+		}
+
+		$product  = isset( $cart_item['data'] ) ? $cart_item['data'] : null;
+		$quantity = isset( $cart_item['quantity'] ) ? (float) $cart_item['quantity'] : 0;
+
+		if (
+			! $product instanceof \WC_Product ||
+			$quantity <= 0 ||
+			! isset( $cart_item['line_subtotal'] ) ||
+			! is_numeric( $cart_item['line_subtotal'] )
+		) {
+			return $html;
+		}
+
+		$product_id = $product->get_id();
+
+		// get_product_price() only called get_price(). Resolve the sale price once
+		// so calculate_sale_price() can populate the quantity-aware tier selected
+		// for this cart item during Astra's fragment request.
+		if ( ! isset( $this->active_tiers[ $product_id ] ) ) {
+			$product->get_sale_price();
+		}
+
+		$tier_data = isset( $this->active_tiers[ $product_id ] ) ? $this->active_tiers[ $product_id ] : array();
+
+		if (
+			empty( $tier_data['src'] ) ||
+			! array_key_exists( 'price', $tier_data ) ||
+			false === $tier_data['price'] ||
+			! is_numeric( $tier_data['price'] )
+		) {
+			return $html;
+		}
+
+		$calculated_unit_price = (float) $cart_item['line_subtotal'] / $quantity;
+		$display_unit_price    = wc_get_price_to_display(
+			$product,
+			array(
+				'price'           => $calculated_unit_price,
+				'display_context' => 'cart',
+			)
+		);
+
+		return '<span class="quantity">' . sprintf(
+			'%s &times; %s',
+			esc_html( $cart_item['quantity'] ),
+			wc_price( $display_unit_price )
+		) . '</span>';
+	}
+
 	public function update_cart_price( $cart ) {
 		if ( ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) || ! is_object( $cart ) || did_action( 'woocommerce_before_calculate_totals' ) > 1 ) {
 			return;
@@ -2469,6 +2551,35 @@ class Dynamic_Rules {
 	// They are included here as pass-through stubs that call back to the facade's originals.
 	// This avoids duplicating ~800+ lines of rendering code.
 
+	/**
+	 * Get the HTML elements and attributes allowed in a pricing table.
+	 *
+	 * @return array
+	 */
+	private function get_price_table_allowed_html() {
+		return array(
+			'table' => array(),
+			'thead' => array(),
+			'tbody' => array(),
+			'th'    => array(),
+			'tr'    => array( 'id' => array() ),
+			'td'    => array(),
+			'div'   => array(
+				'class'    => array(),
+				'id'       => array(),
+				'style'    => array(),
+				'data-min' => array(),
+			),
+			'span'  => array(
+				'class' => array(),
+				'id'    => array(),
+			),
+			'bdi'   => array(),
+			'style' => array(),
+			'pre'   => array(),
+		);
+	}
+
 	public function wholesalex_product_price_table() {
 		global $post;
 		$product_id = $post->ID;
@@ -2496,27 +2607,8 @@ class Dynamic_Rules {
 			$table_data = $this->quantity_based_pricing_table( '', $product_id, array() );
 		}
 		do_action( 'wholesalex_tier_pricing_table', $product );
-		$allowed_tags = array(
-			'table' => array(),
-			'thead' => array(),
-			'tbody' => array(),
-			'th'    => array(),
-			'tr'    => array( 'id' => array() ),
-			'td'    => array(),
-			'div'   => array(
-				'class' => array(),
-				'id'    => array(),
-				'style' => array(),
-			),
-			'span'  => array(
-				'class' => array(),
-				'id'    => array(),
-			),
-			'style' => array(),
-			'pre'   => array(),
-		);
 		if ( $table_data ) {
-			echo wp_kses( $table_data, $allowed_tags );
+			echo wp_kses( $table_data, $this->get_price_table_allowed_html() );
 		}
 	}
 

@@ -2,10 +2,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$user       = get_user_by( 'login', $user_login );
-$user_email = $user->user_email; //phpcs:ignore
+$wholesalex_user = get_user_by( 'login', $user_login );
+$user_email      = $wholesalex_user->user_email; //phpcs:ignore
 
-do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
+do_action( 'woocommerce_email_header', $email_heading, $email ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WooCommerce.
+?>
 
 <?php /* translators: %s: Customer username */ ?>
 <p><?php printf( esc_html_x( 'Hi %s,', 'WholesaleX Registration Approved Email (Customer)', 'wholesalex' ), esc_html( $user_login ) ); ?></p>
@@ -20,4 +21,4 @@ if ( $additional_content ) {
 	echo wp_kses_post( wpautop( wptexturize( $additional_content ) ) );
 }
 
-do_action( 'woocommerce_email_footer', $email );
+do_action( 'woocommerce_email_footer', $email ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WooCommerce.

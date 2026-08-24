@@ -36,6 +36,7 @@ class Deactive {
 	 * @return void
 	 */
 	public function send_plugin_data() {
+		check_ajax_referer( 'wsx_deactivate_feedback', 'nonce' );
 		DurbinClient::send( DurbinClient::DEACTIVATE_ACTION );
 	}
 
@@ -355,6 +356,7 @@ class Deactive {
 						type: 'POST',
 						data: { 
 							action: 'wsx_deactive_plugin',
+							nonce: '<?php echo esc_js( wp_create_nonce( 'wsx_deactivate_feedback' ) ); ?>',
 							cause_id: $('#wsx-deactive-modal input[type=radio]:checked').attr('id'),
 							cause_title: $('#wsx-deactive-modal .wsx-modal-input input[type=radio]:checked').val(),
 							cause_details: $('#wsx-deactive-modal .wsx-reason-input.wsx-active').val()

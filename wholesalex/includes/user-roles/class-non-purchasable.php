@@ -89,7 +89,7 @@ class User_Roles_Non_Purchasable {
 					)
 				)
 			),
-			esc_html__( 'Read more', 'woocommerce' )
+			esc_html__( 'Read more', 'wholesalex' )
 		);
 	}
 

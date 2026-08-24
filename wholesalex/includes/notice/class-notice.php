@@ -60,7 +60,7 @@ class Notice {
 	 * @return bool
 	 */
 	public function is_available_for_notice() {
-		$active_notices = apply_filters( 'xpo_active_notice_lists', array() );
+		$active_notices = apply_filters( 'xpo_active_notice_lists', array() ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook belongs to the shared XPO notice library.
 
 		if ( empty( $active_notices ) ) {
 			return true;
@@ -136,7 +136,7 @@ class Notice {
 		return new \WP_REST_Response(
 			array(
 				'success' => true,
-				'message' => __( 'Hello Bar Action performed', 'wow-table-rate-shipping' ),
+				'message' => __( 'Hello Bar Action performed', 'wholesalex' ),
 			),
 			200
 		);
@@ -462,6 +462,8 @@ class Notice {
 	 * @return void
 	 */
 	public function wsx_dashboard_content_notice($return_bool=false) {
+		/* translators: %s: Discount amount. */
+		$content_subheading = __( 'WholesaleX Summer Sale Offer is Live - Enjoy up to %s on WholesaleX Pro.', 'wholesalex' );
 
 		$content_notices = array(
 			array(
@@ -474,8 +476,8 @@ class Notice {
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( '', 'wholesalex' ),
-				'content_subheading' => __( 'WholesaleX Summer Sale Offer is Live - Enjoy up to %s on WholesaleX Pro.', 'wholesalex' ),
+				'content_heading'    => '',
+				'content_subheading' => $content_subheading,
 				'discount_content'   => '  55% OFF',
 				'border_color'       => '#6c6cff',
 				'icon'               => WHOLESALEX_URL . 'assets/img/banners/wholesalex_logo.svg',
@@ -492,8 +494,8 @@ class Notice {
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( '', 'wholesalex' ),
-				'content_subheading' => __( 'WholesaleX Summer Sale Offer is Live - Enjoy up to %s on WholesaleX Pro.', 'wholesalex' ),
+				'content_heading'    => '',
+				'content_subheading' => $content_subheading,
 				'discount_content'   => '  55% OFF',
 				'border_color'       => '#6c6cff',
 				'icon'               => WHOLESALEX_URL . 'assets/img/banners/discount.svg',
@@ -510,8 +512,8 @@ class Notice {
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( '', 'wholesalex' ),
-				'content_subheading' => __( 'WholesaleX Summer Sale Offer is Live - Enjoy up to %s on WholesaleX Pro.', 'wholesalex' ),
+				'content_heading'    => '',
+				'content_subheading' => $content_subheading,
 				'discount_content'   => '  55% OFF',
 				'border_color'       => '#6c6cff',
 				'icon'               => WHOLESALEX_URL . 'assets/img/banners/discount.svg',
@@ -525,7 +527,7 @@ class Notice {
 
 		foreach ( $content_notices as $key => $notice ) {
 			$notice_key = isset( $notice['key'] ) ? $notice['key'] : $this->notice_version;
-			if ( isset( $_GET['disable_wsx_notice'] ) && $notice_key === sanitize_text_field( wp_unslash( $_GET['disable_wsx_notice'] ) ) ) {
+			if ( isset( $_GET['disable_wsx_notice'] ) && $notice_key === sanitize_text_field( wp_unslash( $_GET['disable_wsx_notice'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This read-only parameter only suppresses notice rendering for the current response.
 				continue;
 			} else {
 				$border_color = $notice['border_color'];

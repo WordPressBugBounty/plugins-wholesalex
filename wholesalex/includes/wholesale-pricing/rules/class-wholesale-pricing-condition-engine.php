@@ -771,7 +771,7 @@ class Wholesale_Pricing_Condition_Engine
 			return array();
 		}
 
-		$languages = apply_filters('wpml_active_languages', null, array('skip_missing' => 0));
+		$languages = apply_filters('wpml_active_languages', null, array('skip_missing' => 0)); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WPML.
 
 		if (empty($languages) || !is_array($languages)) {
 			return array();
@@ -780,7 +780,7 @@ class Wholesale_Pricing_Condition_Engine
 		$translations = array();
 
 		foreach (array_keys($languages) as $language_code) {
-			$translated_id = apply_filters('wpml_object_id', $object_id, $object_type, false, $language_code);
+			$translated_id = apply_filters('wpml_object_id', $object_id, $object_type, false, $language_code); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WPML.
 
 			if ($translated_id) {
 				$translations[] = absint($translated_id);

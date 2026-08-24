@@ -53,6 +53,51 @@ class Recaptcha {
 		add_action( 'wholesalex_registration_form', array( $this, 'add_recaptcha_v2_to_registration_form' ) );
 	}
 
+	/**
+	 * Build the reCAPTCHA form integration script without heredoc syntax.
+	 *
+	 * Dynamic values are JSON encoded before being embedded in JavaScript.
+	 *
+	 * @param string      $form_selector Form selector.
+	 * @param string      $button_name   Submit button name.
+	 * @param string      $button_value  Submit button value.
+	 * @param string|null $site_key      Optional site key. Uses the existing JavaScript variable when null.
+	 * @return string
+	 */
+	private function get_recaptcha_form_script( $form_selector, $button_name, $button_value, $site_key = null ) {
+		$lines = array(
+			'jQuery(document).ready(function($) {',
+			'    $(' . wp_json_encode( $form_selector ) . ').each(function() {',
+			'        $(this).find(".woocommerce-form__input").last().after(',
+			'            "<div class=\"g-recaptcha\" data-sitekey=\"" + recaptchaSiteKey + "\"></div>"',
+			'        );',
+			'    });',
+			'',
+			'    $(' . wp_json_encode( $form_selector ) . ').submit(function(e) {',
+			'        if ($(this).find(".g-recaptcha-response").val() === "") {',
+			'            e.preventDefault();',
+			'            alert("Please complete the reCAPTCHA checkbox.");',
+			'            return false;',
+			'        }',
+			'        $("<input>")',
+			'            .attr({',
+			'                name: ' . wp_json_encode( $button_name ) . ',',
+			'                id: ' . wp_json_encode( $button_name ) . ',',
+			'                type: "hidden",',
+			'                value: ' . wp_json_encode( $button_value ),
+			'            })',
+			'            .appendTo(this);',
+			'    });',
+			'});',
+		);
+
+		if ( null !== $site_key ) {
+			array_splice( $lines, 1, 0, '    var recaptchaSiteKey = ' . wp_json_encode( $site_key ) . ';' );
+		}
+
+		return implode( "\n", $lines );
+	}
+
 	public function add_recaptcha_wholesalex_login() {
 		$recaptcha_version = wholesalex()->get_setting( 'recaptcha_version' );
 		$site_key          = wholesalex()->get_setting( '_settings_google_recaptcha_v2_site_key' ); // Use v2 site key
@@ -62,40 +107,19 @@ class Recaptcha {
 				'google-recaptcha',
 				'https://www.google.com/recaptcha/api.js',
 				array(),
-				null,
+				WHOLESALEX_VER,
 				true
 			);
 		}
 
 		if ( 'recaptcha_v2' === $recaptcha_version && ! empty( $site_key ) ) {
-				wp_enqueue_script( 'google-recaptcha', 'https://www.google.com/recaptcha/api.js', array(), null, true );
-				$inline_script = <<<EOT
-                jQuery(document).ready(function($) {
-                    // Add reCAPTCHA to WooCommerce registration form
-                    $('form.woocommerce-form.woocommerce-form-register.register').each(function() {
-                        $(this).find('.woocommerce-form__input').last().after(
-                            '<div class="g-recaptcha" data-sitekey="' + '$site_key' + '"></div>'
-                        );
-                    });
-
-                    // Prevent form submission if reCAPTCHA is not completed
-                    $('form.woocommerce-form.woocommerce-form-register.register').submit(function(e) {
-                        if ($(this).find('.g-recaptcha-response').val() === '') {
-                            e.preventDefault();
-                            alert('Please complete the reCAPTCHA checkbox.');
-                            return false;
-                        }
-                        $('<input>')
-                            .attr({
-                                name: 'register',
-                                id: 'register',
-                                type: 'hidden',
-                                value: 'Register'
-                            })
-                            .appendTo(this);
-                    });
-                });
-EOT;
+				wp_enqueue_script( 'google-recaptcha', 'https://www.google.com/recaptcha/api.js', array(), WHOLESALEX_VER, true );
+				$inline_script = $this->get_recaptcha_form_script(
+					'form.woocommerce-form.woocommerce-form-register.register',
+					'register',
+					'Register',
+					$site_key
+				);
 
 				// Add inline script to the enqueued reCAPTCHA script.
 				wp_add_inline_script( 'google-recaptcha', $inline_script );
@@ -113,7 +137,7 @@ EOT;
 				'google-recaptcha',
 				'https://www.google.com/recaptcha/api.js',
 				array(),
-				null,
+				WHOLESALEX_VER,
 				true
 			);
 		}
@@ -149,34 +173,13 @@ EOT;
 			$site_key          = wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' );
 
 			if ( 'recaptcha_v2' === $recaptcha_version && ! empty( $site_key ) ) {
-				wp_enqueue_script( 'google-recaptcha', 'https://www.google.com/recaptcha/api.js', array(), null, true );
-				$inline_script = <<<EOT
-                jQuery(document).ready(function($) {
-                    // Add reCAPTCHA to WooCommerce registration form
-                    $('form.woocommerce-form.woocommerce-form-register.register').each(function() {
-                        $(this).find('.woocommerce-form__input').last().after(
-                            '<div class="g-recaptcha" data-sitekey="' + '$site_key' + '"></div>'
-                        );
-                    });
-
-                    // Prevent form submission if reCAPTCHA is not completed
-                    $('form.woocommerce-form.woocommerce-form-register.register').submit(function(e) {
-                        if ($(this).find('.g-recaptcha-response').val() === '') {
-                            e.preventDefault();
-                            alert('Please complete the reCAPTCHA checkbox.');
-                            return false;
-                        }
-                        $('<input>')
-                            .attr({
-                                name: 'register',
-                                id: 'register',
-                                type: 'hidden',
-                                value: 'Register'
-                            })
-                            .appendTo(this);
-                    });
-                });
-EOT;
+				wp_enqueue_script( 'google-recaptcha', 'https://www.google.com/recaptcha/api.js', array(), WHOLESALEX_VER, true );
+				$inline_script = $this->get_recaptcha_form_script(
+					'form.woocommerce-form.woocommerce-form-register.register',
+					'register',
+					'Register',
+					$site_key
+				);
 
 				// Add inline script to the enqueued reCAPTCHA script.
 				wp_add_inline_script( 'google-recaptcha', $inline_script );
@@ -302,7 +305,7 @@ EOT;
 	 * @since 1.0.0
 	 */
 	public function add_recaptcha_on_registration_form() {
-		if ( isset( $_POST['token'], $_POST['wholesalex-registration-nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['wholesalex-registration-nonce'] ), 'wholesalex-registration' ) ) {
+		if ( isset( $_POST['token'], $_POST['wholesalex-registration-nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['wholesalex-registration-nonce'] ) ), 'wholesalex-registration' ) ) {
 			$data              = array(
 				'error_messages' => array(),
 			);
@@ -382,7 +385,7 @@ EOT;
 		$recaptcha_version = wholesalex()->get_setting( 'recaptcha_version' );
 
 		if ( 'recaptcha_v3' === $recaptcha_version ) {
-			if ( isset( $_POST['token'], $_POST['wholesalex-login-nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['wholesalex-login-nonce'] ), 'wholesalex-login' ) ) {
+			if ( isset( $_POST['token'], $_POST['wholesalex-login-nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['wholesalex-login-nonce'] ) ), 'wholesalex-login' ) ) {
 				$data = array(
 					'error_messages' => array(),
 				);
@@ -401,7 +404,7 @@ EOT;
 					}
 				}
 			}
-		} elseif ( isset( $_POST['g-recaptcha-response'], $_POST['wholesalex-login-nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['wholesalex-login-nonce'] ), 'wholesalex-login' ) ) {
+		} elseif ( isset( $_POST['g-recaptcha-response'], $_POST['wholesalex-login-nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['wholesalex-login-nonce'] ) ), 'wholesalex-login' ) ) {
 			$data = array(
 				'error_messages' => array(),
 			);
@@ -426,7 +429,7 @@ EOT;
 					wp_send_json_success( $data );
 				}
 
-				$current_url = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+				$current_url = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 
 				$is_wp_login     = strpos( $current_url, 'wp-login.php' ) !== false;
 				$is_my_account   = strpos( $current_url, 'my-account' ) !== false || strpos( $current_url, 'myaccount' ) !== false;
@@ -517,32 +520,11 @@ EOT;
 				'in_footer' => true,
 			);
 
-			$inline_script = <<<EOT
-				jQuery(document).ready(function($) {
-					$('form.woocommerce-form.woocommerce-form-login.login').each(function() {
-						$(this).find('.woocommerce-form__input').last().after(
-							'<div class="g-recaptcha" data-sitekey="' + recaptchaSiteKey + '"></div>'
-						);
-					});
-
-					// Prevent form submission if reCAPTCHA is not completed
-					$('form.woocommerce-form.woocommerce-form-login.login').submit(function(e) {
-						if ($(this).find('.g-recaptcha-response').val() === '') {
-							e.preventDefault();
-							alert('Please complete the reCAPTCHA checkbox.');
-							return false;
-						}
-						$('<input>')
-							.attr({
-								name: 'login',
-								id: 'login',
-								type: 'hidden',
-								value: 'Login'
-							})
-							.appendTo(this);
-					});
-				});
-			EOT;
+			$inline_script = $this->get_recaptcha_form_script(
+				'form.woocommerce-form.woocommerce-form-login.login',
+				'login',
+				'Login'
+			);
 
 			wp_add_inline_script( 'wholesalex-google-recaptcha-v2', $inline_script );
 		}
@@ -561,7 +543,7 @@ EOT;
 		$recaptcha_version = wholesalex()->get_setting( 'recaptcha_version' );
 		$__site_key        = wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' );
 		$__secret_key      = wholesalex()->get_setting( '_settings_google_recaptcha_v3_secret_key' );
-		$__token         = isset( $_POST['token'] ) ? sanitize_text_field( $_POST['token'] ) : ''; //phpcs:ignore
+		$__token           = isset( $_POST['token'] ) ? sanitize_text_field( wp_unslash( $_POST['token'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Authentication callbacks do not receive a plugin-specific nonce.
 		$__minimum_score   = apply_filters( 'wholesalex_recaptcha_minimum_score_allow', 0.5 );
 
 		if ( 'recaptcha_v3' === $recaptcha_version ) {
@@ -577,7 +559,7 @@ EOT;
 				}
 			}
 		} else {
-			$token = isset( $_POST['g-recaptcha-response'] ) ? sanitize_text_field( $_POST['g-recaptcha-response'] ) : '';
+			$token = isset( $_POST['g-recaptcha-response'] ) ? sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Authentication callbacks do not receive a plugin-specific nonce.
 			if ( $__site_key && $__secret_key ) {
 				$response = wp_remote_post(
 					'https://www.google.com/recaptcha/api/siteverify',
@@ -596,20 +578,15 @@ EOT;
 					);
 				}
 
-				$current_url = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+				$current_url = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 
 				$is_wp_login     = strpos( $current_url, 'wp-login.php' ) !== false;
 				$is_my_account   = strpos( $current_url, 'my-account' ) !== false || strpos( $current_url, 'myaccount' ) !== false;
 				$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
 
 				if ( $is_wp_login || $is_my_account ) {
-					if ( isset( $_POST['log'] ) ) {
-						$username = sanitize_user( wp_unslash( $_POST['log'] ) );
-						$user     = get_user_by( 'login', $username );
-
-						if ( $user instanceof \WP_User && in_array( 'administrator', (array) $user->roles, true ) ) {
-							return $user;
-						}
+					if ( $user instanceof \WP_User && in_array( 'administrator', (array) $user->roles, true ) ) {
+						return $user;
 					}
 					$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
 

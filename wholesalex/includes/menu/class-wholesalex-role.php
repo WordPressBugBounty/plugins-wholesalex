@@ -571,16 +571,17 @@ class WHOLESALEX_Role {
 							'type'  => 'role_setting',
 							'attr'  => array(
 								'user_status'          => array(
-									'type'    => 'radio',
-									'label'   => __( 'Registration Approval Method', 'wholesalex' ),
-									'options' => array(
+									'type'     => 'radio',
+									'label'    => __( 'Registration Approval Method', 'wholesalex' ),
+									'options'  => array(
 										'global_setting' => __( 'Use Global Setting', 'wholesalex' ),
 										'email_confirmation_require' => __( 'Email Confirmation Required', 'wholesalex' ),
 										'auto_approve'   => __( 'Automatically Approve Account', 'wholesalex' ),
 										'admin_approve'  => __( 'Admin Approval Required', 'wholesalex' ),
 									),
-									'default' => 'global_setting',
-									'help'    => __( 'The global registration approval method is configured in the Registration Form settings. Override it here only for this role.', 'wholesalex' ),
+									'default'  => 'global_setting',
+									'help'     => __( 'The global registration approval method is configured in the Registration Form settings. Override it here only for this role.', 'wholesalex' ),
+									'excludes' => apply_filters( 'wholesalex_exclude_regi_form_field', array( 'wholesalex_guest' ) ),
 								),
 								'after_login_redirect' => array(
 									'type'     => 'url',
@@ -959,7 +960,7 @@ class WHOLESALEX_Role {
 		$users        = get_users(
 			array(
 				'fields'     => array( 'ID', 'user_login' ),
-				'meta_query' => array(
+				'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- WholesaleX roles, status, and account type are stored as user metadata.
 					'relation' => 'AND',
 					array(
 						'key'     => '__wholesalex_role',

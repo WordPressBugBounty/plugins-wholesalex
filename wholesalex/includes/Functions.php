@@ -2458,7 +2458,26 @@ class Functions {
 	 * @return void
 	 */
 	public function wsx_migration_install_callback() {
-		if ( ! file_exists( WP_PLUGIN_DIR . '/wholesalex-migration-tool/wholesalex-migration-tool.php' ) ) {
+		check_ajax_referer( 'wholesalex-migration-tool-install', 'nonce' );
+
+		$plugin_file  = 'wholesalex-migration-tool/wholesalex-migration-tool.php';
+		$is_installed = file_exists( WP_PLUGIN_DIR . '/' . $plugin_file );
+
+		if ( ! $is_installed && ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) ) {
+			wp_send_json_error(
+				array( 'message' => __( 'You are not allowed to install and activate plugins.', 'wholesalex' ) ),
+				403
+			);
+		}
+
+		if ( $is_installed && ! current_user_can( 'activate_plugins' ) ) {
+			wp_send_json_error(
+				array( 'message' => __( 'You are not allowed to activate plugins.', 'wholesalex' ) ),
+				403
+			);
+		}
+
+		if ( ! $is_installed ) {
 			include ABSPATH . 'wp-admin/includes/plugin-install.php';
 			include ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
@@ -2495,11 +2514,11 @@ class Functions {
 			$url      = 'update.php?action=install-plugin&plugin=' . rawurlencode( $plugin );
 			$upgrader = new \Plugin_Upgrader( new \WP_Ajax_Upgrader_Skin( compact( 'title', 'url', 'nonce', 'plugin', 'api' ) ) );
 			$upgrader->install( $api->download_link );
-			activate_plugin( '/wholesalex-migration-tool/wholesalex-migration-tool.php' );
+			activate_plugin( $plugin_file );
 			wp_safe_redirect( admin_url( 'admin.php?page=wholesalex-migration' ) );
 			exit;
-		} elseif ( file_exists( WP_PLUGIN_DIR . '/wholesalex-migration-tool/wholesalex-migration-tool.php' ) && ! is_plugin_active( 'wholesalex-migration-tool/wholesalex-migration-tool.php' ) ) {
-			activate_plugin( '/wholesalex-migration-tool/wholesalex-migration-tool.php' );
+		} elseif ( ! is_plugin_active( $plugin_file ) ) {
+			activate_plugin( $plugin_file );
 			wp_safe_redirect( admin_url( 'admin.php?page=wholesalex' ) );
 			exit;
 		}

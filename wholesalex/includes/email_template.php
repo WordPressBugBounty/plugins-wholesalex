@@ -2,6 +2,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- This included email template intentionally uses local presentation variables.
+
 // For Backward Compatibility.
 // Load colors.
 $bg        = get_option( 'woocommerce_email_background_color' );
@@ -316,7 +318,7 @@ $text_lighter_40 = wc_hex_lighter( $text, 40 );
 															echo wp_kses_post(
 																wpautop(
 																	wptexturize(
-																		apply_filters( 'wholealex_email_footer_text', get_option( 'woocommerce_email_footer_text' ) )
+													apply_filters( 'wholealex_email_footer_text', get_option( 'woocommerce_email_footer_text' ) ) // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Retain the existing public hook for backward compatibility.
 																	)
 																)
 															);

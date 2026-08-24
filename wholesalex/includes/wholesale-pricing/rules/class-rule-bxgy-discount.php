@@ -268,8 +268,8 @@ class Wholesale_Pricing_Bxgy_Discount {
 		$sql   .= ' ORDER BY p.post_title ASC LIMIT %d';
 		$args[] = $query_limit;
 
-		$results = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare( $sql, ...$args )
+		$results = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Query uses trusted WordPress table names, static clauses, and prepared placeholders for every value.
+			$wpdb->prepare( $sql, ...$args ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query clauses are static and all values use placeholders.
 		);
 
 		foreach ( (array) $results as $id ) {

@@ -830,7 +830,7 @@ class WHOLESALEX_Registration {
 				<?php
 				break;
 			case 'select':
-				$selected_value = isset( $_POST[ $field['name'] ] ) ? sanitize_text_field( wp_unslash( $_POST[ $field['name'] ] ) ) : '';
+				$selected_value = isset( $_POST[ $field['name'] ] ) && is_string( $_POST[ $field['name'] ] ) ? sanitize_text_field( wp_unslash( $_POST[ $field['name'] ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only form repopulation does not process the submitted value.
 				?>
 					<p data-wsx-exclude="<?php echo esc_attr( $depends ); ?>" class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide wholesalex-custom-field wsx-field" style="<?php echo esc_attr( $depends ? 'display: none;' : '' ); ?>">
 						<?php
@@ -1129,6 +1129,45 @@ class WHOLESALEX_Registration {
 	}
 
 	/**
+	 * Normalize a single registration upload before validation or processing.
+	 *
+	 * WordPress validates the actual uploaded file again in media_handle_upload().
+	 *
+	 * @param string $field_name Registration field name.
+	 * @return array
+	 */
+	private function get_registration_uploaded_file( $field_name ) {
+		if ( ! isset( $_FILES[ $field_name ] ) || ! is_array( $_FILES[ $field_name ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The calling registration handlers verify their nonce; the upload is normalized below.
+			return array();
+		}
+
+		$file = $_FILES[ $field_name ]; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Individual upload properties are validated and sanitized below.
+		if (
+			! isset( $file['name'], $file['tmp_name'], $file['error'], $file['size'] ) ||
+			! is_string( $file['name'] ) ||
+			! is_string( $file['tmp_name'] ) ||
+			! is_numeric( $file['error'] ) ||
+			! is_numeric( $file['size'] )
+		) {
+			return array();
+		}
+
+		$file = array(
+			'name'     => sanitize_file_name( $file['name'] ),
+			'type'     => isset( $file['type'] ) && is_string( $file['type'] ) ? sanitize_mime_type( $file['type'] ) : '',
+			'tmp_name' => sanitize_text_field( $file['tmp_name'] ),
+			'error'    => absint( $file['error'] ),
+			'size'     => absint( $file['size'] ),
+		);
+
+		if ( UPLOAD_ERR_OK !== $file['error'] || '' === $file['name'] || '' === $file['tmp_name'] || 0 === $file['size'] ) {
+			return array();
+		}
+
+		return $file;
+	}
+
+	/**
 	 * Password and Confirm Password Validation
 	 *
 	 * @param WP_Error $validation_error Validation Error.
@@ -1155,7 +1194,8 @@ class WHOLESALEX_Registration {
 		foreach ( $this->woo_custom_fields as $field ) {
 
 			if ( 'file' === $field['type'] ) {
-				$is_valid_file = isset( $_FILES[ $field['name'] ] ) && ! empty( $_FILES[ $field['name'] ] ) && $_FILES[ $field['name'] ]['name'] && ( $_FILES[ $field['name'] ]['size'] > 0 );
+				$uploaded_file = $this->get_registration_uploaded_file( $field['name'] );
+				$is_valid_file = ! empty( $uploaded_file );
 				if ( $is_valid_file ) {
 					// Allowed file types.
 					if ( isset( $field['allowed_file_types'] ) && ! empty( $field['allowed_file_types'] ) ) {
@@ -1179,25 +1219,25 @@ class WHOLESALEX_Registration {
 
 					// Allowed file size -> 5MB.
 					$allowed_file_size_in_mb = $allowed_file_size / 1000000;
-					$file_extension          = strtolower( pathinfo( $_FILES[ $field['name'] ]['name'], PATHINFO_EXTENSION ) );
+					$file_extension          = strtolower( pathinfo( $uploaded_file['name'], PATHINFO_EXTENSION ) );
 
 					if ( ! in_array( $file_extension, $allowed_file_types, true ) ) {
 						// translators: %s Field Name.
 						// translators: %s Allowed File Types.
 						return new WP_Error( '201', sprintf( __( 'File Type Does not support for %1$s Field! Supported File Types is %2$s.', 'wholesalex' ), $field['label'], implode( ',', $allowed_file_types ) ) );
 					}
-					if ( $_FILES[ $field['name'] ]['size'] > $allowed_file_size ) {
+					if ( $uploaded_file['size'] > $allowed_file_size ) {
 						/* translators: 1: Field Label, 2: Allowed Size */
 						return new WP_Error( '201', sprintf( __( 'File is too large! Max Upload Size For %1$s field is %2$s.', 'wholesalex' ), $field['label'], $allowed_file_size_in_mb . 'MB' ) );
 					}
 
 					if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
-						$files[ 'file_' . $field['name'] ]  = $_FILES[ $field['name'] ];
-						$_FILES[ 'file_' . $field['name'] ] = $_FILES[ $field['name'] ];
+						$files[ 'file_' . $field['name'] ]  = $uploaded_file;
+						$_FILES[ 'file_' . $field['name'] ] = $uploaded_file;
 
 					} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
-						$files[ 'wholesalex_cf_' . $field['name'] ]  = $_FILES[ $field['name'] ];
-						$_FILES[ 'wholesalex_cf_' . $field['name'] ] = $_FILES[ $field['name'] ];
+						$files[ 'wholesalex_cf_' . $field['name'] ]  = $uploaded_file;
+						$_FILES[ 'wholesalex_cf_' . $field['name'] ] = $uploaded_file;
 					}
 				}
 				if ( ! $is_rolewise && ( isset( $field['required'] ) && $field['required'] && ! $is_valid_file ) ) {
@@ -1233,8 +1273,7 @@ class WHOLESALEX_Registration {
 	 * @return array
 	 */
 	public function add_custom_woo_field_to_user_meta( $user_id ) {
-		// Nonce is already checked woocommerce registration form.
-		// $nonce_value = isset( $_POST['_wpnonce'] ) ? sanitize_key(wp_unslash( $_POST['_wpnonce'] )) : '';.
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- WooCommerce verifies its registration nonce before firing this callback.
 		if ( empty( $this->woo_custom_fields ) ) {
 			return;
 		}
@@ -1242,7 +1281,8 @@ class WHOLESALEX_Registration {
 		$allowed_registration_roles = $this->get_woo_registration_allowed_roles();
 		foreach ( $this->woo_custom_fields as $field ) {
 			if ( isset( $_POST[ $field['name'] ] ) && ! empty( $_POST[ $field['name'] ] ) ) {
-				$value = '';
+				$value        = '';
+				$posted_value = wp_unslash( $_POST[ $field['name'] ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized according to the configured field type in the switch below.
 				switch ( $field['type'] ) {
 					case 'text':
 					case 'password':
@@ -1250,19 +1290,19 @@ class WHOLESALEX_Registration {
 					case 'date':
 					case 'radio':
 					case 'number':
-						$value = sanitize_text_field( $_POST[ $field['name'] ] );
+						$value = is_string( $posted_value ) ? sanitize_text_field( $posted_value ) : '';
 						break;
 					case 'textarea':
-						$value = sanitize_textarea_field( $_POST[ $field['name'] ] );
+						$value = is_string( $posted_value ) ? sanitize_textarea_field( $posted_value ) : '';
 						break;
 					case 'url':
-						$value = sanitize_url( $_POST[ $field['name'] ] );
+						$value = is_string( $posted_value ) ? sanitize_url( $posted_value ) : '';
 						break;
 					case 'checkbox':
-						$value = wholesalex()->sanitize( $_POST[ $field['name'] ] );
+						$value = wholesalex()->sanitize( $posted_value );
 						break;
 					case 'email':
-						$value = sanitize_email( $_POST[ $field['name'] ] );
+						$value = is_string( $posted_value ) ? sanitize_email( $posted_value ) : '';
 						break;
 					default:
 						break;
@@ -1288,15 +1328,16 @@ class WHOLESALEX_Registration {
 				}
 			}
 
-			if ( isset( $_FILES[ $field['name'] ] ) && ! empty( $_FILES[ $field['name'] ] ) ) {
-				if ( 'file' == $field['type'] ) {
+			$uploaded_file = 'file' === $field['type'] ? $this->get_registration_uploaded_file( $field['name'] ) : array();
+			if ( ! empty( $uploaded_file ) ) {
+				if ( 'file' === $field['type'] ) {
 					if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
-						$files[ 'file_' . $field['name'] ]  = $_FILES[ $field['name'] ];
-						$_FILES[ 'file_' . $field['name'] ] = $_FILES[ $field['name'] ];
+						$files[ 'file_' . $field['name'] ]  = $uploaded_file;
+						$_FILES[ 'file_' . $field['name'] ] = $uploaded_file;
 
 					} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
-						$files[ 'wholesalex_cf_' . $field['name'] ]  = $_FILES[ $field['name'] ];
-						$_FILES[ 'wholesalex_cf_' . $field['name'] ] = $_FILES[ $field['name'] ];
+						$files[ 'wholesalex_cf_' . $field['name'] ]  = $uploaded_file;
+						$_FILES[ 'wholesalex_cf_' . $field['name'] ] = $uploaded_file;
 					}
 				}
 			}
@@ -1345,6 +1386,7 @@ class WHOLESALEX_Registration {
 				add_filter( 'woocommerce_registration_auth_new_customer', '__return_false' );
 			}
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 
@@ -1357,7 +1399,7 @@ class WHOLESALEX_Registration {
 	 */
 	public function process_registration() {
 
-		if ( isset( $_POST['wholesalex-registration-nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['wholesalex-registration-nonce'] ), 'wholesalex-registration' ) ) {
+		if ( isset( $_POST['wholesalex-registration-nonce'] ) && is_string( $_POST['wholesalex-registration-nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['wholesalex-registration-nonce'] ) ), 'wholesalex-registration' ) ) {
 			$data = array(
 				'error_messages' => array(),
 			);
@@ -1462,7 +1504,8 @@ class WHOLESALEX_Registration {
 							}
 						}
 
-						if ( 'file' == $field['type'] && isset( $_FILES[ $field['name'] ] ) && ! empty( $_FILES[ $field['name'] ] ) && $_FILES[ $field['name'] ]['name'] && ( $_FILES[ $field['name'] ]['size'] > 0 ) ) {
+						$uploaded_file = 'file' === $field['type'] ? $this->get_registration_uploaded_file( $field['name'] ) : array();
+						if ( ! empty( $uploaded_file ) ) {
 							// Allowed file types.
 							if ( isset( $field['allowed_file_types'] ) && ! empty( $field['allowed_file_types'] ) ) {
 
@@ -1486,7 +1529,7 @@ class WHOLESALEX_Registration {
 
 							// Allowed file size -> 5MB.
 							$allowed_file_size_in_mb = $allowed_file_size / 1000000;
-							$file_extension          = strtolower( pathinfo( $_FILES[ $field['name'] ]['name'], PATHINFO_EXTENSION ) );
+							$file_extension          = strtolower( pathinfo( $uploaded_file['name'], PATHINFO_EXTENSION ) );
 
 							if ( ! in_array( $file_extension, $allowed_file_types, true ) ) {
 								// translators: %s Field Name.
@@ -1495,19 +1538,19 @@ class WHOLESALEX_Registration {
 								$data['error_messages'][ $field['name'] ] = sprintf( __( 'File Type Does not support for %1$s Field! Supported File Types is %2$s.', 'wholesalex' ), $field['label'], implode( ',', $allowed_file_types ) );
 								throw new \Exception();
 							}
-							if ( $_FILES[ $field['name'] ]['size'] > $allowed_file_size ) {
+							if ( $uploaded_file['size'] > $allowed_file_size ) {
 								/* translators: 1: Field Label, 2: Allowed Size */
 								$data['error_messages'][ $field['name'] ] = sprintf( __( 'File is too large! Max Upload Size For %1$s field is %2$s.', 'wholesalex' ), $field['label'], $allowed_file_size_in_mb . 'MB' );
 								throw new \Exception();
 							}
 
 							if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
-								$files[ 'file_' . $field['name'] ]  = $_FILES[ $field['name'] ];
-								$_FILES[ 'file_' . $field['name'] ] = $_FILES[ $field['name'] ];
+								$files[ 'file_' . $field['name'] ]  = $uploaded_file;
+								$_FILES[ 'file_' . $field['name'] ] = $uploaded_file;
 
 							} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
-								$files[ 'wholesalex_cf_' . $field['name'] ]  = $_FILES[ $field['name'] ];
-								$_FILES[ 'wholesalex_cf_' . $field['name'] ] = $_FILES[ $field['name'] ];
+								$files[ 'wholesalex_cf_' . $field['name'] ]  = $uploaded_file;
+								$_FILES[ 'wholesalex_cf_' . $field['name'] ] = $uploaded_file;
 							}
 						}
 					}

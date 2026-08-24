@@ -84,10 +84,10 @@ class Xpo {
 		if ( is_object( $row ) ) {
 			$value = $row->option_value;
 		} else {
-			return apply_filters( "wsx_default_option_{$option}", $default_value, $option );
+			return apply_filters( "wsx_default_option_{$option}", $default_value, $option ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Preserve the existing dynamic WSX filter for backward compatibility.
 		}
 
-		return apply_filters( "wsx_option_{$option}", maybe_unserialize( $value ), $option );
+		return apply_filters( "wsx_option_{$option}", maybe_unserialize( $value ), $option ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Preserve the existing dynamic WSX filter for backward compatibility.
 	}
 
 	/**
@@ -123,7 +123,7 @@ class Xpo {
 		* Make sure the option doesn't already exist.
 		*/
 
-		if ( apply_filters( "wsx_default_option_{$option}", false, $option, false ) !== self::get_option_without_cache( $option ) ) {
+		if ( apply_filters( "wsx_default_option_{$option}", false, $option, false ) !== self::get_option_without_cache( $option ) ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Preserve the existing dynamic WSX filter for backward compatibility.
 			return false;
 		}
 
@@ -161,7 +161,7 @@ class Xpo {
 			$value = self::get_option_without_cache( $transient_option );
 		}
 
-		return apply_filters( "wsx_transient_{$transient}", $value, $transient );
+		return apply_filters( "wsx_transient_{$transient}", $value, $transient ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Preserve the existing dynamic WSX filter for backward compatibility.
 	}
 
 	/**
@@ -258,11 +258,11 @@ class Xpo {
 		// Step 1: Get parameters.
 		$base_url      = 'https://getwholesalex.com/pricing/?utm_source=wholesalex-plugins&utm_medium=final-hour&utm_campaign=wholesalex-DB';
 		$utm_key       = $params['utmKey'] ?? null;
-		$affiliate     = $params['affiliate'] ?? apply_filters( 'wsx_affiliate_id', '' );
+		$affiliate     = $params['affiliate'] ?? apply_filters( 'wsx_affiliate_id', '' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Preserve the existing WSX public filter for backward compatibility.
 		$hash          = $params['hash'] ?? 'pricing';
 		$custom_config = $params['config'] ?? null;
 
-		$parsed_url = parse_url( $base_url );
+		$parsed_url = wp_parse_url( $base_url );
 		$scheme     = $parsed_url['scheme'] ?? 'https';
 		$host       = $parsed_url['host'] ?? '';
 		$path       = $parsed_url['path'] ?? '';
