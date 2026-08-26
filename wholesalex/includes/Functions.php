@@ -91,7 +91,14 @@ class Functions {
 		} elseif ( ! empty( $dynamic_rules['exclude_cat'] ) ) {
 			$is_hidden = empty( array_intersect( $cats, $dynamic_rules['exclude_cat'] ) );
 		}
-		return $is_hidden;
+		/**
+		 * Allow other price-visibility sources (for example role restrictions)
+		 * to participate in the shared hidden-price check.
+		 *
+		 * @param bool $is_hidden  Whether the product price is hidden.
+		 * @param int  $product_id Product or variation ID.
+		 */
+		return (bool) apply_filters( 'wholesalex_is_price_hidden', $is_hidden, absint( $product_id ) );
 	}
 
 	/**

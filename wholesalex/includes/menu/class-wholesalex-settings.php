@@ -13,6 +13,13 @@ namespace WHOLESALEX;
  */
 class Settings {
 	/**
+	 * WooCommerce's unfiltered My Account page ID.
+	 *
+	 * @var int
+	 */
+	private $woocommerce_myaccount_page_id = 0;
+
+	/**
 	 * Return settings with runtime migrations applied for the admin UI.
 	 *
 	 * The drag list reads its items from the saved value rather than the field's
@@ -35,12 +42,15 @@ class Settings {
 	 * @since v.1.0.0
 	 */
 	public function __construct() {
+		$this->woocommerce_myaccount_page_id = absint( get_option( 'woocommerce_myaccount_page_id' ) );
+
 		add_action( 'rest_api_init', array( $this, 'save_settings_callback' ) );
 		add_filter( 'option_woocommerce_tax_display_shop', array( $this, 'display_price_shop_including_tax' ) );
 		add_filter( 'option_woocommerce_tax_display_cart', array( $this, 'display_price_cart_including_tax' ) );
 		add_filter( 'woocommerce_get_price_suffix', array( $this, 'price_suffix_handler' ), 10, 2 );
 		add_filter( 'wholesalex_recaptcha_minimum_score_allow', array( $this, 'recaptcha_minimum_score_allow' ) );
 		add_filter( 'option_woocommerce_myaccount_page_id', array( $this, 'separate_my_account_page_for_b2b' ), 10, 1 );
+		add_action( 'template_redirect', array( $this, 'redirect_b2b_user_to_separate_my_account_page' ) );
 		add_filter( 'woocommerce_coupons_enabled', array( $this, 'hide_coupon_fields' ) );
 		add_filter( 'plugins_loaded', array( $this, 'hide_quantities_stock_for_b2c_users' ), 10, 2 );
 		$is_page_visibility_by_group = wholesalex()->get_setting( '_settings_page_visibility_by_group', '' );
@@ -514,12 +524,24 @@ class Settings {
 					),
 					'attrGroupOne' => array(
 						'type'                         => 'registration_one',
+						'_settings_enable_separate_page_b2b' => array(
+							'type'    => 'slider',
+							'label'   => __( 'Use Separate Page for B2B Users', 'wholesalex' ),
+							'help'    => __( 'Enable this option to use a different My Account page for B2B users.', 'wholesalex' ),
+							'default' => 'no',
+						),
 						'_settings_seperate_page_b2b'  => array(
-							'type'    => 'select',
-							'label'   => __( 'Separate My Account Page for B2B Users', 'wholesalex' ),
-							'options' => $__pages_option,
-							'help'    => __( 'Select your desired page if you want to separate the My Account Page for B2B users.', 'wholesalex' ),
-							'default' => $my_account_id,
+							'type'       => 'select',
+							'label'      => __( 'Choose Page', 'wholesalex' ),
+							'options'    => $__pages_option,
+							'help'       => __( 'Select the page B2B users should use as their My Account page.', 'wholesalex' ),
+							'default'    => $my_account_id,
+							'depends_on' => array(
+								array(
+									'key'   => '_settings_enable_separate_page_b2b',
+									'value' => 'yes',
+								),
+							),
 							// 'tooltip' => 'Enabling this option will display the pricing tier table on the single product pages. {Check out the documentation} to learn more about the pricing tiers.',
 							// 'doc' => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/?utm_source=wholesalex-menu&utm_medium=settings-documentation&utm_campaign=wholesalex-DB',
 
@@ -1685,18 +1707,77 @@ class Settings {
 
 
 	/**
+	 * Redirect B2B users from WooCommerce's original My Account page.
+	 *
+	 * WordPress navigation menus can retain the original page permalink even
+	 * when WooCommerce's configured page ID is filtered. This redirect ensures
+	 * those links also honor the selected B2B account page.
+	 *
+	 * @return void
+	 */
+	public function redirect_b2b_user_to_separate_my_account_page() {
+		if (
+			! $this->is_separate_b2b_account_page_enabled() ||
+			! is_user_logged_in() ||
+			! $this->is_current_user_b2b() ||
+			0 >= $this->woocommerce_myaccount_page_id ||
+			! is_page( $this->woocommerce_myaccount_page_id )
+		) {
+			return;
+		}
+
+		$separate_page_id = absint( wholesalex()->get_setting( '_settings_seperate_page_b2b', 0 ) );
+
+		if ( 0 >= $separate_page_id || $this->woocommerce_myaccount_page_id === $separate_page_id ) {
+			return;
+		}
+
+		$redirect_url = get_permalink( $separate_page_id );
+		if ( ! $redirect_url ) {
+			return;
+		}
+
+		wp_safe_redirect( $redirect_url );
+		exit;
+	}
+
+	/**
+	 * Whether the separate B2B My Account page is enabled.
+	 *
+	 * @return bool
+	 */
+	private function is_separate_b2b_account_page_enabled() {
+		return 'yes' === wholesalex()->get_setting( '_settings_enable_separate_page_b2b', 'no' );
+	}
+
+	/**
+	 * Whether the current user has a B2B role.
+	 *
+	 * @return bool
+	 */
+	private function is_current_user_b2b() {
+		$user_role = wholesalex()->get_current_user_role();
+
+		if ( empty( $user_role ) || in_array( $user_role, array( 'wholesalex_guest', 'wholesalex_b2c_users' ), true ) ) {
+			return false;
+		}
+
+		return in_array( $user_role, wholesalex()->get_roles( 'ids' ), true );
+	}
+
+	/**
 	 * Separate My Account Page For B2B Users
 	 *
 	 * @param string $option Option.
 	 * @return string
 	 */
 	public function separate_my_account_page_for_b2b( $option ) {
-		$__user_role = wholesalex()->get_current_user_role();
+		if ( ! $this->is_separate_b2b_account_page_enabled() ) {
+			return $option;
+		}
 
-		$__is_b2b = ( 'wholesalex_guest' !== $__user_role && 'wholesalex_b2c_users' !== $__user_role && ! empty( $__user_role ) ) ? true : false;
-
-		$__my_account_page = wholesalex()->get_setting( '_settings_seperate_page_b2b', $option );
-		if ( $__is_b2b && ! empty( $__my_account_page ) ) {
+		$__my_account_page = absint( wholesalex()->get_setting( '_settings_seperate_page_b2b', 0 ) );
+		if ( $this->is_current_user_b2b() && 0 < $__my_account_page ) {
 			return $__my_account_page;
 		}
 

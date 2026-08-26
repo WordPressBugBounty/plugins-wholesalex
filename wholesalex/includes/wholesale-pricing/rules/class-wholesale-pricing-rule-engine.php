@@ -331,6 +331,7 @@ class Wholesale_Pricing_Rule_Engine {
 	private function register_restriction_hooks(): void {
 		add_filter( 'woocommerce_quantity_input_args', array( $this, 'filter_quantity_input_args' ), 10, 2 );
 		add_filter( 'woocommerce_available_variation', array( $this, 'filter_variation_quantity_limits' ), 10, 3 );
+		add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'render_simple_quantity_restriction_data' ) );
 		add_filter( 'woocommerce_loop_add_to_cart_args', array( $this, 'filter_loop_add_to_cart_args' ), 10, 2 );
 		add_filter( 'woocommerce_add_to_cart_validation', array( $this, 'validate_add_to_cart_quantity' ), 10, 5 );
 		add_filter( 'woocommerce_update_cart_validation', array( $this, 'validate_cart_update_quantity' ), 10, 4 );
@@ -1386,7 +1387,63 @@ class Wholesale_Pricing_Rule_Engine {
 			$variation_data['step'] = $restriction['step'];
 		}
 
+		$variation_data['wholesalex_quantity_restriction'] = $this->get_frontend_quantity_restriction( $variation, $restriction );
+
 		return $variation_data;
+	}
+
+	/**
+	 * Print simple-product restriction data for accessible frontend validation.
+	 *
+	 * WooCommerce's quantity template does not support custom data attributes.
+	 * A hidden element keeps the rule beside the form without changing the
+	 * native min/max attributes used by themes and assistive technology.
+	 *
+	 * @return void
+	 */
+	public function render_simple_quantity_restriction_data(): void {
+		global $product;
+
+		if ( ! $product instanceof \WC_Product || ! $product->is_type( 'simple' ) ) {
+			return;
+		}
+
+		$restriction = $this->get_product_quantity_restriction( $product );
+
+		if ( empty( $restriction ) ) {
+			return;
+		}
+
+		$data = $this->get_frontend_quantity_restriction( $product, $restriction );
+		?>
+		<span
+			class="wholesalex-quantity-restriction-data"
+			hidden
+			data-min="<?php echo esc_attr( $data['min'] ); ?>"
+			data-max="<?php echo esc_attr( $data['max'] ); ?>"
+			data-min-message="<?php echo esc_attr( $data['min_message'] ); ?>"
+			data-max-message="<?php echo esc_attr( $data['max_message'] ); ?>"
+		></span>
+		<?php
+	}
+
+	/**
+	 * Prepare quantity limits and resolved warning messages for product forms.
+	 *
+	 * @param \WC_Product $product     Product object.
+	 * @param array       $restriction Restriction data.
+	 * @return array
+	 */
+	private function get_frontend_quantity_restriction( \WC_Product $product, array $restriction ): array {
+		$min_message = isset( $restriction['message']['min'] ) ? trim( wp_strip_all_tags( $restriction['message']['min'] ) ) : '';
+		$max_message = isset( $restriction['message']['max'] ) ? trim( wp_strip_all_tags( $restriction['message']['max'] ) ) : '';
+
+		return array(
+			'min'         => $restriction['min'],
+			'max'         => $restriction['max'],
+			'min_message' => $restriction['min'] > 0 && '' !== $min_message ? wp_strip_all_tags( $this->get_quantity_notice( $product, $restriction, 'min' ) ) : '',
+			'max_message' => $restriction['max'] > 0 && '' !== $max_message ? wp_strip_all_tags( $this->get_quantity_notice( $product, $restriction, 'max' ) ) : '',
+		);
 	}
 
 	/**

@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 6.8    
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.0.4
+Stable tag: 3.0.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -280,7 +280,15 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 
 == Changelog ==
 
-= 3.0.4 – 24 August 2026 =
+= 3.0.5 – 26 August 2026 =
+* Improvement: Added an opt-in separate My Account page for B2B users with automatic account-page redirects.
+* Improvement: Reorganized Registration Form settings, widened the settings sidebar, and improved panel usability.
+* Fix: Applied role-based hidden-price restrictions consistently through shared product visibility checks.
+* Fix: Displayed custom quantity restriction warnings with a native browser fallback.
+* Fix: Discarded incomplete profile discount tiers while preserving an empty tier row for new entries.
+* Fix: Made filtered User Export All operations respect role, status, and search filters across pagination.
+
+= 3.0.4 – 24 August 2026 = 
 * Improvement: Improved drag-and-drop behavior and preserved field selection when reordering Registration Form Builder fields.
 * Improvement: Improved WordPress Plugin Check, internationalization, and coding standards compliance.
 * Fix: Removed registration approval and subaccount restriction options that do not apply to Guest Users.

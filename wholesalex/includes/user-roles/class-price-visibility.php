@@ -27,6 +27,7 @@ class User_Roles_Price_Visibility {
 	 * Constructor.
 	 */
 	public function __construct() {
+		add_filter( 'wholesalex_is_price_hidden', array( $this, 'filter_hidden_price_status' ), 10, 2 );
 		add_filter( 'woocommerce_get_price_html', array( $this, 'hide_price_html' ), 999, 2 );
 		add_filter( 'woocommerce_is_purchasable', array( $this, 'filter_is_purchasable' ), 20, 2 );
 		add_filter( 'woocommerce_variation_is_purchasable', array( $this, 'filter_is_purchasable' ), 20, 2 );
@@ -38,6 +39,21 @@ class User_Roles_Price_Visibility {
 		add_filter( 'woocommerce_cart_item_price', array( $this, 'hide_cart_item_price' ), 999, 3 );
 		add_filter( 'woocommerce_cart_item_subtotal', array( $this, 'hide_cart_item_price' ), 999, 3 );
 		add_action( 'wp_footer', array( $this, 'prepare_request_quote_modal' ), 1 );
+	}
+
+	/**
+	 * Include role restrictions in WholesaleX's shared hidden-price check.
+	 *
+	 * @param bool $is_hidden Current hidden-price status.
+	 * @param int  $product_id Product or variation ID.
+	 * @return bool
+	 */
+	public function filter_hidden_price_status( $is_hidden, $product_id ) {
+		if ( $is_hidden ) {
+			return true;
+		}
+
+		return $this->is_product_price_hidden( wc_get_product( $product_id ) );
 	}
 
 	/**

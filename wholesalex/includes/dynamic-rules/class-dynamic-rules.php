@@ -1783,7 +1783,9 @@ class Dynamic_Rules {
 		$user_profile_filter_map = array();
 
 		if ( isset( $user_profile_tiers['_profile_discounts']['tiers'] ) && ! empty( $user_profile_tiers['_profile_discounts']['tiers'] ) ) {
-			$user_profile_tiers = $user_profile_tiers['_profile_discounts']['tiers'];
+			$user_profile_tiers = wholesalex()->filter_empty_tier(
+				$user_profile_tiers['_profile_discounts']['tiers']
+			);
 			foreach ( $user_profile_tiers as $upt ) {
 				extract( Dynamic_Rules_Condition_Engine::get_filtered_rules( $upt ) );
 				$user_profile_filter = array(

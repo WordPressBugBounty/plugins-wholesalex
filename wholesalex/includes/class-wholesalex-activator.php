@@ -68,6 +68,7 @@ class Activator {
 			'_settings_redirect_url_registration'         => get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ),
 			'_settings_redirect_url_login'                => get_permalink( get_option( 'woocommerce_shop_page_id' ) ),
 			'_settings_registration_success_message'      => __( 'Thank you for registering. Your account will be reviewed by us & approve manually. Please wait to be approved.', 'wholesalex' ),
+			'_settings_enable_separate_page_b2b'          => 'no',
 			'_settings_seperate_page_b2b'                 => get_option( 'woocommerce_myaccount_page_id' ),
 			'_settings_show_form_for_logged_in'           => 'no',
 			'_settings_message_for_logged_in_user'        => __( 'Sorry You Are Not Allowed To View This Form', 'wholesalex' ),

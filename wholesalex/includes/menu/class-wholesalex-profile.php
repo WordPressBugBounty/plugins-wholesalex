@@ -269,6 +269,11 @@ class WHOLESALEX_Profile {
 
 			$__tiers = wholesalex()->sanitize( json_decode( wp_unslash( $_POST['wholesalex_profile_tiers'] ), true ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			$__tiers = $this->enforce_profile_tier_entitlements( $__tiers );
+			if ( isset( $__tiers['_profile_discounts']['tiers'] ) ) {
+				$__tiers['_profile_discounts']['tiers'] = wholesalex()->filter_empty_tier(
+					$__tiers['_profile_discounts']['tiers']
+				);
+			}
 
 			update_user_meta( $user_id, '__wholesalex_profile_discounts', $__tiers );
 		}
@@ -1120,7 +1125,8 @@ class WHOLESALEX_Profile {
 															'type'        => 'number',
 															'placeholder' => '',
 															'default'     => '',
-															'label' => __( 'Min Quantity', 'wholesalex' ),
+															'label'       => __( 'Min Quantity', 'wholesalex' ),
+															'required'    => true,
 														),
 														'_product_select_with_filter' => array(
 															'type'    => 'filter',

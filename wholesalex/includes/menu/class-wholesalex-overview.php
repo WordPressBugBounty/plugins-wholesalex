@@ -34,6 +34,7 @@ class WHOLESALEX_Overview {
 		add_action( 'admin_menu', array( $this, 'overview_submenu_page_callback' ), 1 );
 		add_action( 'rest_api_init', array( $this, 'overview_callback' ) );
 		add_action( 'admin_menu', array( $this, 'go_pro_menu_page' ), 99999 );
+		add_action( 'admin_head', array( $this, 'admin_upgrade_menu_styles' ) );
 		add_action( 'admin_head', array( $this, 'admin_menu_active_styles' ) );
 
 		add_filter( 'wholesalex_capability_access', array( $this, 'wholesalex_menus_access' ) );
@@ -1441,7 +1442,7 @@ class WHOLESALEX_Overview {
 				$button_text = esc_html__( 'Upgrade to Pro', 'wholesalex' );
 			}
 			$title = sprintf(
-				'<div class="wsx-d-flex wsx-item-center wsx-gap-8 wsx-color-lime "><div class="wsx-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" stroke="currentColor" viewBox="0 0 32 32"><path fill="currentColor" d="m3.488 13.184 6.272 6.112-1.472 8.608L16 23.84l7.712 4.064-1.472-8.608 6.272-6.112-8.64-1.248L16 4.128l-3.872 7.808z"/></svg></div>%s</div>',
+				'<div class="wsx-upgrade-menu-content"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M11.0517 5.74391C11.5303 5.13224 12.4696 5.13224 12.9482 5.74391L13.0439 5.88453L15.3896 9.90504L18.4443 7.12867L18.5341 7.05348C19.478 6.32645 20.8624 7.17996 20.5849 8.38258L18.3945 17.8748C18.22 18.631 17.5465 19.1668 16.7704 19.1668H7.22943C6.45334 19.1668 5.77992 18.631 5.60541 17.8748L3.41498 8.38258C3.13753 7.17996 4.52188 6.32645 5.46576 7.05348L5.55561 7.12867L8.60932 9.90504L10.956 5.88453L11.0517 5.74391ZM9.72455 10.9724C9.33727 11.6363 8.43683 11.7746 7.86811 11.2576L5.01947 8.66773L7.06635 17.5379C7.0838 17.6135 7.15182 17.6668 7.22943 17.6668H16.7704C16.8481 17.6668 16.9161 17.6135 16.9335 17.5379L18.9794 8.66773L16.1318 11.2576C15.5631 11.7746 14.6626 11.6363 14.2753 10.9724L11.9999 7.07203L9.72455 10.9724Z" fill="currentColor"/></svg><span>%s</span></div>',
 				Xpo::is_lc_expired() ? __( 'Renew Now', 'wholesalex' ) : $button_text
 			);
 
@@ -1469,6 +1470,47 @@ class WHOLESALEX_Overview {
 		} else {
 			return;
 		}
+	}
+
+	/**
+	 * Style the Upgrade to Pro item in the WordPress admin menu.
+	 *
+	 * @return void
+	 */
+	public function admin_upgrade_menu_styles() {
+		?>
+		<style>
+			#adminmenu #toplevel_page_wholesalex .wp-submenu a[href*="page=go_wholesalex_pro"] {
+				box-sizing: border-box;
+				margin: 4px 8px;
+				padding: 8px 10px;
+				border-radius: 7px;
+				color: #fff !important;
+				background: var(--color-primary, #6c6cff);
+				transition: background-color 0.15s ease-in-out;
+			}
+
+			#adminmenu #toplevel_page_wholesalex .wp-submenu a[href*="page=go_wholesalex_pro"]:hover,
+			#adminmenu #toplevel_page_wholesalex .wp-submenu a[href*="page=go_wholesalex_pro"]:focus {
+				color: #fff !important;
+				background: var(--color-primary-hover, #4d4dff);
+			}
+
+			#adminmenu #toplevel_page_wholesalex .wp-submenu a[href*="page=go_wholesalex_pro"]::before {
+				display: none;
+			}
+
+			#adminmenu .wsx-upgrade-menu-content {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			#adminmenu .wsx-upgrade-menu-content svg {
+				flex: 0 0 auto;
+			}
+		</style>
+		<?php
 	}
 
 
