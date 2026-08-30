@@ -255,7 +255,7 @@ class WHOLESALEX_Shortcodes {
 	 * @return mixed
 	 */
 	private function get_select_role_field( $is_only_b2b = false ) {
-		$__roles        = wholesalex()->get_roles( 'roles_option' );
+		$__roles        = wholesalex()->get_roles( 'store_mode_roles_option' );
 		$__roles_option = array(
 			array(
 				'name'  => __( 'Select Role', 'wholesalex' ),
@@ -298,7 +298,7 @@ class WHOLESALEX_Shortcodes {
 	 */
 	private function get_registration_role_ids_from_options( $options ) {
 		$role_ids       = array();
-		$existing_roles = wholesalex()->get_roles( 'ids' );
+		$existing_roles = array_column( wholesalex()->get_roles( 'store_mode_roles_option' ), 'value' );
 
 		foreach ( (array) $options as $option ) {
 			if ( empty( $option['value'] ) || 'wholesalex_guest' === $option['value'] ) {

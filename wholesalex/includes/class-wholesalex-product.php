@@ -96,13 +96,16 @@ class WHOLESALEX_Product {
 		foreach ( $wholesalex_roles as $role ) {
 			$base_price_meta_key = $role['value'] . '_base_price';
 			$sale_price_meta_key = $role['value'] . '_sale_price';
+			$tier_price_meta_key = $role['value'] . '_tiers';
 			add_filter( "woocommerce_product_export_product_column_{$base_price_meta_key}", array( $this, 'export_column_value' ), 99999, 3 );
 			add_filter( "woocommerce_product_export_product_column_{$sale_price_meta_key}", array( $this, 'export_column_value' ), 99999, 3 );
+			add_filter( "woocommerce_product_export_product_column_{$tier_price_meta_key}", array( $this, 'export_tier_column_value' ), 99999, 3 );
 		}
 
 		add_filter( 'woocommerce_csv_product_import_mapping_options', array( $this, 'import_column_mapping' ) );
-		add_filter( 'woocommerce_csv_product_import_mapping_default_columns', array( $this, 'import_column_mapping' ) );
-		add_filter( 'woocommerce_product_import_inserted_product_object', array( $this, 'process_import' ), 10, 2 );
+		add_filter( 'woocommerce_csv_product_import_mapping_default_columns', array( $this, 'import_column_mapping_default_columns' ) );
+		add_filter( 'woocommerce_product_import_pre_insert_product_object', array( $this, 'validate_tier_import' ), 10, 2 );
+		add_action( 'woocommerce_product_import_inserted_product_object', array( $this, 'process_import' ), 10, 2 );
 
 		add_action( 'woocommerce_variable_product_bulk_edit_actions', array( $this, 'variable_product_bulk_edit_actions' ) );
 
@@ -1258,19 +1261,231 @@ class WHOLESALEX_Product {
 	 */
 	public function process_import( $product, $data ) {
 
-		$product_id = $product->get_id();
-		$roles      = wholesalex()->get_roles( 'b2b_roles_option' );
+		$product_id    = $product->get_id();
+		$roles         = wholesalex()->get_roles( 'b2b_roles_option' );
+		$tiers_updated = false;
 
 		foreach ( $roles as $role ) {
 			$base_price_column_id = $role['value'] . '_base_price';
 			$sale_price_column_id = $role['value'] . '_sale_price';
+			$tier_price_column_id = $role['value'] . '_tiers';
 			if ( isset( $data[ $base_price_column_id ] ) && ! empty( $data[ $base_price_column_id ] ) ) {
 				update_post_meta( $product_id, $base_price_column_id, $data[ $base_price_column_id ] );
 			}
 			if ( isset( $data[ $sale_price_column_id ] ) && ! empty( $data[ $sale_price_column_id ] ) ) {
 				update_post_meta( $product_id, $sale_price_column_id, $data[ $sale_price_column_id ] );
 			}
+
+			if ( ! isset( $data[ $tier_price_column_id ] ) || '' === trim( (string) $data[ $tier_price_column_id ] ) ) {
+				continue;
+			}
+
+			$tiers = $this->parse_imported_tiers( $data[ $tier_price_column_id ], $role, $product );
+			if ( is_wp_error( $tiers ) ) {
+				// The pre-insert validation hook prevents this path during a normal WC import.
+				continue;
+			}
+
+			wholesalex()->save_single_product_discount(
+				$product_id,
+				array(
+					$role['value'] => array(
+						'tiers' => $tiers,
+					),
+				)
+			);
+			$tiers_updated = true;
 		}
+
+		if ( $tiers_updated ) {
+			wc_delete_product_transients( $product_id );
+		}
+	}
+
+	/**
+	 * Validate tier columns before WooCommerce saves the imported product.
+	 *
+	 * @param \WC_Product $product Product object.
+	 * @param array       $data Parsed import data.
+	 * @return \WC_Product
+	 * @throws \Exception When a tier column is invalid.
+	 */
+	public function validate_tier_import( $product, $data ) {
+		$roles = wholesalex()->get_roles( 'b2b_roles_option' );
+
+		foreach ( $roles as $role ) {
+			$tier_price_column_id = $role['value'] . '_tiers';
+			if ( ! isset( $data[ $tier_price_column_id ] ) || '' === trim( (string) $data[ $tier_price_column_id ] ) ) {
+				continue;
+			}
+
+			$tiers = $this->parse_imported_tiers( $data[ $tier_price_column_id ], $role, $product );
+			if ( is_wp_error( $tiers ) ) {
+				throw new \Exception( $tiers->get_error_message() );
+			}
+		}
+
+		return $product;
+	}
+
+	/**
+	 * Parse and normalize the public CSV tier schema to the existing post-meta schema.
+	 *
+	 * An empty JSON tiers array intentionally clears the role's tiers. A blank CSV
+	 * cell never reaches this method and leaves the existing metadata unchanged.
+	 *
+	 * @param string      $raw_value Raw CSV cell value.
+	 * @param array       $role WholesaleX role definition.
+	 * @param \WC_Product $product Product being imported.
+	 * @return array|\WP_Error
+	 */
+	private function parse_imported_tiers( $raw_value, $role, $product ) {
+		$decoded = json_decode( (string) $raw_value, true );
+		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
+			return new \WP_Error(
+				'wholesalex_invalid_product_tiers_json',
+				sprintf(
+					/* translators: %s: B2B role name. */
+					__( 'WholesaleX tier prices for role "%s" must be valid JSON.', 'wholesalex' ),
+					$role['name']
+				)
+			);
+		}
+
+		if ( array_key_exists( 'version', $decoded ) ) {
+			$is_supported_schema = is_numeric( $decoded['version'] )
+				&& 1 === (int) $decoded['version']
+				&& isset( $decoded['tiers'] )
+				&& is_array( $decoded['tiers'] );
+			if ( ! $is_supported_schema ) {
+				return new \WP_Error(
+					'wholesalex_invalid_product_tiers_schema',
+					sprintf(
+						/* translators: %s: B2B role name. */
+						__( 'WholesaleX tier prices for role "%s" use an unsupported schema.', 'wholesalex' ),
+						$role['name']
+					)
+				);
+			}
+			$decoded = $decoded['tiers'];
+		}
+
+		if ( $decoded !== array_values( $decoded ) ) {
+			return new \WP_Error(
+				'wholesalex_invalid_product_tiers_schema',
+				sprintf(
+					/* translators: %s: B2B role name. */
+					__( 'WholesaleX tier prices for role "%s" must contain a list of tiers.', 'wholesalex' ),
+					$role['name']
+				)
+			);
+		}
+
+		$tier_limit = wholesalex()->is_pro_active() ? PHP_INT_MAX : 3;
+		$tier_limit = absint( apply_filters( 'wholesalex_product_csv_import_tier_limit', $tier_limit, $role, $product ) );
+		if ( $tier_limit && count( $decoded ) > $tier_limit ) {
+			return new \WP_Error(
+				'wholesalex_product_tier_limit_exceeded',
+				sprintf(
+					/* translators: 1: B2B role name, 2: allowed number of tiers. */
+					__( 'WholesaleX tier prices for role "%1$s" exceed the allowed limit of %2$d.', 'wholesalex' ),
+					$role['name'],
+					$tier_limit
+				)
+			);
+		}
+
+		$tiers           = array();
+		$used_quantities = array();
+		$allowed_types   = array( 'amount', 'percentage', 'fixed_price' );
+
+		foreach ( $decoded as $index => $tier ) {
+			if ( ! is_array( $tier ) ) {
+				return $this->get_invalid_imported_tier_error( $role, $index );
+			}
+
+			$discount_type = isset( $tier['discount_type'] )
+				? $tier['discount_type']
+				: ( isset( $tier['_discount_type'] ) ? $tier['_discount_type'] : '' );
+			$amount        = isset( $tier['amount'] ) ? $tier['amount'] : ( isset( $tier['_discount_amount'] ) ? $tier['_discount_amount'] : '' );
+			$min_quantity  = isset( $tier['min_quantity'] )
+				? $tier['min_quantity']
+				: ( isset( $tier['_min_quantity'] ) ? $tier['_min_quantity'] : '' );
+
+			$discount_type = sanitize_key( $discount_type );
+			if ( 'fixed' === $discount_type ) {
+				$discount_type = 'fixed_price';
+			}
+
+			$is_valid_amount      = is_numeric( $amount )
+				&& is_finite( (float) $amount )
+				&& (float) $amount > 0;
+			$is_integer_quantity = is_numeric( $min_quantity )
+				&& is_finite( (float) $min_quantity )
+				&& (float) $min_quantity === floor( (float) $min_quantity )
+				&& (float) $min_quantity <= PHP_INT_MAX;
+			$is_valid_tier        = in_array( $discount_type, $allowed_types, true )
+				&& $is_valid_amount
+				&& $is_integer_quantity
+				&& absint( $min_quantity ) >= 1;
+			if ( ! $is_valid_tier ) {
+				return $this->get_invalid_imported_tier_error( $role, $index );
+			}
+
+			if ( 'percentage' === $discount_type && (float) $amount > 100 ) {
+				return $this->get_invalid_imported_tier_error( $role, $index );
+			}
+
+			$min_quantity = absint( $min_quantity );
+			if ( isset( $used_quantities[ $min_quantity ] ) ) {
+				return new \WP_Error(
+					'wholesalex_duplicate_product_tier_quantity',
+					sprintf(
+						/* translators: 1: minimum quantity, 2: B2B role name. */
+						__( 'Minimum quantity %1$d is duplicated in WholesaleX tier prices for role "%2$s".', 'wholesalex' ),
+						$min_quantity,
+						$role['name']
+					)
+				);
+			}
+
+			$used_quantities[ $min_quantity ] = true;
+			$tiers[] = array(
+				'_id'              => wp_unique_id( 'wsx_tier_' ),
+				'_discount_type'   => $discount_type,
+				'_discount_amount' => wc_format_decimal( $amount ),
+				'_min_quantity'    => $min_quantity,
+				'src'              => 'single_product',
+			);
+		}
+
+		usort(
+			$tiers,
+			function ( $first_tier, $second_tier ) {
+				return $first_tier['_min_quantity'] <=> $second_tier['_min_quantity'];
+			}
+		);
+
+		return $tiers;
+	}
+
+	/**
+	 * Return a consistent validation error for an imported tier row.
+	 *
+	 * @param array $role WholesaleX role definition.
+	 * @param int   $index Zero-based tier index.
+	 * @return \WP_Error
+	 */
+	private function get_invalid_imported_tier_error( $role, $index ) {
+		return new \WP_Error(
+			'wholesalex_invalid_product_tier',
+			sprintf(
+				/* translators: 1: tier row number, 2: B2B role name. */
+				__( 'Tier %1$d for WholesaleX role "%2$s" is invalid. Use a positive minimum quantity and amount, with discount type amount, percentage, or fixed_price.', 'wholesalex' ),
+				absint( $index ) + 1,
+				$role['name']
+			)
+		);
 	}
 
 	/**
@@ -2787,7 +3002,29 @@ class WHOLESALEX_Product {
 		foreach ( $roles as $role ) {
 			$columns[ $role['value'] . '_base_price' ] = $role['name'] . ' Base Price';
 			$columns[ $role['value'] . '_sale_price' ] = $role['name'] . ' Sale Price';
+			$columns[ $role['value'] . '_tiers' ]      = $role['name'] . ' Tier Prices';
 		}
+		return $columns;
+	}
+
+	/**
+	 * Add WholesaleX columns to WooCommerce automatic CSV header mapping.
+	 *
+	 * Unlike the mapping-options filter, this filter expects CSV labels as keys
+	 * and internal field IDs as values.
+	 *
+	 * @param array $columns Default column mappings.
+	 * @return array
+	 */
+	public function import_column_mapping_default_columns( $columns ) {
+		$roles = wholesalex()->get_roles( 'b2b_roles_option' );
+
+		foreach ( $roles as $role ) {
+			$columns[ $role['name'] . ' Base Price' ]  = $role['value'] . '_base_price';
+			$columns[ $role['name'] . ' Sale Price' ]  = $role['value'] . '_sale_price';
+			$columns[ $role['name'] . ' Tier Prices' ] = $role['value'] . '_tiers';
+		}
+
 		return $columns;
 	}
 
@@ -2807,6 +3044,69 @@ class WHOLESALEX_Product {
 	}
 
 	/**
+	 * Export existing WholesaleX tier post meta as a versioned JSON CSV cell.
+	 *
+	 * @param mixed       $value Existing export value.
+	 * @param \WC_Product $product Product object.
+	 * @param string      $column_name Export column/meta key.
+	 * @return string
+	 */
+	public function export_tier_column_value( $value, $product, $column_name ) {
+		$stored_tiers = get_post_meta( $product->get_id(), $column_name, true );
+		if ( ! is_array( $stored_tiers ) || empty( $stored_tiers ) ) {
+			return '';
+		}
+
+		$tiers = array();
+		foreach ( $stored_tiers as $tier ) {
+			if ( ! is_array( $tier ) || empty( $tier['_discount_type'] ) || empty( $tier['_discount_amount'] ) || empty( $tier['_min_quantity'] ) ) {
+				continue;
+			}
+
+			$discount_type = 'fixed' === $tier['_discount_type'] ? 'fixed_price' : $tier['_discount_type'];
+			$discount_type = sanitize_key( $discount_type );
+			$amount        = $tier['_discount_amount'];
+			$min_quantity  = $tier['_min_quantity'];
+			$is_valid_tier = in_array( $discount_type, array( 'amount', 'percentage', 'fixed_price' ), true )
+				&& is_numeric( $amount )
+				&& is_numeric( $min_quantity )
+				&& is_finite( (float) $amount )
+				&& is_finite( (float) $min_quantity )
+				&& (float) $amount > 0
+				&& absint( $min_quantity ) > 0
+				&& (float) $min_quantity === floor( (float) $min_quantity )
+				&& ( 'percentage' !== $discount_type || (float) $amount <= 100 );
+			if ( ! $is_valid_tier ) {
+				continue;
+			}
+
+			$tiers[] = array(
+				'min_quantity'  => absint( $min_quantity ),
+				'discount_type' => $discount_type,
+				'amount'        => wc_format_decimal( $amount ),
+			);
+		}
+
+		if ( empty( $tiers ) ) {
+			return '';
+		}
+
+		usort(
+			$tiers,
+			function ( $first_tier, $second_tier ) {
+				return $first_tier['min_quantity'] <=> $second_tier['min_quantity'];
+			}
+		);
+
+		return wp_json_encode(
+			array(
+				'version' => 1,
+				'tiers'   => $tiers,
+			)
+		);
+	}
+
+	/**
 	 * Add WholesaleX Rolewise Column to WC Exporter
 	 *
 	 * @param array $columns Columns.
@@ -2819,6 +3119,7 @@ class WHOLESALEX_Product {
 		foreach ( $roles as $role ) {
 			$columns[ $role['value'] . '_base_price' ] = $role['name'] . ' Base Price';
 			$columns[ $role['value'] . '_sale_price' ] = $role['name'] . ' Sale Price';
+			$columns[ $role['value'] . '_tiers' ]      = $role['name'] . ' Tier Prices';
 		}
 		return $columns;
 	}

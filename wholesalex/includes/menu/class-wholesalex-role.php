@@ -218,18 +218,6 @@ class WHOLESALEX_Role {
 					$_flag = false;
 				}
 			}
-			// Before saving, record all currently-available WTRS instance IDs as "seen" for
-			// this role. This allows the UI to auto-check newly added WTRS methods while
-			// permanently respecting any methods the admin has explicitly deselected.
-			if ( $_flag && ! ( isset( $post['delete'] ) && $post['delete'] ) ) {
-				$_current_wtrs = self::get_current_wtrs_instance_ids();
-				if ( ! empty( $_current_wtrs ) ) {
-					$_prev_seen                  = isset( $_role['_wtrs_seen_methods'] )
-						? array_values( array_filter( (array) $_role['_wtrs_seen_methods'] ) )
-						: array();
-					$_role['_wtrs_seen_methods'] = array_values( array_unique( array_merge( $_prev_seen, $_current_wtrs ) ) );
-				}
-			}
 			$is_delete = isset( $post['delete'] ) && $post['delete'];
 			if ( $is_delete && ! wholesalex()->is_deletable_role( $_id ) ) {
 				wp_send_json_error(
@@ -257,7 +245,7 @@ class WHOLESALEX_Role {
 			);
 
 		} elseif ( 'get' === $type ) {
-			$__roles = array_values( wholesalex()->get_roles() );
+			$__roles = array_values( wholesalex()->get_roles( 'store_mode_roles' ) );
 			if ( empty( $__roles ) ) {
 				$__roles = array(
 					array(
@@ -291,7 +279,17 @@ class WHOLESALEX_Role {
 	 * @return string[]
 	 */
 	private static function get_current_wtrs_instance_ids(): array {
-		$ids        = array();
+		static $ids = null;
+
+		if ( null !== $ids ) {
+			return $ids;
+		}
+
+		$ids = array();
+		if ( ! defined( 'WTRS_VER' ) ) {
+			return $ids;
+		}
+
 		$data_store = \WC_Data_Store::load( 'shipping-zone' );
 		foreach ( $data_store->get_zones() as $zone_raw ) {
 			$zone = new \WC_Shipping_Zone( $zone_raw );
@@ -311,15 +309,11 @@ class WHOLESALEX_Role {
 	}
 
 	/**
-	 * Auto-check WTRS shipping methods that are new to a role (never seen before).
+	 * Auto-check every active WTRS shipping method for each WholesaleX role.
 	 *
-	 * Logic:
-	 * - "seen" = WTRS instance IDs recorded in _wtrs_seen_methods when the role was
-	 *   last saved. Any seen ID that is absent from _shipping_methods was explicitly
-	 *   deselected by the admin and must NOT be re-checked.
-	 * - IDs not in "seen" are brand-new methods the admin has never had a chance to
-	 *   act on, so they default to checked.
-	 * - Nothing is persisted here; _wtrs_seen_methods is written at save time.
+	 * WowShipping owns the enabled state of its methods. WholesaleX mirrors that
+	 * state at runtime so an active WowShipping rule is selected in User Roles and
+	 * remains available at checkout without requiring a separate role save.
 	 *
 	 * @param array $roles Roles array passed by reference.
 	 * @return void
@@ -332,23 +326,31 @@ class WHOLESALEX_Role {
 		}
 
 		foreach ( $roles as &$role ) {
-			// IDs that were present last time this role was saved — the admin has
-			// already made a deliberate choice (checked or unchecked) about these.
-			$seen = isset( $role['_wtrs_seen_methods'] )
-				? array_values( array_filter( (array) $role['_wtrs_seen_methods'] ) )
+			$existing = isset( $role['_shipping_methods'] )
+				? array_values( array_filter( (array) $role['_shipping_methods'] ) )
 				: array();
 
-			// Only auto-check IDs the admin has never seen for this role.
-			$to_add = array_diff( $wtrs_ids, $seen );
-
-			if ( ! empty( $to_add ) ) {
-				$existing                  = isset( $role['_shipping_methods'] )
-					? array_values( array_filter( (array) $role['_shipping_methods'] ) )
-					: array();
-				$role['_shipping_methods'] = array_values( array_unique( array_merge( $existing, $to_add ) ) );
-			}
+			$role['_shipping_methods'] = array_values(
+				array_unique( array_merge( $existing, $wtrs_ids ) )
+			);
 		}
 		unset( $role );
+	}
+
+	/**
+	 * Apply automatic WTRS selections to one role for the current request.
+	 *
+	 * Keeping this normalization in one place ensures every shipping-rate
+	 * handler uses the same effective role without persisting implicit choices.
+	 *
+	 * @param array $role Role configuration.
+	 * @return array
+	 */
+	public static function get_role_with_wtrs_shipping_methods( array $role ): array {
+		$roles = array( $role );
+		self::inject_wtrs_shipping_methods( $roles );
+
+		return $roles[0];
 	}
 
 	/**
@@ -365,7 +367,7 @@ class WHOLESALEX_Role {
 		 */
 		wp_enqueue_script( 'wholesalex_roles' );
 
-		$__roles = array_values( wholesalex()->get_roles() );
+		$__roles = array_values( wholesalex()->get_roles( 'store_mode_roles' ) );
 		if ( empty( $__roles ) ) {
 			$__roles = array(
 				array(

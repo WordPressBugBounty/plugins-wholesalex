@@ -965,7 +965,7 @@ class WHOLESALEX_Overview {
 	 * @return array
 	 */
 	public static function get_wholesale_pricing_integration_data() {
-		$roles     = array_values( wholesalex()->get_roles() );
+		$roles     = array_values( wholesalex()->get_roles( 'store_mode_roles' ) );
 		$b2b_roles = array_map(
 			static function ( $role ) {
 				return array(
@@ -982,6 +982,7 @@ class WHOLESALEX_Overview {
 			'whx_wholesale_pricing_nonce'          => wp_create_nonce( 'whx-export-wholesale-pricing' ),
 			'whx_roles_fields'                     => \WHOLESALEX\WHOLESALEX_Role::get_role_fields(),
 			'whx_roles_data'                       => $roles,
+			'whx_store_mode'                       => wholesalex()->get_setting( '_settings_status', 'b2b' ),
 			'b2b_roles'                            => $b2b_roles,
 			'product_list'                         => array(),
 			'wsx_wizard_url'                       => WHOLESALEX_URL,
@@ -1165,7 +1166,7 @@ class WHOLESALEX_Overview {
 		// regis end.
 
 		// User Roles.
-		$__roles = array_values( wholesalex()->get_roles() );
+		$__roles = array_values( wholesalex()->get_roles( 'store_mode_roles' ) );
 		if ( empty( $__roles ) ) {
 			$__roles = array(
 				array(
@@ -1260,7 +1261,8 @@ class WHOLESALEX_Overview {
 						'whx_form_builder_is_woo_username' => $is_woo_username,
 						'whx_form_builder_login_form_data' => wp_json_encode( $default_form_data['loginFields'] ),
 						'whx_form_builder_form_data'       => wp_json_encode( $form_data ),
-						'whx_form_builder_roles'           => wholesalex()->get_roles( 'roles_option' ),
+						'whx_form_builder_roles'           => wholesalex()->get_roles( 'store_mode_roles_option' ),
+						'whx_store_mode'                   => wholesalex()->get_setting( '_settings_status', 'b2b' ),
 						'whx_form_builder_whitelabel_enabled' => 'yes' === wholesalex()->get_setting( 'wsx_addon_whitelabel' ) && function_exists( 'wholesalex_whitelabel_init' ),
 						'whx_form_builder_slug'            => wholesalex()->get_setting( 'registration_form_buidler_submenu_slug' ),
 						'whx_form_builder_privacy_policy_text' => wc_get_privacy_policy_text( 'registration' ),

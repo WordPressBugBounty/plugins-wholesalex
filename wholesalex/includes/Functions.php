@@ -121,13 +121,16 @@ class Functions {
 		if ( '' === $id && ( '' === $type || 'all' === $type ) ) {
 			return isset( $__roles ) ? $__roles : array();
 		} else {
-			$roles_option      = array();
-			$mapped_roles      = array();
-			$b2b_roles_option  = array();
-			$b2b_mapped_roles  = array();
-			$b2c_roles_option  = array();
-			$b2c_mapped_roles  = array();
-			$guest_role_option = array(
+			$roles_option           = array();
+			$mapped_roles           = array();
+			$b2b_roles_option       = array();
+			$b2b_mapped_roles       = array();
+			$b2c_roles_option       = array();
+			$b2c_mapped_roles       = array();
+			$store_mode_roles        = array();
+			$store_mode_roles_option = array();
+			$store_mode_mapped_roles = array();
+			$guest_role_option         = array(
 				'value' => 'wholesalex_guest',
 				'name'  => 'Guest Users',
 			);
@@ -136,6 +139,20 @@ class Functions {
 					if ( ! ( isset( $role['id'] ) && isset( $role['_role_title'] ) ) ) {
 						continue;
 					}
+					$is_b2c_role = in_array( $role['id'], array( 'wholesalex_b2c_users', 'wholesalex_guest' ), true );
+					$is_visible  = 'b2b_n_b2c' === $__plugin_status
+						|| ( 'b2b' === $__plugin_status && ! $is_b2c_role )
+						|| ( 'b2c' === $__plugin_status && $is_b2c_role );
+
+					if ( $is_visible && ( 'wholesalex_guest' !== $role['id'] || $__enable_guest ) ) {
+						$store_mode_roles[ $role['id'] ] = $role;
+						$store_mode_roles_option[]       = array(
+							'value' => $role['id'],
+							'name'  => $role['_role_title'],
+						);
+						$store_mode_mapped_roles[ $role['id'] ] = $role['_role_title'];
+					}
+
 					$roles_option[]              = array(
 						'value' => $role['id'],
 						'name'  => $role['_role_title'],
@@ -159,6 +176,12 @@ class Functions {
 			}
 			if ( '' === $id ) {
 				switch ( $type ) {
+					case 'store_mode_roles':
+						return $store_mode_roles;
+					case 'store_mode_roles_option':
+						return $store_mode_roles_option;
+					case 'store_mode_mapped_roles':
+						return $store_mode_mapped_roles;
 					case 'roles_option':
 						return $roles_option;
 					case 'mapped_roles':
@@ -1009,7 +1032,7 @@ class Functions {
 			$__fields                 = array();
 			$__billing_form_data      = array();
 
-			$__roles        = wholesalex()->get_roles( 'roles_option' );
+			$__roles        = wholesalex()->get_roles( 'store_mode_roles_option' );
 			$__roles_option = array();
 			foreach ( $__roles as $id => $role ) {
 				if ( $is_only_b2b && isset( $role['value'] ) && 'wholesalex_b2c_users' === $role['value'] ) {

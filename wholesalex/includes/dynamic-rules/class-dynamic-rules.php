@@ -1847,6 +1847,9 @@ class Dynamic_Rules {
 			$profile_shipping_data['methods']     = isset( $profile_settings['_wholesalex_profile_shipping_zone_methods'] ) ? $profile_settings['_wholesalex_profile_shipping_zone_methods'] : array();
 		}
 		$__role_content     = wholesalex()->get_roles( 'by_id', $__role );
+		if ( is_array( $__role_content ) ) {
+			$__role_content = WHOLESALEX_Role::get_role_with_wtrs_shipping_methods( $__role_content );
+		}
 		$__shipping_methods = array();
 		if ( isset( $__role_content['_shipping_methods'] ) && ! empty( $__role_content['_shipping_methods'] ) ) {
 			$__shipping_methods = $__role_content['_shipping_methods'];

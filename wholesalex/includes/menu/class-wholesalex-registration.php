@@ -197,7 +197,7 @@ class WHOLESALEX_Registration {
 				'is_woo_username'            => $is_woo_username,
 				'login_form_data'            => wp_json_encode( $default_form_data['loginFields'] ),
 				'form_data'                  => wp_json_encode( $form_regi_data ),
-				'roles'                      => wholesalex()->get_roles( 'roles_option' ),
+				'roles'                      => wholesalex()->get_roles( 'store_mode_roles_option' ),
 				'whitelabel_enabled'         => 'yes' === wholesalex()->get_setting( 'wsx_addon_whitelabel' ) && function_exists( 'wholesalex_whitelabel_init' ),
 				'slug'                       => wholesalex()->get_setting( 'registration_form_buidler_submenu_slug' ),
 				'privacy_policy_text'        => wc_get_privacy_policy_text( 'registration' ),
@@ -321,7 +321,7 @@ class WHOLESALEX_Registration {
 				wp_send_json_error();
 			}
 		} elseif ( 'get' === $type ) {
-			$__roles_options = wholesalex()->get_roles( 'roles_option' );
+			$__roles_options = wholesalex()->get_roles( 'store_mode_roles_option' );
 
 			wp_send_json_success(
 				array(
@@ -685,11 +685,17 @@ class WHOLESALEX_Registration {
 	 * @return array
 	 */
 	private function normalize_woo_registration_role_options( $options ) {
-		$normalized = array();
-		$seen       = array();
+		$normalized       = array();
+		$seen             = array();
+		$store_mode_roles = array_column( wholesalex()->get_roles( 'store_mode_roles_option' ), 'value' );
 
 		foreach ( (array) $options as $option ) {
-			if ( ! isset( $option['value'] ) || '' === $option['value'] || 'wholesalex_guest' === $option['value'] ) {
+			if (
+				! isset( $option['value'] )
+				|| '' === $option['value']
+				|| 'wholesalex_guest' === $option['value']
+				|| ! in_array( $option['value'], $store_mode_roles, true )
+			) {
 				continue;
 			}
 
@@ -723,7 +729,7 @@ class WHOLESALEX_Registration {
 		if ( 'select' === $field['type'] && 'wholesalex_registration_role' === $field['name'] ) {
 			$field['option'] = $this->normalize_woo_registration_role_options( isset( $field['option'] ) ? $field['option'] : array() );
 			if ( empty( $field['option'] ) ) {
-				$field['option'] = $this->normalize_woo_registration_role_options( wholesalex()->get_roles( 'roles_option' ) );
+				$field['option'] = $this->normalize_woo_registration_role_options( wholesalex()->get_roles( 'store_mode_roles_option' ) );
 			}
 		}
 		switch ( $field['type'] ) {
@@ -1041,7 +1047,7 @@ class WHOLESALEX_Registration {
 	 */
 	private function get_registration_role_ids_from_options( $options ) {
 		$role_ids       = array();
-		$existing_roles = wholesalex()->get_roles( 'ids' );
+		$existing_roles = array_column( wholesalex()->get_roles( 'store_mode_roles_option' ), 'value' );
 
 		foreach ( (array) $options as $option ) {
 			if ( empty( $option['value'] ) || 'wholesalex_guest' === $option['value'] ) {
@@ -1115,7 +1121,7 @@ class WHOLESALEX_Registration {
 		}
 
 		$role_id        = sanitize_text_field( $role_id );
-		$existing_roles = wholesalex()->get_roles( 'ids' );
+		$existing_roles = array_column( wholesalex()->get_roles( 'store_mode_roles_option' ), 'value' );
 
 		if ( 'wholesalex_guest' === $role_id || ! in_array( $role_id, $existing_roles, true ) ) {
 			return false;

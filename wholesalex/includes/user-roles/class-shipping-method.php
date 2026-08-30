@@ -386,6 +386,9 @@ class User_Roles_Shipping_Method {
 		}
 
 		$role_content = wholesalex()->get_roles( 'by_id', $role_id );
+		if ( is_array( $role_content ) ) {
+			$role_content = WHOLESALEX_Role::get_role_with_wtrs_shipping_methods( $role_content );
+		}
 		$methods      = isset( $role_content['_shipping_methods'] ) && is_array( $role_content['_shipping_methods'] ) ? $role_content['_shipping_methods'] : array();
 		$rules        = isset( $role_content['_shipping_method_rules'] ) && is_array( $role_content['_shipping_method_rules'] ) ? $role_content['_shipping_method_rules'] : array();
 		$promo        = $this->normalize_promo( $role_content );
