@@ -679,6 +679,75 @@ class WHOLESALEX_Registration {
 	}
 
 	/**
+	 * Get optional HTML length attributes for supported fields.
+	 *
+	 * @param array $field Field configuration.
+	 * @return string
+	 */
+	private function get_field_length_attributes( $field ) {
+		if ( ! in_array( $field['type'], array( 'text', 'password', 'textarea', 'email' ), true ) ) {
+			return '';
+		}
+
+		$attributes = '';
+		$min_length = isset( $field['minLength'] ) ? absint( $field['minLength'] ) : 0;
+		$max_length = isset( $field['maxLength'] ) ? absint( $field['maxLength'] ) : 0;
+		if ( $min_length > 0 && $max_length > 0 && $min_length > $max_length ) {
+			$temp_length = $min_length;
+			$min_length  = $max_length;
+			$max_length  = $temp_length;
+		}
+
+		if ( $min_length > 0 ) {
+			$attributes .= ' minlength="' . esc_attr( $min_length ) . '"';
+		}
+		if ( $max_length > 0 ) {
+			$attributes .= ' maxlength="' . esc_attr( $max_length ) . '"';
+		}
+
+		return $attributes;
+	}
+
+	/**
+	 * Validate an optional field length configuration.
+	 *
+	 * Empty optional fields are ignored; required-field validation handles them separately.
+	 *
+	 * @param array  $field Field configuration.
+	 * @param string $value Submitted value.
+	 * @return string Validation message, or an empty string when valid.
+	 */
+	private function get_field_length_error( $field, $value ) {
+		if (
+			! in_array( $field['type'], array( 'text', 'password', 'textarea', 'email' ), true ) ||
+			'' === $value
+		) {
+			return '';
+		}
+
+		$length     = function_exists( 'mb_strlen' ) ? mb_strlen( $value ) : strlen( $value );
+		$min_length = isset( $field['minLength'] ) ? absint( $field['minLength'] ) : 0;
+		$max_length = isset( $field['maxLength'] ) ? absint( $field['maxLength'] ) : 0;
+		$label      = isset( $field['label'] ) ? $field['label'] : __( 'This field', 'wholesalex' );
+		if ( $min_length > 0 && $max_length > 0 && $min_length > $max_length ) {
+			$temp_length = $min_length;
+			$min_length  = $max_length;
+			$max_length  = $temp_length;
+		}
+
+		if ( $min_length > 0 && $length < $min_length ) {
+			/* translators: 1: field label, 2: minimum character count. */
+			return sprintf( __( '%1$s must contain at least %2$d characters.', 'wholesalex' ), $label, $min_length );
+		}
+		if ( $max_length > 0 && $length > $max_length ) {
+			/* translators: 1: field label, 2: maximum character count. */
+			return sprintf( __( '%1$s must contain no more than %2$d characters.', 'wholesalex' ), $label, $max_length );
+		}
+
+		return '';
+	}
+
+	/**
 	 * Normalize registration role options for WooCommerce registration output.
 	 *
 	 * @param array $options Role select options.
@@ -721,9 +790,10 @@ class WHOLESALEX_Registration {
 	 * @return void
 	 */
 	public function generate_field_for_woo_registration( $field ) {
-		$field       = WholesaleX_CommonUtils::translate_form_builder_field( $field );
-		$depends     = $this->check_depends( $field );
-		$is_required = isset( $field['required'] ) ? $field['required'] : false;
+		$field             = WholesaleX_CommonUtils::translate_form_builder_field( $field );
+		$depends           = $this->check_depends( $field );
+		$is_required       = isset( $field['required'] ) ? $field['required'] : false;
+		$length_attributes = $this->get_field_length_attributes( $field );
 
 		// Check to Guest User Shouldn't Be Show In WooCommerce Registration Form.
 		if ( 'select' === $field['type'] && 'wholesalex_registration_role' === $field['name'] ) {
@@ -735,6 +805,7 @@ class WHOLESALEX_Registration {
 		switch ( $field['type'] ) {
 			case 'text':
 			case 'password':
+			case 'email':
 			case 'url':
 			case 'tel':
 				?>
@@ -755,7 +826,7 @@ class WHOLESALEX_Registration {
 							<?php
 						}
 						?>
-						<input type="<?php echo esc_attr($field['type']);?>" class="wsx-input woocommerce-Input woocommerce-Input--text input-text <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( isset($_POST[$field['name']]) && ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>" <?php if (!empty($is_required)) echo 'required'; ?> /><?php // @codingStandardsIgnoreLine ?>
+						<input type="<?php echo esc_attr($field['type']);?>" class="wsx-input woocommerce-Input woocommerce-Input--text input-text <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( isset($_POST[$field['name']]) && ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>"<?php echo $length_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Contains only escaped positive integer attributes. ?> <?php if (!empty($is_required)) echo 'required'; ?> /><?php // @codingStandardsIgnoreLine ?>
 						<span class="wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>"> </span>
 						<?php
 						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
@@ -996,7 +1067,7 @@ class WHOLESALEX_Registration {
 							<?php
 						}
 						?>
-						<textarea name="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-textarea input-text <?php echo esc_attr( isset( $field['required'] ) && $field['required'] ? 'wsx-field-required' : '' ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>" rows="2" cols="5" > </textarea>
+						<textarea name="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-textarea input-text <?php echo esc_attr( isset( $field['required'] ) && $field['required'] ? 'wsx-field-required' : '' ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>" rows="2" cols="5"<?php echo $length_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Contains only escaped positive integer attributes. ?>></textarea>
 						<?php
 						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
 							?>
@@ -1256,6 +1327,12 @@ class WHOLESALEX_Registration {
 					}
 				}
 			} else {
+				if ( isset( $_POST[ $field['name'] ] ) && is_string( $_POST[ $field['name'] ] ) ) {
+					$length_error = $this->get_field_length_error( $field, wp_unslash( $_POST[ $field['name'] ] ) );
+					if ( $length_error ) {
+						return new WP_Error( '201', $length_error );
+					}
+				}
 
 				if ( ! $is_rolewise && ( isset( $field['required'] ) && $field['required'] && ( ! isset( $_POST[ $field['name'] ] ) || empty( $_POST[ $field['name'] ] ) ) ) ) {
 					return new WP_Error( '201', $field['label'] . __( ' is Required!', 'wholesalex' ) );
@@ -1473,6 +1550,12 @@ class WHOLESALEX_Registration {
 
 								default:
 									break;
+							}
+
+							$length_error = $this->get_field_length_error( $field, $value );
+							if ( $length_error ) {
+								$data['error_messages'][ $field['name'] ] = $length_error;
+								throw new \Exception();
 							}
 
 							if ( 'user_login' === $field['name'] ) {

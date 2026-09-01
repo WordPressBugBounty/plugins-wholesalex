@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 6.8    
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.0.6
+Stable tag: 3.0.7
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -279,6 +279,12 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Registration Form Builder
 
 == Changelog ==
+
+= 3.0.7 – 1 September 2026 =
+* New: Added opt-in custom pricing priority ordering with confirmation while preserving access-aware pricing sources.
+* New: Added minimum and maximum character limits for supported Registration Form fields.
+* New: Added B2B role information to WooCommerce orders and preserved the role assigned when each order was placed.
+* Fix: Prevented invalid custom tokens from being added through product selection fields.
 
 = 3.0.6 – 30 August 2026 =
 * New: Added validated import and export support for role-based tier prices in WooCommerce product CSV files.

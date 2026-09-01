@@ -59,6 +59,7 @@ class Activator {
 			// General.
 			'_settings_status'                            => 'b2b_n_b2c',
 			'_settings_show_table'                        => 'yes',
+			'_settings_enable_custom_priority_order'      => 'no',
 			'_settings_quantity_based_discount_priority'  => array( 'profile', 'single_product', 'category', 'wholesale_pricing' ),
 			'_settings_display_price_shop_page'           => 'woocommerce_default_tax',
 			'_settings_display_price_cart_checkout'       => 'woocommerce_default_tax',

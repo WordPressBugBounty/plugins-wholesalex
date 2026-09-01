@@ -219,14 +219,15 @@ class WholesaleX_Initialization {
 			'is_rtl_support'      => is_rtl(),
 		);
 
-		wp_localize_script(
-			'wholesalex',
-			'wholesalex',
-			apply_filters(
-				'wholesalex_backend_localize_data',
-				array_merge( $localize_data, Xpo::get_wow_products_details() )
-			)
+		$localize_data = apply_filters(
+			'wholesalex_backend_localize_data',
+			array_merge( $localize_data, Xpo::get_wow_products_details() )
 		);
+		// Strip credentials after filters because integrations can replace the settings payload.
+		if ( isset( $localize_data['settings'] ) && is_array( $localize_data['settings'] ) ) {
+			unset( $localize_data['settings']['_settings_google_recaptcha_v3_secret_key'] );
+		}
+		wp_localize_script( 'wholesalex', 'wholesalex', $localize_data );
 	}
 
 	/**
@@ -241,38 +242,39 @@ class WholesaleX_Initialization {
 
 		do_action( 'wholesalex_after_frontend_enqueue_scripts' );
 
-		wp_localize_script(
-			'wholesalex',
-			'wholesalex',
-			apply_filters(
-				'wholesalex_frontend_localize_data',
-				array(
-					'url'                => WHOLESALEX_URL,
-					'nonce'              => wp_create_nonce( 'wholesalex-registration' ),
-					'ajax'               => admin_url( 'admin-ajax.php' ),
-					'wallet_status'      => wholesalex()->get_setting( 'wsx_addon_wallet' ),
-					'recaptcha_status'   => wholesalex()->get_setting( 'wsx_addon_recaptcha' ),
-					'ver'                => WHOLESALEX_VER,
-					'is_pro_active'      => wholesalex()->is_pro_active(),
-					'pro_ver'            => wholesalex()->is_pro_active() ? WHOLESALEX_PRO_VER : '',
-					'settings'           => wholesalex()->get_setting(),
-					'logo_url'           => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/icons/wholesalex-logo.svg' ),
-					'plugin_name'        => wholesalex()->get_plugin_name(),
-					'is_admin_interface' => is_admin(),
-					'i18n'               => array(
-						'cannot_register_message_for_logged_in_user' => __( 'You cannot register while you are logged in.', 'wholesalex' ),
-						'is_required' => __( 'is required', 'wholesalex' ),
-						'register'    => __( 'Register', 'wholesalex' ),
+		$frontend_localize_data = apply_filters(
+			'wholesalex_frontend_localize_data',
+			array(
+				'url'                => WHOLESALEX_URL,
+				'nonce'              => wp_create_nonce( 'wholesalex-registration' ),
+				'ajax'               => admin_url( 'admin-ajax.php' ),
+				'wallet_status'      => wholesalex()->get_setting( 'wsx_addon_wallet' ),
+				'recaptcha_status'   => wholesalex()->get_setting( 'wsx_addon_recaptcha' ),
+				'ver'                => WHOLESALEX_VER,
+				'is_pro_active'      => wholesalex()->is_pro_active(),
+				'pro_ver'            => wholesalex()->is_pro_active() ? WHOLESALEX_PRO_VER : '',
+				'settings'           => wholesalex()->get_setting(),
+				'logo_url'           => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/icons/wholesalex-logo.svg' ),
+				'plugin_name'        => wholesalex()->get_plugin_name(),
+				'is_admin_interface' => is_admin(),
+				'i18n'               => array(
+					'cannot_register_message_for_logged_in_user' => __( 'You cannot register while you are logged in.', 'wholesalex' ),
+					'is_required' => __( 'is required', 'wholesalex' ),
+					'register'    => __( 'Register', 'wholesalex' ),
 
-					),
-					'cart_url'           => wc_get_cart_url(),
-					'currency_pos'       => get_option( 'woocommerce_currency_pos', 'left' ),
-					'currency_symbol'    => get_woocommerce_currency_symbol(),
-					'is_required'        => __( 'is required', 'wholesalex' ),
+				),
+				'cart_url'           => wc_get_cart_url(),
+				'currency_pos'       => get_option( 'woocommerce_currency_pos', 'left' ),
+				'currency_symbol'    => get_woocommerce_currency_symbol(),
+				'is_required'        => __( 'is required', 'wholesalex' ),
 
-				)
 			)
 		);
+		// Strip credentials after filters because integrations can replace the settings payload.
+		if ( isset( $frontend_localize_data['settings'] ) && is_array( $frontend_localize_data['settings'] ) ) {
+			unset( $frontend_localize_data['settings']['_settings_google_recaptcha_v3_secret_key'] );
+		}
+		wp_localize_script( 'wholesalex', 'wholesalex', $frontend_localize_data );
 	}
 
 	/**

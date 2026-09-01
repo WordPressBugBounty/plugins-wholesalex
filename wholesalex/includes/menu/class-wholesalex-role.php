@@ -212,6 +212,10 @@ class WHOLESALEX_Role {
 			$_role = wp_unslash( $post['role'] );
 			$_role = json_decode( $_role, true );
 			$_role = wholesalex()->sanitize( $_role );
+			// An explicit empty value means that this role cannot use any payment method.
+			if ( is_array( $_role ) && ! array_key_exists( '_payment_methods', $_role ) ) {
+				$_role['_payment_methods'] = array();
+			}
 			$_flag = true;
 			if ( isset( $post['check'] ) ) {
 				if ( empty( wholesalex()->get_roles( 'by_id', $_id ) ) ) {
@@ -696,9 +700,10 @@ class WHOLESALEX_Role {
 	 * @since 1.2.19 Profile Gateway Override Added
 	 */
 	public function available_payment_gateways( $gateways ) {
-		$__role_id         = wholesalex()->get_current_user_role();
-		$__role_content    = wholesalex()->get_roles( 'by_id', $__role_id );
-		$__payment_methods = array();
+		$__role_id                    = wholesalex()->get_current_user_role();
+		$__role_content               = wholesalex()->get_roles( 'by_id', $__role_id );
+		$__payment_methods            = array();
+		$has_payment_method_setting   = is_array( $__role_content ) && array_key_exists( '_payment_methods', $__role_content );
 		if ( isset( $__role_content['_payment_methods'] ) && ! empty( $__role_content['_payment_methods'] ) ) {
 			$__payment_methods = $__role_content['_payment_methods'];
 		}
@@ -727,7 +732,7 @@ class WHOLESALEX_Role {
 			}
 		}
 
-		if ( empty( $__payment_methods ) ) {
+		if ( empty( $__payment_methods ) && ! $has_payment_method_setting ) {
 			return $gateways;
 		}
 

@@ -471,6 +471,9 @@ class Dynamic_Rules {
 		$__user_role = wholesalex()->get_current_user_role();
 		$order_type  = $this->get_order_type_from_user_role( $__user_role );
 		$order->update_meta_data( '__wholesalex_order_type', $order_type );
+		if ( 'b2b' === $order_type ) {
+			$order->update_meta_data( '__wholesalex_order_role', $__user_role );
+		}
 
 		if ( null === WC()->session ) {
 			return;
@@ -1878,16 +1881,18 @@ class Dynamic_Rules {
 			usort( $this->valid_dynamic_rules['payment_order_qty'], array( $this, 'compare_by_priority' ) );
 			$payment_related_rules = $this->valid_dynamic_rules['payment_order_qty'];
 		}
-		$role_payment_methods = array();
+		$role_payment_methods            = array();
+		$has_role_payment_method_setting = is_array( $__role_content ) && array_key_exists( '_payment_methods', $__role_content );
 		if ( isset( $__role_content['_payment_methods'] ) && ! empty( $__role_content['_payment_methods'] ) ) {
 			$role_payment_methods = $__role_content['_payment_methods'];
 			$role_payment_methods = array_filter( $role_payment_methods );
 		}
 		$this->rule_payment_gateway->handle(
 			array(
-				'profile' => $profile_gateway_data,
-				'rules'   => $payment_related_rules,
-				'roles'   => $role_payment_methods,
+				'profile'                         => $profile_gateway_data,
+				'rules'                           => $payment_related_rules,
+				'roles'                           => $role_payment_methods,
+				'has_role_payment_method_setting' => $has_role_payment_method_setting,
 			)
 		);
 

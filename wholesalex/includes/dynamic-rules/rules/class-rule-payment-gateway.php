@@ -76,7 +76,7 @@ class Rule_Payment_Gateway {
 					}
 				}
 
-				if ( empty( $data['roles'] ) ) {
+				if ( empty( $data['roles'] ) && empty( $data['has_role_payment_method_setting'] ) ) {
 					$data['roles'] = array_keys( $gateways );
 				}
 

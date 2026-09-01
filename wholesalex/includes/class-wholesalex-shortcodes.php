@@ -1902,6 +1902,43 @@ class WHOLESALEX_Shortcodes {
 	}
 
 	/**
+	 * Add optional length limits to supported registration fields.
+	 *
+	 * @param string $output Generated field markup.
+	 * @param array  $field  Field configuration.
+	 * @return string
+	 */
+	private function apply_field_length_attributes( $output, $field ) {
+		if ( ! in_array( $field['type'], array( 'text', 'password', 'textarea', 'email' ), true ) ) {
+			return $output;
+		}
+
+		// Remove legacy attributes first so the generated element never contains duplicates.
+		$output     = preg_replace( '/\s+(?:minlength|maxlength)=(?:"[^"]*"|\'[^\']*\')/i', '', $output );
+		$attributes = '';
+		$min_length = isset( $field['minLength'] ) ? absint( $field['minLength'] ) : 0;
+		$max_length = isset( $field['maxLength'] ) ? absint( $field['maxLength'] ) : 0;
+		if ( $min_length > 0 && $max_length > 0 && $min_length > $max_length ) {
+			$temp_length = $min_length;
+			$min_length  = $max_length;
+			$max_length  = $temp_length;
+		}
+
+		if ( $min_length > 0 ) {
+			$attributes .= ' minlength="' . esc_attr( $min_length ) . '"';
+		}
+		if ( $max_length > 0 ) {
+			$attributes .= ' maxlength="' . esc_attr( $max_length ) . '"';
+		}
+
+		if ( '' === $attributes ) {
+			return $output;
+		}
+
+		return preg_replace( '/<(input|textarea)\b/i', '<$1' . $attributes, $output, 1 );
+	}
+
+	/**
 	 * Gemnerate Form Field
 	 *
 	 * @param  array  $field Field Array.
@@ -3951,7 +3988,7 @@ class WHOLESALEX_Shortcodes {
 				break;
 		}
 
-		$output = ob_get_clean();
+		$output = $this->apply_field_length_attributes( ob_get_clean(), $field );
 
 		echo apply_filters( 'wholesalex_registration_form_field', $output, $field['type'], $field['name'], $input_variation, $field ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Field markup is escaped during generation and intentionally remains filterable.
 	}

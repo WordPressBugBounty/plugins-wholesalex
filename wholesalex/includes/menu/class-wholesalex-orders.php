@@ -58,8 +58,17 @@ class WHOLESALEX_Orders {
 				$order_type = 'guest';
 			}
 			if ( 'b2b' === $order_type ) {
-				/* translators: %s: Plugin Name */
-				$__custom_meta_value = apply_filters( 'wholesalex_order_meta_b2b_value', sprintf( __( '%s B2B', 'wholesalex' ), wholesalex()->get_plugin_name() ) );
+				$role_id    = $order->get_meta( '__wholesalex_order_role' );
+				$role_id    = $role_id ? $role_id : get_user_meta( $order->get_user_id(), '__wholesalex_role', true );
+				$role_title = wholesalex()->get_role_name_by_role_id( $role_id );
+				if ( $role_title ) {
+					/* translators: 1: Plugin name, 2: B2B role title. */
+					$__custom_meta_value = sprintf( __( '%1$s B2B (%2$s)', 'wholesalex' ), wholesalex()->get_plugin_name(), $role_title );
+				} else {
+					/* translators: %s: Plugin Name */
+					$__custom_meta_value = sprintf( __( '%s B2B', 'wholesalex' ), wholesalex()->get_plugin_name() );
+				}
+				$__custom_meta_value = apply_filters( 'wholesalex_order_meta_b2b_value', $__custom_meta_value, $order, $role_title );
 				echo esc_html( $__custom_meta_value );
 			} elseif ( 'b2c' === $order_type ) {
 				/* translators: %s: Plugin Name */
