@@ -783,6 +783,10 @@ class Wholesale_Pricing_Rule_Engine {
 		$wholesale_html = wc_price( wc_get_price_to_display( $product, array( 'price' => $wholesale_price ) ) );
 		$rule           = $price_data['rule'];
 
+		if ( 'tiered' === $rule['discount_type'] ) {
+			return $this->tiered_discount->format_product_price_html( $product, $base_price, $wholesale_price );
+		}
+
 		if ( 'regular' === $rule['discount_type'] ) {
 			$label = $this->get_discount_label( $rule );
 			$label = '' !== $label ? '<span class="wsx-wholesale-price-label">' . esc_html( $label ) . '</span>' : '';
@@ -897,6 +901,10 @@ class Wholesale_Pricing_Rule_Engine {
 		$base_max = (float) $range_data['base_max'];
 		$base_html = $base_min === $base_max ? wc_price( $base_min ) : wc_format_price_range( $base_min, $base_max );
 		$rule      = isset( $range_data['rule'] ) && is_array( $range_data['rule'] ) ? $range_data['rule'] : array();
+
+		if ( isset( $rule['discount_type'] ) && 'tiered' === $rule['discount_type'] ) {
+			return $this->tiered_discount->format_display_price_html( $product, $base_html, $wholesale_html );
+		}
 
 		if ( isset( $rule['discount_type'] ) && 'regular' === $rule['discount_type'] ) {
 			$label = $this->get_discount_label( $rule );
@@ -1152,6 +1160,28 @@ class Wholesale_Pricing_Rule_Engine {
 				}
 
 				$this->set_discounted_product( $cart_item['data']->get_id() );
+			} else {
+				foreach ( $this->valid_rules as $rule ) {
+					if (
+						'tiered' !== ( $rule['discount_type'] ?? '' ) ||
+						! $this->can_rule_price_product( $rule, $cart_item['data'], absint( $cart_item['quantity'] ) ) ||
+						empty( $this->tiered_discount->get_tiers( $rule ) )
+					) {
+						continue;
+					}
+
+					// No tier (or regular wholesale rule) priced this quantity. The
+					// cart product may still carry a previous tier's price, so read
+					// the role-aware fallback (including sale) and protect it from catalog filters.
+					$product        = $cart_item['data'];
+					$fallback_price = $this->tiered_discount->get_fallback_price( $product, $this->get_base_price( $product ) );
+					if ( '' !== $fallback_price && is_numeric( $fallback_price ) ) {
+						$product->set_price( $fallback_price );
+						$this->cart_tier_prices[ $product->get_id() ] = (float) $fallback_price;
+					}
+					unset( $cart->cart_contents[ $cart_item_key ]['_wsx_wholesale_pricing_tier_applied'] );
+					break;
+				}
 			}
 		}
 	}
@@ -1212,21 +1242,20 @@ class Wholesale_Pricing_Rule_Engine {
 			return;
 		}
 
-		$fee_names = array();
-
-		foreach ( $fees as $fee ) {
+		foreach ( $fees as $fee_key => $fee ) {
 			if ( empty( $fee['discount'] ) || empty( $fee['name'] ) ) {
 				continue;
 			}
 
-			$fee_name = $fee['name'];
-
-			if ( isset( $fee_names[ $fee_name ] ) ) {
-				$fee_name = wp_unique_id( $fee_name );
-			}
-
-			$fee_names[ $fee_name ] = true;
-			$cart->add_fee( $fee_name, -1 * (float) $fee['discount'], (bool) apply_filters( 'wholesalex_cart_discount_is_taxable', false, $fee ) );
+			// Keep the saved label intact; only the internal fee ID must be unique.
+			$cart->fees_api()->add_fee(
+				array(
+					'id'      => 'wholesalex_wholesale_cart_discount_' . $fee_key,
+					'name'    => $fee['name'],
+					'amount'  => -1 * (float) $fee['discount'],
+					'taxable' => (bool) apply_filters( 'wholesalex_cart_discount_is_taxable', false, $fee ),
+				)
+			);
 
 			if ( ! empty( $fee['rule_id'] ) ) {
 				$this->set_discounted_cart_rule( (string) $fee['rule_id'] );

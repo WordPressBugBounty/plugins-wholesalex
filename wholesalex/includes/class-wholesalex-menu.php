@@ -32,13 +32,13 @@ class WHOLESALEX_Menu {
 
 		$offer_config = array(
 			array(
-				'start'  => '2026-07-06 00:00 Asia/Dhaka',
-				'end'    => '2026-08-16 23:59 Asia/Dhaka',
+				'start'  => '2026-09-09 00:00:00 Asia/Dhaka',
+				'end'    => '2026-10-10 23:59:59 Asia/Dhaka',
 				'text'   => __(
-					'Summer Sale - Up to 55% OFF',
+					'Get Pro - $90 →',
 					'wholesalex'
 				),
-				'utmKey' => 'plugin_meta_summer_db',
+				'utmKey' => 'plugin_meta_base_price',
 			),
 		);
 

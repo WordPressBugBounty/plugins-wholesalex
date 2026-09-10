@@ -336,7 +336,7 @@ class Addons {
 			'name'                   => __( 'Request a Quote', 'wholesalex' ),
 			'desc'                   => __( 'Allow buyers to request custom quotes for the products they want. You can set personalized pricing, negotiate, and finalize purchase terms with ease.', 'wholesalex' ),
 			'img'                    => WHOLESALEX_URL . 'assets/img/addons/raq.svg',
-			'docs'                   => 'https://getwholesalex.com/request-a-quote/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
+			'docs'                   => 'https://getwholesalex.com/docs/request-a-quote/?utm_source=wholesalex-menu&utm_medium=addons-docs&utm_campaign=wholesalex-DB',
 			'live'                   => '',
 			'is_pro'                 => true,
 			'is_different_plugin'    => false,

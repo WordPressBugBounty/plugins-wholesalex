@@ -111,6 +111,7 @@ class Notice {
 	 */
 	public static function get_hellobar_config() {
 		return array(
+			'wsx_helloBar_base_price_2026' => Xpo::get_transient_without_cache( 'wsx_helloBar_base_price_2026' ),
 			'wsx_helloBar_flash_sale_2026' => Xpo::get_transient_without_cache( 'wsx_helloBar_flash_sale_2026' ),
 			'wsx_helloBar_surprise_sale_2026' => Xpo::get_transient_without_cache( 'wsx_helloBar_surprise_sale_2026' ),
 			'wsx_helloBar_massive_sale_2026' => Xpo::get_transient_without_cache( 'wsx_helloBar_massive_sale_2026' ),

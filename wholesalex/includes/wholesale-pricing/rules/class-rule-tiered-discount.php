@@ -216,7 +216,7 @@ class Wholesale_Pricing_Tiered_Discount {
 	private function render_table_layout( array $rule, \WC_Product $product, array $tiers, $active_tier, float $base_price, array $columns, string $heading, string $layout, int $cart_quantity ): void {
 		?>
 		<div class="wsx-price-container-title"><?php echo esc_html( $heading ); ?></div>
-		<div class="wsx-price-table-container wsx-scrollbar wsx-table-overflow <?php echo 'layout_six' === $layout ? 'layout-vertical' : ''; ?>" data-cart-quantity="<?php echo esc_attr( $cart_quantity ); ?>">
+		<div class="wsx-price-table-container wsx-scrollbar wsx-table-overflow <?php echo 'layout_six' === $layout ? 'layout-vertical' : ''; ?>" data-cart-quantity="<?php echo esc_attr( $cart_quantity ); ?>" data-fallback-price-html="<?php echo esc_attr( $this->get_fallback_price_html( $product, $base_price ) ); ?>">
 			<div class="wsx-price-table-header"><div class="wsx-price-table-row">
 				<?php foreach ( $columns as $column ) : ?>
 					<div class="wsx-tooltip wsx-tooltip-global wsx-price-table-cell">
@@ -266,7 +266,7 @@ class Wholesale_Pricing_Tiered_Discount {
 	private function render_classic_layout( array $rule, \WC_Product $product, array $tiers, $active_tier, float $base_price, string $heading, string $layout, int $cart_quantity ): void {
 		?>
 		<div class="wsx-price-container-title"><?php echo esc_html( $heading ); ?></div>
-		<div class="wsx-price-classical-container <?php echo 'layout_three' === $layout ? 'layout-vertical' : ''; ?>" data-cart-quantity="<?php echo esc_attr( $cart_quantity ); ?>">
+		<div class="wsx-price-classical-container <?php echo 'layout_three' === $layout ? 'layout-vertical' : ''; ?>" data-cart-quantity="<?php echo esc_attr( $cart_quantity ); ?>" data-fallback-price-html="<?php echo esc_attr( $this->get_fallback_price_html( $product, $base_price ) ); ?>">
 			<?php foreach ( $tiers as $tier ) : ?>
 				<?php
 				$sale_price = Wholesale_Pricing_Rule_Engine::calculate_discounted_price( $tier, $base_price );
@@ -371,6 +371,47 @@ class Wholesale_Pricing_Tiered_Discount {
 	}
 
 	/**
+	 * Format the fallback price without quantity-one tier filters.
+	 *
+	 * @param \WC_Product $product    Product object.
+	 * @param float       $base_price Price before the tier.
+	 * @return string
+	 */
+	private function get_fallback_price_html( \WC_Product $product, float $base_price ): string {
+		$price        = $this->get_fallback_price( $product, $base_price );
+		$role_regular = (float) get_post_meta( $product->get_id(), wholesalex()->get_current_user_role() . '_base_price', true );
+		$regular      = $role_regular > 0 ? $role_regular : (float) $product->get_regular_price( 'edit' );
+
+		return $this->format_product_price_html( $product, $regular, $price );
+	}
+
+	/**
+	 * Preserve the role's sale price when no quantity tier matches.
+	 *
+	 * This is the payable fallback, independent of the configured tier base.
+	 *
+	 * @param \WC_Product $product    Product object.
+	 * @param float       $base_price Configured tier calculation base.
+	 * @return float
+	 */
+	public function get_fallback_price( \WC_Product $product, float $base_price ): float {
+		$role         = wholesalex()->get_current_user_role();
+		$role_regular = (float) get_post_meta( $product->get_id(), $role . '_base_price', true );
+		$role_sale    = (float) get_post_meta( $product->get_id(), $role . '_sale_price', true );
+		$regular      = $role_regular > 0 ? $role_regular : (float) $product->get_regular_price( 'edit' );
+
+		if ( $role_sale > 0 && $role_sale < $regular ) {
+			return $role_sale;
+		}
+
+		if ( $role_regular <= 0 && $product->is_on_sale( 'edit' ) ) {
+			return (float) $product->get_sale_price( 'edit' );
+		}
+
+		return $base_price;
+	}
+
+	/**
 	 * Format price HTML for the main WooCommerce product price node.
 	 *
 	 * @param \WC_Product $product    Product object.
@@ -378,15 +419,55 @@ class Wholesale_Pricing_Tiered_Discount {
 	 * @param float       $sale_price Tier price.
 	 * @return string
 	 */
-	private function format_product_price_html( \WC_Product $product, float $base_price, float $sale_price ): string {
+	public function format_product_price_html( \WC_Product $product, float $base_price, float $sale_price ): string {
 		$sale_html = wc_price( wc_get_price_to_display( $product, array( 'price' => $sale_price ) ) );
+		$base_html = '';
 
-		if ( $base_price <= 0 || $sale_price <= 0 || $sale_price >= $base_price ) {
-			return $sale_html;
+		if ( ( $base_price > 0 && $sale_price > 0 && $sale_price < $base_price ) ||
+			'yes' === (string) wholesalex()->get_setting( '_settings_hide_wholesalex_price' ) ) {
+			$base_html = wc_price( wc_get_price_to_display( $product, array( 'price' => $base_price ) ) );
 		}
 
-		$base_html = wc_price( wc_get_price_to_display( $product, array( 'price' => $base_price ) ) );
+		return $this->format_display_price_html( $product, $base_html, $sale_html, $sale_price, $base_price );
+	}
 
-		return '<ins>' . wp_kses_post( $sale_html ) . '</ins> <del aria-hidden="true">' . wp_kses_post( $base_html ) . '</del>';
+	/**
+	 * Keep initial and quantity-updated tier prices consistent, including ranges.
+	 *
+	 * @param \WC_Product $product    Product object.
+	 * @param string      $base_html  Formatted price before the tier.
+	 * @param string      $sale_html  Formatted tier price or range.
+	 * @param float|null  $sale_price Tier price for tax suffix placeholders.
+	 * @param float|null  $base_price Base price for regular-price tax suffix placeholders.
+	 * @return string
+	 */
+	public function format_display_price_html( \WC_Product $product, string $base_html, string $sale_html, ?float $sale_price = null, ?float $base_price = null ): string {
+		$hide_retail    = 'yes' === (string) wholesalex()->get_setting( '_settings_hide_retail_price' );
+		$hide_wholesale = 'yes' === (string) wholesalex()->get_setting( '_settings_hide_wholesalex_price' );
+		$suffix_key     = $hide_wholesale && ! $hide_retail ? '_settings_regular_price_suffix' : '_settings_wholesalex_price_suffix';
+		$suffix         = trim( (string) wholesalex()->get_setting( $suffix_key ) );
+		$suffix_price   = $hide_wholesale && ! $hide_retail ? $base_price : $sale_price;
+		$tax_args       = null !== $suffix_price ? array( 'price' => $suffix_price ) : array();
+
+		if ( '{price_including_tax}' === $suffix ) {
+			$suffix = wc_price( wc_get_price_including_tax( $product, $tax_args ) );
+		} elseif ( '{price_excluding_tax}' === $suffix ) {
+			$suffix = wc_price( wc_get_price_excluding_tax( $product, $tax_args ) );
+		}
+
+		$suffix_html = '' !== $suffix ? ' <small class="woocommerce-price-suffix">' . wp_kses_post( $suffix ) . '</small>' : '';
+
+		if ( $hide_wholesale && ! $hide_retail && '' !== $base_html ) {
+			return wp_kses_post( $base_html ) . $suffix_html;
+		}
+
+		$price_html = wp_kses_post( $sale_html ) . $suffix_html;
+
+		if ( '' === $base_html ) {
+			return $price_html;
+		}
+
+		return ( $hide_retail ? '' : '<del class="wsx-wholesale-regular-price wsx-tier-price" aria-hidden="true">' . wp_kses_post( $base_html ) . '</del> ' ) .
+			'<ins class="wsx-wholesale-price-wrap wsx-tier-price">' . $price_html . '</ins>';
 	}
 }

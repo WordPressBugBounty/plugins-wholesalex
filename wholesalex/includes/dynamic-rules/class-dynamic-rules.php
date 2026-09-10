@@ -2028,10 +2028,23 @@ class Dynamic_Rules {
 
 				if ( ! empty( $cart_fees ) ) {
 					$coupon_names = array();
-					foreach ( $cart_fees as $fees ) {
-						foreach ( $fees as $discount ) {
+					foreach ( $cart_fees as $fee_type => $fees ) {
+						foreach ( $fees as $fee_key => $discount ) {
 							if ( isset( $discount['discount'] ) && 0 !== $discount['discount'] ) {
 								$__is_taxable = apply_filters( 'wholesalex_payment_gateway_discount_is_taxable', false );
+								if ( 'cart_discount' === $fee_type ) {
+									// Separate fee identity from the customer-facing discount label.
+									$cart->fees_api()->add_fee(
+										array(
+											'id'      => 'wholesalex_dynamic_cart_discount_' . $fee_key,
+											'name'    => $discount['name'],
+											'amount'  => -1 * floatval( $discount['discount'] ),
+											'taxable' => $__is_taxable,
+										)
+									);
+									continue;
+								}
+
 								if ( ! isset( $coupon_names[ $discount['name'] ] ) ) {
 									$coupon_names[ $discount['name'] ] = true;
 								} else {
@@ -2403,7 +2416,7 @@ class Dynamic_Rules {
 	 * mini-cart template reads WC_Product::get_price() before WholesaleX's tier
 	 * resolver (which filters the sale price) has necessarily run in that request.
 	 * The product can therefore render at its retail price even though the cart
-	 * line and subtotal were calculated with the correct quantity tier.
+	 * line and subtotal were calculated with the correct wholesale or tier price.
 	 *
 	 * @param string $html          Existing mini-cart quantity HTML.
 	 * @param array  $cart_item     WooCommerce cart item.
@@ -2447,13 +2460,32 @@ class Dynamic_Rules {
 
 		$tier_data = isset( $this->active_tiers[ $product_id ] ) ? $this->active_tiers[ $product_id ] : array();
 
+		// An eligible tier source returns price=false when quantity is outside
+		// its ranges. Its calculated cart line still owns the fallback price;
+		// do not leave the mini-cart showing a cached quantity-one tier price.
 		if (
 			empty( $tier_data['src'] ) ||
 			! array_key_exists( 'price', $tier_data ) ||
-			false === $tier_data['price'] ||
-			! is_numeric( $tier_data['price'] )
+			( ! is_numeric( $tier_data['price'] ) && ! ( false === $tier_data['price'] && ! empty( $tier_data['tiers'] ) ) )
 		) {
-			return $html;
+			$wholesale_price = wholesalex()->get_wholesalex_wholesale_prices( $product_id );
+			if ( false === $wholesale_price || ! is_numeric( $wholesale_price ) ) {
+				return $html;
+			}
+
+			// Wholesale-only prices have no active tier. Use the calculated line
+			// so add-ons and currency adjustments remain included. Line subtotals
+			// already exclude tax, regardless of how catalog prices were entered.
+			$line_price = (float) $cart_item['line_subtotal'];
+			if ( WC()->cart && WC()->cart->display_prices_including_tax() ) {
+				$line_price += isset( $cart_item['line_subtotal_tax'] ) ? (float) $cart_item['line_subtotal_tax'] : 0.0;
+			}
+
+			return '<span class="quantity">' . sprintf(
+				'%s &times; %s',
+				esc_html( $cart_item['quantity'] ),
+				wc_price( $line_price / $quantity )
+			) . '</span>';
 		}
 
 		$calculated_unit_price = (float) $cart_item['line_subtotal'] / $quantity;

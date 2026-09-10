@@ -1321,7 +1321,7 @@ class WHOLESALEX_Product {
 
 			$tiers = $this->parse_imported_tiers( $data[ $tier_price_column_id ], $role, $product );
 			if ( is_wp_error( $tiers ) ) {
-				throw new \Exception( $tiers->get_error_message() );
+				throw new \Exception( esc_html( $tiers->get_error_message() ) );
 			}
 		}
 

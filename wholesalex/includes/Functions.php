@@ -61,6 +61,36 @@ class Functions {
 	}
 
 	/**
+	 * Initialize the installation's onboarding state once, before defaults exist.
+	 *
+	 * @return string Persistent onboarding status.
+	 */
+	public function get_onboarding_status() {
+		$status = get_option( 'wholesalex_onboarding_status', null );
+		if ( null !== $status ) {
+			return $status;
+		}
+
+		$settings = get_option( 'wholesalex_settings', array() );
+		$legacy   = $settings['_settings_onboarding_completed'] ?? null;
+		if ( get_option( 'wholesalex_onboarding_completed', false ) || 'yes' === $legacy ) {
+			$status = 'completed';
+		} else {
+			$status = 'pending';
+			foreach ( array( 'wholesalex_settings', 'wholesalex_installation_date', '_wholesalex_roles', '__wholesalex_initial_setup', '__wholesalex_dynamic_rules', '__wholesalex_pricing_rules' ) as $option ) {
+				if ( null !== get_option( $option, null ) ) {
+					$status = 'completed';
+					break;
+				}
+			}
+		}
+
+		// add_option cannot overwrite a state initialized by another request.
+		add_option( 'wholesalex_onboarding_status', $status, '', false );
+		return get_option( 'wholesalex_onboarding_status', 'pending' );
+	}
+
+	/**
 	 * Check if the product price is hidden.
 	 *
 	 * @param string $product_id Type.

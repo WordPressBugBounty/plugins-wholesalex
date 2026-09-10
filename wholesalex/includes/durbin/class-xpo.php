@@ -217,6 +217,11 @@ class Xpo {
 
 	public static function generate_utm_link( $params ) {
 		$default_config = array(
+			'plugin_meta_base_price' => array(
+				'source'   => 'db-wholesalex-plugin-meta',
+				'medium'   => 'base-price',
+				'campaign' => 'wholesalex-dashboard',
+			),
 			'spring_sale'       => array(
 				'source'   => 'db-wholesalex-notice',
 				'medium'   => 'spring-sale',

@@ -270,7 +270,7 @@ class WHOLESALEX_Profile {
 			$__tiers = wholesalex()->sanitize( json_decode( wp_unslash( $_POST['wholesalex_profile_tiers'] ), true ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			$__tiers = $this->enforce_profile_tier_entitlements( $__tiers );
 			if ( isset( $__tiers['_profile_discounts']['tiers'] ) ) {
-				$__tiers['_profile_discounts']['tiers'] = wholesalex()->filter_empty_tier(
+				$__tiers['_profile_discounts']['tiers'] = $this->filter_complete_profile_tiers(
 					$__tiers['_profile_discounts']['tiers']
 				);
 			}
@@ -406,6 +406,49 @@ class WHOLESALEX_Profile {
 				do_action( 'wholesalex_user_profile_update_notify', $user_id, $updated_fields );
 			}
 		}
+	}
+
+	/**
+	 * Keep only profile discounts with a quantity and explicit product targeting.
+	 *
+	 * This is profile-specific: other tier types do not require product filters.
+	 *
+	 * @param mixed $tiers Submitted profile discount rows.
+	 * @return array Complete rows, reindexed for JSON serialization.
+	 */
+	private function filter_complete_profile_tiers( $tiers ): array {
+		$tiers = wholesalex()->filter_empty_tier( $tiers );
+
+		return array_values(
+			array_filter(
+				$tiers,
+				static function ( $tier ) {
+					$quantity = $tier['_min_quantity'] ?? '';
+					$filter   = $tier['_product_filter'] ?? '';
+					if ( ! is_numeric( $quantity ) || ! is_finite( (float) $quantity ) || (float) $quantity <= 0 || ! is_string( $filter ) || '' === trim( $filter ) ) {
+						return false;
+					}
+
+					if ( 'all_products' === $filter ) {
+						return true;
+					}
+
+					// Specific filters must contain at least one actual selection.
+					$selections = $tier[ $filter ] ?? array();
+					if ( ! is_array( $selections ) ) {
+						return false;
+					}
+					foreach ( $selections as $selection ) {
+						$value = is_array( $selection ) ? ( $selection['value'] ?? '' ) : $selection;
+						if ( is_scalar( $value ) && '' !== trim( (string) $value ) ) {
+							return true;
+						}
+					}
+
+					return false;
+				}
+			)
+		);
 	}
 
 	/**

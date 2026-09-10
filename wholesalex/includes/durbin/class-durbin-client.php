@@ -22,15 +22,15 @@ class DurbinClient {
 	 * Send data to Durbin
 	 *
 	 * @param DurbinClient::DEACTIVATE_ACTION|DurbinClient::ACTIVATE_ACTION|DurbinClient::WIZARD_ACTION $action_type action type.
-	 * @return void
+	 * @return bool Whether Durbin accepted the data.
 	 */
 	public static function send( $action_type ) {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
+			return false;
 		}
 
 		if ( ! in_array( $action_type, array( self::DEACTIVATE_ACTION, self::ACTIVATE_ACTION, self::WIZARD_ACTION ), true ) ) {
-			return;
+			return false;
 		}
 
 		$data = self::get_common_data();
@@ -56,7 +56,7 @@ class DurbinClient {
 			);
 		}
 
-		wp_remote_post(
+		$response = wp_remote_post(
 			self::URL,
 			array(
 				'timeout'     => 30,
@@ -70,6 +70,9 @@ class DurbinClient {
 				'body'        => $data,
 			)
 		);
+		return ! is_wp_error( $response )
+			&& wp_remote_retrieve_response_code( $response ) >= 200
+			&& wp_remote_retrieve_response_code( $response ) < 300;
 	}
 
 	/**

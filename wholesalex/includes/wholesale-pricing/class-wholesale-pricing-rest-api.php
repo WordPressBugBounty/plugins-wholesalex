@@ -122,7 +122,7 @@ class Wholesale_Pricing_Rest_Api
         }
 
         $filter = sanitize_key((string) $request->get_param('product_filter'));
-        $allowed_filters = array('all_products', 'specific_products', 'specific_categories', 'brands', 'attributes', 'sku');
+        $allowed_filters = array('all_products', 'specific_products', 'specific_variations', 'specific_categories', 'brands', 'attributes', 'sku');
         if (!in_array($filter, $allowed_filters, true)) {
             $filter = 'all_products';
         }
@@ -221,7 +221,7 @@ class Wholesale_Pricing_Rest_Api
         array $exclude_ids,
         string $role_id
     ): array {
-        if ('specific_products' === $filter && empty($product_ids)) {
+        if (in_array($filter, array('specific_products', 'specific_variations'), true) && empty($product_ids)) {
             return array();
         }
 
@@ -257,7 +257,8 @@ class Wholesale_Pricing_Rest_Api
         }
 
         $ids = array();
-        if ('specific_products' === $filter) {
+        if (in_array($filter, array('specific_products', 'specific_variations'), true)) {
+            $base_args['post_type'] = 'specific_variations' === $filter ? 'product_variation' : 'product';
             $base_args['post__in'] = $product_ids;
             $base_args['orderby'] = 'post__in';
             $ids = (new \WP_Query($base_args))->posts;
@@ -1059,14 +1060,14 @@ class Wholesale_Pricing_Rest_Api
             : 'wholesale_pricing';
 
         // ── Shared targeting ───────────────────────────────────────
-        $allowed_product_filters = array('all_products', 'specific_products', 'specific_categories', 'brands', 'attributes', 'sku');
+        $allowed_product_filters = array('all_products', 'specific_products', 'specific_variations', 'specific_categories', 'brands', 'attributes', 'sku');
         $out['product_filter'] = in_array($rule['product_filter'] ?? '', $allowed_product_filters, true)
             ? $rule['product_filter']
             : 'all_products';
         // Products/categories/brands/attributes/SKUs come from the MultiSelect AJAX
         // component as {name, value} objects. We must preserve that shape so the
         // component can re-render the labels correctly on reload.
-        $out['products'] = isset($rule['products']) ? $this->sanitize_select_items($rule['products'], 'int') : array();
+        $out['products'] = is_array($rule['products'] ?? null) ? $this->sanitize_select_items($rule['products'], 'int') : array();
         $out['categories'] = isset($rule['categories']) ? $this->sanitize_select_items($rule['categories'], 'int') : array();
         $out['brands'] = isset($rule['brands']) ? $this->sanitize_select_items($rule['brands'], 'int') : array();
         $out['attributes'] = isset($rule['attributes']) ? $this->sanitize_select_items($rule['attributes'], 'string') : array();
@@ -1307,7 +1308,11 @@ class Wholesale_Pricing_Rest_Api
     private function sanitize_cart_rule(array $rule): array
     {
         $src = is_array($rule['cart'] ?? null) ? $rule['cart'] : array();
-        $allowed_types = array('percentage', 'amount', 'fixed');
+        $allowed_types = array('percentage', 'amount');
+        // Preserve the amount deducted by legacy Fixed cart discounts.
+        if ('fixed' === ($src['discount_type'] ?? '')) {
+            $src['discount_type'] = 'amount';
+        }
 
         return array(
             'cart' => array(

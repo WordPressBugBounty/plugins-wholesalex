@@ -248,6 +248,19 @@
 	display: block;
 }
 
+/* Keep tier prices on the same line without changing regular wholesale prices. */
+.single-product .price .wsx-tier-price,
+.single-product .wp-block-woocommerce-product-price .wsx-tier-price {
+	display: inline !important;
+	clear: none;
+	margin-bottom: 0;
+}
+
+.single-product .price .wsx-tier-price::before,
+.single-product .wp-block-woocommerce-product-price .wsx-tier-price::before {
+	display: none;
+}
+
 .single-product .price .wsx-wholesale-price,
 .single-product .wp-block-woocommerce-product-price .wsx-wholesale-price {
 	display: inline-flex !important;

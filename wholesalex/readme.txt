@@ -4,7 +4,7 @@ Tags: b2b, wholesale, wholesale plugin, wholesale pricing, woocommerce wholesale
 Requires at least: 6.8    
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.0.7
+Stable tag: 3.0.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -279,6 +279,17 @@ WholesaleX is a complete solution that is easy to use and very intuitive to unde
 6. Registration Form Builder
 
 == Changelog ==
+
+= 3.0.8 – 10 September 2026 =
+* New: Added guided onboarding with store setup, a wholesale pricing tour, and saved completion progress.
+* New: Added grouped variation targeting to Wholesale Pricing with validation, previews and CSV import handling.
+* Improvement: Added Product Add-Ons Ultimate compatibility to preserve add-on charges with wholesale pricing.
+* Improvement: Disabled inactive Role Restriction fields, clarified Request a Quote add-on requirements, and showed excluded users only when a general restriction is enabled.
+* Improvement: Prevented saving enabled User Role restrictions with empty required product, variation, category, or brand selections and added contextual validation messages.
+* Fix: Applied category-based wholesale pricing to subcategories while preserving highest-discount selection.
+* Fix: Corrected wholesale tier prices, price prefixes and suffixes, role sale-price fallback, and Astra mini-cart unit prices.
+* Fix: Corrected registration role authorization and nonce validation while allowing newly added authorized roles.
+* Fix: Skipped incomplete user profile discount tiers when saving.
 
 = 3.0.7 – 1 September 2026 =
 * New: Added opt-in custom pricing priority ordering with confirmation while preserving access-aware pricing sources.

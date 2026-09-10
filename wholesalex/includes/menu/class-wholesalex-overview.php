@@ -404,6 +404,8 @@ class WHOLESALEX_Overview {
 	private function get_spa_route_pages() {
 		$route_pages = array_flip( $this->get_spa_admin_routes() );
 
+		$route_pages['/onboarding'] = apply_filters( 'wholesalex_plugin_menu_slug', 'wholesalex' );
+
 		$route_pages['/edit-wholesale-price'] = isset( $route_pages['/wholesale-pricing'] )
 			? $route_pages['/wholesale-pricing']
 			: 'wholesalex_wholesale_pricing';
@@ -714,6 +716,53 @@ class WHOLESALEX_Overview {
 	 * @since 1.0.0
 	 */
 	public function overview_callback() {
+		register_rest_route(
+			'wholesalex/v1',
+			'/onboarding/contact',
+			array(
+				'methods' => 'POST',
+				'permission_callback' => function () {
+					return current_user_can( apply_filters( 'wholesalex_capability_access', 'manage_options' ) );
+				},
+				'args' => array(
+					'receiveTips' => array( 'type' => 'boolean', 'required' => true ),
+				),
+				'callback' => function ( $request ) {
+					$receive_tips = (bool) $request->get_param( 'receiveTips' );
+					update_option( 'wholesalex_onboarding_receive_tips', $receive_tips, false );
+					// Durbin reads the authenticated user's name and email server-side.
+					// Both legacy flags and saved cycle IDs represent a successful submission.
+					if ( $receive_tips && ! get_user_meta( get_current_user_id(), 'wholesalex_onboarding_contact_sent', true ) ) {
+						if ( DurbinClient::send( DurbinClient::WIZARD_ACTION ) ) {
+							update_user_meta( get_current_user_id(), 'wholesalex_onboarding_contact_sent', true );
+						}
+					}
+					return array( 'success' => true );
+				},
+			)
+		);
+
+		register_rest_route(
+			'wholesalex/v1',
+			'/onboarding/complete',
+			array(
+				'methods' => 'POST',
+				'permission_callback' => function () {
+					return current_user_can( apply_filters( 'wholesalex_capability_access', 'manage_options' ) );
+				},
+				'callback' => function () {
+					update_option( 'wholesalex_onboarding_status', 'completed', false );
+					if ( 'completed' !== get_option( 'wholesalex_onboarding_status' ) ) {
+						return new \WP_Error( 'onboarding_save_failed', __( 'Could not save onboarding progress. Please try again.', 'wholesalex' ), array( 'status' => 500 ) );
+					}
+					return array(
+						'isOnboarding'     => true,
+						'onboardingStatus' => 'completed',
+					);
+				},
+			)
+		);
+
 		register_rest_route(
 			'wholesalex/v1',
 			'/overview_action/',
@@ -1217,6 +1266,8 @@ class WHOLESALEX_Overview {
 						'wholesalex_conversation'          => menu_page_url( $conversation_slug, false ),
 						'wholesalex_users'                 => menu_page_url( $users_slug, false ),
 						'wholesalex_user_info'             => $this->get_current_user_info(),
+						'isOnboarding'                    => 'completed' === wholesalex()->get_onboarding_status(),
+						'onboardingStatus'                => wholesalex()->get_onboarding_status(),
 						/**
 						 * Conversation Translation Stop
 						 */

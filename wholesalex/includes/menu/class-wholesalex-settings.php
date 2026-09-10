@@ -138,6 +138,8 @@ class Settings {
 					wp_send_json_error( sprintf( __( 'To Active "Email Confirmation" Please Enable %1$s Email Template from "Dashboard > %2$s > Emails".', 'wholesalex' ), wholesalex()->get_plugin_name(), wholesalex()->get_plugin_name() ) );
 				}
 			}
+			// Completion is managed by onboarding, not stale settings forms.
+			unset( $post['settings']['_settings_onboarding_completed'], $post['settings']['isOnboarding'] );
 			wholesalex()->set_setting_multiple( $post['settings'] );
 			wp_send_json_success( __( 'Successfully Saved.', 'wholesalex' ) );
 		} elseif ( 'get' === $type ) {

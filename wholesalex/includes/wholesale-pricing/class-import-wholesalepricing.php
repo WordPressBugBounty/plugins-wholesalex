@@ -1457,10 +1457,11 @@ class Import_Wholesale_Pricing {
 	 * @return string
 	 */
 	protected function parse_product_filter( $value ) {
-		$normalized = $this->normalize_key( $value );
+		$normalized = $this->normalize_key( strtolower( (string) $value ) );
 		$map        = array(
 			'allproducts' => 'all_products',
 			'specificproducts' => 'specific_products',
+			'specificvariations' => 'specific_variations',
 			'products' => 'specific_products',
 			'productsinlist' => 'specific_products',
 			'productinlist' => 'specific_products',
@@ -1479,7 +1480,7 @@ class Import_Wholesale_Pricing {
 			'skuinlist' => 'sku',
 		);
 
-		if ( in_array( $value, array( 'all_products', 'specific_products', 'specific_categories', 'brands', 'attributes', 'sku' ), true ) ) {
+		if ( in_array( $value, array( 'all_products', 'specific_products', 'specific_variations', 'specific_categories', 'brands', 'attributes', 'sku' ), true ) ) {
 			return $value;
 		}
 
@@ -1605,6 +1606,9 @@ class Import_Wholesale_Pricing {
 			if ( 'products' === $type ) {
 				$product = wc_get_product( $item_id );
 				$label   = $product ? $product->get_title() : '';
+				if ( $product && $product->is_type( 'variation' ) ) {
+					$label = $product->get_name() . ' (' . $product->get_id() . ')';
+				}
 			} elseif ( 'categories' === $type ) {
 				$term  = get_term_by( 'id', $item_id, 'product_cat' );
 				$label = $term ? $term->name : '';

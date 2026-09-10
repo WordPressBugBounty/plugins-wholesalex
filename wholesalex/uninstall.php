@@ -34,6 +34,9 @@ function wholesalex_uninstall_plugin_data_remove() {
 
 	$option_keys = array(
 		'wholesalex_settings',
+		'wholesalex_onboarding_status',
+		'wholesalex_onboarding_completed',
+		'wholesalex_onboarding_receive_tips',
 		'wholesalex_installation_date',
 		'_wholesalex_default_admin_role_assigned',
 		'_wholesalex_deleted_default_roles',
@@ -114,6 +117,7 @@ function wholesalex_uninstall_plugin_data_remove() {
 	);
 
 	$user_meta_keys = array(
+		'wholesalex_onboarding_contact_sent',
 		'__wholesalex_status',
 		'__wholesalex_account_confirmed',
 		'wholesalex_notice',

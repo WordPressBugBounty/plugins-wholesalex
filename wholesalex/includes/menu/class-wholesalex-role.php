@@ -212,9 +212,9 @@ class WHOLESALEX_Role {
 			$_role = wp_unslash( $post['role'] );
 			$_role = json_decode( $_role, true );
 			$_role = wholesalex()->sanitize( $_role );
-			// An explicit empty value means that this role cannot use any payment method.
+			// Untouched settings default to enabled gateways; preserve explicit selections, including none.
 			if ( is_array( $_role ) && ! array_key_exists( '_payment_methods', $_role ) ) {
-				$_role['_payment_methods'] = array();
+				$_role['_payment_methods'] = array_keys( self::get_enabled_payment_gateway_options() );
 			}
 			$_flag = true;
 			if ( isset( $post['check'] ) ) {
@@ -401,12 +401,11 @@ class WHOLESALEX_Role {
 	}
 
 	/**
-	 * Roles Fields
+	 * Get globally enabled gateways without checkout-specific availability checks.
 	 *
-	 * @since 1.0.0
-	 * @since 1.0.4 Role Settings Section Added.
+	 * @return array Gateway IDs mapped to their display titles.
 	 */
-	public static function get_role_fields() {
+	private static function get_enabled_payment_gateway_options(): array {
 		$available_payment_gateways = WC()->payment_gateways->payment_gateways();
 		$payment_gateways           = array();
 		foreach ( $available_payment_gateways as $key => $gateway ) {
@@ -415,6 +414,17 @@ class WHOLESALEX_Role {
 				$payment_gateways[ $key ] = '' !== $gateway_title ? $gateway_title : $gateway->get_method_title();
 			}
 		}
+		return $payment_gateways;
+	}
+
+	/**
+	 * Roles Fields
+	 *
+	 * @since 1.0.0
+	 * @since 1.0.4 Role Settings Section Added.
+	 */
+	public static function get_role_fields() {
+		$payment_gateways     = self::get_enabled_payment_gateway_options();
 		$__shipping_sections = array();
 
 		$data_store         = WC_Data_Store::load( 'shipping-zone' );
@@ -632,7 +642,7 @@ class WHOLESALEX_Role {
 									'type'    => 'slider',
 									'label'   => __( 'Available Payment Methods', 'wholesalex' ),
 									'options' => $payment_gateways,
-									'default' => array( '' ),
+									'default' => array_keys( $payment_gateways ),
 									'help'    => '',
 								),
 							),

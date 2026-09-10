@@ -267,7 +267,7 @@ class Wholesale_Pricing_Cart_Discount {
 			<div class="wsx-sp-discounts-cards wsx-p-4 wsx-br-sm wsx-mt-8 wsx-bg-promotion">
 				<?php foreach ( $cart_discounts as $cart_discount ) : ?>
 					<?php
-					$heading_text = $this->get_promo_heading_text( $product, $cart_discount );
+					$heading_text = $this->get_promo_heading_text( $cart_discount );
 					$conditions   = '';
 
 					if ( $this->should_show_cart_discount_conditions( $cart_discount['cart'] ?? array() ) && isset( $cart_discount['conditions']['tiers'] ) ) {
@@ -577,20 +577,15 @@ class Wholesale_Pricing_Cart_Discount {
 	/**
 	 * Build the card heading text for a promo rule.
 	 *
-	 * @param \WC_Product $product Current product.
-	 * @param array       $rule    Registered promo rule data.
+	 * @param array $rule Registered promo rule data.
 	 * @return string
 	 */
-	private function get_promo_heading_text( \WC_Product $product, array $rule ): string {
+	private function get_promo_heading_text( array $rule ): string {
 		$type  = isset( $rule['type'] ) ? sanitize_key( $rule['type'] ) : 'percentage';
 		$value = isset( $rule['value'] ) ? (float) $rule['value'] : 0.0;
 
 		if ( 'percentage' === $type ) {
 			return $value . __( ' % OFF', 'wholesalex' );
-		}
-
-		if ( 'fixed' === $type ) {
-			return '<del>' . wc_price( $product->get_price() ) . '</del>. to <ins>' . wc_price( $value ) . '</ins>';
 		}
 
 		return wc_price( $value ) . __( ' OFF', 'wholesalex' );

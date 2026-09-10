@@ -55,8 +55,11 @@ class Wholesale_Pricing_Condition_Engine
 		$priority = 10;
 
 		if ('specific_products' === $filter_type) {
-			$filter['include_products'] = self::pluck_select_values(isset($rule['products']) ? $rule['products'] : array());
+			$filter['include_products'] = self::pluck_select_values(is_array($rule['products'] ?? null) ? $rule['products'] : array());
 			$priority = 50;
+		} elseif ('specific_variations' === $filter_type) {
+			$filter['include_variations'] = self::pluck_select_values(is_array($rule['products'] ?? null) ? $rule['products'] : array());
+			$priority = 60;
 		} elseif ('specific_categories' === $filter_type) {
 			$filter['include_cats'] = self::pluck_select_values(isset($rule['categories']) ? $rule['categories'] : array());
 			$priority = 40;
@@ -76,6 +79,16 @@ class Wholesale_Pricing_Condition_Engine
 		}
 
 		$filter = self::expand_translated_filter_ids($filter);
+
+		// Include every descendant at runtime without changing the saved selection.
+		$selected_categories = $filter['include_cats'];
+		foreach ($selected_categories as $category_id) {
+			$children = get_term_children((int) $category_id, 'product_cat');
+			if (!is_wp_error($children)) {
+				$filter['include_cats'] = array_merge($filter['include_cats'], $children);
+			}
+		}
+		$filter['include_cats'] = array_values(array_unique(array_map('absint', $filter['include_cats'])));
 
 		return array(
 			'filter' => $filter,
@@ -225,7 +238,7 @@ class Wholesale_Pricing_Condition_Engine
 		$brands = self::get_product_brand_ids($product_id);
 		$attributes = self::get_product_attribute_ids($product_id);
 
-		if (!empty($filter['include_variations']) && !empty(array_intersect($product_ids, $filter['include_variations']))) {
+		if ($variation_id > 0 && !empty($filter['include_variations']) && in_array($variation_id, $filter['include_variations'], true)) {
 			return true;
 		}
 
@@ -667,7 +680,7 @@ class Wholesale_Pricing_Condition_Engine
 			return $filter;
 		}
 
-		foreach (array('include_products', 'exclude_products') as $key) {
+		foreach (array('include_products', 'exclude_products', 'include_variations', 'exclude_variations') as $key) {
 			if (!empty($filter[$key])) {
 				$filter[$key] = self::expand_translated_post_ids($filter[$key]);
 			}
@@ -713,7 +726,8 @@ class Wholesale_Pricing_Condition_Engine
 				}
 			}
 
-			$expanded = array_merge($expanded, self::get_wpml_object_translation_ids($post_id, 'product'));
+			$post_type = get_post_type($post_id) ?: 'product';
+			$expanded = array_merge($expanded, self::get_wpml_object_translation_ids($post_id, $post_type));
 		}
 
 		return array_values(array_unique(array_filter($expanded)));

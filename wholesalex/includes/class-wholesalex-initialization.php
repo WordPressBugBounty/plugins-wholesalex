@@ -35,6 +35,12 @@ class WholesaleX_Initialization {
 		add_action( 'admin_init', array( $this, 'remove_admin_notices' ), 11 );
 
 		add_filter( 'admin_body_class', array( $this, 'add_wholesalex_class_on_backend' ) );
+
+		add_filter( 'body_class', function( $classes ) {
+			$classes[] = 'wholesalex-page';
+
+			return $classes;
+		} );
 	}
 
 	/**
@@ -102,6 +108,7 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/rules/class-rule-bxgy-discount.php';
 		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/rules/class-wholesale-pricing-rule-engine.php';
 		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/compatibility/wowaddons/class-wowaddons-compatibility.php';
+		require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/compatibility/product-addons-ultimate/class-product-addons-ultimate-compatibility.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-settings.php';
 		require_once WHOLESALEX_PATH . 'includes/class-wholesalex-scripts.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-registration.php';
@@ -141,6 +148,7 @@ class WholesaleX_Initialization {
 		new \WHOLESALEX\Wholesale_Pricing_Rest_Api();
 		new \WHOLESALEX\Wholesale_Pricing_Rule_Engine();
 		new \WHOLESALEX\Wholesale_Pricing_WowAddons_Compatibility();
+		new \WHOLESALEX\Wholesale_Pricing_Product_Addons_Ultimate_Compatibility();
 
 		new \WHOLESALEX\Addons();
 		new \WHOLESALEX\WHOLESALEX_Users();

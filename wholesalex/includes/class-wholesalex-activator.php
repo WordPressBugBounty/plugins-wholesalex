@@ -18,9 +18,9 @@ class Activator {
 	 * Activator Constructor
 	 */
 	public function __construct() {
-		if ( ! get_option( 'wholesalex_settings' ) ) {
-			$this->init_set_data();
-		}
+		// Initialize new installations without resetting completed onboarding on reactivation.
+		wholesalex()->get_onboarding_status();
+		$this->init_set_data();
 		$had_roles            = (bool) get_option( '_wholesalex_roles' );
 		$created_roles        = $this->init_roles();
 		$default_b2b_role_id  = apply_filters( 'wholesalex_default_b2b_role_id', 'wholesalex_b2b_wholesale' );
@@ -133,18 +133,24 @@ class Activator {
 	 * @since 1.1.0 Initial Setup Wizard Added
 	 */
 	public function activation_redirect( $plugin ) {
-		if ( wp_doing_ajax() ) {
+		if ( ! is_admin() || ! current_user_can( apply_filters( 'wholesalex_capability_access', 'manage_options' ) )
+			|| wp_doing_ajax() || wp_doing_cron()
+			|| ( defined( 'REST_REQUEST' ) && REST_REQUEST )
+			|| ( defined( 'WP_CLI' ) && WP_CLI )
+			|| ( defined( 'WP_INSTALLING' ) && WP_INSTALLING )
+			|| 'pending' !== wholesalex()->get_onboarding_status() ) {
 			return;
 		}
 		// The activated_plugin hook runs only after WordPress has authorized the activation request.
 		if ( wp_doing_ajax() || is_network_admin() || isset( $_GET['activate-multi'] ) || ( isset( $_POST['action'] ) && is_string( $_POST['action'] ) && 'activate-selected' === sanitize_key( wp_unslash( $_POST['action'] ) ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.NonceVerification.Missing -- Core owns activation nonce verification; values are read only to control the redirect.
 			return;
 		}
-		if ( 'wholesalex/wholesalex.php' === $plugin ) {
+		if ( WHOLESALEX_BASE === $plugin ) {
 			if ( ! class_exists( 'woocommerce' ) ) {
 				return;
 			}
-			wp_safe_redirect( admin_url( 'admin.php?page=wholesalex' ) );
+			$menu_slug = apply_filters( 'wholesalex_plugin_menu_slug', 'wholesalex' );
+			wp_safe_redirect( admin_url( 'admin.php?page=' . rawurlencode( $menu_slug ) ) . '#/onboarding' );
 			exit();
 		}
 	}

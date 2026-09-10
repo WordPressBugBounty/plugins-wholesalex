@@ -1160,6 +1160,10 @@ class WHOLESALEX_Registration {
 	 * @return array|null Array of allowed role IDs, or null when the context is missing/invalid.
 	 */
 	private function get_posted_registration_allowed_roles() {
+		if ( ! isset( $_POST['wholesalex_registration_allowed_roles'], $_POST['wholesalex_registration_allowed_roles_nonce'] ) || ! is_string( $_POST['wholesalex_registration_allowed_roles'] ) || ! is_string( $_POST['wholesalex_registration_allowed_roles_nonce'] ) ) {
+			return null;
+		}
+
 		$allowed_roles_value = isset( $_POST['wholesalex_registration_allowed_roles'] ) ? sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_allowed_roles'] ) ) : '';
 		$nonce               = isset( $_POST['wholesalex_registration_allowed_roles_nonce'] ) ? sanitize_key( wp_unslash( $_POST['wholesalex_registration_allowed_roles_nonce'] ) ) : '';
 
@@ -1203,6 +1207,41 @@ class WHOLESALEX_Registration {
 		}
 
 		return in_array( $role_id, $allowed_roles, true );
+	}
+
+	/**
+	 * Get and authorize the role requested by the custom registration form.
+	 *
+	 * The regular registration nonce is public and is not an authorization
+	 * control. A role is trusted only when it is present in the signed role
+	 * context emitted for the form being submitted.
+	 *
+	 * @return string|null Authorized role ID, an empty string when no role was
+	 *                     requested, or null for an invalid request.
+	 */
+	private function get_authorized_posted_registration_role() {
+		if ( ! isset( $_POST['wholesalex-registration-nonce'] ) || ! is_string( $_POST['wholesalex-registration-nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['wholesalex-registration-nonce'] ) ), 'wholesalex-registration' ) ) {
+			return null;
+		}
+
+		if ( ! isset( $_POST['wholesalex_registration_role'] ) || '' === $_POST['wholesalex_registration_role'] ) {
+			return '';
+		}
+
+		if ( ! is_string( $_POST['wholesalex_registration_role'] ) ) {
+			return null;
+		}
+
+		$role_id       = sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_role'] ) );
+		$allowed_roles = $this->get_posted_registration_allowed_roles();
+
+		if ( ! $this->is_registration_role_allowed( $role_id, $allowed_roles ) ) {
+			return null;
+		}
+
+		// The public selector uses current store roles, not saved builder options.
+		// Its signed context also limits role-specific and B2B-only forms.
+		return $role_id;
 	}
 
 	/**
@@ -1254,15 +1293,22 @@ class WHOLESALEX_Registration {
 	 * @return WP_Error
 	 */
 	public function process_woo_registration_validation( $validation_error, $username, $password, $email ) {
-		$nonce_value = isset( $_POST['_wpnonce'] ) ? sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$nonce_value = isset( $_POST['_wpnonce'] ) && is_string( $_POST['_wpnonce'] ) ? sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ) : '';
+		if ( isset( $_POST['woocommerce-register-nonce'] ) ) {
+			$nonce_value = is_string( $_POST['woocommerce-register-nonce'] ) ? sanitize_key( wp_unslash( $_POST['woocommerce-register-nonce'] ) ) : '';
+		}
 
 		if ( ! wp_verify_nonce( $nonce_value, 'woocommerce-register' ) ) {
+			$validation_error->add( 'wholesalex_registration_invalid_nonce', __( 'Registration verification failed. Please reload the page and try again.', 'wholesalex' ) );
 			return $validation_error;
 		}
 		if ( isset( $_POST['password'] ) && isset( $_POST['user_confirm_pass'] ) && ! ( sanitize_text_field( wp_unslash( $_POST['password'] ) ) === sanitize_text_field( wp_unslash( $_POST['user_confirm_pass'] ) ) ) ) {
 			return new WP_Error( '201', __( 'Password and Confirm password does not match!', 'wholesalex' ) );
 		}
 
+		if ( isset( $_POST['wholesalex_registration_role'] ) && ! is_string( $_POST['wholesalex_registration_role'] ) ) {
+			return new WP_Error( '201', __( 'Invalid registration role selected.', 'wholesalex' ) );
+		}
 		$is_rolewise = isset( $_POST['wholesalex_registration_role'] ) ? sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_role'] ) ) : false;
 		if ( $is_rolewise && ! $this->is_registration_role_allowed( $is_rolewise, $this->get_woo_registration_allowed_roles() ) ) {
 			return new WP_Error( '201', __( 'Invalid registration role selected.', 'wholesalex' ) );
@@ -1328,7 +1374,14 @@ class WHOLESALEX_Registration {
 				}
 			} else {
 				if ( isset( $_POST[ $field['name'] ] ) && is_string( $_POST[ $field['name'] ] ) ) {
-					$length_error = $this->get_field_length_error( $field, wp_unslash( $_POST[ $field['name'] ] ) );
+					if ( 'textarea' === $field['type'] ) {
+						$value = sanitize_textarea_field( wp_unslash( $_POST[ $field['name'] ] ) );
+					} elseif ( 'email' === $field['type'] ) {
+						$value = sanitize_email( wp_unslash( $_POST[ $field['name'] ] ) );
+					} else {
+						$value = sanitize_text_field( wp_unslash( $_POST[ $field['name'] ] ) );
+					}
+					$length_error = $this->get_field_length_error( $field, $value );
 					if ( $length_error ) {
 						return new WP_Error( '201', $length_error );
 					}
@@ -1356,12 +1409,26 @@ class WHOLESALEX_Registration {
 	 * @return array
 	 */
 	public function add_custom_woo_field_to_user_meta( $user_id ) {
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- WooCommerce verifies its registration nonce before firing this callback.
+		// Customer creation also runs outside the WooCommerce registration form.
+		$nonce_value = isset( $_POST['_wpnonce'] ) && is_string( $_POST['_wpnonce'] ) ? sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ) : '';
+		if ( isset( $_POST['woocommerce-register-nonce'] ) ) {
+			$nonce_value = is_string( $_POST['woocommerce-register-nonce'] ) ? sanitize_key( wp_unslash( $_POST['woocommerce-register-nonce'] ) ) : '';
+		}
+		if ( ! wp_verify_nonce( $nonce_value, 'woocommerce-register' ) ) {
+			return;
+		}
+
 		if ( empty( $this->woo_custom_fields ) ) {
 			return;
 		}
 		$files                      = array();
 		$allowed_registration_roles = $this->get_woo_registration_allowed_roles();
+		if ( isset( $_POST['wholesalex_registration_role'] ) ) {
+			if ( ! is_string( $_POST['wholesalex_registration_role'] ) || ! $this->is_registration_role_allowed( sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_role'] ) ), $allowed_registration_roles ) ) {
+				return;
+			}
+		}
+
 		foreach ( $this->woo_custom_fields as $field ) {
 			if ( isset( $_POST[ $field['name'] ] ) && ! empty( $_POST[ $field['name'] ] ) ) {
 				$value        = '';
@@ -1469,7 +1536,6 @@ class WHOLESALEX_Registration {
 				add_filter( 'woocommerce_registration_auth_new_customer', '__return_false' );
 			}
 		}
-		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 
@@ -1489,6 +1555,11 @@ class WHOLESALEX_Registration {
 			if ( isset( $_POST['user_email'], $_POST['user_pass'] ) ) {
 
 				try {
+					$__registration_role = $this->get_authorized_posted_registration_role();
+					if ( null === $__registration_role ) {
+						$data['error_messages']['wholesalex_registration_role'] = __( 'Invalid registration role selected.', 'wholesalex' );
+						throw new \Exception();
+					}
 
 					if ( isset( $_POST['user_pass'] ) && isset( $_POST['user_confirm_pass'] ) && ! ( sanitize_text_field( wp_unslash( $_POST['user_pass'] ) ) === sanitize_text_field( wp_unslash( $_POST['user_confirm_pass'] ) ) ) ) {
 						$data['error_messages']['user_pass'] = __( 'Password and Confirm password does not match!', 'wholesalex' );
@@ -1520,7 +1591,6 @@ class WHOLESALEX_Registration {
 
 					$userdata            = array();
 					$usermeta            = array();
-					$__registration_role = '';
 					$files               = array();
 
 					foreach ( $this->registration_fields as $field ) {
@@ -1584,8 +1654,8 @@ class WHOLESALEX_Registration {
 							}
 
 							if ( 'wholesalex_registration_role' === $field['name'] ) {
-								$usermeta['__wholesalex_registration_role'] = $value;
-								$__registration_role                        = $value;
+								// Use only the role authorized before any registration hooks run.
+								$usermeta['__wholesalex_registration_role'] = $__registration_role;
 							} elseif ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
 									$usermeta[ $field['name'] ] = $value;
 							} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
@@ -1643,16 +1713,8 @@ class WHOLESALEX_Registration {
 							}
 						}
 					}
-					if ( ! $__registration_role ) {
-						if ( ( isset( $_POST['wholesalex_registration_role'] ) && ! empty( $_POST['wholesalex_registration_role'] ) ) ) {
-							$usermeta['__wholesalex_registration_role'] = sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_role'] ) );
-							$__registration_role                        = $usermeta['__wholesalex_registration_role'];
-						}
-					}
-
-					if ( ! $this->is_registration_role_allowed( $__registration_role, $this->get_posted_registration_allowed_roles() ) ) {
-						$data['error_messages']['wholesalex_registration_role'] = __( 'Invalid registration role selected.', 'wholesalex' );
-						throw new \Exception();
+					if ( $__registration_role ) {
+						$usermeta['__wholesalex_registration_role'] = $__registration_role;
 					}
 
 					$registered_user_id = wc_create_new_customer( $user_email, $user_name, $password, $userdata );
