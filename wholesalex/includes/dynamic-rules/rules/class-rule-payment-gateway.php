@@ -34,9 +34,7 @@ class Rule_Payment_Gateway {
 	private function preserve_workflow_gateways( $filtered_gateways, $all_gateways ) {
 		$workflow_gateway_ids = apply_filters(
 			'wholesalex_payment_rule_exempt_gateway_ids',
-			array(
-				'wholesalex_subaccount_order_approval',
-			)
+			array()
 		);
 
 		foreach ( $all_gateways as $gateway_id => $gateway ) {

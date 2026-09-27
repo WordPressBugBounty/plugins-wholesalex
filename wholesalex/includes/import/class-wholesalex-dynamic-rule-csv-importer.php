@@ -1,4 +1,4 @@
-<?php //phpcs:ignore
+<?php
 /**
  * WHOLESALEX_Dynamic_Rule_CSV_Importer
  * Inspired By WooCommerce Core Product Import
@@ -146,16 +146,16 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 	/**
 	 * Remove UTF-8 BOM signature.
 	 *
-	 * @param string $string String to handle.
+	 * @param string $input_string String to handle.
 	 *
 	 * @return string
 	 */
-	protected function remove_utf8_bom( $string ) {
-		if ( 'efbbbf' === substr( bin2hex( $string ), 0, 6 ) ) { // EFBBF is the byte order mark (BOM) of UTF-8.
-			$string = substr( $string, 3 );
+	protected function remove_utf8_bom( $input_string ) {
+		if ( 'efbbbf' === substr( bin2hex( $input_string ), 0, 6 ) ) { // EFBBF is the byte order mark (BOM) of UTF-8.
+			$input_string = substr( $input_string, 3 );
 		}
 
-		return $string;
+		return $input_string;
 	}
 
 	/**
@@ -1106,7 +1106,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			$row_data[] = $title;
 		}
 		if ( $id ) {
-			/* translators: %d: dynamic_rule ID */
+			/* translators: %d: Imported record ID. */
 			$row_data[] = sprintf( __( 'ID %d', 'wholesalex' ), $id );
 		}
 

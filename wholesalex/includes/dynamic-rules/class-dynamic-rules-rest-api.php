@@ -132,7 +132,7 @@ class Dynamic_Rules_Rest_Api {
 	 */
 	public function dynamic_rule_restapi_permission() {
 		$capability = apply_filters( 'wholesalex_capability_access', 'manage_options' );
-		$allowed = (bool) apply_filters(
+		$allowed    = (bool) apply_filters(
 			'dynamic_rules_restapi_permission_callback', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Preserve the established public filter for backward compatibility.
 			current_user_can( $capability )
 		);
@@ -250,12 +250,8 @@ class Dynamic_Rules_Rest_Api {
 				$data = $this->data_provider->get_products_with_variations( $query, $limit );
 				break;
 			case 'get_bxgy_free_products':
-				if ( ! class_exists( __NAMESPACE__ . '\Wholesale_Pricing_Bxgy_Discount' ) && defined( 'WHOLESALEX_PATH' ) ) {
-					require_once WHOLESALEX_PATH . 'includes/wholesale-pricing/rules/class-rule-bxgy-discount.php';
-				}
-				$data = class_exists( __NAMESPACE__ . '\Wholesale_Pricing_Bxgy_Discount' )
-					? ( new Wholesale_Pricing_Bxgy_Discount() )->get_free_product_picker_options( $query, $limit )
-					: array();
+				$processor = Wholesale_Pricing_Rule_Registry::processor( 'buy_x_get_y' );
+				$data      = $processor ? $processor->get_free_product_picker_options( $query, $limit ) : array();
 				break;
 			case 'get_payment_gateways':
 				$data = $this->data_provider->get_payment_gateways();
@@ -322,7 +318,10 @@ class Dynamic_Rules_Rest_Api {
 
 			$existing_rule = wholesalex()->get_dynamic_rules( $rule_id );
 			if ( ! empty( $existing_rule ) ) {
-				wholesalex()->set_dynamic_rules( $rule_id, $existing_rule, 'delete' );
+				$result = wholesalex()->set_dynamic_rules( $rule_id, $existing_rule, 'delete' );
+				if ( is_wp_error( $result ) ) {
+					return $result;
+				}
 			}
 
 			return array(
@@ -353,7 +352,10 @@ class Dynamic_Rules_Rest_Api {
 			$existing = wholesalex()->get_dynamic_rules( $rule_id );
 			if ( ! empty( $existing ) ) {
 				$existing['_rule_status'] = isset( $data['_rule_status'] ) ? $data['_rule_status'] : '';
-				wholesalex()->set_dynamic_rules( $rule_id, $existing );
+				$result                   = wholesalex()->set_dynamic_rules( $rule_id, $existing );
+				if ( is_wp_error( $result ) ) {
+					return $result;
+				}
 			}
 			$status_label = ! empty( $data['_rule_status'] ) ? __( 'Rule activated successfully.', 'wholesalex' ) : __( 'Rule deactivated successfully.', 'wholesalex' );
 			return array(
@@ -363,17 +365,12 @@ class Dynamic_Rules_Rest_Api {
 		}
 
 		// Full save.
-		$existing = wholesalex()->get_dynamic_rules( $rule_id );
-		if ( empty( $existing ) && ! wholesalex()->can_create_dynamic_rules() ) {
-			return array(
-				'success' => false,
-				'data'    => array( 'message' => __( 'Creating new Dynamic Rules is not available.', 'wholesalex' ) ),
-			);
-		}
-
 		$data        = apply_filters( 'wholesalex_dynamic_rule_data_before_save', $data );
 		$is_frontend = isset( $post['isFrontend'] ) ? (bool) $post['isFrontend'] : false;
-		wholesalex()->set_dynamic_rules( $rule_id, $data, '', $is_frontend );
+		$result      = wholesalex()->set_dynamic_rules( $rule_id, $data, '', $is_frontend );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
 		do_action( 'wholesalex_dynamic_rule_data_after_save', $data );
 
 		return array(
@@ -422,13 +419,19 @@ class Dynamic_Rules_Rest_Api {
 			if ( 'delete' === $action ) {
 				$existing = wholesalex()->get_dynamic_rules( $rid );
 				if ( ! empty( $existing ) ) {
-					wholesalex()->set_dynamic_rules( $rid, $existing, 'delete' );
+					$result = wholesalex()->set_dynamic_rules( $rid, $existing, 'delete' );
+					if ( is_wp_error( $result ) ) {
+						return $result;
+					}
 				}
 			} else {
 				$existing = wholesalex()->get_dynamic_rules( $rid );
 				if ( $existing ) {
 					$existing['_rule_status'] = ( 'enable' === $action ) ? 'yes' : 'no';
-					wholesalex()->set_dynamic_rules( $rid, $existing );
+					$result                   = wholesalex()->set_dynamic_rules( $rid, $existing );
+					if ( is_wp_error( $result ) ) {
+						return $result;
+					}
 				}
 			}
 		}
@@ -447,7 +450,7 @@ class Dynamic_Rules_Rest_Api {
 	 * @param \WP_REST_Request $server Full details about the request.
 	 * @return array
 	 */
-	public function dynamic_rules_per_page_get( $server ) {
+	public function dynamic_rules_per_page_get( $server ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Retain the established callback signature for compatibility.
 		$per_page = get_option( '_wholesalex_dynamic_rules_per_page', 10 );
 		return array(
 			'success' => true,

@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve the established activator include path.
 /**
  * WholesaleX Activator
  *
@@ -8,6 +8,8 @@
  */
 
 namespace WHOLESALEX;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * WholesaleX Activator Class
@@ -52,9 +54,8 @@ class Activator {
 		$init_data = array(
 			// Recaptcha.
 			'_settings_google_recaptcha_v3_allowed_score' => '0.5',
+			'recaptcha_version'                           => 'recaptcha_v3',
 			// Addons.
-			'wsx_addon_conversation'                      => 'no',
-			'wsx_addon_wallet'                            => 'no',
 			'wsx_addon_recaptcha'                         => 'no',
 			// General.
 			'_settings_status'                            => 'b2b_n_b2c',
@@ -77,15 +78,10 @@ class Activator {
 			'_settings_price_text'                        => __( 'Wholesale Price:', 'wholesalex' ),
 			'_settings_price_text_product_list_page'      => __( 'Wholesale Price:', 'wholesalex' ),
 			'_settings_price_product_list_page'           => 'pricing_range',
-			// Design.
-			'_settings_tier_layout'                       => 'layout_one',
 			'_settings_primary_color'                     => '#2FC4A7',
 			'settings_primary_hover_color'                => '#24A88F',
 			'_settings_text_color'                        => '#272727',
 			'_settings_border_color'                      => '#E5E5E5',
-			'_settings_active_tier_color'                 => '#1986f4',
-			// Conversation.
-			'_settings_show_conversation_my_account_page' => 'yes',
 		);
 		if ( empty( $data ) ) {
 			update_option( 'wholesalex_settings', $init_data );
@@ -141,8 +137,16 @@ class Activator {
 			|| 'pending' !== wholesalex()->get_onboarding_status() ) {
 			return;
 		}
-		// The activated_plugin hook runs only after WordPress has authorized the activation request.
-		if ( wp_doing_ajax() || is_network_admin() || isset( $_GET['activate-multi'] ) || ( isset( $_POST['action'] ) && is_string( $_POST['action'] ) && 'activate-selected' === sanitize_key( wp_unslash( $_POST['action'] ) ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.NonceVerification.Missing -- Core owns activation nonce verification; values are read only to control the redirect.
+		// Confirm this is the authorized single-plugin activation request before
+		// reading anything else from it. Bulk activations carry the bulk nonce and
+		// must not trigger the onboarding redirect.
+		$activation_nonce = isset( $_REQUEST['_wpnonce'] ) && is_string( $_REQUEST['_wpnonce'] ) ? sanitize_key( wp_unslash( $_REQUEST['_wpnonce'] ) ) : '';
+
+		if ( '' === $activation_nonce || ! wp_verify_nonce( $activation_nonce, 'activate-plugin_' . $plugin ) ) {
+			return;
+		}
+
+		if ( wp_doing_ajax() || is_network_admin() || isset( $_GET['activate-multi'] ) || ( isset( $_POST['action'] ) && is_string( $_POST['action'] ) && 'activate-selected' === sanitize_key( wp_unslash( $_POST['action'] ) ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.NonceVerification.Missing -- The activation nonce is verified above; these only distinguish bulk activation.
 			return;
 		}
 		if ( WHOLESALEX_BASE === $plugin ) {

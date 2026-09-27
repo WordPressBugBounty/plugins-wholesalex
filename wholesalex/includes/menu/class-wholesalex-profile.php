@@ -8,6 +8,8 @@
 
 namespace WHOLESALEX;
 
+defined( 'ABSPATH' ) || exit;
+
 use WHOLESALEX\WholesaleX_CommonUtils;
 
 use stdClass;
@@ -106,7 +108,7 @@ class WHOLESALEX_Profile {
 	 */
 	public function profile_action_callback( $server ) {
 		$post = $server->get_params();
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
+		if ( ! isset( $post['nonce'] ) || ! is_string( $post['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $post['nonce'] ) ), 'wholesalex-registration' ) ) {
 			return;
 		}
 
@@ -115,7 +117,7 @@ class WHOLESALEX_Profile {
 
 		if ( 'get' === $type ) {
 
-			$__tiers         = get_user_meta( $user_id, '__wholesalex_profile_discounts', true );
+			$__tiers         = apply_filters( 'wholesalex_profile_discounts', array(), $user_id );
 			$__user_settings = get_user_meta( $user_id, '__wholesalex_profile_settings', true );
 			if ( empty( $__user_settings ) ) {
 				$__user_settings = array();
@@ -154,7 +156,7 @@ class WHOLESALEX_Profile {
 					do_action( 'wholesalex_set_status_active', $user_id, '' );
 					break;
 				case 'reject_user':
-					update_user_meta( $user_id, '__wholesalex_status', 'active' );
+					update_user_meta( $user_id, '__wholesalex_status', 'reject' );
 					do_action( 'wholesalex_set_status_reject', $user_id );
 					break;
 				case 'delete_user':
@@ -231,10 +233,6 @@ class WHOLESALEX_Profile {
 							'enter_more_character' => __( 'Enter 2 or more characters to search.', 'wholesalex' ),
 							'searching'            => __( 'Searching...', 'wholesalex' ),
 							'this_user'            => __( 'This User', 'wholesalex' ),
-							// 'unlock'               => __( 'UNLOCK', 'wholesalex' ),
-							// 'unlock_heading'       => __( 'Unlock All Features', 'wholesalex' ),
-							// 'unlock_desc'          => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
-							// 'upgrade_to_pro'       => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
 						),
 					)
 				);
@@ -252,12 +250,14 @@ class WHOLESALEX_Profile {
 	 */
 	public function save_wholesalex_profile_data( $user_id ) {
 
+		$is_create_user = false;
 		if ( isset( $_POST['_wpnonce_create-user'] ) ) {
-			if ( ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce_create-user'] ), 'create-user' ) ) {
+			if ( ! is_string( $_POST['_wpnonce_create-user'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['_wpnonce_create-user'] ) ), 'create-user' ) || ! current_user_can( 'create_users' ) ) {
 				return;
 			}
-		} elseif ( ! ( isset( $_POST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'update-user_' . $user_id ) ) ) {
-				return;
+			$is_create_user = true;
+		} elseif ( ! isset( $_POST['_wpnonce'] ) || ! is_string( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ), 'update-user_' . $user_id ) ) {
+			return;
 		}
 		if ( ! current_user_can( 'edit_user', $user_id ) ) {
 			return false;
@@ -265,21 +265,12 @@ class WHOLESALEX_Profile {
 
 		do_action( 'wholesalex_save_profile_data', $user_id, wholesalex()->sanitize( $_POST ) );
 
-		if ( isset( $_POST['wholesalex_profile_tiers'] ) && ! empty( $_POST['wholesalex_profile_tiers'] ) ) {
+		// Editing one's own profile does not authorize wholesale roles or pricing overrides.
+		$can_manage_settings = current_user_can( apply_filters( 'wholesalex_capability_access', 'manage_options' ) );
+		if ( $can_manage_settings && isset( $_POST['wholesalex_profile_settings'] ) && ! empty( $_POST['wholesalex_profile_settings'] ) ) {
 
-			$__tiers = wholesalex()->sanitize( json_decode( wp_unslash( $_POST['wholesalex_profile_tiers'] ), true ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			$__tiers = $this->enforce_profile_tier_entitlements( $__tiers );
-			if ( isset( $__tiers['_profile_discounts']['tiers'] ) ) {
-				$__tiers['_profile_discounts']['tiers'] = $this->filter_complete_profile_tiers(
-					$__tiers['_profile_discounts']['tiers']
-				);
-			}
-
-			update_user_meta( $user_id, '__wholesalex_profile_discounts', $__tiers );
-		}
-		if ( isset( $_POST['wholesalex_profile_settings'] ) && ! empty( $_POST['wholesalex_profile_settings'] ) ) {
-
-			$__settings = wholesalex()->sanitize( json_decode( wp_unslash( $_POST['wholesalex_profile_settings'] ), true ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$__settings = wholesalex()->sanitize_json_input( wp_unslash( $_POST['wholesalex_profile_settings'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitize_json_input() decodes the payload and recursively sanitizes every value; sanitizing the raw JSON string first corrupts it.
+			$__settings = is_array( $__settings ) ? $__settings : array();
 
 			$__settings = apply_filters( 'wholesalex_profile_setting_data', $__settings, $user_id );
 
@@ -320,7 +311,7 @@ class WHOLESALEX_Profile {
 						// If the new role isn't editable by the logged-in user die with error.
 						$editable_roles = get_editable_roles();
 						if ( ! empty( $new_role ) && empty( $editable_roles[ $new_role ] ) ) {
-							wp_die( __( 'Sorry, you are not allowed to give users that role.','wholesalex'), 403 ); //phpcs:ignore
+							wp_die( esc_html__( 'Sorry, you are not allowed to give users that role.', 'wholesalex' ), '', array( 'response' => 403 ) );
 						}
 
 						$potential_role = isset( $wp_roles->role_objects[ $new_role ] ) ? $wp_roles->role_objects[ $new_role ] : false;
@@ -363,7 +354,7 @@ class WHOLESALEX_Profile {
 				} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
 					$field_name = 'wholesalex_cf_' . $field['name'];
 				}
-                if ( in_array( $field['name'], $default_fields ) ) { // phpcs:ignore
+				if ( in_array( $field['name'], $default_fields, true ) ) {
 					continue;
 				}
 
@@ -380,7 +371,7 @@ class WHOLESALEX_Profile {
 							break;
 						default:
 							if ( is_array( $_POST[ $field_name ] ) ) {
-								$__value = wholesalex()->sanitize( wp_unslash( $_POST[ $field_name ] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+								$__value = wholesalex()->sanitize( map_deep( wp_unslash( $_POST[ $field_name ] ), 'sanitize_text_field' ) );
 							} else {
 								$__value = sanitize_text_field( wp_unslash( $_POST[ $field_name ] ) );
 							}
@@ -392,92 +383,17 @@ class WHOLESALEX_Profile {
 			}
 		}
 
-		if ( isset( $_POST['action'] ) && 'createuser' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) {
+		if ( $can_manage_settings && $is_create_user && isset( $_POST['action'] ) && 'createuser' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) {
 			update_user_meta( $user_id, '__wholesalex_status', 'active' );
 		} else {
 			$updated_fields = array();
-			if ( isset( $_POST['wholesalex_profile_tiers'] ) && ! empty( $_POST['wholesalex_profile_tiers'] ) ) {
-				$updated_fields[] = __( 'Discounts', 'wholesalex' );
-			}
-			if ( isset( $_POST['wholesalex_profile_settings'] ) && ! empty( $_POST['wholesalex_profile_settings'] ) ) {
+			if ( $can_manage_settings && isset( $_POST['wholesalex_profile_settings'] ) && ! empty( $_POST['wholesalex_profile_settings'] ) ) {
 				$updated_fields[] = __( 'Profile Settings', 'wholesalex' );
 			}
 			if ( ! empty( $updated_fields ) ) {
 				do_action( 'wholesalex_user_profile_update_notify', $user_id, $updated_fields );
 			}
 		}
-	}
-
-	/**
-	 * Keep only profile discounts with a quantity and explicit product targeting.
-	 *
-	 * This is profile-specific: other tier types do not require product filters.
-	 *
-	 * @param mixed $tiers Submitted profile discount rows.
-	 * @return array Complete rows, reindexed for JSON serialization.
-	 */
-	private function filter_complete_profile_tiers( $tiers ): array {
-		$tiers = wholesalex()->filter_empty_tier( $tiers );
-
-		return array_values(
-			array_filter(
-				$tiers,
-				static function ( $tier ) {
-					$quantity = $tier['_min_quantity'] ?? '';
-					$filter   = $tier['_product_filter'] ?? '';
-					if ( ! is_numeric( $quantity ) || ! is_finite( (float) $quantity ) || (float) $quantity <= 0 || ! is_string( $filter ) || '' === trim( $filter ) ) {
-						return false;
-					}
-
-					if ( 'all_products' === $filter ) {
-						return true;
-					}
-
-					// Specific filters must contain at least one actual selection.
-					$selections = $tier[ $filter ] ?? array();
-					if ( ! is_array( $selections ) ) {
-						return false;
-					}
-					foreach ( $selections as $selection ) {
-						$value = is_array( $selection ) ? ( $selection['value'] ?? '' ) : $selection;
-						if ( is_scalar( $value ) && '' !== trim( (string) $value ) ) {
-							return true;
-						}
-					}
-
-					return false;
-				}
-			)
-		);
-	}
-
-	/**
-	 * Prevent profile-only Pro product filters from being saved without a license.
-	 *
-	 * @param mixed $tiers Sanitized profile tier data.
-	 * @return mixed
-	 */
-	private function enforce_profile_tier_entitlements( $tiers ) {
-		if ( wholesalex()->is_pro_active() || ! is_array( $tiers ) ) {
-			return $tiers;
-		}
-
-		if ( empty( $tiers['_profile_discounts']['tiers'] ) || ! is_array( $tiers['_profile_discounts']['tiers'] ) ) {
-			return $tiers;
-		}
-
-		$pro_filters = array( 'brand_in_list', 'sku_in_list', 'att_in_list' );
-		foreach ( $tiers['_profile_discounts']['tiers'] as &$tier ) {
-			if ( ! is_array( $tier ) || ! in_array( $tier['_product_filter'] ?? '', $pro_filters, true ) ) {
-				continue;
-			}
-
-			$tier['_product_filter'] = '';
-			unset( $tier['brand_in_list'], $tier['sku_in_list'], $tier['att_in_list'] );
-		}
-		unset( $tier );
-
-		return $tiers;
 	}
 
 	/**
@@ -530,6 +446,33 @@ class WHOLESALEX_Profile {
 	}
 
 	/**
+	 * Check the nonce sent with the WholesaleX user list filters.
+	 *
+	 * @return bool
+	 */
+	private function is_user_filter_request_verified() {
+		if ( ! isset( $_GET['wholesalex_user_filter_nonce'] ) || ! is_string( $_GET['wholesalex_user_filter_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['wholesalex_user_filter_nonce'] ) ), 'wholesalex_user_filter' ) ) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Read a WholesaleX user list filter value from a verified request.
+	 *
+	 * @param string $key Request key.
+	 * @return string Filter value, or an empty string when the request is not verified.
+	 */
+	private function get_user_filter_value( $key ) {
+		if ( ! $this->is_user_filter_request_verified() ) {
+			return '';
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The filter nonce is verified above.
+		return isset( $_GET[ $key ] ) && is_string( $_GET[ $key ] ) ? sanitize_text_field( wp_unslash( $_GET[ $key ] ) ) : '';
+	}
+
+	/**
 	 * Add Role Filer
 	 *
 	 * @param String $which Role Filter Position ( top or bottom).
@@ -538,10 +481,12 @@ class WHOLESALEX_Profile {
 		$st      = '<select class="wsx-select" name="filter_wholesalex_role_%s" style="float:none;"><option value="">%s</option>%s</select>';
 		$options = '';
 		$roles   = wholesalex()->get_roles( 'roles_option' );
-		$status  = isset( $_GET[ 'filter_wholesalex_role_' . $which ] ) ? sanitize_text_field( $_GET[ 'filter_wholesalex_role_' . $which ] ) : ''; // @codingStandardsIgnoreLine.
+		$status  = $this->get_user_filter_value( 'filter_wholesalex_role_' . $which );
 		foreach ( $roles as $option ) {
 			$options .= sprintf( '<option value="%s" %s>%s</option>', esc_attr( $option['value'] ), selected( $status, $option['value'], false ), esc_html( $option['name'] ) );
 		}
+
+		wp_nonce_field( 'wholesalex_user_filter', 'wholesalex_user_filter_nonce', false );
 
 		$select = sprintf( $st, $which, __( '- Wholesale Role -', 'wholesalex' ), $options );
 		echo wp_kses(
@@ -567,38 +512,41 @@ class WHOLESALEX_Profile {
 	 */
 	public function filter_user_section( $query ) {
 		global $pagenow;
-		$get_data = wholesalex()->sanitize( $_GET ); // @codingStandardsIgnoreLine.
-		if ( is_admin() && 'users.php' === $pagenow ) {
-			$button = key(
-				array_filter(
-					$get_data,
-					function ( $v ) {
-						return __( 'Filter', 'wholesalex' ) === $v;
-					}
-				)
+
+		if ( ! is_admin() || 'users.php' !== $pagenow || ! $this->is_user_filter_request_verified() ) {
+			return;
+		}
+
+		$get_data = wholesalex()->sanitize( wp_unslash( $_GET ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The filter nonce is verified above; values are sanitized recursively.
+		$button   = key(
+			array_filter(
+				$get_data,
+				function ( $v ) {
+					return __( 'Filter', 'wholesalex' ) === $v;
+				}
+			)
+		);
+		if ( isset( $get_data[ 'filter_wholesalex_role_' . $button ] ) && ! empty( $get_data[ 'filter_wholesalex_role_' . $button ] ) ) {
+			$selected_role = $get_data[ 'filter_wholesalex_role_' . $button ];
+			$meta_query    = array(
+				array(
+					'key'     => '__wholesalex_role',
+					'value'   => $selected_role,
+					'compare' => '=',
+				),
 			);
-			if ( isset( $get_data[ 'filter_wholesalex_role_' . $button ] ) && !empty( $get_data[ 'filter_wholesalex_role_' . $button ] ) ) { // @codingStandardsIgnoreLine.
-				$selected_role = $get_data[ 'filter_wholesalex_role_' . $button ]; // @codingStandardsIgnoreLine.
-				$meta_query    = array(
-					array(
-						'key'     => '__wholesalex_role',
-						'value'   => $selected_role,
-						'compare' => '=',
-					),
-				);
-				$query->set( 'meta_key', '__wholesalex_role' );
-				$query->set( 'meta_query', $meta_query );
-			} elseif ( isset( $get_data[ 'filter_wholesalex_status_' . $button ] )  && !empty($get_data[ 'filter_wholesalex_status_' . $button ])) { // @codingStandardsIgnoreLine.
-				$selected_status = $get_data[ 'filter_wholesalex_status_' . $button ]; // @codingStandardsIgnoreLine.
-				$meta_query      = array(
-					array(
-						'key'   => '__wholesalex_status',
-						'value' => $selected_status,
-					),
-				);
-				$query->set( 'meta_key', '__wholesalex_status' );
-				$query->set( 'meta_query', $meta_query );
-			}
+			$query->set( 'meta_key', '__wholesalex_role' );
+			$query->set( 'meta_query', $meta_query );
+		} elseif ( isset( $get_data[ 'filter_wholesalex_status_' . $button ] ) && ! empty( $get_data[ 'filter_wholesalex_status_' . $button ] ) ) {
+			$selected_status = $get_data[ 'filter_wholesalex_status_' . $button ];
+			$meta_query      = array(
+				array(
+					'key'   => '__wholesalex_status',
+					'value' => $selected_status,
+				),
+			);
+			$query->set( 'meta_key', '__wholesalex_status' );
+			$query->set( 'meta_query', $meta_query );
 		}
 	}
 
@@ -617,7 +565,7 @@ class WHOLESALEX_Profile {
 			'inactive' => __( 'Inactive', 'wholesalex' ),
 			'reject'   => __( 'Reject', 'wholesalex' ),
 		);
-		$status         = isset( $_GET[ 'filter_wholesalex_status_' . $which ] ) ? sanitize_text_field( $_GET[ 'filter_wholesalex_status_' . $which ] ) : ''; // @codingStandardsIgnoreLine.
+		$status         = $this->get_user_filter_value( 'filter_wholesalex_status_' . $which );
 		foreach ( $status_options as $key => $option ) {
 			$options .= sprintf( '<option value="%s" %s>%s</option>', esc_attr( $key ), selected( $status, $key, false ), esc_html( $option ) );
 		}
@@ -715,7 +663,7 @@ class WHOLESALEX_Profile {
 		$default_fields     = array( 'user_login', 'user_pass', 'display_name', 'nickname', 'first_name', 'last_name', 'description', 'user_email', 'url', 'user_confirm_email', 'user_confirm_password', 'default_user_role', 'registration_role', 'wholesalex_registration_role', 'user_confirm_pass' );
 		$__has_extra_fields = false;
 		?>
-			<h2 id="wholesalex_extra_information"><?php echo sprintf( esc_html__( '%s Extra Information', 'wholesalex' ), wholesalex()->get_plugin_name() ); //phpcs:ignore ?></h2>
+			<h2 id="wholesalex_extra_information"><?php /* translators: %s: Plugin name. */ echo esc_html( sprintf( __( '%s Extra Information', 'wholesalex' ), wholesalex()->get_plugin_name() ) ); ?></h2>
 			<table class="wsx-table form-table">
 				<?php
 
@@ -727,7 +675,7 @@ class WHOLESALEX_Profile {
 					}
 
 					if ( isset( $field['status'] ) && $field['status'] ) {
-						if ( isset( $field['excludeRoles'] ) && is_array( $field['excludeRoles'] ) && in_array( $user_role, $field['excludeRoles'] ) ) {
+						if ( isset( $field['excludeRoles'] ) && is_array( $field['excludeRoles'] ) && in_array( $user_role, $field['excludeRoles'], true ) ) {
 							continue; // Exclude For this user.
 						} else {
 
@@ -735,7 +683,7 @@ class WHOLESALEX_Profile {
 								$field['title'] = $field['label'];
 							}
 
-							if ( (!isset($field['name']) || !isset($field['title'] )) || in_array( $field['name'], $default_fields ) || ( isset($field['billing_connection']) && !empty($field['billing_connection']) )   ) { // phpcs:ignore
+							if ( ! isset( $field['name'], $field['title'] ) || in_array( $field['name'], $default_fields, true ) || ! empty( $field['billing_connection'] ) || 'termCondition' === $field['type'] ) {
 								continue;
 							}
 							$__has_extra_fields = true;
@@ -794,7 +742,7 @@ class WHOLESALEX_Profile {
 												foreach ( $field['option'] as $option ) :
 													?>
 													<div>
-														<input type="checkbox" name="<?php echo esc_attr( $field_name ) . '[]'; ?>" id="<?php echo esc_attr( $option['value'] ); ?>" value=<?php echo esc_attr( $option['value'] ); ?> class="regular-text" <?php checked( in_array( $option['value'], $__selected_values ), 1, true ); //phpcs:ignore ?> />
+												<input type="checkbox" name="<?php echo esc_attr( $field_name ) . '[]'; ?>" id="<?php echo esc_attr( $option['value'] ); ?>" value=<?php echo esc_attr( $option['value'] ); ?> class="regular-text" <?php checked( in_array( $option['value'], $__selected_values, true ), true, true ); ?> />
 
 														<label for=<?php echo esc_attr( $option['value'] ); ?> > <?php echo esc_html( $option['name'] ); ?>  </label>
 													</div>
@@ -834,7 +782,7 @@ class WHOLESALEX_Profile {
 													$__url = wp_get_attachment_url( $__value );
 													if ( $__url ) {
 														?>
-														<div class="wholesalex_download_file"><a class="wsx-link" href="<?php echo esc_url_raw( $__url ); ?>"><?php esc_html_e( 'Download File', 'wholesalex' ); ?></a></div>
+														<div class="wholesalex_download_file"><a class="wsx-link" href="<?php echo esc_url( $__url ); ?>"><?php esc_html_e( 'Download File', 'wholesalex' ); ?></a></div>
 														<?php
 													} else {
 														?>
@@ -958,28 +906,9 @@ class WHOLESALEX_Profile {
 	public function get_profile_fields() {
 		// Roles Options.
 		$__roles_options = wholesalex()->get_roles( 'mapped_roles' );
-		$is_pro_active    = wholesalex()->is_pro_active();
 		unset( $__roles_options['wholesalex_guest'] );
 
-		$product_filter_options = array(
-			''                  => __( 'Choose Filter...', 'wholesalex' ),
-			'all_products'      => __( 'All Products', 'wholesalex' ),
-			'products_in_list'  => __( 'Specific Products', 'wholesalex' ),
-			'cat_in_list'       => __( 'Specific Categories', 'wholesalex' ),
-			'attribute_in_list' => __( 'Specific Variations', 'wholesalex' ),
-		);
-
-		if ( $is_pro_active ) {
-			$product_filter_options['brand_in_list'] = __( 'Specific Brands', 'wholesalex' );
-			$product_filter_options['sku_in_list']   = __( 'Specific SKU', 'wholesalex' );
-			$product_filter_options['att_in_list']   = __( 'Specific Attributes', 'wholesalex' );
-		} else {
-			$product_filter_options['pro_brand_in_list'] = __( 'Specific Brands (Pro)', 'wholesalex' );
-			$product_filter_options['pro_sku_in_list']   = __( 'Specific SKU (Pro)', 'wholesalex' );
-			$product_filter_options['pro_att_in_list']   = __( 'Specific Attributes (Pro)', 'wholesalex' );
-		}
-
-		return apply_filters(
+		$fields = apply_filters(
 			'wholesalex_profile_fields',
 			array(
 				'_profile_settings' => array(
@@ -1122,170 +1051,6 @@ class WHOLESALEX_Profile {
 								),
 							),
 						),
-						'_profile_discounts_section'     => array(
-							'label' => '',
-							'attr'  => array(
-								'_profile_discounts' => array(
-									/* translators: %s - Plugin Name */
-									'label'    => sprintf( __( '%s Profile Discount', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-									'type'     => 'tiers',
-									'is_pro'   => true,
-									'pro_data' => array(
-										'type'  => 'limit',
-										'value' => 3,
-									),
-									'attr'     => apply_filters(
-										'wholesalex_profile_discounts_fields',
-										array(
-											'discounts' => array(
-												'type'   => 'tier',
-												'_tiers' => array(
-													'columns' => array(
-														__( 'Discount Type', 'wholesalex' ),
-														__( 'Amount', 'wholesalex' ),
-														__( 'Min Quantity', 'wholesalex' ),
-														__( 'Product Filter', 'wholesalex' ),
-													),
-													'data' => array(
-														'_discount_type'        => array(
-															'type'    => 'select',
-															'options' => array(
-																''           => __( 'Choose Discount Type...', 'wholesalex' ),
-																'amount'     => __( 'Discount Amount', 'wholesalex' ),
-																'percentage' => __( 'Discount Percentage', 'wholesalex' ),
-																'fixed'      => __( 'Fixed Price', 'wholesalex' ),
-															),
-															'default' => '',
-															'label' => __( 'Discount Type', 'wholesalex' ),
-														),
-														'_discount_amount'      => array(
-															'type'        => 'number',
-															'placeholder' => '',
-															'default'     => '',
-															'label' => __( 'Amount', 'wholesalex' ),
-														),
-														'_min_quantity'         => array(
-															'type'        => 'number',
-															'placeholder' => '',
-															'default'     => '',
-															'label'       => __( 'Min Quantity', 'wholesalex' ),
-															'required'    => true,
-														),
-														'_product_select_with_filter' => array(
-															'type'    => 'filter',
-															'_product_filter'       => array(
-																'type'    => 'select',
-																'options' => $product_filter_options,
-																'default' => '',
-																'label' => __( 'Product Filter', 'wholesalex' ),
-															),
-															'products_in_list'      => array(
-																'type'        => 'multiselect',
-																'depends_on'  => array(
-																	array(
-																		'key'   => '_product_filter',
-																		'value' => 'products_in_list',
-																	),
-																),
-																'options'     => array(),
-																'placeholder' => __( 'Choose Products to apply discounts', 'wholesalex' ),
-																'default'     => array(),
-																'is_ajax'     => true,
-																'ajax_action' => 'get_products',
-																'ajax_search' => true,
-															),
-															'cat_in_list'           => array(
-																'type'        => 'multiselect',
-																'depends_on'  => array(
-																	array(
-																		'key'   => '_product_filter',
-																		'value' => 'cat_in_list',
-																	),
-																),
-																'options'     => array(),
-																'placeholder' => __( 'Choose Categories to apply discounts', 'wholesalex' ),
-																'default'     => array(),
-																'is_ajax'     => true,
-																'ajax_action' => 'get_categories',
-																'ajax_search' => true,
-															),
-															'attribute_in_list'     => array(
-																'type'        => 'multiselect',
-																'depends_on'  => array(
-																	array(
-																		'key'   => '_product_filter',
-																		'value' => 'attribute_in_list',
-																	),
-																),
-																'options'     => array(),
-																'placeholder' => __( 'Choose Product Variations to apply discounts', 'wholesalex' ),
-																'default'     => array(),
-																'is_ajax'     => true,
-																'ajax_action' => 'get_variation_products',
-																'ajax_search' => true,
-															),
-															'brand_in_list'         => array(
-																'type'        => 'multiselect',
-																'depends_on'  => array(
-																	array(
-																		'key'   => '_product_filter',
-																		'value' => 'brand_in_list',
-																	),
-																),
-																'options'     => array(),
-																'placeholder' => __( 'Choose Brands to apply discounts', 'wholesalex' ),
-																'default'     => array(),
-																'is_ajax'     => true,
-																'ajax_action' => 'get_brands',
-																'ajax_search' => true,
-															),
-															'sku_in_list'           => array(
-																'type'        => 'multiselect',
-																'depends_on'  => array(
-																	array(
-																		'key'   => '_product_filter',
-																		'value' => 'sku_in_list',
-																	),
-																),
-																'options'     => array(),
-																'placeholder' => __( 'Search SKUs to apply discounts', 'wholesalex' ),
-																'default'     => array(),
-																'is_ajax'     => true,
-																'ajax_action' => 'get_skus',
-																'ajax_search' => true,
-															),
-															'att_in_list'           => array(
-																'type'        => 'multiselect',
-																'depends_on'  => array(
-																	array(
-																		'key'   => '_product_filter',
-																		'value' => 'att_in_list',
-																	),
-																),
-																'options'     => array(),
-																'placeholder' => __( 'Choose Attributes to apply discounts', 'wholesalex' ),
-																'default'     => array(),
-																'is_ajax'     => true,
-																'ajax_action' => 'get_attributes',
-																'ajax_search' => true,
-															),
-														),
-													),
-													'add'  => array(
-														'type' => 'button',
-														'label' => __( 'Add Price Tier', 'wholesalex' ),
-													),
-													'upgrade_pro' => array(
-														'type'  => 'button',
-														'label' => __( 'Go For Unlimited Price Tiers', 'wholesalex' ),
-													),
-												),
-											),
-										)
-									),
-								),
-							),
-						),
 						'_profile_user_settings_section' => array(
 							/* translators: %s - Plugin Name */
 							'label' => sprintf( __( '%s User Settings', 'wholesalex' ), wholesalex()->get_plugin_name() ),
@@ -1324,6 +1089,7 @@ class WHOLESALEX_Profile {
 				),
 			),
 		);
+		return $fields;
 	}
 
 	/**

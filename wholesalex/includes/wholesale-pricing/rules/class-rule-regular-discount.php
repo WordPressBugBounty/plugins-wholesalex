@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve the existing loader path and public class name.
 /**
  * WholesaleX Wholesale Pricing - Regular Discount Rule Handler
  *
@@ -47,7 +47,7 @@ class Wholesale_Pricing_Regular_Discount {
 	 * @return string
 	 */
 	public function get_label( array $rule ): string {
-		if ( ! empty( $rule['rule']['label'] ) ) {
+		if ( isset( $rule['rule']['label'] ) ) {
 			return $rule['rule']['label'];
 		}
 

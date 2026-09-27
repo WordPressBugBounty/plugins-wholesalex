@@ -12,22 +12,14 @@
 
 namespace WHOLESALEX;
 
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
  * Handles user targeting, product targeting, and advanced conditions.
  */
-class Wholesale_Pricing_Condition_Engine
-{
-
-	/**
-	 * Per-request cache for lifetime customer condition values.
-	 *
-	 * @var array<int, array{order_count?: int, total_spent?: float}>
-	 */
-	private static $customer_lifetime_cache = array();
+class Wholesale_Pricing_Condition_Engine {
 
 	/**
 	 * Convert a saved wholesale-pricing product filter into the runtime filter shape.
@@ -35,63 +27,65 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param array $rule Saved wholesale-pricing rule.
 	 * @return array{filter: array, priority: int}
 	 */
-	public static function get_runtime_product_filter(array $rule): array
-	{
-		$filter_type = isset($rule['product_filter']) ? $rule['product_filter'] : 'all_products';
-		$filter = array(
-			'include_products' => array(),
+	public static function get_runtime_product_filter( array $rule ): array {
+		$filter_type = isset( $rule['product_filter'] ) ? $rule['product_filter'] : 'all_products';
+		$filter      = array(
+			'include_products'   => array(),
 			'include_attributes' => array(),
-			'include_brands' => array(),
-			'include_cats' => array(),
+			'include_brands'     => array(),
+			'include_cats'       => array(),
 			'include_variations' => array(),
-			'include_skus' => array(),
-			'exclude_products' => array(),
+			'include_skus'       => array(),
+			'exclude_products'   => array(),
 			'exclude_attributes' => array(),
-			'exclude_brands' => array(),
-			'exclude_cats' => array(),
+			'exclude_brands'     => array(),
+			'exclude_cats'       => array(),
 			'exclude_variations' => array(),
-			'is_all_products' => 'all_products' === $filter_type,
+			'is_all_products'    => 'all_products' === $filter_type,
 		);
-		$priority = 10;
+		$priority    = 10;
 
-		if ('specific_products' === $filter_type) {
-			$filter['include_products'] = self::pluck_select_values(is_array($rule['products'] ?? null) ? $rule['products'] : array());
-			$priority = 50;
-		} elseif ('specific_variations' === $filter_type) {
-			$filter['include_variations'] = self::pluck_select_values(is_array($rule['products'] ?? null) ? $rule['products'] : array());
-			$priority = 60;
-		} elseif ('specific_categories' === $filter_type) {
-			$filter['include_cats'] = self::pluck_select_values(isset($rule['categories']) ? $rule['categories'] : array());
-			$priority = 40;
-		} elseif ('brands' === $filter_type) {
-			$filter['include_brands'] = self::pluck_select_values(isset($rule['brands']) ? $rule['brands'] : array());
-			$priority = 40;
-		} elseif ('attributes' === $filter_type) {
-			$filter['include_attributes'] = self::pluck_select_values(isset($rule['attributes']) ? $rule['attributes'] : array());
-			$priority = 40;
-		} elseif ('sku' === $filter_type) {
-			$filter['include_skus'] = self::get_product_ids_for_sku_items(isset($rule['skus']) ? $rule['skus'] : array());
-			$priority = 50;
+		if ( 'specific_products' === $filter_type ) {
+			$filter['include_products'] = self::pluck_select_values( is_array( $rule['products'] ?? null ) ? $rule['products'] : array() );
+			$priority                   = 50;
+		} elseif ( 'specific_variations' === $filter_type ) {
+			$filter['include_variations'] = self::pluck_select_values( is_array( $rule['products'] ?? null ) ? $rule['products'] : array() );
+			$priority                     = 60;
+		} elseif ( 'specific_categories' === $filter_type ) {
+			$filter['include_cats'] = self::pluck_select_values( isset( $rule['categories'] ) ? $rule['categories'] : array() );
+			$priority               = 40;
+		} elseif ( ! in_array( $filter_type, array( 'all_products', 'specific_products', 'specific_variations', 'specific_categories' ), true ) ) {
+			$filter = apply_filters( 'wholesalex_premium_product_filter', $filter, $filter_type, $rule );
+			if ( ! is_array( $filter ) || empty( $filter['_premium_target'] ) ) {
+				$filter = array_merge(
+					$filter,
+					array(
+						'_unavailable'    => true,
+						'is_all_products' => false,
+					)
+				);
+			}
+			$priority = isset( $filter['_priority'] ) ? absint( $filter['_priority'] ) : 10;
 		}
 
-		if ('all_products' === $filter_type || 'specific_categories' === $filter_type) {
-			$filter['exclude_products'] = self::pluck_select_values(isset($rule['exclude_products']) ? $rule['exclude_products'] : array());
+		if ( 'all_products' === $filter_type || 'specific_categories' === $filter_type ) {
+			$filter['exclude_products'] = self::pluck_select_values( isset( $rule['exclude_products'] ) ? $rule['exclude_products'] : array() );
 		}
 
-		$filter = self::expand_translated_filter_ids($filter);
+		$filter = self::expand_translated_filter_ids( $filter );
 
 		// Include every descendant at runtime without changing the saved selection.
 		$selected_categories = $filter['include_cats'];
-		foreach ($selected_categories as $category_id) {
-			$children = get_term_children((int) $category_id, 'product_cat');
-			if (!is_wp_error($children)) {
-				$filter['include_cats'] = array_merge($filter['include_cats'], $children);
+		foreach ( $selected_categories as $category_id ) {
+			$children = get_term_children( (int) $category_id, 'product_cat' );
+			if ( ! is_wp_error( $children ) ) {
+				$filter['include_cats'] = array_merge( $filter['include_cats'], $children );
 			}
 		}
-		$filter['include_cats'] = array_values(array_unique(array_map('absint', $filter['include_cats'])));
+		$filter['include_cats'] = array_values( array_unique( array_map( 'absint', $filter['include_cats'] ) ) );
 
 		return array(
-			'filter' => $filter,
+			'filter'   => $filter,
 			'priority' => $priority,
 		);
 	}
@@ -104,46 +98,45 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param int    $user_id Current user ID, or zero for a guest.
 	 * @return bool
 	 */
-	public static function user_role_matches(array $rule, string $role_id, int $user_id = 0): bool
-	{
-		$role_filter = isset($rule['user_role_filter']) ? $rule['user_role_filter'] : 'all_b2b';
+	public static function user_role_matches( array $rule, string $role_id, int $user_id = 0 ): bool {
+		$role_filter = isset( $rule['user_role_filter'] ) ? $rule['user_role_filter'] : 'all_b2b';
 
-		if ('all' === $role_filter) {
+		if ( 'all' === $role_filter ) {
 			return true;
 		}
 
-		if ('all_users' === $role_filter) {
-			if (0 === $user_id) {
+		if ( 'all_users' === $role_filter ) {
+			if ( 0 === $user_id ) {
 				return false;
 			}
 
-			$excluded_users = apply_filters('wholesalex_dynamic_rules_exclude_users', array());
-			$excluded_users = is_array($excluded_users) ? array_map('absint', $excluded_users) : array();
+			$excluded_users = apply_filters( 'wholesalex_dynamic_rules_exclude_users', array() );
+			$excluded_users = is_array( $excluded_users ) ? array_map( 'absint', $excluded_users ) : array();
 
-			return !in_array($user_id, $excluded_users, true);
+			return ! in_array( $user_id, $excluded_users, true );
 		}
 
-		if ('all_b2b' === $role_filter) {
-			if ('' === $role_id) {
+		if ( 'all_b2b' === $role_filter ) {
+			if ( '' === $role_id ) {
 				return false;
 			}
 
 			$excluded_roles = apply_filters(
 				'wholesalex_dynamic_rules_exclude_roles',
-				array('wholesalex_guest', 'wholesalex_b2c_users')
+				array( 'wholesalex_guest', 'wholesalex_b2c_users' )
 			);
 
-			return !is_array($excluded_roles) || !in_array($role_id, $excluded_roles, true);
+			return ! is_array( $excluded_roles ) || ! in_array( $role_id, $excluded_roles, true );
 		}
 
-		if ('specific_users' === $role_filter) {
-			if (0 === $user_id || empty($rule['specific_users']) || !is_array($rule['specific_users'])) {
+		if ( 'specific_users' === $role_filter ) {
+			if ( 0 === $user_id || empty( $rule['specific_users'] ) || ! is_array( $rule['specific_users'] ) ) {
 				return false;
 			}
 
-			foreach ($rule['specific_users'] as $user) {
-				$value = is_array($user) ? (string) ($user['value'] ?? '') : (string) $user;
-				if ((is_numeric($value) && (int) $value === $user_id) || 'user_' . $user_id === $value) {
+			foreach ( $rule['specific_users'] as $user ) {
+				$value = is_array( $user ) ? (string) ( $user['value'] ?? '' ) : (string) $user;
+				if ( ( is_numeric( $value ) && (int) $value === $user_id ) || 'user_' . $user_id === $value ) {
 					return true;
 				}
 			}
@@ -151,13 +144,13 @@ class Wholesale_Pricing_Condition_Engine
 			return false;
 		}
 
-		if ('specific_roles' !== $role_filter || empty($rule['user_roles']) || !is_array($rule['user_roles'])) {
+		if ( 'specific_roles' !== $role_filter || empty( $rule['user_roles'] ) || ! is_array( $rule['user_roles'] ) ) {
 			return false;
 		}
 
-		foreach ($rule['user_roles'] as $role) {
-			$value = is_array($role) ? (string) ($role['value'] ?? '') : (string) $role;
-			if ($value === $role_id || $value === 'role_' . $role_id) {
+		foreach ( $rule['user_roles'] as $role ) {
+			$value = is_array( $role ) ? (string) ( $role['value'] ?? '' ) : (string) $role;
+			if ( $value === $role_id || 'role_' . $role_id === $value ) {
 				return true;
 			}
 		}
@@ -173,18 +166,17 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param array $rule Saved wholesale-pricing rule.
 	 * @return int
 	 */
-	public static function get_user_targeting_priority(array $rule): int
-	{
-		$priorities = array(
-			'all' => 10,
-			'all_users' => 20,
-			'all_b2b' => 30,
+	public static function get_user_targeting_priority( array $rule ): int {
+		$priorities  = array(
+			'all'            => 10,
+			'all_users'      => 20,
+			'all_b2b'        => 30,
 			'specific_roles' => 50,
 			'specific_users' => 60,
 		);
-		$role_filter = isset($rule['user_role_filter']) ? $rule['user_role_filter'] : 'all_b2b';
+		$role_filter = isset( $rule['user_role_filter'] ) ? $rule['user_role_filter'] : 'all_b2b';
 
-		return isset($priorities[$role_filter]) ? $priorities[$role_filter] : $priorities['all_b2b'];
+		return isset( $priorities[ $role_filter ] ) ? $priorities[ $role_filter ] : $priorities['all_b2b'];
 	}
 
 	/**
@@ -194,17 +186,16 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param array       $rule    Normalized runtime rule.
 	 * @return bool
 	 */
-	public static function is_product_eligible_for_rule(\WC_Product $product, array $rule): bool
-	{
-		$product_id = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
+	public static function is_product_eligible_for_rule( \WC_Product $product, array $rule ): bool {
+		$product_id   = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
 		$variation_id = $product->get_parent_id() ? $product->get_id() : 0;
 
-		$owner_id = absint($rule['owner_id'] ?? 0);
-		if ($owner_id && $owner_id !== absint(get_post_field('post_author', $product_id))) {
+		$owner_id = absint( $rule['owner_id'] ?? 0 );
+		if ( $owner_id && absint( get_post_field( 'post_author', $product_id ) ) !== $owner_id ) {
 			return false;
 		}
 
-		return self::product_ids_match_filter($product_id, $variation_id, $rule['filter']);
+		return self::product_ids_match_filter( $product_id, $variation_id, $rule['filter'] );
 	}
 
 	/**
@@ -215,66 +206,56 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param array $filter       Runtime product filter.
 	 * @return bool
 	 */
-	public static function product_ids_match_filter(int $product_id, int $variation_id, array $filter): bool
-	{
+	public static function product_ids_match_filter( int $product_id, int $variation_id, array $filter ): bool {
 		$product_ids = array();
 
-		if (!empty($filter['exclude_products'])) {
-			$product_ids = self::get_product_id_candidates($product_id, $variation_id);
-			if (!empty(array_intersect($product_ids, $filter['exclude_products']))) {
+		if ( ! empty( $filter['exclude_products'] ) ) {
+			$product_ids = self::get_product_id_candidates( $product_id, $variation_id );
+			if ( ! empty( array_intersect( $product_ids, $filter['exclude_products'] ) ) ) {
 				return false;
 			}
 		}
 
-		if (!empty($filter['is_all_products'])) {
+		if ( ! empty( $filter['_unavailable'] ) ) {
+			return false; }
+
+		if ( ! empty( $filter['is_all_products'] ) ) {
 			return true;
 		}
 
-		if (empty($product_ids)) {
-			$product_ids = self::get_product_id_candidates($product_id, $variation_id);
+		if ( ! empty( $filter['_premium_target'] ) ) {
+			$handlers                = Wholesale_Pricing_Rule_Registry::target_handlers();
+			$key                     = $filter['_premium_target'];
+			$product                 = wc_get_product( $variation_id ? $variation_id : $product_id );
+			$rule                    = (array) $filter['_premium_rule'];
+			$rule['_runtime_filter'] = $filter;
+			return $product instanceof \WC_Product && isset( $handlers[ $key ] ) && is_callable( $handlers[ $key ] )
+				? (bool) $handlers[ $key ]( $product, $rule ) : false;
 		}
 
-		$cats = wc_get_product_term_ids($product_id, 'product_cat');
-		$brands = self::get_product_brand_ids($product_id);
-		$attributes = self::get_product_attribute_ids($product_id);
+		if ( empty( $product_ids ) ) {
+			$product_ids = self::get_product_id_candidates( $product_id, $variation_id );
+		}
 
-		if ($variation_id > 0 && !empty($filter['include_variations']) && in_array($variation_id, $filter['include_variations'], true)) {
+		$cats = wc_get_product_term_ids( $product_id, 'product_cat' );
+
+		if ( $variation_id > 0 && ! empty( $filter['include_variations'] ) && in_array( $variation_id, $filter['include_variations'], true ) ) {
 			return true;
 		}
 
-		if (!empty($filter['exclude_variations']) && empty(array_intersect($product_ids, $filter['exclude_variations']))) {
+		if ( ! empty( $filter['exclude_variations'] ) && empty( array_intersect( $product_ids, $filter['exclude_variations'] ) ) ) {
 			return true;
 		}
 
-		if (!empty($filter['include_products']) && !empty(array_intersect($product_ids, $filter['include_products']))) {
+		if ( ! empty( $filter['include_products'] ) && ! empty( array_intersect( $product_ids, $filter['include_products'] ) ) ) {
 			return true;
 		}
 
-		if (!empty($filter['include_cats']) && !empty(array_intersect($cats, $filter['include_cats']))) {
+		if ( ! empty( $filter['include_cats'] ) && ! empty( array_intersect( $cats, $filter['include_cats'] ) ) ) {
 			return true;
 		}
 
-		if (!empty($filter['exclude_cats']) && empty(array_intersect($cats, $filter['exclude_cats']))) {
-			return true;
-		}
-
-		if (!empty($filter['include_brands']) && !empty(array_intersect($brands, $filter['include_brands']))) {
-			return true;
-		}
-
-		if (!empty($filter['exclude_brands']) && empty(array_intersect($brands, $filter['exclude_brands']))) {
-			return true;
-		}
-
-		if (!empty($filter['include_attributes']) && !empty(array_intersect($attributes, $filter['include_attributes']))) {
-			return true;
-		}
-
-		if (!empty($filter['include_skus']) && !empty(array_intersect($product_ids, $filter['include_skus']))) {
-			return true;
-		}
-
-		if (!empty($filter['exclude_attributes']) && !empty($attributes) && empty(array_intersect($attributes, $filter['exclude_attributes']))) {
+		if ( ! empty( $filter['exclude_cats'] ) && empty( array_intersect( $cats, $filter['exclude_cats'] ) ) ) {
 			return true;
 		}
 
@@ -293,22 +274,21 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param int $variation_id Variation ID from the cart line.
 	 * @return array<int>
 	 */
-	private static function get_product_id_candidates(int $product_id, int $variation_id): array
-	{
-		$ids = array($product_id, $variation_id);
+	private static function get_product_id_candidates( int $product_id, int $variation_id ): array {
+		$ids = array( $product_id, $variation_id );
 
-		foreach ($ids as $id) {
-			if ($id <= 0) {
+		foreach ( $ids as $id ) {
+			if ( $id <= 0 ) {
 				continue;
 			}
 
-			$product = wc_get_product($id);
-			if ($product instanceof \WC_Product && $product->get_parent_id()) {
+			$product = wc_get_product( $id );
+			if ( $product instanceof \WC_Product && $product->get_parent_id() ) {
 				$ids[] = (int) $product->get_parent_id();
 			}
 		}
 
-		return array_values(array_unique(array_filter(array_map('absint', $ids))));
+		return array_values( array_unique( array_filter( array_map( 'absint', $ids ) ) ) );
 	}
 
 	/**
@@ -319,42 +299,36 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param array $context     Optional runtime condition context.
 	 * @return bool
 	 */
-	public static function check_rule_conditions(array $conditions, array $rule_filter = array(), array $context = array()): bool
-	{
-		if (empty($conditions['tiers']) || !is_array($conditions['tiers'])) {
+	public static function check_rule_conditions( array $conditions, array $rule_filter = array(), array $context = array() ): bool {
+		if ( empty( $conditions['tiers'] ) || ! is_array( $conditions['tiers'] ) ) {
 			return true;
 		}
 
-		return self::are_conditions_fulfilled($conditions['tiers'], $rule_filter, $context);
+		return self::are_conditions_fulfilled( $conditions['tiers'], $rule_filter, $context );
 	}
 
 	/**
-	 * Check order-count and total-purchase conditions before product-specific work.
+	 * Check customer-scoped conditions before product-specific work.
 	 *
 	 * @param array $tiers Condition tiers.
 	 * @return bool
 	 */
-	public static function is_user_order_count_purchase_amount_condition_passed(array $tiers): bool
-	{
-		foreach ($tiers as $tier) {
-			if (!isset($tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'])) {
+	public static function is_user_order_count_purchase_amount_condition_passed( array $tiers ): bool {
+		foreach ( $tiers as $tier ) {
+			if ( ! isset( $tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'] ) ) {
 				continue;
 			}
 
-			$field = self::normalize_condition_field((string) $tier['_conditions_for']);
-			if (!in_array($field, array('order_count', 'pro_order_count', 'total_purchase', 'pro_total_purchase'), true)) {
+			$field = self::normalize_condition_field( (string) $tier['_conditions_for'] );
+			if ( in_array( $field, array( 'cart_total_qty', 'cart_total_value', 'cart_total_weight' ), true ) ) {
+				continue; }
+			$handlers = Wholesale_Pricing_Rule_Registry::condition_handlers();
+			if ( isset( $handlers[ $field ] ) ) {
+				if ( ! is_callable( $handlers[ $field ] ) || ! $handlers[ $field ]( $tier, array() ) ) {
+					return false; }
 				continue;
 			}
-
-			if (self::is_pro_condition_field($field) && !self::is_pro_active()) {
-				return false;
-			}
-
-			$actual = in_array($field, array('order_count', 'pro_order_count'), true) ? self::get_customer_order_count() : self::get_customer_total_spent();
-
-			if (!self::is_condition_passed($tier['_conditions_operator'], (float) $tier['_conditions_value'], (float) $actual)) {
-				return false;
-			}
+			return false;
 		}
 
 		return true;
@@ -368,21 +342,19 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param array $context     Optional runtime condition context.
 	 * @return bool
 	 */
-	private static function are_conditions_fulfilled(array $tiers, array $rule_filter = array(), array $context = array()): bool
-	{
-		$cart_data = self::get_filtered_cart_data($rule_filter, $context);
+	private static function are_conditions_fulfilled( array $tiers, array $rule_filter = array(), array $context = array() ): bool {
+		$cart_data = self::get_filtered_cart_data( $rule_filter, $context );
 
-		foreach ($tiers as $tier) {
-			if (!isset($tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'])) {
+		foreach ( $tiers as $tier ) {
+			if ( ! isset( $tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'] ) ) {
 				continue;
 			}
 
-			$field = self::normalize_condition_field((string) $tier['_conditions_for']);
+			$field    = self::normalize_condition_field( (string) $tier['_conditions_for'] );
 			$operator = $tier['_conditions_operator'];
-			$value = (float) $tier['_conditions_value'];
+			$value    = (float) $tier['_conditions_value'];
 
-
-			switch ($field) {
+			switch ( $field ) {
 				case 'cart_total_qty':
 					$actual = $cart_data['qty'];
 					break;
@@ -392,29 +364,21 @@ class Wholesale_Pricing_Condition_Engine
 				case 'cart_total_weight':
 					$actual = $cart_data['weight'];
 					break;
-				case 'order_count':
-				case 'pro_order_count':
-					if (self::is_pro_condition_field($field) && !self::is_pro_active()) {
-						return false;
-					}
-					$actual = self::get_customer_order_count();
-					break;
-				case 'total_purchase':
-				case 'pro_total_purchase':
-					if (self::is_pro_condition_field($field) && !self::is_pro_active()) {
-						return false;
-					}
-					$actual = self::get_customer_total_spent();
-					break;
 				default:
-					$actual = apply_filters('wholesalex_wholesale_pricing_condition_value', null, $field, $tier, $rule_filter);
-					if (null === $actual) {
+					$handlers = Wholesale_Pricing_Rule_Registry::condition_handlers();
+					if ( isset( $handlers[ $field ] ) ) {
+						if ( ! is_callable( $handlers[ $field ] ) || ! $handlers[ $field ]( $tier, $context ) ) {
+							return false; }
+						continue 2;
+					}
+					$actual = apply_filters( 'wholesalex_wholesale_pricing_condition_value', null, $field, $tier, $rule_filter );
+					if ( null === $actual ) {
 						return false;
 					}
 					break;
 			}
 
-			if (!self::is_condition_passed($operator, $value, (float) $actual)) {
+			if ( ! self::is_condition_passed( $operator, $value, (float) $actual ) ) {
 				return false;
 			}
 		}
@@ -428,40 +392,8 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param string $field Raw condition field.
 	 * @return string
 	 */
-	private static function normalize_condition_field(string $field): string
-	{
-		$aliases = array(
-			'lifetime_order_count' => 'pro_order_count',
-			'lifetime_orders' => 'pro_order_count',
-			'user_order_count' => 'pro_order_count',
-			'lifetime_purchase' => 'pro_total_purchase',
-			'lifetime_spend' => 'pro_total_purchase',
-			'lifetime_total_spent' => 'pro_total_purchase',
-			'user_total_purchase' => 'pro_total_purchase',
-		);
-
-		return isset($aliases[$field]) ? $aliases[$field] : $field;
-	}
-
-	/**
-	 * Check whether a condition field requires WholesaleX Pro.
-	 *
-	 * @param string $field Normalized condition field.
-	 * @return bool
-	 */
-	private static function is_pro_condition_field(string $field): bool
-	{
-		return in_array($field, array('pro_order_count', 'pro_total_purchase'), true);
-	}
-
-	/**
-	 * Check whether WholesaleX Pro is active for Pro-only conditions.
-	 *
-	 * @return bool
-	 */
-	private static function is_pro_active(): bool
-	{
-		return method_exists(wholesalex(), 'is_pro_active') && wholesalex()->is_pro_active();
+	private static function normalize_condition_field( string $field ): string {
+		return (string) apply_filters( 'wholesalex_premium_condition_field', $field );
 	}
 
 	/**
@@ -472,17 +404,16 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param float  $actual_value    Actual value.
 	 * @return bool
 	 */
-	private static function is_condition_passed(string $operator, float $condition_value, float $actual_value): bool
-	{
-		switch ($operator) {
+	private static function is_condition_passed( string $operator, float $condition_value, float $actual_value ): bool {
+		switch ( $operator ) {
 			case 'greater':
 				return $actual_value > $condition_value;
 			case 'less':
 				return $actual_value < $condition_value;
 			case 'equal':
-				return $actual_value == $condition_value;
+				return $actual_value === $condition_value;
 			case 'not_equal':
-				return $actual_value != $condition_value;
+				return $actual_value !== $condition_value;
 			case 'greater_equal':
 				return $actual_value >= $condition_value;
 			case 'less_equal':
@@ -499,43 +430,42 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param array $context     Optional runtime condition context.
 	 * @return array{qty: int, value: float, weight: float}
 	 */
-	private static function get_filtered_cart_data(array $rule_filter, array $context = array()): array
-	{
+	private static function get_filtered_cart_data( array $rule_filter, array $context = array() ): array {
 		$data = array(
-			'qty' => 0,
-			'value' => 0.0,
+			'qty'    => 0,
+			'value'  => 0.0,
 			'weight' => 0.0,
 		);
 
-		if (function_exists('WC') && WC()->cart) {
-			foreach (WC()->cart->get_cart() as $cart_item) {
-				if (!self::cart_item_matches_filter($cart_item, $rule_filter)) {
+		if ( function_exists( 'WC' ) && WC()->cart ) {
+			foreach ( WC()->cart->get_cart() as $cart_item ) {
+				if ( ! self::cart_item_matches_filter( $cart_item, $rule_filter ) ) {
 					continue;
 				}
 
-				$product = isset($cart_item['data']) && $cart_item['data'] instanceof \WC_Product ? $cart_item['data'] : false;
-				$quantity = absint($cart_item['quantity'] ?? 0);
+				$product  = isset( $cart_item['data'] ) && $cart_item['data'] instanceof \WC_Product ? $cart_item['data'] : false;
+				$quantity = absint( $cart_item['quantity'] ?? 0 );
 
-				$data['qty'] += $quantity;
-				$data['value'] += isset($cart_item['line_subtotal']) ? (float) $cart_item['line_subtotal'] : ($product ? (float) $product->get_price('edit') * $quantity : 0.0);
+				$data['qty']   += $quantity;
+				$data['value'] += isset( $cart_item['line_subtotal'] ) ? (float) $cart_item['line_subtotal'] : ( $product ? (float) $product->get_price( 'edit' ) * $quantity : 0.0 );
 
-				if ($product && $product->get_weight()) {
+				if ( $product && $product->get_weight() ) {
 					$data['weight'] += (float) $product->get_weight() * $quantity;
 				}
 			}
 		}
 
-		if (!empty($context['preview_cart_item']) && is_array($context['preview_cart_item'])) {
+		if ( ! empty( $context['preview_cart_item'] ) && is_array( $context['preview_cart_item'] ) ) {
 			$preview_item = $context['preview_cart_item'];
 
-			if (self::cart_item_matches_filter($preview_item, $rule_filter)) {
-				$product = isset($preview_item['data']) && $preview_item['data'] instanceof \WC_Product ? $preview_item['data'] : false;
-				$quantity = absint($preview_item['quantity'] ?? 0);
+			if ( self::cart_item_matches_filter( $preview_item, $rule_filter ) ) {
+				$product  = isset( $preview_item['data'] ) && $preview_item['data'] instanceof \WC_Product ? $preview_item['data'] : false;
+				$quantity = absint( $preview_item['quantity'] ?? 0 );
 
-				$data['qty'] += $quantity;
-				$data['value'] += isset($preview_item['line_subtotal']) ? (float) $preview_item['line_subtotal'] : ($product ? (float) $product->get_price('edit') * $quantity : 0.0);
+				$data['qty']   += $quantity;
+				$data['value'] += isset( $preview_item['line_subtotal'] ) ? (float) $preview_item['line_subtotal'] : ( $product ? (float) $product->get_price( 'edit' ) * $quantity : 0.0 );
 
-				if ($product && $product->get_weight()) {
+				if ( $product && $product->get_weight() ) {
 					$data['weight'] += (float) $product->get_weight() * $quantity;
 				}
 			}
@@ -551,12 +481,11 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param array $rule_filter Runtime product filter.
 	 * @return bool
 	 */
-	private static function cart_item_matches_filter(array $cart_item, array $rule_filter): bool
-	{
-		$product_id = isset($cart_item['product_id']) ? (int) $cart_item['product_id'] : 0;
-		$variation_id = isset($cart_item['variation_id']) ? (int) $cart_item['variation_id'] : 0;
+	private static function cart_item_matches_filter( array $cart_item, array $rule_filter ): bool {
+		$product_id   = isset( $cart_item['product_id'] ) ? (int) $cart_item['product_id'] : 0;
+		$variation_id = isset( $cart_item['variation_id'] ) ? (int) $cart_item['variation_id'] : 0;
 
-		return self::product_ids_match_filter($product_id, $variation_id, $rule_filter);
+		return self::product_ids_match_filter( $product_id, $variation_id, $rule_filter );
 	}
 
 	/**
@@ -565,103 +494,14 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param array $items Select item list.
 	 * @return array
 	 */
-	private static function pluck_select_values(array $items): array
-	{
+	private static function pluck_select_values( array $items ): array {
 		$values = array();
 
-		foreach ($items as $item) {
-			$values[] = is_array($item) ? absint($item['value'] ?? 0) : absint($item);
+		foreach ( $items as $item ) {
+			$values[] = is_array( $item ) ? absint( $item['value'] ?? 0 ) : absint( $item );
 		}
 
-		return array_values(array_filter($values));
-	}
-
-	/**
-	 * Resolve selected SKU values to their matching product and variation IDs.
-	 *
-	 * Current selections use the `sku:` prefix so numeric SKUs remain distinct
-	 * from legacy selections, which stored a product ID as the value.
-	 *
-	 * @param array $items Selected SKU items.
-	 * @return array
-	 */
-	private static function get_product_ids_for_sku_items(array $items): array
-	{
-		$product_ids = array();
-
-		foreach ($items as $item) {
-			$value = is_array($item) ? ($item['value'] ?? '') : $item;
-			if (!is_scalar($value)) {
-				continue;
-			}
-
-			$raw_value = trim((string) $value);
-			$sku = '';
-
-			if ('' === $raw_value) {
-				continue;
-			}
-
-			if (0 === strpos($raw_value, 'sku:')) {
-				$sku = substr($raw_value, 4);
-			} elseif (is_numeric($raw_value)) {
-				$product_id = absint($raw_value);
-				if ($product_id) {
-					$product_ids[] = $product_id;
-					$product = function_exists('wc_get_product') ? wc_get_product($product_id) : false;
-					$sku = $product ? $product->get_sku() : get_post_meta($product_id, '_sku', true);
-				}
-			} else {
-				$sku = $raw_value;
-			}
-
-			$sku = trim((string) $sku);
-			if ('' !== $sku) {
-				$product_ids = array_merge($product_ids, self::get_product_ids_by_sku($sku));
-			}
-		}
-
-		return array_values(array_unique(array_filter(array_map('absint', $product_ids))));
-	}
-
-	/**
-	 * Get every product and variation ID with an exact SKU match.
-	 *
-	 * @param string $sku Product SKU.
-	 * @return array
-	 */
-	private static function get_product_ids_by_sku(string $sku): array
-	{
-		static $cache = array();
-
-		$sku = trim($sku);
-		if ('' === $sku) {
-			return array();
-		}
-
-		$cache_key = md5($sku);
-		if (isset($cache[$cache_key])) {
-			return $cache[$cache_key];
-		}
-
-		global $wpdb;
-
-		$product_ids = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				"SELECT pm.post_id
-				 FROM {$wpdb->postmeta} pm
-				 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-				 WHERE pm.meta_key = '_sku'
-				   AND pm.meta_value = %s
-				   AND p.post_type IN ('product', 'product_variation')
-				   AND p.post_status NOT IN ('trash', 'auto-draft')",
-				$sku
-			)
-		);
-
-		$cache[$cache_key] = array_values(array_unique(array_map('absint', $product_ids)));
-
-		return $cache[$cache_key];
+		return array_values( array_filter( $values ) );
 	}
 
 	/**
@@ -674,27 +514,20 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param array $filter Runtime product filter.
 	 * @return array
 	 */
-	private static function expand_translated_filter_ids(array $filter): array
-	{
-		if (!apply_filters('wholesalex_wholesale_pricing_expand_translated_filter_ids', true, $filter)) {
+	private static function expand_translated_filter_ids( array $filter ): array {
+		if ( ! apply_filters( 'wholesalex_wholesale_pricing_expand_translated_filter_ids', true, $filter ) ) {
 			return $filter;
 		}
 
-		foreach (array('include_products', 'exclude_products', 'include_variations', 'exclude_variations') as $key) {
-			if (!empty($filter[$key])) {
-				$filter[$key] = self::expand_translated_post_ids($filter[$key]);
+		foreach ( array( 'include_products', 'exclude_products', 'include_variations', 'exclude_variations' ) as $key ) {
+			if ( ! empty( $filter[ $key ] ) ) {
+				$filter[ $key ] = self::expand_translated_post_ids( $filter[ $key ] );
 			}
 		}
 
-		foreach (array('include_cats', 'exclude_cats') as $key) {
-			if (!empty($filter[$key])) {
-				$filter[$key] = self::expand_translated_term_ids($filter[$key], array('product_cat'));
-			}
-		}
-
-		foreach (array('include_brands', 'exclude_brands') as $key) {
-			if (!empty($filter[$key])) {
-				$filter[$key] = self::expand_translated_term_ids($filter[$key], self::get_supported_brand_taxonomies());
+		foreach ( array( 'include_cats', 'exclude_cats' ) as $key ) {
+			if ( ! empty( $filter[ $key ] ) ) {
+				$filter[ $key ] = self::expand_translated_term_ids( $filter[ $key ], array( 'product_cat' ) );
 			}
 		}
 
@@ -707,30 +540,30 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param array $post_ids Product or variation IDs.
 	 * @return array
 	 */
-	private static function expand_translated_post_ids(array $post_ids): array
-	{
-		$post_ids = array_values(array_unique(array_filter(array_map('absint', $post_ids))));
+	private static function expand_translated_post_ids( array $post_ids ): array {
+		$post_ids = array_values( array_unique( array_filter( array_map( 'absint', $post_ids ) ) ) );
 
-		if (empty($post_ids)) {
+		if ( empty( $post_ids ) ) {
 			return $post_ids;
 		}
 
 		$expanded = $post_ids;
 
-		foreach ($post_ids as $post_id) {
-			if (function_exists('pll_get_post_translations')) {
-				$translations = pll_get_post_translations($post_id);
+		foreach ( $post_ids as $post_id ) {
+			if ( function_exists( 'pll_get_post_translations' ) ) {
+				$translations = pll_get_post_translations( $post_id );
 
-				if (is_array($translations)) {
-					$expanded = array_merge($expanded, array_map('absint', $translations));
+				if ( is_array( $translations ) ) {
+					$expanded = array_merge( $expanded, array_map( 'absint', $translations ) );
 				}
 			}
 
-			$post_type = get_post_type($post_id) ?: 'product';
-			$expanded = array_merge($expanded, self::get_wpml_object_translation_ids($post_id, $post_type));
+			$post_type = get_post_type( $post_id );
+			$post_type = $post_type ? $post_type : 'product';
+			$expanded  = array_merge( $expanded, self::get_wpml_object_translation_ids( $post_id, $post_type ) );
 		}
 
-		return array_values(array_unique(array_filter($expanded)));
+		return array_values( array_unique( array_filter( $expanded ) ) );
 	}
 
 	/**
@@ -740,36 +573,35 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param array $taxonomies Allowed taxonomies for the selected filter.
 	 * @return array
 	 */
-	private static function expand_translated_term_ids(array $term_ids, array $taxonomies): array
-	{
-		$term_ids = array_values(array_unique(array_filter(array_map('absint', $term_ids))));
-		$taxonomies = array_values(array_filter($taxonomies, 'taxonomy_exists'));
+	private static function expand_translated_term_ids( array $term_ids, array $taxonomies ): array {
+		$term_ids   = array_values( array_unique( array_filter( array_map( 'absint', $term_ids ) ) ) );
+		$taxonomies = array_values( array_filter( $taxonomies, 'taxonomy_exists' ) );
 
-		if (empty($term_ids) || empty($taxonomies)) {
+		if ( empty( $term_ids ) || empty( $taxonomies ) ) {
 			return $term_ids;
 		}
 
 		$expanded = $term_ids;
 
-		foreach ($term_ids as $term_id) {
-			$term = get_term($term_id);
+		foreach ( $term_ids as $term_id ) {
+			$term = get_term( $term_id );
 
-			if (!$term instanceof \WP_Term || !in_array($term->taxonomy, $taxonomies, true)) {
+			if ( ! $term instanceof \WP_Term || ! in_array( $term->taxonomy, $taxonomies, true ) ) {
 				continue;
 			}
 
-			if (function_exists('pll_get_term_translations')) {
-				$translations = pll_get_term_translations($term_id);
+			if ( function_exists( 'pll_get_term_translations' ) ) {
+				$translations = pll_get_term_translations( $term_id );
 
-				if (is_array($translations)) {
-					$expanded = array_merge($expanded, array_map('absint', $translations));
+				if ( is_array( $translations ) ) {
+					$expanded = array_merge( $expanded, array_map( 'absint', $translations ) );
 				}
 			}
 
-			$expanded = array_merge($expanded, self::get_wpml_object_translation_ids($term_id, $term->taxonomy));
+			$expanded = array_merge( $expanded, self::get_wpml_object_translation_ids( $term_id, $term->taxonomy ) );
 		}
 
-		return array_values(array_unique(array_filter($expanded)));
+		return array_values( array_unique( array_filter( $expanded ) ) );
 	}
 
 	/**
@@ -779,236 +611,27 @@ class Wholesale_Pricing_Condition_Engine
 	 * @param string $object_type Post type or taxonomy.
 	 * @return array
 	 */
-	private static function get_wpml_object_translation_ids(int $object_id, string $object_type): array
-	{
-		if (false === has_filter('wpml_object_id') || false === has_filter('wpml_active_languages')) {
+	private static function get_wpml_object_translation_ids( int $object_id, string $object_type ): array {
+		if ( false === has_filter( 'wpml_object_id' ) || false === has_filter( 'wpml_active_languages' ) ) {
 			return array();
 		}
 
-		$languages = apply_filters('wpml_active_languages', null, array('skip_missing' => 0)); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WPML.
+		$languages = apply_filters( 'wpml_active_languages', null, array( 'skip_missing' => 0 ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WPML.
 
-		if (empty($languages) || !is_array($languages)) {
+		if ( empty( $languages ) || ! is_array( $languages ) ) {
 			return array();
 		}
 
 		$translations = array();
 
-		foreach (array_keys($languages) as $language_code) {
-			$translated_id = apply_filters('wpml_object_id', $object_id, $object_type, false, $language_code); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WPML.
+		foreach ( array_keys( $languages ) as $language_code ) {
+			$translated_id = apply_filters( 'wpml_object_id', $object_id, $object_type, false, $language_code ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WPML.
 
-			if ($translated_id) {
-				$translations[] = absint($translated_id);
+			if ( $translated_id ) {
+				$translations[] = absint( $translated_id );
 			}
 		}
 
-		return array_values(array_unique(array_filter($translations)));
-	}
-
-	/**
-	 * Return supported brand taxonomies that exist on the site.
-	 *
-	 * @return array
-	 */
-	private static function get_supported_brand_taxonomies(): array
-	{
-		return array_values(array_filter(array('product_brand', 'pwb-brand', 'yith_product_brand'), 'taxonomy_exists'));
-	}
-
-	/**
-	 * Return supported brand term IDs for a product.
-	 *
-	 * @param int $product_id Product ID.
-	 * @return array
-	 */
-	private static function get_product_brand_ids(int $product_id): array
-	{
-		$brand_ids = array();
-
-		foreach (array('product_brand', 'pwb-brand', 'yith_product_brand') as $taxonomy) {
-			if (!taxonomy_exists($taxonomy)) {
-				continue;
-			}
-
-			$terms = wc_get_product_term_ids($product_id, $taxonomy);
-			if (!empty($terms) && !is_wp_error($terms)) {
-				$brand_ids = array_merge($brand_ids, array_map('absint', $terms));
-			}
-		}
-
-		return array_values(array_unique($brand_ids));
-	}
-
-	/**
-	 * Return WooCommerce attribute taxonomy IDs assigned to a product.
-	 *
-	 * @param int $product_id Product ID.
-	 * @return array
-	 */
-	private static function get_product_attribute_ids(int $product_id): array
-	{
-		$product = wc_get_product($product_id);
-
-		if (!$product) {
-			return array();
-		}
-
-		$attributes = $product->get_attributes();
-		if (empty($attributes)) {
-			return array();
-		}
-
-		$taxonomy_to_id_map = array();
-		foreach (wc_get_attribute_taxonomies() as $registered_attr) {
-			$taxonomy_name = wc_attribute_taxonomy_name($registered_attr->attribute_name);
-			$taxonomy_to_id_map[$taxonomy_name] = absint($registered_attr->attribute_id);
-		}
-
-		$attribute_ids = array();
-		foreach ($attributes as $attribute) {
-			$taxonomy = '';
-
-			if (is_object($attribute) && method_exists($attribute, 'is_taxonomy')) {
-				if (!$attribute->is_taxonomy()) {
-					continue;
-				}
-				$taxonomy = $attribute->get_taxonomy();
-			} elseif (is_string($attribute) && taxonomy_exists($attribute)) {
-				$taxonomy = $attribute;
-			} elseif (is_array($attribute) && !empty($attribute['name']) && taxonomy_exists($attribute['name'])) {
-				$taxonomy = $attribute['name'];
-			}
-
-			if ($taxonomy && isset($taxonomy_to_id_map[$taxonomy])) {
-				$attribute_ids[] = $taxonomy_to_id_map[$taxonomy];
-			}
-		}
-
-		return array_values(array_unique($attribute_ids));
-	}
-
-	/**
-	 * Return current customer's WooCommerce order count.
-	 *
-	 * @return int
-	 */
-	private static function get_customer_order_count(): int
-	{
-		$user_id = self::get_condition_user_id();
-
-		if ($user_id <= 0) {
-			return 0;
-		}
-
-		if (isset(self::$customer_lifetime_cache[$user_id]['order_count'])) {
-			return absint(self::$customer_lifetime_cache[$user_id]['order_count']);
-		}
-
-		$count = self::calculate_customer_order_count($user_id);
-
-		self::$customer_lifetime_cache[$user_id]['order_count'] = $count;
-
-		return $count;
-	}
-
-	/**
-	 * Return current customer's WooCommerce total spent.
-	 *
-	 * @return float
-	 */
-	private static function get_customer_total_spent(): float
-	{
-		$user_id = self::get_condition_user_id();
-
-		if ($user_id <= 0) {
-			return 0.0;
-		}
-
-		if (isset(self::$customer_lifetime_cache[$user_id]['total_spent'])) {
-			return (float) self::$customer_lifetime_cache[$user_id]['total_spent'];
-		}
-
-		$total = self::calculate_customer_total_spent($user_id);
-
-		self::$customer_lifetime_cache[$user_id]['total_spent'] = $total;
-
-		return $total;
-	}
-
-	/**
-	 * Return the user ID that condition checks should evaluate.
-	 *
-	 * @return int
-	 */
-	private static function get_condition_user_id(): int
-	{
-		$user_id = apply_filters('wholesalex_set_current_user', get_current_user_id());
-		return absint($user_id);
-	}
-
-	/**
-	 * Calculate lifetime order count directly for the current request.
-	 *
-	 * Avoids stale WooCommerce customer meta so cart-discount conditions match
-	 * the customer's actual order history on the cart and checkout pages.
-	 *
-	 * @param int $user_id User ID.
-	 * @return int
-	 */
-	private static function calculate_customer_order_count(int $user_id): int
-	{
-		if (!function_exists('wc_get_orders')) {
-			return absint(wc_get_customer_order_count($user_id));
-		}
-
-		$statuses = array_keys(wc_get_order_statuses());
-		$statuses = apply_filters('wholesalex_wholesale_pricing_lifetime_order_count_statuses', $statuses, $user_id);
-
-		$orders = wc_get_orders(
-			array(
-				'customer_id' => $user_id,
-				'status' => $statuses,
-				'limit' => -1,
-				'return' => 'ids',
-			)
-		);
-
-		return is_array($orders) ? count($orders) : absint(wc_get_customer_order_count($user_id));
-	}
-
-	/**
-	 * Calculate lifetime purchase amount directly for the current request.
-	 *
-	 * @param int $user_id User ID.
-	 * @return float
-	 */
-	private static function calculate_customer_total_spent(int $user_id): float
-	{
-		if (!function_exists('wc_get_orders')) {
-			return (float) wc_get_customer_total_spent($user_id);
-		}
-
-		$statuses = wc_get_is_paid_statuses();
-		$statuses = apply_filters('wholesalex_wholesale_pricing_lifetime_purchase_statuses', $statuses, $user_id);
-		$orders = wc_get_orders(
-			array(
-				'customer_id' => $user_id,
-				'status' => $statuses,
-				'limit' => -1,
-			)
-		);
-
-		if (!is_array($orders)) {
-			return (float) wc_get_customer_total_spent($user_id);
-		}
-
-		$total = 0.0;
-
-		foreach ($orders as $order) {
-			if ($order instanceof \WC_Order) {
-				$total += (float) $order->get_total();
-			}
-		}
-
-		return $total;
+		return array_values( array_unique( array_filter( $translations ) ) );
 	}
 }

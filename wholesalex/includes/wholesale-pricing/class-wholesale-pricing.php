@@ -55,8 +55,8 @@ class Wholesale_Pricing {
 		 */
 		if ( current_user_can( 'manage_options' ) ) {
 			return array(
-				'is_vendor' => false,
-				'vendor_id' => 0,
+				'is_vendor'  => false,
+				'vendor_id'  => 0,
 				'owner_type' => 'admin',
 				'can_manage' => true,
 			);
@@ -66,8 +66,8 @@ class Wholesale_Pricing {
 
 		if ( current_user_can( $global_manager_capability ) ) {
 			return array(
-				'is_vendor' => false,
-				'vendor_id' => 0,
+				'is_vendor'  => false,
+				'vendor_id'  => 0,
 				'owner_type' => 'admin',
 				'can_manage' => true,
 			);
@@ -76,16 +76,16 @@ class Wholesale_Pricing {
 		$context = apply_filters(
 			'wholesalex_wholesale_pricing_manager_context',
 			array(
-				'is_vendor' => false,
-				'vendor_id' => 0,
+				'is_vendor'  => false,
+				'vendor_id'  => 0,
 				'owner_type' => 'admin',
 				'can_manage' => false,
 			)
 		);
 
 		return array(
-			'is_vendor' => ! empty( $context['is_vendor'] ),
-			'vendor_id' => isset( $context['vendor_id'] ) ? absint( $context['vendor_id'] ) : 0,
+			'is_vendor'  => ! empty( $context['is_vendor'] ),
+			'vendor_id'  => isset( $context['vendor_id'] ) ? absint( $context['vendor_id'] ) : 0,
 			'owner_type' => isset( $context['owner_type'] ) ? sanitize_key( $context['owner_type'] ) : 'admin',
 			'can_manage' => ! empty( $context['can_manage'] ),
 		);
@@ -109,8 +109,8 @@ class Wholesale_Pricing {
 				$rules,
 				static function ( $rule ) use ( $context ) {
 					return is_array( $rule )
-						&& $context['vendor_id'] === absint( $rule['owner_id'] ?? 0 )
-						&& $context['owner_type'] === sanitize_key( $rule['owner_type'] ?? '' );
+						&& absint( $rule['owner_id'] ?? 0 ) === $context['vendor_id']
+						&& sanitize_key( $rule['owner_type'] ?? '' ) === $context['owner_type'];
 				}
 			)
 		);
@@ -129,8 +129,8 @@ class Wholesale_Pricing {
 			return true;
 		}
 
-		return $context['vendor_id'] === absint( $rule['owner_id'] ?? 0 )
-			&& $context['owner_type'] === sanitize_key( $rule['owner_type'] ?? '' );
+		return absint( $rule['owner_id'] ?? 0 ) === $context['vendor_id']
+			&& sanitize_key( $rule['owner_type'] ?? '' ) === $context['owner_type'];
 	}
 
 	// ── Readers ──────────────────────────────────────────────────────────────
@@ -145,12 +145,47 @@ class Wholesale_Pricing {
 	 */
 	public static function get_all_rules(): array {
 		if ( isset( $GLOBALS[ self::GLOBAL_KEY ] ) && is_array( $GLOBALS[ self::GLOBAL_KEY ] ) ) {
-			return $GLOBALS[ self::GLOBAL_KEY ];
+			$rules = $GLOBALS[ self::GLOBAL_KEY ];
+		} else {
+			$rules = get_option( self::OPTION_KEY, array() );
+			$rules = is_array( $rules ) ? $rules : array();
 		}
-		$rules = get_option( self::OPTION_KEY, array() );
-		$rules = is_array( $rules ) ? $rules : array();
+
+		$rules = self::migrate_tier_pricing_rule_types( $rules );
 
 		$GLOBALS[ self::GLOBAL_KEY ] = $rules; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- GLOBAL_KEY contains the WholesaleX-prefixed cache key.
+		return $rules;
+	}
+
+	/**
+	 * Reclassify legacy tiered Wholesale Pricing records without reshaping them.
+	 *
+	 * The tier processor still consumes discount_type, tiers, design and
+	 * restrictions in their original locations. Changing only rule_type keeps
+	 * existing calculations compatible and makes the migration safe to repeat
+	 * after interrupted upgrades or imports from older versions.
+	 *
+	 * @param array<string, array> $rules Stored pricing rules.
+	 * @return array<string, array>
+	 */
+	private static function migrate_tier_pricing_rule_types( array $rules ): array {
+		$changed = false;
+
+		foreach ( $rules as $id => $rule ) {
+			if (
+				is_array( $rule ) &&
+				'wholesale_pricing' === ( $rule['rule_type'] ?? '' ) &&
+				'tiered' === ( $rule['discount_type'] ?? '' )
+			) {
+				$rules[ $id ]['rule_type'] = 'tier_pricing';
+				$changed                    = true;
+			}
+		}
+
+		if ( $changed ) {
+			update_option( self::OPTION_KEY, $rules, false );
+		}
+
 		return $rules;
 	}
 
@@ -187,10 +222,14 @@ class Wholesale_Pricing {
 	 * @return array The stored rule.
 	 */
 	public static function save_rule( string $id, array $data ): array {
+		if ( 'wholesale_pricing' === ( $data['rule_type'] ?? '' ) && 'tiered' === ( $data['discount_type'] ?? '' ) ) {
+			$data['rule_type'] = 'tier_pricing';
+		}
+
 		$rules        = self::get_all_rules();
 		$rules[ $id ] = $data;
 
-		update_option( self::OPTION_KEY, $rules, false ); // autoload=false
+		update_option( self::OPTION_KEY, $rules, false );
 		$GLOBALS[ self::GLOBAL_KEY ] = $rules; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- GLOBAL_KEY contains the WholesaleX-prefixed cache key.
 
 		/**

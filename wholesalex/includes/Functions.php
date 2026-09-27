@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName, WordPress.Files.FileName.NotHyphenatedLowercase -- Preserve the public Functions.php include path.
 /**
  * Common Functions.
  *
@@ -28,7 +28,17 @@ class Functions {
 	public function __construct() {
 
 		if ( ! isset( $GLOBALS['wholesalex_settings'] ) ) {
-			$GLOBALS['wholesalex_settings'] = get_option( 'wholesalex_settings' );
+			$settings = get_option( 'wholesalex_settings', array() );
+			$settings = is_array( $settings ) ? $settings : array();
+
+			// The reCAPTCHA settings UI has always displayed v3 as its default.
+			// Keep the runtime value in sync so an untouched radio does not fall
+			// through to the v2 branches before the first explicit selection.
+			if ( ! isset( $settings['recaptcha_version'] ) ) {
+				$settings['recaptcha_version'] = 'recaptcha_v3';
+			}
+
+			$GLOBALS['wholesalex_settings'] = $settings;
 		}
 		if ( ! isset( $GLOBALS['wholesalex_single_product_settings'] ) ) {
 			$GLOBALS['wholesalex_single_product_settings'] = get_option( '__wholesalex_single_product_settings', array() );
@@ -57,7 +67,6 @@ class Functions {
 		if ( ! isset( $GLOBALS['wholesalex_profile_discounts'] ) ) {
 			$GLOBALS['wholesalex_profile_discounts'] = get_option( '__wholesalex_profile_discounts', array() );
 		}
-
 	}
 
 	/**
@@ -151,16 +160,16 @@ class Functions {
 		if ( '' === $id && ( '' === $type || 'all' === $type ) ) {
 			return isset( $__roles ) ? $__roles : array();
 		} else {
-			$roles_option           = array();
-			$mapped_roles           = array();
-			$b2b_roles_option       = array();
-			$b2b_mapped_roles       = array();
-			$b2c_roles_option       = array();
-			$b2c_mapped_roles       = array();
+			$roles_option            = array();
+			$mapped_roles            = array();
+			$b2b_roles_option        = array();
+			$b2b_mapped_roles        = array();
+			$b2c_roles_option        = array();
+			$b2c_mapped_roles        = array();
 			$store_mode_roles        = array();
 			$store_mode_roles_option = array();
 			$store_mode_mapped_roles = array();
-			$guest_role_option         = array(
+			$guest_role_option       = array(
 				'value' => 'wholesalex_guest',
 				'name'  => 'Guest Users',
 			);
@@ -175,8 +184,8 @@ class Functions {
 						|| ( 'b2c' === $__plugin_status && $is_b2c_role );
 
 					if ( $is_visible && ( 'wholesalex_guest' !== $role['id'] || $__enable_guest ) ) {
-						$store_mode_roles[ $role['id'] ] = $role;
-						$store_mode_roles_option[]       = array(
+						$store_mode_roles[ $role['id'] ]        = $role;
+						$store_mode_roles_option[]              = array(
 							'value' => $role['id'],
 							'name'  => $role['_role_title'],
 						);
@@ -257,12 +266,12 @@ class Functions {
 		return apply_filters(
 			'wholesalex_initial_roles',
 			array(
-				'wholesalex_b2c_users'    => array(
+				'wholesalex_b2c_users'     => array(
 					'id'          => 'wholesalex_b2c_users',
 					'_role_title' => __( 'B2C Users', 'wholesalex' ),
 					'removeable'  => false,
 				),
-				'wholesalex_guest'        => array(
+				'wholesalex_guest'         => array(
 					'id'          => 'wholesalex_guest',
 					'_role_title' => __( 'Guest Users', 'wholesalex' ),
 					'removeable'  => false,
@@ -420,6 +429,7 @@ class Functions {
 			return;
 		}
 		$wholesalex_roles = wholesalex()->get_roles( 'ids' );
+		// phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict -- Keep compatibility with role IDs supplied by existing integrations.
 		if ( ! in_array( $new_role_id, $wholesalex_roles ) ) {
 			return;
 		}
@@ -465,6 +475,12 @@ class Functions {
 			$existing_role = get_user_meta( $admin->ID, '__wholesalex_role', true );
 			if ( empty( $existing_role ) ) {
 				wholesalex()->change_role( $admin->ID, $role_id );
+
+				// Default admin assignment does not require registration approval.
+				if ( '' === get_user_meta( $admin->ID, '__wholesalex_status', true ) &&
+					'' === get_user_meta( $admin->ID, '__wholesalex_registration_role', true ) ) {
+					update_user_meta( $admin->ID, '__wholesalex_status', 'active' );
+				}
 			}
 		}
 
@@ -478,18 +494,18 @@ class Functions {
 	 * @return void
 	 */
 	public function unassign_users_from_role( $role_id ) {
-		$current_role_users = get_users(
+		$current_role_users      = get_users(
 			array(
 				'fields'     => array( 'ID' ),
-				'meta_key'   => '__wholesalex_role', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				'meta_value' => $role_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				'meta_key'   => '__wholesalex_role', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Role selection uses the stored user metadata; WordPress has no indexed lookup for these plugin keys.
+				'meta_value' => $role_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Role selection uses the stored user metadata; WordPress has no indexed lookup for these plugin keys.
 			)
 		);
 		$registration_role_users = get_users(
 			array(
 				'fields'     => array( 'ID' ),
-				'meta_key'   => '__wholesalex_registration_role', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				'meta_value' => $role_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				'meta_key'   => '__wholesalex_registration_role', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Role selection uses the stored user metadata; WordPress has no indexed lookup for these plugin keys.
+				'meta_value' => $role_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Role selection uses the stored user metadata; WordPress has no indexed lookup for these plugin keys.
 			)
 		);
 		$user_ids                = array_unique(
@@ -556,14 +572,8 @@ class Functions {
 	 * @since v.1.0.0
 	 * @return STRING | URL with Arg
 	 */
-	public function get_premium_link( $url = '', $tag = 'go_premium' ) {
-		$url          = $url ? $url : 'https://www.wpxpo.com/wholesalex/pricing/';
-		$affiliate_id = apply_filters( 'wholesalex_affiliate_id', false );
-		$arg          = array( 'utm_source' => $tag );
-		if ( ! empty( $affiliate_id ) ) {
-			$arg['ref'] = esc_attr( $affiliate_id );
-		}
-		return add_query_arg( $arg, $url );
+	public function get_premium_link( $url = '', $tag = 'go_premium' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Keep the public method signature compatible with existing callers.
+		return $url ? $url : 'https://www.wpxpo.com/wholesalex/pricing/';
 	}
 
 	/**
@@ -630,11 +640,6 @@ class Functions {
 				if ( isset( $value['wholesalex_sale_price'] ) ) {
 					update_post_meta( $id, $sale_price_meta_name, $value['wholesalex_sale_price'] );
 				}
-
-				if ( isset( $value['tiers'] ) ) {
-					$meta_name = $role_name . '_tiers';
-					update_post_meta( $id, $meta_name, $value['tiers'] );
-				}
 			}
 		}
 	}
@@ -654,12 +659,17 @@ class Functions {
 		foreach ( $role_ids as $role_id ) {
 			$sale_price                                = get_post_meta( $id, $role_id . '_sale_price', true );
 			$base_price                                = get_post_meta( $id, $role_id . '_base_price', true );
-			$tiers                                     = get_post_meta( $id, $role_id . '_tiers', true );
 			$data[ $role_id ]['wholesalex_sale_price'] = $sale_price ? $sale_price : '';
 			$data[ $role_id ]['wholesalex_base_price'] = $base_price ? $base_price : '';
-			$data[ $role_id ]['tiers']                 = $tiers ? $tiers : array();
+			$data[ $role_id ]['tiers']                 = array();
 		}
-		return $data;
+		/**
+		 * Filter a product's role-based prices.
+		 *
+		 * @param array      $data Role-based prices keyed by role ID.
+		 * @param int|string $id   Product ID.
+		 */
+		return apply_filters( 'wholesalex_single_product_discount', $data, $id );
 	}
 	/**
 	 * Save Single Product Settings
@@ -710,52 +720,37 @@ class Functions {
 	/**
 	 * Save Category Discounts
 	 *
+	 * This plugin does not register category-level role discounts. The action
+	 * below lets an extension that adds such a field persist its own data.
+	 *
 	 * @param mixed $id Category ID.
 	 * @param array $discounts Category WholesaleX Discounts Data.
 	 * @return void
 	 */
 	public function save_category_discounts( $id = '', $discounts = array() ) {
-		if ( '' !== $id && ! empty( $discounts ) ) {
-			// $data        = $GLOBALS['wholesalex_category_discounts'];
-			// save category discounts on product meta
-			foreach ( $discounts as $role_id => $discount ) {
-				if ( $discount['tiers'] ) {
-					$tiers = $discount['tiers'];
-					update_term_meta( $id, $role_id . '_tiers', $tiers );
-				}
-			}
-		}
+		/**
+		 * Fires when category role discounts are submitted.
+		 *
+		 * @param int|string $id        Category ID.
+		 * @param array      $discounts Submitted discounts keyed by role ID.
+		 */
+		do_action( 'wholesalex_save_category_discounts', $id, $discounts );
 	}
 
 	/**
-	 * Get Category Visibiltiy Settings
+	 * Get Category Discounts
 	 *
 	 * @param mixed $id Category ID.
 	 * @return array
 	 */
 	public function get_category_discounts( $id = '' ) {
-		$data = $GLOBALS['wholesalex_category_discounts'];
-
-		if ( '' !== $id ) {
-			$roles         = wholesalex()->get_roles( 'ids' );
-			$discounts     = array();
-			$discount_data = array();
-			foreach ( $roles as $role_id ) {
-				$discounts['tiers'] = array();
-				$discount           = get_term_meta( $id, $role_id . '_tiers', true );
-				if ( $discount && is_array( $discount ) ) {
-					$discounts['tiers']        = $discount;
-					$discount_data[ $role_id ] = $discounts;
-				}
-			}
-
-			if ( empty( $discount_data ) && isset( $data[ $id ] ) && ! empty( $data[ $id ] ) ) {
-				$discount_data = $data[ $id ];
-			}
-			return $discount_data;
-		} else {
-			return array();
-		}
+		/**
+		 * Filter a category's role-based discounts.
+		 *
+		 * @param array      $discounts Discounts keyed by role ID.
+		 * @param int|string $id        Category ID, or '' for all categories.
+		 */
+		return (array) apply_filters( 'wholesalex_category_discounts', array(), $id );
 	}
 
 
@@ -796,42 +791,6 @@ class Functions {
 	}
 
 	/**
-	 * Get the current Dynamic Rules access policy.
-	 *
-	 * Dynamic Rules are legacy-edit-only from v3.0.0 onward:
-	 * stores with saved rules can view and maintain them, while stores without
-	 * saved rules should not see the Dynamic Rules workflow.
-	 *
-	 * @param array|null $rules Optional rules to evaluate, useful for scoped integrations.
-	 * @return array
-	 */
-	public function get_dynamic_rules_access( $rules = null ) {
-		$rules     = is_array( $rules ) ? $rules : $this->get_dynamic_rules();
-		$has_rules = ! empty( $rules );
-
-		return apply_filters(
-			'wholesalex_dynamic_rules_access',
-			array(
-				'has_rules'  => $has_rules,
-				'can_view'   => $has_rules,
-				'can_create' => false,
-				'mode'       => $has_rules ? 'edit_only' : 'hidden',
-			),
-			$rules
-		);
-	}
-
-	/**
-	 * Whether the current request may create a new Dynamic Rule.
-	 *
-	 * @return bool
-	 */
-	public function can_create_dynamic_rules() {
-		$access = $this->get_dynamic_rules_access();
-		return ! empty( $access['can_create'] );
-	}
-
-	/**
 	 * Get Dynamic Rules
 	 *
 	 * @return boolean
@@ -866,6 +825,7 @@ class Functions {
 		$user_rules = array();
 
 		foreach ( $rules as $rule ) {
+			// phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual -- Stored author IDs and caller IDs may be integers or numeric strings.
 			if ( isset( $rule['created_by'] ) && $rule['created_by'] == $user_id ) {
 				$user_rules[] = $rule;
 			}
@@ -881,7 +841,7 @@ class Functions {
 	 * @param array   $_rule Rule.
 	 * @param string  $_type Type.
 	 * @param boolean $is_frontend Is the request come from fronend.
-	 * @return void
+	 * @return bool|\WP_Error|null
 	 * @since 1.0.0
 	 * @since 1.0.1 Usages Count Added
 	 * @since 1.2.4 Is frontend check added
@@ -890,10 +850,6 @@ class Functions {
 		if ( '' !== $_id && ! empty( $_rule ) ) {
 
 			$__rules          = wholesalex()->get_dynamic_rules();
-			$is_existing_rule = isset( $__rules[ $_id ] );
-			if ( 'delete' !== $_type && ! $is_existing_rule && ! wholesalex()->can_create_dynamic_rules() ) {
-				return false;
-			}
 			$__for_all        = ( ( 'all_users' === $_rule['_rule_for'] ) || ( 'all_roles' === $_rule['_rule_for'] ) ) ? true : false;
 			$__previous_count = ( isset( $__rules[ $_id ]['limit']['usages_count'] ) && ! empty( $__rules[ $_id ]['limit']['usages_count'] ) ) ? $__rules[ $_id ]['limit']['usages_count'] : '';
 			$__usages_count   = isset( $_rule['limit']['usages_count'] ) ? (int) $_rule['limit']['usages_count'] : ( $__previous_count ? $__previous_count : '' );
@@ -932,7 +888,7 @@ class Functions {
 	 * @param string $_id Role ID.
 	 * @param array  $_role Role.
 	 * @param string $_type Type.
-	 * @return void
+	 * @return bool|null
 	 */
 	public function set_roles( $_id = '', $_role = array(), $_type = '' ) {
 		if ( '' !== $_id && ! empty( $_role ) ) {
@@ -941,6 +897,18 @@ class Functions {
 			}
 
 			$__roles = $GLOBALS['wholesalex_roles'];
+
+			// System role names are identifiers in the UI and must not be renamed,
+			// including by requests that bypass the disabled admin field.
+			if ( in_array( $_id, array( 'wholesalex_b2c_users', 'wholesalex_guest' ), true ) ) {
+				$default_roles = $this->get_default_roles();
+				if ( ! empty( $__roles[ $_id ]['_role_title'] ) ) {
+					$_role['_role_title'] = $__roles[ $_id ]['_role_title'];
+				} elseif ( ! empty( $default_roles[ $_id ]['_role_title'] ) ) {
+					$_role['_role_title'] = $default_roles[ $_id ]['_role_title'];
+				}
+			}
+
 			if ( isset( $__roles[ $_id ] ) && ! empty( $__roles[ $_id ] ) ) {
 				// update.
 				$__roles[ $_id ] = wholesalex()->sanitize( $_role );
@@ -988,18 +956,6 @@ class Functions {
 		if ( empty( $__user_role ) ) {
 			return 'wholesalex_b2c_users';
 		}
-	}
-
-
-	/**
-	 * Get License Status
-	 *
-	 * @return string
-	 * @since 1.0.0
-	 */
-	public function get_license_status() {
-		$license_data = get_option( 'edd_wholesalex_license_data', array() );
-		return isset( $license_data['license'] ) ? $license_data['license'] : '';
 	}
 
 
@@ -1155,20 +1111,11 @@ class Functions {
 	 * @since 1.2.4 Settings Default Value Added
 	 */
 	public function get_quantity_based_discount_priorities() {
-		$dynamic_rules_access = $this->get_dynamic_rules_access();
-		$default_priorities   = array( 'profile', 'single_product', 'category', 'wholesale_pricing' );
-
-		if ( ! empty( $dynamic_rules_access['can_view'] ) ) {
-			$default_priorities[] = 'dynamic_rule';
-		}
+		$default_priorities = array( 'profile', 'single_product', 'category', 'wholesale_pricing', 'dynamic_rule' );
 
 		$priorities = wholesalex()->get_setting( '_settings_quantity_based_discount_priority', $default_priorities );
 		$priorities = is_array( $priorities ) ? array_values( array_unique( $priorities ) ) : array();
-		$allowed    = array( 'profile', 'single_product', 'category', 'wholesale_pricing' );
-
-		if ( ! empty( $dynamic_rules_access['can_view'] ) ) {
-			$allowed[] = 'dynamic_rule';
-		}
+		$allowed    = array( 'profile', 'single_product', 'category', 'wholesale_pricing', 'dynamic_rule' );
 
 		$priorities = array_values( array_intersect( $priorities, $allowed ) );
 
@@ -1205,6 +1152,109 @@ class Functions {
 			}
 		}
 		return $data;
+	}
+
+	/**
+	 * Get the admin page slug for the screen being rendered.
+	 *
+	 * WordPress builds plugin screen ids as "{parent}_page_{slug}" or
+	 * "toplevel_page_{slug}", so the current page is read from the screen
+	 * rather than from an unauthenticated request value.
+	 *
+	 * @return string Page slug, or an empty string outside a plugin page.
+	 */
+	public function get_current_admin_page_slug() {
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return '';
+		}
+
+		$screen = get_current_screen();
+
+		if ( ! $screen || ! is_string( $screen->id ) ) {
+			return '';
+		}
+
+		$position = strpos( $screen->id, '_page_' );
+
+		return false === $position ? '' : sanitize_key( substr( $screen->id, $position + 6 ) );
+	}
+
+	/**
+	 * Sanitize a block of CSS declarations before it is enqueued inline.
+	 *
+	 * Stripping markup alone is not sufficient for CSS, so this also drops
+	 * comments and the constructs that let a stylesheet execute script or pull
+	 * in remote resources.
+	 *
+	 * @param string $css CSS declarations.
+	 * @return string Sanitized CSS, or an empty string when nothing is left.
+	 */
+	public function sanitize_inline_css( $css ) {
+		if ( ! is_string( $css ) || '' === $css ) {
+			return '';
+		}
+
+		$css = wp_strip_all_tags( $css );
+		$css = preg_replace( '#/\*.*?\*/#s', '', $css );
+		$css = preg_replace( '#(?:@import|@charset|expression\s*\(|javascript\s*:|vbscript\s*:|behaviou?r\s*:|-moz-binding)#i', '', $css );
+		$css = str_replace( array( '<', '>', '\\' ), '', (string) $css );
+
+		// Compare origins, not URL prefixes; keep quotes around paths containing spaces.
+		$site = wp_parse_url( site_url() );
+		$css  = preg_replace_callback(
+			'#url\(\s*([\'"]?)(.*?)\1\s*\)#is',
+			function ( $matches ) use ( $site ) {
+				// Browsers remove URL controls that PHP may interpret as path characters.
+				if ( preg_match( '/[\x00-\x1F\x7F]/', $matches[2] ) ) {
+					return 'none';
+				}
+				$value           = trim( $matches[2] );
+				$url             = wp_parse_url( $value );
+				$is_relative     = is_array( $url ) && ! isset( $url['scheme'] ) && ! isset( $url['host'] );
+				$is_inline_image = preg_match( '#^data:image/(?:png|gif|jpe?g|webp|avif);base64,[a-z0-9+/=]+$#i', $value );
+				$is_same_origin  = is_array( $site ) && is_array( $url )
+					&& isset( $site['scheme'], $site['host'], $url['scheme'], $url['host'] )
+					&& strtolower( $site['scheme'] ) === strtolower( $url['scheme'] )
+					&& strtolower( $site['host'] ) === strtolower( $url['host'] )
+					&& ( $site['port'] ?? ( 'https' === strtolower( $site['scheme'] ) ? 443 : 80 ) ) === ( $url['port'] ?? ( 'https' === strtolower( $url['scheme'] ) ? 443 : 80 ) )
+					&& ! isset( $url['user'] ) && ! isset( $url['pass'] );
+
+				if ( '' === $value || $is_relative || $is_inline_image || $is_same_origin ) {
+					return 'url(' . $matches[1] . $value . $matches[1] . ')';
+				}
+
+				return 'none';
+			},
+			(string) $css
+		);
+
+		return trim( (string) $css );
+	}
+
+	/**
+	 * Decode and recursively sanitize a JSON request payload.
+	 *
+	 * Sanitizing the raw JSON string before decoding is unsafe: strip_tags()
+	 * removes everything between a "<" and a ">" that appear in different
+	 * values, which silently drops keys, and percent-encoded sequences such as
+	 * %20 are stripped from URLs. The payload is therefore decoded first and
+	 * every decoded value is sanitized afterwards.
+	 *
+	 * @param string $raw_json Raw JSON string taken from the request.
+	 * @return array|null Sanitized array, or null when the payload is not valid JSON.
+	 */
+	public function sanitize_json_input( $raw_json ) {
+		if ( ! is_string( $raw_json ) || '' === $raw_json ) {
+			return null;
+		}
+
+		$decoded = json_decode( $raw_json, true );
+
+		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
+			return null;
+		}
+
+		return map_deep( $decoded, 'sanitize_text_field' );
 	}
 
 	/**
@@ -1590,7 +1640,7 @@ class Functions {
 			foreach ( WC()->cart->get_cart() as $cart_item ) {
 				if ( $product_id ) {
 					if ( ! empty( $cart_item['data'] ) && in_array( $product_id, array( $cart_item['product_id'], $cart_item['variation_id'] ), true ) ) {
-						$__is_parent_rule_apply = apply_filters( 'wholesalex_apply_parent_rule_to_variations', false );  // Add This Filter TO Work Dynamic Rule For Combine Variation Product Like Quantity Base Discount
+						$__is_parent_rule_apply = apply_filters( 'wholesalex_apply_parent_rule_to_variations', false );  // Add This Filter TO Work Dynamic Rule For Combine Variation Product Like Quantity Base Discount.
 						if ( $__is_parent_rule_apply ) {
 							$__quantity += $cart_item['quantity'];
 						} else {
@@ -1624,7 +1674,7 @@ class Functions {
 		if ( ! empty( $product_id ) && isset( WC()->cart ) ) {
 
 			foreach ( WC()->cart->get_cart() as $cart_item ) {
-				if ( isset($cart_item['product_id']) && isset($cart_item['variation_id']) && isset($cart_item['line_total']) &&  in_array( $product_id, array( $cart_item['product_id'], $cart_item['variation_id'] ) ) ) { //phpcs:ignore
+				if ( isset( $cart_item['product_id'] ) && isset( $cart_item['variation_id'] ) && isset( $cart_item['line_total'] ) && in_array( $product_id, array( $cart_item['product_id'], $cart_item['variation_id'] ) ) ) { // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict -- Product IDs may arrive as numeric strings from callers.
 					return $cart_item['line_total'];
 				}
 			}
@@ -1693,7 +1743,7 @@ class Functions {
 	 * @since 1.0.0
 	 * @since 1.0.2 Updated and Backward Compatibility Added.
 	 */
-	public function get_language_n_text( $from_setting, $default ) {
+	public function get_language_n_text( $from_setting, $default ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound -- Retain the public parameter name for named-argument compatibility.
 
 		if ( version_compare( WHOLESALEX_VER, '1.0.2', '>=' ) > 0 ) {
 			if ( isset( $GLOBALS['wholesalex_settings'][ $from_setting ] ) ) {
@@ -1707,27 +1757,6 @@ class Functions {
 			return $default;
 		}
 	}
-
-	/**
-	 * IS Pro Enabled
-	 *
-	 * @return mixed Setting Value.
-	 * @since 1.0.0
-	 */
-	public function is_pro_enabled() {
-		return ( function_exists( 'wholesalex_pro' ) && wholesalex_pro()->is_active() );
-	}
-
-	/**
-	 * Is Pro Active.
-	 */
-	public function is_pro_active() {
-		// For Pro Check.
-		$__is_pro_active = Xpo::is_lc_active();
-
-		return $__is_pro_active;
-	}
-
 
 	/**
 	 * Calculate Per Unit Sale Price
@@ -1788,10 +1817,6 @@ class Functions {
 	public function get_single_product_default_settings( $key = '' ) {
 		if ( '' !== $key ) {
 			switch ( $key ) {
-				case '_settings_tier_layout':
-					return 'layout_one';
-				case '_settings_show_tierd_pricing_table':
-					return 'yes';
 				case '_settings_override_tax_extemption':
 					return 'disable';
 				case '_settings_override_shipping_role':
@@ -1820,56 +1845,6 @@ class Functions {
 
 		return $ids;
 	}
-
-	/**
-	 * Get WholesaleX License Type
-	 *
-	 * @return string
-	 */
-	public function get_license_type() {
-		$__status = get_option( 'edd_wholesalex_license_status', true );
-		if ( 'valid' !== $__status ) {
-			return '';
-		}
-		return get_option( '__wholesalex_license_type', '' );
-	}
-
-	/**
-	 * Get Upgrade Pro Popup HTML
-	 *
-	 * @param string $heading Heading.
-	 * @param string $subheading Subheading.
-	 * @param string $desc Description.
-	 * @param string $url URL.
-	 * @return void
-	 * @since 1.0.10
-	 */
-	public function get_upgrade_pro_popup_html( $heading = '', $subheading = '', $desc = '', $url = '' ) {
-		if ( '' === $url ) {
-			$url = wholesalex()->get_premium_link();
-		}
-		?>
-		<div id="wholesalex-pro-popup" class="wholesalex-popup-container popup-center display-none">
-			<div class="wholesalex-unlock-popup wholesalex-unlock-modal">
-				<img src="<?php echo esc_url( WHOLESALEX_URL ) . 'assets/icons/unlock.svg'; ?>" alt="Unlock Icon"/>
-				<h4 class="wholesalex-md-heading wholesalex-mt25"><?php echo esc_html( $heading ); ?></h4>
-				<?php
-				if ( $subheading ) {
-					?>
-					<span class="wholesalex-unlock-subheading"><?php echo esc_html( $subheading ); ?> </span>
-					<?php
-				}
-				?>
-				<div class="wholesalex-popup-desc">
-					<?php echo esc_html( $desc ); ?>
-				</div>
-				<a href="<?php echo esc_url( $url ); ?>" class="wsx-link wholesalex-btn wholesalex-btn-warning wholesalex-mt25"><?php echo esc_html__( 'Get WholesaleX Pro', 'wholesalex' ); ?></a>
-				<button class="wholesalex-popup-close pro-popup" id="wholesalex-close-pro-popup" onclick="closeWholesaleXGetProPopUp()"></button>
-			</div>
-		</div>
-		<?php
-	}
-
 
 	/**
 	 * Check Any String Start With
@@ -1932,7 +1907,7 @@ class Functions {
 		if ( is_multisite() ) {
 			$active_plugins = array_merge( $active_plugins, array_keys( get_site_option( 'active_sitewide_plugins', array() ) ) );
 		}
-		if ( file_exists( WP_PLUGIN_DIR . '/woocommerce-product-addon/woocommerce-product-addon.php' ) && in_array( 'woocommerce-product-addon/woocommerce-product-addon.php', $active_plugins, true ) ) {
+		if ( in_array( 'woocommerce-product-addon/woocommerce-product-addon.php', $active_plugins, true ) ) {
 			return true;
 		} else {
 			return false;
@@ -1958,16 +1933,11 @@ class Functions {
 			case 'wholesalex-wholesale-pricing':
 			case 'wholesalex_dynamic_rules':
 			case 'wholesalex-registration':
-			case 'wsx_conversation':
 			case 'wholesalex':
-			case 'wholesalex-setup-wizard':
 			case 'wholesalex-analytics':
 			case 'wholesalex-help':
-			case 'wholesalex-conversation':
-			case 'wholesalex-license':
 			case 'wholesalex-our-products':
 			case 'wholesalex-user-role-requests':
-			case 'wholesalex-setup-wizard':
 			case 'wholesalex-support':
 			case 'wholesalex-migration':
 				$status = true;
@@ -1987,7 +1957,7 @@ class Functions {
 			$status = false;
 		}
 
-		return $status;
+		return (bool) apply_filters( 'wholesalex_is_plugin_page', $status, $page );
 	}
 
 	/**
@@ -2051,58 +2021,24 @@ class Functions {
 	/**
 	 * Unlock Options that are locked for different pricing plans.
 	 *
-	 * @param array $locked_options Locked Options.
+	 * @param array $options Locked Options.
 	 * @return array Unlocked Options
 	 * @since 1.0.6
 	 */
-	public function unlock_options( $locked_options ) {
-
-		$unlocked_options = array();
-		if ( wholesalex()->is_pro_active() && is_array( $locked_options ) ) {
-			foreach ( $locked_options as $key => $value ) {
-				$temp       = $key;
-				$search_key = '#^pro_(.*)$#i';
-				if ( preg_match( $search_key, $key ) ) {
-					$option_key                      = str_replace( 'pro_', '', $key );
-					$option_name                     = str_replace( '(Pro)', '', $value );
-					$unlocked_options[ $option_key ] = $option_name;
-					$temp                            = $option_key;
-				}
-				if ( $key === $temp ) {
-					$unlocked_options[ $key ] = $value;
-				}
-			}
-		}
-
-		return $unlocked_options;
+	public function unlock_options( $options ) {
+		return apply_filters( 'wholesalex_extension_options', is_array( $options ) ? $options : array() );
 	}
+
 	/**
 	 * Unlock Tier Layouts that are locked for different pricing plans.
 	 *
-	 * @param array $locked_options Locked Options.
+	 * @param array $options Locked Options.
 	 * @return array Unlocked Options
 	 * @since 1.0.6
 	 */
-	public function unlock_layouts( $locked_options ) {
-		$unlocked_options = array();
-		if ( wholesalex()->is_pro_active() && is_array( $locked_options ) ) {
-			foreach ( $locked_options as $key => $value ) {
-				$temp       = $key;
-				$search_key = '#^pro_(.*)$#i';
-				if ( preg_match( $search_key, $key ) ) {
-					$option_key                      = str_replace( 'pro_', '', $key );
-					$unlocked_options[ $option_key ] = $value;
-					$temp                            = $option_key;
-				}
-				if ( $key === $temp ) {
-					$unlocked_options[ $key ] = $value;
-				}
-			}
-		}
-
-		return $unlocked_options;
+	public function unlock_layouts( $options ) {
+		return apply_filters( 'wholesalex_extension_layouts', is_array( $options ) ? $options : array() );
 	}
-
 
 	/**
 	 * Helper function for logging
@@ -2513,106 +2449,16 @@ class Functions {
 		return $result;
 	}
 	/**
-	 * Install Wholesalex Migration Tool Plugin With Ajax
-	 *
-	 * @return void
-	 */
-	public function wsx_migration_install_callback() {
-		check_ajax_referer( 'wholesalex-migration-tool-install', 'nonce' );
-
-		$plugin_file  = 'wholesalex-migration-tool/wholesalex-migration-tool.php';
-		$is_installed = file_exists( WP_PLUGIN_DIR . '/' . $plugin_file );
-
-		if ( ! $is_installed && ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) ) {
-			wp_send_json_error(
-				array( 'message' => __( 'You are not allowed to install and activate plugins.', 'wholesalex' ) ),
-				403
-			);
-		}
-
-		if ( $is_installed && ! current_user_can( 'activate_plugins' ) ) {
-			wp_send_json_error(
-				array( 'message' => __( 'You are not allowed to activate plugins.', 'wholesalex' ) ),
-				403
-			);
-		}
-
-		if ( ! $is_installed ) {
-			include ABSPATH . 'wp-admin/includes/plugin-install.php';
-			include ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-
-			if ( ! class_exists( 'Plugin_Installer_Skin' ) ) {
-				include ABSPATH . 'wp-admin/includes/class-plugin-installer-skin.php';
-			}
-			if ( ! class_exists( 'Plugin_Upgrader' ) ) {
-				include ABSPATH . 'wp-admin/includes/class-plugin-upgrader.php';
-			}
-			$plugin = 'wholesalex-migration-tool';
-			$api    = plugins_api(
-				'plugin_information',
-				array(
-					'slug'   => $plugin,
-					'fields' => array(
-						'short_description' => false,
-						'sections'          => false,
-						'requires'          => false,
-						'rating'            => false,
-						'ratings'           => false,
-						'downloaded'        => false,
-						'last_updated'      => false,
-						'added'             => false,
-						'tags'              => false,
-						'compatibility'     => false,
-						'homepage'          => false,
-						'donate_link'       => false,
-					),
-				)
-			);
-			// Translators: %s is the plugin name and version.
-			$title    = sprintf( __( 'Installing Plugin: %s', 'wholesalex' ), $api->name . ' ' . $api->version );
-			$nonce    = 'install-plugin_' . $plugin;
-			$url      = 'update.php?action=install-plugin&plugin=' . rawurlencode( $plugin );
-			$upgrader = new \Plugin_Upgrader( new \WP_Ajax_Upgrader_Skin( compact( 'title', 'url', 'nonce', 'plugin', 'api' ) ) );
-			$upgrader->install( $api->download_link );
-			activate_plugin( $plugin_file );
-			wp_safe_redirect( admin_url( 'admin.php?page=wholesalex-migration' ) );
-			exit;
-		} elseif ( ! is_plugin_active( $plugin_file ) ) {
-			activate_plugin( $plugin_file );
-			wp_safe_redirect( admin_url( 'admin.php?page=wholesalex' ) );
-			exit;
-		}
-	}
-
-	/**
 	 * Check if a plugin is installed and activated.
 	 *
 	 * @param string $plugin_path The relative path to the plugin file (e.g., 'woocommerce/woocommerce.php').
 	 * @return bool True if the plugin is installed and activated, false otherwise.
 	 */
 	public function is_plugin_installed_and_activated( $plugin_path ) {
-		if ( file_exists( WP_PLUGIN_DIR . '/' . $plugin_path ) && is_plugin_active( $plugin_path ) ) {
+		if ( is_plugin_active( $plugin_path ) ) {
 			return true;
 		}
 
-		return false;
-	}
-
-	/**
-	 * Get Price ID
-	 *
-	 * @return bool
-	 */
-	public function get_price_id() {
-		if ( wholesalex()->is_pro_active() ) {
-			$license_data = get_option( 'edd_wholesalex_license_data', false );
-			$license_data = (array) $license_data;
-			if ( is_array( $license_data ) && isset( $license_data['price_id'] ) ) {
-				return $license_data['price_id'];
-			} else {
-				return false;
-			}
-		}
 		return false;
 	}
 }

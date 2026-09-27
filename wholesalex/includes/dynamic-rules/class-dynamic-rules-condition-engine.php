@@ -28,6 +28,7 @@ class Dynamic_Rules_Condition_Engine {
 	 * @return bool
 	 */
 	public static function has_limit( $limit, $rule_id ) {
+		// phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- Preserve the existing local-time comparison contract for saved schedules.
 		$current_date = current_time( 'timestamp' );
 
 		if ( isset( $limit['_start_date'] ) && ! empty( $limit['_start_date'] ) ) {
@@ -69,8 +70,10 @@ class Dynamic_Rules_Condition_Engine {
 			case 'less':
 				return $actual_value < $condition_value;
 			case 'equal':
+				// phpcs:ignore Universal.Operators.StrictComparisons -- Preserve numeric equality between stored price strings and runtime numbers.
 				return $actual_value == $condition_value;
 			case 'not_equal':
+				// phpcs:ignore Universal.Operators.StrictComparisons -- Preserve numeric equality between stored price strings and runtime numbers.
 				return $actual_value != $condition_value;
 			case 'greater_equal':
 				return $actual_value >= $condition_value;
@@ -151,20 +154,9 @@ class Dynamic_Rules_Condition_Engine {
 						$all_passed = false;
 					}
 					break;
-				case 'order_count':
-					$order_count = Dynamic_Rules::$cu_order_counts;
-					if ( ! self::is_condition_passed( $operator, $condition_value, $order_count ) ) {
-						$all_passed = false;
-					}
-					break;
-				case 'total_purchase':
-					$total_purchase = Dynamic_Rules::$cu_total_spent;
-					if ( ! self::is_condition_passed( $operator, $condition_value, $total_purchase ) ) {
-						$all_passed = false;
-					}
-					break;
 				default:
-					$all_passed = apply_filters( 'wholesalex_dynamic_rules_condition_check', $all_passed, $tier, $condition_for, $operator, $condition_value );
+					// Conditions this plugin does not evaluate fail unless an extension handles them.
+					$all_passed = (bool) apply_filters( 'wholesalex_dynamic_rules_condition_check', false, $tier, $condition_for, $operator, $condition_value );
 					break;
 			}
 
@@ -177,7 +169,7 @@ class Dynamic_Rules_Condition_Engine {
 	}
 
 	/**
-	 * Check order count / purchase amount conditions for user-scope checks.
+	 * Check customer-scoped (non-cart) conditions for user-scope checks.
 	 *
 	 * @param array $tiers Condition tiers.
 	 * @return bool
@@ -194,20 +186,11 @@ class Dynamic_Rules_Condition_Engine {
 			$operator        = $tier['_conditions_operator'];
 			$condition_value = floatval( $tier['_conditions_value'] );
 
-			switch ( $condition_for ) {
-				case 'order_count':
-					$order_count = Dynamic_Rules::$cu_order_counts;
-					if ( ! self::is_condition_passed( $operator, $condition_value, $order_count ) ) {
-						$all_passed = false;
-					}
-					break;
-				case 'total_purchase':
-					$total_purchase = Dynamic_Rules::$cu_total_spent;
-					if ( ! self::is_condition_passed( $operator, $condition_value, $total_purchase ) ) {
-						$all_passed = false;
-					}
-					break;
+			if ( in_array( $condition_for, array( 'cart_total_qty', 'cart_total_value', 'cart_total_weight' ), true ) ) {
+				continue;
 			}
+			// Customer-scoped conditions this plugin does not evaluate fail unless an extension handles them.
+			$all_passed = (bool) apply_filters( 'wholesalex_dynamic_rules_condition_check', false, $tier, $condition_for, $operator, $condition_value );
 
 			if ( ! $all_passed ) {
 				return false;
@@ -221,7 +204,7 @@ class Dynamic_Rules_Condition_Engine {
 	 * Wrapper for is_conditions_fullfiled that unpacks conditions array.
 	 *
 	 * @param mixed $conditions Conditions array with 'tiers' key.
-	 * @param mixed $rule_filter Rule filter.
+	 * @param mixed $rule_filter Product targeting filter.
 	 * @return bool
 	 */
 	public static function check_rule_conditions( $conditions, $rule_filter = array() ) {
@@ -240,20 +223,21 @@ class Dynamic_Rules_Condition_Engine {
 	 * @return array Normalised filter with include/exclude lists and priority.
 	 */
 	public static function get_filtered_rules( $discount ) {
-		$include_products   = array();
-		$include_cats       = array();
-		$include_brands     = array();
-		$include_variations = array();
-		$include_attributes = array();
-		$include_skus       = array();
-		$exclude_products   = array();
-		$exclude_skus       = array();
-		$exclude_cats       = array();
-		$exclude_brands     = array();
-		$exclude_variations = array();
-		$exclude_attributes = array();
-		$is_all_products    = false;
-		$product_priority   = 10;
+		$include_products    = array();
+		$include_cats        = array();
+		$include_brands      = array();
+		$include_variations  = array();
+		$include_attributes  = array();
+		$include_skus        = array();
+		$exclude_products    = array();
+		$exclude_skus        = array();
+		$exclude_cats        = array();
+		$exclude_brands      = array();
+		$exclude_variations  = array();
+		$exclude_attributes  = array();
+		$premium_unavailable = false;
+		$is_all_products     = false;
+		$product_priority    = 10;
 
 		switch ( $discount['_product_filter'] ) {
 			case 'all_products':
@@ -305,47 +289,18 @@ class Dynamic_Rules_Condition_Engine {
 				}
 				break;
 			case 'brand_in_list':
-				if ( ! isset( $discount['brand_in_list'] ) ) {
-					break;
-				}
-				foreach ( $discount['brand_in_list'] as $list ) {
-					if ( isset( $list['value'] ) ) {
-						array_push( $include_brands, (int) $list['value'] );
-						$product_priority = 30;
-					}
-				}
-				break;
 			case 'brand_not_in_list':
-				if ( ! isset( $discount['brand_not_in_list'] ) ) {
-					break;
-				}
-				foreach ( $discount['brand_not_in_list'] as $list ) {
-					if ( isset( $list['value'] ) ) {
-						array_push( $exclude_brands, (int) $list['value'] );
-						$product_priority = 30;
-					}
-				}
-				break;
 			case 'att_in_list':
-				if ( ! isset( $discount['att_in_list'] ) ) {
-					break;
-				}
-				foreach ( $discount['att_in_list'] as $list ) {
-					if ( isset( $list['value'] ) ) {
-						array_push( $include_attributes, (int) $list['value'] );
-						$product_priority = 30;
-					}
-				}
-				break;
 			case 'att_not_in_list':
-				if ( ! isset( $discount['att_not_in_list'] ) ) {
-					break;
-				}
-				foreach ( $discount['att_not_in_list'] as $list ) {
-					if ( isset( $list['value'] ) ) {
-						array_push( $exclude_attributes, (int) $list['value'] );
-						$product_priority = 30;
-					}
+				$premium_target = apply_filters( 'wholesalex_legacy_premium_target_parse', null, $discount );
+				if ( is_array( $premium_target ) ) {
+					$include_brands     = isset( $premium_target['include_brands'] ) ? $premium_target['include_brands'] : array();
+					$exclude_brands     = isset( $premium_target['exclude_brands'] ) ? $premium_target['exclude_brands'] : array();
+					$include_attributes = isset( $premium_target['include_attributes'] ) ? $premium_target['include_attributes'] : array();
+					$exclude_attributes = isset( $premium_target['exclude_attributes'] ) ? $premium_target['exclude_attributes'] : array();
+					$product_priority   = 30;
+				} else {
+					$premium_unavailable = true;
 				}
 				break;
 			case 'attribute_in_list':
@@ -371,31 +326,14 @@ class Dynamic_Rules_Condition_Engine {
 				}
 				break;
 			case 'sku_in_list':
-				if ( ! isset( $discount['sku_in_list'] ) ) {
-					break;
-				}
-				foreach ( $discount['sku_in_list'] as $list ) {
-					if ( isset( $list['value'] ) ) {
-						$include_skus     = array_merge(
-							$include_skus,
-							self::get_product_ids_for_sku_filter_value( $list['value'] )
-						);
-						$product_priority = 20;
-					}
-				}
-				break;
 			case 'sku_not_in_list':
-				if ( ! isset( $discount['sku_not_in_list'] ) ) {
-					break;
-				}
-				foreach ( $discount['sku_not_in_list'] as $list ) {
-					if ( isset( $list['value'] ) ) {
-						$exclude_skus     = array_merge(
-							$exclude_skus,
-							self::get_product_ids_for_sku_filter_value( $list['value'] )
-						);
-						$product_priority = 20;
-					}
+				$premium_target = apply_filters( 'wholesalex_legacy_premium_target_parse', null, $discount );
+				if ( is_array( $premium_target ) ) {
+					$include_skus     = isset( $premium_target['include_skus'] ) ? $premium_target['include_skus'] : array();
+					$exclude_skus     = isset( $premium_target['exclude_skus'] ) ? $premium_target['exclude_skus'] : array();
+					$product_priority = 20;
+				} else {
+					$premium_unavailable = true;
 				}
 				break;
 		}
@@ -404,20 +342,21 @@ class Dynamic_Rules_Condition_Engine {
 		$exclude_skus = array_values( array_unique( array_map( 'intval', $exclude_skus ) ) );
 
 		return array(
-			'include_products'   => $include_products,
-			'include_cats'       => $include_cats,
-			'include_brands'     => $include_brands,
-			'include_attributes' => $include_attributes,
-			'include_variations' => $include_variations,
-			'include_skus'       => $include_skus,
-			'exclude_products'   => $exclude_products,
-			'exclude_cats'       => $exclude_cats,
-			'exclude_brands'     => $exclude_brands,
-			'exclude_attributes' => $exclude_attributes,
-			'exclude_variations' => $exclude_variations,
-			'exclude_skus'       => $exclude_skus,
-			'is_all_products'    => $is_all_products,
-			'product_priority'   => $product_priority,
+			'include_products'    => $include_products,
+			'include_cats'        => $include_cats,
+			'include_brands'      => $include_brands,
+			'include_attributes'  => $include_attributes,
+			'include_variations'  => $include_variations,
+			'include_skus'        => $include_skus,
+			'exclude_products'    => $exclude_products,
+			'exclude_cats'        => $exclude_cats,
+			'exclude_brands'      => $exclude_brands,
+			'exclude_attributes'  => $exclude_attributes,
+			'exclude_variations'  => $exclude_variations,
+			'exclude_skus'        => $exclude_skus,
+			'is_all_products'     => $is_all_products,
+			'product_priority'    => $product_priority,
+			'premium_unavailable' => $premium_unavailable,
 		);
 	}
 
@@ -430,94 +369,6 @@ class Dynamic_Rules_Condition_Engine {
 	 * @param mixed $value Saved SKU filter value.
 	 * @return array Product and variation IDs sharing the resolved SKU.
 	 */
-	private static function get_product_ids_for_sku_filter_value( $value ) {
-		if ( ! is_scalar( $value ) ) {
-			return array();
-		}
-
-		$raw_value   = trim( (string) $value );
-		$product_ids = array();
-		$sku         = '';
-
-		if ( '' === $raw_value ) {
-			return array();
-		}
-
-		if ( 0 === strpos( $raw_value, 'sku:' ) ) {
-			$sku = substr( $raw_value, 4 );
-		} elseif ( is_numeric( $raw_value ) ) {
-			$product_id = absint( $raw_value );
-			if ( $product_id ) {
-				$product_ids[] = $product_id;
-
-				if ( function_exists( 'wc_get_product' ) ) {
-					$product = wc_get_product( $product_id );
-					if ( $product ) {
-						$sku = $product->get_sku();
-					}
-				}
-
-				if ( '' === $sku ) {
-					$sku = get_post_meta( $product_id, '_sku', true );
-				}
-			}
-		} else {
-			$sku = $raw_value;
-		}
-
-		$sku = trim( (string) $sku );
-		if ( '' !== $sku ) {
-			$product_ids = array_merge(
-				$product_ids,
-				self::get_product_ids_by_sku( $sku )
-			);
-		}
-
-		$product_ids = array_filter( array_map( 'intval', $product_ids ) );
-
-		return array_values( array_unique( $product_ids ) );
-	}
-
-	/**
-	 * Get all products and variations that have the exact SKU.
-	 *
-	 * @param string $sku Product SKU.
-	 * @return array Product and variation IDs.
-	 */
-	private static function get_product_ids_by_sku( $sku ) {
-		static $sku_product_ids = array();
-
-		$sku = trim( (string) $sku );
-		if ( '' === $sku ) {
-			return array();
-		}
-
-		$cache_key = md5( $sku );
-		if ( isset( $sku_product_ids[ $cache_key ] ) ) {
-			return $sku_product_ids[ $cache_key ];
-		}
-
-		global $wpdb;
-
-		$product_ids = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				"SELECT pm.post_id
-				 FROM {$wpdb->postmeta} pm
-				 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-				 WHERE pm.meta_key = '_sku'
-				   AND pm.meta_value = %s
-				   AND p.post_type IN ('product', 'product_variation')
-				   AND p.post_status NOT IN ('trash', 'auto-draft')",
-				$sku
-			)
-		);
-
-		$sku_product_ids[ $cache_key ] = array_values(
-			array_unique( array_map( 'intval', $product_ids ) )
-		);
-
-		return $sku_product_ids[ $cache_key ];
-	}
 
 	/**
 	 * Check if given product is eligible for a rule's filter.
@@ -528,11 +379,13 @@ class Dynamic_Rules_Condition_Engine {
 	 * @return bool
 	 */
 	public static function is_eligible_for_rule( $product_id, $variation_id, $filter ) {
-		$product_id         = absint( $product_id );
-		$variation_id       = absint( $variation_id );
-		$cats               = wc_get_product_term_ids( $product_id, 'product_cat' );
-		$brand              = wc_get_product_term_ids( $product_id, 'product_brand' );
-		$product_attributes = self::get_product_attributes( $product_id );
+		$product_id   = absint( $product_id );
+		$variation_id = absint( $variation_id );
+		$cats         = wc_get_product_term_ids( $product_id, 'product_cat' );
+
+		if ( ! empty( $filter['premium_unavailable'] ) ) {
+			return false;
+		}
 
 		$status = false;
 
@@ -552,18 +405,8 @@ class Dynamic_Rules_Condition_Engine {
 			$status = true;
 		} elseif ( ! empty( $filter['exclude_cats'] ) && empty( array_intersect( $cats, $filter['exclude_cats'] ) ) ) {
 			$status = true;
-		} elseif ( ! empty( $filter['include_brands'] ) && ! empty( array_intersect( $brand, $filter['include_brands'] ) ) ) {
-			$status = true;
-		} elseif ( ! empty( $filter['exclude_brands'] ) && empty( array_intersect( $brand, $filter['exclude_brands'] ) ) ) {
-			$status = true;
-		} elseif ( ! empty( $filter['include_attributes'] ) && ! empty( $product_attributes ) && ! empty( array_intersect( $product_attributes, $filter['include_attributes'] ) ) ) {
-			$status = true;
-		} elseif ( ! empty( $filter['exclude_attributes'] ) && ! empty( $product_attributes ) && empty( array_intersect( $product_attributes, $filter['exclude_attributes'] ) ) ) {
-			$status = true;
-		} elseif ( ! empty( $filter['include_skus'] ) && ( in_array( $product_id, $filter['include_skus'], true ) || in_array( $variation_id, $filter['include_skus'], true ) ) ) {
-			$status = true;
-		} elseif ( ! empty( $filter['exclude_skus'] ) && ! in_array( $product_id, $filter['exclude_skus'], true ) && ! in_array( $variation_id, $filter['exclude_skus'], true ) ) {
-			$status = true;
+		} elseif ( ! empty( $filter['include_brands'] ) || ! empty( $filter['exclude_brands'] ) || ! empty( $filter['include_attributes'] ) || ! empty( $filter['exclude_attributes'] ) || ! empty( $filter['include_skus'] ) || ! empty( $filter['exclude_skus'] ) ) {
+			$status = (bool) apply_filters( 'wholesalex_legacy_premium_target_match', false, $product_id, $variation_id, $filter );
 		}
 
 		return $status;
@@ -576,54 +419,7 @@ class Dynamic_Rules_Condition_Engine {
 	 * @return array
 	 */
 	public static function get_product_attributes( $product_id ) {
-		$product = wc_get_product( $product_id );
-
-		if ( ! $product ) {
-			return array();
-		}
-
-		$attribute_ids = array();
-		$attributes    = $product->get_attributes();
-
-		if ( empty( $attributes ) ) {
-			return array();
-		}
-
-		$registered_attributes = wc_get_attribute_taxonomies();
-		$taxonomy_to_id_map    = array();
-
-		foreach ( $registered_attributes as $registered_attr ) {
-			$taxonomy_name                        = wc_attribute_taxonomy_name( $registered_attr->attribute_name );
-			$taxonomy_to_id_map[ $taxonomy_name ] = intval( $registered_attr->attribute_id );
-		}
-
-		foreach ( $attributes as $attribute ) {
-			$taxonomy = '';
-
-			if ( is_object( $attribute ) && method_exists( $attribute, 'is_taxonomy' ) ) {
-				if ( ! $attribute->is_taxonomy() ) {
-					continue;
-				}
-				$taxonomy = $attribute->get_taxonomy();
-			} elseif ( is_string( $attribute ) && taxonomy_exists( $attribute ) ) {
-				$taxonomy = $attribute;
-			} elseif ( is_array( $attribute ) && ! empty( $attribute['name'] ) && taxonomy_exists( $attribute['name'] ) ) {
-				$taxonomy = $attribute['name'];
-			} else {
-				continue;
-			}
-
-			$terms = wc_get_product_terms( $product_id, $taxonomy, array( 'fields' => 'ids' ) );
-
-			if ( is_wp_error( $terms ) || empty( $terms ) ) {
-				continue;
-			}
-			if ( isset( $taxonomy_to_id_map[ $taxonomy ] ) ) {
-				$attribute_ids[] = $taxonomy_to_id_map[ $taxonomy ];
-			}
-		}
-
-		return array_unique( $attribute_ids );
+		return apply_filters( 'wholesalex_legacy_product_attribute_ids', array(), $product_id );
 	}
 
 	/**

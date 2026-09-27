@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve the established scripts include path.
 /**
  * WholesaleX Scripts
  *
@@ -59,7 +59,6 @@ class Scripts {
 		'wholesalex-registration'  => 'wholesalex_form_builder',
 		'wsx_conversation'         => 'wholesalex_header',
 		'wholesalex'               => 'wholesalex_overview',
-		'wholesalex-setup-wizard'  => 'wholesalex_wizard',
 	);
 	/**
 	 * Register all scripts
@@ -68,44 +67,37 @@ class Scripts {
 		$register_scripts = apply_filters(
 			'wholesalex_register_backend_scripts',
 			array(
-				'wholesalex_category'     => array(
+				'wholesalex_category'         => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_cat.js',
 					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_cat.asset.php',
 					'deps'      => array(),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'wholesalex_overview'     => array(
+				'wholesalex_overview'         => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_overview.js',
 					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_overview.asset.php',
 					'deps'      => array(),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'wholesalex_product'      => array(
+				'wholesalex_product'          => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_product.js',
 					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_product.asset.php',
 					'deps'      => array(),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'wholesalex_all_products' => array(
+				'wholesalex_all_products'     => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_all_products.js',
 					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_all_products.asset.php',
 					'deps'      => array(),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'wholesalex_profile'      => array(
+				'wholesalex_profile'          => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_profile.js',
 					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_profile.asset.php',
-					'deps'      => array(),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex-builder'      => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/wholesalex_wallet.js',
-					'asset'     => WHOLESALEX_PATH . 'assets/js/wholesalex_wallet.asset.php',
 					'deps'      => array(),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
@@ -113,13 +105,6 @@ class Scripts {
 				'wholesalex_dashboard_widget' => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_dashboard_widget.js',
 					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_dashboard_widget.asset.php',
-					'deps'      => array( 'react', 'react-dom' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'whx_migration_tools' => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_migration_tools.js',
-					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_migration_tools.asset.php',
 					'deps'      => array( 'react', 'react-dom' ),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
@@ -137,6 +122,10 @@ class Scripts {
 
 			$deps = isset( $args['deps'] ) && is_array( $args['deps'] ) ? $args['deps'] : array();
 			$deps = array_values( array_unique( array_merge( $asset['dependencies'], $deps ) ) );
+			if ( 'wholesalex' !== $handle ) {
+				$deps[] = 'wholesalex';
+				$deps   = array_values( array_unique( $deps ) );
+			}
 
 			$ver = $asset['version'];
 			wp_register_script( $handle, $args['src'], $deps, $ver, $args['in_footer'] );
@@ -180,58 +169,37 @@ class Scripts {
 		$register_scripts = apply_filters(
 			'wholesalex_register_frontend_scripts',
 			array(
-				'wholesalex_category'     => array(
+				'wholesalex_category' => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_cat.js',
 					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_cat.asset.php',
 					'deps'      => array(),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'wholesalex_overview'     => array(
+				'wholesalex_overview' => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_overview.js',
 					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_overview.asset.php',
 					'deps'      => array(),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'wholesalex_product'      => array(
+				'wholesalex_product'  => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_product.js',
 					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_product.asset.php',
 					'deps'      => array(),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'whx_integration' => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/whx_integration.js',
-					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_integration.asset.php',
-					'deps'      => array(),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_profile'      => array(
+				'wholesalex_profile'     => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_profile.js',
 					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_profile.asset.php',
 					'deps'      => array(),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'wholesalex-builder'      => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/wholesalex_wallet.js',
-					'asset'     => WHOLESALEX_PATH . 'assets/js/wholesalex_wallet.asset.php',
-					'deps'      => array(),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex'              => array(
+				'wholesalex'          => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/wholesalex-public.js',
 					'asset'     => WHOLESALEX_PATH . 'assets/js/wholesalex-public.asset.php',
-					'deps'      => array( 'jquery', 'wp-i18n' ),
-					'ver'       => WHOLESALEX_VER,
-					'in_footer' => true,
-				),
-				'wholesalex_price_table'  => array(
-					'src'       => WHOLESALEX_URL . 'assets/js/wholesalex-price-table.js',
-					'asset'     => WHOLESALEX_PATH . 'assets/js/wholesalex-price-table.asset.php',
 					'deps'      => array( 'jquery', 'wp-i18n' ),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
@@ -249,6 +217,10 @@ class Scripts {
 
 			$deps = isset( $args['deps'] ) && is_array( $args['deps'] ) ? $args['deps'] : array();
 			$deps = array_values( array_unique( array_merge( $asset['dependencies'], $deps ) ) );
+			if ( 'wholesalex' !== $handle ) {
+				$deps[] = 'wholesalex';
+				$deps   = array_values( array_unique( $deps ) );
+			}
 
 			$ver = $asset['version'];
 			wp_register_script( $handle, $args['src'], $deps, $ver, $args['in_footer'] );

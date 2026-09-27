@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve the existing loader path and public class name.
 /**
  * Product Add-Ons Ultimate compatibility for WholesaleX product pricing.
  *
@@ -39,7 +39,11 @@ class Wholesale_Pricing_Product_Addons_Ultimate_Compatibility {
 	 * Register only when Product Add-Ons Ultimate is loaded.
 	 */
 	public function __construct() {
-		add_action( 'plugins_loaded', array( $this, 'register_hooks' ), 20 );
+		if ( did_action( 'plugins_loaded' ) ) {
+			$this->register_hooks();
+		} else {
+			add_action( 'plugins_loaded', array( $this, 'register_hooks' ), 20 );
+		}
 	}
 
 	/**
@@ -74,7 +78,7 @@ class Wholesale_Pricing_Product_Addons_Ultimate_Compatibility {
 		return isset( $item['data'] ) && $item['data'] instanceof \WC_Product
 			&& $item['data']->is_type( array( 'simple', 'variation' ) )
 			&& empty( $item['free_product'] )
-			&& empty( $item[ Wholesale_Pricing_Bxgy_Discount::CART_ITEM_FLAG ] )
+			&& empty( $item['_wholesalex_wp_bxgy_free_item'] )
 			&& empty( $extras['use_calc_set_price'] )
 			&& empty( $extras['products'] )
 			&& empty( $extras['child_fields'] )
@@ -157,7 +161,7 @@ class Wholesale_Pricing_Product_Addons_Ultimate_Compatibility {
 			$product->set_price( $price );
 			$cart->cart_contents[ $key ]['product_extras']['original_price']    = $base;
 			$cart->cart_contents[ $key ]['product_extras']['price_with_extras'] = $price;
-			$this->composed_products[ spl_object_hash( $product ) ]            = true;
+			$this->composed_products[ spl_object_hash( $product ) ]             = true;
 		}
 
 		$this->addon_prices = array();

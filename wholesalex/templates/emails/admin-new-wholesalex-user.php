@@ -1,10 +1,15 @@
 <?php
+/**
+ * Admin new wholesalex user.
+ *
+ * @package WholesaleX
+ */
 
 defined( 'ABSPATH' ) || exit;
 
 do_action( 'woocommerce_email_header', $email_heading, $email ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WooCommerce.
-$wholesalex_user = get_user_by( 'login', $user_login );
-$user_email      = $wholesalex_user->user_email; //phpcs:ignore
+$wholesalex_user            = get_user_by( 'login', $user_login );
+$wholesalex_recipient_email = $wholesalex_user->user_email;
 
 ?>
 
@@ -18,7 +23,7 @@ $user_email      = $wholesalex_user->user_email; //phpcs:ignore
 	<br />
 	<?php
 	echo esc_html_x( 'Email: ', 'New WholesaleX User Email (Admin)', 'wholesalex' );
-	echo esc_html( $user_email );
+	echo esc_html( $wholesalex_recipient_email );
 	?>
 </p>
 <?php

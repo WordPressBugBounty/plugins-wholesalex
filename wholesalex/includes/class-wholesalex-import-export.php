@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve the established import-export include path.
 /**
  * Import Export Handler
  *
@@ -8,10 +8,19 @@
 
 namespace WHOLESALEX;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * WholesaleX Import Export Class
  */
 class ImportExport {
+
+	/**
+	 * Name of the staged import file for the current request.
+	 *
+	 * @var string
+	 */
+	protected $import_file_name = '';
 
 	/**
 	 * Constructor
@@ -203,18 +212,18 @@ class ImportExport {
 	 * @return void
 	 */
 	public function export_users() {
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
+		$nonce = isset( $_POST['nonce'] ) && is_string( $_POST['nonce'] ) ? sanitize_key( wp_unslash( $_POST['nonce'] ) ) : '';
 		if ( ! wp_verify_nonce( $nonce, 'wholesalex-registration' ) ) {
 			return;
 		}
 		if ( ! $this->export_import_allowed() ) {
 			return;
 		}
-		$user_status        = isset( $_POST['getFilterStatus'] ) ? sanitize_text_field( wp_unslash( $_POST['getFilterStatus'] ) ) : '';
-		$search_query       = isset( $_POST['getSearchValue'] ) ? sanitize_text_field( wp_unslash( $_POST['getSearchValue'] ) ) : '';
-		$user_role          = isset( $_POST['getFilterRole'] ) ? sanitize_text_field( wp_unslash( $_POST['getFilterRole'] ) ) : '';
-		$selected_user_ids  = isset( $_POST['getSelectedUserIds'] ) ? sanitize_text_field( wp_unslash( $_POST['getSelectedUserIds'] ) ) : array();
-		$export_all         = isset( $_POST['exportAll'] ) && 'yes' === sanitize_text_field( wp_unslash( $_POST['exportAll'] ) );
+		$user_status       = isset( $_POST['getFilterStatus'] ) ? sanitize_text_field( wp_unslash( $_POST['getFilterStatus'] ) ) : '';
+		$search_query      = isset( $_POST['getSearchValue'] ) ? sanitize_text_field( wp_unslash( $_POST['getSearchValue'] ) ) : '';
+		$user_role         = isset( $_POST['getFilterRole'] ) ? sanitize_text_field( wp_unslash( $_POST['getFilterRole'] ) ) : '';
+		$selected_user_ids = isset( $_POST['getSelectedUserIds'] ) ? sanitize_text_field( wp_unslash( $_POST['getSelectedUserIds'] ) ) : array();
+		$export_all        = isset( $_POST['exportAll'] ) && 'yes' === sanitize_text_field( wp_unslash( $_POST['exportAll'] ) );
 		if ( $export_all ) {
 			$selected_user_ids = '';
 		}
@@ -329,6 +338,92 @@ class ImportExport {
 	}
 
 
+	/**
+	 * Return the directory used for staged import files, creating and hardening it.
+	 *
+	 * The staged CSV contains customer data, so the directory is protected against
+	 * direct web access and directory listing on Apache, LiteSpeed, IIS and nginx
+	 * setups that honour these files.
+	 *
+	 * @return string Absolute path with a trailing slash.
+	 */
+	protected function get_import_dir() {
+		$upload_dir = wp_upload_dir();
+		$target_dir = trailingslashit( $upload_dir['basedir'] ) . 'wholesalex_import_data/';
+
+		if ( ! is_dir( $target_dir ) ) {
+			wp_mkdir_p( $target_dir );
+		}
+
+		$guards = array(
+			'.htaccess'  => "Require all denied\n<IfModule !mod_authz_core.c>\nOrder allow,deny\nDeny from all\n</IfModule>\n",
+			'index.php'  => "<?php\n// Silence is golden.\n",
+			'index.html' => '',
+			'web.config' => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<configuration><system.webServer><authorization><deny users=\"*\" /></authorization></system.webServer></configuration>\n",
+		);
+
+		// WP_Filesystem may be unavailable or need credentials on some hosts, and
+		// the uploads directory is always writable by PHP directly, so write the
+		// guards with the filesystem API when it is ready and fall back otherwise.
+		global $wp_filesystem;
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		$has_filesystem = WP_Filesystem() && is_object( $wp_filesystem );
+
+		foreach ( $guards as $guard_file => $contents ) {
+			$guard_path = $target_dir . $guard_file;
+			if ( file_exists( $guard_path ) ) {
+				continue;
+			}
+			if ( $has_filesystem ) {
+				$wp_filesystem->put_contents( $guard_path, $contents, FS_CHMOD_FILE );
+			} else {
+				@file_put_contents( $guard_path, $contents ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents,WordPress.PHP.NoSilencedErrors.Discouraged -- Local guard-file fallback when WP_Filesystem requires unavailable credentials; preserve non-fatal import handling.
+			}
+		}
+
+		return $target_dir;
+	}
+
+	/**
+	 * Return the staged import file recorded for the current import, if it exists.
+	 *
+	 * @return string Absolute path, or an empty string when no staged file is recorded.
+	 */
+	protected function get_staged_import_file() {
+		$stats = get_option( '__wholesalex_customer_import_export_stats', array() );
+		$name  = is_array( $stats ) && isset( $stats['file_name'] ) ? basename( (string) $stats['file_name'] ) : '';
+
+		if ( '' === $name ) {
+			return '';
+		}
+
+		$path = $this->get_import_dir() . $name;
+
+		return is_file( $path ) ? $path : '';
+	}
+
+	/**
+	 * Remove any staged import file and the progress record that points at it.
+	 *
+	 * @return void
+	 */
+	protected function delete_staged_import_file() {
+		$stats = get_option( '__wholesalex_customer_import_export_stats', array() );
+		$name  = is_array( $stats ) && isset( $stats['file_name'] ) ? basename( (string) $stats['file_name'] ) : '';
+
+		if ( '' !== $name ) {
+			$path = $this->get_import_dir() . $name;
+			if ( is_file( $path ) ) {
+				wp_delete_file( $path );
+			}
+		}
+
+		// Remove files left by earlier versions, which used a fixed, guessable name.
+		$legacy = $this->get_import_dir() . 'wholesalex_users.csv';
+		if ( is_file( $legacy ) ) {
+			wp_delete_file( $legacy );
+		}
+	}
 
 	/**
 	 * Save csv file
@@ -336,33 +431,24 @@ class ImportExport {
 	 * @param string $file File Path.
 	 */
 	public function save_csv_file( $file ) {
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
+		$nonce = isset( $_POST['nonce'] ) && is_string( $_POST['nonce'] ) ? sanitize_key( wp_unslash( $_POST['nonce'] ) ) : '';
 		if ( ! wp_verify_nonce( $nonce, 'wholesalex-registration' ) ) {
 			return;
 		}
 
-		global $wp_filesystem;
-		require_once ABSPATH . '/wp-admin/includes/file.php';
-		WP_Filesystem();
-
-		$upload_dir = wp_upload_dir(); // WordPress upload directory.
-
-		// wholesalex custom import csv folder.
-		$target_dir = $upload_dir['basedir'] . '/wholesalex_import_data/';
-
-		// Check if the target directory exists.
-		if ( file_exists( $target_dir ) && $wp_filesystem->is_dir( $target_dir ) ) {
-			$specific_file = $target_dir . 'wholesalex_users.csv';
-			if ( file_exists( $specific_file ) ) {
-				wp_delete_file( $specific_file );
-				delete_option( '__wholesalex_customer_import_export_stats' );
-			}
-		} else {
-			// Create the directory if it doesn't exist.
-			$wp_filesystem->mkdir( $target_dir, 0755, true );
+		if ( ! $this->export_import_allowed() ) {
+			return;
 		}
 
-		$file_name = 'wholesalex_users.csv'; // Specify the new file name.
+		// Discard anything staged by a previous run before staging the new upload.
+		$this->delete_staged_import_file();
+		delete_option( '__wholesalex_customer_import_export_stats' );
+
+		$target_dir = $this->get_import_dir();
+
+		// An unguessable name keeps the staged customer data out of reach even if
+		// the directory guards above are not honoured by the web server.
+		$this->import_file_name = 'wholesalex_users-' . wp_generate_password( 32, false, false ) . '.csv';
 
 		$overrides = array(
 			'test_form' => false,
@@ -376,10 +462,17 @@ class ImportExport {
 		remove_filter( 'upload_dir', array( $this, 'change_upload_dir' ) );
 
 		if ( ( is_object( $upload_success ) && ! is_null( $upload_success->url ) ) || is_array( $upload_success ) ) {
+			// Record the name WordPress actually wrote; it sanitizes the requested
+			// name and appends a suffix if anything already occupies that path.
+			$stored_name = ( is_array( $upload_success ) && ! empty( $upload_success['file'] ) )
+				? basename( $upload_success['file'] )
+				: $this->import_file_name;
+
 			// count csv row and update in db.
-			$file_path                      = $upload_dir['basedir'] . '/wholesalex_import_data/' . $file_name;
+			$file_path                      = $target_dir . $stored_name;
 			$row_count                      = $this->count_and_filter_csv( $file_path );
 			$stats                          = get_option( '__wholesalex_customer_import_export_stats', array() );
+			$stats['file_name']             = $stored_name;
 			$stats['total']                 = $row_count;
 			$stats['process']               = 0;
 			$stats['update_existing']       = isset( $_POST['update_existing'] ) ? sanitize_text_field( wp_unslash( $_POST['update_existing'] ) ) : 'no';
@@ -398,11 +491,13 @@ class ImportExport {
 	/**
 	 * Change Import File Name
 	 *
-	 * @param string $file File Name.
-	 * @return string
+	 * @param array $file File Data.
+	 * @return array
 	 */
 	public function change_import_file_name( $file ) {
-		$file['name'] = 'wholesalex_users.csv';
+		if ( ! empty( $this->import_file_name ) ) {
+			$file['name'] = $this->import_file_name;
+		}
 		return $file;
 	}
 
@@ -440,7 +535,7 @@ class ImportExport {
 	 * Upload csv file
 	 */
 	public function import_users() {
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_key( $_POST['nonce'] ) : '';
+		$nonce = isset( $_POST['nonce'] ) && is_string( $_POST['nonce'] ) ? sanitize_key( wp_unslash( $_POST['nonce'] ) ) : '';
 		if ( ! wp_verify_nonce( $nonce, 'wholesalex-registration' ) ) {
 			return;
 		}
@@ -459,9 +554,15 @@ class ImportExport {
 			'process'         => 0,
 			'update_existing' => 'no',
 		);
-		if ( isset( $_FILES['file'] ) && ! empty( $_FILES['file'] ) ) {
-			$file           = $_FILES['file']; //phpcs:ignore
-			$file_extension = pathinfo( $file['name'], PATHINFO_EXTENSION );
+		if ( isset( $_FILES['file'] ) && is_array( $_FILES['file'] ) && isset( $_FILES['file']['name'] ) && is_string( $_FILES['file']['name'] ) ) {
+			$file           = array(
+				'name'     => sanitize_file_name( wp_unslash( $_FILES['file']['name'] ) ),
+				'type'     => isset( $_FILES['file']['type'] ) ? sanitize_mime_type( wp_unslash( $_FILES['file']['type'] ) ) : '',
+				'tmp_name' => isset( $_FILES['file']['tmp_name'] ) ? sanitize_text_field( $_FILES['file']['tmp_name'] ) : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Temporary upload path is only passed to WordPress upload handling.
+				'error'    => isset( $_FILES['file']['error'] ) ? absint( $_FILES['file']['error'] ) : 0,
+				'size'     => isset( $_FILES['file']['size'] ) ? absint( $_FILES['file']['size'] ) : 0,
+			);
+			$file_extension = strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) );
 			if ( 'csv' !== $file_extension ) {
 				return wp_send_json_success( $response );
 			}
@@ -492,10 +593,13 @@ class ImportExport {
 	 */
 	public function count_and_filter_csv( $file_path ) {
 		$row_count = 0;
-		if ( ( $handle = fopen( $file_path, 'r+' ) ) !== false ) { // @codingStandardsIgnoreLine.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- CSV parsing requires a stream resource.
+		$handle = fopen( $file_path, 'r+' );
+		if ( false !== $handle ) {
 			$columns = fgetcsv( $handle );
 
 			$mapped_column = array_flip( $columns );
+			// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Read each CSV row once and stop at end of file.
 			while ( false !== ( $data = fgetcsv( $handle ) ) ) {
 				$email = $data[ $mapped_column['email'] ];
 
@@ -503,7 +607,7 @@ class ImportExport {
 					++$row_count;
 				}
 			}
-			fclose( $handle ); // @codingStandardsIgnoreLine.
+			fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Close the CSV stream resource.
 		}
 
 		return $row_count;
@@ -516,12 +620,12 @@ class ImportExport {
 	 * @return void
 	 */
 	public function wholesalex_process_import_users() {
-		if ( ! ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'wholesalex-registration' ) ) ) {
-			return;
+		if ( ! isset( $_POST['nonce'] ) || ! is_string( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), 'wholesalex-registration' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'wholesalex' ) ), 403 );
 		}
 
 		if ( ! $this->export_import_allowed() ) {
-			return;
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to import users.', 'wholesalex' ) ), 403 );
 		}
 
 		add_filter( 'send_password_change_email', '__return_false' );
@@ -531,12 +635,12 @@ class ImportExport {
 
 		$max_process = isset( $stats['process_per_iteration'] ) ? $stats['process_per_iteration'] : 10;
 		// Check if a previous end position is stored.
-		$start_from        = isset( $stats['previous_position'] ) ? $stats['previous_position'] : 1;
+		$start_from       = isset( $stats['previous_position'] ) ? $stats['previous_position'] : 1;
 		$current_position = isset( $stats['current_position'] ) ? $stats['current_position'] : 1;
 
 		$is_update = isset( $_POST['update_existing'] ) ? 'yes' === $_POST['update_existing'] : false;
 
-		$response   = array(
+		$response = array(
 			'log'           => isset( $stats['log'] ) ? $stats['log'] : '',
 			'message'       => '',
 			'insert_count'  => isset( $stats['insert_count'] ) ? $stats['insert_count'] : 0,
@@ -545,11 +649,20 @@ class ImportExport {
 			'total'         => isset( $stats['total'] ) ? $stats['total'] : 0,
 			'process'       => isset( $stats['process'] ) ? $stats['process'] : 0,
 		);
-		$upload_dir = wp_upload_dir(); // WordPress upload directory.
-
 		// wholesalex custom import csv folder.
-		$file_path = $upload_dir['basedir'] . '/wholesalex_import_data/wholesalex_users.csv';
-		if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) { // @codingStandardsIgnoreLine.
+		$file_path = $this->get_staged_import_file();
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- CSV parsing requires a stream resource.
+		$handle = '' !== $file_path ? fopen( $file_path, 'r' ) : false;
+
+		if ( false === $handle ) {
+			// No staged file left to read: the import is over. The browser polls
+			// until processed reaches total, so report completion rather than
+			// echoing a count that can never advance.
+			$response['process'] = $response['total'];
+			wp_send_json_success( $response );
+		}
+
+		if ( false !== $handle ) {
 
 			// Get the length of the first row.
 
@@ -567,6 +680,13 @@ class ImportExport {
 				fseek( $handle, $start_from );
 			}
 
+			// Assume the chunk drains the file; the row-limit break below clears this.
+			$reached_end_of_file = true;
+			// Rows can be skipped without advancing the file position, so seed this
+			// from the stored value rather than leaving it undefined on an empty chunk.
+			$current_position = isset( $stats['previous_position'] ) ? $stats['previous_position'] : 0;
+
+			// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Read each CSV row once and stop at end of file.
 			while ( ( $data = fgetcsv( $handle ) ) !== false ) {
 				$user_extra_data_upsate = array();
 
@@ -704,6 +824,7 @@ class ImportExport {
 					$field_value   = 'nickname' === $field_key || 'bio' === $field_key || 'avatar' === $field_key ? $data[ $mapped_column[ $field_key ] ] : $$field_key;
 					$current_value = ( 'display_name' === $field_key ) ? $user_data_full->display_name : get_user_meta( $user->ID, $meta_key, true );
 
+					// phpcs:ignore Universal.Operators.StrictComparisons.LooseNotEqual -- CSV strings and stored metadata retain their existing value comparison.
 					if ( ! empty( $field_value ) && $field_value != $current_value ) {
 						$user_data[ $meta_key ]   = $field_value;
 						$log                     .= ucfirst( str_replace( '_', ' ', $field_key ) ) . ' Updated.';
@@ -773,6 +894,7 @@ class ImportExport {
 				}
 				$user_extra_data_upsate = array();
 				if ( ( $row_count - 1 ) >= $max_process ) {
+					$reached_end_of_file = false;
 					break;
 				}
 			}
@@ -787,11 +909,26 @@ class ImportExport {
 
 			$response['total'] = $stats['total'];
 
+			if ( $reached_end_of_file ) {
+				// Some skipped rows never advance the processed counter, so align it
+				// with the total once the file is drained; otherwise the browser,
+				// which polls until processed reaches total, would never stop.
+				$response['process'] = $response['total'];
+				$stats['process']    = $response['total'];
+			}
+
 			update_option( '__wholesalex_customer_import_export_stats', $stats );
 
 			$response['log'] = $stats['log'];
 
-			fclose( $handle ); // @codingStandardsIgnoreLine.
+			fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Close the CSV stream resource.
+
+			// The staged file holds customer data. Remove it once the reader has
+			// drained the file, rather than relying on the processed-row counter,
+			// which does not advance for every skipped row.
+			if ( $reached_end_of_file ) {
+				$this->delete_staged_import_file();
+			}
 		}
 
 		wp_send_json_success( $response );
@@ -801,7 +938,7 @@ class ImportExport {
 	 * Serve the generated file.
 	 */
 	public function download_export_file() {
-		if ( isset( $_GET['action'], $_GET['nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['nonce'] ) ), 'product-csv' ) && 'download_product_csv' === sanitize_text_field( wp_unslash( $_GET['action'] ) ) ) { // WPCS: input var ok, sanitization ok.
+		if ( isset( $_GET['action'], $_GET['nonce'] ) && is_string( $_GET['action'] ) && is_string( $_GET['nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['nonce'] ) ), 'product-csv' ) && 'download_product_csv' === sanitize_text_field( wp_unslash( $_GET['action'] ) ) ) { // WPCS: input var ok, sanitization ok.
 			include_once WC_ABSPATH . 'includes/export/class-wc-product-csv-exporter.php'; // @codingStandardsIgnoreLine.
 			$exporter = new \WC_Product_CSV_Exporter();
 
@@ -819,8 +956,10 @@ class ImportExport {
 	 * @return void
 	 */
 	public function export_roles() {
-		$nonce_value = isset( $_GET['nonce'] ) ? sanitize_key( wp_unslash( $_GET['nonce'] ) ) : '';
-		if ( ! wp_verify_nonce( $nonce_value, 'whx-export-roles' ) || ! $this->export_import_allowed() ) {
+		if ( ! isset( $_GET['nonce'] ) || ! is_string( $_GET['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['nonce'] ) ), 'whx-export-roles' ) ) {
+			return;
+		}
+		if ( ! $this->export_import_allowed() ) {
 			return;
 		}
 		if ( isset( $_GET['action'] ) && sanitize_text_field( wp_unslash( $_GET['action'] ) ) === 'export-roles-csv' ) { // WPCS: input var ok, sanitization ok.
@@ -839,8 +978,10 @@ class ImportExport {
 	 * @return void
 	 */
 	public function export_dynamic_rules() {
-		$nonce_value = isset( $_GET['nonce'] ) ? sanitize_key( wp_unslash( $_GET['nonce'] ) ) : '';
-		if ( ! wp_verify_nonce( $nonce_value, 'whx-export-dynamic-rules' ) || ! $this->export_import_allowed() ) {
+		if ( ! isset( $_GET['nonce'] ) || ! is_string( $_GET['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['nonce'] ) ), 'whx-export-dynamic-rules' ) ) {
+			return;
+		}
+		if ( ! $this->export_import_allowed() ) {
 			return;
 		}
 		if ( isset( $_GET['action'] ) && sanitize_text_field( wp_unslash( $_GET['action'] ) ) === 'export-dynamic-rule-csv' ) { // WPCS: input var ok, sanitization ok.

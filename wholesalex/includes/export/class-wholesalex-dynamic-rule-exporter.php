@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve existing include paths and template overrides.
 /**
  * Handles WholesaleX Dynamic Rule CSV export.
  * Inspired From WooCommerce Core
@@ -94,9 +94,12 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 		$this->total_rows = count( $rules );
 		$this->row_data   = array();
 
-		// These read-only filters are authorized by the WooCommerce exporter request that invokes this callback.
-		$exported_ids = isset( $_GET['exported_ids'] ) ? array_map( 'strval', explode( ',', sanitize_text_field( wp_unslash( $_GET['exported_ids'] ) ) ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Export selection does not change application state.
-		$export_all   = isset( $_GET['export_all'] ) && 'yes' === sanitize_text_field( wp_unslash( $_GET['export_all'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Export selection does not change application state.
+		$exported_ids = array();
+		$export_all   = false;
+		if ( isset( $_GET['nonce'] ) && is_string( $_GET['nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['nonce'] ) ), 'whx-export-dynamic-rules' ) ) {
+			$exported_ids = isset( $_GET['exported_ids'] ) ? array_map( 'strval', explode( ',', sanitize_text_field( wp_unslash( $_GET['exported_ids'] ) ) ) ) : array();
+			$export_all   = isset( $_GET['export_all'] ) && 'yes' === sanitize_text_field( wp_unslash( $_GET['export_all'] ) );
+		}
 
 		foreach ( $rules as $rule ) {
 			if ( $export_all || in_array( (string) $rule['id'], $exported_ids, true ) ) {

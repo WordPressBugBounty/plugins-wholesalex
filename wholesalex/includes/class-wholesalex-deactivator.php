@@ -7,6 +7,8 @@
  * @package           WholesaleX
  */
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * WholesaleX Deactivator Class
  */
@@ -18,6 +20,6 @@ class WholesaleX_Deactivator {
 	 * @since    1.0.0
 	 */
 	public static function deactivate() {
-		// TODO: Deactivate Actions.
+		// No deactivation actions are required.
 	}
 }

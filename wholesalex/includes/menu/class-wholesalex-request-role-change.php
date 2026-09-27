@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve the established public class and loader filename for compatibility.
 /**
  * Role change Action.
  *
@@ -6,7 +6,10 @@
  * @since 2.0.13
  */
 
+
 namespace WHOLESALEX;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * WholesaleX Category Class.
@@ -290,7 +293,7 @@ class WHOLESALEX_RequstRoleChange {
 		$post = $server->get_params();
 
 		// Nonce validation.
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
+		if ( ! isset( $post['nonce'] ) || ! is_string( $post['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $post['nonce'] ) ), 'wholesalex-registration' ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid request. Please refresh the page and try again.', 'wholesalex' ) ) );
 			return;
 		}

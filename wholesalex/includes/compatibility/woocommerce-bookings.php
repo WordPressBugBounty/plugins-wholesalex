@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve existing include paths and template overrides.
 /**
  * Compatibility with woocommerce Booking product and woocommerce booking.
  *

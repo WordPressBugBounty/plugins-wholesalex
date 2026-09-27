@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve the existing loader path and public class name.
 /**
  * WholesaleX Wholesale Pricing - Cart Discount Rule Handler
  *
@@ -95,7 +95,7 @@ class Wholesale_Pricing_Cart_Discount {
 	 * @return void
 	 */
 	public function render_promo_html( $product, array $rules ): void {
-		echo $this->get_promo_html( $product, $rules ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses( $this->get_promo_html( $product, $rules ), $this->get_promo_allowed_html() );
 	}
 
 	/**
@@ -193,7 +193,7 @@ class Wholesale_Pricing_Cart_Discount {
 			<div class="wsx-font-14"> <?php echo esc_html__( 'Promotions:', 'wholesalex' ); ?></div>
 			<div class="wsx-relative">
 				<div class="wsx-font-12 wsx-bg-secondary wsx-br-md wsx-pt-4 wsx-pb-6 wsx-plr-10 wsx-color-text-reverse wsx-curser-pointer wsx-btn-icon"
-					id="<?php echo esc_attr( $button_id ); ?>" data-product-id="<?php echo esc_attr( $product_id ); ?>">
+					id="<?php echo esc_attr( $button_id ); ?>" data-wsx-promo-toggle="1" data-modal="#<?php echo esc_attr( $modal_id ); ?>" data-icon="#<?php echo esc_attr( $icon_id ); ?>" data-product-id="<?php echo esc_attr( $product_id ); ?>">
 					<?php echo esc_html( apply_filters( 'wholesalex_wholesale_pricing_cart_discount_promo_button_text', __( 'Get exclusive offers', 'wholesalex' ), $product, $cart_discounts ) ); ?>
 					<div class="wsx-icon" id="<?php echo esc_attr( $icon_id ); ?>" style="margin-bottom: -4px; transition: all 0.3s;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5 7.5 5 5 5-5" /></svg></div>
 				</div>
@@ -207,36 +207,67 @@ class Wholesale_Pricing_Cart_Discount {
 				</div>
 			</div>
 		</div>
-		<script type="text/javascript">
-			(function($) {
-				'use strict';
-				const button = $('#<?php echo esc_js( $button_id ); ?>');
-				const modal = $('#<?php echo esc_js( $modal_id ); ?>');
-				const icon = $('#<?php echo esc_js( $icon_id ); ?>');
-
-				button.on('click', function(e) {
-					e.preventDefault();
-					modal.slideToggle(100);
-					if (icon.hasClass('rotated')) {
-						icon.removeClass('rotated').css('transform', 'rotate(0deg)');
-					} else {
-						icon.addClass('rotated').css('transform', 'rotate(180deg)');
-					}
-				});
-
-				$(document).on('click', function(e) {
-					if ($(e.target).closest('#<?php echo esc_js( $modal_id ); ?>').length) {
-						return;
-					}
-					if ($(e.target).closest('#<?php echo esc_js( $button_id ); ?>').length) {
-						return;
-					}
-					modal.hide(100);
-					icon.removeClass('rotated').css('transform', 'rotate(0deg)');
-				});
-			})(jQuery);
-		</script>
 		<?php
+		$this->enqueue_promo_toggle_script();
+	}
+
+	/**
+	 * Allowed HTML for promo markup output.
+	 *
+	 * @return array
+	 */
+	private function get_promo_allowed_html(): array {
+		$allowed                                 = wp_kses_allowed_html( 'post' );
+		$allowed['svg']                          = array(
+			'xmlns'   => true,
+			'width'   => true,
+			'height'  => true,
+			'fill'    => true,
+			'viewbox' => true,
+		);
+		$allowed['path']                         = array(
+			'stroke'          => true,
+			'stroke-linecap'  => true,
+			'stroke-linejoin' => true,
+			'stroke-width'    => true,
+			'd'               => true,
+			'fill'            => true,
+		);
+		$allowed['div']['id']                    = true;
+		$allowed['div']['data-product-id']       = true;
+		$allowed['div']['data-wsx-promo-toggle'] = true;
+		$allowed['div']['data-modal']            = true;
+		$allowed['div']['data-icon']             = true;
+		return $allowed;
+	}
+
+	/**
+	 * Register the shared promo popup toggle script.
+	 *
+	 * @return void
+	 */
+	public function enqueue_promo_toggle_script(): void {
+		if ( wp_script_is( 'wholesalex-promo-toggle', 'enqueued' ) ) {
+			return;
+		}
+		wp_register_script( 'wholesalex-promo-toggle', '', array( 'jquery' ), WHOLESALEX_VER, true );
+		wp_enqueue_script( 'wholesalex-promo-toggle' );
+		wp_add_inline_script(
+			'wholesalex-promo-toggle',
+			"jQuery(function($){
+	$(document).on('click', '[data-wsx-promo-toggle]', function(e){
+		e.preventDefault();
+		var icon = $($(this).data('icon'));
+		$($(this).data('modal')).slideToggle(100);
+		icon.toggleClass('rotated').css('transform', icon.hasClass('rotated') ? 'rotate(180deg)' : 'rotate(0deg)');
+	});
+	$(document).on('click', function(e){
+		if ($(e.target).closest('[data-wsx-promo-toggle], .wsx-dr-single-product-discounts-modal').length) { return; }
+		$('.wsx-dr-single-product-discounts-modal').hide(100);
+		$('[data-wsx-promo-toggle] .wsx-icon').removeClass('rotated').css('transform', 'rotate(0deg)');
+	});
+});"
+		);
 	}
 
 	/**
@@ -345,8 +376,8 @@ class Wholesale_Pricing_Cart_Discount {
 	 * @return array<string, string>
 	 */
 	private function normalize_condition_texts( array $texts ): array {
-		$normalized = $this->get_default_condition_texts();
-		$legacy_map = $this->get_legacy_condition_text_map();
+		$normalized      = $this->get_default_condition_texts();
+		$legacy_map      = $this->get_legacy_condition_text_map();
 		$legacy_defaults = $this->get_legacy_default_condition_texts();
 
 		foreach ( $legacy_map as $legacy_key => $current_keys ) {
@@ -402,11 +433,11 @@ class Wholesale_Pricing_Cart_Discount {
 			return;
 		}
 
-		$current     = $boundaries[ $direction ];
-		$replace     = 'lower' === $direction ? $value > $current['value'] : $value < $current['value'];
-		$same_value  = $value === $current['value'];
-		$is_strict   = in_array( $operator, array( 'greater', 'less' ), true );
-		$was_strict  = in_array( $current['operator'], array( 'greater', 'less' ), true );
+		$current    = $boundaries[ $direction ];
+		$replace    = 'lower' === $direction ? $value > $current['value'] : $value < $current['value'];
+		$same_value = $value === $current['value'];
+		$is_strict  = in_array( $operator, array( 'greater', 'less' ), true );
+		$was_strict = in_array( $current['operator'], array( 'greater', 'less' ), true );
 
 		if ( $replace || ( $same_value && $is_strict && ! $was_strict ) ) {
 			$boundaries[ $direction ] = $candidate;
@@ -477,30 +508,30 @@ class Wholesale_Pricing_Cart_Discount {
 	 */
 	private function get_default_condition_texts(): array {
 		return array(
-			'cart_total_qty_less_conditions_text'                   => __( 'Keep your items below {max_value} to qualify.', 'wholesalex' ),
-			'cart_total_qty_less_equal_conditions_text'             => __( 'Keep your items at {max_value} or less to qualify.', 'wholesalex' ),
-			'cart_total_qty_greater_conditions_text'                => __( 'Add more than {min_value} items to qualify.', 'wholesalex' ),
-			'cart_total_qty_greater_equal_conditions_text'          => __( 'Add {min_value} or more items to qualify.', 'wholesalex' ),
-			'cart_total_qty_greater_less_conditions_text'           => __( 'Add more than {min_value} but less than {max_value} items to unlock this offer.', 'wholesalex' ),
+			'cart_total_qty_less_conditions_text'          => __( 'Keep your items below {max_value} to qualify.', 'wholesalex' ),
+			'cart_total_qty_less_equal_conditions_text'    => __( 'Keep your items at {max_value} or less to qualify.', 'wholesalex' ),
+			'cart_total_qty_greater_conditions_text'       => __( 'Add more than {min_value} items to qualify.', 'wholesalex' ),
+			'cart_total_qty_greater_equal_conditions_text' => __( 'Add {min_value} or more items to qualify.', 'wholesalex' ),
+			'cart_total_qty_greater_less_conditions_text'  => __( 'Add more than {min_value} but less than {max_value} items to unlock this offer.', 'wholesalex' ),
 			'cart_total_qty_greater_equal_less_equal_conditions_text' => __( 'Add {min_value} to {max_value} items to unlock this offer.', 'wholesalex' ),
-			'cart_total_qty_greater_less_equal_conditions_text'     => __( 'Add more than {min_value} to {max_value} items to unlock this offer.', 'wholesalex' ),
-			'cart_total_qty_greater_equal_less_conditions_text'     => __( 'Add {min_value} to less than {max_value} items to unlock this offer.', 'wholesalex' ),
-			'cart_total_weight_less_conditions_text'                => __( 'Keep your weight below {max_value} to qualify.', 'wholesalex' ),
-			'cart_total_weight_less_equal_conditions_text'          => __( 'Keep your total weight at {max_value} or less to qualify.', 'wholesalex' ),
-			'cart_total_weight_greater_conditions_text'             => __( 'Add more than {min_value} in weight to qualify.', 'wholesalex' ),
-			'cart_total_weight_greater_equal_conditions_text'       => __( 'Add {min_value} or more in weight to qualify.', 'wholesalex' ),
-			'cart_total_weight_greater_less_conditions_text'        => __( 'Add more than {min_value} but less than {max_value} in weight to unlock this offer.', 'wholesalex' ),
+			'cart_total_qty_greater_less_equal_conditions_text' => __( 'Add more than {min_value} to {max_value} items to unlock this offer.', 'wholesalex' ),
+			'cart_total_qty_greater_equal_less_conditions_text' => __( 'Add {min_value} to less than {max_value} items to unlock this offer.', 'wholesalex' ),
+			'cart_total_weight_less_conditions_text'       => __( 'Keep your weight below {max_value} to qualify.', 'wholesalex' ),
+			'cart_total_weight_less_equal_conditions_text' => __( 'Keep your total weight at {max_value} or less to qualify.', 'wholesalex' ),
+			'cart_total_weight_greater_conditions_text'    => __( 'Add more than {min_value} in weight to qualify.', 'wholesalex' ),
+			'cart_total_weight_greater_equal_conditions_text' => __( 'Add {min_value} or more in weight to qualify.', 'wholesalex' ),
+			'cart_total_weight_greater_less_conditions_text' => __( 'Add more than {min_value} but less than {max_value} in weight to unlock this offer.', 'wholesalex' ),
 			'cart_total_weight_greater_equal_less_equal_conditions_text' => __( 'Add {min_value} to {max_value} in weight to unlock this offer.', 'wholesalex' ),
-			'cart_total_weight_greater_less_equal_conditions_text'  => __( 'Add more than {min_value} to {max_value} in weight to unlock this offer.', 'wholesalex' ),
-			'cart_total_weight_greater_equal_less_conditions_text'  => __( 'Add {min_value} to less than {max_value} in weight to unlock this offer.', 'wholesalex' ),
-			'cart_total_value_less_conditions_text'                 => __( 'Keep your spend below ${max_value} to qualify.', 'wholesalex' ),
-			'cart_total_value_less_equal_conditions_text'           => __( 'Keep your spend at ${max_value} or less to qualify.', 'wholesalex' ),
-			'cart_total_value_greater_conditions_text'              => __( 'Spend more than ${min_value} to qualify.', 'wholesalex' ),
-			'cart_total_value_greater_equal_conditions_text'        => __( 'Spend ${min_value} or more to qualify.', 'wholesalex' ),
-			'cart_total_value_greater_less_conditions_text'         => __( 'Spend more than ${min_value} but less than ${max_value} to unlock this offer.', 'wholesalex' ),
+			'cart_total_weight_greater_less_equal_conditions_text' => __( 'Add more than {min_value} to {max_value} in weight to unlock this offer.', 'wholesalex' ),
+			'cart_total_weight_greater_equal_less_conditions_text' => __( 'Add {min_value} to less than {max_value} in weight to unlock this offer.', 'wholesalex' ),
+			'cart_total_value_less_conditions_text'        => __( 'Keep your spend below ${max_value} to qualify.', 'wholesalex' ),
+			'cart_total_value_less_equal_conditions_text'  => __( 'Keep your spend at ${max_value} or less to qualify.', 'wholesalex' ),
+			'cart_total_value_greater_conditions_text'     => __( 'Spend more than ${min_value} to qualify.', 'wholesalex' ),
+			'cart_total_value_greater_equal_conditions_text' => __( 'Spend ${min_value} or more to qualify.', 'wholesalex' ),
+			'cart_total_value_greater_less_conditions_text' => __( 'Spend more than ${min_value} but less than ${max_value} to unlock this offer.', 'wholesalex' ),
 			'cart_total_value_greater_equal_less_equal_conditions_text' => __( 'Spend between ${min_value} and ${max_value} to unlock this offer.', 'wholesalex' ),
-			'cart_total_value_greater_less_equal_conditions_text'   => __( 'Spend more than ${min_value} and up to ${max_value} to unlock this offer.', 'wholesalex' ),
-			'cart_total_value_greater_equal_less_conditions_text'   => __( 'Spend ${min_value} or more but less than ${max_value} to unlock this offer.', 'wholesalex' ),
+			'cart_total_value_greater_less_equal_conditions_text' => __( 'Spend more than ${min_value} and up to ${max_value} to unlock this offer.', 'wholesalex' ),
+			'cart_total_value_greater_equal_less_conditions_text' => __( 'Spend ${min_value} or more but less than ${max_value} to unlock this offer.', 'wholesalex' ),
 		);
 	}
 
@@ -511,15 +542,15 @@ class Wholesale_Pricing_Cart_Discount {
 	 */
 	private function get_legacy_default_condition_texts(): array {
 		return array(
-			'cart_total_value_max_conditions_text'        => 'Spend upto {min_value}',
-			'cart_total_value_min_conditions_text'        => 'Spend min {max_value}',
-			'cart_total_value_min_max_conditions_text'    => 'Spend {min_value} to {max_value}',
-			'cart_total_qty_min_max_conditions_text'      => 'Add {min_value} to {max_value} product(s) to cart',
-			'cart_total_qty_min_conditions_text'          => 'Add min {min_value} product(s) to cart',
-			'cart_total_qty_max_conditions_text'          => 'Add {max_value} or more product(s) to cart',
-			'cart_total_weight_min_max_conditions_text'   => 'Add {min_value} to {max_value} {unit} to cart',
-			'cart_total_weight_min_conditions_text'       => 'Add min {min_value} {unit} to cart',
-			'cart_total_weight_max_conditions_text'       => 'Add up to {max_value} {unit} to cart',
+			'cart_total_value_max_conditions_text'      => 'Spend upto {min_value}',
+			'cart_total_value_min_conditions_text'      => 'Spend min {max_value}',
+			'cart_total_value_min_max_conditions_text'  => 'Spend {min_value} to {max_value}',
+			'cart_total_qty_min_max_conditions_text'    => 'Add {min_value} to {max_value} product(s) to cart',
+			'cart_total_qty_min_conditions_text'        => 'Add min {min_value} product(s) to cart',
+			'cart_total_qty_max_conditions_text'        => 'Add {max_value} or more product(s) to cart',
+			'cart_total_weight_min_max_conditions_text' => 'Add {min_value} to {max_value} {unit} to cart',
+			'cart_total_weight_min_conditions_text'     => 'Add min {min_value} {unit} to cart',
+			'cart_total_weight_max_conditions_text'     => 'Add up to {max_value} {unit} to cart',
 		);
 	}
 
@@ -530,14 +561,14 @@ class Wholesale_Pricing_Cart_Discount {
 	 */
 	private function get_legacy_condition_text_map(): array {
 		return array(
-			'cart_total_value_max_conditions_text' => array( 'cart_total_value_less_conditions_text', 'cart_total_value_less_equal_conditions_text' ),
-			'cart_total_value_min_conditions_text' => array( 'cart_total_value_greater_conditions_text', 'cart_total_value_greater_equal_conditions_text' ),
-			'cart_total_value_min_max_conditions_text' => array( 'cart_total_value_greater_less_conditions_text', 'cart_total_value_greater_equal_less_equal_conditions_text', 'cart_total_value_greater_less_equal_conditions_text', 'cart_total_value_greater_equal_less_conditions_text' ),
-			'cart_total_qty_max_conditions_text' => array( 'cart_total_qty_less_conditions_text', 'cart_total_qty_less_equal_conditions_text' ),
-			'cart_total_qty_min_conditions_text' => array( 'cart_total_qty_greater_conditions_text', 'cart_total_qty_greater_equal_conditions_text' ),
-			'cart_total_qty_min_max_conditions_text' => array( 'cart_total_qty_greater_less_conditions_text', 'cart_total_qty_greater_equal_less_equal_conditions_text', 'cart_total_qty_greater_less_equal_conditions_text', 'cart_total_qty_greater_equal_less_conditions_text' ),
-			'cart_total_weight_max_conditions_text' => array( 'cart_total_weight_less_conditions_text', 'cart_total_weight_less_equal_conditions_text' ),
-			'cart_total_weight_min_conditions_text' => array( 'cart_total_weight_greater_conditions_text', 'cart_total_weight_greater_equal_conditions_text' ),
+			'cart_total_value_max_conditions_text'      => array( 'cart_total_value_less_conditions_text', 'cart_total_value_less_equal_conditions_text' ),
+			'cart_total_value_min_conditions_text'      => array( 'cart_total_value_greater_conditions_text', 'cart_total_value_greater_equal_conditions_text' ),
+			'cart_total_value_min_max_conditions_text'  => array( 'cart_total_value_greater_less_conditions_text', 'cart_total_value_greater_equal_less_equal_conditions_text', 'cart_total_value_greater_less_equal_conditions_text', 'cart_total_value_greater_equal_less_conditions_text' ),
+			'cart_total_qty_max_conditions_text'        => array( 'cart_total_qty_less_conditions_text', 'cart_total_qty_less_equal_conditions_text' ),
+			'cart_total_qty_min_conditions_text'        => array( 'cart_total_qty_greater_conditions_text', 'cart_total_qty_greater_equal_conditions_text' ),
+			'cart_total_qty_min_max_conditions_text'    => array( 'cart_total_qty_greater_less_conditions_text', 'cart_total_qty_greater_equal_less_equal_conditions_text', 'cart_total_qty_greater_less_equal_conditions_text', 'cart_total_qty_greater_equal_less_conditions_text' ),
+			'cart_total_weight_max_conditions_text'     => array( 'cart_total_weight_less_conditions_text', 'cart_total_weight_less_equal_conditions_text' ),
+			'cart_total_weight_min_conditions_text'     => array( 'cart_total_weight_greater_conditions_text', 'cart_total_weight_greater_equal_conditions_text' ),
 			'cart_total_weight_min_max_conditions_text' => array( 'cart_total_weight_greater_less_conditions_text', 'cart_total_weight_greater_equal_less_equal_conditions_text', 'cart_total_weight_greater_less_equal_conditions_text', 'cart_total_weight_greater_equal_less_conditions_text' ),
 		);
 	}
@@ -563,15 +594,15 @@ class Wholesale_Pricing_Cart_Discount {
 	 *
 	 * @param array  $rule    Registered promo rule data.
 	 * @param string $key     Cart setting key.
-	 * @param string $default Default value.
+	 * @param string $fallback Default value.
 	 * @return string
 	 */
-	private function get_cart_setting( array $rule, string $key, string $default ): string {
+	private function get_cart_setting( array $rule, string $key, string $fallback ): string {
 		if ( isset( $rule['cart'][ $key ] ) && is_scalar( $rule['cart'][ $key ] ) ) {
 			return (string) $rule['cart'][ $key ];
 		}
 
-		return $default;
+		return $fallback;
 	}
 
 	/**
@@ -701,6 +732,7 @@ class Wholesale_Pricing_Cart_Discount {
 	 */
 	private function get_hash_key( array $rule ): string {
 		return md5(
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Preserve legacy rule hash keys; the serialized value is never unserialized.
 			serialize(
 				array(
 					'id'     => $rule['id'] ?? '',

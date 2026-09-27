@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve existing include paths and template overrides.
 /**
  * Class wholesalex new user file.
  *
@@ -220,4 +220,3 @@ if ( ! class_exists( 'WHOLESALEX\WholesaleX_New_User_Auto_Approved_Email' ) ) {
 }
 
 return new WholesaleX_New_User_Auto_Approved_Email();
-

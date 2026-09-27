@@ -8,6 +8,8 @@
 
 namespace WHOLESALEX;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * WholesaleX Category Class.
  */

@@ -28,10 +28,27 @@ class WHOLESALEX_Dynamic_Rules {
 	/**
 	 * Static properties kept here for backward-compat. The orchestrator syncs
 	 * these after it sets its own copies in get_valid_dynamic_rules().
+	 *
+	 * @var int
 	 */
-	public static $cu_order_counts           = 0;
-	public static $cu_total_spent            = 0;
-	public static $total_cart_counts         = '';
+	public static $cu_order_counts = 0;
+	/**
+	 * Total amount spent by the current customer.
+	 *
+	 * @var int|float
+	 */
+	public static $cu_total_spent = 0;
+	/**
+	 * Cart quantity, or an empty string before initialization.
+	 *
+	 * @var int|float|string
+	 */
+	public static $total_cart_counts = '';
+	/**
+	 * Unique cart item count, or an empty string before initialization.
+	 *
+	 * @var int|string
+	 */
 	public static $total_unique_item_on_cart = '';
 
 	/**
@@ -61,7 +78,7 @@ class WHOLESALEX_Dynamic_Rules {
 	public function __construct() {
 		self::load_dependencies();
 		$this->orchestrator = new Dynamic_Rules();
-		$this->rest_api = new Dynamic_Rules_Rest_Api();
+		$this->rest_api     = new Dynamic_Rules_Rest_Api();
 	}
 
 	/**

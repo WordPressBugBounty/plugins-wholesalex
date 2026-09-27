@@ -1,21 +1,29 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName, WordPress.Files.FileName.NotHyphenatedLowercase -- Preserve existing include paths and template overrides.
+/**
+ * Aeila currency switcher.
+ *
+ * @package WholesaleX
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 if ( ! class_exists( 'Aelia_Integration_Helper' ) ) {
 
+	// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Preserve the established compatibility helper class name.
 	/**
 	 * Aelia Currency Switcher helper class.
 	 */
-	class Aelia_Integration_Helper { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Preserve the established compatibility helper class name.
+	class Aelia_Integration_Helper {
+		// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound
 
 		/**
 		 * Shop's base currency. Used for caching.
 		 *
 		 * @var string $_base_currency
 		 */
-		protected static $_base_currency;
+		protected static $_base_currency; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore -- Preserve the protected property for integration subclasses.
 
 		/**
 		 * Returns shop's base currency. This method implements some simple caching,

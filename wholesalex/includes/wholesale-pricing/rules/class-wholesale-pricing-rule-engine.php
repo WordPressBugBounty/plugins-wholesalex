@@ -129,12 +129,12 @@ class Wholesale_Pricing_Rule_Engine {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->regular_discount = new Wholesale_Pricing_Regular_Discount();
-		$this->product_discount = new Wholesale_Pricing_Product_Discount();
-		$this->tiered_discount  = new Wholesale_Pricing_Tiered_Discount();
-		$this->cart_discount    = new Wholesale_Pricing_Cart_Discount();
-		$this->bogo_discount    = new Wholesale_Pricing_Bogo_Discount();
-		$this->bxgy_discount    = new Wholesale_Pricing_Bxgy_Discount();
+		$this->regular_discount = Wholesale_Pricing_Rule_Registry::processor( 'regular' );
+		$this->product_discount = Wholesale_Pricing_Rule_Registry::processor( 'product_discount' );
+		$this->tiered_discount  = Wholesale_Pricing_Rule_Registry::processor( 'tiered' );
+		$this->cart_discount    = Wholesale_Pricing_Rule_Registry::processor( 'cart_discount' );
+		$this->bogo_discount    = Wholesale_Pricing_Rule_Registry::processor( 'bogo_discount' );
+		$this->bxgy_discount    = Wholesale_Pricing_Rule_Registry::processor( 'buy_x_get_y' );
 
 		add_action( 'wp_loaded', array( $this, 'load_valid_rules' ) );
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_cart_item_prices' ), 999 );
@@ -154,7 +154,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param bool  $first_tier Whether inactive tiers should be exposed for display.
 	 * @return array
 	 */
-	public function provide_priority_tier_result( $result, $product_id, $parent_id, $base_price, $quantity, $first_tier = false ): array {
+	public function provide_priority_tier_result( $result, $product_id, $parent_id, $base_price, $quantity, $first_tier = false ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Retain the established callback signature for compatibility.
 		$product = wc_get_product( $product_id );
 
 		if ( ! $product instanceof \WC_Product ) {
@@ -207,7 +207,9 @@ class Wholesale_Pricing_Rule_Engine {
 				continue;
 			}
 
-			if ( ! $this->is_pro_feature_available() && $this->uses_pro_product_targeting( $rule ) ) {
+			$unavailable_feature = Wholesale_Pricing_Rule_Registry::unavailable_feature( $rule );
+			if ( '' !== $unavailable_feature ) {
+				do_action( 'wholesalex_wholesale_pricing_rule_unavailable', (string) ( $rule['id'] ?? '' ), $unavailable_feature, $rule );
 				continue;
 			}
 
@@ -230,7 +232,7 @@ class Wholesale_Pricing_Rule_Engine {
 			}
 
 			if ( 'buy_x_get_y' === ( $rule['rule_type'] ?? '' ) ) {
-				if ( ! $this->is_pro_feature_available() ) {
+				if ( ! $this->bxgy_discount ) {
 					continue;
 				}
 
@@ -359,6 +361,7 @@ class Wholesale_Pricing_Rule_Engine {
 		if ( $this->cart_discount->has_promo_rules( $this->valid_cart_discount_rules ) ) {
 			add_action( 'woocommerce_before_add_to_cart_form', array( $this, 'render_simple_product_cart_discount_promo' ), 10 );
 			add_filter( 'woocommerce_available_variation', array( $this, 'append_variation_cart_discount_promo' ), 20, 3 );
+			add_action( 'wholesalex_after_frontend_enqueue_scripts', array( $this, 'enqueue_promo_toggle_assets' ), 10 );
 		}
 	}
 
@@ -373,6 +376,7 @@ class Wholesale_Pricing_Rule_Engine {
 		if ( $this->bogo_discount->has_promo_rules( $this->valid_bogo_discount_rules ) ) {
 			add_action( 'woocommerce_before_add_to_cart_form', array( $this, 'render_simple_product_bogo_discount_promo' ), 10 );
 			add_filter( 'woocommerce_available_variation', array( $this, 'append_variation_bogo_discount_promo' ), 20, 3 );
+			add_action( 'wholesalex_after_frontend_enqueue_scripts', array( $this, 'enqueue_promo_toggle_assets' ), 10 );
 		}
 
 		if ( $this->bogo_discount->has_badge_rules( $this->valid_bogo_discount_rules ) ) {
@@ -389,12 +393,12 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return void
 	 */
 	private function register_bxgy_discount_hooks(): void {
-		if ( $this->bxgy_discount->has_promo_rules( $this->valid_bxgy_discount_rules ) ) {
+		if ( $this->bxgy_discount && $this->bxgy_discount->has_promo_rules( $this->valid_bxgy_discount_rules ) ) {
 			add_action( 'woocommerce_before_add_to_cart_form', array( $this, 'render_simple_product_bxgy_discount_promo' ), 10 );
 			add_filter( 'woocommerce_available_variation', array( $this, 'append_variation_bxgy_discount_promo' ), 20, 3 );
 		}
 
-		if ( $this->bxgy_discount->has_badge_rules( $this->valid_bxgy_discount_rules ) ) {
+		if ( $this->bxgy_discount && $this->bxgy_discount->has_badge_rules( $this->valid_bxgy_discount_rules ) ) {
 			add_filter( 'wopb_after_loop_image', array( $this, 'wopb_render_bxgy_discount_badge' ), 10 );
 			add_action( 'woocommerce_before_shop_loop_item_title', array( $this, 'render_bxgy_discount_badge' ), 10 );
 			add_action( 'wholesalex_after_frontend_enqueue_scripts', array( $this, 'enqueue_single_product_bxgy_discount_badge' ), 10 );
@@ -498,7 +502,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return void
 	 */
 	public function render_bogo_discount_badge(): void {
-		echo $this->bogo_discount->get_badge_markup( $this->valid_bogo_discount_rules, false ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo wp_kses_post( $this->bogo_discount->get_badge_markup( $this->valid_bogo_discount_rules, false ) );
 	}
 
 	/**
@@ -508,6 +512,26 @@ class Wholesale_Pricing_Rule_Engine {
 	 */
 	public function wopb_render_bogo_discount_badge(): string {
 		return $this->bogo_discount->get_badge_markup( $this->valid_bogo_discount_rules, false );
+	}
+
+	/**
+	 * Enqueue the shared promo popup toggle script on single product pages.
+	 *
+	 * Registered independently of promo rendering so the handler is present for
+	 * variation markup that WooCommerce loads over AJAX.
+	 *
+	 * @return void
+	 */
+	public function enqueue_promo_toggle_assets(): void {
+		if ( ! is_product() ) {
+			return;
+		}
+
+		if ( $this->cart_discount ) {
+			$this->cart_discount->enqueue_promo_toggle_script();
+		} elseif ( $this->bogo_discount ) {
+			$this->bogo_discount->enqueue_promo_toggle_script();
+		}
 	}
 
 	/**
@@ -542,7 +566,7 @@ class Wholesale_Pricing_Rule_Engine {
 		$css = $this->bogo_discount->get_badge_css( $this->valid_bogo_discount_rules );
 
 		if ( '' !== trim( $css ) ) {
-			wp_add_inline_style( 'wholesalex', $css );
+			wp_add_inline_style( 'wholesalex', wholesalex()->sanitize_inline_css( $css ) );
 		}
 	}
 
@@ -560,7 +584,7 @@ class Wholesale_Pricing_Rule_Engine {
 
 		$this->load_valid_rules();
 
-		if ( empty( $this->valid_bxgy_discount_rules ) ) {
+		if ( ! $this->bxgy_discount || empty( $this->valid_bxgy_discount_rules ) ) {
 			return;
 		}
 
@@ -582,7 +606,7 @@ class Wholesale_Pricing_Rule_Engine {
 
 		$this->load_valid_rules();
 
-		if ( empty( $this->valid_bxgy_discount_rules ) ) {
+		if ( ! $this->bxgy_discount || empty( $this->valid_bxgy_discount_rules ) ) {
 			return $variation_array;
 		}
 
@@ -597,7 +621,9 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return void
 	 */
 	public function render_bxgy_discount_badge(): void {
-		echo $this->bxgy_discount->get_badge_markup( $this->valid_bxgy_discount_rules, false ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		if ( ! $this->bxgy_discount ) {
+			return; }
+			echo wp_kses_post( $this->bxgy_discount->get_badge_markup( $this->valid_bxgy_discount_rules, false ) );
 	}
 
 	/**
@@ -606,7 +632,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return string
 	 */
 	public function wopb_render_bxgy_discount_badge(): string {
-		return $this->bxgy_discount->get_badge_markup( $this->valid_bxgy_discount_rules, false );
+		return $this->bxgy_discount ? $this->bxgy_discount->get_badge_markup( $this->valid_bxgy_discount_rules, false ) : '';
 	}
 
 	/**
@@ -625,6 +651,8 @@ class Wholesale_Pricing_Rule_Engine {
 			return;
 		}
 
+		if ( ! $this->bxgy_discount ) {
+			return; }
 		$this->bxgy_discount->enqueue_single_badge_script( $this->valid_bxgy_discount_rules, $product );
 	}
 
@@ -638,10 +666,12 @@ class Wholesale_Pricing_Rule_Engine {
 			return;
 		}
 
+		if ( ! $this->bxgy_discount ) {
+			return; }
 		$css = $this->bxgy_discount->get_badge_css( $this->valid_bxgy_discount_rules );
 
 		if ( '' !== trim( $css ) ) {
-			wp_add_inline_style( 'wholesalex', $css );
+			wp_add_inline_style( 'wholesalex', wholesalex()->sanitize_inline_css( $css ) );
 		}
 	}
 
@@ -662,6 +692,15 @@ class Wholesale_Pricing_Rule_Engine {
 
 		$this->load_valid_rules();
 
+		if ( ! $this->bxgy_discount ) {
+			// Remove previously granted gifts before restored products are charged at their regular prices.
+			foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
+				if ( ! empty( $cart_item['_wholesalex_wp_bxgy_free_item'] ) ) {
+					$cart->remove_cart_item( $cart_item_key );
+				}
+			}
+			return;
+		}
 		$this->bxgy_discount->sync_free_cart_items( $cart, $this->valid_bxgy_discount_rules );
 	}
 
@@ -676,6 +715,8 @@ class Wholesale_Pricing_Rule_Engine {
 			return;
 		}
 
+		if ( ! $this->bxgy_discount ) {
+			return; }
 		$this->bxgy_discount->set_free_cart_item_prices( $cart );
 	}
 
@@ -788,8 +829,8 @@ class Wholesale_Pricing_Rule_Engine {
 		}
 
 		if ( 'regular' === $rule['discount_type'] ) {
-			$label = $this->get_discount_label( $rule );
-			$label = '' !== $label ? '<span class="wsx-wholesale-price-label">' . esc_html( $label ) . '</span>' : '';
+			$label                 = $this->get_discount_label( $rule );
+			$label                 = '' !== $label ? '<span class="wsx-wholesale-price-label">' . esc_html( $label ) . '</span>' : '';
 			$price_visibility_html = $this->get_price_visibility_html(
 				$base_html,
 				$this->get_wholesale_price_markup( $label, $wholesale_html, $this->get_price_suffix_html( $product, 'wholesale' ) ),
@@ -897,8 +938,19 @@ class Wholesale_Pricing_Rule_Engine {
 			$wholesale_html = wc_format_price_range( $min, $max );
 		}
 
-		$base_min = (float) $range_data['base_min'];
-		$base_max = (float) $range_data['base_max'];
+		if ( is_shop() || is_product_category() ) {
+			switch ( wholesalex()->get_setting( '_settings_price_product_list_page', 'pricing_range' ) ) {
+				case 'minimum_pricing':
+					$wholesale_html = wc_price( $min );
+					break;
+				case 'maximum_pricing':
+					$wholesale_html = wc_price( $max );
+					break;
+			}
+		}
+
+		$base_min  = (float) $range_data['base_min'];
+		$base_max  = (float) $range_data['base_max'];
 		$base_html = $base_min === $base_max ? wc_price( $base_min ) : wc_format_price_range( $base_min, $base_max );
 		$rule      = isset( $range_data['rule'] ) && is_array( $range_data['rule'] ) ? $range_data['rule'] : array();
 
@@ -907,8 +959,8 @@ class Wholesale_Pricing_Rule_Engine {
 		}
 
 		if ( isset( $rule['discount_type'] ) && 'regular' === $rule['discount_type'] ) {
-			$label = $this->get_discount_label( $rule );
-			$label = '' !== $label ? '<span class="wsx-wholesale-price-label">' . esc_html( $label ) . '</span>' : '';
+			$label                 = $this->get_discount_label( $rule );
+			$label                 = '' !== $label ? '<span class="wsx-wholesale-price-label">' . esc_html( $label ) . '</span>' : '';
 			$price_visibility_html = $this->get_price_visibility_html(
 				$base_html,
 				$this->get_wholesale_price_markup( $label, $wholesale_html, $this->get_price_suffix_html( $product, 'wholesale' ) ),
@@ -943,6 +995,13 @@ class Wholesale_Pricing_Rule_Engine {
 			'</del>';
 	}
 
+	/**
+	 * Get wholesale price markup.
+	 *
+	 * @param string $label_html Label html.
+	 * @param string $price_html Price html.
+	 * @param string $suffix_html Suffix html.
+	 */
 	private function get_wholesale_price_markup( string $label_html, string $price_html, string $suffix_html = '' ): string {
 		return '<span class="wsx-wholesale-price">' .
 			wp_kses_post( $label_html ) .
@@ -1026,7 +1085,7 @@ class Wholesale_Pricing_Rule_Engine {
 			'tax_display' => get_option( 'woocommerce_tax_display_shop' ),
 			'for_display' => (bool) $for_display,
 		);
-		$hash[] = 'wsx_wholesale_pricing_' . md5( wp_json_encode( $context ) );
+		$hash[]  = 'wsx_wholesale_pricing_' . md5( wp_json_encode( $context ) );
 		return $hash;
 	}
 
@@ -1129,7 +1188,7 @@ class Wholesale_Pricing_Rule_Engine {
 			) {
 				$resolved_tier_price = max( 0, (float) $active_tier_data['price'] );
 				$cart_item['data']->set_price( $resolved_tier_price );
-				$this->cart_tier_prices[ $cart_item['data']->get_id() ] = $resolved_tier_price;
+				$this->cart_tier_prices[ $cart_item['data']->get_id() ]                       = $resolved_tier_price;
 				$cart->cart_contents[ $cart_item_key ]['_wsx_wholesale_pricing_tier_applied'] = true;
 				$this->set_discounted_product( $cart_item['data']->get_id() );
 				continue;
@@ -1556,9 +1615,9 @@ class Wholesale_Pricing_Rule_Engine {
 		$restriction        = $this->get_product_quantity_restriction( $values['data'] );
 
 		if ( ! empty( $restriction ) ) {
-			$rule              = isset( $restriction['rule'] ) ? $restriction['rule'] : array();
-			$updated_quantity  = $this->get_cart_quantity_for_update( $values['data'], $rule, $cart_item_key, $requested_quantity );
-			$passed            = $this->validate_quantity_against_restriction( $passed, $values['data'], $restriction, $updated_quantity );
+			$rule             = isset( $restriction['rule'] ) ? $restriction['rule'] : array();
+			$updated_quantity = $this->get_cart_quantity_for_update( $values['data'], $rule, $cart_item_key, $requested_quantity );
+			$passed           = $this->validate_quantity_against_restriction( $passed, $values['data'], $restriction, $updated_quantity );
 		}
 
 		if ( ! $passed ) {
@@ -1632,7 +1691,7 @@ class Wholesale_Pricing_Rule_Engine {
 			return;
 		}
 
-		echo $this->get_tier_table_markup( $product ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup is generated internally and escaped at field level.
+		echo $this->sanitize_tier_table_markup( $this->get_tier_table_markup( $product ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Sanitized by sanitize_tier_table_markup().
 	}
 
 	/**
@@ -1645,10 +1704,34 @@ class Wholesale_Pricing_Rule_Engine {
 	 */
 	public function append_variation_tier_table( $variation_data, $product, $variation ): array {
 		if ( $variation instanceof \WC_Product ) {
-			$variation_data['availability_html'] .= $this->get_tier_table_markup( $variation );
+			$variation_data['availability_html'] .= $this->sanitize_tier_table_markup( $this->get_tier_table_markup( $variation ) );
 		}
 
 		return $variation_data;
+	}
+
+	/**
+	 * Sanitize generated tier-table markup without stripping its scoped CSS.
+	 *
+	 * wp_kses_post() removes style elements but leaves their text content behind,
+	 * which prints the generated CSS on product pages. The tier renderer builds
+	 * this CSS only from validated rule design values, so permit the style wrapper
+	 * while retaining the normal post allowlist for all table markup.
+	 *
+	 * @param string $markup Generated tier table HTML and scoped CSS.
+	 * @return string
+	 */
+	private function sanitize_tier_table_markup( string $markup ): string {
+		$allowed_html          = wp_kses_allowed_html( 'post' );
+		$allowed_html['style'] = array(
+			'id'   => true,
+			'type' => true,
+		);
+
+		return wp_kses(
+			$markup,
+			apply_filters( 'wholesalex_wholesale_pricing_tier_allowed_html', $allowed_html )
+		);
 	}
 
 	/**
@@ -2035,12 +2118,12 @@ class Wholesale_Pricing_Rule_Engine {
 	private function is_rule_available_for_user( array $rule, string $role_id, int $user_id ): bool {
 		if (
 			'active' !== ( $rule['status'] ?? '' ) ||
-			! in_array( $rule['rule_type'] ?? '', array( 'wholesale_pricing', 'product_discount' ), true )
+			! in_array( $rule['rule_type'] ?? '', array( 'wholesale_pricing', 'tier_pricing', 'product_discount' ), true )
 		) {
 			return false;
 		}
 
-		if ( 'tiered' === ( $rule['discount_type'] ?? '' ) && ! $this->is_pro_feature_available() ) {
+		if ( 'tiered' === ( $rule['discount_type'] ?? '' ) && ! $this->tiered_discount ) {
 			return false;
 		}
 
@@ -2154,49 +2237,11 @@ class Wholesale_Pricing_Rule_Engine {
 	}
 
 	/**
-	 * Check whether Pro-only wholesale-pricing features may run.
+	 * Get runtime restrictions.
 	 *
-	 * @return bool
-	 */
-	private function is_pro_feature_available(): bool {
-		return method_exists( wholesalex(), 'is_pro_active' ) && wholesalex()->is_pro_active();
-	}
-
-	/**
-	 * Check whether a rule uses a Pro-only product target.
-	 *
-	 * @param array $rule Saved rule.
-	 * @return bool
-	 */
-	private function uses_pro_product_targeting( array $rule ): bool {
-		return in_array( $rule['product_filter'] ?? '', array( 'brands', 'attributes', 'sku' ), true );
-	}
-
-	/**
-	 * Strip Pro-only restriction flags from runtime rules when Pro is inactive.
-	 *
-	 * @param array $restrictions Saved restriction data.
-	 * @return array
+	 * @param array $restrictions Configured rule restrictions.
 	 */
 	private function get_runtime_restrictions( array $restrictions ): array {
-		if ( $this->is_pro_feature_available() ) {
-			return $restrictions;
-		}
-
-		$restrictions['enable_quantity_limits']      = false;
-		$restrictions['enable_quantity_step']        = false;
-		$restrictions['enable_value_limits']         = false;
-		$restrictions['tiered_combined_variations'] = false;
-		$restrictions['min_quantity']                = '';
-		$restrictions['max_quantity']                = '';
-		$restrictions['quantity_step']               = '';
-		$restrictions['min_amount']                  = '';
-		$restrictions['max_amount']                  = '';
-		$restrictions['min_quantity_message']        = '';
-		$restrictions['max_quantity_message']        = '';
-		$restrictions['min_amount_message']          = '';
-		$restrictions['max_amount_message']          = '';
-
 		return $restrictions;
 	}
 
@@ -2217,8 +2262,10 @@ class Wholesale_Pricing_Rule_Engine {
 			'title'               => isset( $rule['title'] ) ? $rule['title'] : '',
 			'owner_id'            => absint( $rule['owner_id'] ?? 0 ),
 			'owner_type'          => sanitize_key( $rule['owner_type'] ?? 'admin' ),
+			// Keep the established runtime contract: the dedicated stored type is
+			// still a wholesale-pricing tier for processors and integrations.
 			'rule_type'           => 'product_discount' === ( $rule['rule_type'] ?? '' ) ? 'product_discount' : 'wholesale_pricing',
-			'discount_type'       => isset( $rule['discount_type'] ) && 'tiered' === $rule['discount_type'] ? 'tiered' : 'regular',
+			'discount_type'       => 'tier_pricing' === ( $rule['rule_type'] ?? '' ) || ( isset( $rule['discount_type'] ) && 'tiered' === $rule['discount_type'] ) ? 'tiered' : 'regular',
 			'rule'                => 'product_discount' === ( $rule['rule_type'] ?? '' )
 				? ( isset( $rule['product_discount'] ) ? $rule['product_discount'] : array() )
 				: ( 'tiered' === ( $rule['discount_type'] ?? '' ) ? array( 'tiers' => isset( $rule['tiers'] ) ? $rule['tiers'] : array() ) : ( isset( $rule['regular'] ) ? $rule['regular'] : array() ) ),
@@ -2309,16 +2356,16 @@ class Wholesale_Pricing_Rule_Engine {
 			'title'               => isset( $rule['title'] ) ? $rule['title'] : '',
 			'rule_type'           => 'buy_x_get_y',
 			'rule'                => array(
-				'_minimum_purchase_count'           => isset( $bxgy['min_qty'] ) ? absint( $bxgy['min_qty'] ) : 1,
-				'_free_item'                        => isset( $bxgy['free_products'] ) && is_array( $bxgy['free_products'] ) ? $bxgy['free_products'] : array(),
-				'_free_item_count'                  => isset( $bxgy['free_item_count'] ) ? absint( $bxgy['free_item_count'] ) : 1,
-				'_per_cart_once'                    => ! empty( $bxgy['per_cart_once'] ),
-				'_buy_x_get_product_badge_enable'   => ! empty( $bxgy['show_badge'] ) ? 'yes' : 'no',
-				'_product_badge_label'              => isset( $bxgy['badge_label'] ) ? $bxgy['badge_label'] : '',
-				'_product_badge_styles'             => isset( $bxgy['badge_style'] ) ? $bxgy['badge_style'] : 'style_one',
-				'_product_badge_position'           => isset( $bxgy['badge_position'] ) ? $bxgy['badge_position'] : '',
-				'_product_badge_bg_color'           => isset( $bxgy['badge_bg_color'] ) ? $bxgy['badge_bg_color'] : '#5a40e8',
-				'_product_badge_text_color'         => isset( $bxgy['badge_text_color'] ) ? $bxgy['badge_text_color'] : '#ffffff',
+				'_minimum_purchase_count'         => isset( $bxgy['min_qty'] ) ? absint( $bxgy['min_qty'] ) : 1,
+				'_free_item'                      => isset( $bxgy['free_products'] ) && is_array( $bxgy['free_products'] ) ? $bxgy['free_products'] : array(),
+				'_free_item_count'                => isset( $bxgy['free_item_count'] ) ? absint( $bxgy['free_item_count'] ) : 1,
+				'_per_cart_once'                  => ! empty( $bxgy['per_cart_once'] ),
+				'_buy_x_get_product_badge_enable' => ! empty( $bxgy['show_badge'] ) ? 'yes' : 'no',
+				'_product_badge_label'            => isset( $bxgy['badge_label'] ) ? $bxgy['badge_label'] : '',
+				'_product_badge_styles'           => isset( $bxgy['badge_style'] ) ? $bxgy['badge_style'] : 'style_one',
+				'_product_badge_position'         => isset( $bxgy['badge_position'] ) ? $bxgy['badge_position'] : '',
+				'_product_badge_bg_color'         => isset( $bxgy['badge_bg_color'] ) ? $bxgy['badge_bg_color'] : '#5a40e8',
+				'_product_badge_text_color'       => isset( $bxgy['badge_text_color'] ) ? $bxgy['badge_text_color'] : '#ffffff',
 			),
 			'bxgy'                => $bxgy,
 			'filter'              => $filter_data['filter'],
@@ -2396,11 +2443,11 @@ class Wholesale_Pricing_Rule_Engine {
 
 		return array(
 			'preview_cart_item' => array(
-				'product_id'     => $product_id,
-				'variation_id'   => $variation_id,
-				'quantity'       => $quantity,
-				'line_subtotal'  => $product_value,
-				'data'           => $product,
+				'product_id'    => $product_id,
+				'variation_id'  => $variation_id,
+				'quantity'      => $quantity,
+				'line_subtotal' => $product_value,
+				'data'          => $product,
 			),
 		);
 	}
@@ -2472,6 +2519,7 @@ class Wholesale_Pricing_Rule_Engine {
 			return false;
 		}
 
+		// phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- Preserve the existing local-time comparison contract for saved schedules.
 		$now  = current_time( 'timestamp' );
 		$from = get_post_meta( $product->get_id(), '_sale_price_dates_from', true );
 		$to   = get_post_meta( $product->get_id(), '_sale_price_dates_to', true );
@@ -2620,7 +2668,7 @@ class Wholesale_Pricing_Rule_Engine {
 		$quantity           = 0;
 		$product_id         = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
 		$variation_id       = $product->get_parent_id() ? $product->get_id() : 0;
-		$combine_variations = ! empty( $rule['restrictions']['tiered_combined_variations'] );
+		$combine_variations = (bool) apply_filters( 'wholesalex_premium_combine_variations', false, $rule );
 
 		foreach ( WC()->cart->get_cart() as $cart_item ) {
 			if ( $combine_variations && $variation_id && (int) $cart_item['product_id'] === (int) $product_id ) {
@@ -2655,7 +2703,7 @@ class Wholesale_Pricing_Rule_Engine {
 		$quantity           = 0;
 		$product_id         = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
 		$variation_id       = $product->get_parent_id() ? $product->get_id() : 0;
-		$combine_variations = ! empty( $rule['restrictions']['tiered_combined_variations'] );
+		$combine_variations = (bool) apply_filters( 'wholesalex_premium_combine_variations', false, $rule );
 
 		foreach ( WC()->cart->get_cart() as $key => $cart_item ) {
 			$item_quantity = $key === $cart_item_key ? $new_quantity : absint( $cart_item['quantity'] );
@@ -2704,24 +2752,15 @@ class Wholesale_Pricing_Rule_Engine {
 	 */
 	private function get_product_quantity_restriction( \WC_Product $product ) {
 		foreach ( $this->valid_rules as $rule ) {
-			$restrictions        = $rule['restrictions'];
-			$preview_conditions  = $this->can_preview_conditions_for_request();
-			$quantity            = $preview_conditions ? $this->get_display_quantity_for_rule( $product, $rule ) : null;
+			$restrictions       = $rule['restrictions'];
+			$preview_conditions = $this->can_preview_conditions_for_request();
+			$quantity           = $preview_conditions ? $this->get_display_quantity_for_rule( $product, $rule ) : null;
 
 			if ( ! $this->rule_uses_quantity_limits( $rule ) || ! $this->is_product_eligible_for_rule( $product, $rule ) || ! $this->conditions_pass( $rule, $product, $quantity, $preview_conditions ) ) {
 				continue;
 			}
 
-			return array(
-				'min'     => isset( $restrictions['min_quantity'] ) ? absint( $restrictions['min_quantity'] ) : 0,
-				'max'     => isset( $restrictions['max_quantity'] ) ? absint( $restrictions['max_quantity'] ) : 0,
-				'step'    => ! empty( $restrictions['enable_quantity_step'] ) && isset( $restrictions['quantity_step'] ) ? absint( $restrictions['quantity_step'] ) : 0,
-				'message' => array(
-					'min' => isset( $restrictions['min_quantity_message'] ) ? $restrictions['min_quantity_message'] : '',
-					'max' => isset( $restrictions['max_quantity_message'] ) ? $restrictions['max_quantity_message'] : '',
-				),
-				'rule'    => $rule,
-			);
+			return apply_filters( 'wholesalex_premium_quantity_data', false, $rule );
 		}
 
 		return false;
@@ -2744,17 +2783,7 @@ class Wholesale_Pricing_Rule_Engine {
 				continue;
 			}
 
-			$restrictions = $rule['restrictions'];
-
-			return array(
-				'min'     => isset( $restrictions['min_amount'] ) ? (float) $restrictions['min_amount'] : 0.0,
-				'max'     => isset( $restrictions['max_amount'] ) ? (float) $restrictions['max_amount'] : 0.0,
-				'message' => array(
-					'min' => isset( $restrictions['min_amount_message'] ) ? $restrictions['min_amount_message'] : '',
-					'max' => isset( $restrictions['max_amount_message'] ) ? $restrictions['max_amount_message'] : '',
-				),
-				'rule'    => $rule,
-			);
+			return apply_filters( 'wholesalex_premium_value_data', false, $rule );
 		}
 
 		return false;
@@ -2768,7 +2797,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return bool
 	 */
 	private function rule_uses_quantity_limits( array $rule ): bool {
-		return 'regular' === ( $rule['discount_type'] ?? 'regular' ) && ! empty( $rule['restrictions']['enable_quantity_limits'] );
+		return (bool) apply_filters( 'wholesalex_premium_restriction_uses', false, 'quantity', $rule );
 	}
 
 	/**
@@ -2778,7 +2807,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return bool
 	 */
 	private function rule_uses_value_limits( array $rule ): bool {
-		return 'regular' === ( $rule['discount_type'] ?? 'regular' ) && ! empty( $rule['restrictions']['enable_value_limits'] );
+		return (bool) apply_filters( 'wholesalex_premium_restriction_uses', false, 'value', $rule );
 	}
 
 	/**
@@ -2792,26 +2821,11 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return int
 	 */
 	private function get_display_quantity_for_rule( \WC_Product $product, array $rule ): int {
-		$display_quantity = max( 1, $this->get_cart_quantity( $product, $rule ) );
-
-		if ( $this->rule_uses_quantity_limits( $rule ) ) {
-			$min = isset( $rule['restrictions']['min_quantity'] ) ? absint( $rule['restrictions']['min_quantity'] ) : 0;
-
-			if ( $min > 0 ) {
-				$display_quantity = max( $display_quantity, $min );
-			}
-		}
-
-		if ( $this->rule_uses_value_limits( $rule ) ) {
-			$minimum_amount = isset( $rule['restrictions']['min_amount'] ) ? (float) $rule['restrictions']['min_amount'] : 0.0;
-			$unit_price     = $this->get_product_value( $product, 1, $rule );
-
-			if ( $minimum_amount > 0 && $unit_price > 0 ) {
-				$display_quantity = max( $display_quantity, (int) ceil( $minimum_amount / $unit_price ) );
-			}
-		}
-
-		return $display_quantity;
+		$quantity = max( 1, $this->get_cart_quantity( $product, $rule ) );
+		if ( ! has_filter( 'wholesalex_premium_display_quantity' ) ) {
+			return $quantity; }
+		$unit_price = $this->get_product_value( $product, 1, $rule );
+		return (int) apply_filters( 'wholesalex_premium_display_quantity', $quantity, $rule, $unit_price );
 	}
 
 	/**
@@ -2824,16 +2838,11 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return bool
 	 */
 	private function validate_quantity_against_restriction( bool $passed, \WC_Product $product, array $restriction, int $quantity ): bool {
-		if ( $restriction['min'] > 0 && $quantity < $restriction['min'] ) {
-			wc_add_notice( $this->get_quantity_notice( $product, $restriction, 'min' ), 'error' );
+		$type = apply_filters( 'wholesalex_premium_quantity_notice_type', '', $restriction, $quantity );
+		if ( '' !== $type ) {
+			wc_add_notice( $this->get_quantity_notice( $product, $restriction, $type ), 'error' );
 			return false;
 		}
-
-		if ( $restriction['max'] > 0 && $quantity > $restriction['max'] ) {
-			wc_add_notice( $this->get_quantity_notice( $product, $restriction, 'max' ), 'error' );
-			return false;
-		}
-
 		return $passed;
 	}
 
@@ -2850,7 +2859,7 @@ class Wholesale_Pricing_Rule_Engine {
 		$product_value = $this->get_product_value( $product, $quantity, $restriction['rule'] );
 
 		if ( ! $this->amount_is_inside_limits( $restriction, $product_value ) ) {
-			$type = $restriction['min'] > 0 && $product_value < $restriction['min'] ? 'min' : 'max';
+			$type = apply_filters( 'wholesalex_premium_amount_notice_type', '', $restriction, $product_value );
 			wc_add_notice( $this->get_amount_notice( $product, $restriction, $type, $product_value ), 'error' );
 			return false;
 		}
@@ -2868,29 +2877,16 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return void
 	 */
 	private function maybe_add_quantity_notice( array &$shown_notices, array $rule, \WC_Product $product, int $quantity ): void {
-		$restrictions = $rule['restrictions'];
-
-		$restriction = array(
-			'min'     => isset( $restrictions['min_quantity'] ) ? absint( $restrictions['min_quantity'] ) : 0,
-			'max'     => isset( $restrictions['max_quantity'] ) ? absint( $restrictions['max_quantity'] ) : 0,
-			'message' => array(
-				'min' => isset( $restrictions['min_quantity_message'] ) ? $restrictions['min_quantity_message'] : '',
-				'max' => isset( $restrictions['max_quantity_message'] ) ? $restrictions['max_quantity_message'] : '',
-			),
-		);
-
-		if ( $restriction['min'] > 0 && $quantity < $restriction['min'] ) {
-			$key = $rule['id'] . ':min:' . $product->get_id();
-			if ( empty( $shown_notices[ $key ] ) ) {
-				wc_add_notice( $this->get_quantity_notice( $product, $restriction, 'min' ), 'error' );
-				$shown_notices[ $key ] = true;
-			}
-		} elseif ( $restriction['max'] > 0 && $quantity > $restriction['max'] ) {
-			$key = $rule['id'] . ':max:' . $product->get_id();
-			if ( empty( $shown_notices[ $key ] ) ) {
-				wc_add_notice( $this->get_quantity_notice( $product, $restriction, 'max' ), 'error' );
-				$shown_notices[ $key ] = true;
-			}
+		$restriction = apply_filters( 'wholesalex_premium_quantity_data', false, $rule );
+		if ( ! is_array( $restriction ) ) {
+			return; }
+		$type = apply_filters( 'wholesalex_premium_quantity_notice_type', '', $restriction, $quantity );
+		if ( '' === $type ) {
+			return; }
+		$key = $rule['id'] . ':' . $type . ':' . $product->get_id();
+		if ( empty( $shown_notices[ $key ] ) ) {
+			wc_add_notice( $this->get_quantity_notice( $product, $restriction, $type ), 'error' );
+			$shown_notices[ $key ] = true;
 		}
 	}
 
@@ -2904,26 +2900,13 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @return void
 	 */
 	private function maybe_add_amount_notice( array &$shown_notices, array $rule, \WC_Product $product, int $quantity ): void {
-		$restrictions = $rule['restrictions'];
-		$restriction  = array(
-			'min'     => isset( $restrictions['min_amount'] ) ? (float) $restrictions['min_amount'] : 0.0,
-			'max'     => isset( $restrictions['max_amount'] ) ? (float) $restrictions['max_amount'] : 0.0,
-			'message' => array(
-				'min' => isset( $restrictions['min_amount_message'] ) ? $restrictions['min_amount_message'] : '',
-				'max' => isset( $restrictions['max_amount_message'] ) ? $restrictions['max_amount_message'] : '',
-			),
-			'rule'    => $rule,
-		);
+		$restriction = apply_filters( 'wholesalex_premium_value_data', false, $rule );
+		if ( ! is_array( $restriction ) ) {
+			return; }
 		$product_value = $this->get_product_value( $product, $quantity, $rule );
-
-		if ( $restriction['min'] > 0 && $product_value < $restriction['min'] ) {
-			$type = 'min';
-		} elseif ( $restriction['max'] > 0 && $product_value > $restriction['max'] ) {
-			$type = 'max';
-		} else {
-			return;
-		}
-
+		$type          = apply_filters( 'wholesalex_premium_amount_notice_type', '', $restriction, $product_value );
+		if ( '' === $type ) {
+			return; }
 		$key = $rule['id'] . ':amount_' . $type . ':' . $product->get_id();
 		if ( empty( $shown_notices[ $key ] ) ) {
 			wc_add_notice( $this->get_amount_notice( $product, $restriction, $type, $product_value ), 'error' );
@@ -3007,44 +2990,21 @@ class Wholesale_Pricing_Rule_Engine {
 	 * Check quantity min/max.
 	 *
 	 * @param array $restrictions Rule restrictions.
-	 * @param int   $quantity     Quantity.
+	 * @param int   $quantity     Quantity used to evaluate tier eligibility.
 	 * @return bool
 	 */
 	private function quantity_is_inside_limits( array $restrictions, int $quantity ): bool {
-		$min = isset( $restrictions['min_quantity'] ) ? absint( $restrictions['min_quantity'] ) : 0;
-		$max = isset( $restrictions['max_quantity'] ) ? absint( $restrictions['max_quantity'] ) : 0;
-
-		if ( $min > 0 && $quantity < $min ) {
-			return false;
-		}
-
-		if ( $max > 0 && $quantity > $max ) {
-			return false;
-		}
-
-		return true;
+		return (bool) apply_filters( 'wholesalex_premium_quantity_inside', false, $restrictions, $quantity );
 	}
 
 	/**
-	 * Check amount min/max.
+	 * Amount is inside limits.
 	 *
-	 * @param array $restrictions Rule restrictions.
-	 * @param float $amount       Amount.
-	 * @return bool
+	 * @param array $restrictions Configured rule restrictions.
+	 * @param float $amount Amount.
 	 */
 	private function amount_is_inside_limits( array $restrictions, float $amount ): bool {
-		$min = isset( $restrictions['min_amount'] ) ? (float) $restrictions['min_amount'] : ( isset( $restrictions['min'] ) ? (float) $restrictions['min'] : 0.0 );
-		$max = isset( $restrictions['max_amount'] ) ? (float) $restrictions['max_amount'] : ( isset( $restrictions['max'] ) ? (float) $restrictions['max'] : 0.0 );
-
-		if ( $min > 0 && $amount < $min ) {
-			return false;
-		}
-
-		if ( $max > 0 && $amount > $max ) {
-			return false;
-		}
-
-		return true;
+		return (bool) apply_filters( 'wholesalex_premium_amount_inside', false, $restrictions, $amount );
 	}
 
 	/**
@@ -3073,8 +3033,8 @@ class Wholesale_Pricing_Rule_Engine {
 			return;
 		}
 
-		$products = WC()->session->get( '__wholesalex_discounted_products' );
-		$products = is_array( $products ) ? $products : array();
+		$products                = WC()->session->get( '__wholesalex_discounted_products' );
+		$products                = is_array( $products ) ? $products : array();
 		$products[ $product_id ] = true;
 
 		WC()->session->set( '__wholesalex_discounted_products', $products );
@@ -3091,8 +3051,8 @@ class Wholesale_Pricing_Rule_Engine {
 			return;
 		}
 
-		$rules = WC()->session->get( '__wholesalex_wholesale_pricing_cart_discount_rules' );
-		$rules = is_array( $rules ) ? $rules : array();
+		$rules             = WC()->session->get( '__wholesalex_wholesale_pricing_cart_discount_rules' );
+		$rules             = is_array( $rules ) ? $rules : array();
 		$rules[ $rule_id ] = true;
 
 		WC()->session->set( '__wholesalex_wholesale_pricing_cart_discount_rules', $rules );
@@ -3109,8 +3069,8 @@ class Wholesale_Pricing_Rule_Engine {
 			return;
 		}
 
-		$rules = WC()->session->get( '__wholesalex_wholesale_pricing_bogo_discount_rules' );
-		$rules = is_array( $rules ) ? $rules : array();
+		$rules             = WC()->session->get( '__wholesalex_wholesale_pricing_bogo_discount_rules' );
+		$rules             = is_array( $rules ) ? $rules : array();
 		$rules[ $rule_id ] = true;
 
 		WC()->session->set( '__wholesalex_wholesale_pricing_bogo_discount_rules', $rules );

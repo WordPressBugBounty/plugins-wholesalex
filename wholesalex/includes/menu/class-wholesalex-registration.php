@@ -8,6 +8,8 @@
 
 namespace WHOLESALEX;
 
+defined( 'ABSPATH' ) || exit;
+
 use Exception;
 use WHOLESALEX\WholesaleX_CommonUtils;
 use WP_Error;
@@ -32,6 +34,13 @@ class WHOLESALEX_Registration {
 	public $registration_fields = array();
 
 	/**
+	 * Verified context captured before registration hooks run.
+	 *
+	 * @var array|null
+	 */
+	private $authorized_registration_context = null;
+
+	/**
 	 * Registration Constructor
 	 */
 	public function __construct() {
@@ -52,27 +61,10 @@ class WHOLESALEX_Registration {
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
 
-		add_action( 'woocommerce_register_form', array( $this, 'add_custom_field_on_woo_registration' ) );
-
-		add_action( 'woocommerce_process_registration_errors', array( $this, 'process_woo_registration_validation' ), 10, 4 );
-
-		add_action( 'woocommerce_created_customer', array( $this, 'add_custom_woo_field_to_user_meta' ) );
-
 		add_action( 'wp_ajax_nopriv_wholesalex_process_registration', array( $this, 'process_registration' ) );
 		add_action( 'wp_ajax_wholesalex_process_registration', array( $this, 'process_registration' ) );
 
 		add_action( 'template_redirect', array( $this, 'show_wholesalex_notice' ) );
-
-		add_action( 'woocommerce_register_form_tag', array( $this, 'allow_file_upload_on_woo_registration' ) );
-	}
-
-	/**
-	 * Allow File Upload on WooCommerce Registration
-	 *
-	 * @since 1.0.0
-	 */
-	public function allow_file_upload_on_woo_registration() {
-		echo 'enctype="multipart/form-data"';
 	}
 
 
@@ -157,67 +149,23 @@ class WHOLESALEX_Registration {
 		);
 
 		// Add File Support Type.
-		$file_condition_options = array(
-			array(
-				'value' => 'jpg',
-				'name'  => 'JPG',
-			),
-			array(
-				'value' => 'jpeg',
-				'name'  => 'JPEG',
-			),
-			array(
-				'value' => 'png',
-				'name'  => 'PNG',
-			),
-			array(
-				'value' => 'txt',
-				'name'  => 'TXT',
-			),
-			array(
-				'value' => 'pdf',
-				'name'  => 'PDF',
-			),
-			array(
-				'value' => 'doc',
-				'name'  => 'DOC',
-			),
-			array(
-				'value' => 'docx',
-				'name'  => 'DOCX',
-			),
-		);
 
 		$form_regi_data    = WholesaleX_CommonUtils::get_default_registration_form_fields();
 		$default_form_data = WholesaleX_CommonUtils::get_empty_form();
 		wp_localize_script(
 			'wholesalex_form_builder',
 			'whx_form_builder',
-			array(
-				'is_woo_username'            => $is_woo_username,
-				'login_form_data'            => wp_json_encode( $default_form_data['loginFields'] ),
-				'form_data'                  => wp_json_encode( $form_regi_data ),
-				'roles'                      => wholesalex()->get_roles( 'store_mode_roles_option' ),
-				'whitelabel_enabled'         => 'yes' === wholesalex()->get_setting( 'wsx_addon_whitelabel' ) && function_exists( 'wholesalex_whitelabel_init' ),
-				'slug'                       => wholesalex()->get_setting( 'registration_form_buidler_submenu_slug' ),
-				'privacy_policy_text'        => wc_get_privacy_policy_text( 'registration' ),
-				'password_condition_options' => $password_condition_options,
-				'file_condition_options'     => $file_condition_options,
-				'billing_fields'             => array(
-					''                         => __( 'No Mapping', 'wholesalex' ),
-					'billing_first_name'       => __( 'Billing First Name', 'wholesalex' ),
-					'billing_last_name'        => __( 'Billing Last Name', 'wholesalex' ),
-					'billing_company'          => __( 'Billing Company', 'wholesalex' ),
-					'billing_address_1'        => __( 'Billing Address 1', 'wholesalex' ),
-					'billing_address_2'        => __( 'Billing Address 2', 'wholesalex' ),
-					'billing_city'             => __( 'Billing City', 'wholesalex' ),
-					'billing_postcode'         => __( 'Billing Post Code', 'wholesalex' ),
-					'billing_country'          => __( 'Billing Country', 'wholesalex' ),
-					'billing_state'            => __( 'Billing State', 'wholesalex' ),
-					'billing_email'            => __( 'Billing Email', 'wholesalex' ),
-					'billing_phone'            => __( 'Billing Phone', 'wholesalex' ),
-					'custom_user_meta_mapping' => __( 'Custom User Meta Mapping', 'wholesalex' ),
-				),
+			apply_filters(
+				'wholesalex_form_builder_script_data',
+				array(
+					'is_woo_username'            => $is_woo_username,
+					'login_form_data'            => wp_json_encode( $default_form_data['loginFields'] ),
+					'form_data'                  => wp_json_encode( $form_regi_data ),
+					'roles'                      => wholesalex()->get_roles( 'store_mode_roles_option' ),
+					'privacy_policy_text'        => wc_get_privacy_policy_text( 'registration' ),
+					'password_condition_options' => $password_condition_options,
+
+				)
 			)
 		);
 		?>
@@ -253,7 +201,9 @@ class WHOLESALEX_Registration {
 				array(
 					'methods'             => 'GET',
 					'callback'            => array( $this, 'get_form_preview' ),
-					'permission_callback' => '__return_true',
+					'permission_callback' => function () {
+						return current_user_can( 'edit_posts' );
+					},
 					'args'                => array(),
 				),
 			)
@@ -266,17 +216,12 @@ class WHOLESALEX_Registration {
 	 * @param object $server Server.
 	 * @since 1.0.0
 	 */
-	public function get_form_preview( $server ) {
-		$post = $server->get_params();
-
-		$role = isset( $post['role'] ) ? sanitize_text_field( $post['role'] ) : '';
-
+	public function get_form_preview( $server ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Retain the established callback signature for compatibility.
 		$form_regi_data = WholesaleX_CommonUtils::get_new_form_builder_data();
 
 		wp_send_json_success(
 			array(
 				'formdata' => wp_json_encode( $form_regi_data ),
-				'role'     => $post,
 			)
 		);
 	}
@@ -289,7 +234,7 @@ class WHOLESALEX_Registration {
 	 */
 	public function builder_action_callback( $server ) {
 		$post = $server->get_params();
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
+		if ( ! isset( $post['nonce'] ) || ! is_string( $post['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $post['nonce'] ) ), 'wholesalex-registration' ) ) {
 			return;
 		}
 
@@ -385,11 +330,12 @@ class WHOLESALEX_Registration {
 	 * @param string     $registration_role Registration Role.
 	 * @return void
 	 */
-	public function confirmation_email_after_registration( $user_id, $registration_role ) {
+	public function confirmation_email_after_registration( $user_id, $registration_role ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Preserve the existing callback or public method signature.
 		update_user_meta( $user_id, '__wholesalex_status', 'pending' );
 
 		$confirmation_code = bin2hex( random_bytes( 16 ) );
 		update_user_meta( $user_id, '__wholesalex_email_confirmation_code', $confirmation_code );
+		update_user_meta( $user_id, '__wholesalex_email_confirmation_code_time', time() );
 		update_user_meta( $user_id, '__wholesalex_account_confirmed', false );
 		do_action( 'wholesalex_user_email_confirmation', $user_id, $confirmation_code );
 	}
@@ -404,6 +350,11 @@ class WHOLESALEX_Registration {
 	 * @return void
 	 */
 	public function auto_approve_after_registration( $user_id, $registration_role, $password = '' ) {
+		$error = Registration_Context::approval_error( $user_id, $registration_role );
+		if ( is_wp_error( $error ) ) {
+			update_user_meta( $user_id, '__wholesalex_status', 'pending' );
+			return;
+		}
 		wholesalex()->change_role( $user_id, $registration_role );
 		update_user_meta( $user_id, '__wholesalex_status', 'active' );
 		do_action( 'wholesalex_set_status_active', $user_id, $password );
@@ -531,7 +482,18 @@ class WHOLESALEX_Registration {
 		}
 
 		if ( 'yes' === $view_price_product_list || 'yes' === $view_price_product_single ) {
-			$product_redirect = isset( $_POST['redirect'] ) ? wp_unslash( $_POST['redirect'] ) : $url;//phpcs:ignore
+			// Only trust the submitted redirect when the login form's own nonce verifies.
+			$login_nonce_verified = false;
+			if ( isset( $_POST['woocommerce-login-nonce'] ) && is_string( $_POST['woocommerce-login-nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['woocommerce-login-nonce'] ) ), 'woocommerce-login' ) ) {
+				$login_nonce_verified = true;
+			} elseif ( isset( $_POST['wholesalex-login-nonce'] ) && is_string( $_POST['wholesalex-login-nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['wholesalex-login-nonce'] ) ), 'wholesalex-login' ) ) {
+				$login_nonce_verified = true;
+			} elseif ( isset( $_POST['_wpnonce'] ) && is_string( $_POST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ), 'woocommerce-login' ) ) {
+				$login_nonce_verified = true;
+			}
+
+			$product_redirect = $login_nonce_verified && isset( $_POST['redirect'] ) && is_string( $_POST['redirect'] ) ? esc_url_raw( wp_unslash( $_POST['redirect'] ) ) : $url;
+			$product_redirect = wp_validate_redirect( $product_redirect, $url );
 			$product_redirect = remove_query_arg( array( 'wc_error', 'password-reset' ), $product_redirect );
 
 			if ( ! empty( $product_redirect ) ) {
@@ -544,7 +506,7 @@ class WHOLESALEX_Registration {
 					$redirect_url_prices = isset( $query_params['redirect'] ) ? $query_params['redirect'] : '';
 				}
 
-				$redirect_url_view_prices = isset( $_GET['redirect'] ) ? esc_url( $_GET['redirect'] ) : '';//phpcs:ignore
+				$redirect_url_view_prices = isset( $_GET['redirect'] ) && is_string( $_GET['redirect'] ) ? wp_validate_redirect( esc_url_raw( wp_unslash( $_GET['redirect'] ) ), '' ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This read-only redirect hint is validated against the site's allowed hosts.
 				$redirect_url_view_prices = empty( $redirect_url_view_prices ) ? $product_redirect : $redirect_url_view_prices;
 
 				if ( $redirect_url_view_prices ) {
@@ -585,7 +547,7 @@ class WHOLESALEX_Registration {
 
 		$role_content = wholesalex()->get_roles( 'by_id', $regi_role );
 
-		if ( isset( $role_content['user_status'] ) && 'global_setting' != $role_content['user_status'] ) {
+		if ( isset( $role_content['user_status'] ) && 'global_setting' !== $role_content['user_status'] ) {
 			return $role_content['user_status'];
 		}
 		if ( ! empty( $__user_status_option ) ) {
@@ -608,7 +570,7 @@ class WHOLESALEX_Registration {
 		$role_content   = wholesalex()->get_roles( 'by_id', $registration_role );
 
 		if ( ! empty( $__redirect_url ) ) {
-			$redirect_url = esc_url_raw( $__redirect_url ); //phpcs:ignore
+			$redirect_url = esc_url_raw( $__redirect_url );
 		}
 
 		if ( isset( $role_content['after_registration_redirect'] ) && esc_url_raw( $role_content['after_registration_redirect'] ) === $role_content['after_registration_redirect'] ) {
@@ -627,7 +589,7 @@ class WHOLESALEX_Registration {
 	public function after_registration_success_message( $message ) {
 		$__registration_success_message = wholesalex()->get_setting( '_settings_registration_success_message', __( 'Thank you for registering. Your account will be reviewed by us & approve manually. Please wait to be approved.', 'wholesalex' ) );
 		if ( ! empty( $__registration_success_message ) ) {
-			$__registration_success_message = esc_html( $__registration_success_message ); //phpcs:ignore
+			$__registration_success_message = esc_html( $__registration_success_message );
 			return $__registration_success_message;
 		}
 
@@ -679,432 +641,17 @@ class WHOLESALEX_Registration {
 	}
 
 	/**
-	 * Get optional HTML length attributes for supported fields.
-	 *
-	 * @param array $field Field configuration.
-	 * @return string
-	 */
-	private function get_field_length_attributes( $field ) {
-		if ( ! in_array( $field['type'], array( 'text', 'password', 'textarea', 'email' ), true ) ) {
-			return '';
-		}
-
-		$attributes = '';
-		$min_length = isset( $field['minLength'] ) ? absint( $field['minLength'] ) : 0;
-		$max_length = isset( $field['maxLength'] ) ? absint( $field['maxLength'] ) : 0;
-		if ( $min_length > 0 && $max_length > 0 && $min_length > $max_length ) {
-			$temp_length = $min_length;
-			$min_length  = $max_length;
-			$max_length  = $temp_length;
-		}
-
-		if ( $min_length > 0 ) {
-			$attributes .= ' minlength="' . esc_attr( $min_length ) . '"';
-		}
-		if ( $max_length > 0 ) {
-			$attributes .= ' maxlength="' . esc_attr( $max_length ) . '"';
-		}
-
-		return $attributes;
-	}
-
-	/**
-	 * Validate an optional field length configuration.
-	 *
-	 * Empty optional fields are ignored; required-field validation handles them separately.
-	 *
-	 * @param array  $field Field configuration.
-	 * @param string $value Submitted value.
-	 * @return string Validation message, or an empty string when valid.
-	 */
-	private function get_field_length_error( $field, $value ) {
-		if (
-			! in_array( $field['type'], array( 'text', 'password', 'textarea', 'email' ), true ) ||
-			'' === $value
-		) {
-			return '';
-		}
-
-		$length     = function_exists( 'mb_strlen' ) ? mb_strlen( $value ) : strlen( $value );
-		$min_length = isset( $field['minLength'] ) ? absint( $field['minLength'] ) : 0;
-		$max_length = isset( $field['maxLength'] ) ? absint( $field['maxLength'] ) : 0;
-		$label      = isset( $field['label'] ) ? $field['label'] : __( 'This field', 'wholesalex' );
-		if ( $min_length > 0 && $max_length > 0 && $min_length > $max_length ) {
-			$temp_length = $min_length;
-			$min_length  = $max_length;
-			$max_length  = $temp_length;
-		}
-
-		if ( $min_length > 0 && $length < $min_length ) {
-			/* translators: 1: field label, 2: minimum character count. */
-			return sprintf( __( '%1$s must contain at least %2$d characters.', 'wholesalex' ), $label, $min_length );
-		}
-		if ( $max_length > 0 && $length > $max_length ) {
-			/* translators: 1: field label, 2: maximum character count. */
-			return sprintf( __( '%1$s must contain no more than %2$d characters.', 'wholesalex' ), $label, $max_length );
-		}
-
-		return '';
-	}
-
-	/**
-	 * Normalize registration role options for WooCommerce registration output.
-	 *
-	 * @param array $options Role select options.
-	 * @return array
-	 */
-	private function normalize_woo_registration_role_options( $options ) {
-		$normalized       = array();
-		$seen             = array();
-		$store_mode_roles = array_column( wholesalex()->get_roles( 'store_mode_roles_option' ), 'value' );
-
-		foreach ( (array) $options as $option ) {
-			if (
-				! isset( $option['value'] )
-				|| '' === $option['value']
-				|| 'wholesalex_guest' === $option['value']
-				|| ! in_array( $option['value'], $store_mode_roles, true )
-			) {
-				continue;
-			}
-
-			$value = sanitize_text_field( $option['value'] );
-			if ( isset( $seen[ $value ] ) ) {
-				continue;
-			}
-
-			$seen[ $value ] = true;
-			$normalized[]   = array(
-				'value' => $value,
-				'name'  => isset( $option['name'] ) ? WholesaleX_CommonUtils::translate_form_builder_default_text( $option['name'] ) : $value,
-			);
-		}
-
-		return $normalized;
-	}
-
-	/**
-	 * Generate custom Fields for displaying on woo registration form
-	 *
-	 * @param array $field Field.
-	 * @return void
-	 */
-	public function generate_field_for_woo_registration( $field ) {
-		$field             = WholesaleX_CommonUtils::translate_form_builder_field( $field );
-		$depends           = $this->check_depends( $field );
-		$is_required       = isset( $field['required'] ) ? $field['required'] : false;
-		$length_attributes = $this->get_field_length_attributes( $field );
-
-		// Check to Guest User Shouldn't Be Show In WooCommerce Registration Form.
-		if ( 'select' === $field['type'] && 'wholesalex_registration_role' === $field['name'] ) {
-			$field['option'] = $this->normalize_woo_registration_role_options( isset( $field['option'] ) ? $field['option'] : array() );
-			if ( empty( $field['option'] ) ) {
-				$field['option'] = $this->normalize_woo_registration_role_options( wholesalex()->get_roles( 'store_mode_roles_option' ) );
-			}
-		}
-		switch ( $field['type'] ) {
-			case 'text':
-			case 'password':
-			case 'email':
-			case 'url':
-			case 'tel':
-				?>
-					<p data-wsx-exclude="<?php echo esc_attr( $depends ); ?>" class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide wholesalex-custom-field wsx-field" style="<?php echo esc_attr( $depends ? 'display: none;' : '' ); ?>">
-						<?php
-						if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
-							?>
-							<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
-							<?php
-							if ( isset( $field['required'] ) && $field['required'] ) {
-								?>
-									<span class="required">*</span>
-								<?php
-							}
-
-							?>
-								</label>
-							<?php
-						}
-						?>
-						<input type="<?php echo esc_attr($field['type']);?>" class="wsx-input woocommerce-Input woocommerce-Input--text input-text <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( isset($_POST[$field['name']]) && ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>"<?php echo $length_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Contains only escaped positive integer attributes. ?> <?php if (!empty($is_required)) echo 'required'; ?> /><?php // @codingStandardsIgnoreLine ?>
-						<span class="wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>"> </span>
-						<?php
-						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
-							?>
-								<span class="description"><?php echo esc_html( $field['help_message'] ); ?></span>
-							<?php
-						}
-						?>
-						<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
-					</p>
-				<?php
-				// code...
-				break;
-
-			case 'number':
-			case 'date':
-				?>
-					<p data-wsx-exclude="<?php echo esc_attr( $depends ); ?>" class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide wholesalex-custom-field wsx-field" style="<?php echo esc_attr( $depends ? 'display: none;' : '' ); ?>">
-						<?php
-						if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
-							?>
-							<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
-							<?php
-							if ( isset( $field['required'] ) && $field['required'] ) {
-								?>
-									<span class="required">*</span>
-								<?php
-							}
-
-							?>
-								</label>
-							<?php
-						}
-						?>
-						<input type="<?php echo esc_attr($field['type']);?>" class="wsx-input woocommerce-Input woocommerce-Input--text input-text <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( isset($_POST[$field['name']]) && ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>" <?php if (!empty($is_required)) echo 'required'; ?> /><?php // @codingStandardsIgnoreLine ?>
-						<span class="wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>"> </span>
-						<?php
-						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
-							?>
-								<span class="description"><?php echo esc_html( $field['help_message'] ); ?></span>
-							<?php
-						}
-						?>
-						<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
-					</p>
-				<?php
-				// code...
-				break;
-			case 'file':
-				?>
-					<p data-wsx-exclude="<?php echo esc_attr( $depends ); ?>" class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide wholesalex-custom-field wsx-field" style="<?php echo esc_attr( $depends ? 'display: none;' : '' ); ?>">
-						<?php
-						if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
-							?>
-							<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
-							<?php
-							if ( isset( $field['required'] ) && $field['required'] ) {
-								?>
-										<span class="required">*</span>
-								<?php
-							}
-							?>
-								</label>
-							<?php
-						}
-						?>
-						<input type="<?php echo esc_attr($field['type']);?>" class="wsx-input woocommerce-Input  <?php echo esc_attr(isset($field['required']) && $field['required']?'wsx-field-required':'');  ?>" name="<?php echo esc_attr($field['name']); ?>" id="<?php echo esc_attr($field['name']); ?>"  value="<?php echo ( ! empty( $_POST[$field['name']] ) ) ? esc_attr( wp_unslash( $_POST[$field['name']] ) ) : ''; ?>" <?php if (!empty($is_required)) echo 'required'; ?> /><?php // @codingStandardsIgnoreLine ?>
-						<span class="wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>"> </span>
-						<?php
-						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
-							?>
-								<span class="description"><?php echo esc_html( $field['help_message'] ); ?></span>
-							<?php
-						}
-						?>
-						<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
-					</p>
-				<?php
-				break;
-			case 'select':
-				$selected_value = isset( $_POST[ $field['name'] ] ) && is_string( $_POST[ $field['name'] ] ) ? sanitize_text_field( wp_unslash( $_POST[ $field['name'] ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only form repopulation does not process the submitted value.
-				?>
-					<p data-wsx-exclude="<?php echo esc_attr( $depends ); ?>" class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide wholesalex-custom-field wsx-field" style="<?php echo esc_attr( $depends ? 'display: none;' : '' ); ?>">
-						<?php
-						if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
-							?>
-							<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
-							<?php
-							if ( isset( $field['required'] ) && $field['required'] ) {
-								?>
-									<span class="required">*</span>
-								<?php
-							}
-							?>
-								</label>
-							<?php
-						}
-						?>
-						<select 
-							class="wsx-select <?php echo esc_attr( isset( $field['required'] ) && $field['required'] ? 'wsx-field-required' : '' ); ?>" 
-							name="<?php echo esc_attr( $field['name'] ); ?>" 
-							id="<?php echo esc_attr( $field['name'] ); ?>"
-							<?php
-							if ( ! empty( $is_required ) ) {
-								echo 'required';}
-							?>
-													>
-							<option value="" disabled <?php selected( $selected_value, '' ); ?>><?php esc_html_e( 'Please select', 'wholesalex' ); ?></option>
-
-							<?php
-							foreach ( $field['option'] as $option ) {
-								?>
-								<option value="<?php echo esc_attr( $option['value'] ); ?>" <?php selected( $selected_value, $option['value'] ); ?>>
-									<?php echo esc_html( $option['name'] ); ?>
-								</option>
-								<?php
-							}
-							?>
-						</select>
-						<?php
-						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
-							?>
-								<span class="description"><?php echo esc_html( $field['help_message'] ); ?></span>
-							<?php
-						}
-						?>
-						<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
-					</p>
-				<?php
-				// code...
-				break;
-			case 'radio':
-				?>
-				<p data-wsx-exclude="<?php echo esc_attr( $depends ); ?>" class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide wholesalex-custom-field wsx-field" style="<?php echo esc_attr( $depends ? 'display: none;' : '' ); ?>">
-					<?php
-					if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
-						?>
-						<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
-						<?php
-						if ( isset( $field['required'] ) && $field['required'] ) {
-							?>
-								<span class="required">*</span>
-							<?php
-						}
-						?>
-							</label>
-						<?php
-					}
-					?>
-					<span>
-					<?php
-					$index = 0;
-					foreach ( $field['option'] as $option ) {
-						?>
-						<input 
-							type="radio" 
-							class="wsx-radio woocommerce-form__input" 
-							name="<?php echo esc_attr( $field['name'] ); ?>" 
-							value="<?php echo esc_attr( $option['value'] ); ?>" 
-							id="<?php echo esc_attr( $option['value'] ); ?>"
-							<?php
-							if ( 0 === $index && ! empty( $is_required ) ) {
-								echo 'required';}
-							?>
-													/>
-						<span><?php echo esc_html( $option['name'] ); ?></span>
-						<?php
-						++$index;
-					}
-					?>
-					</span>
-					<?php
-					if ( isset( $field['help_message'] ) && $field['help_message'] ) {
-						?>
-								<span class="description"><?php echo esc_html( $field['help_message'] ); ?></span>
-							<?php
-					}
-					?>
-				</p>
-				<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
-				<?php
-				break;
-
-			case 'checkbox':
-				?>
-				<p data-wsx-exclude="<?php echo esc_attr( $depends ); ?>" class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide wholesalex-custom-field wsx-field" style="<?php echo esc_attr( $depends ? 'display: none;' : '' ); ?>">
-					<?php
-					if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
-						?>
-						<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
-						<?php
-						if ( isset( $field['required'] ) && $field['required'] ) {
-							?>
-								<span class="required">*</span>
-							<?php
-						}
-						?>
-							</label>
-						<?php
-					}
-					?>
-					<span>
-					<?php
-					foreach ( $field['option'] as $option ) {
-						?>
-								<input type="checkbox" class="wsx-checkbox woocommerce-form__input woocommerce-form__input-checkbox" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" id="<?php echo esc_attr( $option['value'] ); ?>" />
-								<span><?php echo esc_html( $option['name'] ); ?></span>
-							<?php
-					}
-					?>
-					</span>
-					<?php
-					if ( isset( $field['help_message'] ) && $field['help_message'] ) {
-						?>
-								<span class="description"><?php echo esc_html( $field['help_message'] ); ?></span>
-							<?php
-					}
-					?>
-					<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
-				</p>
-				<?php
-				break;
-			case 'textarea':
-				?>
-					<p data-wsx-exclude="<?php echo esc_attr( $depends ); ?>" class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide wholesalex-custom-field wsx-field" style="<?php echo esc_attr( $depends ? 'display: none;' : '' ); ?>" required="<?php echo esc_attr( $is_required ); ?>">
-						<?php
-						if ( ! ( isset( $field['isLabelHide'] ) && $field['isLabelHide'] ) ) {
-							?>
-							<label class="wsx-label" for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>&nbsp;
-							<?php
-							if ( isset( $field['required'] ) && $field['required'] ) {
-								?>
-									<span class="required">*</span>
-								<?php
-							}
-							?>
-								</label>
-							<?php
-						}
-						?>
-						<textarea name="<?php echo esc_attr( $field['name'] ); ?>" class="wsx-textarea input-text <?php echo esc_attr( isset( $field['required'] ) && $field['required'] ? 'wsx-field-required' : '' ); ?>" id="<?php echo esc_attr( $field['name'] ); ?>" placeholder="<?php echo isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : ''; ?>" rows="2" cols="5"<?php echo $length_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Contains only escaped positive integer attributes. ?>></textarea>
-						<?php
-						if ( isset( $field['help_message'] ) && $field['help_message'] ) {
-							?>
-								<span class="description"><?php echo esc_html( $field['help_message'] ); ?></span>
-							<?php
-						}
-						?>
-					</p>
-					<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
-
-				<?php
-				break;
-			default:
-				// code...
-				break;
-		}
-	}
-
-	/**
-	 * Add Custom Field on Default WooCommerce Registration Form
-	 *
-	 * @return void
-	 */
-	public function add_custom_field_on_woo_registration() {
-		$fields = $this->woo_custom_fields;
-
-		foreach ( $fields as $field ) {
-			$this->generate_field_for_woo_registration( $field );
-		}
-	}
-
-	/**
 	 * Set Custom Fields
 	 *
 	 * @return void
 	 */
 	public function set_custom_fields() {
+		// Extensions can request fields during plugins_loaded, before translations are ready.
+		if ( ! did_action( 'init' ) ) {
+			add_action( 'init', array( $this, 'set_custom_fields' ), 0 );
+			return;
+		}
+
 		$GLOBALS['wholesalex_registration_fields'] = WholesaleX_CommonUtils::get_form_fields();
 		$this->woo_custom_fields                   = $GLOBALS['wholesalex_registration_fields']['woo_custom_fields'];
 		$this->registration_fields                 = $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'];
@@ -1116,7 +663,7 @@ class WHOLESALEX_Registration {
 	 * @param array $options Role select options.
 	 * @return array
 	 */
-	private function get_registration_role_ids_from_options( $options ) {
+	protected function get_registration_role_ids_from_options( $options ) {
 		$role_ids       = array();
 		$existing_roles = array_column( wholesalex()->get_roles( 'store_mode_roles_option' ), 'value' );
 
@@ -1135,52 +682,13 @@ class WHOLESALEX_Registration {
 	}
 
 	/**
-	 * Get roles allowed by the WooCommerce registration form configuration.
-	 *
-	 * @return array
-	 */
-	private function get_woo_registration_allowed_roles() {
-		if ( empty( $this->woo_custom_fields ) ) {
-			$this->set_custom_fields();
-		}
-
-		foreach ( $this->woo_custom_fields as $field ) {
-			if ( isset( $field['name'] ) && 'wholesalex_registration_role' === $field['name'] ) {
-				$options = isset( $field['option'] ) ? $field['option'] : array();
-				return $this->get_registration_role_ids_from_options( $options );
-			}
-		}
-
-		return array();
-	}
-
-	/**
-	 * Get the signed role allow-list submitted by the WholesaleX registration form.
+	 * Load allowed roles from the submitted form's saved server configuration.
 	 *
 	 * @return array|null Array of allowed role IDs, or null when the context is missing/invalid.
 	 */
 	private function get_posted_registration_allowed_roles() {
-		if ( ! isset( $_POST['wholesalex_registration_allowed_roles'], $_POST['wholesalex_registration_allowed_roles_nonce'] ) || ! is_string( $_POST['wholesalex_registration_allowed_roles'] ) || ! is_string( $_POST['wholesalex_registration_allowed_roles_nonce'] ) ) {
-			return null;
-		}
-
-		$allowed_roles_value = isset( $_POST['wholesalex_registration_allowed_roles'] ) ? sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_allowed_roles'] ) ) : '';
-		$nonce               = isset( $_POST['wholesalex_registration_allowed_roles_nonce'] ) ? sanitize_key( wp_unslash( $_POST['wholesalex_registration_allowed_roles_nonce'] ) ) : '';
-
-		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'wholesalex-registration-role|' . $allowed_roles_value ) ) {
-			return null;
-		}
-
-		$options = array_map(
-			function ( $role_id ) {
-				return array(
-					'value' => sanitize_text_field( $role_id ),
-				);
-			},
-			array_filter( array_map( 'trim', explode( ',', $allowed_roles_value ) ) )
-		);
-
-		return $this->get_registration_role_ids_from_options( $options );
+		$this->authorized_registration_context = Registration_Context::posted();
+		return null !== $this->authorized_registration_context ? $this->authorized_registration_context['allowed_roles'] : null;
 	}
 
 	/**
@@ -1190,7 +698,7 @@ class WHOLESALEX_Registration {
 	 * @param array|null $allowed_roles Allowed role IDs for the current form.
 	 * @return bool
 	 */
-	private function is_registration_role_allowed( $role_id, $allowed_roles ) {
+	protected function is_registration_role_allowed( $role_id, $allowed_roles ) {
 		if ( empty( $role_id ) ) {
 			return true;
 		}
@@ -1213,19 +721,18 @@ class WHOLESALEX_Registration {
 	 * Get and authorize the role requested by the custom registration form.
 	 *
 	 * The regular registration nonce is public and is not an authorization
-	 * control. A role is trusted only when it is present in the signed role
-	 * context emitted for the form being submitted.
+	 * control. Roles are resolved from the identified form's saved configuration.
 	 *
-	 * @return string|null Authorized role ID, an empty string when no role was
-	 *                     requested, or null for an invalid request.
+	 * @return string|null Authorized role ID, or null for an invalid request.
 	 */
 	private function get_authorized_posted_registration_role() {
+		$this->authorized_registration_context = null;
 		if ( ! isset( $_POST['wholesalex-registration-nonce'] ) || ! is_string( $_POST['wholesalex-registration-nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['wholesalex-registration-nonce'] ) ), 'wholesalex-registration' ) ) {
 			return null;
 		}
 
 		if ( ! isset( $_POST['wholesalex_registration_role'] ) || '' === $_POST['wholesalex_registration_role'] ) {
-			return '';
+			return null;
 		}
 
 		if ( ! is_string( $_POST['wholesalex_registration_role'] ) ) {
@@ -1235,307 +742,12 @@ class WHOLESALEX_Registration {
 		$role_id       = sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_role'] ) );
 		$allowed_roles = $this->get_posted_registration_allowed_roles();
 
-		if ( ! $this->is_registration_role_allowed( $role_id, $allowed_roles ) ) {
+		if ( '' === $role_id || ! $this->is_registration_role_allowed( $role_id, $allowed_roles ) ) {
 			return null;
 		}
 
-		// The public selector uses current store roles, not saved builder options.
-		// Its signed context also limits role-specific and B2B-only forms.
+		$this->authorized_registration_context['role'] = $role_id;
 		return $role_id;
-	}
-
-	/**
-	 * Normalize a single registration upload before validation or processing.
-	 *
-	 * WordPress validates the actual uploaded file again in media_handle_upload().
-	 *
-	 * @param string $field_name Registration field name.
-	 * @return array
-	 */
-	private function get_registration_uploaded_file( $field_name ) {
-		if ( ! isset( $_FILES[ $field_name ] ) || ! is_array( $_FILES[ $field_name ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The calling registration handlers verify their nonce; the upload is normalized below.
-			return array();
-		}
-
-		$file = $_FILES[ $field_name ]; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Individual upload properties are validated and sanitized below.
-		if (
-			! isset( $file['name'], $file['tmp_name'], $file['error'], $file['size'] ) ||
-			! is_string( $file['name'] ) ||
-			! is_string( $file['tmp_name'] ) ||
-			! is_numeric( $file['error'] ) ||
-			! is_numeric( $file['size'] )
-		) {
-			return array();
-		}
-
-		$file = array(
-			'name'     => sanitize_file_name( $file['name'] ),
-			'type'     => isset( $file['type'] ) && is_string( $file['type'] ) ? sanitize_mime_type( $file['type'] ) : '',
-			'tmp_name' => sanitize_text_field( $file['tmp_name'] ),
-			'error'    => absint( $file['error'] ),
-			'size'     => absint( $file['size'] ),
-		);
-
-		if ( UPLOAD_ERR_OK !== $file['error'] || '' === $file['name'] || '' === $file['tmp_name'] || 0 === $file['size'] ) {
-			return array();
-		}
-
-		return $file;
-	}
-
-	/**
-	 * Password and Confirm Password Validation
-	 *
-	 * @param WP_Error $validation_error Validation Error.
-	 * @param string   $username Username.
-	 * @param string   $password Password.
-	 * @param string   $email Email.
-	 * @return WP_Error
-	 */
-	public function process_woo_registration_validation( $validation_error, $username, $password, $email ) {
-		$nonce_value = isset( $_POST['_wpnonce'] ) && is_string( $_POST['_wpnonce'] ) ? sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ) : '';
-		if ( isset( $_POST['woocommerce-register-nonce'] ) ) {
-			$nonce_value = is_string( $_POST['woocommerce-register-nonce'] ) ? sanitize_key( wp_unslash( $_POST['woocommerce-register-nonce'] ) ) : '';
-		}
-
-		if ( ! wp_verify_nonce( $nonce_value, 'woocommerce-register' ) ) {
-			$validation_error->add( 'wholesalex_registration_invalid_nonce', __( 'Registration verification failed. Please reload the page and try again.', 'wholesalex' ) );
-			return $validation_error;
-		}
-		if ( isset( $_POST['password'] ) && isset( $_POST['user_confirm_pass'] ) && ! ( sanitize_text_field( wp_unslash( $_POST['password'] ) ) === sanitize_text_field( wp_unslash( $_POST['user_confirm_pass'] ) ) ) ) {
-			return new WP_Error( '201', __( 'Password and Confirm password does not match!', 'wholesalex' ) );
-		}
-
-		if ( isset( $_POST['wholesalex_registration_role'] ) && ! is_string( $_POST['wholesalex_registration_role'] ) ) {
-			return new WP_Error( '201', __( 'Invalid registration role selected.', 'wholesalex' ) );
-		}
-		$is_rolewise = isset( $_POST['wholesalex_registration_role'] ) ? sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_role'] ) ) : false;
-		if ( $is_rolewise && ! $this->is_registration_role_allowed( $is_rolewise, $this->get_woo_registration_allowed_roles() ) ) {
-			return new WP_Error( '201', __( 'Invalid registration role selected.', 'wholesalex' ) );
-		}
-
-		foreach ( $this->woo_custom_fields as $field ) {
-
-			if ( 'file' === $field['type'] ) {
-				$uploaded_file = $this->get_registration_uploaded_file( $field['name'] );
-				$is_valid_file = ! empty( $uploaded_file );
-				if ( $is_valid_file ) {
-					// Allowed file types.
-					if ( isset( $field['allowed_file_types'] ) && ! empty( $field['allowed_file_types'] ) ) {
-						$create_file_types = array();
-						foreach ( $field['allowed_file_types'] as $item ) {
-							$create_file_types[] = $item['value'];
-						}
-						$create_file_types  = implode( ',', $create_file_types );
-						$allowed_file_types = explode( ',', $create_file_types );
-						$allowed_file_types = wholesalex()->sanitize( $allowed_file_types );
-					} else {
-						$allowed_file_types = array( 'jpg', 'jpeg', 'png', 'txt', 'pdf', 'doc', 'docx' );
-					}
-
-					// Allowed file size.
-					if ( isset( $field['maximum_file_size'] ) && ! empty( $field['maximum_file_size'] ) ) {
-						$allowed_file_size = sanitize_text_field( $field['maximum_file_size'] );
-					} else {
-						$allowed_file_size = 5000000; // 5MB Default
-					}
-
-					// Allowed file size -> 5MB.
-					$allowed_file_size_in_mb = $allowed_file_size / 1000000;
-					$file_extension          = strtolower( pathinfo( $uploaded_file['name'], PATHINFO_EXTENSION ) );
-
-					if ( ! in_array( $file_extension, $allowed_file_types, true ) ) {
-						// translators: %s Field Name.
-						// translators: %s Allowed File Types.
-						return new WP_Error( '201', sprintf( __( 'File Type Does not support for %1$s Field! Supported File Types is %2$s.', 'wholesalex' ), $field['label'], implode( ',', $allowed_file_types ) ) );
-					}
-					if ( $uploaded_file['size'] > $allowed_file_size ) {
-						/* translators: 1: Field Label, 2: Allowed Size */
-						return new WP_Error( '201', sprintf( __( 'File is too large! Max Upload Size For %1$s field is %2$s.', 'wholesalex' ), $field['label'], $allowed_file_size_in_mb . 'MB' ) );
-					}
-
-					if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
-						$files[ 'file_' . $field['name'] ]  = $uploaded_file;
-						$_FILES[ 'file_' . $field['name'] ] = $uploaded_file;
-
-					} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
-						$files[ 'wholesalex_cf_' . $field['name'] ]  = $uploaded_file;
-						$_FILES[ 'wholesalex_cf_' . $field['name'] ] = $uploaded_file;
-					}
-				}
-				if ( ! $is_rolewise && ( isset( $field['required'] ) && $field['required'] && ! $is_valid_file ) ) {
-					return new WP_Error( '201', $field['label'] . __( ' is Required!', 'wholesalex' ) );
-				}
-				if ( $is_rolewise ) {
-					$is_field_excluded = ( isset( $field['excludeRoles'] ) && ! empty( $field['excludeRoles'] ) && is_array( $field['excludeRoles'] ) ) && in_array( $is_rolewise, $this->get_multiselect_values( $field['excludeRoles'] ) );
-					if ( ! $is_field_excluded && ( isset( $field['required'] ) && $field['required'] && ! $is_valid_file ) ) {
-						return new WP_Error( '201', $field['label'] . __( ' is Required!', 'wholesalex' ) );
-					}
-				}
-			} else {
-				if ( isset( $_POST[ $field['name'] ] ) && is_string( $_POST[ $field['name'] ] ) ) {
-					if ( 'textarea' === $field['type'] ) {
-						$value = sanitize_textarea_field( wp_unslash( $_POST[ $field['name'] ] ) );
-					} elseif ( 'email' === $field['type'] ) {
-						$value = sanitize_email( wp_unslash( $_POST[ $field['name'] ] ) );
-					} else {
-						$value = sanitize_text_field( wp_unslash( $_POST[ $field['name'] ] ) );
-					}
-					$length_error = $this->get_field_length_error( $field, $value );
-					if ( $length_error ) {
-						return new WP_Error( '201', $length_error );
-					}
-				}
-
-				if ( ! $is_rolewise && ( isset( $field['required'] ) && $field['required'] && ( ! isset( $_POST[ $field['name'] ] ) || empty( $_POST[ $field['name'] ] ) ) ) ) {
-					return new WP_Error( '201', $field['label'] . __( ' is Required!', 'wholesalex' ) );
-				}
-				if ( $is_rolewise ) {
-					$is_field_excluded = ( isset( $field['excludeRoles'] ) && ! empty( $field['excludeRoles'] ) && is_array( $field['excludeRoles'] ) ) && in_array( $is_rolewise, $this->get_multiselect_values( $field['excludeRoles'] ) );
-					if ( ! $is_field_excluded && ( isset( $field['required'] ) && $field['required'] && ( ! isset( $_POST[ $field['name'] ] ) || empty( $_POST[ $field['name'] ] ) ) ) ) {
-						return new WP_Error( '201', $field['label'] . __( ' is Required!', 'wholesalex' ) );
-					}
-				}
-			}
-		}
-
-		return $validation_error;
-	}
-
-	/**
-	 * Get Multiselect Values
-	 *
-	 * @param array $user_id Array.
-	 * @return array
-	 */
-	public function add_custom_woo_field_to_user_meta( $user_id ) {
-		// Customer creation also runs outside the WooCommerce registration form.
-		$nonce_value = isset( $_POST['_wpnonce'] ) && is_string( $_POST['_wpnonce'] ) ? sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ) : '';
-		if ( isset( $_POST['woocommerce-register-nonce'] ) ) {
-			$nonce_value = is_string( $_POST['woocommerce-register-nonce'] ) ? sanitize_key( wp_unslash( $_POST['woocommerce-register-nonce'] ) ) : '';
-		}
-		if ( ! wp_verify_nonce( $nonce_value, 'woocommerce-register' ) ) {
-			return;
-		}
-
-		if ( empty( $this->woo_custom_fields ) ) {
-			return;
-		}
-		$files                      = array();
-		$allowed_registration_roles = $this->get_woo_registration_allowed_roles();
-		if ( isset( $_POST['wholesalex_registration_role'] ) ) {
-			if ( ! is_string( $_POST['wholesalex_registration_role'] ) || ! $this->is_registration_role_allowed( sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_role'] ) ), $allowed_registration_roles ) ) {
-				return;
-			}
-		}
-
-		foreach ( $this->woo_custom_fields as $field ) {
-			if ( isset( $_POST[ $field['name'] ] ) && ! empty( $_POST[ $field['name'] ] ) ) {
-				$value        = '';
-				$posted_value = wp_unslash( $_POST[ $field['name'] ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized according to the configured field type in the switch below.
-				switch ( $field['type'] ) {
-					case 'text':
-					case 'password':
-					case 'select':
-					case 'date':
-					case 'radio':
-					case 'number':
-						$value = is_string( $posted_value ) ? sanitize_text_field( $posted_value ) : '';
-						break;
-					case 'textarea':
-						$value = is_string( $posted_value ) ? sanitize_textarea_field( $posted_value ) : '';
-						break;
-					case 'url':
-						$value = is_string( $posted_value ) ? sanitize_url( $posted_value ) : '';
-						break;
-					case 'checkbox':
-						$value = wholesalex()->sanitize( $posted_value );
-						break;
-					case 'email':
-						$value = is_string( $posted_value ) ? sanitize_email( $posted_value ) : '';
-						break;
-					default:
-						break;
-				}
-
-				if ( '' != $value ) {
-					$key = $field['name'];
-					if ( 'wholesalex_registration_role' === $key ) {
-						if ( ! $this->is_registration_role_allowed( $value, $allowed_registration_roles ) ) {
-							continue;
-						}
-						$key = '__wholesalex_registration_role';
-					}
-					if ( 'user_confirm_pass' !== $key && 'user_confirm_email' !== $key ) {
-
-						if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
-						} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
-							$key = 'wholesalex_cf_' . $field['name'];
-						}
-
-						update_user_meta( $user_id, $key, $value );
-					}
-				}
-			}
-
-			$uploaded_file = 'file' === $field['type'] ? $this->get_registration_uploaded_file( $field['name'] ) : array();
-			if ( ! empty( $uploaded_file ) ) {
-				if ( 'file' === $field['type'] ) {
-					if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
-						$files[ 'file_' . $field['name'] ]  = $uploaded_file;
-						$_FILES[ 'file_' . $field['name'] ] = $uploaded_file;
-
-					} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
-						$files[ 'wholesalex_cf_' . $field['name'] ]  = $uploaded_file;
-						$_FILES[ 'wholesalex_cf_' . $field['name'] ] = $uploaded_file;
-					}
-				}
-			}
-		}
-
-		if ( ! empty( $files ) ) {
-			/**
-			* Process File Upload
-			*/
-			require_once ABSPATH . 'wp-admin/includes/image.php';
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-			require_once ABSPATH . 'wp-admin/includes/media.php';
-
-			foreach ( $files as $key => $file ) {
-				// Upload File.
-				$file_id = media_handle_upload( $key, 0 );
-
-				if ( $file_id ) {
-					// Set file registered user as file author.
-					wp_update_post(
-						array(
-							'ID'          => $file_id,
-							'post_author' => $user_id,
-						)
-					);
-
-					// Update file id in user meta.
-					update_user_meta( $user_id, $key, $file_id );
-				}
-			}
-		}
-
-		if ( isset( $_POST['wholesalex_registration_role'] ) && ! empty( $_POST['wholesalex_registration_role'] ) ) {
-			$regi_role            = sanitize_text_field( wp_unslash( $_POST['wholesalex_registration_role'] ) );
-			if ( ! $this->is_registration_role_allowed( $regi_role, $allowed_registration_roles ) ) {
-				return;
-			}
-			$__user_status_option = apply_filters( 'wholesalex_registration_form_user_status_option', 'admin_approve', $user_id, $regi_role );
-
-			do_action( 'wholesalex_registration_form_user_status_' . $__user_status_option, $user_id, $regi_role );
-
-			$__user_login_option = apply_filters( 'wholesalex_registration_form_user_login_option', 'manual_login' );
-			do_action( 'wholesalex_registration_form_user_' . $__user_login_option, $user_id, $regi_role );
-
-			if ( 'admin_approve' === $__user_status_option ) {
-				add_filter( 'woocommerce_registration_auth_new_customer', '__return_false' );
-			}
-		}
 	}
 
 
@@ -1552,57 +764,88 @@ class WHOLESALEX_Registration {
 			$data = array(
 				'error_messages' => array(),
 			);
-			if ( isset( $_POST['user_email'], $_POST['user_pass'] ) ) {
+			if ( isset( $_POST['user_email'] ) ) {
 
 				try {
 					$__registration_role = $this->get_authorized_posted_registration_role();
 					if ( null === $__registration_role ) {
-						$data['error_messages']['wholesalex_registration_role'] = __( 'Invalid registration role selected.', 'wholesalex' );
+						$data['error_messages']['other_error'] = __( 'This registration form has expired or the selected role is not allowed. Please reload the page and try again. If the problem continues, contact the store administrator.', 'wholesalex' );
 						throw new \Exception();
 					}
 
+					$registration_context = $this->authorized_registration_context;
+
 					if ( isset( $_POST['user_pass'] ) && isset( $_POST['user_confirm_pass'] ) && ! ( sanitize_text_field( wp_unslash( $_POST['user_pass'] ) ) === sanitize_text_field( wp_unslash( $_POST['user_confirm_pass'] ) ) ) ) {
 						$data['error_messages']['user_pass'] = __( 'Password and Confirm password does not match!', 'wholesalex' );
-						wp_send_json_success( $data );
+						wp_send_json_error( $data );
 					}
 					do_action( 'wholesalex_before_process_user_registration' );
 
-					$user_email = trim( wp_unslash( $_POST['user_email'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-					$password   = sanitize_text_field( wp_unslash( $_POST['user_pass'] ) );
+					$user_email = isset( $_POST['user_email'] ) && is_string( $_POST['user_email'] ) ? sanitize_email( wp_unslash( $_POST['user_email'] ) ) : '';
+					$password   = isset( $_POST['user_pass'] ) && is_string( $_POST['user_pass'] ) ? sanitize_text_field( wp_unslash( $_POST['user_pass'] ) ) : '';
 					$user_name  = '';
 
-					if ( empty( $user_email ) && ! is_email( $user_email ) ) {
-						$data['error_messages']['user_email'] = __( 'Email is Required!', 'wholesalex' );
+					if ( ! is_email( $user_email ) ) {
+						$data['error_messages']['user_email'] = __( 'Enter a valid email address.', 'wholesalex' );
 					}
-					if ( empty( $password ) ) {
-						$data['error_messages']['user_pass'] = __( 'Password is Required!', 'wholesalex' );
+					foreach ( $this->registration_fields as $field ) {
+						if ( 'user_pass' === $field['name'] && ! empty( $field['required'] ) && '' === $password ) {
+							$data['error_messages']['user_pass'] = __( 'Password is Required!', 'wholesalex' );
+							break;
+						}
+					}
+					if ( ! empty( $data['error_messages'] ) ) {
+						throw new \Exception();
 					}
 
 					// Disable WooCommerce Account Creation Email For wholesalex users.
 					add_filter( 'woocommerce_email_enabled_customer_new_account', '__return_false' );
 
 					/**
-					 * Remove All Third Party Plugin Registration Errors Filter.
+					 * Allow site owners to drop third-party `woocommerce_registration_errors`
+					 * validators that conflict with the WholesaleX registration form.
+					 *
+					 * Nothing is removed by default: clearing the hook outright also disables
+					 * anti-spam and security plugins that legitimately validate registrations.
+					 * Return an array of callables to remove only the conflicting ones.
 					 *
 					 * @since 1.0.2
+					 * @since 3.0.9 No longer removes every callback by default.
+					 *
+					 * @param array $callbacks Callbacks to remove, each as array( callable, priority ).
 					 */
-					remove_all_filters( 'woocommerce_registration_errors' );
-					remove_filter( 'woocommerce_created_customer', array( $this, 'add_custom_woo_field_to_user_meta' ) );
+					$conflicting_validators = (array) apply_filters( 'wholesalex_remove_registration_error_filters', array() );
+					foreach ( $conflicting_validators as $validator ) {
+						if ( is_array( $validator ) && isset( $validator[0] ) ) {
+							remove_filter( 'woocommerce_registration_errors', $validator[0], isset( $validator[1] ) ? (int) $validator[1] : 10 );
+						}
+					}
+					do_action( 'wholesalex_before_create_registered_customer' );
 
-					$userdata            = array();
-					$usermeta            = array();
-					$files               = array();
+					$userdata   = array();
+					$submission = apply_filters(
+						'wholesalex_registration_submission',
+						array(
+							'meta'   => array(),
+							'errors' => array(),
+						),
+						$this->registration_fields
+					);
+					if ( ! empty( $submission['errors'] ) ) {
+						$data['error_messages'] = array_merge( $data['error_messages'], $submission['errors'] );
+						throw new \Exception();
+					}
+					$usermeta = $submission['meta'];
 
 					foreach ( $this->registration_fields as $field ) {
-						if ( 'file' !== $field['type'] && isset( $_POST[ $field['name'] ] ) && ! empty( $_POST[ $field['name'] ] ) ) {
+						if ( ! WholesaleX_CommonUtils::is_standard_registration_field( $field ) ) {
+							continue; }
+						if ( isset( $_POST[ $field['name'] ] ) && ! empty( $_POST[ $field['name'] ] ) ) {
 							$value = '';
 							switch ( $field['type'] ) {
 								case 'text':
 								case 'password':
 								case 'select':
-								case 'date':
-								case 'radio':
-								case 'number':
 									$value = sanitize_text_field( wp_unslash( $_POST[ $field['name'] ] ) );
 									break;
 								case 'textarea':
@@ -1610,9 +853,6 @@ class WHOLESALEX_Registration {
 									break;
 								case 'url':
 									$value = sanitize_url( wp_unslash( $_POST[ $field['name'] ] ) );
-									break;
-								case 'checkbox':
-									$value = wholesalex()->sanitize( sanitize_text_field( wp_unslash( $_POST[ $field['name'] ] ) ) );
 									break;
 								case 'email':
 									$value = sanitize_email( wp_unslash( $_POST[ $field['name'] ] ) );
@@ -1622,7 +862,7 @@ class WHOLESALEX_Registration {
 									break;
 							}
 
-							$length_error = $this->get_field_length_error( $field, $value );
+							$length_error = apply_filters( 'wholesalex_registration_field_error', '', $field, $value );
 							if ( $length_error ) {
 								$data['error_messages'][ $field['name'] ] = $length_error;
 								throw new \Exception();
@@ -1645,7 +885,7 @@ class WHOLESALEX_Registration {
 								continue;
 							}
 							if ( 'url' === $field['name'] ) {
-                            $userdata['user_url'] =  $value ;// phpcs:ignore
+								$userdata['user_url'] = esc_url_raw( $value );
 								continue;
 							}
 							if ( 'user_email' === $field['name'] ) {
@@ -1656,66 +896,14 @@ class WHOLESALEX_Registration {
 							if ( 'wholesalex_registration_role' === $field['name'] ) {
 								// Use only the role authorized before any registration hooks run.
 								$usermeta['__wholesalex_registration_role'] = $__registration_role;
-							} elseif ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
-									$usermeta[ $field['name'] ] = $value;
-							} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
-								$usermeta[ 'wholesalex_cf_' . $field['name'] ] = $value;
-							}
-						}
-
-						$uploaded_file = 'file' === $field['type'] ? $this->get_registration_uploaded_file( $field['name'] ) : array();
-						if ( ! empty( $uploaded_file ) ) {
-							// Allowed file types.
-							if ( isset( $field['allowed_file_types'] ) && ! empty( $field['allowed_file_types'] ) ) {
-
-								$create_file_types = array();
-								foreach ( $field['allowed_file_types'] as $item ) {
-									$create_file_types[] = $item['value'];
-								}
-								$create_file_types  = implode( ',', $create_file_types );
-								$allowed_file_types = explode( ',', $create_file_types );
-								$allowed_file_types = wholesalex()->sanitize( $allowed_file_types );
-							} else {
-								$allowed_file_types = array( 'jpg', 'jpeg', 'png', 'txt', 'pdf', 'doc', 'docx' );
-							}
-
-							// Allowed file size.
-							if ( isset( $field['maximum_file_size'] ) && ! empty( $field['maximum_file_size'] ) ) {
-								$allowed_file_size = sanitize_text_field( $field['maximum_file_size'] );
-							} else {
-								$allowed_file_size = 5000000; // 5MB Default
-							}
-
-							// Allowed file size -> 5MB.
-							$allowed_file_size_in_mb = $allowed_file_size / 1000000;
-							$file_extension          = strtolower( pathinfo( $uploaded_file['name'], PATHINFO_EXTENSION ) );
-
-							if ( ! in_array( $file_extension, $allowed_file_types, true ) ) {
-								// translators: %s Field Name.
-								// translators: %s Allowed File Types.
-
-								$data['error_messages'][ $field['name'] ] = sprintf( __( 'File Type Does not support for %1$s Field! Supported File Types is %2$s.', 'wholesalex' ), $field['label'], implode( ',', $allowed_file_types ) );
-								throw new \Exception();
-							}
-							if ( $uploaded_file['size'] > $allowed_file_size ) {
-								/* translators: 1: Field Label, 2: Allowed Size */
-								$data['error_messages'][ $field['name'] ] = sprintf( __( 'File is too large! Max Upload Size For %1$s field is %2$s.', 'wholesalex' ), $field['label'], $allowed_file_size_in_mb . 'MB' );
-								throw new \Exception();
-							}
-
-							if ( isset( $field['migratedFromOldBuilder'] ) && $field['migratedFromOldBuilder'] ) {
-								$files[ 'file_' . $field['name'] ]  = $uploaded_file;
-								$_FILES[ 'file_' . $field['name'] ] = $uploaded_file;
-
-							} elseif ( isset( $field['custom_field'] ) && $field['custom_field'] ) {
-								$files[ 'wholesalex_cf_' . $field['name'] ]  = $uploaded_file;
-								$_FILES[ 'wholesalex_cf_' . $field['name'] ] = $uploaded_file;
 							}
 						}
 					}
 					if ( $__registration_role ) {
 						$usermeta['__wholesalex_registration_role'] = $__registration_role;
 					}
+					// Set protected provenance after custom fields, before any approval action.
+					$usermeta['__wholesalex_registration_context'] = $registration_context;
 
 					$registered_user_id = wc_create_new_customer( $user_email, $user_name, $password, $userdata );
 					if ( is_wp_error( $registered_user_id ) ) {
@@ -1752,28 +940,7 @@ class WHOLESALEX_Registration {
 							}
 						}
 
-						/**
-						* Process File Upload
-						*/
-						require_once ABSPATH . 'wp-admin/includes/image.php';
-						require_once ABSPATH . 'wp-admin/includes/file.php';
-						require_once ABSPATH . 'wp-admin/includes/media.php';
-
-						foreach ( $files as $key => $file ) {
-							// Upload File.
-							$file_id = media_handle_upload( $key, 0 );
-
-							// Set file registered user as file author.
-							wp_update_post(
-								array(
-									'ID'          => $file_id,
-									'post_author' => $registered_user_id,
-								)
-							);
-
-							// Update file id in user meta.
-							update_user_meta( $registered_user_id, $key, $file_id );
-						}
+						do_action( 'wholesalex_registration_customer_created', $registered_user_id, $submission );
 
 						$__user_status_option = apply_filters( 'wholesalex_registration_form_user_status_option', 'admin_approve', $registered_user_id, $__registration_role );
 
@@ -1787,23 +954,23 @@ class WHOLESALEX_Registration {
 						$__redirect_url = add_query_arg( 'wsx-notice', 'regi_success', $__redirect_url );
 						$__redirect_url = add_query_arg( 'wsx-nonce', wp_create_nonce( 'wsx_notice' ), $__redirect_url );
 
+						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Apply WooCommerce's existing registration redirect filter for compatibility.
 						$data['redirect'] = wp_validate_redirect( apply_filters( 'woocommerce_registration_redirect', $__redirect_url, $registered_user_id ), wc_get_page_permalink( 'myaccount' ) );
 
 						wp_send_json_success( $data );
 
 					}
 				} catch ( \Exception $th ) {
-					wp_send_json_success( $data );
+					wp_send_json_error( $data );
 				}
 			} else {
 				if ( ! isset( $_POST['user_email'] ) ) {
 					$data['error_messages']['user_email'] = __( 'Email is Required!', 'wholesalex' );
 				}
-				if ( ! isset( $_POST['user_pass'] ) ) {
-					$data['error_messages']['user_pass'] = __( 'Password is Required!', 'wholesalex' );
-				}
-				wp_send_json_success( $data );
+				wp_send_json_error( $data );
 			}
+		} else {
+			wp_send_json_error( array( 'error_messages' => array( 'other_error' => __( 'This registration form has expired. Please reload the page and try again.', 'wholesalex' ) ) ) );
 		}
 	}
 
@@ -1817,7 +984,7 @@ class WHOLESALEX_Registration {
 	 */
 	public function show_wholesalex_notice() {
 
-		if ( isset( $_GET['wsx-notice'], $_GET['wsx-nonce'] ) && wp_verify_nonce( sanitize_key( $_GET['wsx-nonce'] ), 'wsx_notice' ) ) {
+		if ( isset( $_GET['wsx-notice'], $_GET['wsx-nonce'] ) && is_string( $_GET['wsx-notice'] ) && is_string( $_GET['wsx-nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['wsx-nonce'] ) ), 'wsx_notice' ) ) {
 			$notice_type = sanitize_text_field( wp_unslash( $_GET['wsx-notice'] ) );
 			switch ( $notice_type ) {
 				case 'regi_success':

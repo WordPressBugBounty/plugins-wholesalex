@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve the established common-utils include path.
 /**
  * WholesaleX Initialization. Initialize All Files And Dependencies
  *
@@ -39,41 +39,41 @@ class WholesaleX_CommonUtils {
 		$translations = apply_filters(
 			'wholesalex_form_builder_default_text_map',
 			array(
-				'Please select'   => __( 'Please select', 'wholesalex' ),
-				'Select Role'     => __( 'Select Role', 'wholesalex' ),
-				'Select Roles'    => __( 'Select Roles', 'wholesalex' ),
-				'Select Registration Roles' => __( 'Select Registration Roles', 'wholesalex' ),
-				'Select Option'   => __( 'Select Option', 'wholesalex' ),
-				'Username'        => __( 'Username', 'wholesalex' ),
-				'Username or Email' => __( 'Username or Email', 'wholesalex' ),
-				'Email'           => __( 'Email', 'wholesalex' ),
-				'Password'        => __( 'Password', 'wholesalex' ),
-				'Confirm Password' => __( 'Confirm Password', 'wholesalex' ),
-				'First Name'      => __( 'First Name', 'wholesalex' ),
-				'Last Name'       => __( 'Last Name', 'wholesalex' ),
-				'User Bio'        => __( 'User Bio', 'wholesalex' ),
-				'Nickname'        => __( 'Nickname', 'wholesalex' ),
-				'Display Name'    => __( 'Display Name', 'wholesalex' ),
-				'Website'         => __( 'Website', 'wholesalex' ),
-				'Confirm Email'   => __( 'Confirm Email', 'wholesalex' ),
-				'Term and Condition' => __( 'Term and Condition', 'wholesalex' ),
-				'Remember me'     => __( 'Remember me', 'wholesalex' ),
-				'Register'        => __( 'Register', 'wholesalex' ),
-				'Log in'          => __( 'Log in', 'wholesalex' ),
-				'Login'           => __( 'Login', 'wholesalex' ),
-				'Sign In to Your Account' => __( 'Sign In to Your Account', 'wholesalex' ),
+				'Please select'                       => __( 'Please select', 'wholesalex' ),
+				'Select Role'                         => __( 'Select Role', 'wholesalex' ),
+				'Select Roles'                        => __( 'Select Roles', 'wholesalex' ),
+				'Select Registration Roles'           => __( 'Select Registration Roles', 'wholesalex' ),
+				'Select Option'                       => __( 'Select Option', 'wholesalex' ),
+				'Username'                            => __( 'Username', 'wholesalex' ),
+				'Username or Email'                   => __( 'Username or Email', 'wholesalex' ),
+				'Email'                               => __( 'Email', 'wholesalex' ),
+				'Password'                            => __( 'Password', 'wholesalex' ),
+				'Confirm Password'                    => __( 'Confirm Password', 'wholesalex' ),
+				'First Name'                          => __( 'First Name', 'wholesalex' ),
+				'Last Name'                           => __( 'Last Name', 'wholesalex' ),
+				'User Bio'                            => __( 'User Bio', 'wholesalex' ),
+				'Nickname'                            => __( 'Nickname', 'wholesalex' ),
+				'Display Name'                        => __( 'Display Name', 'wholesalex' ),
+				'Website'                             => __( 'Website', 'wholesalex' ),
+				'Confirm Email'                       => __( 'Confirm Email', 'wholesalex' ),
+				'Term and Condition'                  => __( 'Term and Condition', 'wholesalex' ),
+				'Remember me'                         => __( 'Remember me', 'wholesalex' ),
+				'Register'                            => __( 'Register', 'wholesalex' ),
+				'Log in'                              => __( 'Log in', 'wholesalex' ),
+				'Login'                               => __( 'Login', 'wholesalex' ),
+				'Sign In to Your Account'             => __( 'Sign In to Your Account', 'wholesalex' ),
 				"Don't have an account? Sign up now!" => __( "Don't have an account? Sign up now!", 'wholesalex' ),
-				'Text'            => __( 'Text', 'wholesalex' ),
-				'Text Area'       => __( 'Text Area', 'wholesalex' ),
-				'Radio'           => __( 'Radio', 'wholesalex' ),
-				'Checkbox'        => __( 'Checkbox', 'wholesalex' ),
-				'File'            => __( 'File', 'wholesalex' ),
-				'Select'          => __( 'Select', 'wholesalex' ),
-				'Number'          => __( 'Number', 'wholesalex' ),
-				'Date'            => __( 'Date', 'wholesalex' ),
-				'Value 1'         => __( 'Value 1', 'wholesalex' ),
-				'Value 2'         => __( 'Value 2', 'wholesalex' ),
-				'Value 3'         => __( 'Value 3', 'wholesalex' ),
+				'Text'                                => __( 'Text', 'wholesalex' ),
+				'Text Area'                           => __( 'Text Area', 'wholesalex' ),
+				'Radio'                               => __( 'Radio', 'wholesalex' ),
+				'Checkbox'                            => __( 'Checkbox', 'wholesalex' ),
+				'File'                                => __( 'File', 'wholesalex' ),
+				'Select'                              => __( 'Select', 'wholesalex' ),
+				'Number'                              => __( 'Number', 'wholesalex' ),
+				'Date'                                => __( 'Date', 'wholesalex' ),
+				'Value 1'                             => __( 'Value 1', 'wholesalex' ),
+				'Value 2'                             => __( 'Value 2', 'wholesalex' ),
+				'Value 3'                             => __( 'Value 3', 'wholesalex' ),
 				'I agree to the Terms and Conditions {Privacy Policy}' => __( 'I agree to the Terms and Conditions {Privacy Policy}', 'wholesalex' ),
 			)
 		);
@@ -745,10 +745,50 @@ class WholesaleX_CommonUtils {
 	}
 
 	/**
-	 * Get New Form Builder Data
+	 * Login controls share the field renderer, but cannot populate registration metadata.
 	 *
-	 * @return array
+	 * @param array $field Field definition.
+	 * @return bool
 	 */
+	public static function is_standard_form_field( $field ) {
+		$login_types = array(
+			'username'   => 'text',
+			'password'   => 'password',
+			'rememberme' => 'checkbox',
+		);
+		return self::is_standard_registration_field( $field ) || (
+			empty( $field['custom_field'] ) && isset( $login_types[ $field['name'] ?? '' ] )
+			&& ( $field['type'] ?? '' ) === $login_types[ $field['name'] ]
+		);
+	}
+
+	/**
+	 * Standard account fields supplied by the base registration form.
+	 *
+	 * @param array $field Field definition.
+	 * @return bool
+	 */
+	public static function is_standard_registration_field( $field ) {
+		$types = array(
+			'user_login'                   => 'text',
+			'first_name'                   => 'text',
+			'last_name'                    => 'text',
+			'display_name'                 => 'text',
+			'nickname'                     => 'text',
+			'description'                  => 'textarea',
+			'user_email'                   => 'email',
+			'user_confirm_email'           => 'email',
+			'user_pass'                    => 'password',
+			'user_confirm_pass'            => 'password',
+			'url'                          => 'url',
+			'wholesalex_registration_role' => 'select',
+			'wholesalex_term_condition'    => 'termCondition',
+		);
+		return empty( $field['custom_field'] ) && isset( $types[ $field['name'] ?? '' ] )
+			&& ( $field['type'] ?? '' ) === $types[ $field['name'] ];
+	}
+
+	/** Collect the active fields supplied by the base form and registered extensions. */
 	public static function get_form_fields() {
 		$woo_custom_fields   = array();
 		$registration_fields = array();
@@ -763,27 +803,25 @@ class WholesaleX_CommonUtils {
 					foreach ( $row['columns'] as $field ) {
 						if ( ( isset( $field['status'] ) && $field['status'] ) ) {
 							$field = self::translate_form_builder_field( $field );
-							if ( isset( $field['isAddToWooCommerceRegistration'] ) && $field['isAddToWooCommerceRegistration'] ) {
-								$woo_custom_fields[] = $field;
+
+							if ( apply_filters( 'wholesalex_registration_field_available', self::is_standard_registration_field( $field ), $field ) ) {
+								$registration_fields[] = $field;
 							}
-							if ( isset( $field['enableForBillingForm'] ) && $field['enableForBillingForm'] ) {
-								$billing_fields[] = $field;
-							}
-							if ( isset( $field['isEditableByUser'] ) && $field['isEditableByUser'] ) {
-								$myaccount_fields[] = $field;
-							}
-							$registration_fields[] = $field;
 						}
 					}
 				}
 			}
 		}
 
-		return array(
-			'woo_custom_fields' => $woo_custom_fields,
-			'wholesalex_fields' => $registration_fields,
-			'billing_fields'    => $billing_fields,
-			'myaccount_fields'  => $myaccount_fields,
+		return apply_filters(
+			'wholesalex_registration_runtime_fields',
+			array(
+				'woo_custom_fields' => $woo_custom_fields,
+				'wholesalex_fields' => $registration_fields,
+				'billing_fields'    => $billing_fields,
+				'myaccount_fields'  => $myaccount_fields,
+			),
+			$fields
 		);
 	}
 }

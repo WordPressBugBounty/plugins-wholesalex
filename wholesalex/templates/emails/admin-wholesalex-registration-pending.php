@@ -1,4 +1,9 @@
 <?php
+/**
+ * Admin wholesalex registration pending.
+ *
+ * @package WholesaleX
+ */
 
 defined( 'ABSPATH' ) || exit;
 
@@ -35,18 +40,17 @@ if ( empty( $wholesalex_user_id ) ) {
 			'number' => 1,
 		)
 	);
-	$wholesalex_user_id = ! empty( $wholesalex_admin_users ) ? (int) $wholesalex_admin_users[0]->ID : 1;
+	$wholesalex_user_id     = ! empty( $wholesalex_admin_users ) ? (int) $wholesalex_admin_users[0]->ID : 1;
 }
 
-$user_email = ( isset( $user ) && is_object( $user ) ) ? $user->user_email : wp_get_current_user()->user_email; //phpcs:ignore
 
 ?>
 
 <p>
-	<p><?php printf( esc_html_x( 'Hi,', 'WholesaleX Registration Pending(Admin) Email', 'wholesalex' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+	<p><?php echo esc_html_x( 'Hi,', 'WholesaleX Registration Pending(Admin) Email', 'wholesalex' ); ?></p>
 	<?php /* translators: 1: User Profile URL, 2: Username */ ?>
-	<p><?php printf( _x( 'A new user, <a class="wsx-link" href="%1$s">%2$s</a>, has registered and is awaiting your approval to access our platform.', 'WholesaleX Registration Pending(Admin) Email', 'wholesalex' ), admin_url( 'user-edit.php?user_id=' . $wholesalex_user_id ), $user_login ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
-	<p><?php printf( esc_html_x( 'Please review the registration details and take the necessary steps to grant access to the new User.', 'WholesaleX Registration Pending(Admin) Email', 'wholesalex' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+	<p><?php echo wp_kses_post( sprintf( _x( 'A new user, <a class="wsx-link" href="%1$s">%2$s</a>, has registered and is awaiting your approval to access our platform.', 'WholesaleX Registration Pending(Admin) Email', 'wholesalex' ), esc_url( admin_url( 'user-edit.php?user_id=' . $wholesalex_user_id ) ), esc_html( $user_login ) ) ); ?></p>
+	<p><?php echo esc_html_x( 'Please review the registration details and take the necessary steps to grant access to the new User.', 'WholesaleX Registration Pending(Admin) Email', 'wholesalex' ); ?></p>
 
 </p>
 <?php

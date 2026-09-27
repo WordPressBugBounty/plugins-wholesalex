@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve existing include paths and template overrides.
 /**
  * WholesaleX User Roles - Shipping Method Rules
  *
@@ -164,7 +164,22 @@ class User_Roles_Shipping_Method {
 			return;
 		}
 
-		echo $this->get_product_shipping_promo_html( $product ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$allowed         = wp_kses_allowed_html( 'post' );
+		$allowed['svg']  = array(
+			'xmlns'   => true,
+			'width'   => true,
+			'height'  => true,
+			'fill'    => true,
+			'viewbox' => true,
+		);
+		$allowed['path'] = array(
+			'stroke'          => true,
+			'stroke-linecap'  => true,
+			'stroke-linejoin' => true,
+			'stroke-width'    => true,
+			'd'               => true,
+		);
+		echo wp_kses( $this->get_product_shipping_promo_html( $product ), $allowed );
 	}
 
 	/**
@@ -389,9 +404,9 @@ class User_Roles_Shipping_Method {
 		if ( is_array( $role_content ) ) {
 			$role_content = WHOLESALEX_Role::get_role_with_wtrs_shipping_methods( $role_content );
 		}
-		$methods      = isset( $role_content['_shipping_methods'] ) && is_array( $role_content['_shipping_methods'] ) ? $role_content['_shipping_methods'] : array();
-		$rules        = isset( $role_content['_shipping_method_rules'] ) && is_array( $role_content['_shipping_method_rules'] ) ? $role_content['_shipping_method_rules'] : array();
-		$promo        = $this->normalize_promo( $role_content );
+		$methods = isset( $role_content['_shipping_methods'] ) && is_array( $role_content['_shipping_methods'] ) ? $role_content['_shipping_methods'] : array();
+		$rules   = isset( $role_content['_shipping_method_rules'] ) && is_array( $role_content['_shipping_method_rules'] ) ? $role_content['_shipping_method_rules'] : array();
+		$promo   = $this->normalize_promo( $role_content );
 
 		return array(
 			'methods' => array_values( array_unique( array_map( 'strval', array_filter( $methods ) ) ) ),
@@ -498,11 +513,11 @@ class User_Roles_Shipping_Method {
 	 *
 	 * @param array  $role_content Role data.
 	 * @param string $key Legacy field key.
-	 * @param string $default Default value.
+	 * @param string $default_value Default value.
 	 * @return string
 	 */
-	private function get_legacy_promo_value( $role_content, $key, $default ) {
-		return isset( $role_content[ $key ] ) ? $role_content[ $key ] : $default;
+	private function get_legacy_promo_value( $role_content, $key, $default_value ) {
+		return isset( $role_content[ $key ] ) ? $role_content[ $key ] : $default_value;
 	}
 
 	/**

@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve existing include paths and template overrides.
 /**
  * WholesaleX User Roles - Tax Rules
  *
@@ -99,7 +99,7 @@ class User_Roles_Tax_Rules {
 	 * @param array          $calculate_tax_for Tax location.
 	 * @return void
 	 */
-	public function maybe_zero_order_item_taxes( $item, $calculate_tax_for ) {
+	public function maybe_zero_order_item_taxes( $item, $calculate_tax_for ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Preserve the public callback signature.
 		if ( ! $item instanceof \WC_Order_Item_Product || $this->is_admin_request() ) {
 			return;
 		}
@@ -159,7 +159,7 @@ class User_Roles_Tax_Rules {
 	 * @param array $package Shipping package.
 	 * @return array
 	 */
-	public function maybe_zero_shipping_taxes( $rates, $package ) {
+	public function maybe_zero_shipping_taxes( $rates, $package ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Preserve the public callback signature.
 		$rule = $this->get_rule();
 		if ( empty( $rule ) || 'yes' !== $rule['tax_exempted'] || 'all_products' !== $rule['filter'] ) {
 			return $rates;

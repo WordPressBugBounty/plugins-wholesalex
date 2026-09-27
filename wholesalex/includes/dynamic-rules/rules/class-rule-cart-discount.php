@@ -53,7 +53,7 @@ class Rule_Cart_Discount {
 					$pid,
 					'cart_discount',
 					array(
-						'type'                => $rule['rule']['_discount_type'],
+						'type'                => ! empty( $rule['rule']['_discount_type'] ) ? $rule['rule']['_discount_type'] : 'percentage',
 						'value'               => $rule['rule']['_discount_amount'],
 						'conditions'          => $rule['conditions'],
 						'who_priority'        => $rule['who_priority'],
@@ -170,12 +170,14 @@ class Rule_Cart_Discount {
 			$discount_amount = 0;
 			$discount_name   = '';
 			$is_all_products = $rule['filter']['is_all_products'];
-			$discount_type   = $rule['rule']['_discount_type'];
-			$hash_key        = md5( serialize( array( $rule['id'], $rule['filter'] ) ) );
+			// Older rules may omit the editor's default percentage selection.
+			$discount_type = ! empty( $rule['rule']['_discount_type'] ) ? $rule['rule']['_discount_type'] : 'percentage';
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Preserve legacy rule hash keys; the serialized value is never unserialized.
+			$hash_key = md5( serialize( array( $rule['id'], $rule['filter'] ) ) );
 
 			if ( $is_all_products ) {
 				$total_value     = wholesalex()->get_cart_total();
-				$discount_amount = ( 'percentage' == $discount_type ) ? ( $total_value * floatval( $rule['rule']['_discount_amount'] ) ) / 100 : floatval( $rule['rule']['_discount_amount'] );
+				$discount_amount = ( 'percentage' === $discount_type ) ? ( $total_value * floatval( $rule['rule']['_discount_amount'] ) ) / 100 : floatval( $rule['rule']['_discount_amount'] );
 				$discount_name   = apply_filters( 'wholesalex_cart_discount_title', isset( $rule['rule']['_discount_name'] ) ? $rule['rule']['_discount_name'] : __( 'Cart Discounts', 'wholesalex' ) );
 				if ( isset( $hash[ $hash_key ] ) && is_array( $hash[ $hash_key ] ) ) {
 					if ( $discount_amount >= $hash[ $hash_key ]['discount'] ) {

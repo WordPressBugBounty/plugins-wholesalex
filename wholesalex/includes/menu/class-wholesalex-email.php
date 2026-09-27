@@ -8,6 +8,8 @@
 
 namespace WHOLESALEX;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * WholesaleX Email Class
  */
@@ -16,8 +18,6 @@ class WHOLESALEX_Email {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'wp_ajax_save_wholesalex_email_settings', array( $this, 'save_wholesalex_email_settings' ) );
-
 		add_action( 'rest_api_init', array( $this, 'register_email_template_restapi' ) );
 
 		add_filter( 'wholealex_email_footer_text', array( $this, 'replace_email_footer_smart_tags' ) );
@@ -106,7 +106,7 @@ class WHOLESALEX_Email {
 	 */
 	public function email_template_rest_callback( $server ) {
 		$post = $server->get_params();
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
+		if ( ! isset( $post['nonce'] ) || ! is_string( $post['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $post['nonce'] ) ), 'wholesalex-registration' ) ) {
 			return;
 		}
 
@@ -123,25 +123,25 @@ class WHOLESALEX_Email {
 				$response['data']   = self::get_email_templates();
 				break;
 			case 'update_status':
-				$template_name = isset( $post['template_name'] ) ? sanitize_text_field( $post['template_name'] ) : '';
-				$status        = isset( $post['enabled'] ) ? sanitize_text_field( $post['enabled'] ) : 'no';
-				if ( $template_name ) {
+				$template_name = isset( $post['template_name'] ) && is_string( $post['template_name'] ) ? sanitize_text_field( $post['template_name'] ) : '';
+				$status        = isset( $post['enabled'] ) && is_string( $post['enabled'] ) ? sanitize_text_field( $post['enabled'] ) : '';
+				if ( isset( self::get_email_templates()[ $template_name ] ) && in_array( $status, array( 'yes', 'no' ), true ) ) {
 					$template_key_name            = 'woocommerce_' . $template_name . '_settings';
-					$template_settings            = get_option( $template_key_name, array() );
+					$template_settings            = (array) get_option( $template_key_name, array() );
 					$template_settings['enabled'] = $status;
 
 					update_option( $template_key_name, $template_settings );
 					$response['status']       = true;
 					$response['template_key'] = $template_name;
 					$response['enabled']      = $status;
-					$response['data']         = $status === 'yes' ? __( 'Successfully enabled', 'wholesalex' ) : __( 'Successfully disabled', 'wholesalex' );
+					$response['data']         = 'yes' === $status ? __( 'Successfully enabled', 'wholesalex' ) : __( 'Successfully disabled', 'wholesalex' );
 				}
 				break;
 			case 'save_template':
-				$template_name = isset( $post['template_name'] ) ? sanitize_text_field( $post['template_name'] ) : '';
-				if ( $template_name ) {
+				$template_name = isset( $post['template_name'] ) && is_string( $post['template_name'] ) ? sanitize_text_field( $post['template_name'] ) : '';
+				if ( isset( self::get_email_templates()[ $template_name ] ) && isset( $post['template'] ) && is_array( $post['template'] ) ) {
 					$template_key_name = 'woocommerce_' . $template_name . '_settings';
-					$template_settings = get_option( $template_key_name, array() );
+					$template_settings = (array) get_option( $template_key_name, array() );
 					if ( isset( $post['template']['recipient'] ) ) {
 						$template_settings['recipient'] = $this->sanitize_multiple_email_fields( $post['template']['recipient'] );
 					}
@@ -162,8 +162,6 @@ class WHOLESALEX_Email {
 					$response['status'] = true;
 					$response['data']   = __( 'Success', 'wholesalex' );
 				}
-				$response['status'] = true;
-				$response['data']   = __( 'Success', 'wholesalex' );
 				break;
 
 			default:
@@ -183,25 +181,6 @@ class WHOLESALEX_Email {
 		$admin_email_template_ids = array(
 			'wholesalex_new_user_approval_required',
 			'wholesalex_new_user_registered',
-		);
-		$pro_template_ids         = apply_filters(
-			'wholesalex_pro_email_template_ids',
-			array(
-				'wholesalex_conversation_email',
-				'wholesalex_conversation_reply_email',
-				'wholesalex_raq_make_offer',
-				'wholesalex_raq_expiring_offer',
-				'wholesalex_raq_admin_new_quote_request',
-				'wholesalex_subaccount_create',
-				'wholesalex_subaccount_order_approval_require',
-				'wholesalex_subaccount_order_approved',
-				'wholesalex_subaccount_order_pending',
-				'wholesalex_subaccount_order_placed',
-				'wholesalex_subaccount_order_reject',
-				'wholesalex_user_profile_update_notify',
-				'wholesalex_wallet_recharge_email',
-				'wholesalex_wallet_debit_email',
-			)
 		);
 
 		$templates_ids = apply_filters(
@@ -327,267 +306,7 @@ class WHOLESALEX_Email {
 					),
 
 				),
-				'wholesalex_raq_admin_new_quote_request' => array(
-					'enabled'            => 'yes',
-					'subject'            => __( 'You have received a new Quote Request', 'wholesalex' ),
-					'heading'            => __( 'You have received a new Quote Request', 'wholesalex' ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: New Quote Request', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{date}'                  => __( 'Show The Current Date', 'wholesalex' ),
-						'{admin_name}'            => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{site_name}'             => __( 'Show Site Name', 'wholesalex' ),
-						'{customer_display_name}' => __( 'Customer Name', 'wholesalex' ),
-					),
 
-				),
-				'wholesalex_raq_make_offer'              => array(
-					'enabled'            => 'yes',
-					/* translators: %s Site Title */
-					'subject'            => sprintf( __( 'You have received an offer from %s', 'wholesalex' ), '{site_name}' ),
-					/* translators: %s Site Title */
-					'heading'            => sprintf( __( 'You have received an offer from %s', 'wholesalex' ), '{site_name}' ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: Quote Request Offer', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{date}'       => __( 'Show The Current Date', 'wholesalex' ),
-						'{admin_name}' => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{site_name}'  => __( 'Show Site Name', 'wholesalex' ),
-					),
-
-				),
-				'wholesalex_wallet_recharge_email'       => array(
-					'enabled'            => 'no',
-					/* translators: %s Site Title */
-					'subject'            => sprintf( __( 'You’ve received funds!', 'wholesalex' ) ),
-					/* translators: %s Site Title */
-					'heading'            => sprintf( __( 'Your WholesaleX Wallet has been Recharged!', 'wholesalex' ) ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: Wallet Credit Email', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{date}'       => __( 'Show The Current Date', 'wholesalex' ),
-						'{admin_name}' => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{site_name}'  => __( 'Show Site Name', 'wholesalex' ),
-					),
-
-				),
-				'wholesalex_wallet_debit_email'          => array(
-					'enabled'            => 'no',
-					/* translators: %s Site Title */
-					'subject'            => sprintf( __( 'Funds deducted from Your WholesaleX wallet.', 'wholesalex' ) ),
-					/* translators: %s Site Title */
-					'heading'            => sprintf( __( 'Your WholesaleX Wallet has been Debited', 'wholesalex' ) ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: Wallet Debit Email', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{date}'       => __( 'Show The Current Date', 'wholesalex' ),
-						'{admin_name}' => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{site_name}'  => __( 'Show Site Name', 'wholesalex' ),
-					),
-
-				),
-				'wholesalex_raq_expiring_offer'          => array(
-					'enabled'            => 'yes',
-					'subject'            => __( 'Offer is expiring soon.', 'wholesalex' ),
-					'heading'            => __( 'Offer is expiring soon.', 'wholesalex' ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: Quote Request Offer Expiring', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{date}'       => __( 'Show The Current Date', 'wholesalex' ),
-						'{admin_name}' => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{site_name}'  => __( 'Show Site Name', 'wholesalex' ),
-					),
-
-				),
-				'wholesalex_conversation_email'          => array(
-					'enabled'            => 'no',
-					'subject'            => __( 'User Send Message Notification', 'wholesalex' ),
-					'heading'            => __( 'User Send Message', 'wholesalex' ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: New Conversation Alert Email', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{date}'               => __( 'Show Current Date', 'wholesalex' ),
-						'{admin_name}'         => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{site_name}'          => __( 'Show Site Name', 'wholesalex' ),
-						'{conversation_name}'  => __( 'Show Conversation Name', 'wholesalex' ),
-						'{conversation_email}' => __( 'Show Conversation Email', 'wholesalex' ),
-					),
-
-				),
-				'wholesalex_user_profile_update_notify'  => array(
-					'enabled'            => 'no',
-					'subject'            => __( 'User Data Updated by Admin', 'wholesalex' ),
-					'heading'            => __( 'Your Profile Data Was Updated!', 'wholesalex' ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: Profile Data Update Email', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{date}'       => __( 'Show Current Date', 'wholesalex' ),
-						'{admin_name}' => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{site_name}'  => __( 'Show Site Name', 'wholesalex' ),
-					),
-
-				),
-				'wholesalex_conversation_reply_email'    => array(
-					'enabled'            => 'no',
-					'subject'            => __( 'User reply Message Notification', 'wholesalex' ),
-					'heading'            => __( 'User reply Message to the you', 'wholesalex' ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: Reply to Conversation Alert Email ', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{date}'               => __( 'Show Current Date', 'wholesalex' ),
-						'{admin_name}'         => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{site_name}'          => __( 'Show Site Name', 'wholesalex' ),
-						'{conversation_name}'  => __( 'Show Conversation Name', 'wholesalex' ),
-						'{conversation_email}' => __( 'Show Conversation Email', 'wholesalex' ),
-					),
-
-				),
-				'wholesalex_subaccount_create'           => array(
-					'enabled'            => 'yes',
-					'subject'            => __( 'Subaccount Creation Confirmation', 'wholesalex' ),
-					'heading'            => __( 'Subaccount Creation Confirmation', 'wholesalex' ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: Subaccount Create', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{date}'             => __( 'Show Current Date', 'wholesalex' ),
-						'{admin_name}'       => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{site_name}'        => __( 'Show Site Name', 'wholesalex' ),
-						'{subaccount_name}'  => __( 'Show Subaccount Name', 'wholesalex' ),
-						'{subaccount_email}' => __( 'Show Subaccount Email', 'wholesalex' ),
-					),
-
-				),
-				'wholesalex_subaccount_order_approval_require' => array(
-					'enabled'            => 'yes',
-					'subject'            => __( 'Approval Require For New Order #{order_number}', 'wholesalex' ),
-					'heading'            => __( 'Approval Require For New Order #{order_number}', 'wholesalex' ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: Subaccount Order Approval Require', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{subaccount_name}'         => __( 'Show Subaccount Name', 'wholesalex' ),
-						'{order_date}'              => __( 'Show Order Date', 'wholesalex' ),
-						'{order_number}'            => __( 'Show Order Number', 'wholesalex' ),
-						'{order_billing_full_name}' => __( 'Show Billing Full Name', 'wholesalex' ),
-						'{view_order}'              => __( 'Show View Order URL', 'wholesalex' ),
-						'{admin_name}'              => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{date}'                    => __( 'Show Current Date', 'wholesalex' ),
-						'{site_name}'               => __( 'Show Site Name', 'wholesalex' ),
-						'{subaccount_email}'        => __( 'Show Subaccount Email', 'wholesalex' ),
-					),
-
-				),
-				'wholesalex_subaccount_order_approved'   => array(
-					'enabled'            => 'yes',
-					/* translators: %s Order Number */
-					'subject'            => sprintf( __( 'Your Order #%s Has Been Approved', 'wholesalex' ), '{order_number}' ),
-					/* translators: %s Order Number */
-					'heading'            => sprintf( __( 'Your Order #%s Has Been Approved', 'wholesalex' ), '{order_number}' ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: Subaccount Order Approved', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{subaccount_name}'         => __( 'Show Subaccount Name', 'wholesalex' ),
-						'{order_date}'              => __( 'Show Order Date', 'wholesalex' ),
-						'{order_number}'            => __( 'Show Order Number', 'wholesalex' ),
-						'{order_billing_full_name}' => __( 'Show Billing Full Name', 'wholesalex' ),
-						'{view_order}'              => __( 'Show View Order URL', 'wholesalex' ),
-						'{admin_name}'              => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{date}'                    => __( 'Show Current Date', 'wholesalex' ),
-						'{site_name}'               => __( 'Show Site Name', 'wholesalex' ),
-						'{subaccount_email}'        => __( 'Show Subaccount Email', 'wholesalex' ),
-					),
-
-				),
-				'wholesalex_subaccount_order_pending'    => array(
-					'enabled'            => 'yes',
-					/* translators: %s Order Number */
-					'subject'            => sprintf( __( 'Order #%s Pending For Parent Account Approval', 'wholesalex' ), '{order_number}' ),
-					/* translators: %s Order Number */
-					'heading'            => sprintf( __( 'Order #%s Pending For Parent Account Approval', 'wholesalex' ), '{order_number}' ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: Subaccount Order Pending For Parent Approval', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{subaccount_name}'         => __( 'Show Subaccount Name', 'wholesalex' ),
-						'{order_date}'              => __( 'Show Order Date', 'wholesalex' ),
-						'{order_number}'            => __( 'Show Order Number', 'wholesalex' ),
-						'{order_billing_full_name}' => __( 'Show Billing Full Name', 'wholesalex' ),
-						'{view_order}'              => __( 'Show View Order URL', 'wholesalex' ),
-						'{admin_name}'              => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{date}'                    => __( 'Show Current Date', 'wholesalex' ),
-						'{site_name}'               => __( 'Show Site Name', 'wholesalex' ),
-						'{subaccount_email}'        => __( 'Show Subaccount Email', 'wholesalex' ),
-					),
-
-				),
-				'wholesalex_subaccount_order_placed'     => array(
-					'enabled'            => 'yes',
-					/* translators: %s Subaccount Name */
-					'subject'            => sprintf( __( 'An Order Placed By %s', 'wholesalex' ), '{subaccount_name}' ),
-					/* translators: %s Subaccount Name */
-					'heading'            => sprintf( __( 'An Order Placed By %s', 'wholesalex' ), '{subaccount_name}' ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: Subaccount Order Placed', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{subaccount_name}'         => __( 'Show Subaccount Name', 'wholesalex' ),
-						'{order_date}'              => __( 'Show Order Date', 'wholesalex' ),
-						'{order_number}'            => __( 'Show Order Number', 'wholesalex' ),
-						'{order_billing_full_name}' => __( 'Show Billing Full Name', 'wholesalex' ),
-						'{view_order}'              => __( 'Show View Order URL', 'wholesalex' ),
-						'{admin_name}'              => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{date}'                    => __( 'Show Current Date', 'wholesalex' ),
-						'{site_name}'               => __( 'Show Site Name', 'wholesalex' ),
-						'{subaccount_email}'        => __( 'Show Subaccount Email', 'wholesalex' ),
-					),
-
-				),
-				'wholesalex_subaccount_order_reject'     => array(
-					'enabled'            => 'yes',
-					/* translators: %s Order Number */
-					'subject'            => sprintf( __( 'Your Order #%s Has Been Rejected', 'wholesalex' ), '{order_number}' ),
-					/* translators: %s Order Number */
-					'heading'            => sprintf( __( 'Your Order #%s Has Been Rejected', 'wholesalex' ), '{order_number}' ),
-					'additional_content' => '',
-					'email_type'         => 'html',
-					/* translators: %s: Plugin Name */
-					'title'              => sprintf( __( '%s: Subaccount Order Rejected', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'smart_tags'         => array(
-						'{subaccount_name}'         => __( 'Show Subaccount Name', 'wholesalex' ),
-						'{order_date}'              => __( 'Show Order Date', 'wholesalex' ),
-						'{order_number}'            => __( 'Show Order Number', 'wholesalex' ),
-						'{order_billing_full_name}' => __( 'Show Billing Full Name', 'wholesalex' ),
-						'{view_order}'              => __( 'Show View Order URL', 'wholesalex' ),
-						'{admin_name}'              => __( 'Show Site Admin Name', 'wholesalex' ),
-						'{date}'                    => __( 'Show Current Date', 'wholesalex' ),
-						'{site_name}'               => __( 'Show Site Name', 'wholesalex' ),
-						'{subaccount_email}'        => __( 'Show Subaccount Email', 'wholesalex' ),
-					),
-
-				),
 			)
 		);
 
@@ -597,9 +316,6 @@ class WHOLESALEX_Email {
 			$template_key_name = 'woocommerce_' . $template_id . '_settings';
 			$template_settings = get_option( $template_key_name, $template );
 
-			if ( in_array( $template_id, $pro_template_ids, true ) ) {
-				$template_settings['is_lock'] = ! wholesalex()->is_pro_active();
-			}
 			if ( in_array( $template_id, $admin_email_template_ids, true ) ) {
 				$template['recipient'] = get_option( 'admin_email' );
 			}
@@ -637,27 +353,7 @@ class WHOLESALEX_Email {
 			'whx_email_templates',
 			'whx_email_templates',
 			array(
-				'i18n' => array(
-					// 'whx_email_templates_admin_email_recipient' => __( 'Admin Email Recipient', 'wholesalex' ),
-					// 'whx_email_templates_subject'        => __( 'Subject', 'wholesalex' ),
-					// 'whx_email_templates_heading'        => __( 'Heading', 'wholesalex' ),
-					// 'whx_email_templates_additional_content' => __( 'Additional Content', 'wholesalex' ),
-					// 'whx_email_templates_smart_tag_used' => __( 'Smart Tag Used', 'wholesalex' ),
-					// 'whx_email_templates_email_type'     => __( 'Email Type', 'wholesalex' ),
-					// 'whx_email_templates_smart_tags'     => __( 'Smart Tags', 'wholesalex' ),
-					// 'whx_email_templates_save_changes'   => __( 'Save Changes', 'wholesalex' ),
-					// 'whx_email_templates_status'         => __( 'Status', 'wholesalex' ),
-					// 'whx_email_templates_email_template' => __( 'Email Template', 'wholesalex' ),
-					// 'whx_email_templates_content_type'   => __( 'Content Type', 'wholesalex' ),
-					// 'whx_email_templates_action'         => __( 'Action', 'wholesalex' ),
-					// 'whx_email_templates_edit'           => __( 'Edit', 'wholesalex' ),
-					// 'whx_email_templates_unlock'         => __( 'UNLOCK', 'wholesalex' ),
-					// 'whx_email_templates_unlock_full_email_access' => __( 'Unlock Full Email Access with', 'wholesalex' ),
-					// 'whx_email_templates_with_wholesalex_pro' => __( 'With WholesaleX Pro', 'wholesalex' ),
-					// 'whx_email_templates_upgrade_pro_message' => __( 'We are sorry, but only a limited number of emails are available on the free version. Please upgrade to a pro plan to get full access.', 'wholesalex' ),
-					// 'whx_email_templates_upgrade_to_pro_btn' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
-					// 'whx_email_templates_emails'         => __( 'Emails', 'wholesalex' ),
-				),
+				'i18n' => array(),
 			)
 		);
 		?>
@@ -665,26 +361,6 @@ class WHOLESALEX_Email {
 		<?php
 	}
 
-
-	/**
-	 * Save WholesaleX Email Status
-	 *
-	 * @since 1.0.0
-	 */
-	public function save_wholesalex_email_settings() {
-		if ( ! ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'wholesalex-registration' ) ) ) {
-			die( 'Nonce Verification Faild!' );
-		}
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-		$__id    = isset( $_POST['id'] ) ? sanitize_text_field( wp_unslash( $_POST['id'] ) ) : '';
-		$__value = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
-		if ( ! empty( $__id ) ) {
-			update_option( $__id, ( 'true' === $__value ? true : false ) );
-		}
-		wp_send_json_success( __( 'Success.', 'wholesalex' ) );
-	}
 
 	/**
 	 * Replace Email Footer Smart Tag

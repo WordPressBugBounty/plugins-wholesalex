@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve existing include paths and template overrides.
 /**
  * Class wholesalex new user Registration admin notification file.
  *
@@ -118,7 +118,7 @@ if ( ! class_exists( 'WHOLESALEX\WholesaleX_New_User_Verification_Email' ) ) {
 				$this->user_email       = stripslashes( $this->object->user_email );
 				$this->recipient        = $this->user_email;
 				$confirmation_code      = get_user_meta( $user_id, '__wholesalex_email_confirmation_code', true );
-				$this->confirmation_url = esc_url( get_site_url() . '/my-account/?user_id=' . $user_id . '&confirmation_code=' . urlencode( $confirmation_code ) );
+				$this->confirmation_url = esc_url( get_site_url() . '/my-account/?user_id=' . $user_id . '&confirmation_code=' . rawurlencode( $confirmation_code ) );
 			}
 
 			if ( $this->is_enabled() && $this->get_recipient() ) {

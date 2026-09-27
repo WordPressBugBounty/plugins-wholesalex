@@ -1,9 +1,13 @@
 <?php
+/**
+ * Wholesalex email verification.
+ *
+ * @package WholesaleX
+ */
 
 defined( 'ABSPATH' ) || exit;
 
 $wholesalex_user = get_user_by( 'login', $user_login );
-$user_email      = $wholesalex_user->user_email; //phpcs:ignore
 
 do_action( 'woocommerce_email_header', $email_heading, $email ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WooCommerce.
 ?>
@@ -11,7 +15,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email ); // phpcs:ignore
 <?php /* translators: %s: Customer username */ ?>
 <p><?php printf( esc_html_x( 'Hi %s,', 'WholesaleX Email Verification Email (Customer)', 'wholesalex' ), esc_html( $user_login ) ); ?></p>
 <p><?php printf( esc_html_x( 'To complete your registration, please click the link below to confirm your email address.', 'WholesaleX Email Verification Email (Customer)', 'wholesalex' ) ); ?>
-<p><?php printf( '%s', make_clickable( esc_url( $confirmation_url ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+<p><?php echo wp_kses_post( make_clickable( esc_url( $confirmation_url ) ) ); ?></p>
 <p><?php printf( esc_html_x( "By confirming your Email, you will gain full access to your account and enjoy all our platform's benefits", 'WholesaleX Email Verification Email (Customer)', 'wholesalex' ) ); ?>
 
 <?php

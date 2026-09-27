@@ -62,7 +62,16 @@ body.wholesalex_backend_body:not(.wsx-loaded) #wholesalex-react-root {
 	visibility: hidden;
 }
 
-:root {
+/* Keep design tokens inside WholesaleX mounts and controls on shared admin screens. */
+:where(
+	[id^="wholesalex"],
+	[id^="_wholesalex"],
+	[id^="wsx-"],
+	[class^="wholesalex-"],
+	[class*=" wholesalex-"],
+	[class^="wsx-"],
+	[class*=" wsx-"]
+) {
 	/* color variables */
 	--color-primary: #6c6cff;
 	--color-secondary: #fead01;
@@ -144,7 +153,15 @@ body.wholesalex_backend_body:not(.wsx-loaded) #wholesalex-react-root {
 }
 
 /* default style */
-img {
+:where(
+	[id^="wholesalex"],
+	[id^="_wholesalex"],
+	[id^="wsx-"],
+	[class^="wholesalex-"],
+	[class*=" wholesalex-"],
+	[class^="wsx-"],
+	[class*=" wsx-"]
+) img {
 	max-width: 100%;
 	height: auto;
 }
@@ -678,7 +695,7 @@ input:checked ~ .wsx-checkbox-mark:after {
 	overflow-y: auto;
 	height: 70vh;
 }
-.wxs-menu-item {
+.wsx-menu .wxs-menu-item {
 	transition: all var(--transition-md) ease;
 }
 .wsx-nav-link {
@@ -1190,8 +1207,8 @@ input:checked ~ .wsx-checkbox-mark:after {
 	max-width: 450px;
 }
 
-._shipping_section,
-._payment_gateway_section {
+#_wholesalex_edit_profile ._shipping_section,
+#_wholesalex_edit_profile ._payment_gateway_section {
 	padding: 32px 24px;
 	background-color: var(--color-gray);
 	border-radius: var(--border-radius-md);
@@ -1209,7 +1226,7 @@ input:checked ~ .wsx-checkbox-mark:after {
 	border-color: var(--color-border-primary);
 }
 
-._credit_section {
+#_wholesalex_edit_profile ._credit_section {
 	display: grid;
 	gap: 32px;
 	grid-template-columns: repeat(2, minmax(120px, 1fr));
@@ -1290,7 +1307,7 @@ input:checked ~ .wsx-checkbox-mark:after {
 	display: flex;
 	gap: 15px;
 }
-progress.woocommerce-importer-progress {
+#wholesalex-overview progress.woocommerce-importer-progress {
 	height: 30px;
 	width: 100%;
 }
@@ -1303,7 +1320,7 @@ section.wholesalex-importer-done.success-popup-content {
 	gap: 10px;
 }
 
-.import-complete-text.message {
+#wholesalex-overview .import-complete-text.message {
 	font-size: 16px;
 	font-weight: bold;
 	color: var(--color-text-dark);
@@ -3201,8 +3218,15 @@ select.wsx-select {
 	}
 }
 @media (max-width: 782px) {
-	input,
-	textarea {
+	:where(
+		[id^="wholesalex"],
+		[id^="_wholesalex"],
+		[id^="wsx-"],
+		[class^="wholesalex-"],
+		[class*=" wholesalex-"],
+		[class^="wsx-"],
+		[class*=" wsx-"]
+	) :is(input, textarea) {
 		font-size: 14px;
 	}
 }
@@ -3392,41 +3416,39 @@ select.wsx-select {
 	border-radius: 2px;
 	box-shadow: 0 0 0 transparent;
 }
-/* FormTokenField's static suggestions list for singleproduct page to avoid overflow issue */
-#woocommerce-product-data
-	.panel-wrap
-	.wsx-multiselect-component
-	.components-form-token-field__suggestions-list {
-	position: static !important;
-	background-color: transparent;
-	border: none;
-	border-top: 1px solid #949494;
-	border-radius: 0;
+/* Let product suggestions escape the panel without expanding the input field.
+ * flow-root preserves the float containment previously provided by overflow. */
+#woocommerce-product-data:has(#wsx_tab_data .components-form-token-field__suggestions-list) {
+	/* WooCommerce clips the outer postbox to its rounded corners. */
+	overflow: visible;
+}
+#woocommerce-product-data .panel-wrap:has(#wsx_tab_data .components-form-token-field__suggestions-list) {
+	display: flow-root;
+	overflow: visible;
+}
+#wsx_tab_data:has(.components-form-token-field__suggestions-list) {
+	overflow: visible;
 }
 
 /* Modal Component content center position */
-.components-modal__screen-overlay {
-	align-items: center;
-	justify-content: center;
-}
 .wsx-upgrade-modal .components-modal__content {
 	margin-top: 0;
 }
 
 /* DataViews Table styles */
-.dataviews-view-table
+#wholesalex-overview .dataviews-view-table
 	col[class^="dataviews-view-table__col-"]:not(
 		.dataviews-view-table__col-__select
 	) {
 	width: auto !important;
 }
-.dataviews-wrapper
+#wholesalex-overview .dataviews-wrapper
 	.dataviews-view-table
 	thead
 	th:has(.dataviews-view-table-header-button):first-child {
 	padding-left: 16px;
 }
-.dataviews-view-table
+#wholesalex-overview .dataviews-view-table
 	tr:hover
 	.dataviews-item-actions
 	.components-button:not(.dataviews-all-actions-button) {
@@ -3435,11 +3457,12 @@ select.wsx-select {
 .dataviews-item-actions .wsx-data-views-action-label {
 	display: none;
 }
-.dataviews-pagination .components-input-control__backdrop {
+#wholesalex-overview .dataviews-pagination .components-input-control__backdrop {
 	border: 1px solid var(--wp-components-color-gray-600, #949494) !important;
 }
 
 .wsx-product-icon svg {
-	width: 100%;
+	display: block;
+	width: auto;
 	height: 32px;
 }

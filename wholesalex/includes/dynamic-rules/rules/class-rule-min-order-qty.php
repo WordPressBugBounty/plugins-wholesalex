@@ -23,6 +23,13 @@ class Rule_Min_Order_Qty {
 	 * @param array $data All categorized rules data.
 	 */
 	public function handle( $data ) {
+		// Older rules can omit the editor's default "off" value for this toggle.
+		foreach ( $data['min_order_qty'] ?? array() as $index => $rule ) {
+			if ( empty( $rule['rule']['_min_order_qty_disable'] ) ) {
+				$data['min_order_qty'][ $index ]['rule']['_min_order_qty_disable'] = 'no';
+			}
+		}
+
 		// Quantity input args for simple products.
 		add_filter(
 			'woocommerce_quantity_input_args',

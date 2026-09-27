@@ -1,4 +1,13 @@
-:root {
+/* Limit WholesaleX tokens to plugin markup, including storefront widgets. */
+:where(
+	[id^="wholesalex"],
+	[id^="_wholesalex"],
+	[id^="wsx-"],
+	[class^="wholesalex-"],
+	[class*=" wholesalex-"],
+	[class^="wsx-"],
+	[class*=" wsx-"]
+) {
 	--color-primary: #6c6cff;
 	--color-secondary: #fead01;
 	--color-tertiary: #070707;
@@ -454,13 +463,6 @@ textarea.wsx-br-md {
 
 .wholesalex-field label.wsx-label {
 	margin-bottom: 8px;
-}
-
-.woocommerce-account .woocommerce-MyAccount-content {
-	width: 60%;
-}
-.woocommerce-account .large-9.col .woocommerce-MyAccount-content {
-	width: 100%;
 }
 
 /* Sub account Style */
@@ -2596,11 +2598,6 @@ label.wsx-slider {
 		max-width: 56vw;
 	}
 }
-@media (max-width: 689px) {
-	.woocommerce-account .woocommerce-MyAccount-content {
-		width: 100%;
-	}
-}
 @media (max-width: 490px) {
 	.wsx-message {
 		max-width: 46vw;
@@ -2612,7 +2609,7 @@ label.wsx-slider {
 		flex-direction: column;
 	}
 }
-.approve-button {
+.wholesalex_wallet_page .approve-button {
 	margin-right: 10px;
 	padding: 10px;
 	background-color: #4caf50;
@@ -2622,7 +2619,7 @@ label.wsx-slider {
 	cursor: pointer;
 }
 
-.decline-button {
+.wholesalex_wallet_page .decline-button {
 	padding: 10px;
 	background-color: #f44336;
 	border: none;

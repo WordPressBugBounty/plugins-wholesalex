@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve the existing loader path and public class name.
 /**
  * WholesaleX Wholesale Pricing - Product Discount Rule Handler
  *

@@ -8,6 +8,8 @@
 
 namespace WHOLESALEX;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * WholesaleX Category Class.
  */
@@ -71,7 +73,7 @@ class WHOLESALEX_Category {
 	 */
 	public function category_action_callback( $server ) {
 		$post = $server->get_params();
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
+		if ( ! isset( $post['nonce'] ) || ! is_string( $post['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $post['nonce'] ) ), 'wholesalex-registration' ) ) {
 			return;
 		}
 
@@ -100,19 +102,15 @@ class WHOLESALEX_Category {
 	 * @since 1.0.0
 	 */
 	public function save_category_fields_action( $term_id ) {
-		if ( ! ( isset( $_POST['_wpnonce_add_update_cat'] ) && wp_verify_nonce( sanitize_key( $_POST['_wpnonce_add_update_cat'] ), 'wholesalex_cat_add_update' ) ) ) {
+		if ( ! isset( $_POST['_wpnonce_add_update_cat'] ) || ! is_string( $_POST['_wpnonce_add_update_cat'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['_wpnonce_add_update_cat'] ) ), 'wholesalex_cat_add_update' ) ) {
 			return;
 		}
 
 		if ( isset( $_POST['wholesalex_category_visibility_settings'] ) && ! empty( $_POST['wholesalex_category_visibility_settings'] ) ) {
-			$__visibility_settings = wholesalex()->sanitize( json_decode( wp_unslash( $_POST['wholesalex_category_visibility_settings'] ), true ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			wholesalex()->save_category_visibility_settings( $term_id, $__visibility_settings );
-
-		}
-		if ( isset( $_POST['wholesalex_category_tiers'] ) && ! empty( $_POST['wholesalex_category_tiers'] ) ) {
-			$__tiers = wholesalex()->sanitize( json_decode( wp_unslash( $_POST['wholesalex_category_tiers'] ), true ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			wholesalex()->save_category_discounts( $term_id, $__tiers );
-
+			$__visibility_settings = wholesalex()->sanitize_json_input( wp_unslash( $_POST['wholesalex_category_visibility_settings'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitize_json_input() decodes the payload and recursively sanitizes every value; sanitizing the raw JSON string first corrupts it.
+			if ( is_array( $__visibility_settings ) ) {
+				wholesalex()->save_category_visibility_settings( $term_id, $__visibility_settings );
+			}
 		}
 	}
 
@@ -133,12 +131,6 @@ class WHOLESALEX_Category {
 				'visibility_settings' => wholesalex()->get_category_visibility_settings(),
 				'fields'              => $this->get_category_fields(),
 				'discounts'           => wholesalex()->get_category_discounts(),
-				// 'i18n'                => array(
-				// 	'unlock'         => __( 'UNLOCK', 'wholesalex' ),
-				// 	'unlock_heading' => __( 'Unlock All Features with', 'wholesalex' ),
-				// 	'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
-				// 	'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
-				// ),
 			),
 		);
 		wp_nonce_field( 'wholesalex_cat_add_update', '_wpnonce_add_update_cat' ); ?>
@@ -163,12 +155,6 @@ class WHOLESALEX_Category {
 				'visibility_settings' => wholesalex()->get_category_visibility_settings(),
 				'fields'              => $this->get_category_fields(),
 				'discounts'           => array( $term->term_id => wholesalex()->get_category_discounts( $term->term_id ) ),
-				// 'i18n'                => array(
-				// 	'unlock'         => __( 'UNLOCK', 'wholesalex' ),
-				// 	'unlock_heading' => __( 'Unlock All Features with', 'wholesalex' ),
-				// 	'unlock_desc'    => __( 'We are sorry, but unfortunately, this feature is unavailable in the free version. Please upgrade to a pro plan to unlock all features.', 'wholesalex' ),
-				// 	'upgrade_to_pro' => __( 'Upgrade to Pro  ➤', 'wholesalex' ),
-				// ),
 			),
 		);
 		wp_nonce_field( 'wholesalex_cat_add_update', '_wpnonce_add_update_cat' );
@@ -256,70 +242,6 @@ class WHOLESALEX_Category {
 		$__roles_options = wholesalex()->get_roles( 'b2b_roles_option' );
 		$__users_options = wholesalex()->get_users()['user_options'];
 
-		$__b2b_roles = array();
-		foreach ( $__roles_options as $role ) {
-			if ( ! ( isset( $role['value'] ) && isset( $role['name'] ) ) ) {
-				continue;
-			}
-			$__b2b_roles[ $role['value'] ] = array(
-				'label'    => $role['name'],
-				'type'     => 'tiers',
-				'is_pro'   => true,
-				'pro_data' => array(
-					'type'  => 'limit',
-					'value' => 3,
-				),
-				'attr'     => array(
-					$role['value'] . 'tier' => array(
-						'type'   => 'tier',
-						'_tiers' => array(
-							'columns'     => array(
-								__( 'Discount Type', 'wholesalex' ),
-								/* translators: %s: WholesaleX Role Name */
-								sprintf( __( ' %s Price', 'wholesalex' ), $role['name'] ),
-								__( 'Min Quantity', 'wholesalex' ),
-							),
-							'data'        => array(
-								'_discount_type'   => array(
-									'type'    => 'select',
-									'options' => array(
-										''            => __( 'Choose Discount Type...', 'wholesalex' ),
-										'amount'      => __( 'Discount Amount', 'wholesalex' ),
-										'percentage'  => __( 'Discount Percentage', 'wholesalex' ),
-										'fixed_price' => __( 'Fixed Price', 'wholesalex' ),
-									),
-									'default' => '',
-									'label'   => __( 'Discount Type', 'wholesalex' ),
-								),
-								'_discount_amount' => array(
-									'type'        => 'number',
-									'placeholder' => '',
-									'default'     => '',
-									/* translators: %s: WholesaleX Role Name */
-									'label'       => /*sprintf( __( ' %s Price', 'wholesalex' ), $role['name'] ),*/
-									__( 'Price', 'wholesalex' ),
-								),
-								'_min_quantity'    => array(
-									'type'        => 'number',
-									'placeholder' => '',
-									'default'     => '',
-									'label'       => __( 'Min Quantity', 'wholesalex' ),
-								),
-							),
-							'add'         => array(
-								'type'  => 'button',
-								'label' => __( 'Add Price Tier', 'wholesalex' ),
-							),
-							'upgrade_pro' => array(
-								'type'  => 'button',
-								'label' => __( 'Go For Unlimited Price Tiers', 'wholesalex' ),
-							),
-						),
-					),
-				),
-			);
-		}
-
 		return apply_filters(
 			'wholesalex_category_fields',
 			array(
@@ -373,121 +295,7 @@ class WHOLESALEX_Category {
 						),
 					),
 				),
-				'_b2b_tiers'         => array(
-					/* translators: %s: Plugin Name */
-					'label' => sprintf( __( '%s Tier Pricing', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'attr'  => apply_filters( 'wholesalex_category_b2b_roles_tier_fields', $__b2b_roles ),
-				),
 			),
-		);
-	}
-
-	/**
-	 * Get WholesaleX Settings Fields
-	 *
-	 * @return array wholesalex category settings fields.
-	 * @since 1.0.0
-	 */
-	public function get_category_settings() {
-		$roles                      = wholesalex()->get_roles( 'b2b_roles_option' );
-		$role_based_discount_option = array();
-		foreach ( $roles as $role ) {
-			if ( ! ( isset( $role['value'] ) && isset( $role['name'] ) ) ) {
-				continue;
-			}
-			$role_based_discount_option[ $role['value'] ] = array(
-				'label'         => $role['name'],
-				'discount_type' => array(
-					'type'    => 'select',
-					'options' => array(
-						''            => __( 'Choose Discount Type...', 'wholesalex' ),
-						'amount'      => __( 'Discount Amount', 'wholesalex' ),
-						'percentage'  => __( 'Discount Percentage', 'wholesalex' ),
-						'fixed_price' => __( 'Fixed Price', 'wholesalex' ),
-					),
-					'default' => '',
-				),
-				'amount'        => array(
-					'type'        => 'number',
-					'placeholder' => '',
-					'default'     => '',
-				),
-			);
-		}
-
-		return apply_filters(
-			'wholesalex_category_fields',
-			array(
-				'general'        => array(
-					'attr' => array(
-						'wholesalex_category_visibility' => array(
-							'type'    => 'radio',
-							'label'   => __( 'Visibility', 'wholesalex' ),
-							'options' => array(
-								/* translators: %s: Plugin Name */
-								'wholesalex_user_public' => sprintf( __( '%s Users and Public', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-								'public_only'            => __( 'Public Only', 'wholesalex' ),
-								/* translators: %s: Plugin Name */
-								'wholesalex_only'        => sprintf( __( '%s User Only', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-							),
-							'default' => '',
-						),
-					),
-				),
-				'role_based'     => array(
-					'attr' => $role_based_discount_option,
-				),
-				'quantity_based' => array(
-					'attr' => array(
-						'wholesalex_qb_pricing_switch'   => array(
-							'type'    => 'slider',
-							'label'   => __( 'Quantity Based Pricing', 'wholesalex' ),
-							'desc'    => __( 'Enable Quantity Based Pricing', 'wholesalex' ),
-							'default' => 'no',
-						),
-						'wholesalex_cat_quantity_switch' => array(
-							'type'    => 'slider',
-							'label'   => __( 'Apply Quantity Based Pricing in each product', 'wholesalex' ),
-							'desc'    => __( 'Enable Quantity Based Pricing on each product', 'wholesalex' ),
-							'default' => 'no',
-						),
-						'_quantity_based_discount'       => array(
-							'wholesalex_start_quantity' => array(
-								'type'        => 'number',
-								'label'       => __( 'Start Quantity', 'wholesalex' ),
-								'placeholder' => __( '2', 'wholesalex' ),
-								'help'        => '',
-								'default'     => '',
-							),
-							'wholesalex_end_quantity'   => array(
-								'type'        => 'number',
-								'label'       => __( 'End Quantity', 'wholesalex' ),
-								'placeholder' => __( '10', 'wholesalex' ),
-								'help'        => '',
-								'default'     => '',
-							),
-							'wholesalex_quantity_based_discount_type' => array(
-								'type'    => 'select',
-								'label'   => __( 'Discount Type', 'wholesalex' ),
-								'options' => array(
-									''            => __( 'Choose Discount Type...', 'wholesalex' ),
-									'amount'      => __( 'Discount Amount', 'wholesalex' ),
-									'percentage'  => __( 'Discount Percentage', 'wholesalex' ),
-									'fixed_price' => __( 'Fixed Price', 'wholesalex' ),
-								),
-								'default' => '',
-							),
-							'wholesalex_quantity_based_discount_value' => array(
-								'type'        => 'number',
-								'label'       => '',
-								'placeholder' => __( '10', 'wholesalex' ),
-								'help'        => '',
-								'default'     => '',
-							),
-						),
-					),
-				),
-			)
 		);
 	}
 }

@@ -1,4 +1,9 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.NotHyphenatedLowercase -- Preserve the existing email template include path.
+/**
+ * WholesaleX email presentation template.
+ *
+ * @package WholesaleX
+ */
 
 defined( 'ABSPATH' ) || exit;
 
@@ -318,7 +323,7 @@ $text_lighter_40 = wc_hex_lighter( $text, 40 );
 															echo wp_kses_post(
 																wpautop(
 																	wptexturize(
-													apply_filters( 'wholealex_email_footer_text', get_option( 'woocommerce_email_footer_text' ) ) // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Retain the existing public hook for backward compatibility.
+																		apply_filters( 'wholealex_email_footer_text', get_option( 'woocommerce_email_footer_text' ) ) // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Retain the existing public hook for backward compatibility.
 																	)
 																)
 															);

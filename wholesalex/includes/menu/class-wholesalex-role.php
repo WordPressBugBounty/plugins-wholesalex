@@ -8,6 +8,8 @@
 
 namespace WHOLESALEX;
 
+defined( 'ABSPATH' ) || exit;
+
 use WC_Data_Store;
 use WC_Shipping_Zone;
 
@@ -33,7 +35,6 @@ class WHOLESALEX_Role {
 		 * @since 1.0.4
 		 */
 		add_filter( 'woocommerce_coupons_enabled', array( $this, 'hide_coupon_fields' ) );
-		add_filter( 'wholesalex_user_subaccount_create_permission', array( $this, 'restrict_subaccount_creation' ), 10, 2 );
 
 		/**
 		 * Auto Role Migration
@@ -43,10 +44,6 @@ class WHOLESALEX_Role {
 		add_action( 'wholesalex_before_dynamic_rules_loaded', array( $this, 'auto_wholesalex_role_migration' ) );
 
 		add_action( 'admin_init', array( $this, 'conditionally_filter_additional_role' ) );
-
-		add_filter( 'wholesalex_csv_role_import_mapping_options', array( $this, 'set_import_column_value' ) );
-		add_filter( 'wholesalex_csv_role_import_mapping_default_columns', array( $this, 'set_import_mapping_default_column' ) );
-		add_filter( 'wholesalex_role_importer_parsed_data', array( $this, 'parse_import_data' ) );
 	}
 
 	/**
@@ -200,7 +197,7 @@ class WHOLESALEX_Role {
 	 */
 	public function role_action_callback( $server ) {
 		$post = $server->get_params();
-		if ( ! ( isset( $post['nonce'] ) && wp_verify_nonce( sanitize_key( $post['nonce'] ), 'wholesalex-registration' ) ) ) {
+		if ( ! isset( $post['nonce'] ) || ! is_string( $post['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $post['nonce'] ) ), 'wholesalex-registration' ) ) {
 			return;
 		}
 
@@ -390,8 +387,7 @@ class WHOLESALEX_Role {
 					'data'        => $__roles,
 					'nonce'       => wp_create_nonce( 'whx-export-roles' ),
 					'tax_classes' => \WHOLESALEX\Dynamic_Rules::get_tax_classes(),
-					'i18n'        => array(
-					),
+					'i18n'        => array(),
 				)
 			);
 		?>
@@ -410,7 +406,7 @@ class WHOLESALEX_Role {
 		$payment_gateways           = array();
 		foreach ( $available_payment_gateways as $key => $gateway ) {
 			if ( 'yes' === $gateway->enabled ) {
-				$gateway_title = trim( (string) $gateway->get_title() );
+				$gateway_title            = trim( (string) $gateway->get_title() );
 				$payment_gateways[ $key ] = '' !== $gateway_title ? $gateway_title : $gateway->get_method_title();
 			}
 		}
@@ -424,7 +420,7 @@ class WHOLESALEX_Role {
 	 * @since 1.0.4 Role Settings Section Added.
 	 */
 	public static function get_role_fields() {
-		$payment_gateways     = self::get_enabled_payment_gateway_options();
+		$payment_gateways    = self::get_enabled_payment_gateway_options();
 		$__shipping_sections = array();
 
 		$data_store         = WC_Data_Store::load( 'shipping-zone' );
@@ -710,10 +706,10 @@ class WHOLESALEX_Role {
 	 * @since 1.2.19 Profile Gateway Override Added
 	 */
 	public function available_payment_gateways( $gateways ) {
-		$__role_id                    = wholesalex()->get_current_user_role();
-		$__role_content               = wholesalex()->get_roles( 'by_id', $__role_id );
-		$__payment_methods            = array();
-		$has_payment_method_setting   = is_array( $__role_content ) && array_key_exists( '_payment_methods', $__role_content );
+		$__role_id                  = wholesalex()->get_current_user_role();
+		$__role_content             = wholesalex()->get_roles( 'by_id', $__role_id );
+		$__payment_methods          = array();
+		$has_payment_method_setting = is_array( $__role_content ) && array_key_exists( '_payment_methods', $__role_content );
 		if ( isset( $__role_content['_payment_methods'] ) && ! empty( $__role_content['_payment_methods'] ) ) {
 			$__payment_methods = $__role_content['_payment_methods'];
 		}
@@ -767,7 +763,7 @@ class WHOLESALEX_Role {
 
 		foreach ( $shipping_methods as $rate_key => $rate ) {
 
-			if ( in_array( $rate->instance_id, $__shipping_methods ) ) { //phpcs:ignore
+			if ( in_array( $rate->instance_id, $__shipping_methods ) ) { // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict -- Saved shipping instance IDs can be numeric strings.
 				$__available_shipping_methods[ $rate_key ] = $rate;
 			}
 		}
@@ -788,7 +784,7 @@ class WHOLESALEX_Role {
 	 * @return object shipping methods.
 	 * @since 1.0.4
 	 */
-	public function filter_shipping_methods( $package_rates, $package ) {
+	public function filter_shipping_methods( $package_rates, $package ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Preserve the existing callback or public method signature.
 		$__role_id          = wholesalex()->get_current_user_role();
 		$__role_content     = wholesalex()->get_roles( 'by_id', $__role_id );
 		$__shipping_methods = array();
@@ -801,7 +797,7 @@ class WHOLESALEX_Role {
 		$__available_shipping_methods = array();
 
 		foreach ( $package_rates as $rate_key => $rate ) {
-			if (in_array($rate->instance_id, $__shipping_methods)) { //phpcs:ignore
+			if ( in_array( $rate->instance_id, $__shipping_methods ) ) { // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict -- Saved shipping instance IDs can be numeric strings.
 				$__available_shipping_methods[ $rate_key ] = $rate;
 			}
 		}
@@ -838,10 +834,6 @@ class WHOLESALEX_Role {
 	 * @since 1.0.4
 	 */
 	public function hide_coupon_fields( $enabled ) {
-		if ( ! is_user_logged_in() ) {
-			return $enabled;
-		}
-
 		$user_id      = (int) apply_filters( 'wholesalex_set_current_user', get_current_user_id() );
 		$restrictions = $this->get_general_restrictions_for_user( $user_id );
 		if ( $this->is_user_excluded_from_general_restrictions( $user_id, $restrictions ) ) {
@@ -853,27 +845,6 @@ class WHOLESALEX_Role {
 		}
 
 		return $enabled;
-	}
-
-	/**
-	 * Restrict subaccount creation for users whose role enables the general restriction.
-	 *
-	 * @param bool $has_permission Existing permission status.
-	 * @param int  $user_id User attempting to create a subaccount.
-	 * @return bool
-	 */
-	public function restrict_subaccount_creation( $has_permission, $user_id ) {
-		if ( ! $has_permission ) {
-			return false;
-		}
-
-		$user_id      = (int) apply_filters( 'wholesalex_set_current_user', absint( $user_id ) );
-		$restrictions = $this->get_general_restrictions_for_user( $user_id );
-		if ( $this->is_user_excluded_from_general_restrictions( $user_id, $restrictions ) ) {
-			return true;
-		}
-
-		return ! $this->is_truthy( isset( $restrictions['_restrict_subaccount'] ) ? $restrictions['_restrict_subaccount'] : false );
 	}
 
 	/**
@@ -976,7 +947,7 @@ class WHOLESALEX_Role {
 	public function get_users_by_role_id( $role_id ) {
 		$users        = get_users(
 			array(
-				'fields'     => array( 'ID', 'user_login' ),
+				'fields'     => array( 'ID', 'user_login', 'display_name' ),
 				'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- WholesaleX roles, status, and account type are stored as user metadata.
 					'relation' => 'AND',
 					array(
@@ -1035,50 +1006,5 @@ class WHOLESALEX_Role {
 			}
 		}
 		return $roles;
-	}
-
-	/**
-	 * Set Import Column Value
-	 *
-	 * @param array $options Options.
-	 * @return array
-	 */
-	public function set_import_column_value( $options ) {
-		if ( ! isset( $options['_raq_replace_add_to_cart_with_quote'] ) ) {
-			$options['_raq_replace_add_to_cart_with_quote'] = __( 'Replace Add to Cart With Add to Quote', 'wholesalex' );
-		}
-
-		return $options;
-	}
-
-	/**
-	 * Set Import Mapping Default Column
-	 *
-	 * @param array $columns Columns.
-	 * @return array
-	 */
-	public function set_import_mapping_default_column( $columns ) {
-		if ( ! isset( $columns[ __( 'Replace Add to Cart With Add to Quote', 'wholesalex' ) ] ) ) {
-			$columns[ __( 'Replace Add to Cart With Add to Quote', 'wholesalex' ) ] = '_raq_replace_add_to_cart_with_quote';
-		}
-
-		return $columns;
-	}
-
-	/**
-	 * Parse Import Data
-	 *
-	 * @param array $data Import Data.
-	 * @return array
-	 */
-	public function parse_import_data( $data ) {
-		if ( isset( $data['_raq_replace_add_to_cart_with_quote'] ) ) {
-			$value = sanitize_text_field( $data['_raq_replace_add_to_cart_with_quote'] );
-			if ( ! ( 'yes' === $value || 'no' === $value ) ) {
-				$value = '';
-			}
-		}
-
-		return $data;
 	}
 }

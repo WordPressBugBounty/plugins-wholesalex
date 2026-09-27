@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve existing include paths and template overrides.
 /**
  * Compatibility with woocommerce Booking product and woocommerce booking.
  *
@@ -46,7 +46,7 @@ class WHOLESALEX_WooProduct_Bundles {
 	 * @param string     $context Context string where filter is applied.
 	 * @return bool True to ignore dynamic pricing for this product.
 	 */
-	public function is_product_bundle( $ignore, $p_product, $context = '' ) {
+	public function is_product_bundle( $ignore, $p_product, $context = '' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Preserve the public callback signature.
 		// Only proceed if WPC Product Bundles is active.
 		if ( ! function_exists( 'is_plugin_active' ) || ! is_plugin_active( 'woo-product-bundle/wpc-product-bundles.php' ) ) {
 			return $ignore;

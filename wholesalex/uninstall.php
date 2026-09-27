@@ -63,10 +63,9 @@ function wholesalex_uninstall_plugin_data_remove() {
 		'woocommerce_wholesalex_user_profile_update_notify_settings',
 	);
 
-	// Delete options from the wp_options table.
-	$placeholders = array_fill( 0, count( $option_keys ), '%s' );
-	$query        = "DELETE FROM $wpdb->options WHERE option_name IN (" . implode( ', ', $placeholders ) . ')';
-	$wpdb->query( $wpdb->prepare( $query, ...$option_keys ) ); //phpcs:ignore
+	foreach ( $option_keys as $option_key ) {
+		delete_option( $option_key );
+	}
 
 	$post_meta_keys = array(
 		'wholesalex_b2b_stock_status',
@@ -78,15 +77,14 @@ function wholesalex_uninstall_plugin_data_remove() {
 		'wholesalex_b2b_variable_separate_stock_status',
 	);
 
-	// Delete post meta keys from the wp_postmeta table.
-	$placeholders = array_fill( 0, count( $post_meta_keys ), '%s' );
-	$query        = "DELETE FROM $wpdb->postmeta WHERE meta_key IN (" . implode( ', ', $placeholders ) . ')';
-	$wpdb->query( $wpdb->prepare( $query, ...$post_meta_keys ) ); //phpcs:ignore
+	foreach ( $post_meta_keys as $post_meta_key ) {
+		delete_metadata( 'post', 0, $post_meta_key, '', true );
+	}
 
 	$dynamic_prefix = 'wholesalex_';
 	$suffixes       = array( '_base_price', '_sale_price' );
 	foreach ( $suffixes as $suffix ) {
-		$wpdb->query( //phpcs:ignore
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall deletes matching metadata in bulk; the metadata API cannot delete keys by prefix, and caching a DELETE is not applicable.
 			$wpdb->prepare(
 				"DELETE FROM $wpdb->postmeta WHERE meta_key LIKE %s",
 				$wpdb->esc_like( $dynamic_prefix ) . '%' . $wpdb->esc_like( $suffix )
@@ -95,21 +93,21 @@ function wholesalex_uninstall_plugin_data_remove() {
 	}
 
 	// Delete all keys with prefix 'wholesalex_'.
-	$wpdb->query( //phpcs:ignore
+	$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall deletes matching metadata in bulk; the metadata API cannot delete keys by prefix, and caching a DELETE is not applicable.
 		$wpdb->prepare(
 			"DELETE FROM $wpdb->postmeta WHERE meta_key LIKE %s",
 			$wpdb->esc_like( $dynamic_prefix ) . '%'
 		)
 	);
 
-	$wpdb->query( //phpcs:ignore
+	$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall deletes matching metadata in bulk; the metadata API cannot delete keys by prefix, and caching a DELETE is not applicable.
 		$wpdb->prepare(
 			"DELETE FROM $wpdb->termmeta WHERE meta_key LIKE %s",
 			$wpdb->esc_like( $dynamic_prefix ) . '%'
 		)
 	);
 
-	$wpdb->query( //phpcs:ignore
+	$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall deletes matching metadata in bulk; the metadata API cannot delete keys by prefix, and caching a DELETE is not applicable.
 		$wpdb->prepare(
 			"DELETE FROM $wpdb->usermeta WHERE meta_key LIKE %s",
 			$wpdb->esc_like( '__wholesalex_' ) . '%'
@@ -127,10 +125,9 @@ function wholesalex_uninstall_plugin_data_remove() {
 		'__wholesalex_email_confirmation_code',
 	);
 
-	// Delete user meta keys from the wp_usermeta table.
-	$placeholders = array_fill( 0, count( $user_meta_keys ), '%s' );
-	$query        = "DELETE FROM $wpdb->usermeta WHERE meta_key IN (" . implode( ', ', $placeholders ) . ')';
-	$wpdb->query( $wpdb->prepare( $query, ...$user_meta_keys ) ); //phpcs:ignore
+	foreach ( $user_meta_keys as $user_meta_key ) {
+		delete_metadata( 'user', 0, $user_meta_key, '', true );
+	}
 
 	$user_option_keys = array(
 		'wholesalex_dynamic_rule_import_mapping',
@@ -138,10 +135,9 @@ function wholesalex_uninstall_plugin_data_remove() {
 		'wholesalex_role_import_error_log',
 	);
 
-	// Delete user option keys from the wp_usermeta table for specific users.
-	$placeholders = array_fill( 0, count( $user_option_keys ), '%s' );
-	$query        = "DELETE FROM $wpdb->usermeta WHERE meta_key IN (" . implode( ', ', $placeholders ) . ')'; //phpcs:ignore
-	$wpdb->query( $wpdb->prepare( $query, ...$user_option_keys ) ); //phpcs:ignore
+	foreach ( $user_option_keys as $user_option_key ) {
+		delete_metadata( 'user', 0, $user_option_key, '', true );
+	}
 }
 
 // Run the uninstall process.

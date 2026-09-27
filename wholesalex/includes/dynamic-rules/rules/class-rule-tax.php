@@ -93,7 +93,7 @@ class Rule_Tax {
 				}
 
 				if ( isset( $rule['rule']['_tax_exempted'] ) && 'yes' === $rule['rule']['_tax_exempted'] ) {
-					$rule_key                                = isset( $rule['id'] ) ? (string) $rule['id'] : md5( wp_json_encode( $rule ) );
+					$rule_key                               = isset( $rule['id'] ) ? (string) $rule['id'] : md5( wp_json_encode( $rule ) );
 					$this->tax_exemption_rules[ $rule_key ] = $rule;
 				}
 
@@ -134,6 +134,7 @@ class Rule_Tax {
 			if ( $is_customer_vat_exempt ) {
 				add_filter(
 					'woocommerce_package_rates',
+					// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Retain the established callback signature for compatibility.
 					function ( $rates, $package ) {
 						foreach ( $rates as $rate_key => $rate ) {
 							$rates[ $rate_key ]->taxes = array_map(
@@ -223,7 +224,7 @@ class Rule_Tax {
 	 * @param array          $calculate_tax_for Tax location.
 	 * @return void
 	 */
-	public function maybe_zero_order_item_taxes( $item, $calculate_tax_for ) {
+	public function maybe_zero_order_item_taxes( $item, $calculate_tax_for ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Retain the established callback signature for compatibility.
 		if ( ! $item instanceof \WC_Order_Item_Product ) {
 			return;
 		}
@@ -281,7 +282,7 @@ class Rule_Tax {
 			return false;
 		}
 
-		$tax_setting = get_option( 'woocommerce_tax_based_on' );
+		$tax_setting  = get_option( 'woocommerce_tax_based_on' );
 		$user_country = 'shipping' === $tax_setting ? WC()->customer->get_shipping_country() : WC()->customer->get_billing_country();
 
 		return in_array( $user_country, $allowed_country, true );

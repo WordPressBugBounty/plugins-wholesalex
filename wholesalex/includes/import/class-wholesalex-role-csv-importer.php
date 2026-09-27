@@ -431,7 +431,7 @@ class WHOLESALEX_Role_CSV_Importer extends WHOLESALEX_Role_Importer {
 			$row_data[] = $title;
 		}
 		if ( $id ) {
-			/* translators: %d: role ID */
+			/* translators: %d: Imported record ID. */
 			$row_data[] = sprintf( __( 'ID %d', 'wholesalex' ), $id );
 		}
 

@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve existing include paths and template overrides.
 /**
  * WholesaleX User Roles - Payment Method Rules
  *
@@ -353,10 +353,10 @@ class User_Roles_Payment_Method {
 			return array();
 		}
 
-		$attribute_ids          = array();
-		$attributes             = $product->get_attributes();
-		$registered_attributes  = wc_get_attribute_taxonomies();
-		$taxonomy_to_id_map     = array();
+		$attribute_ids         = array();
+		$attributes            = $product->get_attributes();
+		$registered_attributes = wc_get_attribute_taxonomies();
+		$taxonomy_to_id_map    = array();
 
 		foreach ( $registered_attributes as $registered_attr ) {
 			$taxonomy_name                        = wc_attribute_taxonomy_name( $registered_attr->attribute_name );

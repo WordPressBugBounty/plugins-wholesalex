@@ -1,4 +1,9 @@
 <?php
+/**
+ * Class xpo.
+ *
+ * @package WholesaleX
+ */
 
 namespace WHOLESALEX;
 
@@ -10,52 +15,6 @@ defined( 'ABSPATH' ) || exit;
  * @package REVX
  */
 class Xpo {
-
-	/**
-	 * Gets license key
-	 *
-	 * @return string
-	 */
-	public static function get_lc_key() {
-		return get_option( 'edd_wholesalex_license_key', '' );
-	}
-
-	public static function is_lc_active() {
-		if ( defined( 'WHOLESALEX_PRO_VER' ) ) {
-			$license_data = get_option( 'edd_wholesalex_license_data', array() );
-			return isset( $license_data['license'] ) && 'valid' === $license_data['license'];
-		}
-		return false;
-	}
-
-	/**
-	 * Checks if the license has expired.
-	 *
-	 * This method checks the stored license data in the WordPress options table
-	 * and determines if the license status is set to 'expired'. It returns `true`
-	 * if the license is expired, otherwise `false`.
-	 *
-	 * @return bool True if the license is expired, otherwise false.
-	 */
-	public static function is_lc_expired() {
-		$license_data = get_option( 'edd_wholesalex_license_data', array() );
-		return isset( $license_data['license'] ) && 'expired' === $license_data['license'];
-	}
-
-	/**
-	 * Gets the checkout URL used to renew an expired license.
-	 *
-	 * @return string
-	 */
-	public static function get_lc_renewal_url() {
-		return add_query_arg(
-			array(
-				'edd_license_key' => self::get_lc_key(),
-				'renew'           => 1,
-			),
-			'https://account.wpxpo.com/checkout/'
-		);
-	}
 
 	/**
 	 * Get Option Value bypassing cache
@@ -79,7 +38,7 @@ class Xpo {
 
 		$value = $default_value;
 
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s LIMIT 1", $option ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s LIMIT 1", $option ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- This helper deliberately bypasses the options cache; values are passed through wpdb::prepare.
 
 		if ( is_object( $row ) ) {
 			$value = $row->option_value;
@@ -130,7 +89,7 @@ class Xpo {
 		$serialized_value = maybe_serialize( $value );
 		$autoload         = ( 'no' === $autoload || false === $autoload ) ? 'no' : 'yes';
 
-		$result = $wpdb->query( $wpdb->prepare( "INSERT INTO `$wpdb->options` (`option_name`, `option_value`, `autoload`) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`)", $option, $serialized_value, $autoload ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->query( $wpdb->prepare( "INSERT INTO `$wpdb->options` (`option_name`, `option_value`, `autoload`) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`)", $option, $serialized_value, $autoload ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- This helper deliberately bypasses the options cache; values are passed through wpdb::prepare.
 		if ( ! $result ) {
 			return false;
 		}
@@ -215,97 +174,14 @@ class Xpo {
 		return $result;
 	}
 
-	public static function generate_utm_link( $params ) {
-		$default_config = array(
-			'plugin_meta_base_price' => array(
-				'source'   => 'db-wholesalex-plugin-meta',
-				'medium'   => 'base-price',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			'spring_sale'       => array(
-				'source'   => 'db-wholesalex-notice',
-				'medium'   => 'spring-sale',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			'content_notice'    => array(
-				'source'   => 'db-wholesalex-notice',
-				'medium'   => 'spring-sale',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			'img_banner_notice' => array(
-				'source'   => 'db-wholesalex-banner',
-				'medium'   => 'spring-sale',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			'plugin_meta'       => array(
-				'source'   => 'db-wholesalex-plugin',
-				'medium'   => 'plugin-meta',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			'plugin_meta_summer_db' => array(
-				'source'   => 'db-wholesalex-plugin-meta',
-				'medium'   => 'summer-sale',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			'summer_db'        => array(
-				'source'   => 'db-wholesalex-notice',
-				'medium'   => 'summer-sale',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			'submenu_upgrade'   => array(
-				'source'   => 'db-wholesalex-sub-menu',
-				'medium'   => 'upgrade',
-				'campaign' => 'wholesalex-dashboard',
-			),
-			
-		);
-
-		// Step 1: Get parameters.
-		$base_url      = 'https://getwholesalex.com/pricing/?utm_source=wholesalex-plugins&utm_medium=final-hour&utm_campaign=wholesalex-DB';
-		$utm_key       = $params['utmKey'] ?? null;
-		$affiliate     = $params['affiliate'] ?? apply_filters( 'wsx_affiliate_id', '' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Preserve the existing WSX public filter for backward compatibility.
-		$hash          = $params['hash'] ?? 'pricing';
-		$custom_config = $params['config'] ?? null;
-
-		$parsed_url = wp_parse_url( $base_url );
-		$scheme     = $parsed_url['scheme'] ?? 'https';
-		$host       = $parsed_url['host'] ?? '';
-		$path       = $parsed_url['path'] ?? '';
-		$query      = array();
-
-		// Step 3: Extract existing query params if present.
-		if ( isset( $parsed_url['query'] ) ) {
-			parse_str( $parsed_url['query'], $query );
-		}
-
-		// Step 4: Determine config.
-		$utm_config = $custom_config ?? ( $utm_key && isset( $default_config[ $utm_key ] ) ? $default_config[ $utm_key ] : array() );
-
-		// Step 5: Add UTM parameters.
-		if ( ! empty( $utm_config ) ) {
-			$query = array_merge(
-				$query,
-				array(
-					'utm_source'   => $utm_config['source'],
-					'utm_medium'   => $utm_config['medium'],
-					'utm_campaign' => $utm_config['campaign'],
-				)
-			);
-		}
-
-		// Step 6: Add affiliate if present.
-		if ( $affiliate ) {
-			$query['ref'] = $affiliate;
-		}
-
-		// Step 7: Reconstruct URL.
-		$final_url = $scheme . '://' . $host . $path;
-
-		if ( ! empty( $query ) ) {
-			$final_url .= '?' . http_build_query( $query );
-		}
-
-		return $final_url;
+	/**
+	 * Get the pricing URL.
+	 *
+	 * @param array $params Legacy campaign parameters retained for compatibility.
+	 * @return string
+	 */
+	public static function generate_utm_link( $params ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Preserve the public method signature.
+		return 'https://getwholesalex.com/pricing/';
 	}
 
 
@@ -315,132 +191,10 @@ class Xpo {
 	 * @return array
 	 */
 	public static function get_wow_products_details() {
+		// Preserve the bundle's data shape without inspecting unrelated plugins.
 		return array(
-			'products'        => array(
-				'wow_shipping' => file_exists( WP_PLUGIN_DIR . '/wow-table-rate-shipping/wow-table-rate-shipping.php' ),
-				'post_x'       => file_exists( WP_PLUGIN_DIR . '/ultimate-post/ultimate-post.php' ),
-				'wow_store'    => file_exists( WP_PLUGIN_DIR . '/product-blocks/product-blocks.php' ),
-				'wow_optin'    => file_exists( WP_PLUGIN_DIR . '/optin/optin.php' ),
-				'wow_revenue'  => file_exists( WP_PLUGIN_DIR . '/revenue/revenue.php' ),
-				'wholesale_x'  => file_exists( WP_PLUGIN_DIR . '/wholesalex/wholesalex.php' ),
-				'wow_addon'    => file_exists( WP_PLUGIN_DIR . '/product-addons/product-addons.php' ),
-				'wow_invoice'  => file_exists( WP_PLUGIN_DIR . '/wow-pdf-invoices-packing-slips/wow-pdf-invoices-packing-slips.php' ),
-
-			),
-			'products_active' => array(
-				'wow_shipping' => defined( 'WTRS_VER' ),
-				'post_x'       => defined( 'ULTP_VER' ),
-				'wow_store'    => defined( 'WOPB_VER' ),
-				'wow_optin'    => defined( 'OPTN_VERSION' ),
-				'wow_revenue'  => defined( 'REVENUE_VER' ),
-				'wholesale_x'  => defined( 'WHOLESALEX_VER' ),
-				'wow_addon'    => defined( 'PRAD_VER' ),
-				'wow_invoice'  => defined( 'WINV_VER' ),
-			),
+			'products'        => array(),
+			'products_active' => array(),
 		);
-	}
-
-
-	/**
-	 * Installs and activates a plugin by its name only.
-	 *
-	 * @param string $name The name or slug of the plugin to install and activate.
-	 */
-	public static function install_and_active_plugin( $name ) {
-		$to_r        = array( 'done' => true );
-		$plugin_slug = $name;
-		switch ( $name ) {
-			case 'wow_shipping':
-				$plugin_slug = 'wow-table-rate-shipping';
-				break;
-			case 'post_x':
-				$plugin_slug = 'ultimate-post';
-				break;
-			case 'wow_store':
-				$plugin_slug = 'product-blocks';
-				break;
-			case 'wow_optin':
-				$plugin_slug = 'optin';
-				break;
-			case 'wow_revenue':
-				$plugin_slug = 'revenue';
-				break;
-			case 'wholesale_x':
-				$plugin_slug = 'wholesalex';
-				break;
-			case 'wow_addon':
-				$plugin_slug = 'product-addons';
-				break;
-			case 'wow_invoice':
-				$plugin_slug = 'wow-pdf-invoices-packing-slips';
-				break;
-			default:
-				return false;
-		}
-
-		if ( ! file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php' ) ) {
-				$to_r = self::plugin_install( $plugin_slug . '/' . $plugin_slug . '.php', $plugin_slug );
-		} else {
-			activate_plugin( $plugin_slug . '/' . $plugin_slug . '.php' );
-		}
-		return $to_r;
-	}
-
-	/**
-	 * Installs a plugin based on the provided plugin file and slug.
-	 *
-	 * This function is expected to handle the logic required to install a plugin,
-	 * such as downloading, unpacking, and activating the plugin using the provided
-	 * plugin file and slug.
-	 *
-	 * @param string $plugin The plugin file path or identifier (e.g., 'plugin-directory/plugin-file.php').
-	 * @param string $slug   The plugin slug (typically the directory name of the plugin).
-	 */
-	public static function plugin_install( $plugin, $slug ) {
-		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-		require_once ABSPATH . 'wp-admin/includes/file.php';
-		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-
-		if ( ! class_exists( 'Plugin_Upgrader' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/class-plugin-upgrader.php';
-		}
-		if ( ! class_exists( 'WP_Ajax_Upgrader_Skin' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/class-wp-ajax-upgrader-skin.php';
-		}
-
-		$api = plugins_api(
-			'plugin_information',
-			array(
-				'slug'   => $slug,
-				'fields' => array(
-					'short_description' => false,
-					'sections'          => false,
-					'requires'          => false,
-					'rating'            => false,
-					'ratings'           => false,
-					'downloaded'        => false,
-					'last_updated'      => false,
-					'added'             => false,
-					'tags'              => false,
-					'compatibility'     => false,
-					'homepage'          => false,
-					'donate_link'       => false,
-				),
-			)
-		);
-
-		if ( is_wp_error( $api ) ) {
-			wp_send_json_error( array( 'message' => $api->get_error_message() ) );
-		}
-
-		$upgrader       = new \Plugin_Upgrader( new \WP_Ajax_Upgrader_Skin( compact( 'title', 'url', 'nonce', 'plugin', 'api' ) ) );
-		$install_result = $upgrader->install( $api->download_link );
-
-		if ( ! is_wp_error( $install_result ) ) {
-			activate_plugin( $plugin );
-			return array( 'done' => false );
-		}
-
-		return array( 'done' => true );
 	}
 }

@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve existing include paths and template overrides.
 /**
  * Abstract WholesaleX Dynamic Rule Importer
  * Inspired By WooCommerce Core Product Importer
@@ -205,7 +205,10 @@ abstract class WHOLESALEX_Dynamic_Rule_Importer implements WHOLESALEX_Importer_I
 
 			$rule = apply_filters( 'wholesalex_dynamic_rule_import_pre_insert_rule_data', $rule, $data );
 
-			wholesalex()->set_dynamic_rules( $rule['id'], $rule );
+			$result = wholesalex()->set_dynamic_rules( $rule['id'], $rule );
+			if ( is_wp_error( $result ) ) {
+				return $result;
+			}
 
 			do_action( 'wholesalex_dynamic_rule_import_inserted_rule', $rule, $data );
 

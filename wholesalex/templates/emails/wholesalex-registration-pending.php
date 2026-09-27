@@ -1,9 +1,13 @@
 <?php
+/**
+ * Wholesalex registration pending.
+ *
+ * @package WholesaleX
+ */
 
 defined( 'ABSPATH' ) || exit;
 
 $wholesalex_user = get_user_by( 'login', $user_login );
-$user_email      = $wholesalex_user->user_email; //phpcs:ignore
 
 do_action( 'woocommerce_email_header', $email_heading, $email ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook is provided by WooCommerce.
 ?>

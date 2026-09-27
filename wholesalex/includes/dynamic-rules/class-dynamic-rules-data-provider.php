@@ -149,11 +149,11 @@ class Dynamic_Rules_Data_Provider {
 			return array();
 		}
 
-		$args = array(
+		$args      = array(
 			'post_type'      => 'product',
 			'post_status'    => 'publish',
 			'posts_per_page' => $this->get_multilingual_query_limit( $limit ),
-			'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+			'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- The product picker must filter by the selected product category.
 				array(
 					'taxonomy' => 'product_cat',
 					'field'    => 'term_id',
@@ -253,7 +253,7 @@ class Dynamic_Rules_Data_Provider {
 	 * @param int|string $limit Requested limit.
 	 * @return int
 	 */
-	private function normalize_result_limit( $limit ) {
+	public function normalize_result_limit( $limit ) {
 		$limit = absint( $limit );
 
 		if ( $limit <= 0 ) {
@@ -269,7 +269,7 @@ class Dynamic_Rules_Data_Provider {
 	 * @param int $limit Public response limit.
 	 * @return int
 	 */
-	private function get_multilingual_query_limit( $limit ) {
+	public function get_multilingual_query_limit( $limit ) {
 		return min( max( $this->normalize_result_limit( $limit ) * 5, 20 ), 100 );
 	}
 
@@ -282,7 +282,7 @@ class Dynamic_Rules_Data_Provider {
 	 * @param int    $limit       Public response limit.
 	 * @return array
 	 */
-	private function collapse_translated_select_options( array $items, $object_type, $subtype, $limit ) {
+	public function collapse_translated_select_options( array $items, $object_type, $subtype, $limit ) {
 		$limit = $this->normalize_result_limit( $limit );
 
 		if ( ! apply_filters( 'wholesalex_collapse_multilingual_select_options', true, $items, $object_type, $subtype ) ) {
@@ -454,67 +454,17 @@ class Dynamic_Rules_Data_Provider {
 	 * @return array
 	 */
 	public function get_brands( $search = '', $limit = 20 ) {
-		$__final    = array();
-		$taxonomies = array( 'product_brand', 'pwb-brand', 'yith_product_brand' );
-		$taxonomy   = '';
-		foreach ( $taxonomies as $tax ) {
-			if ( taxonomy_exists( $tax ) ) {
-				$taxonomy = $tax;
-				break;
-			}
-		}
-		if ( '' === $taxonomy ) {
-			return $__final;
-		}
-		$args = array(
-			'taxonomy'   => $taxonomy,
-			'hide_empty' => false,
-			'number'     => $this->get_multilingual_query_limit( $limit ),
-		);
-		if ( '' !== $search ) {
-			$args['search'] = $search;
-		}
-		$__brands = get_terms( $args );
-		if ( is_wp_error( $__brands ) ) {
-			return array();
-		}
-		foreach ( $__brands as $brand ) {
-			$__final[] = array(
-				'value' => $brand->term_id,
-				'name'  => $brand->name,
-			);
-		}
-		return $this->collapse_translated_select_options( $__final, 'term', $taxonomy, $limit );
+		return apply_filters( 'wholesalex_legacy_brand_options', array(), $search, $limit, $this );
 	}
 
 	/**
-	 * Get WooCommerce Attributes.
+	 * Get attributes.
 	 *
-	 * @param string $search Search Keyword.
-	 * @param int    $limit  Maximum number of attributes to return.
-	 * @return array
+	 * @param string $search Search text used to filter attribute results.
+	 * @param int    $limit Maximum number of results.
 	 */
 	public function get_attributes( $search = '', $limit = 20 ) {
-		$__final      = array();
-		$__attributes = wc_get_attribute_taxonomies();
-		$limit        = $this->normalize_result_limit( $limit );
-
-		foreach ( $__attributes as $attribute ) {
-			if ( '' !== $search ) {
-				if ( false !== strpos( $attribute->attribute_label, $search ) || false !== strpos( $attribute->attribute_name, $search ) ) {
-					$__final[] = array(
-						'value' => (int) $attribute->attribute_id,
-						'name'  => $attribute->attribute_label,
-					);
-				}
-			} else {
-				$__final[] = array(
-					'value' => (int) $attribute->attribute_id,
-					'name'  => $attribute->attribute_label,
-				);
-			}
-		}
-		return array_slice( $__final, 0, $limit );
+		return apply_filters( 'wholesalex_legacy_attribute_options', array(), $search, $limit, $this );
 	}
 
 	/**
@@ -576,13 +526,13 @@ class Dynamic_Rules_Data_Provider {
 		$options    = array();
 
 		foreach ( $parent_ids as $parent_id ) {
-			$parent = wc_get_product( $parent_id );
-			if ( ! $parent instanceof \WC_Product_Variable ) {
+			$parent_product = wc_get_product( $parent_id );
+			if ( ! $parent_product instanceof \WC_Product_Variable ) {
 				continue;
 			}
 
 			$variations = array();
-			foreach ( $parent->get_children() as $variation_id ) {
+			foreach ( $parent_product->get_children() as $variation_id ) {
 				$variation = wc_get_product( $variation_id );
 				if ( ! $variation instanceof \WC_Product_Variation || 'publish' !== $variation->get_status() ) {
 					continue;
@@ -591,8 +541,8 @@ class Dynamic_Rules_Data_Provider {
 				$item = array(
 					'value'        => $variation->get_id(),
 					'product_id'   => $variation->get_id(),
-					'parent_id'    => $parent->get_id(),
-					'name'         => $this->get_role_restriction_variation_label( $variation, $parent ),
+					'parent_id'    => $parent_product->get_id(),
+					'name'         => $this->get_role_restriction_variation_label( $variation, $parent_product ),
 					'is_variation' => true,
 				);
 
@@ -608,9 +558,9 @@ class Dynamic_Rules_Data_Provider {
 			}
 
 			$group = array(
-				'value'           => 'variable:' . $parent->get_id(),
-				'product_id'      => $parent->get_id(),
-				'name'            => $parent->get_name(),
+				'value'           => 'variable:' . $parent_product->get_id(),
+				'product_id'      => $parent_product->get_id(),
+				'name'            => $parent_product->get_name(),
 				'is_group'        => true,
 				'variation_count' => count( $variations ),
 			);
@@ -697,10 +647,10 @@ class Dynamic_Rules_Data_Provider {
 	 * Build a readable child-variation label.
 	 *
 	 * @param \WC_Product_Variation $variation Variation product.
-	 * @param \WC_Product_Variable  $parent    Parent product.
+	 * @param \WC_Product_Variable  $parent_product    Parent product.
 	 * @return string
 	 */
-	private function get_role_restriction_variation_label( $variation, $parent ) {
+	private function get_role_restriction_variation_label( $variation, $parent_product ) {
 		$attributes = array();
 
 		foreach ( $variation->get_variation_attributes() as $taxonomy => $value ) {
@@ -719,7 +669,7 @@ class Dynamic_Rules_Data_Provider {
 			$attributes[] = rawurldecode( wp_strip_all_tags( (string) $value ) );
 		}
 
-		$label = implode( ' - ', array_filter( array_merge( array( $parent->get_name() ), $attributes ) ) );
+		$label = implode( ' - ', array_filter( array_merge( array( $parent_product->get_name() ), $attributes ) ) );
 
 		return $label . ' (' . $variation->get_id() . ')';
 	}
@@ -747,39 +697,7 @@ class Dynamic_Rules_Data_Provider {
 	 * @return array
 	 */
 	public function get_skus( $search = '', $limit = 30 ) {
-		global $wpdb;
-		$like    = '%' . $wpdb->esc_like( $search ) . '%';
-		$limit   = $this->normalize_result_limit( $limit );
-		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				"SELECT pm.meta_value AS sku
-				 FROM {$wpdb->postmeta} pm
-				 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-				 WHERE pm.meta_key = '_sku'
-				   AND pm.meta_value LIKE %s
-				   AND pm.meta_value != ''
-				   AND p.post_type IN ('product', 'product_variation')
-				   AND p.post_status = 'publish'
-				 GROUP BY pm.meta_value
-				 ORDER BY pm.meta_value ASC
-				 LIMIT %d",
-				$like,
-				$limit
-			)
-		);
-		$__final = array();
-		foreach ( $results as $row ) {
-			$sku = trim( (string) $row->sku );
-			if ( '' === $sku ) {
-				continue;
-			}
-
-			$__final[] = array(
-				'value' => 'sku:' . $sku,
-				'name'  => $sku,
-			);
-		}
-		return $__final;
+		return apply_filters( 'wholesalex_legacy_sku_options', array(), $search, $limit, $this );
 	}
 
 	/**
@@ -960,7 +878,7 @@ class Dynamic_Rules_Data_Provider {
 		foreach ( $available as $gateway ) {
 			if ( 'yes' === $gateway->enabled ) {
 				$gateway_title = trim( (string) $gateway->get_title() );
-				$options[] = array(
+				$options[]     = array(
 					'value' => $gateway->id,
 					'name'  => '' !== $gateway_title ? $gateway_title : $gateway->get_method_title(),
 				);
@@ -1023,14 +941,6 @@ class Dynamic_Rules_Data_Provider {
 											'shipping_rule' => __( 'Shipping Rule', 'wholesalex' ),
 											'min_order_qty' => __( 'Minimum Order Quantity', 'wholesalex' ),
 											'tax_rule' => __( 'Tax Rule', 'wholesalex' ),
-											'pro_restrict_checkout' => __( 'Checkout Restriction (Pro)', 'wholesalex' ),
-											'pro_quantity_based' => __( 'Quantity Based Discount (Pro)', 'wholesalex' ),
-											'pro_extra_charge' => __( 'Extra Charge (Pro)', 'wholesalex' ),
-											'pro_buy_x_get_y' => __( 'Buy X Get Y Free (Pro)', 'wholesalex' ),
-											'pro_max_order_qty' => __( 'Maximum Order Quantity (Pro)', 'wholesalex' ),
-											'pro_restrict_product_visibility' => __( 'Restrict Product Visibility (Pro)', 'wholesalex' ),
-											'pro_hidden_price' => __( 'Hidden Price (Pro)', 'wholesalex' ),
-											'pro_non_purchasable' => __( 'Non Purchasable (Pro)', 'wholesalex' ),
 										),
 										'rule_type'
 									),
@@ -1120,12 +1030,6 @@ class Dynamic_Rules_Data_Provider {
 											'cat_not_in_list' => __( 'Categories not in list', 'wholesalex' ),
 											'attribute_in_list' => __( 'Variations in list', 'wholesalex' ),
 											'attribute_not_in_list' => __( 'Variations not in list', 'wholesalex' ),
-											'pro_brand_in_list' => __( 'Brand in list (Pro)', 'wholesalex' ),
-											'pro_brand_not_in_list' => __( 'Brand not in list (Pro)', 'wholesalex' ),
-											'pro_att_in_list' => __( 'Attribute in list (Pro)', 'wholesalex' ),
-											'pro_att_not_in_list' => __( 'Attribute not in list (Pro)', 'wholesalex' ),
-											'sku_in_list'     => __( 'SKU in list', 'wholesalex' ),
-											'sku_not_in_list' => __( 'SKU not in list', 'wholesalex' ),
 										),
 										'product_filter'
 									),
@@ -1225,102 +1129,6 @@ class Dynamic_Rules_Data_Provider {
 									'default'     => array(),
 									'is_ajax'     => true,
 									'ajax_action' => 'get_variation_products',
-									'ajax_search' => true,
-								),
-								'brand_in_list'         => array(
-									'label'       => __( 'Select Multiple Brands', 'wholesalex' ),
-									'type'        => 'multiselect',
-									'depends_on'  => array(
-										array(
-											'key'   => '_product_filter',
-											'value' => 'brand_in_list',
-										),
-									),
-									'options'     => array(),
-									'placeholder' => apply_filters( 'wholesalex_dynamic_rules_brand_in_list_placeholder', __( 'Choose Brands to apply discounts', 'wholesalex' ) ),
-									'default'     => array(),
-									'is_ajax'     => true,
-									'ajax_action' => 'get_brands',
-									'ajax_search' => true,
-								),
-								'brand_not_in_list'     => array(
-									'label'       => __( 'Select Multiple Brands', 'wholesalex' ),
-									'type'        => 'multiselect',
-									'depends_on'  => array(
-										array(
-											'key'   => '_product_filter',
-											'value' => 'brand_not_in_list',
-										),
-									),
-									'options'     => array(),
-									'placeholder' => apply_filters( 'wholesalex_dynamic_rules_brand_not_in_list_placeholder', __( 'Choose Brands that wont apply discounts', 'wholesalex' ) ),
-									'default'     => array(),
-									'is_ajax'     => true,
-									'ajax_action' => 'get_brands',
-									'ajax_search' => true,
-								),
-								'att_in_list'           => array(
-									'label'       => __( 'Select Multiple Attributes', 'wholesalex' ),
-									'type'        => 'multiselect',
-									'depends_on'  => array(
-										array(
-											'key'   => '_product_filter',
-											'value' => 'att_in_list',
-										),
-									),
-									'options'     => array(),
-									'placeholder' => apply_filters( 'wholesalex_dynamic_rules_att_in_list_placeholder', __( 'Choose Attributes to apply discounts', 'wholesalex' ) ),
-									'default'     => array(),
-									'is_ajax'     => true,
-									'ajax_action' => 'get_attributes',
-									'ajax_search' => true,
-								),
-								'att_not_in_list'       => array(
-									'label'       => __( 'Select Multiple Attributes', 'wholesalex' ),
-									'type'        => 'multiselect',
-									'depends_on'  => array(
-										array(
-											'key'   => '_product_filter',
-											'value' => 'att_not_in_list',
-										),
-									),
-									'options'     => array(),
-									'placeholder' => apply_filters( 'wholesalex_dynamic_rules_att_not_in_list_placeholder', __( 'Choose Attributes that wont apply discounts', 'wholesalex' ) ),
-									'default'     => array(),
-									'is_ajax'     => true,
-									'ajax_action' => 'get_attributes',
-									'ajax_search' => true,
-								),
-								'sku_in_list'           => array(
-									'label'       => __( 'Select Multiple SKUs', 'wholesalex' ),
-									'type'        => 'multiselect',
-									'depends_on'  => array(
-										array(
-											'key'   => '_product_filter',
-											'value' => 'sku_in_list',
-										),
-									),
-									'options'     => array(),
-									'placeholder' => apply_filters( 'wholesalex_dynamic_rules_sku_in_list_placeholder', __( 'Search SKUs to apply discounts', 'wholesalex' ) ),
-									'default'     => array(),
-									'is_ajax'     => true,
-									'ajax_action' => 'get_skus',
-									'ajax_search' => true,
-								),
-								'sku_not_in_list'       => array(
-									'label'       => __( 'Select Multiple SKUs', 'wholesalex' ),
-									'type'        => 'multiselect',
-									'depends_on'  => array(
-										array(
-											'key'   => '_product_filter',
-											'value' => 'sku_not_in_list',
-										),
-									),
-									'options'     => array(),
-									'placeholder' => apply_filters( 'wholesalex_dynamic_rules_sku_not_in_list_placeholder', __( "Search SKUs that won't apply discounts", 'wholesalex' ) ),
-									'default'     => array(),
-									'is_ajax'     => true,
-									'ajax_action' => 'get_skus',
 									'ajax_search' => true,
 								),
 							),
@@ -1575,7 +1383,8 @@ class Dynamic_Rules_Data_Provider {
 								'_minimum_purchase_count' => array(
 									'type'        => 'number',
 									'label'       => __( 'Product Quantity (X)', 'wholesalex' ),
-									'default'     => '',
+									'default'     => 2,
+									'min'         => 2,
 									'placeholder' => '',
 									'help'        => '',
 								),
@@ -1691,8 +1500,6 @@ class Dynamic_Rules_Data_Provider {
 														'cart_total_qty' => __( 'Cart - Total Quantity', 'wholesalex' ),
 														'cart_total_value' => __( 'Cart - Total Value', 'wholesalex' ),
 														'cart_total_weight' => __( 'Cart - Total Weight', 'wholesalex' ),
-														'pro_order_count' => __( 'Lifetime Order Count (Pro)', 'wholesalex' ),
-														'pro_total_purchase' => __( 'Lifetime Purchase (Pro)', 'wholesalex' ),
 													),
 													'conditions'
 												),

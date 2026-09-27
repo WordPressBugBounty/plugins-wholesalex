@@ -9,6 +9,8 @@
 
 namespace WHOLESALEX;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * WHOLESALEX_Importer_Interface class.
  */

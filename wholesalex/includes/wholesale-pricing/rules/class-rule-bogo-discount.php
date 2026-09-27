@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve the existing loader path and public class name.
 /**
  * WholesaleX Wholesale Pricing - BOGO Discount Rule Handler
  *
@@ -118,7 +118,7 @@ class Wholesale_Pricing_Bogo_Discount {
 	 * @return void
 	 */
 	public function render_promo_html( $product, array $rules ): void {
-		echo $this->get_promo_html( $product, $rules ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses( $this->get_promo_html( $product, $rules ), $this->get_promo_allowed_html() );
 	}
 
 	/**
@@ -308,9 +308,9 @@ class Wholesale_Pricing_Bogo_Discount {
 				continue;
 			}
 
-			$product   = $cart_item['data'];
-			$group_id  = $variation_id ? $product_id : $product->get_id();
-			$quantity  = absint( $cart_item['quantity'] ?? 0 );
+			$product    = $cart_item['data'];
+			$group_id   = $variation_id ? $product_id : $product->get_id();
+			$quantity   = absint( $cart_item['quantity'] ?? 0 );
 			$unit_price = (float) $product->get_price();
 
 			if ( ! isset( $groups[ $group_id ] ) ) {
@@ -399,7 +399,7 @@ class Wholesale_Pricing_Bogo_Discount {
 			<div class="wsx-font-14"><?php echo esc_html__( 'Promotions:', 'wholesalex' ); ?></div>
 			<div class="wsx-relative">
 				<div class="wsx-font-12 wsx-bg-secondary wsx-br-md wsx-pt-4 wsx-pb-6 wsx-plr-10 wsx-color-text-reverse wsx-curser-pointer wsx-btn-icon"
-					id="<?php echo esc_attr( $button_id ); ?>" data-product-id="<?php echo esc_attr( $product_id ); ?>">
+					id="<?php echo esc_attr( $button_id ); ?>" data-wsx-promo-toggle="1" data-modal="#<?php echo esc_attr( $modal_id ); ?>" data-icon="#<?php echo esc_attr( $icon_id ); ?>" data-product-id="<?php echo esc_attr( $product_id ); ?>">
 					<?php echo esc_html( apply_filters( 'wholesalex_wholesale_pricing_bogo_promo_button_text', __( 'Get exclusive offers', 'wholesalex' ), $product, $rules ) ); ?>
 					<div class="wsx-icon" id="<?php echo esc_attr( $icon_id ); ?>" style="margin-bottom: -4px; transition: all 0.3s;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5 7.5 5 5 5-5" /></svg></div>
 				</div>
@@ -413,29 +413,67 @@ class Wholesale_Pricing_Bogo_Discount {
 				</div>
 			</div>
 		</div>
-		<script type="text/javascript">
-			(function($) {
-				'use strict';
-				const button = $('#<?php echo esc_js( $button_id ); ?>');
-				const modal = $('#<?php echo esc_js( $modal_id ); ?>');
-				const icon = $('#<?php echo esc_js( $icon_id ); ?>');
-
-				button.on('click', function(e) {
-					e.preventDefault();
-					modal.slideToggle(100);
-					icon.toggleClass('rotated').css('transform', icon.hasClass('rotated') ? 'rotate(180deg)' : 'rotate(0deg)');
-				});
-
-				$(document).on('click', function(e) {
-					if ($(e.target).closest('#<?php echo esc_js( $modal_id ); ?>, #<?php echo esc_js( $button_id ); ?>').length) {
-						return;
-					}
-					modal.hide(100);
-					icon.removeClass('rotated').css('transform', 'rotate(0deg)');
-				});
-			})(jQuery);
-		</script>
 		<?php
+		$this->enqueue_promo_toggle_script();
+	}
+
+	/**
+	 * Allowed HTML for promo markup output.
+	 *
+	 * @return array
+	 */
+	private function get_promo_allowed_html(): array {
+		$allowed                                 = wp_kses_allowed_html( 'post' );
+		$allowed['svg']                          = array(
+			'xmlns'   => true,
+			'width'   => true,
+			'height'  => true,
+			'fill'    => true,
+			'viewbox' => true,
+		);
+		$allowed['path']                         = array(
+			'stroke'          => true,
+			'stroke-linecap'  => true,
+			'stroke-linejoin' => true,
+			'stroke-width'    => true,
+			'd'               => true,
+			'fill'            => true,
+		);
+		$allowed['div']['id']                    = true;
+		$allowed['div']['data-product-id']       = true;
+		$allowed['div']['data-wsx-promo-toggle'] = true;
+		$allowed['div']['data-modal']            = true;
+		$allowed['div']['data-icon']             = true;
+		return $allowed;
+	}
+
+	/**
+	 * Register the shared promo popup toggle script.
+	 *
+	 * @return void
+	 */
+	public function enqueue_promo_toggle_script(): void {
+		if ( wp_script_is( 'wholesalex-promo-toggle', 'enqueued' ) ) {
+			return;
+		}
+		wp_register_script( 'wholesalex-promo-toggle', '', array( 'jquery' ), WHOLESALEX_VER, true );
+		wp_enqueue_script( 'wholesalex-promo-toggle' );
+		wp_add_inline_script(
+			'wholesalex-promo-toggle',
+			"jQuery(function($){
+	$(document).on('click', '[data-wsx-promo-toggle]', function(e){
+		e.preventDefault();
+		var icon = $($(this).data('icon'));
+		$($(this).data('modal')).slideToggle(100);
+		icon.toggleClass('rotated').css('transform', icon.hasClass('rotated') ? 'rotate(180deg)' : 'rotate(0deg)');
+	});
+	$(document).on('click', function(e){
+		if ($(e.target).closest('[data-wsx-promo-toggle], .wsx-dr-single-product-discounts-modal').length) { return; }
+		$('.wsx-dr-single-product-discounts-modal').hide(100);
+		$('[data-wsx-promo-toggle] .wsx-icon').removeClass('rotated').css('transform', 'rotate(0deg)');
+	});
+});"
+		);
 	}
 
 	/**
@@ -446,16 +484,16 @@ class Wholesale_Pricing_Bogo_Discount {
 	 * @return void
 	 */
 	private function render_promo_cards( \WC_Product $product, array $rules ): void {
-		?>
-		<div class="wsx-sp-bogo-discounts">
-			<div class="wsx-sp-rule-info">
-				<div class="wsx-font-14 wsx-font-medium">
-					<?php echo esc_html__( 'Buy X Get 1 Discounted', 'wholesalex' ); ?>
+		foreach ( $rules as $rule ) :
+			?>
+			<div class="wsx-sp-bogo-discounts">
+				<div class="wsx-sp-rule-info">
+					<div class="wsx-font-14 wsx-font-medium">
+						<?php echo esc_html( $rule['bogo']['heading_text'] ?? __( 'Buy X Get 1 Discounted', 'wholesalex' ) ); ?>
+					</div>
 				</div>
-			</div>
 
-			<div class="wsx-sp-discounts-cards wsx-p-4 wsx-br-sm wsx-mt-8 wsx-bg-promotion">
-				<?php foreach ( $rules as $rule ) : ?>
+				<div class="wsx-sp-discounts-cards wsx-p-4 wsx-br-sm wsx-mt-8 wsx-bg-promotion">
 					<?php
 					$min_qty      = isset( $rule['rule']['_minimum_purchase_count'] ) ? absint( $rule['rule']['_minimum_purchase_count'] ) : 1;
 					$heading_text = ! empty( $rule['bogo']['offer_text'] ) ? (string) $rule['bogo']['offer_text'] : __( '100% Off on 1 Product', 'wholesalex' );
@@ -472,10 +510,10 @@ class Wholesale_Pricing_Bogo_Discount {
 						<div class="wsx-font-18"><?php echo esc_html( $heading_text ); ?></div>
 						<div class="wsx-font-14"><?php echo esc_html( $desc ); ?></div>
 					</div>
-				<?php endforeach; ?>
+				</div>
 			</div>
-		</div>
-		<?php
+			<?php
+		endforeach;
 	}
 
 	/**
@@ -550,6 +588,7 @@ class Wholesale_Pricing_Bogo_Discount {
 	 */
 	private function get_hash_key( array $rule, int $group_id ): string {
 		return md5(
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Preserve legacy rule hash keys; the serialized value is never unserialized.
 			serialize(
 				array(
 					'id'       => $rule['id'] ?? '',
