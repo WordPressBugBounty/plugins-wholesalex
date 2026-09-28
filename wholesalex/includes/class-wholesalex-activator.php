@@ -25,6 +25,8 @@ class Activator {
 		$this->init_set_data();
 		$had_roles            = (bool) get_option( '_wholesalex_roles' );
 		$created_roles        = $this->init_roles();
+		require_once WHOLESALEX_PATH . 'includes/class-registration-page.php';
+		Registration_Page::install();
 		$default_b2b_role_id  = apply_filters( 'wholesalex_default_b2b_role_id', 'wholesalex_b2b_wholesale' );
 		$default_role_ids     = array_keys( wholesalex()->get_default_roles() );
 		$role_ids             = wholesalex()->get_roles( 'ids' );
@@ -72,7 +74,7 @@ class Activator {
 			'_settings_registration_success_message'      => __( 'Thank you for registering. Your account will be reviewed by us & approve manually. Please wait to be approved.', 'wholesalex' ),
 			'_settings_enable_separate_page_b2b'          => 'no',
 			'_settings_seperate_page_b2b'                 => get_option( 'woocommerce_myaccount_page_id' ),
-			'_settings_show_form_for_logged_in'           => 'no',
+			'_settings_show_form_for_logged_in'           => 'yes',
 			'_settings_message_for_logged_in_user'        => __( 'Sorry You Are Not Allowed To View This Form', 'wholesalex' ),
 			// Price.
 			'_settings_price_text'                        => __( 'Wholesale Price:', 'wholesalex' ),

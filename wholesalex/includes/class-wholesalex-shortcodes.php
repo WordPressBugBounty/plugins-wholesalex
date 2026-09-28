@@ -620,7 +620,7 @@ class WHOLESALEX_Shortcodes {
 	 */
 	public function registration_shortcode( $atts = array() ) {
 		if ( is_user_logged_in() && is_singular() ) {
-			$__form_view_for_logged_in_user = wholesalex()->get_setting( '_settings_show_form_for_logged_in' );
+			$__form_view_for_logged_in_user = wholesalex()->get_setting( '_settings_show_form_for_logged_in', 'yes' );
 
 			$__message_for_logged_in_user = wholesalex()->get_setting( '_settings_message_for_logged_in_user' );
 			if ( 'yes' !== $__form_view_for_logged_in_user ) {
@@ -663,7 +663,7 @@ class WHOLESALEX_Shortcodes {
 		);
 
 		if ( is_user_logged_in() && is_singular() ) {
-			$__form_view_for_logged_in_user = wholesalex()->get_setting( '_settings_show_form_for_logged_in' );
+			$__form_view_for_logged_in_user = wholesalex()->get_setting( '_settings_show_form_for_logged_in', 'yes' );
 			$__message_for_logged_in_user   = wholesalex()->get_setting( '_settings_message_for_logged_in_user' );
 			if ( 'yes' !== $__form_view_for_logged_in_user ) {
 				if ( is_admin() || ! function_exists( 'wc_add_notice' ) || ! function_exists( 'wc_print_notices' ) ) {
@@ -702,7 +702,7 @@ class WHOLESALEX_Shortcodes {
 	 */
 	public function login_shortcode( $atts = array() ) {
 		if ( is_user_logged_in() && is_singular() ) {
-			$__form_view_for_logged_in_user = wholesalex()->get_setting( '_settings_show_form_for_logged_in' );
+			$__form_view_for_logged_in_user = wholesalex()->get_setting( '_settings_show_form_for_logged_in', 'yes' );
 			$__message_for_logged_in_user   = wholesalex()->get_setting( '_settings_message_for_logged_in_user' );
 			if ( 'yes' !== $__form_view_for_logged_in_user ) {
 				if ( is_admin() || ! function_exists( 'wc_add_notice' ) || ! function_exists( 'wc_print_notices' ) ) {

@@ -524,7 +524,7 @@ class Settings {
 							'label'   => __( 'Show Registration Form For Logged In User', 'wholesalex' ),
 							'desc'    => __( 'Click on the check box if you want to show registration form logged in users.', 'wholesalex' ),
 							'help'    => '',
-							'default' => 'no',
+							'default' => 'yes',
 						),
 						'_settings_redirect_url_registration' => array(
 							'type'        => 'text',

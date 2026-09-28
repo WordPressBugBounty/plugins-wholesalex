@@ -1927,6 +1927,7 @@ class Functions {
 			case 'wholesalex-settings':
 			case 'wholesalex-users':
 			case 'wholesalex-addons':
+			case 'wholesalex-pro-features':
 			case 'wholesalex_role':
 			case 'wholesalex-email':
 			case 'wholesalex_wholesale_pricing':

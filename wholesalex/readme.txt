@@ -4,7 +4,7 @@ Tags: b2b, wholesale pricing, private store, woocommerce wholesale, hide prices
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.1.2
+Stable tag: 3.1.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -259,6 +259,10 @@ Yes. You can set a start date, end date, or both for a wholesale pricing rule. T
 4. Registration Form Builder
 
 == Changelog ==
+
+= 3.1.3 – 28 September 2026 =
+* New: Added a managed registration page for improved registration page handling.
+* Improvement: Enhanced the Registration Form Builder UI, save states, and default visibility settings.
 
 = 3.1.2 – 27 September 2026 =
 * Fix: Prevented the built-in B2C and Guest user role names from being changed, including through direct requests. 

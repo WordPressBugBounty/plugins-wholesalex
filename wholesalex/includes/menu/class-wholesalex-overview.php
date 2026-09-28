@@ -161,6 +161,18 @@ class WHOLESALEX_Overview {
 			),
 		);
 
+		if ( ! function_exists( 'wholesalex_pro' ) || ! wholesalex_pro()->is_active() ) {
+			$submenus[] = array(
+				'title'      => __( 'Pro Features', 'wholesalex' ),
+				'menu_title' => __( 'Pro Features', 'wholesalex' ),
+				'capability' => $manage_options_cap,
+				'slug'       => '/pro-features',
+				'menu_slug'  => 'wholesalex-pro-features',
+				'callback'   => array( $this, 'output' ),
+				'identifier' => 'pro_features',
+			);
+		}
+
 		$submenus[] = array(
 			'title'      => __( 'Dynamic Rules', 'wholesalex' ),
 			'menu_title' => __( 'Dynamic Rules', 'wholesalex' ),
@@ -235,6 +247,7 @@ class WHOLESALEX_Overview {
 				'wholesalex_role'               => '/user-role',
 				'wholesalex-registration'       => '/registration',
 				'wholesalex-addons'             => '/addons',
+				'wholesalex-pro-features'       => '/pro-features',
 				'wholesalex-users'              => '/users',
 				'wholesalex-settings'           => '/settings',
 				'wholesalex-our-products'       => '/our-products',
@@ -281,6 +294,7 @@ class WHOLESALEX_Overview {
 				'/user-role'                 => __( 'User Roles', 'wholesalex' ),
 				'/registration'              => __( 'Registration Form', 'wholesalex' ),
 				'/addons'                    => __( 'Addons', 'wholesalex' ),
+				'/pro-features'              => __( 'Pro Features', 'wholesalex' ),
 				'/users'                     => __( 'Users', 'wholesalex' ),
 				'/settings'                  => __( 'Settings', 'wholesalex' ),
 				'/our-products'              => __( 'Wpxpo Plugins', 'wholesalex' ),
