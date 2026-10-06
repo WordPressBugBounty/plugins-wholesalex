@@ -127,12 +127,17 @@ class WHOLESALEX_Product {
 				}
 			}
 		}
+		$has_saved_tiers = array();
+		foreach ( array_keys( $discounts ) as $product_id ) {
+			$has_saved_tiers[ $product_id ] = wholesalex()->has_saved_page_tiers( 'product', $product_id );
+		}
 		wp_localize_script(
 			'wholesalex_product',
 			'wholesalex_single_product',
 			array(
-				'fields'    => self::get_product_fields(),
-				'discounts' => $discounts,
+				'fields'          => self::get_product_fields(),
+				'discounts'       => $discounts,
+				'has_saved_tiers' => $has_saved_tiers,
 			),
 		);
 
@@ -653,30 +658,35 @@ class WHOLESALEX_Product {
 	 * @return string stock status
 	 */
 	public function b2b_get_stock_status( $stock_status, $product ) {
+		if ( $product->managing_stock() ) {
+			return $this->get_customer_managed_stock_status( $product );
+		}
 
 		if ( wholesalex()->is_active_b2b_user() ) {
-
-			if ( $product->get_manage_stock() ) {
-				// Manage Stock Enabled.
-
-				if ( ! intval( $product->get_stock_quantity() ) ) {
-					$stock_status = 'outofstock';
-				}
-
-				if ( 'no' !== $product->get_backorders() ) {
-					$stock_status = 'instock'; // For allowing backorder.
-				}
-			} else {
-				// Manage Stock Disabled.
-				$stock_status = get_post_meta( $product->get_id(), 'wholesalex_b2b_stock_status', true );
-			}
-
-			if ( empty( $stock_status ) ) {
-				$stock_status = 'instock';
-			}
+			$b2b_status = get_post_meta( $product->get_id(), 'wholesalex_b2b_stock_status', true );
+			$stock_status = ! empty( $b2b_status ) ? $b2b_status : 'instock';
 		}
 
 		return $stock_status;
+	}
+
+	/**
+	 * Resolve availability using the current customer's stock and backorder policy.
+	 *
+	 * Stored stock status can reflect a different customer's policy after a save.
+	 * Use the filtered getters so shared, separate and inherited stock agree with
+	 * WooCommerce's availability HTML, variation data and cart validation.
+	 *
+	 * @param \WC_Product $product Product with managed stock.
+	 * @return string
+	 */
+	private function get_customer_managed_stock_status( $product ) {
+		$threshold = abs( (float) get_option( 'woocommerce_notify_no_stock_amount', 0 ) );
+		if ( (float) $product->get_stock_quantity() > $threshold ) {
+			return 'instock';
+		}
+
+		return $product->backorders_allowed() ? 'onbackorder' : 'outofstock';
 	}
 
 	/**
@@ -710,7 +720,10 @@ class WHOLESALEX_Product {
 
 		if ( wholesalex()->is_active_b2b_user() ) {
 			$product_id = $product->get_id();
-			$status     = get_post_meta( $product_id, 'wholesalex_b2b_backorders', true );
+			$b2b_backorders = get_post_meta( $product_id, 'wholesalex_b2b_backorders', true );
+			if ( in_array( $b2b_backorders, array( 'no', 'yes', 'notify' ), true ) ) {
+				$status = $b2b_backorders;
+			}
 		}
 		return $status;
 	}
@@ -723,50 +736,7 @@ class WHOLESALEX_Product {
 	 * @return string stock status.
 	 */
 	public function b2b_variation_get_stock_status( $stock_status, $product ) {
-
-		if ( wholesalex()->is_active_b2b_user() ) {
-
-			$manage_stock = $product->get_manage_stock();
-
-			if ( true === $manage_stock ) {
-				// Variation manages its own stock.
-
-				if ( ! intval( $product->get_stock_quantity() ) ) {
-					$stock_status = 'outofstock';
-				}
-
-				if ( 'no' !== $product->get_backorders() ) {
-					$stock_status = 'instock'; // For allowing backorder.
-				}
-			} elseif ( 'parent' === $manage_stock ) {
-				// Variation inherits stock from the parent product.
-				// Read B2B stock settings directly from the parent to avoid incorrectly
-				// using per-variation meta that is never set for parent-managed variations.
-				$parent_id                 = $product->get_parent_id();
-				$separate_b2b_stock_status = get_post_meta( $parent_id, 'wholesalex_b2b_separate_stock_status', true );
-
-				if ( 'yes' === $separate_b2b_stock_status ) {
-					$b2b_qty        = intval( get_post_meta( $parent_id, 'wholesalex_b2b_stock', true ) );
-					$b2b_backorders = get_post_meta( $parent_id, 'wholesalex_b2b_backorders', true );
-
-					if ( $b2b_qty > 0 ) {
-						$stock_status = 'instock';
-					} elseif ( 'yes' === $b2b_backorders || 'notify' === $b2b_backorders ) {
-						$stock_status = 'onbackorder';
-					} else {
-						$stock_status = 'outofstock';
-					}
-				}
-			} else {
-				// Manage Stock Disabled.
-				$stock_status = get_post_meta( $product->get_id(), 'wholesalex_b2b_stock_status', true );
-			}
-
-			if ( empty( $stock_status ) ) {
-				$stock_status = 'instock';
-			}
-		}
-		return $stock_status;
+		return $this->b2b_get_stock_status( $stock_status, $product );
 	}
 
 	/**
@@ -1466,12 +1436,17 @@ class WHOLESALEX_Product {
 				}
 			}
 		}
+		$has_saved_tiers = array();
+		foreach ( array_keys( $discounts ) as $product_id ) {
+			$has_saved_tiers[ $product_id ] = wholesalex()->has_saved_page_tiers( 'product', $product_id );
+		}
 		wp_localize_script(
 			'wholesalex_product',
 			'wholesalex_single_product',
 			array(
-				'fields'    => self::get_product_fields(),
-				'discounts' => $discounts,
+				'fields'          => self::get_product_fields(),
+				'discounts'       => $discounts,
+				'has_saved_tiers' => $has_saved_tiers,
 			),
 		);
 		?>
@@ -1709,7 +1684,7 @@ class WHOLESALEX_Product {
 									'type'    => 'select',
 									'label'   => __( 'Hide B2B Role and Users', 'wholesalex' ),
 									'options' => array(
-										''              => __( 'Choose Options...', 'wholesalex' ),
+										''              => __( '- Select Role -', 'wholesalex' ),
 										'b2b_all'       => __( 'All B2B Users', 'wholesalex' ),
 										'b2b_specific'  => __( 'Specific B2B Roles', 'wholesalex' ),
 										'user_specific' => __( 'Specific Register Users', 'wholesalex' ),

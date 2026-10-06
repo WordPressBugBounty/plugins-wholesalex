@@ -125,112 +125,13 @@ class WholesaleX_CommonUtils {
 	}
 
 	/**
-	 * Get Form Builder Theme Appearance Colors
+	 * Get the default registration form colors.
 	 *
-	 * @param string $theme Theme key.
 	 * @return array
 	 */
-	public static function get_form_builder_theme_appearance_colors( $theme = 'classic' ) {
-		$themes = array(
-			'classic' => array(
-				'signup' => array(
-					'primaryColor'    => '#111111',
-					'textPrimary'     => '#111111',
-					'textSecondary'   => '#707070',
-					'background'      => '#ffffff',
-					'borderColor'     => '#e0e0e0',
-					'inputBackground' => '#ffffff',
-					'buttonText'      => '#ffffff',
-					'link'            => '#6c6cff',
-					'containerColor'  => '#ffffff',
-				),
-				'login'  => array(
-					'primaryColor'    => '#111111',
-					'textPrimary'     => '#111111',
-					'textSecondary'   => '#707070',
-					'background'      => '#ffffff',
-					'borderColor'     => '#e0e0e0',
-					'inputBackground' => '#ffffff',
-					'buttonText'      => '#ffffff',
-					'link'            => '#6c6cff',
-					'containerColor'  => '#ffffff',
-				),
-			),
-			'purple'  => array(
-				'signup' => array(
-					'primaryColor'    => '#6c6cff',
-					'textPrimary'     => '#ffffff',
-					'textSecondary'   => '#d8d8ff',
-					'background'      => '#6c6cff',
-					'borderColor'     => '#8d8dff',
-					'inputBackground' => '#8484ff',
-					'buttonText'      => '#6c6cff',
-					'link'            => '#d8d8ff',
-					'containerColor'  => '#ffffff',
-				),
-				'login'  => array(
-					'primaryColor'    => '#6c6cff',
-					'textPrimary'     => '#6c6cff',
-					'textSecondary'   => '#6c6e77',
-					'background'      => '#ffffff',
-					'borderColor'     => '#d6d6ff',
-					'inputBackground' => '#d6d6ff',
-					'buttonText'      => '#ffffff',
-					'link'            => '#6c6cff',
-					'containerColor'  => '#ffffff',
-				),
-			),
-			'blue'    => array(
-				'signup' => array(
-					'primaryColor'    => '#0051d4',
-					'textPrimary'     => '#ffffff',
-					'textSecondary'   => '#9dc2ff',
-					'background'      => '#0051d4',
-					'borderColor'     => '#ffffff',
-					'inputBackground' => '#296ddb',
-					'buttonText'      => '#ffffff',
-					'link'            => '#d7e6ff',
-					'containerColor'  => '#ffffff',
-				),
-				'login'  => array(
-					'primaryColor'    => '#0051d4',
-					'textPrimary'     => '#ffffff',
-					'textSecondary'   => '#9dc2ff',
-					'background'      => '#0051d4',
-					'borderColor'     => '#ffffff',
-					'inputBackground' => '#296ddb',
-					'buttonText'      => '#ffffff',
-					'link'            => '#d7e6ff',
-					'containerColor'  => '#ffffff',
-				),
-			),
-			'black'   => array(
-				'signup' => array(
-					'primaryColor'    => '#141516',
-					'textPrimary'     => '#f5f5f5',
-					'textSecondary'   => '#c8c8d6',
-					'background'      => '#141516',
-					'borderColor'     => '#343a46',
-					'inputBackground' => '#222222',
-					'buttonText'      => '#141516',
-					'link'            => '#c8c8d6',
-					'containerColor'  => '#f4f4f4',
-				),
-				'login'  => array(
-					'primaryColor'    => '#141516',
-					'textPrimary'     => '#141516',
-					'textSecondary'   => '#656565',
-					'background'      => '#ffffff',
-					'borderColor'     => '#656565',
-					'inputBackground' => '#ededed',
-					'buttonText'      => '#ffffff',
-					'link'            => '#141516',
-					'containerColor'  => '#f4f4f4',
-				),
-			),
-		);
-
-		return isset( $themes[ $theme ] ) ? $themes[ $theme ] : $themes['classic'];
+	public static function get_form_builder_default_appearance_colors() {
+		$template = json_decode( file_get_contents( __DIR__ . '/data/registration-template-1.json' ), true );
+		return $template['style']['appearance']['defaultAdvancedColors'];
 	}
 
 		/**
@@ -400,7 +301,7 @@ class WholesaleX_CommonUtils {
 								'label'       => '#343A46',
 								'text'        => '#343A46',
 								'background'  => '#FFF',
-								'border'      => '#6C6CFF',
+								'border'      => '#111111',
 								'placeholder' => '#6C6E77',
 							),
 							'warning' =>
@@ -427,7 +328,7 @@ class WholesaleX_CommonUtils {
 								'label'       => '#343A46',
 								'text'        => '#343A46',
 								'background'  => '#FFF',
-								'border'      => '#6C6CFF',
+								'border'      => '#111111',
 								'placeholder' => '#6C6E77',
 							),
 							'warning' =>
@@ -447,13 +348,13 @@ class WholesaleX_CommonUtils {
 							'normal' =>
 							array(
 								'text'       => '#fff',
-								'background' => '#6C6CFF',
+								'background' => '#111111',
 								'border'     => '',
 							),
 							'hover'  =>
 							array(
 								'text'       => '#fff',
-								'background' => '#1a1ac3',
+								'background' => '#333333',
 								'border'     => '',
 							),
 						),
@@ -462,13 +363,13 @@ class WholesaleX_CommonUtils {
 							'normal' =>
 							array(
 								'text'       => '#fff',
-								'background' => '#6C6CFF',
+								'background' => '#111111',
 								'border'     => '',
 							),
 							'hover'  =>
 							array(
 								'text'       => '#fff',
-								'background' => '#1a1ac3',
+								'background' => '#333333',
 								'border'     => '',
 							),
 						),
@@ -566,7 +467,7 @@ class WholesaleX_CommonUtils {
 				),
 				'appearance'  =>
 				array(
-					'advancedColors' => self::get_form_builder_theme_appearance_colors( 'classic' ),
+					'advancedColors' => self::get_form_builder_default_appearance_colors(),
 					'container'      => array(
 						'color' => '#ffffff',
 					),
@@ -635,7 +536,53 @@ class WholesaleX_CommonUtils {
 			$form_data = json_decode( $new_form, true );
 		}
 
-		return is_array( $form_data ) ? $form_data : $default_form;
+		$form_data = is_array( $form_data ) ? $form_data : $default_form;
+		$original_form_data = $form_data;
+		$form_data = self::normalize_default_registration_template( $form_data );
+		if ( ( $new_form && is_array( json_decode( $new_form, true ) ) && $original_form_data !== $form_data ) || ( ! $new_form && is_array( $old_form ) ) ) {
+			update_option( 'wholesalex_registration_form', wp_json_encode( $form_data ) );
+		}
+
+		return $form_data;
+	}
+
+	/**
+	 * Convert legacy template designs while preserving form content and settings.
+	 *
+	 * @param array $form_data Form builder configuration.
+	 * @return array
+	 */
+	public static function normalize_default_registration_template( $form_data ) {
+		$form_data['settings'] = isset( $form_data['settings'] ) && is_array( $form_data['settings'] ) ? $form_data['settings'] : array();
+		if ( 'premade_1' !== ( $form_data['settings']['premadeTemplate'] ?? '' ) ) {
+			$template = json_decode( file_get_contents( __DIR__ . '/data/registration-template-1.json' ), true );
+			foreach ( array_keys( $form_data['settings'] ) as $key ) {
+				if ( 0 === strpos( $key, 'appearance_' ) ) {
+					unset( $form_data['settings'][ $key ] );
+				}
+			}
+			$form_data['settings'] = array_merge( $form_data['settings'], $template['settings'] );
+			$form_data['style'] = $template['style'];
+			foreach ( array( 'registrationFormHeader', 'loginFormHeader' ) as $key ) {
+				$form_data[ $key ] = isset( $form_data[ $key ] ) && is_array( $form_data[ $key ] ) ? $form_data[ $key ] : array();
+				$form_data[ $key ]['styles'] = $template[ $key ]['styles'];
+			}
+		}
+		if ( 3 !== ( $form_data['settings']['appearance_colorDefaultsVersion'] ?? null ) || isset( $form_data['settings']['appearance_colorTheme'] ) ) {
+			$template = json_decode( file_get_contents( __DIR__ . '/data/registration-template-1.json' ), true );
+			// Existing Classic forms keep their custom colors; retired palettes receive Classic defaults once.
+			if ( 'classic' !== ( $form_data['settings']['appearance_colorTheme'] ?? '' ) ) {
+				$form_data['style']['color'] = $template['style']['color'];
+				$form_data['style']['appearance']['advancedColors'] = $template['style']['appearance']['advancedColors'];
+				$form_data['style']['appearance']['container']['color'] = $template['style']['appearance']['container']['color'];
+			}
+			$form_data['style']['appearance']['defaultAdvancedColors'] = $template['style']['appearance']['defaultAdvancedColors'];
+			$form_data['settings']['appearance_colorDefaultsVersion'] = 3;
+		}
+		unset( $form_data['settings']['appearance_colorTheme'] );
+		$form_data['settings']['inputStyle'] = 'variation_1';
+		$form_data['settings']['inputVariation'] = 'variation_1';
+		return $form_data;
 	}
 
 	/**

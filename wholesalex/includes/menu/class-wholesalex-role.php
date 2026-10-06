@@ -595,20 +595,6 @@ class WHOLESALEX_Role {
 									'help'     => __( 'The global registration approval method is configured in the Registration Form settings. Override it here only for this role.', 'wholesalex' ),
 									'excludes' => apply_filters( 'wholesalex_exclude_regi_form_field', array( 'wholesalex_guest' ) ),
 								),
-								'after_login_redirect' => array(
-									'type'     => 'url',
-									'label'    => __( 'Redirected to Page URL (After Login)', 'wholesalex' ),
-									'help'     => '',
-									'default'  => wholesalex()->get_setting( '_settings_redirect_url_login' ),
-									'excludes' => apply_filters( 'wholesalex_exclude_regi_form_field', array( 'wholesalex_guest', 'wholesalex_b2c_users' ) ),
-								),
-								'after_registration_redirect' => array(
-									'type'     => 'url',
-									'label'    => __( 'Redirected to Page URL (After Registration)', 'wholesalex' ),
-									'help'     => '',
-									'default'  => wholesalex()->get_setting( '_settings_redirect_url_registration' ),
-									'excludes' => apply_filters( 'wholesalex_exclude_regi_form_field', array( 'wholesalex_guest', 'wholesalex_b2c_users' ) ),
-								),
 							),
 						),
 						'display_prices_section'       => array(

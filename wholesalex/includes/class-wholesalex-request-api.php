@@ -35,12 +35,12 @@ class WHOLESALEX_Request_API {
 		}
 		$addon_name  = isset( $_POST['addon'] ) ? sanitize_text_field( wp_unslash( $_POST['addon'] ) ) : '';
 		$addon_value = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
-		if ( 'wsx_addon_recaptcha' === $addon_name ) {
+		if ( 'wsx_addon_recaptcha' === $addon_name && 'yes' === $addon_value ) {
 			$__site_key   = wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' );
 			$__secret_key = wholesalex()->get_setting( '_settings_google_recaptcha_v3_secret_key' );
 			if ( empty( $__site_key ) || empty( $__secret_key ) ) {
 				/* translators: %s: Plugin name. */
-				wp_send_json_error( sprintf( __( 'Please Set Site Key and Secret Key Before Enable Recaptcha (Path: Dashboard > %s > Settings > Recaptcha)', 'wholesalex' ), wholesalex()->get_plugin_name() ) );
+				wp_send_json_error( __( 'Enter both reCAPTCHA keys in Registration Form > Form Settings before enabling reCAPTCHA.', 'wholesalex' ) );
 			}
 		}
 		do_action( 'wholesalex_' . $addon_name . '_before_status_update', $addon_value );

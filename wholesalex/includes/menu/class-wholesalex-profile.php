@@ -135,9 +135,10 @@ class WHOLESALEX_Profile {
 			);
 			wp_send_json_success(
 				array(
-					'default'  => $this->get_profile_fields(),
-					'tiers'    => $__tiers,
-					'settings' => array_merge(
+					'default'         => $this->get_profile_fields(),
+					'tiers'           => $__tiers,
+					'has_saved_tiers' => wholesalex()->has_saved_page_tiers( 'profile', $user_id ),
+					'settings'        => array_merge(
 						is_array( $__user_settings ) ? $__user_settings : array(),
 						is_array( $__role_settings ) ? $__role_settings : array()
 					),
@@ -905,7 +906,7 @@ class WHOLESALEX_Profile {
 	 */
 	public function get_profile_fields() {
 		// Roles Options.
-		$__roles_options = wholesalex()->get_roles( 'mapped_roles' );
+		$__roles_options = wholesalex()->get_roles( 'store_mode_mapped_roles' );
 		unset( $__roles_options['wholesalex_guest'] );
 
 		$fields = apply_filters(

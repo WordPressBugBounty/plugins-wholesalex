@@ -94,17 +94,6 @@ class Addons {
 					return $response;
 				}
 
-				if ( 'wsx_addon_recaptcha' === $addon_name && 'yes' === $addon_value ) {
-					$__site_key   = wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' );
-					$__secret_key = wholesalex()->get_setting( '_settings_google_recaptcha_v3_secret_key' );
-					if ( empty( $__site_key ) || empty( $__secret_key ) ) {
-						$response['status'] = false;
-						/* translators: %s: Plugin name. */
-						$response['data'] = sprintf( __( 'Please Set Site Key and Secret Key Before Enable Recaptcha (Path: Dashboard > %s > Settings > Recaptcha)', 'wholesalex' ), wholesalex()->get_plugin_name() );
-						return $response;
-					}
-				}
-
 				// $addon_name is validated above against the known addons config, so it is safe to use in the dynamic hook names below.
 				do_action( 'wholesalex_' . $addon_name . '_before_status_update', $addon_value );
 				$error = apply_filters( 'wholesalex_' . $addon_name . '_error', '', $addon_value );
@@ -288,25 +277,11 @@ class Addons {
 			'live'                => '',
 			'is_pro'              => true,
 			'is_different_plugin' => false,
-			'eligible_price_ids'  => array( '3', '6', '7' ),
+			'eligible_price_ids'  => array( '1', '2', '3', '4', '5', '6', '7' ),
 			'status'              => wholesalex()->get_setting( 'wsx_addon_whitelabel' ),
 			'lock_status'         => true,
 			'setting_id'          => '#whitelabel',
 			'video'               => 'https://www.youtube.com/embed/xMTJYQFbWEw',
-		);
-
-		$config['wsx_addon_recaptcha'] = array(
-			'name'        => __( 'reCAPTCHA', 'wholesalex' ),
-			'desc'        => __( 'Protect your website from suspicious login attempts by adding an extra layer of security with Google reCAPTCHA v3.', 'wholesalex' ),
-			'img'         => WHOLESALEX_URL . 'assets/img/addons/recaptcha.svg',
-			'docs'        => 'https://getwholesalex.com/docs/wholesalex/add-on/recaptcha/',
-			'live'        => '',
-			'is_pro'      => false,
-			'moreFeature' => 'https://getwholesalex.com/docs/wholesalex/add-on/recaptcha/',
-			'video'       => 'https://www.youtube.com/',
-			'status'      => wholesalex()->get_setting( 'wsx_addon_recaptcha' ),
-			'setting_id'  => '#recaptcha',
-			'lock_status' => false,
 		);
 
 		$config['wsx_addon_dokan_integration'] = array(

@@ -10,6 +10,7 @@
  *   POST /wholesalex/v1/wholesale_pricing_action
  *       action = wholesale_pricing_action  (type=get) → list all rules
  *       action = save_wholesale_pricing_rule           → create / update
+ *       action = trash_wholesale_pricing_rule          → archive and remove single
  *       action = delete_wholesale_pricing_rule         → delete single
  *       action = bulk_delete_wholesale_pricing_rules   → bulk delete
  *       action = bulk_set_wholesale_pricing_status     → bulk enable/disable
@@ -517,6 +518,9 @@ class Wholesale_Pricing_Rest_Api {
 			case 'save_wholesale_pricing_rule':
 				return $this->handle_save( $params );
 
+			case 'trash_wholesale_pricing_rule':
+				return $this->handle_delete( $params, true );
+
 			case 'delete_wholesale_pricing_rule':
 				return $this->handle_delete( $params );
 
@@ -679,6 +683,7 @@ class Wholesale_Pricing_Rest_Api {
 		}
 
 		if (
+			'active' === $sanitized['status'] &&
 			'product_discount' === ( $sanitized['rule_type'] ?? '' ) &&
 			(
 				! is_numeric( $sanitized['product_discount']['amount'] ?? null ) ||
@@ -705,12 +710,12 @@ class Wholesale_Pricing_Rest_Api {
 	}
 
 	/**
-	 * Delete a single rule.
+	 * Delete a single rule, optionally retaining a recoverable trash copy.
 	 *
 	 * @param array $params Raw request params.
 	 * @return \WP_REST_Response
 	 */
-	private function handle_delete( array $params ) {
+	private function handle_delete( array $params, bool $trash = false ) {
 		$id = isset( $params['id'] ) ? sanitize_text_field( $params['id'] ) : '';
 
 		if ( empty( $id ) ) {
@@ -727,12 +732,21 @@ class Wholesale_Pricing_Rest_Api {
 			return $this->forbidden_rule_response();
 		}
 
+		if ( $trash ) {
+			// Keep a recoverable copy outside the rules used for storefront pricing.
+			$trash_key = '__wholesalex_trashed_pricing_rule_' . $id;
+			$archived  = array( 'rule' => $rule, 'trashed_at' => time() );
+			if ( ! update_option( $trash_key, $archived, false ) && get_option( $trash_key ) !== $archived ) {
+				return rest_ensure_response( array( 'success' => false, 'message' => __( 'Failed to move pricing rule to trash.', 'wholesalex' ) ) );
+			}
+		}
+
 		Wholesale_Pricing::delete_rule( $id );
 
 		return rest_ensure_response(
 			array(
 				'success' => true,
-				'message' => __( 'Rule deleted.', 'wholesalex' ),
+				'message' => $trash ? __( 'Rule moved to trash.', 'wholesalex' ) : __( 'Rule deleted.', 'wholesalex' ),
 			)
 		);
 	}

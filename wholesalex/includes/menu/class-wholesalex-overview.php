@@ -28,6 +28,7 @@ class WHOLESALEX_Overview {
 		add_action( 'rest_api_init', array( $this, 'overview_callback' ) );
 		add_action( 'admin_menu', array( $this, 'go_pro_menu_page' ), 99999 );
 		add_action( 'admin_head', array( $this, 'admin_upgrade_menu_styles' ) );
+		add_action( 'admin_footer', array( $this, 'admin_upgrade_menu_new_tab' ) );
 		add_action( 'admin_head', array( $this, 'admin_menu_active_styles' ) );
 
 		add_filter( 'wholesalex_capability_access', array( $this, 'wholesalex_menus_access' ) );
@@ -115,19 +116,10 @@ class WHOLESALEX_Overview {
 				'identifier' => 'registration',
 			),
 			array(
-				'title'      => __( 'Addons', 'wholesalex' ),
-				'menu_title' => __( 'Addons', 'wholesalex' ),
+				'title'      => __( 'Customers', 'wholesalex' ),
+				'menu_title' => __( 'Customers', 'wholesalex' ),
 				'capability' => $manage_options_cap,
-				'slug'       => '/addons',
-				'menu_slug'  => apply_filters( 'wholesalex_addons_submenu_slug', 'wholesalex-addons' ),
-				'callback'   => array( $this, 'output' ),
-				'identifier' => 'addons',
-			),
-			array(
-				'title'      => __( 'Users', 'wholesalex' ),
-				'menu_title' => __( 'Users', 'wholesalex' ),
-				'capability' => $manage_options_cap,
-				'slug'       => '/users',
+				'slug'       => '/customers',
 				'menu_slug'  => 'wholesalex-users',
 				'callback'   => array( $this, 'output' ),
 				'identifier' => 'users',
@@ -142,8 +134,8 @@ class WHOLESALEX_Overview {
 				'identifier' => 'settings',
 			),
 			array(
-				'title'      => __( 'Wpxpo Plugins', 'wholesalex' ),
-				'menu_title' => __( 'WPXPO Plugins', 'wholesalex' ),
+				'title'      => __( 'Plugins', 'wholesalex' ),
+				'menu_title' => __( 'Plugins', 'wholesalex' ),
 				'capability' => $manage_options_cap,
 				'slug'       => '/our-products',
 				'menu_slug'  => 'wholesalex-our-products',
@@ -173,15 +165,18 @@ class WHOLESALEX_Overview {
 			);
 		}
 
-		$submenus[] = array(
-			'title'      => __( 'Dynamic Rules', 'wholesalex' ),
-			'menu_title' => __( 'Dynamic Rules', 'wholesalex' ),
-			'capability' => $manage_options_cap,
-			'slug'       => '/dynamic-rules',
-			'menu_slug'  => apply_filters( 'wholesalex_dynamic_rules_submenu_slug', 'wholesalex_dynamic_rules' ),
-			'callback'   => array( $this, 'output' ),
-			'identifier' => 'dynamic_rules',
-		);
+		$dynamic_rules_access = wholesalex()->get_dynamic_rules_access();
+		if ( ! empty( $dynamic_rules_access['can_view'] ) ) {
+			$submenus[] = array(
+				'title'      => __( 'Dynamic Rules', 'wholesalex' ),
+				'menu_title' => __( 'Dynamic Rules', 'wholesalex' ),
+				'capability' => $manage_options_cap,
+				'slug'       => '/dynamic-rules',
+				'menu_slug'  => apply_filters( 'wholesalex_dynamic_rules_submenu_slug', 'wholesalex_dynamic_rules' ),
+				'callback'   => array( $this, 'output' ),
+				'identifier' => 'dynamic_rules',
+			);
+		}
 
 		if ( 'yes' === $is_role_switcher_option_enable ) {
 			$submenus[] = array(
@@ -216,6 +211,19 @@ class WHOLESALEX_Overview {
 
 		foreach ( $submenus as $submenu ) {
 			$submenu_slug = isset( $submenu['menu_slug'] ) ? $submenu['menu_slug'] : $submenu['slug'];
+			if ( isset( $submenu['identifier'] ) && 'users' === $submenu['identifier'] && current_user_can( $submenu['capability'] ) ) {
+				$pending_count = (int) $this->get_new_registrations_count();
+				if ( $pending_count > 0 ) {
+					$formatted_count = number_format_i18n( $pending_count );
+					$submenu['menu_title'] .= sprintf(
+						' <span class="update-plugins count-%1$d"><span class="plugin-count" aria-hidden="true">%2$s</span><span class="screen-reader-text">%3$s</span></span>',
+						$pending_count,
+						esc_html( $formatted_count ),
+						/* translators: %s: Number of pending customers. */
+						esc_html( sprintf( _n( '%s pending customer', '%s pending customers', $pending_count, 'wholesalex' ), $formatted_count ) )
+					);
+				}
+			}
 			add_submenu_page(
 				wholesalex()->get_menu_slug(),
 				$submenu['title'],
@@ -246,9 +254,8 @@ class WHOLESALEX_Overview {
 				'wholesalex_dynamic_rules'      => '/dynamic-rules',
 				'wholesalex_role'               => '/user-role',
 				'wholesalex-registration'       => '/registration',
-				'wholesalex-addons'             => '/addons',
 				'wholesalex-pro-features'       => '/pro-features',
-				'wholesalex-users'              => '/users',
+				'wholesalex-users'              => '/customers',
 				'wholesalex-settings'           => '/settings',
 				'wholesalex-our-products'       => '/our-products',
 				'wholesalex-analytics'          => '/analytics',
@@ -293,11 +300,10 @@ class WHOLESALEX_Overview {
 				'/dynamic-rules'             => __( 'Dynamic Rules', 'wholesalex' ),
 				'/user-role'                 => __( 'User Roles', 'wholesalex' ),
 				'/registration'              => __( 'Registration Form', 'wholesalex' ),
-				'/addons'                    => __( 'Addons', 'wholesalex' ),
 				'/pro-features'              => __( 'Pro Features', 'wholesalex' ),
-				'/users'                     => __( 'Users', 'wholesalex' ),
+				'/customers'                 => __( 'Customers', 'wholesalex' ),
 				'/settings'                  => __( 'Settings', 'wholesalex' ),
-				'/our-products'              => __( 'Wpxpo Plugins', 'wholesalex' ),
+				'/our-products'              => __( 'Plugins', 'wholesalex' ),
 				'/analytics'                 => __( 'Analytics', 'wholesalex' ),
 				'/user_role_change_requests' => __( 'User Role Requests', 'wholesalex' ),
 			)
@@ -414,6 +420,10 @@ class WHOLESALEX_Overview {
 			#adminmenu #toplevel_page_wholesalex .wp-submenu a.current {
 				color: #72aee6;
 				position: relative;
+			}
+
+			#adminmenu #toplevel_page_wholesalex .wp-submenu li.current a,
+			#adminmenu #toplevel_page_wholesalex .wp-submenu a.current {
 				font-weight: 600;
 			}
 
@@ -576,6 +586,38 @@ class WHOLESALEX_Overview {
 	 * @since 1.0.0
 	 */
 	public function overview_callback() {
+		register_rest_route(
+			'wholesalex/v1',
+			'/overview/preferences',
+			array(
+				'methods'             => 'POST',
+				'permission_callback' => function () {
+					return current_user_can( apply_filters( 'wholesalex_capability_access', 'manage_options' ) );
+				},
+				'args'                => array(
+					'preference' => array(
+						'required' => true,
+						'type'     => 'string',
+						'enum'     => array( 'overview_complete_steps', 'overview_steps_collapsed' ),
+					),
+					'value' => array(
+						'required' => true,
+						'type'     => 'string',
+						'enum'     => array( 'yes', 'no' ),
+					),
+				),
+				'callback'            => function ( $request ) {
+					$key   = $request->get_param( 'preference' );
+					$value = $request->get_param( 'value' );
+					update_option( $key, $value, false );
+					if ( $value !== get_option( $key, 'no' ) ) {
+						return new \WP_Error( 'overview_save_failed', __( 'Could not save overview preferences. Please try again.', 'wholesalex' ), array( 'status' => 500 ) );
+					}
+					return array( $key => $value );
+				},
+			)
+		);
+
 		register_rest_route(
 			'wholesalex/v1',
 			'/onboarding/complete',
@@ -845,11 +887,7 @@ class WHOLESALEX_Overview {
 			'price_decimals'       => wc_get_price_decimals(),
 			'price_decimal_sep'    => wc_get_price_decimal_separator(),
 			'price_thousand_sep'   => wc_get_price_thousand_separator(),
-			'dynamic_rules_access' => array(
-				'can_view'   => true,
-				'can_create' => true,
-				'mode'       => 'full',
-			),
+			'dynamic_rules_access' => wholesalex()->get_dynamic_rules_access(),
 		);
 	}
 
@@ -1098,6 +1136,8 @@ class WHOLESALEX_Overview {
 						'wholesalex_user_info'             => $this->get_current_user_info(),
 						'isOnboarding'                     => 'completed' === wholesalex()->get_onboarding_status(),
 						'onboardingStatus'                 => wholesalex()->get_onboarding_status(),
+						'overview_complete_steps'          => get_option( 'overview_complete_steps', 'no' ),
+						'overview_steps_collapsed'         => get_option( 'overview_steps_collapsed', 'no' ),
 						/**
 						 * Conversation Translation Stop
 						 */
@@ -1152,18 +1192,18 @@ class WHOLESALEX_Overview {
 						'whx_form_builder_file_condition_options' => $file_condition_options,
 						'whx_form_builder_billing_fields'  => array(
 							'' => __( 'No Mapping', 'wholesalex' ),
-							'whx_form_builder_billing_first_name' => __( 'Billing	First Name', 'wholesalex' ),
-							'whx_form_builder_billing_last_name' => __( 'Billing	Last Name', 'wholesalex' ),
-							'whx_form_builder_billing_company' => __( 'Billing	Company', 'wholesalex' ),
-							'whx_form_builder_billing_address_1' => __( 'Billing	Address	1', 'wholesalex' ),
-							'whx_form_builder_billing_address_2' => __( 'Billing	Address	2', 'wholesalex' ),
-							'whx_form_builder_billing_city' => __( 'Billing	City', 'wholesalex' ),
-							'whx_form_builder_billing_postcode' => __( 'Billing	Post Code', 'wholesalex' ),
-							'whx_form_builder_billing_country' => __( 'Billing	Country', 'wholesalex' ),
-							'whx_form_builder_billing_state' => __( 'Billing	State', 'wholesalex' ),
-							'whx_form_builder_billing_email' => __( 'Billing	Email', 'wholesalex' ),
-							'whx_form_builder_billing_phone' => __( 'Billing	Phone', 'wholesalex' ),
-							'whx_form_builder_custom_user_meta_mapping' => __( 'Custom User	Meta Mapping', 'wholesalex' ),
+							'whx_form_builder_billing_first_name' => __( 'Billing First Name', 'wholesalex' ),
+							'whx_form_builder_billing_last_name' => __( 'Billing Last Name', 'wholesalex' ),
+							'whx_form_builder_billing_company' => __( 'Billing Company', 'wholesalex' ),
+							'whx_form_builder_billing_address_1' => __( 'Billing Address 1', 'wholesalex' ),
+							'whx_form_builder_billing_address_2' => __( 'Billing Address 2', 'wholesalex' ),
+							'whx_form_builder_billing_city' => __( 'Billing City', 'wholesalex' ),
+							'whx_form_builder_billing_postcode' => __( 'Billing Post Code', 'wholesalex' ),
+							'whx_form_builder_billing_country' => __( 'Billing Country', 'wholesalex' ),
+							'whx_form_builder_billing_state' => __( 'Billing State', 'wholesalex' ),
+							'whx_form_builder_billing_email' => __( 'Billing Email', 'wholesalex' ),
+							'whx_form_builder_billing_phone' => __( 'Billing Phone', 'wholesalex' ),
+							'whx_form_builder_custom_user_meta_mapping' => __( 'Custom User Meta Mapping', 'wholesalex' ),
 						),
 						/**
 						 * Registration From Translation Stop
@@ -1307,16 +1347,8 @@ class WHOLESALEX_Overview {
 	public function go_pro_menu_page() {
 		if ( apply_filters( 'wholesalex_show_upgrade_menu', true ) ) {
 
-			$now = new \DateTime( 'now', wp_timezone() );
+			$button_text = \WHOLESALEX\Includes\Admin\Notice\Promo_Links::menu_label( __( 'Upgrade to Pro', 'wholesalex' ) );
 
-			$start_date = new \DateTime( '2026-01-01 00:00:00', wp_timezone() );
-			$end_date   = new \DateTime( '2026-02-15 23:59:59', wp_timezone() );
-
-			if ( $now >= $start_date && $now <= $end_date ) {
-				$button_text = esc_html__( 'New Year Sale!', 'wholesalex' );
-			} else {
-				$button_text = esc_html__( 'Upgrade to Pro', 'wholesalex' );
-			}
 			$title = sprintf(
 				'<div class="wsx-upgrade-menu-content"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M11.0517 5.74391C11.5303 5.13224 12.4696 5.13224 12.9482 5.74391L13.0439 5.88453L15.3896 9.90504L18.4443 7.12867L18.5341 7.05348C19.478 6.32645 20.8624 7.17996 20.5849 8.38258L18.3945 17.8748C18.22 18.631 17.5465 19.1668 16.7704 19.1668H7.22943C6.45334 19.1668 5.77992 18.631 5.60541 17.8748L3.41498 8.38258C3.13753 7.17996 4.52188 6.32645 5.46576 7.05348L5.55561 7.12867L8.60932 9.90504L10.956 5.88453L11.0517 5.74391ZM9.72455 10.9724C9.33727 11.6363 8.43683 11.7746 7.86811 11.2576L5.01947 8.66773L7.06635 17.5379C7.0838 17.6135 7.15182 17.6668 7.22943 17.6668H16.7704C16.8481 17.6668 16.9161 17.6135 16.9335 17.5379L18.9794 8.66773L16.1318 11.2576C15.5631 11.7746 14.6626 11.6363 14.2753 10.9724L11.9999 7.07203L9.72455 10.9724Z" fill="currentColor"/></svg><span>%s</span></div>',
 				apply_filters( 'wholesalex_upgrade_menu_label', $button_text )
@@ -1384,6 +1416,23 @@ class WHOLESALEX_Overview {
 				flex: 0 0 auto;
 			}
 		</style>
+		<?php
+	}
+
+	/**
+	 * Open the upgrade submenu in a new tab.
+	 *
+	 * @return void
+	 */
+	public function admin_upgrade_menu_new_tab() {
+		?>
+		<script>
+			const upgradeMenuLink = document.querySelector( '#adminmenu .wsx-upgrade-menu-content' )?.closest( 'a' );
+			if ( upgradeMenuLink ) {
+				upgradeMenuLink.target = '_blank';
+				upgradeMenuLink.rel = 'noopener noreferrer';
+			}
+		</script>
 		<?php
 	}
 
@@ -1520,7 +1569,8 @@ class WHOLESALEX_Overview {
 				'meta_key'     => '__wholesalex_status', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Registration status is stored as user metadata.
 				'meta_value'   => 'pending', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Required status value for the registration count.
 				'meta_compare' => '=',
-				'fields'       => array( 'display_name', 'user_email', 'ID', 'user_registered' ),
+				'fields'       => 'ID',
+				'number'       => 1,
 				'count_total'  => true,
 			)
 		);

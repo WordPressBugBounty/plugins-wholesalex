@@ -125,7 +125,9 @@ class WHOLESALEX_Email {
 			case 'update_status':
 				$template_name = isset( $post['template_name'] ) && is_string( $post['template_name'] ) ? sanitize_text_field( $post['template_name'] ) : '';
 				$status        = isset( $post['enabled'] ) && is_string( $post['enabled'] ) ? sanitize_text_field( $post['enabled'] ) : '';
-				if ( isset( self::get_email_templates()[ $template_name ] ) && in_array( $status, array( 'yes', 'no' ), true ) ) {
+				if ( ! self::is_template_addon_enabled( $template_name ) ) {
+					$response['data'] = __( 'Enable the required add-on before changing this email.', 'wholesalex' );
+				} elseif ( isset( self::get_email_templates()[ $template_name ] ) && in_array( $status, array( 'yes', 'no' ), true ) ) {
 					$template_key_name            = 'woocommerce_' . $template_name . '_settings';
 					$template_settings            = (array) get_option( $template_key_name, array() );
 					$template_settings['enabled'] = $status;
@@ -139,7 +141,9 @@ class WHOLESALEX_Email {
 				break;
 			case 'save_template':
 				$template_name = isset( $post['template_name'] ) && is_string( $post['template_name'] ) ? sanitize_text_field( $post['template_name'] ) : '';
-				if ( isset( self::get_email_templates()[ $template_name ] ) && isset( $post['template'] ) && is_array( $post['template'] ) ) {
+				if ( ! self::is_template_addon_enabled( $template_name ) ) {
+					$response['data'] = __( 'Enable the required add-on before changing this email.', 'wholesalex' );
+				} elseif ( isset( self::get_email_templates()[ $template_name ] ) && isset( $post['template'] ) && is_array( $post['template'] ) ) {
 					$template_key_name = 'woocommerce_' . $template_name . '_settings';
 					$template_settings = (array) get_option( $template_key_name, array() );
 					if ( isset( $post['template']['recipient'] ) ) {
@@ -170,6 +174,29 @@ class WHOLESALEX_Email {
 		}
 
 		wp_send_json( $response );
+	}
+
+	/**
+	 * Check whether the add-on required by an email template is enabled.
+	 *
+	 * @param string $template_name Email template ID.
+	 * @return bool
+	 */
+	private static function is_template_addon_enabled( $template_name ) {
+		$addons = array(
+			'wholesalex_raq_'          => 'wsx_addon_raq',
+			'wholesalex_subaccount_'   => 'wsx_addon_subaccount',
+			'wholesalex_conversation_' => 'wsx_addon_conversation',
+			'wholesalex_wallet_'       => 'wsx_addon_wallet',
+		);
+
+		foreach ( $addons as $prefix => $addon_id ) {
+			if ( 0 === strpos( $template_name, $prefix ) ) {
+				return 'yes' === wholesalex()->get_setting( $addon_id );
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -311,6 +338,10 @@ class WHOLESALEX_Email {
 		);
 
 		$templates_data = array();
+		$email_sections = array();
+		foreach ( WC()->mailer()->get_emails() as $email_key => $email ) {
+			$email_sections[ $email->id ] = strtolower( $email_key );
+		}
 
 		foreach ( $templates_ids as $template_id => $template ) {
 			$template_key_name = 'woocommerce_' . $template_id . '_settings';
@@ -321,6 +352,10 @@ class WHOLESALEX_Email {
 			}
 
 			$templates_data[ $template_id ] = wp_parse_args( $template_settings, $template );
+			$templates_data[ $template_id ]['edit_url'] = admin_url(
+				'admin.php?page=wc-settings&tab=email' .
+				( isset( $email_sections[ $template_id ] ) ? '&section=' . rawurlencode( $email_sections[ $template_id ] ) : '' )
+			);
 
 		}
 

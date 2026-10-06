@@ -142,7 +142,8 @@ class Dynamic_Rules_Rest_Api {
 			$allowed = $context['is_vendor'] && $context['can_manage'];
 		}
 
-		return $allowed;
+		$access = wholesalex()->get_dynamic_rules_access();
+		return $allowed && ! empty( $access['can_view'] );
 	}
 
 	// ─── Main Handler: /dynamic_rule_action ──────────────────────

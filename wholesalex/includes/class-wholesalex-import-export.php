@@ -1015,7 +1015,7 @@ class ImportExport {
 	 * If we're on that screen, redirect to the custom one.
 	 */
 	public function dynamic_rules_importer() {
-		if ( $this->export_import_allowed() ) {
+		if ( wholesalex()->can_create_dynamic_rules() && $this->export_import_allowed() ) {
 			include_once WHOLESALEX_PATH . 'includes/import/class-wholesalex-dynamic-rule-csv-importer.php';
 			include_once WHOLESALEX_PATH . 'includes/import/class-wholesalex-dynamic-rule-csv-importer-controller.php';
 			$importer = new WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller();

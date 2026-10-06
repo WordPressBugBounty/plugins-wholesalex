@@ -1,0 +1,251 @@
+{
+	"settings": {
+		"inputVariation": "variation_1",
+		"inputStyle": "variation_1",
+		"premadeTemplate": "premade_1",
+		"appearance_colorDefaultsVersion": 3
+	},
+	"registrationFormHeader": {
+		"isHideDescription": false,
+		"styles": {
+			"title": {
+				"size": 24,
+				"weight": 500,
+				"transform": "",
+				"padding": "",
+				"color": "#343A46"
+			},
+			"description": {
+				"size": 14,
+				"weight": 400,
+				"transform": "",
+				"padding": "",
+				"color": "#343A46"
+			}
+		}
+	},
+	"loginFormHeader": {
+		"isHideDescription": false,
+		"styles": {
+			"title": {
+				"size": 24,
+				"weight": 500,
+				"transform": "",
+				"padding": "",
+				"color": "#343A46"
+			},
+			"description": {
+				"size": 14,
+				"weight": 400,
+				"transform": "",
+				"padding": "",
+				"color": "#343A46"
+			}
+		}
+	},
+	"style": {
+		"color": {
+			"field": {
+				"signIn": {
+					"normal": {
+						"label": "#111111",
+						"text": "#111111",
+						"background": "#ffffff",
+						"border": "#e0e0e0",
+						"placeholder": "#707070"
+					},
+					"active": {
+						"label": "#111111",
+						"text": "#111111",
+						"background": "#ffffff",
+						"border": "#111111",
+						"placeholder": "#707070"
+					},
+					"warning": {
+						"label": "#343A46",
+						"text": "#FF6C6C",
+						"background": "#FFF",
+						"border": "#FF6C6C",
+						"placeholder": "#6C6E77"
+					}
+				},
+				"signUp": {
+					"normal": {
+						"label": "#111111",
+						"text": "#111111",
+						"background": "#ffffff",
+						"border": "#e0e0e0",
+						"placeholder": "#707070"
+					},
+					"active": {
+						"label": "#111111",
+						"text": "#111111",
+						"background": "#ffffff",
+						"border": "#111111",
+						"placeholder": "#707070"
+					},
+					"warning": {
+						"label": "#343A46",
+						"text": "#FF6C6C",
+						"background": "#FFF",
+						"border": "#FF6C6C",
+						"placeholder": "#6C6E77"
+					}
+				}
+			},
+			"button": {
+				"signIn": {
+					"normal": {
+						"text": "#ffffff",
+						"background": "#111111",
+						"border": ""
+					},
+					"hover": {
+						"text": "#ffffff",
+						"background": "#333333",
+						"border": ""
+					}
+				},
+				"signUp": {
+					"normal": {
+						"text": "#ffffff",
+						"background": "#111111",
+						"border": ""
+					},
+					"hover": {
+						"text": "#ffffff",
+						"background": "#333333",
+						"border": ""
+					}
+				}
+			},
+			"container": {
+				"main": {
+					"background": "#FFF",
+					"border": "#E9E9F0"
+				},
+				"signIn": {
+					"background": "#FFF",
+					"border": ""
+				},
+				"signUp": {
+					"background": "#FFF",
+					"border": ""
+				}
+			}
+		},
+		"typography": {
+			"field": {
+				"label": {
+					"size": 14,
+					"weight": 500,
+					"transform": ""
+				},
+				"input": {
+					"size": 14,
+					"weight": 400,
+					"transform": ""
+				}
+			},
+			"button": {
+				"size": 14,
+				"weight": 500,
+				"transform": ""
+			}
+		},
+		"sizeSpacing": {
+			"input": {
+				"width": 395,
+				"border": 1,
+				"borderRadius": 2,
+				"padding": 16
+			},
+			"button": {
+				"width": 50,
+				"border": 0,
+				"borderRadius": 2,
+				"padding": 13,
+				"align": "left"
+			},
+			"container": {
+				"main": {
+					"width": 1200,
+					"border": 1,
+					"borderRadius": 16,
+					"padding": 0,
+					"align": "",
+					"separator": 1
+				},
+				"signIn": {
+					"width": "",
+					"border": 0,
+					"borderRadius": 16,
+					"padding": 54,
+					"align": "",
+					"separator": ""
+				},
+				"signUp": {
+					"width": "",
+					"border": 0,
+					"borderRadius": 16,
+					"padding": 54,
+					"align": "",
+					"separator": ""
+				}
+			}
+		},
+		"appearance": {
+			"defaultAdvancedColors": {
+				"signup": {
+					"primaryColor": "#111111",
+					"textPrimary": "#111111",
+					"textSecondary": "#707070",
+					"background": "#ffffff",
+					"borderColor": "#e0e0e0",
+					"inputBackground": "#ffffff",
+					"buttonText": "#ffffff",
+					"link": "#6c6cff",
+					"containerColor": "#ffffff"
+				},
+				"login": {
+					"primaryColor": "#111111",
+					"textPrimary": "#111111",
+					"textSecondary": "#707070",
+					"background": "#ffffff",
+					"borderColor": "#e0e0e0",
+					"inputBackground": "#ffffff",
+					"buttonText": "#ffffff",
+					"link": "#6c6cff",
+					"containerColor": "#ffffff"
+				}
+			},
+			"advancedColors": {
+				"signup": {
+					"primaryColor": "#111111",
+					"textPrimary": "#111111",
+					"textSecondary": "#707070",
+					"background": "#ffffff",
+					"borderColor": "#e0e0e0",
+					"inputBackground": "#ffffff",
+					"buttonText": "#ffffff",
+					"link": "#6c6cff",
+					"containerColor": "#ffffff"
+				},
+				"login": {
+					"primaryColor": "#111111",
+					"textPrimary": "#111111",
+					"textSecondary": "#707070",
+					"background": "#ffffff",
+					"borderColor": "#e0e0e0",
+					"inputBackground": "#ffffff",
+					"buttonText": "#ffffff",
+					"link": "#6c6cff",
+					"containerColor": "#ffffff"
+				}
+			},
+			"container": {
+				"color": "#ffffff"
+			}
+		}
+	}
+}

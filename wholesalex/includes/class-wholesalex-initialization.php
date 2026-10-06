@@ -7,7 +7,6 @@
  * @package           WholesaleX
  */
 
-use WHOLESALEX\Notice;
 use WHOLESALEX\Scripts;
 use WHOLESALEX\Xpo;
 
@@ -25,7 +24,7 @@ class WholesaleX_Initialization {
 	 */
 	public function __construct() {
 		$this->load_dependencies();
-		$this->include_addons(); // Include Addons
+		require_once WHOLESALEX_PATH . 'includes/recaptcha/init.php';
 		// Admin Assets.
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 
@@ -39,27 +38,10 @@ class WholesaleX_Initialization {
 	}
 
 	/**
-	 * Include Addons Directory
-	 *
-	 * @since v.1.0.0
-	 */
-	public function include_addons() {
-		$addons_dir = array_filter( glob( WHOLESALEX_PATH . 'addons/*' ), 'is_dir' );
-		if ( count( $addons_dir ) > 0 ) {
-			foreach ( $addons_dir as $key => $value ) {
-				$addon_dir_name = str_replace( dirname( $value ) . '/', '', $value );
-				$file_name      = WHOLESALEX_PATH . 'addons/' . $addon_dir_name . '/init.php';
-				if ( file_exists( $file_name ) ) {
-					include_once $file_name;
-				}
-			}
-		}
-	}
-
-	/**
 	 * Load All Required Dependencies
 	 */
 	private function load_dependencies() {
+		require_once WHOLESALEX_PATH . 'includes/class-wholesalex-role-preview.php';
 		require_once WHOLESALEX_PATH . 'includes/pricing/class-tier-pricing-calculator.php';
 		require_once WHOLESALEX_PATH . 'includes/class-registration-context.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-overview.php';
@@ -100,7 +82,7 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/compatibility/woo-product-bundles.php';
 		require_once WHOLESALEX_PATH . 'includes/compatibility/aeila_currency_switcher.php';
 		require_once WHOLESALEX_PATH . 'includes/durbin/class-xpo.php';
-		require_once WHOLESALEX_PATH . 'includes/notice/class-notice.php';
+		require_once WHOLESALEX_PATH . 'includes/admin/notice/class-notice.php';
 		require_once WHOLESALEX_PATH . 'includes/class-wholesalex-common-utils.php';
 
 		/** Register extensions after shared classes load and before runtime objects are created. */
@@ -108,6 +90,7 @@ class WholesaleX_Initialization {
 
 		do_action( 'wholesalex_after_core_loaded' );
 
+		new \WHOLESALEX\Wholesalex_Role_Preview();
 		new \WHOLESALEX\WHOLESALEX_Role();
 		new \WHOLESALEX\WHOLESALEX_Registration();
 		new \WHOLESALEX\User_Roles_Payment_Method();
@@ -138,8 +121,7 @@ class WholesaleX_Initialization {
 		new \WHOLESALEX\WHOLESALEX_RequstRoleChange();
 		new \WHOLESALEX\WHOLESALEX_Woocommerce_Bookings();
 		new \WHOLESALEX\WHOLESALEX_WooProduct_Bundles();
-
-		new \WHOLESALEX\Notice();
+		new \WHOLESALEX\Includes\Admin\Notice\Notice();
 
 		add_action( 'template_redirect', array( $this, 'wholesalex_process_user_email_confirmation' ) );
 	}
@@ -184,12 +166,9 @@ class WholesaleX_Initialization {
 			'settings'             => wholesalex()->get_setting(),
 			'logo_url'             => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/icons/wholesalex-logo.svg' ),
 			'plugin_name'          => wholesalex()->get_plugin_name(),
-			'dynamic_rules_access' => array(
-				'can_view'   => true,
-				'can_create' => true,
-				'mode'       => 'full',
-			),
+			'dynamic_rules_access' => wholesalex()->get_dynamic_rules_access(),
 			'is_admin_interface'   => is_admin(),
+			'helloBar'             => \WHOLESALEX\Includes\Admin\Notice\Notice::get_hellobar_config(),
 			'i18n'                 => array(
 				'smart_tags' => __( 'Available Smart Tags: ', 'wholesalex' ),
 			),

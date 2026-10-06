@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Core class for managing plugin actions and integrations.
  *
- * @package REVX
+ * @package WHOLESALEX
  */
 class Xpo {
 

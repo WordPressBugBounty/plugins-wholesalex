@@ -425,7 +425,7 @@ class WHOLESALEX_Shortcodes {
 				<?php
 			} elseif ( ! in_array( 'wholesalex_registration_role', $this->registration_form_felds_name, true ) ) {
 				$select_role_field = $this->get_select_role_field( $is_only_b2b );
-				$this->render_columns( $select_role_field, $is_rolewise, $input_variation );
+				$this->render_columns( $select_role_field, $is_rolewise, $input_variation, $is_only_b2b );
 			}
 			$this->render_registration_role_context_fields( $role );
 		}
@@ -1139,6 +1139,33 @@ class WHOLESALEX_Shortcodes {
 
 
 		<?php do_action( 'wholesalex_registration_inline_script', $registration_fields ); ?>
+					const checkRecaptchaV2 = (form) => {
+						const $form = $(form);
+						$form.find('.wsx-recaptcha-warning').remove();
+						if (wholesalex.recaptcha_status !== 'yes' || wholesalex.settings.recaptcha_version !== 'recaptcha_v2') {
+							return true;
+						}
+						if (($form.find('[name="g-recaptcha-response"]').val() || '').trim()) {
+							return true;
+						}
+						const warning = $('<p>', { class: 'wsx-recaptcha-warning', role: 'alert', tabindex: '-1' })
+							.text(<?php echo wp_json_encode( __( 'Please check the “I’m not a robot” checkbox before continuing.', 'wholesalex' ) ); ?>)
+							.css('color', '#b32d2e');
+						const widget = $form.find('.g-recaptcha').last();
+						if (widget.length) {
+							warning.insertAfter(widget);
+						} else {
+							warning.prependTo($form);
+						}
+						warning.trigger('focus');
+						return false;
+					};
+					wrapper.find('.wholesalex-login-form, .wholesalex-registration-form').on('submit', function(e) {
+						if (!checkRecaptchaV2(this)) {
+							e.preventDefault();
+							e.stopImmediatePropagation();
+						}
+					});
 					const processRegistration = (formObject)=>{
 						const entries = Object.fromEntries(formObject.entries());
 
@@ -1206,6 +1233,10 @@ class WHOLESALEX_Shortcodes {
 
 					// Process Registration
 					wrapper.find('.wsx-register-btn').on('click',function(e){
+						if (!checkRecaptchaV2($(this).closest('form'))) {
+							e.preventDefault();
+							return;
+						}
 						// e.preventDefault();
 
 						if($(this).closest('form')[0].checkValidity()){
@@ -1251,6 +1282,10 @@ class WHOLESALEX_Shortcodes {
 
 					// Process Login
 					wrapper.find('.wsx-login-btn').on('click',function(e){
+						if (!checkRecaptchaV2($(this).closest('form'))) {
+							e.preventDefault();
+							return;
+						}
 						if($(this).closest('form')[0].checkValidity()){
 							e.preventDefault();
 						}
@@ -1306,7 +1341,6 @@ class WHOLESALEX_Shortcodes {
 									}
 
 								});
-								processLogin();
 
 						} else {
 							processLogin();
@@ -1445,7 +1479,7 @@ class WHOLESALEX_Shortcodes {
 			'--wsx-form-container-width'                 => isset( $style['sizeSpacing']['container']['main']['width'] ) ? $style['sizeSpacing']['container']['main']['width'] . 'px' : null,
 			'--wsx-form-container-border-width'          => isset( $style['sizeSpacing']['container']['main']['border'] ) ? $style['sizeSpacing']['container']['main']['border'] . 'px' : null,
 			'--wsx-form-container-border-radius'         => isset( $style['sizeSpacing']['container']['main']['borderRadius'] ) ? $style['sizeSpacing']['container']['main']['borderRadius'] . 'px' : null,
-			'--wsx-form-container-padding'               => isset( $style['sizeSpacing']['container']['main']['padding'] ) ? $style['sizeSpacing']['container']['main']['padding'] . 'px' : null,
+			'--wsx-form-container-padding'               => isset( $style['sizeSpacing']['container']['main']['padding'] ) ? $style['sizeSpacing']['container']['main']['padding'] . 'px' : '0px',
 			'--wsx-form-container-separator'             => isset( $style['sizeSpacing']['container']['main']['separator'] ) ? $style['sizeSpacing']['container']['main']['separator'] . 'px' : null,
 			'--wsx-form-container-separator-space'       => isset( $style['sizeSpacing']['container']['main']['separatorSpace'] ) ? $style['sizeSpacing']['container']['main']['separatorSpace'] . 'px' : '0px',
 
@@ -1598,7 +1632,7 @@ class WHOLESALEX_Shortcodes {
 			: '40px';
 		$_style['--wsx-appearance-button-size']  = isset( $settings['appearance_buttonSize'] ) && isset( $_appearance_button_size_map[ $settings['appearance_buttonSize'] ] )
 			? $_appearance_button_size_map[ $settings['appearance_buttonSize'] ]
-			: '40px';
+			: '36px';
 		$_style['--wsx-appearance-button-width'] = isset( $settings['appearance_buttonWidth'] ) && 'full' === $settings['appearance_buttonWidth']
 			? '100%'
 			: ( ! empty( $_style['--wsx-form-button-width'] ) ? $_style['--wsx-form-button-width'] : '100%' );

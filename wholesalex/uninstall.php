@@ -38,6 +38,7 @@ function wholesalex_uninstall_plugin_data_remove() {
 		'wholesalex_onboarding_completed',
 		'wholesalex_onboarding_receive_tips',
 		'wholesalex_installation_date',
+		'wholesalex_legacy_dynamic_rules_access',
 		'_wholesalex_default_admin_role_assigned',
 		'_wholesalex_deleted_default_roles',
 		'__wholesalex_customer_import_export_stats',

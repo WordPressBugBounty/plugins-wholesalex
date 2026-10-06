@@ -21,6 +21,54 @@ defined( 'ABSPATH' ) || exit;
 class Functions {
 
 	/**
+	 * Whether this admin record has configured, persisted tiers to warn about.
+	 * Returns only a flag; it does not expose or enable premium pricing data.
+	 *
+	 * @param string $type Record type: profile, product, or category.
+	 * @param int    $id   Record ID.
+	 * @return bool
+	 */
+	public function has_saved_page_tiers( $type, $id ) {
+		$id = absint( $id );
+		if ( ! $id || ! in_array( $type, array( 'profile', 'product', 'category' ), true ) ) {
+			return false;
+		}
+
+		$has_rows = static function ( $rows ) {
+			foreach ( is_array( $rows ) ? $rows : array() as $row ) {
+				foreach ( array( '_discount_type', '_discount_amount', '_min_quantity' ) as $field ) {
+					if ( is_array( $row ) && isset( $row[ $field ] ) && is_scalar( $row[ $field ] ) && '' !== trim( (string) $row[ $field ] ) ) {
+						return true;
+					}
+				}
+			}
+			return false;
+		};
+
+		if ( 'profile' === $type ) {
+			$data = get_user_meta( $id, '__wholesalex_profile_discounts', true );
+			return $has_rows( $data['_profile_discounts']['tiers'] ?? array() );
+		}
+
+		$meta_type = 'product' === $type ? 'post' : 'term';
+		foreach ( $this->get_roles( 'ids' ) as $role_id ) {
+			if ( $has_rows( get_metadata( $meta_type, $id, $role_id . '_tiers', true ) ) ) {
+				return true;
+			}
+		}
+
+		if ( 'category' === $type ) {
+			$legacy = get_option( '__wholesalex_category_discounts', array() );
+			foreach ( (array) ( $legacy[ $id ] ?? array() ) as $role ) {
+				if ( is_array( $role ) && $has_rows( $role['tiers'] ?? array() ) ) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Setup class.
 	 *
 	 * @since v.1.0.0
@@ -67,6 +115,51 @@ class Functions {
 		if ( ! isset( $GLOBALS['wholesalex_profile_discounts'] ) ) {
 			$GLOBALS['wholesalex_profile_discounts'] = get_option( '__wholesalex_profile_discounts', array() );
 		}
+	}
+
+	/**
+	 * Persist installation eligibility before activation creates default options.
+	 * Existing stores retain full access, even after deleting their last rule.
+	 *
+	 * @param array|null $rules Optional scoped rules for integration metadata.
+	 * @return array
+	 */
+	public function get_dynamic_rules_access( $rules = null ) {
+		$enabled = get_option( 'wholesalex_legacy_dynamic_rules_access', null );
+		if ( null === $enabled ) {
+			$enabled = 'no';
+			foreach ( array( 'wholesalex_settings', 'wholesalex_installation_date', '_wholesalex_roles', '__wholesalex_initial_setup', '__wholesalex_dynamic_rules', '__wholesalex_pricing_rules' ) as $option ) {
+				if ( null !== get_option( $option, null ) ) {
+					$enabled = 'yes';
+					break;
+				}
+			}
+			add_option( 'wholesalex_legacy_dynamic_rules_access', $enabled, '', false );
+			$enabled = get_option( 'wholesalex_legacy_dynamic_rules_access', 'no' );
+		}
+
+		$rules   = is_array( $rules ) ? $rules : $this->get_dynamic_rules();
+		$allowed = 'yes' === $enabled;
+		return apply_filters(
+			'wholesalex_dynamic_rules_access',
+			array(
+				'has_rules'  => ! empty( $rules ),
+				'can_view'   => $allowed,
+				'can_create' => $allowed,
+				'mode'       => $allowed ? 'full' : 'hidden',
+			),
+			$rules
+		);
+	}
+
+	/**
+	 * Whether this installation can create Dynamic Rules.
+	 *
+	 * @return bool
+	 */
+	public function can_create_dynamic_rules() {
+		$access = $this->get_dynamic_rules_access();
+		return ! empty( $access['can_create'] );
 	}
 
 	/**
@@ -849,6 +942,10 @@ class Functions {
 	public function set_dynamic_rules( $_id = '', $_rule = array(), $_type = '', $is_frontend = false ) {
 		if ( '' !== $_id && ! empty( $_rule ) ) {
 
+			if ( 'delete' !== $_type && ! $this->can_create_dynamic_rules() ) {
+				return false;
+			}
+
 			$__rules          = wholesalex()->get_dynamic_rules();
 			$__for_all        = ( ( 'all_users' === $_rule['_rule_for'] ) || ( 'all_roles' === $_rule['_rule_for'] ) ) ? true : false;
 			$__previous_count = ( isset( $__rules[ $_id ]['limit']['usages_count'] ) && ! empty( $__rules[ $_id ]['limit']['usages_count'] ) ) ? $__rules[ $_id ]['limit']['usages_count'] : '';
@@ -947,15 +1044,11 @@ class Functions {
 			return 'wholesalex_guest';
 		}
 
-		$__user_role = get_user_meta( $user_id, '__wholesalex_role', true );
+		$role = get_user_meta( $user_id, '__wholesalex_role', true );
+		$role = ! empty( $role ) ? $role : 'wholesalex_b2c_users';
 
-		if ( isset( $__user_role ) && ! empty( $__user_role ) ) {
-			return $__user_role;
-		}
-
-		if ( empty( $__user_role ) ) {
-			return 'wholesalex_b2c_users';
-		}
+		/** Filter the effective pricing role without changing the assigned account role. */
+		return apply_filters( 'wholesalex_user_role', $role, (int) $user_id );
 	}
 
 
@@ -1091,15 +1184,8 @@ class Functions {
 			return 'wholesalex_guest';
 		}
 
-		$__current_user_id = apply_filters( 'wholesalex_set_current_user', get_current_user_id() );
-		$__user_role       = get_user_meta( $__current_user_id, '__wholesalex_role', true );
-
-		if ( isset( $__user_role ) && ! empty( $__user_role ) ) {
-			return $__user_role;
-		}
-		if ( empty( $__user_role ) ) {
-			return 'wholesalex_b2c_users';
-		}
+		$user_id = apply_filters( 'wholesalex_set_current_user', get_current_user_id() );
+		return $this->get_user_role( $user_id );
 	}
 
 
@@ -1115,7 +1201,11 @@ class Functions {
 
 		$priorities = wholesalex()->get_setting( '_settings_quantity_based_discount_priority', $default_priorities );
 		$priorities = is_array( $priorities ) ? array_values( array_unique( $priorities ) ) : array();
-		$allowed    = array( 'profile', 'single_product', 'category', 'wholesale_pricing', 'dynamic_rule' );
+		$allowed    = $default_priorities;
+		$access     = $this->get_dynamic_rules_access();
+		if ( empty( $access['can_view'] ) ) {
+			$allowed = array_values( array_diff( $allowed, array( 'dynamic_rule' ) ) );
+		}
 
 		$priorities = array_values( array_intersect( $priorities, $allowed ) );
 
@@ -1871,7 +1961,7 @@ class Functions {
 		if ( ! ( $user_id && $product_id ) ) {
 			return false;
 		}
-		$user_role_id = get_user_meta( $user_id, '__wholesalex_role', true );
+		$user_role_id = apply_filters( 'wholesalex_user_role', get_user_meta( $user_id, '__wholesalex_role', true ), (int) $user_id );
 		$product      = wc_get_product( $product_id );
 		if ( ! $product ) {
 			return false;
@@ -1926,7 +2016,6 @@ class Functions {
 		switch ( $page ) {
 			case 'wholesalex-settings':
 			case 'wholesalex-users':
-			case 'wholesalex-addons':
 			case 'wholesalex-pro-features':
 			case 'wholesalex_role':
 			case 'wholesalex-email':
@@ -1949,7 +2038,6 @@ class Functions {
 		}
 		if ( wholesalex()->get_setting( 'plugin_menu_slug' ) === $page || wholesalex()->get_setting( 'dynamic_rule_submenu_slug' ) === $page || wholesalex()->get_setting( 'emails_submenu_slug' ) === $page ||
 			wholesalex()->get_setting( 'registration_form_buidler_submenu_slug' ) === $page || wholesalex()->get_setting( 'role_submenu_slug' ) === $page || wholesalex()->get_setting( 'settings_submenu_slug' ) === $page || wholesalex()->get_setting( 'users_submenu_slug' ) === $page
-			|| wholesalex()->get_setting( 'addons_submenu_slug' ) === $page
 		) {
 			$status = true;
 		}

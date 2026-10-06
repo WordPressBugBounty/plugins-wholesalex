@@ -1955,6 +1955,8 @@ class Dynamic_Rules {
 			$is_eligible = false;
 		}
 
+		$is_eligible = apply_filters( 'wholesalex_pricing_user_eligible', $is_eligible, $user_id );
+
 		$__discounts        = wholesalex()->get_dynamic_rules();
 		$__role             = wholesalex()->get_user_role( $user_id );
 		$__discounts_for_me = array();

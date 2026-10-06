@@ -33,7 +33,7 @@ class WHOLESALEX_Menu {
 	public function plugin_action_links_callback( $links ) {
 
 		$setting_link                        = array();
-		$setting_link['wholesalex_settings'] = '<a href="' . esc_url( admin_url( 'admin.php?page=wholesalex-settings' ) ) . '">' . esc_html__( 'Settings', 'wholesalex' ) . '</a>';
+		$setting_link['wholesalex_settings'] = '<a href="' . esc_url( admin_url( 'admin.php?page=wholesalex' ) ) . '">' . esc_html__( 'Overview', 'wholesalex' ) . '</a>';
 		return array_merge( $setting_link, $links );
 	}
 
@@ -49,7 +49,7 @@ class WHOLESALEX_Menu {
 		if ( strpos( $file, 'wholesalex.php' ) !== false ) {
 			$new_links = array(
 				'wholesalex_docs'    => '<a href="https://getwholesalex.com/documentation/" target="_blank">' . esc_html__( 'Docs', 'wholesalex' ) . '</a>',
-				'wholesalex_support' => '<a href="' . esc_url( 'https://getwholesalex.com/contact/' ) . '" target="_blank">' . esc_html__( 'Support', 'wholesalex' ) . '</a>',
+				'wholesalex_support' => '<a href="' . esc_url( 'https://account.wpxpo.com/contact/' ) . '" target="_blank">' . esc_html__( 'Support', 'wholesalex' ) . '</a>',
 			);
 			$links     = array_merge( $links, $new_links );
 		}

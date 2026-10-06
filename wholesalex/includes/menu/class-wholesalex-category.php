@@ -131,6 +131,7 @@ class WHOLESALEX_Category {
 				'visibility_settings' => wholesalex()->get_category_visibility_settings(),
 				'fields'              => $this->get_category_fields(),
 				'discounts'           => wholesalex()->get_category_discounts(),
+				'has_saved_tiers'     => false,
 			),
 		);
 		wp_nonce_field( 'wholesalex_cat_add_update', '_wpnonce_add_update_cat' ); ?>
@@ -155,6 +156,7 @@ class WHOLESALEX_Category {
 				'visibility_settings' => wholesalex()->get_category_visibility_settings(),
 				'fields'              => $this->get_category_fields(),
 				'discounts'           => array( $term->term_id => wholesalex()->get_category_discounts( $term->term_id ) ),
+				'has_saved_tiers'     => wholesalex()->has_saved_page_tiers( 'category', $term->term_id ),
 			),
 		);
 		wp_nonce_field( 'wholesalex_cat_add_update', '_wpnonce_add_update_cat' );
@@ -269,7 +271,7 @@ class WHOLESALEX_Category {
 									'type'    => 'select',
 									'label'   => __( 'Hide B2B Role and Users', 'wholesalex' ),
 									'options' => array(
-										''              => __( 'Choose Options...', 'wholesalex' ),
+										''              => __( '- Select Role -', 'wholesalex' ),
 										'b2b_all'       => __( 'All B2B Users', 'wholesalex' ),
 										'b2b_specific'  => __( 'Specific B2B Roles', 'wholesalex' ),
 										'user_specific' => __( 'Specific Register Users', 'wholesalex' ),

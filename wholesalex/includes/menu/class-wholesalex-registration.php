@@ -58,6 +58,7 @@ class WHOLESALEX_Registration {
 		add_action( 'wholesalex_registration_form_user_status_admin_approve', array( $this, 'user_registration_admin_approval_need' ) );
 
 		add_action( 'init', array( $this, 'register_block' ) );
+		add_filter( 'render_block_wholesalex/forms', array( $this, 'render_forms_block' ) );
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
 
@@ -112,6 +113,20 @@ class WHOLESALEX_Registration {
 	 */
 	public function render_block() {
 		return '';
+	}
+
+	/**
+	 * Let the builder control login visibility for new and previously saved blocks.
+	 *
+	 * Keep the saved markup intact for block validation and leave standalone
+	 * registration shortcodes unchanged. The combined shortcode checks the
+	 * builder's login setting before rendering.
+	 *
+	 * @param string $block_content Saved block markup.
+	 * @return string
+	 */
+	public function render_forms_block( $block_content ) {
+		return preg_replace( '/\[wholesalex_registration(?=[\s\]])/', '[wholesalex_login_registration', $block_content );
 	}
 
 	/**
@@ -291,6 +306,7 @@ class WHOLESALEX_Registration {
 		}
 
 		$decoded = $this->sanitize_form_builder_value( $decoded );
+		$decoded = WholesaleX_CommonUtils::normalize_default_registration_template( $decoded );
 
 		return wp_json_encode( $decoded );
 	}
@@ -370,7 +386,8 @@ class WHOLESALEX_Registration {
 	public function auto_login_after_registration( $user_id ) {
 		$__user_status = wholesalex()->get_user_status( $user_id );
 		if ( 'pending' === $__user_status ) {
-			$user_login_option = wholesalex()->get_setting( '_settings_user_status_option', 'admin_approve' );
+			$registration_role = get_user_meta( $user_id, '__wholesalex_registration_role', true );
+			$user_login_option = apply_filters( 'wholesalex_registration_form_user_status_option', 'admin_approve', $user_id, $registration_role );
 			switch ( $user_login_option ) {
 				case 'admin_approve':
 					/* translators: %s: Account Status */
@@ -384,6 +401,9 @@ class WHOLESALEX_Registration {
 					// code...
 					break;
 			}
+		}
+		if ( 'active' !== $__user_status ) {
+			return new WP_Error( 'admin_approval_pending', esc_html__( 'Your account is not active. Please contact the site administrator.', 'wholesalex' ) );
 		}
 		wc_set_customer_auth_cookie( $user_id );
 		do_action( 'wholesalex_user_auto_login', $user_id );
@@ -428,7 +448,8 @@ class WHOLESALEX_Registration {
 			return $user;
 		}
 
-		$user_login_option = wholesalex()->get_setting( '_settings_user_status_option', 'admin_approve' );
+		$registration_role = get_user_meta( $user->ID, '__wholesalex_registration_role', true );
+		$user_login_option = apply_filters( 'wholesalex_registration_form_user_status_option', 'admin_approve', $user->ID, $registration_role );
 		$status            = get_the_author_meta( '__wholesalex_status', $user->ID );
 
 		if ( 'admin_approve' === $user_login_option ) {
@@ -473,13 +494,6 @@ class WHOLESALEX_Registration {
 		$view_price_product_list   = wholesalex()->get_setting( '_settings_login_to_view_price_product_list', 'no' );
 		$view_price_product_single = wholesalex()->get_setting( '_settings_login_to_view_price_product_page', 'no' );
 		$url                       = esc_url_raw( wholesalex()->get_setting( '_settings_redirect_url_login', get_permalink( get_option( 'woocommerce_shop_page_id' ) ) ) );
-		$role_content              = wholesalex()->get_roles( 'by_id', get_user_meta( $user->ID, '__wholesalex_role', true ) );
-		if ( isset( $role_content['after_login_redirect'] ) && esc_url_raw( $role_content['after_login_redirect'] ) === $role_content['after_login_redirect'] ) {
-			$redirect_url = esc_url_raw( $role_content['after_login_redirect'] );
-			if ( $redirect_url ) {
-				return $redirect_url;
-			}
-		}
 
 		if ( 'yes' === $view_price_product_list || 'yes' === $view_price_product_single ) {
 			// Only trust the submitted redirect when the login form's own nonce verifies.
@@ -567,14 +581,9 @@ class WHOLESALEX_Registration {
 	 */
 	public function after_registration_redirect( $redirect_url, $user_id, $registration_role ) {
 		$__redirect_url = wholesalex()->get_setting( '_settings_redirect_url_registration', get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
-		$role_content   = wholesalex()->get_roles( 'by_id', $registration_role );
 
 		if ( ! empty( $__redirect_url ) ) {
 			$redirect_url = esc_url_raw( $__redirect_url );
-		}
-
-		if ( isset( $role_content['after_registration_redirect'] ) && esc_url_raw( $role_content['after_registration_redirect'] ) === $role_content['after_registration_redirect'] ) {
-			$redirect_url = esc_url_raw( $role_content['after_registration_redirect'] );
 		}
 
 		return $redirect_url;
@@ -605,7 +614,8 @@ class WHOLESALEX_Registration {
 	 * @since 1.1.6
 	 */
 	public function user_registration_admin_approval_need( $user_id ) {
-		add_user_meta( $user_id, '__wholesalex_status', 'pending' );
+		// Replace any status initialized by customer-creation hooks before applying role approval.
+		update_user_meta( $user_id, '__wholesalex_status', 'pending' );
 		set_transient( 'wholesalex_registration_approval_required_email_status_' . $user_id, true );
 		do_action( 'wholesalex_set_user_approval_needed', $user_id );
 	}
@@ -789,6 +799,15 @@ class WHOLESALEX_Registration {
 						$data['error_messages']['user_email'] = __( 'Enter a valid email address.', 'wholesalex' );
 					}
 					foreach ( $this->registration_fields as $field ) {
+						if ( 'termCondition' === ( $field['type'] ?? '' ) && WholesaleX_CommonUtils::is_standard_registration_field( $field ) && ! empty( $field['required'] ) ) {
+							$excluded_roles = isset( $field['excludeRoles'] ) && is_array( $field['excludeRoles'] ) ? array_column( $field['excludeRoles'], 'value' ) : array();
+							if ( ! in_array( $__registration_role, $excluded_roles, true ) ) {
+								$consent = $_POST[ $field['name'] ] ?? null;
+								if ( ! is_string( $consent ) || $field['name'] !== wp_unslash( $consent ) ) {
+									$data['error_messages'][ $field['name'] ] = __( 'Please accept the terms and conditions.', 'wholesalex' );
+								}
+							}
+						}
 						if ( 'user_pass' === $field['name'] && ! empty( $field['required'] ) && '' === $password ) {
 							$data['error_messages']['user_pass'] = __( 'Password is Required!', 'wholesalex' );
 							break;

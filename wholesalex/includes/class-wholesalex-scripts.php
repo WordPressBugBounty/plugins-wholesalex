@@ -52,7 +52,6 @@ class Scripts {
 	public $wholesalex_pages = array(
 		'wholesalex-settings'      => 'wholesalex_settings',
 		'wholesalex-users'         => 'wholesalex_header',
-		'wholesalex-addons'        => 'wholesalex_header',
 		'wholesalex-pro-features'  => 'wholesalex_overview',
 		'wholesalex_role'          => 'wholesalex_roles',
 		'wholesalex-email'         => 'wholesalex_header',

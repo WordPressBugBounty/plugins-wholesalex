@@ -127,6 +127,13 @@ class Settings {
 
 		if ( 'set' === $type ) {
 			$post = wholesalex()->sanitize( $post );
+			if ( 'yes' === ( $post['settings']['wsx_addon_recaptcha'] ?? '' ) ) {
+				$site_key   = $post['settings']['_settings_google_recaptcha_v3_site_key'] ?? wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' );
+				$secret_key = $post['settings']['_settings_google_recaptcha_v3_secret_key'] ?? wholesalex()->get_setting( '_settings_google_recaptcha_v3_secret_key' );
+				if ( empty( $site_key ) || empty( $secret_key ) ) {
+					wp_send_json_error( __( 'Enter both reCAPTCHA keys in Registration Form > Form Settings before enabling reCAPTCHA.', 'wholesalex' ) );
+				}
+			}
 
 			if ( 'email_confirmation_require' === $post['settings']['_settings_user_status_option'] ) {
 				$__confirmation_email_status = get_option( 'wholesalex_email_verification_email_status' );
@@ -191,8 +198,12 @@ class Settings {
 		}
 		$my_account_id = get_option( 'woocommerce_myaccount_page_id' );
 
-		$weight_unit        = get_option( 'woocommerce_weight_unit' );
-		$pricing_priorities = array( 'profile', 'single_product', 'category', 'wholesale_pricing', 'dynamic_rule' );
+		$weight_unit          = get_option( 'woocommerce_weight_unit' );
+		$pricing_priorities   = array( 'profile', 'single_product', 'category', 'wholesale_pricing', 'dynamic_rule' );
+		$dynamic_rules_access = wholesalex()->get_dynamic_rules_access();
+		if ( empty( $dynamic_rules_access['can_view'] ) ) {
+			$pricing_priorities = array_values( array_diff( $pricing_priorities, array( 'dynamic_rule' ) ) );
+		}
 		$settings_fields    = apply_filters(
 			'wholesalex_setting_fields',
 			array(
@@ -271,14 +282,6 @@ class Settings {
 							'default' => 'no',
 							'tooltip' => 'Enable it to let users get a discount on the total cart amount - including the tax amount.',
 						),
-						'_settings_access_shop_manager_with_wxs_menu' => array(
-							'type'    => 'slider',
-							'label'   => __( 'Allow Full Access to Shop Manager', 'wholesalex' ),
-							'desc'    => __( 'Check this box if you want to enable Full Access of WholesaleX to the Shop Manager', 'wholesalex' ),
-							'help'    => '',
-							'default' => 'no',
-							'tooltip' => '⚠️ Enabling this option gives Shop Managers full access to WholesaleX, including pricing changes, user profile settings, and all other configurations.',
-						),
 						'_settings_role_switcher_option' => array(
 							'type'    => 'slider',
 							'label'   => __( 'Enable User Role Switching', 'wholesalex' ),
@@ -294,263 +297,13 @@ class Settings {
 							'default' => 'no',
 							'tooltip' => __( 'Enable/Disable WholesaleX pages for specific user groups.', 'wholesalex' ),
 						),
-					),
-				),
-				'price'                => array(
-					'label'         => __( 'Price Display', 'wholesalex' ),
-					'attr'          => array(
-						'type'                           => 'price_zero',
-						'_settings_price_text'           => array(
-							'type'        => 'text',
-							'label'       => __( 'Wholesale Price Text for Product Pages', 'wholesalex' ),
-							'placeholder' => __( 'Wholesale Price:', 'wholesalex' ),
-							'help'        => __( 'The text is shown immediately before the wholesale price in product single page. The default text is “Wholesale Price:”', 'wholesalex' ),
-							'default'     => __( 'Wholesale Price:', 'wholesalex' ),
-						),
-						'_settings_price_text_product_list_page' => array(
-							'type'        => 'text',
-							'label'       => __( 'Wholesale Price Text for Product Listing Pages', 'wholesalex' ),
-							'placeholder' => __( 'Wholesale Price:', 'wholesalex' ),
-							'help'        => __( 'The text is shown immediately before the wholesale price in product listing page. The default text is “Wholesale Price:”.', 'wholesalex' ),
-							'default'     => __( 'Wholesale Price:', 'wholesalex' ),
-						),
-						'_settings_regular_price_suffix' => array(
-							'type'        => 'text',
-							'label'       => __( 'Override Regular Price Suffix', 'wholesalex' ),
-							'placeholder' => '',
-							'help'        => __( 'Display desired text after regular prices on shop and single products pages.', 'wholesalex' ),
-							'default'     => '',
-							'tooltip'     => 'Add your custom text to replace the default one, which will be displayed just after the wholesale prices of the products of the shop and single product pages',
-							'doc'         => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
-						),
-						'_settings_wholesalex_price_suffix' => array(
-							'type'        => 'text',
-							/* translators: %s - Plugin Name */
-							'label'       => sprintf( __( '%s Price Suffix', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-							'placeholder' => '',
-							'help'        => __( 'Display desired text after wholesale prices on shop and single products pages.', 'wholesalex' ),
-							'default'     => '',
-							'tooltip'     => 'Add the custom text that you want to display just after the wholesale prices of the products of the shop and single product pages.',
-							'doc'         => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
-						),
-					),
-					'attrGroupOne'  => array(
-						'type' => 'price_one',
-						'_settings_display_price_shop_page' => array(
-							'type'    => 'radio',
-							'label'   => __( 'Display Prices in the Shop', 'wholesalex' ),
-							'options' => array(
-								'woocommerce_default_tax' => __( 'Use WooCommerce default', 'wholesalex' ),
-								'incl'                    => __( 'Including Tax', 'wholesalex' ),
-								'excl'                    => __( 'Excluding Tax', 'wholesalex' ),
-							),
-							'help'    => __( 'Display prices including or excluding taxes on the shop page.', 'wholesalex' ),
-							'default' => 'woocommerce_default_tax',
-							'tooltip' => 'Decide and select whether the product prices on the shop page will be with or without taxes.',
-							'doc'     => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
-
-						),
-						'_settings_price_product_list_page' => array(
-							'type'        => 'radio',
-							'label'       => __( 'Wholesale Price On Product Listing Page', 'wholesalex' ),
-							'options'     => array(
-								'pricing_range'   => __( 'Pricing Range', 'wholesalex' ),
-								'minimum_pricing' => __( 'Minimum Pricing', 'wholesalex' ),
-								'maximum_pricing' => __( 'Maximum Pricing', 'wholesalex' ),
-							),
-							'placeholder' => __( 'Pricing Range, Minimum Pricing, Maximum Pricing', 'wholesalex' ),
-							'help'        => __( 'Choose the wholesale price range, lowest price, or highest price for variable products on shop and category pages.', 'wholesalex' ),
-							'default'     => 'pricing_range',
-						),
-					),
-					'attrGroupTwo'  => array(
-						'type'                            => 'price_two',
-						'label'                           => __( 'Price Visibility', 'wholesalex' ),
-						'_settings_hide_retail_price'     => array(
+						'_settings_access_shop_manager_with_wxs_menu' => array(
 							'type'    => 'slider',
-							'label'   => __( 'Hide Retail Price', 'wholesalex' ),
-							'desc'    => __( 'Click on the check box if you want to hide the retail price.', 'wholesalex' ),
-							'help'    => __( 'Once you click on this check box the regular price will be hidden if the wholesale price is present.', 'wholesalex' ),
-							'default' => 'no',
-						),
-						'_settings_hide_wholesalex_price' => array(
-							'type'    => 'slider',
-							'label'   => __( 'Hide Wholesale Price', 'wholesalex' ),
-							'desc'    => __( 'Hide wholesale price for all users.', 'wholesalex' ),
-							'help'    => __( 'This option will hide wholesale price in price-column of product-listing page.', 'wholesalex' ),
-							'default' => 'no',
-						),
-					),
-					'attrGroupFour' => array(
-						'type' => 'price_four',
-						'_settings_quantity_based_discount_priority' => array(
-							'type'         => 'priorityDragList',
-							'label'        => __( 'Pricing / Discount Priority', 'wholesalex' ),
-							'desc'         => __( 'We recommend using the default priority order for consistent pricing. Enable custom priority only if you need to change which pricing method gets priority.', 'wholesalex' ),
-							'options'      => wholesalex()->get_quantity_based_discount_priorities(),
-							'default'      => $pricing_priorities,
-							'enable_key'   => '_settings_enable_custom_priority_order',
-							'enable_label' => __( 'Enable to set custom priority order', 'wholesalex' ),
-							'tooltip'      => __( 'Determines which pricing method gets priority when multiple prices or discounts apply to the same product.', 'wholesalex' ),
-							'doc'          => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
-						),
-					),
-				),
-				'private_store'        => array(
-					'label'        => __( 'Private Store', 'wholesalex' ),
-					'attr'         => array(
-						'type'                    => 'private_store_zero',
-						'_settings_private_store' => array(
-							'type'    => 'slider',
-							'label'   => __( 'Private Store', 'wholesalex' ),
-							'desc'    => __( 'Click the check box to make the store private from logged out users', 'wholesalex' ),
+							'label'   => __( 'Allow Full Access to Shop Manager', 'wholesalex' ),
+							'desc'    => __( 'Check this box if you want to enable Full Access of WholesaleX to the Shop Manager', 'wholesalex' ),
 							'help'    => '',
 							'default' => 'no',
-							'tooltip' => 'Enable this option to hide your store from guest and B2C customers',
-							'doc'     => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
-						),
-					),
-					'attrGroupOne' => array(
-						'type' => 'private_store_one',
-						'_settings_private_store_redirect_url' => array(
-							'type'       => 'text',
-							'label'      => __( 'Force Redirect URL', 'wholesalex' ),
-							'depends_on' => array(
-								array(
-									'key'   => '_settings_private_store',
-									'value' => 'yes',
-								),
-							),
-							'help'       => __( 'Enter an url where you want to force redirect logged out users.', 'wholesalex' ),
-							'default'    => get_permalink( $my_account_id ),
-							'tooltip'    => 'Add your desired URL where you want to redirect the logged-out users',
-						),
-						'_settings_private_store_whitelist_url' => array(
-							'type'       => 'text',
-							'label'      => __( 'Whitelist URL (For Private Store)', 'wholesalex' ),
-							'depends_on' => array(
-								array(
-									'key'   => '_settings_private_store',
-									'value' => 'yes',
-								),
-							),
-							'help'       => __( 'Enter Comma Separated URLs to make these whitelist on private store', 'wholesalex' ),
-							'default'    => '',
-						),
-					),
-					'attrGroupTwo' => array(
-						'type'                          => 'general_two',
-						'_settings_login_to_view_price_product_page' => array(
-							'type'    => 'slider',
-							'label'   => __( 'Show Login to view price on Single Product Page', 'wholesalex' ),
-							'desc'    => __( 'Login to view price', 'wholesalex' ),
-							'help'    => __( 'Display logging option on single product pages to view price.', 'wholesalex' ),
-							'default' => 'no',
-						),
-						'_settings_login_to_view_price_login_url' => array(
-							'type'    => 'text',
-							'label'   => __( 'Login to View Price Login URL', 'wholesalex' ),
-							'desc'    => __( 'Login to View Price Login URL', 'wholesalex' ),
-							'help'    => __( 'Will redirect to this link for login, when login to view prices enabled.', 'wholesalex' ),
-							'default' => get_permalink( $my_account_id ),
-						),
-						'_language_login_to_see_prices' => array(
-							'type'        => 'text',
-							'label'       => __( 'Login To See Price Text', 'wholesalex' ),
-							'placeholder' => '',
-							'help'        => '',
-							'default'     => __( 'Login to see prices', 'wholesalex' ),
-						),
-						'_settings_login_to_view_price_product_list' => array(
-							'type'    => 'slider',
-							'label'   => __( 'Show Login to view price on Product Listing Page', 'wholesalex' ),
-							'desc'    => __( 'Login to view price', 'wholesalex' ),
-							'help'    => __( 'Display logging option on the product listing page to view price.', 'wholesalex' ),
-							'default' => 'no',
-						),
-					),
-				),
-				'registration_n_login' => array(
-					'label'        => __( 'Registration & Login', 'wholesalex' ),
-					'attr'         => array(
-						'type'                         => 'registration_zero',
-						'_settings_user_login_option'  => array(
-							'type'    => 'radio',
-							'label'   => __( 'User Login Option', 'wholesalex' ),
-							'options' => array(
-								'manual_login' => __( 'Manual Login After Registration', 'wholesalex' ),
-								'auto_login'   => __( 'Auto Login After Registration', 'wholesalex' ),
-							),
-							'help'    => __( 'Auto login after registration will work only if the user status option is set to “Auto Approve”. ', 'wholesalex' ),
-							'link'    => 'https://getwholesalex.com/docs/wholesalex/registration-form-builder/',
-							'default' => 'manual_login',
-						),
-						'_settings_user_status_option' => array(
-							'type'    => 'radio',
-							'label'   => __( 'Registration Approval Method', 'wholesalex' ),
-							'options' => array(
-								'email_confirmation_require' => __( 'Email Confirmation', 'wholesalex' ),
-								'auto_approve'  => __( 'Auto Approval', 'wholesalex' ),
-								'admin_approve' => __( 'Admin Approval Required', 'wholesalex' ),
-							),
-							'help'    => __( 'This is the default registration approval method for all users. You can set a different approval method for individual B2B roles from the User Roles settings.', 'wholesalex' ),
-							'default' => 'admin_approve',
-						),
-					),
-					'attrGroupOne' => array(
-						'type'                         => 'registration_one',
-						'_settings_enable_separate_page_b2b' => array(
-							'type'    => 'slider',
-							'label'   => __( 'Use Separate Page for B2B Users', 'wholesalex' ),
-							'help'    => __( 'Enable this option to use a different My Account page for B2B users.', 'wholesalex' ),
-							'default' => 'no',
-						),
-						'_settings_seperate_page_b2b'  => array(
-							'type'       => 'select',
-							'label'      => __( 'Choose Page', 'wholesalex' ),
-							'options'    => $__pages_option,
-							'help'       => __( 'Select the page B2B users should use as their My Account page.', 'wholesalex' ),
-							'default'    => $my_account_id,
-							'depends_on' => array(
-								array(
-									'key'   => '_settings_enable_separate_page_b2b',
-									'value' => 'yes',
-								),
-							),
-
-						),
-						'_settings_show_form_for_logged_in' => array(
-							'type'    => 'slider',
-							'label'   => __( 'Show Registration Form For Logged In User', 'wholesalex' ),
-							'desc'    => __( 'Click on the check box if you want to show registration form logged in users.', 'wholesalex' ),
-							'help'    => '',
-							'default' => 'yes',
-						),
-						'_settings_redirect_url_registration' => array(
-							'type'        => 'text',
-							'label'       => __( 'Redirect Page URL (After Registration)', 'wholesalex' ),
-							'placeholder' => __( 'http://', 'wholesalex' ),
-							'help'        => '',
-							'default'     => get_permalink( $my_account_id ),
-						),
-						'_settings_redirect_url_login' => array(
-							'type'        => 'text',
-							'label'       => __( 'Redirect Page URL (After Login)', 'wholesalex' ),
-							'placeholder' => __( 'http://', 'wholesalex' ),
-							'help'        => '',
-							'default'     => get_permalink( get_option( 'woocommerce_shop_page_id' ) ),
-						),
-						'_settings_registration_success_message' => array(
-							'type'    => 'textarea',
-							'label'   => __( 'Registration Successful Message', 'wholesalex' ),
-							'help'    => '',
-							'default' => __( 'Thank you for registering. Your account will be reviewed by us & approve manually. Please wait to be approved.', 'wholesalex' ),
-						),
-						'_settings_message_for_logged_in_user' => array(
-							'type'    => 'textarea',
-							'label'   => __( 'Registration Form Message For Logged In User', 'wholesalex' ),
-							'help'    => '',
-							'default' => __( 'Sorry You Are Not Allowed To View This Form', 'wholesalex' ),
+							'tooltip' => '⚠️ Enabling this option gives Shop Managers full access to WholesaleX, including pricing changes, user profile settings, and all other configurations.',
 						),
 					),
 				),
@@ -1305,6 +1058,264 @@ class Settings {
 						),
 					),
 				),
+				'price'                => array(
+					'label'         => __( 'Price Display', 'wholesalex' ),
+					'attr'          => array(
+						'type'                           => 'price_zero',
+						'_settings_price_text'           => array(
+							'type'        => 'text',
+							'label'       => __( 'Wholesale Price Text for Product Pages', 'wholesalex' ),
+							'placeholder' => __( 'Wholesale Price:', 'wholesalex' ),
+							'help'        => __( 'The text is shown immediately before the wholesale price in product single page. The default text is “Wholesale Price:”', 'wholesalex' ),
+							'default'     => __( 'Wholesale Price:', 'wholesalex' ),
+						),
+						'_settings_price_text_product_list_page' => array(
+							'type'        => 'text',
+							'label'       => __( 'Wholesale Price Text for Product Listing Pages', 'wholesalex' ),
+							'placeholder' => __( 'Wholesale Price:', 'wholesalex' ),
+							'help'        => __( 'The text is shown immediately before the wholesale price in product listing page. The default text is “Wholesale Price:”.', 'wholesalex' ),
+							'default'     => __( 'Wholesale Price:', 'wholesalex' ),
+						),
+						'_settings_regular_price_suffix' => array(
+							'type'        => 'text',
+							'label'       => __( 'Override Regular Price Suffix', 'wholesalex' ),
+							'placeholder' => '',
+							'help'        => __( 'Display desired text after regular prices on shop and single products pages.', 'wholesalex' ),
+							'default'     => '',
+							'tooltip'     => 'Add your custom text to replace the default one, which will be displayed just after the wholesale prices of the products of the shop and single product pages',
+							'doc'         => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
+						),
+						'_settings_wholesalex_price_suffix' => array(
+							'type'        => 'text',
+							/* translators: %s - Plugin Name */
+							'label'       => sprintf( __( '%s Price Suffix', 'wholesalex' ), wholesalex()->get_plugin_name() ),
+							'placeholder' => '',
+							'help'        => __( 'Display desired text after wholesale prices on shop and single products pages.', 'wholesalex' ),
+							'default'     => '',
+							'tooltip'     => 'Add the custom text that you want to display just after the wholesale prices of the products of the shop and single product pages.',
+							'doc'         => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
+						),
+					),
+					'attrGroupOne'  => array(
+						'type' => 'price_one',
+						'_settings_display_price_shop_page' => array(
+							'type'    => 'radio',
+							'label'   => __( 'Display Prices in the Shop', 'wholesalex' ),
+							'options' => array(
+								'woocommerce_default_tax' => __( 'Use WooCommerce default', 'wholesalex' ),
+								'incl'                    => __( 'Including Tax', 'wholesalex' ),
+								'excl'                    => __( 'Excluding Tax', 'wholesalex' ),
+							),
+							'help'    => __( 'Display prices including or excluding taxes on the shop page.', 'wholesalex' ),
+							'default' => 'woocommerce_default_tax',
+							'tooltip' => 'Decide and select whether the product prices on the shop page will be with or without taxes.',
+							'doc'     => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
+
+						),
+						'_settings_price_product_list_page' => array(
+							'type'        => 'radio',
+							'label'       => __( 'Wholesale Price On Product Listing Page', 'wholesalex' ),
+							'options'     => array(
+								'pricing_range'   => __( 'Pricing Range', 'wholesalex' ),
+								'minimum_pricing' => __( 'Minimum Pricing', 'wholesalex' ),
+								'maximum_pricing' => __( 'Maximum Pricing', 'wholesalex' ),
+							),
+							'placeholder' => __( 'Pricing Range, Minimum Pricing, Maximum Pricing', 'wholesalex' ),
+							'help'        => __( 'Choose the wholesale price range, lowest price, or highest price for variable products on shop and category pages.', 'wholesalex' ),
+							'default'     => 'pricing_range',
+						),
+					),
+					'attrGroupTwo'  => array(
+						'type'                            => 'price_two',
+						'label'                           => __( 'Price Visibility', 'wholesalex' ),
+						'_settings_hide_retail_price'     => array(
+							'type'    => 'slider',
+							'label'   => __( 'Hide Retail Price', 'wholesalex' ),
+							'desc'    => __( 'Click on the check box if you want to hide the retail price.', 'wholesalex' ),
+							'help'    => __( 'Once you click on this check box the regular price will be hidden if the wholesale price is present.', 'wholesalex' ),
+							'default' => 'no',
+						),
+						'_settings_hide_wholesalex_price' => array(
+							'type'    => 'slider',
+							'label'   => __( 'Hide Wholesale Price', 'wholesalex' ),
+							'desc'    => __( 'Hide wholesale price for all users.', 'wholesalex' ),
+							'help'    => __( 'This option will hide wholesale price in price-column of product-listing page.', 'wholesalex' ),
+							'default' => 'no',
+						),
+					),
+					'attrGroupFour' => array(
+						'type' => 'price_four',
+						'_settings_quantity_based_discount_priority' => array(
+							'type'         => 'priorityDragList',
+							'label'        => __( 'Pricing / Discount Priority', 'wholesalex' ),
+							'desc'         => __( 'We recommend using the default priority order for consistent pricing. Enable custom priority only if you need to change which pricing method gets priority.', 'wholesalex' ),
+							'options'      => wholesalex()->get_quantity_based_discount_priorities(),
+							'default'      => $pricing_priorities,
+							'enable_key'   => '_settings_enable_custom_priority_order',
+							'enable_label' => __( 'Enable to set custom priority order', 'wholesalex' ),
+							'tooltip'      => __( 'Determines which pricing method gets priority when multiple prices or discounts apply to the same product.', 'wholesalex' ),
+							'doc'          => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
+						),
+					),
+				),
+				'private_store'        => array(
+					'label'        => __( 'Private Store', 'wholesalex' ),
+					'attr'         => array(
+						'type'                    => 'private_store_zero',
+						'_settings_private_store' => array(
+							'type'    => 'slider',
+							'label'   => __( 'Private Store', 'wholesalex' ),
+							'desc'    => __( 'Click the check box to make the store private from logged out users', 'wholesalex' ),
+							'help'    => '',
+							'default' => 'no',
+							'tooltip' => 'Enable this option to hide your store from guest and B2C customers',
+							'doc'     => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
+						),
+					),
+					'attrGroupOne' => array(
+						'type' => 'private_store_one',
+						'_settings_private_store_redirect_url' => array(
+							'type'       => 'text',
+							'label'      => __( 'Force Redirect URL', 'wholesalex' ),
+							'depends_on' => array(
+								array(
+									'key'   => '_settings_private_store',
+									'value' => 'yes',
+								),
+							),
+							'help'       => __( 'Enter an url where you want to force redirect logged out users.', 'wholesalex' ),
+							'default'    => get_permalink( $my_account_id ),
+							'tooltip'    => 'Add your desired URL where you want to redirect the logged-out users',
+						),
+						'_settings_private_store_whitelist_url' => array(
+							'type'       => 'text',
+							'label'      => __( 'Whitelist URL (For Private Store)', 'wholesalex' ),
+							'depends_on' => array(
+								array(
+									'key'   => '_settings_private_store',
+									'value' => 'yes',
+								),
+							),
+							'help'       => __( 'Enter Comma Separated URLs to make these whitelist on private store', 'wholesalex' ),
+							'default'    => '',
+						),
+					),
+					'attrGroupTwo' => array(
+						'type'                          => 'general_two',
+						'_settings_login_to_view_price_product_page' => array(
+							'type'    => 'slider',
+							'label'   => __( 'Show Login to view price on Single Product Page', 'wholesalex' ),
+							'desc'    => __( 'Login to view price', 'wholesalex' ),
+							'help'    => __( 'Display logging option on single product pages to view price.', 'wholesalex' ),
+							'default' => 'no',
+						),
+						'_settings_login_to_view_price_login_url' => array(
+							'type'    => 'text',
+							'label'   => __( 'Login to View Price Login URL', 'wholesalex' ),
+							'desc'    => __( 'Login to View Price Login URL', 'wholesalex' ),
+							'help'    => __( 'Will redirect to this link for login, when login to view prices enabled.', 'wholesalex' ),
+							'default' => get_permalink( $my_account_id ),
+						),
+						'_language_login_to_see_prices' => array(
+							'type'        => 'text',
+							'label'       => __( 'Login To See Price Text', 'wholesalex' ),
+							'placeholder' => '',
+							'help'        => '',
+							'default'     => __( 'Login to see prices', 'wholesalex' ),
+						),
+						'_settings_login_to_view_price_product_list' => array(
+							'type'    => 'slider',
+							'label'   => __( 'Show Login to view price on Product Listing Page', 'wholesalex' ),
+							'desc'    => __( 'Login to view price', 'wholesalex' ),
+							'help'    => __( 'Display logging option on the product listing page to view price.', 'wholesalex' ),
+							'default' => 'no',
+						),
+					),
+				),
+				'registration_n_login' => array(
+					'label'        => __( 'Registration & Login', 'wholesalex' ),
+					'attr'         => array(
+						'type'                         => 'registration_zero',
+						'_settings_user_login_option'  => array(
+							'type'    => 'radio',
+							'label'   => __( 'User Login Option', 'wholesalex' ),
+							'options' => array(
+								'manual_login' => __( 'Manual Login After Registration', 'wholesalex' ),
+								'auto_login'   => __( 'Auto Login After Registration', 'wholesalex' ),
+							),
+							'help'    => __( 'Auto login after registration will work only if the user status option is set to “Auto Approve”. ', 'wholesalex' ),
+							'link'    => 'https://getwholesalex.com/docs/wholesalex/registration-form-builder/',
+							'default' => 'manual_login',
+						),
+						'_settings_user_status_option' => array(
+							'type'    => 'radio',
+							'label'   => __( 'Registration Approval Method', 'wholesalex' ),
+							'options' => array(
+								'email_confirmation_require' => __( 'Email Confirmation', 'wholesalex' ),
+								'auto_approve'  => __( 'Auto Approval', 'wholesalex' ),
+								'admin_approve' => __( 'Admin Approval Required', 'wholesalex' ),
+							),
+							'help'    => __( 'This is the default registration approval method for all users. You can set a different approval method for individual B2B roles from the User Roles settings.', 'wholesalex' ),
+							'default' => 'admin_approve',
+						),
+					),
+					'attrGroupOne' => array(
+						'type'                         => 'registration_one',
+						'_settings_enable_separate_page_b2b' => array(
+							'type'    => 'slider',
+							'label'   => __( 'Use Separate Page for B2B Users', 'wholesalex' ),
+							'help'    => __( 'Enable this option to use a different My Account page for B2B users.', 'wholesalex' ),
+							'default' => 'no',
+						),
+						'_settings_seperate_page_b2b'  => array(
+							'type'       => 'select',
+							'label'      => __( 'Choose Page', 'wholesalex' ),
+							'options'    => $__pages_option,
+							'help'       => __( 'Select the page B2B users should use as their My Account page.', 'wholesalex' ),
+							'default'    => $my_account_id,
+							'depends_on' => array(
+								array(
+									'key'   => '_settings_enable_separate_page_b2b',
+									'value' => 'yes',
+								),
+							),
+
+						),
+						'_settings_show_form_for_logged_in' => array(
+							'type'    => 'slider',
+							'label'   => __( 'Show Registration Form For Logged In User', 'wholesalex' ),
+							'desc'    => __( 'Click on the check box if you want to show registration form logged in users.', 'wholesalex' ),
+							'help'    => '',
+							'default' => 'yes',
+						),
+						'_settings_redirect_url_registration' => array(
+							'type'        => 'text',
+							'label'       => __( 'Redirect Page URL (After Registration)', 'wholesalex' ),
+							'placeholder' => __( 'http://', 'wholesalex' ),
+							'help'        => '',
+							'default'     => get_permalink( $my_account_id ),
+						),
+						'_settings_redirect_url_login' => array(
+							'type'        => 'text',
+							'label'       => __( 'Redirect Page URL (After Login)', 'wholesalex' ),
+							'placeholder' => __( 'http://', 'wholesalex' ),
+							'help'        => '',
+							'default'     => get_permalink( get_option( 'woocommerce_shop_page_id' ) ),
+						),
+						'_settings_registration_success_message' => array(
+							'type'    => 'textarea',
+							'label'   => __( 'Registration Successful Message', 'wholesalex' ),
+							'help'    => '',
+							'default' => __( 'Thank you for registering. Your account will be reviewed by us & approve manually. Please wait to be approved.', 'wholesalex' ),
+						),
+						'_settings_message_for_logged_in_user' => array(
+							'type'    => 'textarea',
+							'label'   => __( 'Registration Form Message For Logged In User', 'wholesalex' ),
+							'help'    => '',
+							'default' => __( 'Sorry You Are Not Allowed To View This Form', 'wholesalex' ),
+						),
+					),
+				),
 				'language_n_text'      => array(
 					'label' => __( 'Language and Text', 'wholesalex' ),
 
@@ -1355,48 +1366,6 @@ class Settings {
 						),
 					),
 				),
-				'recaptcha'            => array(
-					'label' => __( 'reCAPTCHA', 'wholesalex' ),
-					'attr'  => array(
-						'recaptcha_version' => array(
-							'type'    => 'radio',
-							'label'   => __( 'Recaptcha Status', 'wholesalex' ),
-							'options' => array(
-								'recaptcha_v2' => __( 'Recaptcha v2', 'wholesalex' ),
-								'recaptcha_v3' => __( 'Recaptcha v3', 'wholesalex' ),
-							),
-							'default' => 'recaptcha_v3',
-						),
-						'type'              => 'recaptcha_zero',
-						'_settings_google_recaptcha_v3_site_key' => array(
-							'type'        => 'text',
-							'label'       => __( 'Site Key', 'wholesalex' ),
-							'placeholder' => __( 'Site Key...', 'wholesalex' ),
-							'default'     => '',
-							'help'        => __( 'For Gettings reCAPTCHA Site Key, You have to create an project on google recaptcha. ', 'wholesalex' ),
-							'link'        => 'https://getwholesalex.com/add-on/recaptcha/',
-						),
-						'_settings_google_recaptcha_v3_secret_key' => array(
-							'type'        => 'text',
-							'label'       => __( 'Secret Key', 'wholesalex' ),
-							'placeholder' => __( 'Secret Key...', 'wholesalex' ),
-							'default'     => '',
-							'help'        => __( 'For Gettings reCAPTCHA secret Key, You have to create an project on google recaptcha. ', 'wholesalex' ),
-							'link'        => 'https://getwholesalex.com/add-on/recaptcha/',
-						),
-						'_settings_google_recaptcha_v3_allowed_score' => array(
-							'type'        => 'text',
-							'label'       => __( 'Minimum Allowed Score', 'wholesalex' ),
-							'placeholder' => '',
-							'default'     => __( '0.5', 'wholesalex' ),
-							'help'        => __( 'Set minimum allowed score for reCAPTCHA. Default Range: 0.0 - 1.00', 'wholesalex' ),
-							'hide_if'     => array(
-								'key'   => 'recaptcha_version',
-								'value' => 'recaptcha_v2',
-							),
-						),
-					),
-				),
 				'system'               => array(
 					'label' => __( 'System', 'wholesalex' ),
 					'attr'  => array(
@@ -1407,7 +1376,7 @@ class Settings {
 							'default' => 'no',
 							'label'   => __( 'Enable Deletion of WholesaleX Plugin Data', 'wholesalex' ),
 							'desc'    => __( 'Enable this option to allow deleting WholesaleX plugin data when uninstalling the plugin.', 'wholesalex' ),
-							'help'    => __( 'Warning: All WholesaleX data will be permanently removed from the database upon uninstall. This cannot be undone.', 'wholesalex' ),
+							'help'    => __( 'Warning: Uninstalling WholesaleX from your site will permanently remove all WholesaleX data from the database. This action cannot be undone.', 'wholesalex' ),
 							'tooltip' => __( 'Permanently delete all WholesaleX data on uninstall.', 'wholesalex' ),
 						),
 					),
@@ -1418,6 +1387,10 @@ class Settings {
 				),
 			),
 		);
+
+		if ( empty( $dynamic_rules_access['can_view'] ) ) {
+			unset( $settings_fields['dynamic_rules'], $settings_fields['design'] );
+		}
 
 		return $settings_fields;
 	}

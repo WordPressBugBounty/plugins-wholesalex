@@ -21,6 +21,7 @@ class Activator {
 	 */
 	public function __construct() {
 		// Initialize new installations without resetting completed onboarding on reactivation.
+		wholesalex()->get_dynamic_rules_access();
 		wholesalex()->get_onboarding_status();
 		$this->init_set_data();
 		$had_roles            = (bool) get_option( '_wholesalex_roles' );
