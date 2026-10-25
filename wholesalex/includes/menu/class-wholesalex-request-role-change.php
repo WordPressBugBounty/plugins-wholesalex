@@ -6,7 +6,6 @@
  * @since 2.0.13
  */
 
-
 namespace WHOLESALEX;
 
 defined( 'ABSPATH' ) || exit;
@@ -56,11 +55,11 @@ class WHOLESALEX_RequstRoleChange {
 	 */
 	public function request_to_change_role_action() {
 		$__roles         = $GLOBALS['wholesalex_roles'];
-		$current_role    = wholesalex()->get_current_user_role();
-		$current_user    = wp_get_current_user();
-		$current_email   = $current_user->user_email;
 		$current_user_id = get_current_user_id();
-		$request         = get_user_meta( $current_user_id, 'wsx_change_role_request', true );
+		// Account membership must not inherit a manager's storefront pricing preview.
+		$current_role = get_user_meta( $current_user_id, '__wholesalex_role', true );
+		$current_role = ! empty( $current_role ) ? $current_role : 'wholesalex_b2c_users';
+		$request      = get_user_meta( $current_user_id, 'wsx_change_role_request', true );
 
 		$show_role_request_ui = true;
 
@@ -74,8 +73,8 @@ class WHOLESALEX_RequstRoleChange {
 
 		$role_titles = array_filter(
 			array_map(
-				function ( $role ) use ( $current_role_name ) {
-					if ( isset( $current_role_name ) && $role['_role_title'] === $current_role_name ) {
+				function ( $role ) use ( $current_role ) {
+					if ( (string) $role['id'] === (string) $current_role ) {
 						return null;
 					}
 					return array(
@@ -142,9 +141,11 @@ class WHOLESALEX_RequstRoleChange {
 				const roleSelect = document.getElementById('roleSelect');
 				const successMessage = document.getElementById('successMessage');
 
-				const currentRole = <?php echo wp_json_encode( $current_role_name ); ?>;
-				const userName = <?php echo wp_json_encode( $current_user->display_name ); ?>;
-				const userEmail = <?php echo wp_json_encode( $current_email ); ?>;
+				if (!sendRequestBtn || !roleSelect) {
+					return;
+				}
+				const requestUrl = <?php echo wp_json_encode( rest_url( 'wholesalex/v1/role_change_request_action/' ) ); ?>;
+				const requestNonce = <?php echo wp_json_encode( wp_create_nonce( 'wp_rest' ) ); ?>;
 
 				sendRequestBtn.addEventListener('click', async function () {
 					if (roleSelect.value !== '') {
@@ -155,36 +156,35 @@ class WHOLESALEX_RequstRoleChange {
 							const selectedRole = roleSelect.value;
 
 							const userData = {
-								name: userName,
-								prev_role: currentRole,
-								selected_role: selectedRole,
-								email: userEmail
+								selected_role: selectedRole
 							};
 
 							try {
-								const res = await fetch('/wp-json/wholesalex/v1/role_change_request_action/', {
+								const res = await fetch(requestUrl, {
 									method: 'POST',
+									credentials: 'same-origin',
 									headers: {
 										'Content-Type': 'application/json',
-										// Include nonce if required for authentication
-										'X-WP-Nonce': wpApiSettings.nonce
+										'X-WP-Nonce': requestNonce
 									},
 									body: JSON.stringify(userData)
 								});
 
-								if (res.ok) {
+								const result = await res.json();
+								if (res.ok && result.success) {
+									sendRequestBtn.style.display = 'none';
+									roleSelect.disabled = true;
 									successMessage.style.display = 'block';
 
 									setTimeout(() => {
 										successMessage.style.display = 'none';
 									}, 2000);
 								} else {
-									const errorText = await res.text();
-									throw new Error(`Server responded with status ${res.status}: ${errorText}`);
+									throw new Error(result.message || (result.data && result.data.message) || <?php echo wp_json_encode( __( 'Error occurred while changing role.', 'wholesalex' ) ); ?>);
 								}
 							} catch (error) {
 								console.error('Request failed', error);
-								alert('<?php echo esc_js( __( 'Error occurred while changing role.', 'wholesalex' ) ); ?>');
+								alert(error.message || <?php echo wp_json_encode( __( 'Error occurred while changing role.', 'wholesalex' ) ); ?>);
 							}
 
 						}
@@ -216,6 +216,7 @@ class WHOLESALEX_RequstRoleChange {
 
 		<?php
 	}
+
 
 
 	/**
@@ -319,11 +320,19 @@ class WHOLESALEX_RequstRoleChange {
 					return;
 				}
 
-				// Perform the action.
+				$operation = 'accept' === $action ? 'accept_role_request' : ( 'reject' === $action ? 'reject_role_request' : '' );
+				$error     = User_Operation_Policy::authorize( $operation, get_current_user_id(), $id );
+				if ( is_wp_error( $error ) ) {
+					return $error;
+				}
 
 				if ( 'accept' === $action ) {
 					$request = get_user_meta( $id, 'wsx_change_role_request', true );
 					if ( isset( $request['selected_role'] ) && ! empty( $request['selected_role'] ) ) {
+						$error = User_Operation_Policy::authorize( 'accept_role_request', get_current_user_id(), $id, array( 'role' => $request['selected_role'] ) );
+						if ( is_wp_error( $error ) ) {
+							return $error;
+						}
 						wholesalex()->change_role( $id, $request['selected_role'] );
 						delete_user_meta( $id, 'wsx_change_role_request' );
 					} else {
@@ -342,7 +351,7 @@ class WHOLESALEX_RequstRoleChange {
 				return;
 		}
 
-		wp_send_json( $response );
+		return rest_ensure_response( $response );
 	}
 
 	/**
@@ -357,13 +366,15 @@ class WHOLESALEX_RequstRoleChange {
 		$search_query   = isset( $post['search'] ) ? sanitize_text_field( $post['search'] ) : '';
 		$items_per_page = isset( $post['itemsPerPage'] ) ? (int) $post['itemsPerPage'] : 10;
 
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return new \WP_Error( 'rest_forbidden', 'Only administrators can perform this action.', array( 'status' => 403 ) );
+		$error = User_Operation_Policy::authorize( 'read', get_current_user_id(), 0 );
+		if ( is_wp_error( $error ) ) {
+			return $error;
 		}
 
 		// Get all users with the meta key 'wsx_change_role_request'.
 		$users = get_users(
 			array(
+				'blog_id'      => get_current_blog_id(),
 				'meta_key'     => 'wsx_change_role_request', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Role-change requests are persisted as user metadata.
 				'meta_compare' => 'EXISTS',
 			)
@@ -372,6 +383,9 @@ class WHOLESALEX_RequstRoleChange {
 		$result = array();
 
 		foreach ( $users as $user ) {
+			if ( is_wp_error( User_Operation_Policy::authorize( 'read', get_current_user_id(), $user->ID ) ) ) {
+				continue;
+			}
 			$request_data = get_user_meta( $user->ID, 'wsx_change_role_request', true );
 
 			// Optional: only return requests that are pending.
@@ -405,7 +419,7 @@ class WHOLESALEX_RequstRoleChange {
 		);
 		$response['status'] = true;
 
-		return wp_send_json( $response );
+		return rest_ensure_response( $response );
 	}
 
 
@@ -417,11 +431,7 @@ class WHOLESALEX_RequstRoleChange {
 	 * @since 2.0.14
 	 */
 	public function get_role_title( $id ) {
-		$__roles = $GLOBALS['wholesalex_roles'];
-
-		$get_role = $__roles[ $id ];
-
-		return $get_role['_role_title'];
+		return wholesalex()->get_role_name_by_role_id( $id );
 	}
 
 
@@ -446,15 +456,17 @@ class WHOLESALEX_RequstRoleChange {
 	 */
 	public function role_change_restapi_action( $data ) {
 		$user_id       = get_current_user_id();
-		$name          = sanitize_text_field( $data['name'] );
-		$prev_role     = sanitize_text_field( $data['prev_role'] );
-		$selected_role = sanitize_text_field( $data['selected_role'] );
-		$email         = sanitize_email( $data['email'] );
-
-		$user = get_user_by( 'id', $user_id );
-		if ( ! $user ) {
-			return new WP_Error( 'rest_user_not_found', __( 'User not found', 'wholesalex' ), array( 'status' => 404 ) );
+		$selected_role = isset( $data['selected_role'] ) && is_string( $data['selected_role'] ) ? sanitize_key( $data['selected_role'] ) : '';
+		$error         = User_Operation_Policy::authorize( 'request', $user_id, $user_id, array( 'role' => $selected_role ) );
+		if ( is_wp_error( $error ) ) {
+			return $error;
 		}
+		$user      = get_userdata( $user_id );
+		$name      = $user->display_name;
+		$email     = $user->user_email;
+		$role_id   = get_user_meta( $user_id, '__wholesalex_role', true );
+		$role_id   = $role_id ? $role_id : get_user_meta( $user_id, '__wholesalex_registration_role', true );
+		$prev_role = wholesalex()->get_role_name_by_role_id( $role_id );
 
 		// Store role change request in user meta.
 		$request_data = array(

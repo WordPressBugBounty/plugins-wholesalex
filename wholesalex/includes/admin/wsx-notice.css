@@ -157,7 +157,6 @@
 
 .wsx-content-discount_btn {
 	background-color: #ffffff;
-	text-decoration: none;
 	border: 1px solid var(--wsx-notice-primary);
 	padding: 5px 10px;
 	border-radius: 5px;
@@ -218,7 +217,6 @@
 
 /* Data-collection consent notice */
 .wsx-consent-box {
-	width: 656px;
 	padding: 16px !important;
 	border: 1px solid var(--wsx-notice-dark);
 	border-left-width: 4px;

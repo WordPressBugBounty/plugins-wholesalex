@@ -66,7 +66,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 				'shipping_rule'               => __( 'Shipping Rule Data', 'wholesalex' ),
 				'min_order_qty'               => __( 'Min Order Quantity Data', 'wholesalex' ),
 				'tax_rule'                    => __( 'Tax Rule Data', 'wholesalex' ),
-				'quantity_based'              => __( 'Quantity Based Data', 'wholesalex' ),
 				'extra_charge'                => __( 'Extra Charge Data', 'wholesalex' ),
 				'buy_x_get_y'                 => __( 'Buy X Get Y Data', 'wholesalex' ),
 				'max_order_qty'               => __( 'Max Order Quantity Data', 'wholesalex' ),
@@ -194,7 +193,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value__rule_status( $rule ) {
-		$methods = isset( $rule['_rule_status'] ) && $rule['_rule_status'] ? 'yes' : 'no';
+		$methods = in_array( $rule['_rule_status'] ?? '', array( true, 1, '1', 'yes' ), true ) ? 'yes' : 'no';
 		return $methods;
 	}
 	/**
@@ -401,12 +400,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value_product_discount( $rule ) {
-		$data = '';
-		if ( isset( $rule['_rule_type'] ) && 'product_discount' === $rule['_rule_type'] ) {
-			$discount = isset( $rule['product_discount'] ) ? $rule['product_discount'] : array();
-			$data     = sprintf( '_discount_type:%s;_discount_amount:%s;_discount_name:%s', $discount['_discount_type'], $discount['_discount_amount'], $discount['_discount_name'] );
-		}
-		return $data;
+		return isset( $rule['product_discount'] ) && is_array( $rule['product_discount'] ) ? 'json:' . wp_json_encode( $rule['product_discount'] ) : '';
 	}
 	/**
 	 * Get Cart Discount
@@ -417,12 +411,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value_cart_discount( $rule ) {
-		$data = '';
-		if ( isset( $rule['_rule_type'] ) && 'cart_discount' === $rule['_rule_type'] ) {
-			$discount = isset( $rule['cart_discount'] ) ? $rule['cart_discount'] : array();
-			$data     = sprintf( '_discount_type:%s;_discount_amount:%s;_discount_name:%s', $discount['_discount_type'], $discount['_discount_amount'], $discount['_discount_name'] );
-		}
-		return $data;
+		return isset( $rule['cart_discount'] ) && is_array( $rule['cart_discount'] ) ? 'json:' . wp_json_encode( $rule['cart_discount'] ) : '';
 	}
 	/**
 	 * Get Cart Discount
@@ -433,25 +422,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value_payment_order_qty( $rule ) {
-		$data = '';
-		if ( isset( $rule['_rule_type'] ) && 'payment_order_qty' === $rule['_rule_type'] ) {
-			$discount = isset( $rule['payment_order_qty'] ) ? $rule['payment_order_qty'] : array();
-			if ( ! is_array( $discount ) || ! isset( $discount['_payment_gateways'] ) || ! is_array( $discount['_payment_gateways'] ) ) {
-				return '';
-			}
-			$gateway_data = array();
-			if ( ! isset( $discount['_payment_gateways'] ) ) {
-				return '';
-			}
-			if ( ! is_array( $discount['_payment_gateways'] ) ) {
-				$discount['_payment_gateways'] = array();
-			}
-			foreach ( $discount['_payment_gateways'] as $gateway ) {
-				$gateway_data[] = $gateway['value'] . '(' . $gateway['name'] . ')';
-			}
-			$data = sprintf( '_payment_gateways:%s;_order_quantity:%s', implode( ',', $gateway_data ), $discount['_order_quantity'] );
-		}
-		return $data;
+		return isset( $rule['payment_order_qty'] ) && is_array( $rule['payment_order_qty'] ) ? 'json:' . wp_json_encode( $rule['payment_order_qty'] ) : '';
 	}
 
 	/**
@@ -463,22 +434,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value_payment_discount( $rule ) {
-		$data = '';
-		if ( isset( $rule['_rule_type'] ) && 'payment_discount' === $rule['_rule_type'] ) {
-			$discount     = isset( $rule['payment_discount'] ) ? $rule['payment_discount'] : array();
-			$gateway_data = array();
-			if ( ! isset( $discount['_payment_gateways'] ) ) {
-				return '';
-			}
-			if ( ! is_array( $discount['_payment_gateways'] ) ) {
-				$discount['_payment_gateways'] = array();
-			}
-			foreach ( $discount['_payment_gateways'] as $gateway ) {
-				$gateway_data[] = $gateway['value'] . '(' . $gateway['name'] . ')';
-			}
-			$data = sprintf( '_payment_gateways:%s;_discount_type:%s;_discount_amount:%s;_discount_name:%s', implode( ',', $gateway_data ), $discount['_discount_type'], $discount['_discount_amount'], $discount['_discount_name'] );
-		}
-		return $data;
+		return isset( $rule['payment_discount'] ) && is_array( $rule['payment_discount'] ) ? 'json:' . wp_json_encode( $rule['payment_discount'] ) : '';
 	}
 
 	/**
@@ -490,22 +446,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value_extra_charge( $rule ) {
-		$data = '';
-		if ( isset( $rule['_rule_type'] ) && 'extra_charge' === $rule['_rule_type'] ) {
-			$discount     = isset( $rule['extra_charge'] ) ? $rule['extra_charge'] : array();
-			$gateway_data = array();
-			if ( ! isset( $discount['_payment_gateways'] ) ) {
-				return '';
-			}
-			if ( ! is_array( $discount['_payment_gateways'] ) ) {
-				$discount['_payment_gateways'] = array();
-			}
-			foreach ( $discount['_payment_gateways'] as $gateway ) {
-				$gateway_data[] = $gateway['value'] . '(' . $gateway['name'] . ')';
-			}
-			$data = sprintf( '_payment_gateways:%s;_charge_type:%s;_charge_amount:%s;_charge_name:%s', implode( ',', $gateway_data ), $discount['_charge_type'], $discount['_charge_amount'], $discount['_charge_name'] );
-		}
-		return $data;
+		return isset( $rule['extra_charge'] ) && is_array( $rule['extra_charge'] ) ? 'json:' . wp_json_encode( $rule['extra_charge'] ) : '';
 	}
 	/**
 	 * Get Tax Rule
@@ -516,15 +457,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value_tax_rule( $rule ) {
-		$data = '';
-		if ( isset( $rule['_rule_type'] ) && 'tax_rule' === $rule['_rule_type'] ) {
-			$discount = isset( $rule['tax_rule'] ) ? $rule['tax_rule'] : array();
-			if ( ! is_array( $discount ) ) {
-				return '';
-			}
-			$data = sprintf( '_tax_exempted:%s;_tax_class:%s', $discount['_tax_exempted'], isset( $discount['_tax_class'] ) ? $discount['_tax_class'] : '' );
-		}
-		return $data;
+		return isset( $rule['tax_rule'] ) && is_array( $rule['tax_rule'] ) ? 'json:' . wp_json_encode( $rule['tax_rule'] ) : '';
 	}
 
 
@@ -537,22 +470,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value_shipping_rule( $rule ) {
-		$data = '';
-		if ( isset( $rule['_rule_type'] ) && 'shipping_rule' === $rule['_rule_type'] ) {
-			$discount           = isset( $rule['shipping_rule'] ) ? $rule['shipping_rule'] : array();
-			$shipping_zone_data = array();
-			if ( ! isset( $discount['_shipping_zone_methods'] ) ) {
-				return '';
-			}
-			if ( ! is_array( $discount['_shipping_zone_methods'] ) ) {
-				$discount['_shipping_zone_methods'] = array();
-			}
-			foreach ( $discount['_shipping_zone_methods'] as $shipping_zone ) {
-				$shipping_zone_data[] = $shipping_zone['value'] . '(' . $shipping_zone['name'] . ')';
-			}
-			$data = sprintf( '__shipping_zone:%s;_shipping_zone_methods:%s', $discount['__shipping_zone'], implode( ',', $shipping_zone_data ) );
-		}
-		return $data;
+		return isset( $rule['shipping_rule'] ) && is_array( $rule['shipping_rule'] ) ? 'json:' . wp_json_encode( $rule['shipping_rule'] ) : '';
 	}
 	/**
 	 * Get Shipping Rule
@@ -563,12 +481,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value_buy_x_get_one( $rule ) {
-		$data = '';
-		if ( isset( $rule['_rule_type'] ) && 'buy_x_get_one' === $rule['_rule_type'] ) {
-			$discount = isset( $rule['buy_x_get_one'] ) ? $rule['buy_x_get_one'] : array();
-			$data     = sprintf( '_minimum_purchase_count:%s', $discount['_minimum_purchase_count'] );
-		}
-		return $data;
+		return isset( $rule['buy_x_get_one'] ) && is_array( $rule['buy_x_get_one'] ) ? 'json:' . wp_json_encode( $rule['buy_x_get_one'] ) : '';
 	}
 	/**
 	 * Get Shipping Rule
@@ -579,22 +492,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value_buy_x_get_y( $rule ) {
-		$data = '';
-		if ( isset( $rule['_rule_type'] ) && 'buy_x_get_y' === $rule['_rule_type'] ) {
-			$discount   = isset( $rule['buy_x_get_y'] ) ? $rule['buy_x_get_y'] : array();
-			$free_items = array();
-			if ( ! isset( $discount['_free_item'] ) ) {
-				return '';
-			}
-			if ( ! is_array( $discount['_free_item'] ) ) {
-				$discount['_free_item'] = array();
-			}
-			foreach ( $discount['_free_item'] as $item ) {
-				$free_items[] = $item['value'];
-			}
-			$data = sprintf( '_minimum_purchase_count:%s;_free_item:%s;_free_item_count:%s', $discount['_minimum_purchase_count'], implode( ',', $free_items ), $discount['_free_item_count'] );
-		}
-		return $data;
+		return apply_filters( 'wholesalex_legacy_csv_field_exported', '', 'buy_x_get_y', $rule );
 	}
 	/**
 	 * Get Shipping Rule
@@ -605,12 +503,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value_min_order_qty( $rule ) {
-		$data = '';
-		if ( isset( $rule['_rule_type'] ) && 'min_order_qty' === $rule['_rule_type'] ) {
-			$discount = isset( $rule['min_order_qty'] ) ? $rule['min_order_qty'] : array();
-			$data     = sprintf( '_min_order_qty:%s', $discount['_min_order_qty'] );
-		}
-		return $data;
+		return isset( $rule['min_order_qty'] ) && is_array( $rule['min_order_qty'] ) ? 'json:' . wp_json_encode( $rule['min_order_qty'] ) : '';
 	}
 	/**
 	 * Get Shipping Rule
@@ -621,12 +514,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value_max_order_qty( $rule ) {
-		$data = '';
-		if ( isset( $rule['_rule_type'] ) && 'max_order_qty' === $rule['_rule_type'] ) {
-			$discount = isset( $rule['max_order_qty'] ) ? $rule['max_order_qty'] : array();
-			$data     = sprintf( '_max_order_qty:%s', $discount['_max_order_qty'] );
-		}
-		return $data;
+		return isset( $rule['max_order_qty'] ) && is_array( $rule['max_order_qty'] ) ? 'json:' . wp_json_encode( $rule['max_order_qty'] ) : '';
 	}
 	/**
 	 * Get Shipping Rule
@@ -636,18 +524,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @since  1.2.9
 	 * @return string
 	 */
-	protected function get_column_value_quantity_based( $rule ) {
-		$data = '';
-		if ( isset( $rule['_rule_type'] ) && 'quantity_based' === $rule['_rule_type'] ) {
-			$tiers     = isset( $rule['quantity_based']['tiers'] ) ? $rule['quantity_based']['tiers'] : array();
-			$tier_data = array();
-			foreach ( $tiers as $tier ) {
-				$tier_data[] = sprintf( '_discount_type:%s,_discount_amount:%s,_min_quantity:%s,_discount_name:%s', $tier['_discount_type'], $tier['_discount_amount'], $tier['_min_quantity'], $tier['_discount_name'] );
-			}
-			$data = implode( ';', $tier_data );
-		}
-		return $data;
-	}
+
 	/**
 	 * Get Shipping Rule
 	 *
@@ -657,18 +534,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Exporter extends \WC_CSV_Batch_Exporter {
 	 * @return string
 	 */
 	protected function get_column_value_conditions( $rule ) {
-		$data = '';
-		if ( isset( $rule['conditions'] ) && ! empty( $rule['conditions'] ) ) {
-			$tiers     = isset( $rule['conditions']['tiers'] ) ? $rule['conditions']['tiers'] : array();
-			$tier_data = array();
-			foreach ( $tiers as $tier ) {
-				if ( isset( $tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'] ) ) {
-					$tier_data[] = sprintf( '_conditions_for:%s,_conditions_operator:%s,_conditions_value:%s', $tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'] );
-				}
-			}
-			$data = implode( ';', $tier_data );
-
-		}
-		return $data;
+		return isset( $rule['conditions'] ) && is_array( $rule['conditions'] ) ? 'json:' . wp_json_encode( $rule['conditions'] ) : '';
 	}
 }

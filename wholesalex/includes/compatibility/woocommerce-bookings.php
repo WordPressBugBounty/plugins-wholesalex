@@ -39,6 +39,6 @@ class WHOLESALEX_Woocommerce_Bookings {
 		if ( $product->is_type( 'mwb_booking' ) || $product->is_type( 'booking' ) ) {
 			return true;
 		}
-		return false;
+		return $price;
 	}
 }

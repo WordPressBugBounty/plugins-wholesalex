@@ -98,6 +98,40 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 	}
 
 	/**
+	 * Resolve only owned uploads and return structured parser errors.
+	 *
+	 * @param string $id Opaque upload identity.
+	 * @param array  $args Parser settings.
+	 * @return WHOLESALEX_Dynamic_Rule_CSV_Importer
+	 */
+	private function get_job_importer( $id, $args ) {
+		$jobs   = new Dynamic_Rule_Import_Jobs();
+		$stream = $jobs->open( $id );
+		if ( is_wp_error( $stream ) ) {
+			wp_send_json(
+				array(
+					'status'  => false,
+					'message' => $stream->get_error_message(),
+				),
+				400
+			);
+		}
+		try {
+			return self::get_importer( $stream, $args );
+		} catch ( \InvalidArgumentException $error ) {
+			fclose( $stream ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Release the private request-local CSV stream.
+			$jobs->delete( $id );
+			wp_send_json(
+				array(
+					'status'  => false,
+					'message' => $error->getMessage(),
+				),
+				400
+			);
+		}
+	}
+
+	/**
 	 * Check whether a file is a valid CSV file.
 	 *
 	 * @param string $file File path.
@@ -162,69 +196,15 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 		if ( ! isset( $_POST['nonce'] ) || ! is_string( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), 'wholesalex-registration' ) ) {
 			return;
 		}
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- handle_upload() verifies the registration nonce before reading upload data.
-		$file_url = isset( $_POST['file_url'] ) ? sanitize_text_field( wp_unslash( $_POST['file_url'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- WooCommerce wc_clean sanitizes the unslashed importer value after nonce verification.
-
-		if ( empty( $file_url ) ) {
-			if ( ! isset( $_FILES['import'] ) || ! is_array( $_FILES['import'] ) || ! isset( $_FILES['import']['name'] ) || ! is_string( $_FILES['import']['name'] ) ) {
-				return new WP_Error( 'wholesalex_dynamic_rule_csv_importer_upload_file_empty', __( 'File is empty. Please upload something more substantial. This error could also be caused by uploads being disabled in your php.ini or by post_max_size being defined as smaller than upload_max_filesize in php.ini.', 'wholesalex' ) );
-			}
-
-			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated -- The upload name shape is checked above and the file type is checked on the next line.
-			if ( ! self::is_file_valid_csv( sanitize_file_name( wp_unslash( $_FILES['import']['name'] ) ), false ) ) {
-				return new WP_Error( 'wholesalex_dynamic_rule_csv_importer_upload_file_invalid', __( 'Invalid file type. The importer supports CSV and TXT file formats.', 'wholesalex' ) );
-			}
-
-			$overrides = array(
-				'test_form' => false,
-				'mimes'     => self::get_valid_csv_filetypes(),
-			);
-			$import    = array(
-				'name'     => sanitize_file_name( wp_unslash( $_FILES['import']['name'] ) ),
-				'type'     => isset( $_FILES['import']['type'] ) ? sanitize_mime_type( wp_unslash( $_FILES['import']['type'] ) ) : '',
-				'tmp_name' => isset( $_FILES['import']['tmp_name'] ) ? sanitize_text_field( $_FILES['import']['tmp_name'] ) : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Temporary upload path is only passed to wp_handle_upload().
-				'error'    => isset( $_FILES['import']['error'] ) ? absint( $_FILES['import']['error'] ) : 0,
-				'size'     => isset( $_FILES['import']['size'] ) ? absint( $_FILES['import']['size'] ) : 0,
-			);
-			$upload    = wp_handle_upload( $import, $overrides );
-
-			if ( isset( $upload['error'] ) ) {
-				return new WP_Error( 'wholesalex_dynamic_rule_csv_importer_upload_error', $upload['error'] );
-			}
-
-			// Construct the object array.
-			$object = array(
-				'post_title'     => basename( $upload['file'] ),
-				'post_content'   => $upload['url'],
-				'post_mime_type' => $upload['type'],
-				'guid'           => $upload['url'],
-				'context'        => 'import',
-				'post_status'    => 'private',
-			);
-
-			// Save the data.
-			$id = wp_insert_attachment( $object, $upload['file'] );
-
-			/*
-			 * Schedule a cleanup for one day from now in case of failed
-			 * import or missing wp_import_cleanup() call.
-			 */
-			wp_schedule_single_event( time() + DAY_IN_SECONDS, 'importer_scheduled_cleanup', array( $id ) );
-
-			return $upload['file'];
-		} elseif (
-			( 0 === stripos( realpath( ABSPATH . $file_url ), ABSPATH ) ) &&
-			file_exists( ABSPATH . $file_url )
-		) {
-			if ( ! self::is_file_valid_csv( ABSPATH . $file_url ) ) {
-				return new WP_Error( 'wholesalex_dynamic_rule_csv_importer_upload_file_invalid', __( 'Invalid file type. The importer supports CSV and TXT file formats.', 'wholesalex' ) );
-			}
-
-			return ABSPATH . $file_url;
+		if ( ! current_user_can( 'manage_options' ) || ! isset( $_FILES['import'] ) || ! is_array( $_FILES['import'] ) ) {
+			return new WP_Error( 'invalid_upload', __( 'Please upload a CSV file.', 'wholesalex' ) );
 		}
-		// phpcs:enable WordPress.Security.NonceVerification.Missing
-
-		return new WP_Error( 'wholesalex_dynamic_rule_csv_importer_upload_invalid_file', __( 'Please upload or provide the link to a valid CSV file.', 'wholesalex' ) );
+		$upload = $_FILES['import']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Validate uploaded-file identity, type and size before reading bytes below.
+		if ( ! isset( $upload['name'], $upload['tmp_name'], $upload['error'], $upload['size'] ) || ! is_string( $upload['name'] ) || ! is_string( $upload['tmp_name'] ) || UPLOAD_ERR_OK !== $upload['error'] || ! is_uploaded_file( $upload['tmp_name'] ) || ! self::is_file_valid_csv( $upload['name'], false ) || $upload['size'] > Dynamic_Rule_Import_Jobs::MAX_BYTES ) {
+			return new WP_Error( 'invalid_upload', __( 'Please upload a valid CSV file of at most 5 MB.', 'wholesalex' ) );
+		}
+		$csv = file_get_contents( $upload['tmp_name'], false, null, 0, Dynamic_Rule_Import_Jobs::MAX_BYTES + 1 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read only the verified PHP upload, with a strict size limit.
+		return ( new Dynamic_Rule_Import_Jobs() )->create( $csv );
 	}
 
 
@@ -279,7 +259,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 					__( 'Shipping Rule Data', 'wholesalex' ) => 'shipping_rule',
 					__( 'Min Order Quantity Data', 'wholesalex' ) => 'min_order_qty',
 					__( 'Tax Rule Data', 'wholesalex' )    => 'tax_rule',
-					__( 'Quantity Based Data', 'wholesalex' ) => 'quantity_based',
 					__( 'Extra Charge Data', 'wholesalex' ) => 'extra_charge',
 					__( 'Buy X Get Y Data', 'wholesalex' ) => 'buy_x_get_y',
 					__( 'Max Order Quantity Data', 'wholesalex' ) => 'max_order_qty',
@@ -363,7 +342,6 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 			'shipping_rule'               => __( 'Shipping Rule Data', 'wholesalex' ),
 			'min_order_qty'               => __( 'Min Order Quantity Data', 'wholesalex' ),
 			'tax_rule'                    => __( 'Tax Rule Data', 'wholesalex' ),
-			'quantity_based'              => __( 'Quantity Based Data', 'wholesalex' ),
 			'extra_charge'                => __( 'Extra Charge Data', 'wholesalex' ),
 			'buy_x_get_y'                 => __( 'Buy X Get Y Data', 'wholesalex' ),
 			'max_order_qty'               => __( 'Max Order Quantity Data', 'wholesalex' ),
@@ -425,7 +403,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 				'update_existing'    => isset( $_POST['update_existing'] ) && is_string( $_POST['update_existing'] ) && 'yes' === sanitize_text_field( wp_unslash( $_POST['update_existing'] ) ),
 			);
 
-			$importer                         = self::get_importer( $this->file, $args );
+			$importer                         = $this->get_job_importer( $this->file, $args );
 			$headers                          = $importer->get_raw_keys();
 			$response_data['args']            = $args;
 			$response_data['headers']         = $headers;
@@ -469,15 +447,19 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 		);
 		$this->file    = isset( $_POST['file'] ) && is_string( $_POST['file'] ) ? sanitize_text_field( wp_unslash( $_POST['file'] ) ) : '';
 
-		if ( ! self::is_file_valid_csv( $this->file ) ) {
-			$response_data['message'] = __( 'Invalid file type. The importer supports CSV and TXT file formats.', 'wholesalex' );
+		$stream = ( new Dynamic_Rule_Import_Jobs() )->open( $this->file );
+		if ( is_wp_error( $stream ) ) {
+			wp_send_json(
+				array(
+					'status'  => false,
+					'message' => $stream->get_error_message(),
+				),
+				400
+			);
 		}
+		fclose( $stream ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Release the private request-local CSV stream.
 
-		if ( ! is_file( $this->file ) ) {
-			$response_data['message'] = __( 'The file does not exist, please try again.', 'wholesalex' );
-		}
-
-		if ( ! empty( $_POST['map_from'] ) && ! empty( $_POST['map_to'] ) ) {
+		if ( ! empty( $_POST['map_from'] ) && ! empty( $_POST['map_to'] ) && is_array( $_POST['map_from'] ) && is_array( $_POST['map_to'] ) && count( $_POST['map_from'] ) === count( $_POST['map_to'] ) ) {
 			$mapping_from = map_deep( wp_unslash( $_POST['map_from'] ), 'sanitize_text_field' );
 			$mapping_to   = map_deep( wp_unslash( $_POST['map_to'] ), 'sanitize_text_field' );
 
@@ -487,6 +469,18 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 			$response_data['message'] = __( 'Error Occured!', 'wholesalex' );
 			wp_send_json( $response_data );
 		}
+		$this->get_job_importer(
+			$this->file,
+			array(
+				'lines'              => 1,
+				'delimiter'          => $this->delimiter,
+				'character_encoding' => $this->character_encoding,
+				'mapping'            => array(
+					'from' => array_values( $mapping_from ),
+					'to'   => array_values( $mapping_to ),
+				),
+			)
+		);
 		$response_data['status']             = true;
 		$response_data['mapping']            = array(
 			'from' => array_values( $mapping_from ),
@@ -553,7 +547,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 			$error_log = array();
 		}
 
-		$importer = self::get_importer( $file, $params );
+		$importer = $this->get_job_importer( $file, $params );
 
 		$results          = $importer->import();
 		$percent_complete = $importer->get_percent_complete();
@@ -572,6 +566,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller {
 		);
 
 		if ( 100 === $percent_complete ) {
+			( new Dynamic_Rule_Import_Jobs() )->delete( $file );
 
 			$__dynamic_rules = array_values( wholesalex()->get_dynamic_rules() );
 			if ( empty( $__dynamic_rules ) ) {

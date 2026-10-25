@@ -284,8 +284,11 @@ class WHOLESALEX_Users {
 					$sort_field     = isset( $post['sortField'] ) ? sanitize_text_field( $post['sortField'] ) : 'ID';
 					$sort_direction = isset( $post['sortDirection'] ) ? sanitize_text_field( $post['sortDirection'] ) : 'desc';
 
-				$response['status']   = true;
-					$response['data'] = $this->get_wholesale_users( $items_per_page, $page, $user_status, $search_query, $user_role, $sort_field, $sort_direction );
+				$response['data'] = $this->get_wholesale_users( $items_per_page, $page, $user_status, $search_query, $user_role, $sort_field, $sort_direction );
+				if ( is_wp_error( $response['data'] ) ) {
+					return $response['data'];
+				}
+				$response['status'] = true;
 				break;
 
 			case 'update_status':
@@ -462,6 +465,10 @@ class WHOLESALEX_Users {
 	 * @return array
 	 */
 	public function get_wholesale_users( $user_per_page = -1, $page = 1, $status = '', $search_query = '', $role = '', $sort_field = 'ID', $sort_direction = 'desc' ) {
+		$authorization = User_Operation_Policy::authorize( 'read', get_current_user_id(), 0 );
+		if ( is_wp_error( $authorization ) ) {
+			return $authorization;
+		}
 		$normalized_sort_field = strtolower( (string) $sort_field );
 		$orderby_map           = array(
 			'id'                => 'ID',
@@ -524,6 +531,7 @@ class WHOLESALEX_Users {
 		}
 
 		$args = array(
+			'blog_id'     => get_current_blog_id(),
 			'meta_query'  => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- The admin user list filters on WholesaleX role and status metadata.
 			'orderby'     => $orderby,
 			'order'       => $order,
@@ -543,6 +551,10 @@ class WHOLESALEX_Users {
 		$column_value = array();
 
 		foreach ( $users as $key => $user ) {
+			if ( is_wp_error( User_Operation_Policy::authorize( 'read', get_current_user_id(), $user->ID ) ) ) {
+				--$total_users;
+				continue;
+			}
 			$user_id            = $user->ID;
 			$wholesalex_role_id = get_user_meta( $user_id, '__wholesalex_role', true );
 
@@ -602,13 +614,14 @@ class WHOLESALEX_Users {
 	 * @return \WP_Error|null Error when an approval cannot be authorized.
 	 */
 	public function bulk_actions( $action, $ids ) {
-		// Preflight every approval so a rejected row cannot leave a partial batch.
-		if ( 'active' === $action && is_array( $ids ) ) {
-			foreach ( $ids as $id ) {
-				$error = $this->registration_approval_error( $id );
-				if ( is_wp_error( $error ) ) {
-					return $error;
-				}
+		if ( ! is_array( $ids ) || empty( $ids ) ) {
+			return new \WP_Error( 'wholesalex_invalid_user_batch', __( 'Invalid user IDs.', 'wholesalex' ), array( 'status' => 400 ) );
+		}
+		// Authorize the entire batch before the first mutation or notification.
+		foreach ( $ids as $id ) {
+			$error = $this->user_action_error( $action, $id );
+			if ( is_wp_error( $error ) ) {
+				return $error;
 			}
 		}
 		switch ( $action ) {
@@ -654,23 +667,24 @@ class WHOLESALEX_Users {
 	 * @return \WP_Error|null Error when an approval cannot be authorized.
 	 */
 	public function handle_user_action( $action, $user_id ) {
-		$registration_role = get_user_meta( $user_id, '__wholesalex_registration_role', true );
-		if ( 'active' === $action ) {
-			$error = $this->registration_approval_error( $user_id );
-			if ( is_wp_error( $error ) ) {
-				return $error;
-			}
+		$error = $this->user_action_error( $action, $user_id );
+		if ( is_wp_error( $error ) ) {
+			return $error;
 		}
+		$registration_role = get_user_meta( $user_id, '__wholesalex_registration_role', true );
 
 		switch ( $action ) {
 			case 'active':
 			case 'pending':
 			case 'reject':
 				$old_status = get_user_meta( $user_id, '__wholesalex_status', true );
+				require_once dirname( __DIR__ ) . '/registration/class-confirmation-service.php';
+				$result = Confirmation_Service::set_status( $user_id, $action );
+				if ( is_wp_error( $result ) ) {
+					return $result;
+				}
 
 				if ( $old_status !== $action ) {
-					// proceed.
-					update_user_meta( $user_id, '__wholesalex_status', $action );
 					do_action( 'wholesalex_set_status_' . $action, $user_id, $old_status );
 				}
 
@@ -691,6 +705,50 @@ class WHOLESALEX_Users {
 				// code...
 				break;
 		}
+	}
+
+	/**
+	 * Validate one action, including any role applied during approval.
+	 *
+	 * @param string $action Action.
+	 * @param int    $user_id Target user.
+	 * @return true|\WP_Error
+	 */
+	private function user_action_error( $action, $user_id ) {
+		$operations = array(
+			'active'  => 'approve',
+			'pending' => 'reject',
+			'reject'  => 'reject',
+			'delete'  => 'delete',
+		);
+		$context    = array();
+		if ( wholesalex()->start_with( $action, 'change_role_to_' ) ) {
+			$operation       = 'promote';
+			$context['role'] = substr( $action, strlen( 'change_role_to_' ) );
+		} elseif ( isset( $operations[ $action ] ) ) {
+			$operation = $operations[ $action ];
+		} else {
+			return new \WP_Error( 'wholesalex_invalid_user_action', __( 'Invalid user action.', 'wholesalex' ), array( 'status' => 400 ) );
+		}
+		$error = User_Operation_Policy::authorize( $operation, get_current_user_id(), $user_id, $context );
+		if ( is_wp_error( $error ) ) {
+			return $error;
+		}
+		if ( 'active' === $action && ! get_user_meta( $user_id, '__wholesalex_role', true ) ) {
+			$registration_role = get_user_meta( $user_id, '__wholesalex_registration_role', true );
+			if ( '' !== $registration_role ) {
+				$context['role'] = $registration_role;
+				$error           = User_Operation_Policy::authorize( 'approve', get_current_user_id(), $user_id, $context );
+				if ( is_wp_error( $error ) ) {
+					return $error;
+				}
+			}
+			$error = $this->registration_approval_error( $user_id );
+			if ( is_wp_error( $error ) ) {
+				return $error;
+			}
+		}
+		return true;
 	}
 
 	/**

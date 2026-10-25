@@ -109,7 +109,7 @@ class Dynamic_Rules_Data_Provider {
 
 			$item = array(
 				'value' => (int) $result->ID,
-				'name'  => $title . ' (' . $result->ID . ')',
+				'name'  => '#' . $result->ID . ' ' . $title,
 			);
 
 			if ( '' !== $price ) {
@@ -180,7 +180,7 @@ class Dynamic_Rules_Data_Provider {
 		foreach ( $query->posts as $product ) {
 			$products[] = array(
 				'value' => (int) $product->ID,
-				'name'  => $product->post_title . ' (' . $product->ID . ')',
+				'name'  => '#' . $product->ID . ' ' . $product->post_title,
 			);
 		}
 
@@ -501,7 +501,7 @@ class Dynamic_Rules_Data_Provider {
 		foreach ( $__variations as $variation ) {
 			$__final[] = array(
 				'value' => $variation->ID,
-				'name'  => $variation->post_title . ' (' . $variation->ID . ')',
+				'name'  => '#' . $variation->ID . ' ' . $variation->post_title,
 			);
 		}
 
@@ -671,7 +671,7 @@ class Dynamic_Rules_Data_Provider {
 
 		$label = implode( ' - ', array_filter( array_merge( array( $parent_product->get_name() ), $attributes ) ) );
 
-		return $label . ' (' . $variation->get_id() . ')';
+		return '#' . $variation->get_id() . ' ' . $label;
 	}
 
 	/**
@@ -1492,7 +1492,7 @@ class Dynamic_Rules_Data_Provider {
 										'data' => array(
 											'_conditions_for' => array(
 												'type'    => 'select',
-												'label'   => 'Condition',
+												'label'   => __( 'Condition', 'wholesalex' ),
 												'options' => apply_filters(
 													'wholesalex_dynamic_rules_condition_options',
 													array(
@@ -1509,7 +1509,7 @@ class Dynamic_Rules_Data_Provider {
 											),
 											'_conditions_operator' => array(
 												'type'    => 'select',
-												'label'   => 'Operator',
+												'label'   => __( 'Operator', 'wholesalex' ),
 												'options' => array(
 													''     => __( 'Choose Operators...', 'wholesalex' ),
 													'less' => __( 'Less than (<)', 'wholesalex' ),
@@ -1523,7 +1523,7 @@ class Dynamic_Rules_Data_Provider {
 											),
 											'_conditions_value' => array(
 												'type'    => 'number',
-												'label'   => 'Amount',
+												'label'   => __( 'Amount', 'wholesalex' ),
 												'default' => '',
 												'placeholder' => __( 'Amount', 'wholesalex' ),
 												'help'    => '',

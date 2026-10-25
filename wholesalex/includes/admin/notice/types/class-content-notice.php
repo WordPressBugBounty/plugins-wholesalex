@@ -28,7 +28,6 @@ class Content_Notice extends Abstract_Campaign_Notice {
 		return array_merge(
 			parent::get_defaults(),
 			array(
-				'utm_key'            => 'content_notice',
 				'content_heading'    => '',
 				'content_subheading' => '',    // May contain one %s, replaced by `discount_content` in bold.
 				'discount_content'   => '',

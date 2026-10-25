@@ -1,0 +1,885 @@
+== Changelog ==
+
+= 3.1.5 – 22 October 2026 =
+* Security: Restricted public script settings to approved values and removed unsafe HTML rendering from generic admin tables.
+* Security: Strengthened rule ownership checks, bulk-operation authorization and private CSV import handling.
+* Security: Improved account confirmation, session revocation and reCAPTCHA verification.
+* Fix: Corrected discount eligibility, zero-price handling, BOGO allocation, usage limits and pricing-rule validation.
+* Fix: Improved CSV round trips, concurrent rule updates, customer stock restoration and multisite data retention.
+* Fix: Improved admin request errors, retry behavior and pricing previews.
+* Improvement: Moved premium enforcement and wallet interfaces into the separate Pro add-on while preserving saved Pro data.
+* Improvement: Removed unused code and assets, refreshed translations and dependency notices, and included matching readable source and build instructions.
+
+= 3.1.4 – 6 October 2026 =
+* New: Added an admin-bar preview for checking storefront pricing as a wholesale role.
+* New: Added active wholesale rule summaries and persistent setup guide controls to the Overview page.
+* New: Added draft, publish, preview, and trash actions to the Wholesale Pricing builder.
+* Improvement: Reorganized add-on settings into dedicated Settings tabs and moved companion integrations to the Plugins page.
+* Improvement: Updated registration form workflows with unsaved-change confirmation and Gutenberg-based shortcode insertion.
+* Fix: Corrected customer-specific stock availability for managed products and variations.
+* Fix: Enforced required registration terms server-side and prevented pending customers from logging in when role-based approval applies.
+* Fix: Improved reCAPTCHA v2 and v3 verification on login and registration forms, including duplicate-widget prevention.
+
+= 3.1.3 – 28 September 2026 =
+* New: Added a managed registration page for improved registration page handling.
+* Improvement: Enhanced the Registration Form Builder UI, save states, and default visibility settings.
+
+= 3.1.2 – 27 September 2026 =
+* Fix: Prevented the built-in B2C and Guest user role names from being changed, including through direct requests.
+* Fix: Prevented variable-product price ranges from displaying as $0.00 when wholesale sale prices are applied.
+* Fix: Applied the configured price range, minimum price, or maximum price consistently to variable products across wholesale pricing engines and cached dynamic rules.
+* New: Added customizable BOGO promotion headings with live preview and moved badge-label controls into the Design section.
+* Improvement: Simplified category and SKU formatting when importing and exporting wholesale pricing rules through CSV.
+* Improvement: Removed the obsolete setup wizard and its unused, unprefixed AJAX actions.
+
+= 3.1.1 – 26 September 2026 =
+* Fix: Made all bundled registration form designs available in the Free plugin.
+* Security: Restricted email-template option updates to registered WholesaleX templates and accepted status values.
+* Security: Validated BOGO badge CSS values and added the generated CSS through the WordPress inline-style API.
+* Security: Safely serialized reCAPTCHA site keys used in JavaScript contexts.
+* Improvement: Documented the matching human-readable JavaScript source, build process, and all YouTube tutorial locations.
+* Improvement: Configured production JavaScript builds not to emit external source-map references.
+
+= 3.0.10 – 24 September 2026 =
+* Security: Wholesale profile role, tax, shipping and pricing changes now require management permission; ordinary self-profile edits remain available.
+* Fix: Rejected form-specific registration nonces and other registration validation failures return JSON errors while successful registrations retain their success response.
+* Security: Nonce checks now fail early and are verified before any request data is read, across the settings, profile, email, category, product, role and user endpoints.
+* Security: The CSV importers and exporters verify their nonce before reading request values, and uploaded file data is sanitized before it reaches the upload handler.
+* Security: Output escaping hardened: form fields, promo popups, tier tables and badges are filtered with wp_kses, and logout and download links use esc_url.
+* Security: Form and badge CSS is sanitized and queued with the stylesheet instead of being echoed directly.
+* Fix: A failed nonce check on registration now returns an error response instead of a success response.
+* Fix: Invalid settings payloads no longer overwrite saved product or category settings.
+* Security: reCAPTCHA v3 can no longer be skipped on the login forms by omitting the token field; verification is now required whenever the form is served with reCAPTCHA enabled.
+* Security: Email confirmation links now expire (48 hours by default, filterable) and the confirmation secret is deleted once the account is confirmed.
+* Security: The post-activation onboarding redirect now verifies the plugin activation nonce.
+
+= 3.0.8 – 18 September 2026 =
+* Update: Tier pricing table and its design settings are now provided by WholesaleX Pro.
+* Update: Per-product tier table style, vertical style and show/hide settings are now part of WholesaleX Pro.
+
+= 3.0.7 – 1 September 2026 =
+* New: Added opt-in custom pricing priority ordering with confirmation while preserving access-aware pricing sources.
+* New: Added minimum and maximum character limits for supported Registration Form fields.
+* New: Added B2B role information to WooCommerce orders and preserved the role assigned when each order was placed.
+* Fix: Prevented invalid custom tokens from being added through product selection fields.
+
+= 3.0.6 - 30 August 2026 =
+* New: Added validated import and export support for role-based tier prices in WooCommerce product CSV files.
+* New: Added undo and redo controls to the Registration Form Builder.
+* Fix: Displayed only the roles applicable to the selected B2B, B2C, or hybrid store mode across role management and registration flows.
+* Fix: Synchronized active WowShipping methods with WholesaleX user roles and checkout without requiring a role save.
+
+= 2.1.2 - 14 July 2025 =
+* Fix: Resolved issue where Conversation did not work with reCAPTCHA v2.
+* Fix: Fixed retail price display issue with role-based pricing.
+* Improvement: Updated the License page for better usability.
+* Improvement: Added a new Our Product page.
+
+= 2.0.20 - 17 June 2025 =
+* New: Added reCAPTCHA v2 in wholesalex login.
+* Fix: Fixed reCAPTCHA validation in wordpress login.
+
+= 2.0.19 - 16 June 2025 =
+* New: Integrated reCAPTCHA v2 support for enhanced spam protection.
+* Improvement: Wholesalex role is now available in Elementor's display conditions.
+* Improvement: Added filter to customize registration form with select options.
+* Fix: Fixed tax exemption not applying correctly with reduced tax rate settings in dynamic rules.
+
+= 2.0.18 - 02 June 2025 =
+* improvement: Added compatibility with Aelia Currency Switcher
+* improvement: Tiered pricing table now properly highlights on quantity change when using the WowStore Single template.
+* Fix: Checkout button not displaying in block-based cart when checkout restrictions are enabled.
+* Fix: Allow tax total settings is not working with restrict checkout and cart discount issue fixed.
+
+= 2.0.17 - 27 May 2025 =
+* Fix: Wholesalex Registration form option in woocommerce get auto required.
+* improvement: Bulk activation free and pro from plugin list.
+* improvement: Scroll bar is not showing for the tier price in Mobile View.
+* improvement: Made user role request section translatable.
+
+= 2.0.16 - 13 May 2025 =
+* New: Added Page Visibility By Group.
+* New: Added an option to hide stock levels for B2C users.
+* Improvement: Added Compatibility With Woocommerce Bookings.
+* Improvement: User role switching.
+
+= 2.0.15 - 7 May 2025 =
+* New: Added User role switching options.
+* New: Chat Support Integration.
+* Fix: Fixed tax exemption not working for Shipping costs.
+* Improvement: Added Compatibility With Bookings For WooCommerce.
+
+= 2.0.14 - 29 April 2025 =
+* Improvement: Default product showing in bulkorder search.
+* Fix: Fixed Dynamic rules saving issue in wcfm and dokan.
+
+= 2.0.13 - 22 April 2025 =
+* Improvement: Allow Multiple form validation in one page.
+* Improvement: Tier pricing table updates dynamically based on the Quantity field.
+* Improvement: Compatible with Tax blocks for the tax exemption on Cart page.
+* Fix: Fixed Woocommerce Schedule Sale is not working issue.
+* Fix: Fixed issue with user email sending.
+* Fix: Fixed Tier price table text length.
+
+= 2.0.12 - 16 April 2025 =
+* Improvement: Added options for Admin to apply Dynamic Rules in the backend.
+* Improvement: Made dynamic rules products and categories clickable for easier navigation.
+* Fix : Resolved the issue where the minimum quantity and step counter were reset for variation products.
+* Fix : Fixed translation warning with WordPress version 6.8.
+
+= 2.0.5 - 05 February 2025 =
+* Fix: Registration User Name, Email, Password Field Name Edit Access Issue Fixed.
+
+= 2.0.5 - 29 January 2025 =
+* New: Regular Price or Sale Price Product Discount Feature Added in General Setting.
+* New: Added "Quantity Step" Feature To Min/Max Order Quantity Dynamic Rules.
+* Fix: WholesaleX Registration Now Works Seamlessly with WooCommerce Default Registration Form
+
+= 2.0.4 - 16 January 2025 =
+* Improvement: Compatibility With Dokan and WCFM New UI Design.
+* Fix: User Import Issue Fixed
+* Fix: Select Condition in Registration Form Issue Fixed
+
+= 2.0.3 - 09 January 2024 =
+* Improvement: Custom Price 'Product Add-Ons for WooCommerce' Plugin Compatibility in Variable Product
+* Improvement: RTL Design Support With New UI Design.
+* Update: Access to Edit B2C and Guest User Role Title.
+* Update: Add Hook to Modify Request Quote Message Content.
+* Fix: Resolved the Saving Issue of Discount Price.
+* Fix: Resolved the Maximum and Minimum Quantity Step in Variable Product.
+
+* Fix: Resolved the Saving Issue of Discount Price.
+
+= 2.0.2 - 30 December 2024 =
+* Fix: Resolved the issue of the product popup button not displaying correctly on the product page.
+
+= 2.0.1 - 25 December 2024 =
+* Improvement: Enhancements to the User Interface
+
+= 2.0.0 - 24 December 2024 =
+* New: Added Last Week Sales Data to the Dashboard.
+* New: Introduced an Individual Addon Settings Popup on the Addon Page.
+* New: User Rules now support Bulk Actions, Pagination, Role Searching, and Optimized.
+* New: Dynamic Rules now include Bulk Actions, Pagination, Sorting (Ascending/Descending), Rule Searching, and Optimized.
+* Improvement: Added functionality to save User Filter Queries in the database.
+* Improvement: Enhanced the Tier Pricing Table Editor with a new UI and additional features.
+* Improvement: Added the WholesaleX Migration Tool as an Addon.
+
+= 1.5.10 - 03 December 2024 =
+* New: Dynamic Rules Discounts Are Now Supported in Backend Order Processing.
+* New: Added "Quantity Step" Feature To Minimum Order Quantity Dynamic Rules.
+* Update: Enhanced "Request A Quote" Feature To Dynamically Show Or Hide Prices.
+* Fix: Corrected Issue With The "Select Role" Field Appearing In Registration Form Specific B2B Shortcodes.
+* Fix: Addressed Backend Issue Causing The Registration Form Block Loading.
+
+= 1.5.9 - 14 November 2024 =
+* Update: WordPress 6.7 Compatibility Added
+
+= 1.5.8 - 28 October 2024 =
+* Fix: All Email Related Issue Resolved
+
+= 1.5.7 - 16 October 2024 =
+* New: Lost Password Feature Added in Registration Form
+* Fix: Registration Form Field Assigning Checkout Page Required Issue Resolved
+* Fix: New User Registration Email Issue Resolved
+
+= 1.5.6 - 06 October 2024 =
+* Improvement: Compatibility With High-Performance Order Storage (HPOS) For Order Types
+* Fix: Combine Variation Product Work For Quantity Based Discount Dynamic Rule Issue Resolved
+* Fix: Allow Access To Shop Manager Fails to Load User Profile Issue Resolved
+* Fix: Guest User Role Appearing in Default WooCommerce Registration Form Issue Resolved
+
+= 1.5.5 - 24 September 2024 =
+* Improvement: Rest Api Deprecated Issue Resolved
+
+= 1.5.4 - 12 September 2024 =
+* Improvement: WowCommerce Community Social Group Updated
+
+= 1.5.3 - 11 September 2024 =
+* Improvement: Product Exclude With WowStore Compatibility Added
+* Fix: Variable Pricing Range and Formatting Issue Resolved
+* Fix: Bogo Discount with Exclude Tax Issue Resolved
+* Fix: Registration Login Form Select Role Shortcode Issue Resolved
+
+= 1.5.2 - 02 September 2024 =
+* Fix: Price Formatting Issue Resolved
+
+= 1.5.1 - 22 August 2024 =
+* Improvement: WooCommerce Subscriptions Compatibility Added
+* Improvement: Min/Max Quantities for WooCommerce Compatibility Added
+* Improvement: Compatibility with High-Performance Order Storage (HPOS)
+* Improvement: Introduce New Stats to Find out If the Cart or Checkout Page is Using HPOS and Block-Based Templates.
+* Fix: Dynamic Rules Badge JS File Issue Resolved
+
+= 1.5.0 - 14 August 2024 =
+* New: Wholesalex Admin Panel Widgets Added to the WordPress Dashboard
+* New: File Type Selection Option Added in the Registration Form
+* Update: Migration Menu and Migration Tool Updated
+* Fix: Dynamic Rules Import Data Saving Issue Fixed
+* Fix: Compatibility with Advanced Dynamic Pricing Improved
+* Fix: OceanWP Theme Design Compatibility added
+* Fix: Twenty Twenty-Four Theme Design Compatibility Added
+* Fix: Deprecated Issue Resolved
+
+= 1.4.10 - 17 July 2024 =
+* New: Bogo Discount (Buy X Get One Free) Badge Feature Added
+* New: The Feature Enabling Only the Login Form in the Registration Form has Been Added.
+* New: Registration Builder Includes an Improved Password Strength and Secure Validation Feature.
+* New: Delete WholesaleX Plugin Data Permanently Setting Feature Added.
+* Update: Dashboard Sales Summary (B2B) Updated
+* Update: Rest of The World Shipping Zone Updated
+* Fix: Recent Orders Showing Issue Fixed
+* Fix: Select Role and B2C User and Guest User Translation Issue Fixed
+* Fix: Price Adjusting Using Ajax Issue Fixed
+* Fix: B2C Product hiding Redirect Issue Fixed
+
+= 1.4.9 - 26 June 2024 =
+* Update: Registration Form Set Default Field and Condition Updated
+* Fix: Inventory Quantity Update Issue Fixed
+* Fix: Registration Form B2B Select All Role Getting Issue Fixed
+* Fix: Flatsome Theme Mini Cart Compatibility Issue Fixed
+
+= 1.4.8 - 12 June 2024 =
+* New: Terms and Condition In Registration Builder Feature Added
+* Update: Show Product Wise Wholesale Role in Variable is Updated
+* Update: Show Short code Within the Input Box is Updated
+* Fix: User Roles and Log In Form Translation Issue Fixed
+
+= 1.4.7 - 05 June 2024 =
+* New: Allow to Full Access of WholesaleX to the Shop Manager Feature Added
+* Update: Registration Form Username Field Mandatory If WooCommerce Settings Disable Warning Added
+* Fix: Registration Form Exclude For Roles Is Not Working for Required In Billing Issue Fixed
+* Fix: Dashboard Broken In RTL Issue Fixed
+* Fix: Conditional Discount Offers Translation Issue Fixed
+
+= 1.4.6 - 03 June 2024 =
+* New: Profile Data Update Email Notification Features Added
+* New: Allow Tax To Cart Total Amount Condition Feature Added
+* Update: Default Wholesale Price Showing Level Updated
+* Fix: Sale price Hide Issue Fixed
+* Fix: Registration Form Redirect Issue Fixed
+* Fix: Quantity Based Discount Parent Child Combination Issue Fixed
+
+= 1.4.5 - 16 May 2024 =
+* New: Export Specific Users With Filter
+* Update: Show Users ID In User Page
+* Fix: Variation Zero Price Issue Fixed
+* Fix: Disable Minimum Order Quantity on Shop & Product Page Issue Fixed
+
+
+= 1.4.4 - 14 May 2024 =
+* New: Shop & Product Page Disabled Quantity Condition Added In Minimum Order Quantity
+* Update: Setup Wizard Updated
+* Fix: WordPress 6.5 Compatibility Added
+
+= 1.4.3 - 09 May 2024 =
+* Fix: Variation Wholesale Price Showing Issue Fixed
+* Fix: Sale Badge Not Showing in Variable Product Issue Fixed
+* Fix: Variable Cart Item Getting Zero Price Issue Fixed
+* Fix: Tax Not Showing In Variation Product Issue Fixed
+* Fix: WooCommerce Subscription Plugin Price Compatibility Issue Fixed
+* Fix: User Import Infinity Loading Issue Fixed
+* Fix: Product Same Price Repeated In Shop Page Issue Fixed
+* Fix: Checkout Extra Field Required Setting Issue Fixed
+* Fix: Registration Form Field Naming Conventions Issue Fixed
+* Fix: SubAccount Only Required Specific Field Issue Fixed
+* Fix: Discount Price Range Showing For Specific Variation Product Issue Fixed
+
+= 1.4.2 - 21 April 2024 =
+* New: Product Search with SKU in Dynamic Rule
+* Fix: Price without Vat Issue Fixed
+* Fix: Tax Exemption for specific User & Profile Issue Fixed
+* Fix: Product Variation on Single Page Not Showing Issue Fixed
+* Fix: Registration Form Style 8 Placeholder Issue Fixed
+* Fix: Registration Redirect After Log In Issue Fixed
+* Fix: Tax Not Showing in Shop & Single Page Issue Fixed
+* Fix: Email Template User Profile Link Not Working Issue Fixed
+
+= 1.4.1 - 04 April 2024 =
+* Fix: Email Smart Tag Issue Fixed
+* Fix: Log In to View Price Issue Fixed
+
+= 1.4.0 - 02 April 2024 =
+* New: Dynamic Rule Product Page Promotions Popup/Notice Added
+* Update: Dynamic Rules Restructure and Speed Optimize
+* Fix: Email Design & Save Issue Fixed
+* Fix: Registration Form Confirm Password Issue Fixed
+
+= 1.3.6 - 20 March 2024 =
+* Fix: Product Variations Wholesale Price Empty Issue Fixed
+* Fix: Variations B2B Stock Empty Issue Fixed
+
+= 1.3.5 - 17 March 2024 =
+* Fix: B2B Stock Management Error On Dokan Multi Vendor Issue Fixed
+* Fix: User Profile Payment Method Override Not Working Issue Fixed
+
+= 1.3.4 - 10 March 2024 =
+* Fix: Some data escaping and nonce validation issue fixed
+
+= 1.3.3 - 8 March 2024 =
+* Fix: Email Confirmation Security Issue Fixed
+
+= 1.3.2 - 27 February 2024 =
+* New: Rolewise Override User Status, Redirect URL after Logged In and Logged Out Settings Added
+* New: Forget Password URL Added on WholesaleX Login Form
+* Update: Country Based Tax Exemption Added on Tax Rule
+* Fix: Rolewise Fields Dropdown Not Working on WooCommerce Registration Form
+* Fix: Disable Product Variation Price Visibility Issue
+* Fix: Translation Issue
+* Fix: WP Ajax Capability Check Added
+
+= 1.3.1 - 11 February 2024 =
+* Fix: Breakdance Builder Compatibility Issue With WholesaleX Form
+* Fix: Single Product Tier Layout Inherit Global Settings Layout
+
+= 1.3.0 - 6 February 2024 =
+* New: Registration Form Builder Updated
+* Update: Variable Product Show Min/Max Price Instead of Range
+* Fix: BOGO Discount Dynamic Rule Tax Calculation Updated
+
+= 1.2.20 - 29 January 2024 =
+* New: Quick Support Page Added
+* Update: Cart Discount, Min Order Quantity, Max Order Quantity, Buy X Get Y, Payment Discount, Extra Charge Dynamic Rule Compatibility Added with Woocommerce Cart and Checkout Block
+* Fix: Product Variation Dynamic Rule Error Issue Fixed
+* Fix: Payment Gateway Not Found On User Profile, Dynamic Rule Search Issue Fixed
+
+= 1.2.19 - 4 January 2024 =
+* Update: Override Rolewise Payment Method on User Profile
+* Fix: YayCurrency Conflict with WholesaleX on Cart Price Issue Fixed
+* Fix: Email and Registration Form Translation Issue Fixed
+
+= 1.2.18 - 6 December 2023 =
+* New: B2B Stock Management Added
+
+= 1.2.17 - 29 November 2023 =
+* New: Bulk Users Wholesale Role Change Action Added on WholesaleX Users Page.
+* New: Wholesale Role Filter Added on WholesaleX Users Page.
+* Fix: Email Template Toggle switch Not Working on WholesaleX Emails Page Issue Fixed.
+
+= 1.2.16 - 16 November 2023 =
+* Fix: Rolewise Base price conflict with Additional Product Field For WooCommerce Plugin Issue Fixed.
+* Update: Banner Update
+
+= 1.2.14 - 19 November 2023 =
+* New: Request A Quote New Email Template Added
+* Fix: WooCommerce Schedule Sale Price Visibility Issue Fixed
+* Fix: Moved the position of wholesalex custom field on the checkout page from "after the shipping fields" to "after the billing fields"
+
+= 1.2.13 - 13 November 2023 =
+* New: Variable Product Variation Bulk Action added for Rolewise Base and Sale Price
+* New: Login to See Price Login URL field added on Setting
+* Fix: WholesaleX Users Delete Action Not Working Issue Fixed
+
+= 1.2.12 - 04 October 2023 =
+* Fix: Data Validation and Sanitize Issue Fixed
+
+= 1.2.11 - 01 October 2023 =
+* Fix: Compatibility Added with WooCommerce Custom Product Addon Plugin
+* New: WCFM WooCommerce B2B MultiVendor Marketplace Solution Integration Added
+
+= 1.2.10 - 13 September 2023 =
+* New: Password strength meter added on the WholesaleX registration form to help users create secure passwords.
+* New: An Alert added for logged-in users who try to register using the WholesaleX registration form.
+* New: Enabled multiple recipients for new user approval requires email.
+* New: New fields on the registration form builder are automatically enabled for registration.
+* Fix: Empty default fields on the registration form builder issue fixed.
+
+= 1.2.9 - 31 August 2023 =
+* New: Dynamic Rule and User Role Import Export Added
+
+= 1.2.8 - 28 August 2023 =
+* New: Dokan WooCommerce B2B Multi Vendor Marketplace Solution Integration Added
+* Fix: New field not being enabled for registration form in the Registration Form Builder Issue Fixed
+
+= 1.2.7 - 25 August 2023 =
+* Fix: User Profile WholesaleX Section Continuous Loading Issue Fixed
+
+= 1.2.6 - 23 August 2023 =
+* Fix: CURCY – Multi Currency for WooCommerce Conflict with Wholesale Price on Cart Page Issue Fixed
+* Fix: Wholesale Price Not Working on Category Page Issue Fixed
+* Fix: Translation Source Not Found Issue Fixed
+
+= 1.2.5 - 14 August 2023 =
+* Fix: Minimum Product Quantity Dynamic Rules Caching Issue Fixed
+* Update: Dashboard Banner Update
+
+= 1.2.4 - 6 August 2023 =
+* New: Added Ajax Search functionality to multiple select fields in Dynamic Rules and User Profile.
+* New: Added Private Store url check without query param.
+* New: Added Login to view prices redirect back to referrer page.
+* Fix: Fixed WholesaleX Settings caching issue.
+* Fix: Fixed Discount Priority List Error.
+* Fix: Fixed User Verified Email Not Working Issue.
+* Fix: Fixed Minimum Order Quantity Dynamic Rule Not Working.
+
+= 1.2.3 - 18 July 2023 =
+* Update: WholesaleX Email Templates Sync With WooCommerce Emails
+* Fix: WholesaleX Price Suffix Not Working Issue Fixed
+
+= 1.2.2 - 13 July 2023 =
+* Fix: WholesaleX Overview Page Date Fatal Error Issue Fixed
+
+= 1.2.1 - 13 July 2023 =
+* Fix: Email Template Broken Issue Fixed
+* Fix: WholesaleX User Search Not Working Issue Fixed
+
+= 1.2.0 - 12 July 2023 =
+* Update: Backend UI Update
+* New: Move Dynamic Tax Rule, Shipping Rule, Buy X Get One, Payment Order Quantity, Payment Discount, Minimum Order Quantity Rule into Free
+* New: Exclude URLs(Whitelist URLs for Private Store) Field added on Settings.
+* New: WholesaleX Email Inherit WooCommerce Email Header and Footer
+
+= 1.1.10 - 14 June 2023 =
+* Update: Banner Update
+* Update: Admin Approval Require Restriction Remove For WooCommerce Registration Form Users
+* New: Registration Form Shortcode Added For All B2B Roles
+* Fix: Wholesale Price Not Working with PPOM Plugin Issue Fixed
+
+= 1.1.9 - 31 May 2023 =
+* Update: WholesaleX Customer Import Export Updated
+* New: WholesaleX Users Filter By WholesaleX Role Option Added
+
+= 1.1.8 - 22 May 2023 =
+* New: WholesaleX Free Shipping Label Change Setting Added
+* Update: Banner Update
+
+= 1.1.7 - 18 May 2023 =
+* New: WholesaleX Customer Import and Exporter
+* Fix: PPOM Plugin Custom Price Not Working with wholesalex
+
+= 1.1.6 - 11 May 2023 =
+* New: Setting Added for disable WooCommerce New User Registration Email For Wholesale User
+* Fix: reCaptcha Addon Error on WholesaleX Registration Form Issue Fixed.
+* Fix: WholesaleX Pending User Does not receive email Issue fixed.
+
+= 1.1.5 - 10 April 2023 =
+* New: WholesaleX Single Product Rolewise Price Integration Added With WooCommerce Export Importer
+* Fix: Rolewise Base Price not working on simple product Issue Fixed.
+* Fix: Dynamic Pricing Not Applied on Ajax Based Grid/Quick View Issue Fixed.
+
+= 1.1.4 - 30 April 2023 =
+* Fix: Duplicate Price Visible (Without any rule) on Frontend Issue Fixed
+* Fix: Dynamic Rule Product In List and Product Not In List Filter Not Working on Variable Product Issue Fixed
+* Fix: Rolewise Multiple Product Variation Price Not Save at a time Issue Fixed
+
+= 1.1.3 - 17 April 2023 =
+* Update: Banner Updated
+
+= 1.1.2 - 5 April 2023 =
+* New: Go Pro Link and Submenu Page Added
+* Fix: Update User Profile, Reset WholesaleX Role Issue Fixed
+* Fix: Banner Broken Issue Fixed
+
+= 1.1.1 - 27 March 2023 =
+* Update: Link and Pricing Plan Updated
+
+= 1.1.0 - 22 March 2023 =
+* New: Initial Setup Wizard Added
+
+= 1.0.10 - 13 March 2023 =
+* New: Create price tiers from the product,category and user profile pages
+* New: Get Pro Modal Added
+* Fix: Minicart Price Excluding Tax Issue Fixed
+* Fix: WholesaleX Role and Status filter not working on Users Page
+* Fix: Typography Issue Fixed on Dashboard and Registration Form Builder
+
+
+== Historical Readme Changelog (4846ffec) ==
+
+The following readme history is preserved verbatim from commit
+4846ffec3ed0ba261df41edbd8c683250266b9ca. Its recorded dates and entries may
+differ from the existing changelog above; both historical records are retained.
+
+== Changelog ==
+
+= 3.1.4 – 6 October 2026 =
+* New: Added an admin-bar preview for checking storefront pricing as a wholesale role.
+* New: Added active wholesale rule summaries and persistent setup guide controls to the Overview page.
+* New: Added draft, publish, preview, and trash actions to the Wholesale Pricing builder.
+* Improvement: Reorganized add-on settings into dedicated Settings tabs and moved companion integrations to the Plugins page.
+* Improvement: Updated registration form workflows with unsaved-change confirmation and Gutenberg-based shortcode insertion.
+* Fix: Corrected customer-specific stock availability for managed products and variations.
+* Fix: Enforced required registration terms server-side and prevented pending customers from logging in when role-based approval applies.
+* Fix: Improved reCAPTCHA v2 and v3 verification on login and registration forms, including duplicate-widget prevention.
+
+= 3.1.3 – 28 September 2026 =
+* New: Added a managed registration page for improved registration page handling.
+* Improvement: Enhanced the Registration Form Builder UI, save states, and default visibility settings.
+
+= 3.1.2 – 27 September 2026 =
+* Fix: Prevented the built-in B2C and Guest user role names from being changed, including through direct requests.
+* Fix: Prevented variable-product price ranges from displaying as $0.00 when wholesale sale prices are applied.
+* Fix: Applied the configured price range, minimum price, or maximum price consistently to variable products across wholesale pricing engines and cached dynamic rules.
+* New: Added customizable BOGO promotion headings with live preview and moved badge-label controls into the Design section.
+* Improvement: Simplified category and SKU formatting when importing and exporting wholesale pricing rules through CSV.
+* Improvement: Removed the obsolete setup wizard and its unused, unprefixed AJAX actions.
+
+= 3.1.1 – 26 September 2026 =
+* Fix: Made all bundled registration form designs available in the Free plugin.
+* Security: Restricted email-template option updates to registered WholesaleX templates and accepted status values.
+* Security: Validated BOGO badge CSS values and added the generated CSS through the WordPress inline-style API.
+* Security: Safely serialized reCAPTCHA site keys used in JavaScript contexts.
+* Improvement: Documented the matching human-readable JavaScript source, build process, and all YouTube tutorial locations.
+* Improvement: Configured production JavaScript builds not to emit external source-map references.
+
+= 3.1.0 – 24 September 2026 =
+* Security: Wholesale profile role, tax, shipping and pricing changes now require management permission; ordinary self-profile edits remain available.
+* Fix: Rejected form-specific registration nonces and other registration validation failures return JSON errors while successful registrations retain their success response.
+* Security: Nonce checks now fail early and are verified before any request data is read, across the settings, profile, email, category, product, role and user endpoints.
+* Security: The CSV importers and exporters verify their nonce before reading request values, and uploaded file data is sanitized before it reaches the upload handler.
+* Security: Output escaping hardened: form fields, promo popups, tier tables and badges are filtered with wp_kses, and logout and download links use esc_url.
+* Security: Form and badge CSS is sanitized and queued with the stylesheet instead of being echoed directly.
+* Fix: A failed nonce check on registration now returns an error response instead of a success response.
+* Fix: Invalid settings payloads no longer overwrite saved product or category settings.
+* Security: reCAPTCHA v3 can no longer be skipped on the login forms by omitting the token field; verification is now required whenever the form is served with reCAPTCHA enabled.
+* Security: Email confirmation links now expire (48 hours by default, filterable) and the confirmation secret is deleted once the account is confirmed.
+* Security: The post-activation onboarding redirect now verifies the plugin activation nonce.
+
+= 3.0.9 – 20 September 2026 =
+* Security: Staged user-import CSV files are now saved under an unguessable file name in a directory protected from direct web access, and are deleted as soon as the import finishes. Files left by earlier versions are removed on the next import.
+* Security: Added a capability check to the user-import file handler. 
+* Fix: The registration form no longer removes every third-party `woocommerce_registration_errors` validator, so anti-spam and security plugins keep working. Conflicting validators can be removed individually with the new `wholesalex_remove_registration_error_filters` filter.
+* Change: Product, category, and customer profile tier pricing is no longer part of this plugin; it is provided by the separate WholesaleX Pro plugin. Your saved tier settings are retained. Without a compatible Pro plugin, this version uses non-tier pricing.
+* Change: The readme now states clearly which features are included in this plugin, which require WholesaleX Pro, and which are separate free plugins.
+* Security: Tightened the Addons REST endpoint permission check to require install_plugins and activate_plugins capabilities in addition to manage_options.
+
+= 3.0.8 – 10 September 2026 =
+* New: Added guided onboarding with store setup, a wholesale pricing tour, and saved completion progress.
+* New: Added grouped variation targeting to Wholesale Pricing with validation, previews and CSV import handling.
+* Improvement: Added Product Add-Ons Ultimate compatibility to preserve add-on charges with wholesale pricing.
+* Improvement: Disabled inactive Role Restriction fields, clarified Request a Quote add-on requirements, and showed excluded users only when a general restriction is enabled.
+* Improvement: Prevented saving enabled User Role restrictions with empty required product, variation, category, or brand selections and added contextual validation messages.
+* Fix: Applied category-based wholesale pricing to subcategories while preserving highest-discount selection.
+* Fix: Corrected wholesale tier prices, price prefixes and suffixes, role sale-price fallback, and Astra mini-cart unit prices.
+* Fix: Corrected registration role authorization and nonce validation while allowing newly added authorized roles.
+* Fix: Skipped incomplete user profile discount tiers when saving.
+
+= 3.0.7 – 1 September 2026 =
+* New: Added opt-in custom pricing priority ordering with confirmation while preserving access-aware pricing sources.
+* New: Added minimum and maximum character limits for supported Registration Form fields.
+* New: Added B2B role information to WooCommerce orders and preserved the role assigned when each order was placed.
+* Fix: Prevented invalid custom tokens from being added through product selection fields.
+
+= 3.0.6 – 30 August 2026 =
+* New: Added validated import and export support for role-based tier prices in WooCommerce product CSV files.
+* New: Added undo and redo controls to the Registration Form Builder.
+* Fix: Displayed only the roles applicable to the selected B2B, B2C, or hybrid store mode across role management and registration flows.
+* Fix: Synchronized active WowShipping methods with WholesaleX user roles and checkout without requiring a role save.
+
+= 3.0.5 – 26 August 2026 =
+* Improvement: Added an opt-in separate My Account page for B2B users with automatic account-page redirects.
+* Improvement: Reorganized Registration Form settings, widened the settings sidebar, and improved panel usability.
+* Fix: Applied role-based hidden-price restrictions consistently through shared product visibility checks.
+* Fix: Displayed custom quantity restriction warnings with a native browser fallback.
+* Fix: Discarded incomplete profile discount tiers while preserving an empty tier row for new entries.
+* Fix: Made filtered User Export All operations respect role, status, and search filters across pagination.
+
+= 3.0.4 – 24 August 2026 = 
+* Improvement: Improved drag-and-drop behavior and preserved field selection when reordering Registration Form Builder fields.
+* Improvement: Improved WordPress Plugin Check, internationalization, and coding standards compliance.
+* Fix: Removed registration approval and subaccount restriction options that do not apply to Guest Users.
+* Fix: Prevented page visibility redirect loops while allowing supported editor preview requests.
+* Fix: Corrected tiered unit prices displayed in Astra mini-cart fragments.
+
+= 3.0.3 – 19 August 2026 =
+* Improvement: Updated the Profile Tier product filters.
+* Improvement: Added a sample CSV file to the User Import section.
+* Improvement: Refreshed the Users and User Roles table styling.
+* Improvement: Resolved the overlapping layout issue in Wholesale Pricing product filters.
+* Fix: Fixed the scrolling issue in the Registration Form Builder field settings.
+* Fix: Prevented expired scheduled sale prices from appearing as active in Dynamic Rules.
+* Fix: Added payment gateway label fallbacks and preserved subaccount approval gateways during role filtering.
+* Fix: Fixed discount priority handling to prevent compounded tier discounts while preserving wholesale base prices.
+
+= 3.0.2 – 13 August 2026 =
+* Improvement: Added a direct product-view shortcut to the Wholesale Pricing preview builder.
+* Improvement: Reorganized price suffix options under the Price Display settings.
+* Improvement: Removed Guest Users from assignable role dropdowns in user profiles and the Registration Form Builder.
+* Fix: Fixed B2B bulk pricing updates for newly generated product variations, including validation and error handling.
+* Fix: Allowed authorized shop managers to override user payment gateways.
+* Fix: Fixed coupon and subaccount restrictions to properly support excluded users.
+* Fix: Fixed role-based shipping conditions to respect WooCommerce free-shipping requirements.
+
+= 3.0.1 – 10 August 2026 =
+* New: Added variable product and variation support to product search in Buy X Get Y rules.
+* New: Introduced the initial setup for the new Overview page with onboarding.
+* New: Added support for filtering specific product variations in role restrictions.
+* Improvement: Reorganized the Registration Form settings for better accessibility and usability.
+* Improvement: Updated individual product restriction logic in Wholesale Pricing for minimum and maximum order values.
+* Fix: Fixed the zero-price issue for empty variations.
+* Fix: Fixed the tax-exempt rules issue where tax was incorrectly added on the Thank You page.
+
+= 3.0.0 – 28 July 2026 =
+* New: Introduced a redesigned Wholesale Pricing Builder for creating wholesale pricing, product discounts, cart discounts, BOGO, and Buy X Get Y offers.
+* New: Added a live storefront preview by product, user role, or specific customer while configuring pricing rules.
+* New: Added tiered pricing table design controls for layouts, headings, colors, typography, column order, and visibility.
+* New: Added role-based controls for product visibility, purchasing, checkout, price visibility, tax, coupons, quote requests, and subaccounts.
+* New: Expanded pricing targeting to specific users, user roles, products, categories, brands, attributes, and SKUs, with product exclusions.
+* New: Consolidated the Registration Form Builder's general and text settings into one place for easier configuration.
+* New: Added advanced appearance controls for signup and login forms, including text, background, input, border, button, link, and container colors.
+* Improvement: Restructured User Roles into separate Role Settings and Role Restrictions sections for easier management. 
+
+= 2.4.5 – 23 July 2026 =
+* Improvement: Added "Export All" functionality for Dynamic Rules, Users, and User Roles.
+
+= 2.4.4 – 19 July 2026 =
+* Improvement: Updated the Bulk Order settings layout and shortcode options.
+
+= 2.4.3 – 07 July 2026 =
+* Feature: Added user role change request email. 
+* Fix: Resolved minified email HTML issue.
+* Improvement: Improved BxGy multiple free gifts handling.
+
+= 2.4.2 – 18 June 2026 =
+* New: Added SKU-based product filtering support in Dynamic Rules.
+
+= 2.4.1 – 11 June 2026 =
+* Fix: Resolved the admin backorder compatibility issue with Dynamic Rules.
+* Fix: Fixed the settings synchronization issue to ensure current values are saved properly.
+
+= 2.4.0 – 08 June 2026 =
+* New: Added brand filter support on the customer profile page for brand-based product browsing.
+* Improvement: Updated plugin installation function for improved reliability.
+* Fix: Prevented WholesaleX activation when WooCommerce is not installed.
+
+= 2.3.9 – 18 May 2026 =
+* Improvement: Refactored the Dynamic Rules edit and save workflow for improved maintainability and stability.
+* Improvement: Enhanced wholesale order type handling for guest users.
+
+= 2.3.8 – 12 May 2026 =
+* Fixed: Resolved the tax-exclusive calculation issue in tier pricing discounts.
+* Improvement: Improved shipping method handling and resolved shipping zone-related issues.
+* Improvement: Added server-side validation for public registration role requests to prevent unauthorized WholesaleX role selection.
+
+= 2.3.7 – 06 May 2026 =
+* Improvement: Updated WholesaleX B2B and B2C stock status handling for variable products.
+* Fix: Resolved compatibility issues with preload payment gateways caused by third-party plugin conflicts.
+* Compatibility: Improved WooCommerce Gift Card plugin compatibility and addressed related issues.
+
+= 2.3.6 – 15 April 2026 =
+* Fix: Fixed overview section data update issue to ensure real-time consistency.
+
+= 2.3.5 – 08 April 2026 =
+* Fix: Fixed an issue where product discount and quantity-based discount rules were incorrectly combined.
+
+= 2.3.4 – 31 March 2026 =
+* Improvement: Dynamic rules are now displayed for brands and attributes in the product list.
+* Fix: Resolved an issue with profile notification emails.
+* Fix: Fixed disappearing issue in role-based pricing on the single product page.
+* Fix: Resolved duplicate rule issue.
+
+= 2.3.3 – 12 March 2026 =
+* Improvement: Refactored Dynamic Rules with a new folder structure and separated files for each rule.
+* Improvement: Updated package dependencies and version code.
+* Fix: Resolved a conditional logic issue affecting registration form fields.
+* Fix: Corrected Date and Limit rules starting time issue.
+
+= 2.3.2 – 03 March 2026 =
+* Improvement: Improved Dashboard overview page for faster loading.
+* Improvement: Restructured WholesaleX migration tools.
+
+= 2.3.1 – 25 February 2026 =
+* Fix: Resolved a floating-point formatting issue affecting sale price, regular price, and minimum quantity calculations.
+
+= 2.3.0 – 22 February 2026 =
+* New: All React components are now built using WordPress components.
+* New: Profile, Single Product Page, and Category pages are now built with WordPress components.
+* Improvement: Enhanced shipping rule conditions.
+* Improvement: Updated wholesale-only regular price issue.
+
+= 2.2.5 – 23 December 2025 =
+* Fix: Resolved an issue where the registration approval email link was not functioning correctly.
+* Improvement: Enhanced the Buy X Get Y functionality for better reliability and behavior.
+
+= 2.2.4 – 17 December 2025 =
+* Fix: Resolved an issue with the Buy X Get One Free dynamic pricing rule.
+* Improvement: Improved compatibility with YITH Product Bundle.
+* Improvement: Fixed accessibility issues in checkbox and radio fields on the registration form.
+
+= 2.2.3 – 25 November 2025 =
+* Improvement: Added a filter to remove Guest and B2C users from the role-switching options.
+* Improvement: Enhanced the WholesaleX registration form for better usability.
+
+= 2.2.2 – 19 November 2025 =
+* New: Added brand name support to the dynamic rule product filter.
+* New: Added attribute support to the dynamic rule product filter.
+* Fix: Resolved the pending user registration warning issue.
+* Improvement: Enhanced compatibility with Product Extra Addons for both simple and variable products.
+
+= 2.2.1 – 06 November 2025 =
+* Improvement: Added compatibility with WPC Product Bundles plugin.
+* Improvement: Updated dynamic rules product attribute names to match variation selections.
+
+= 2.2.0 – 29 October 2025 =
+* Fix: Resolved variable product pricing issue with WholesaleX role-based pricing.
+* Fix: Corrected BOGO discount item quantity calculation issue.
+* Fix: Addressed custom date warning appearing in the overview section.
+
+= 2.1.10 – 04 September 2025 =
+* Improvement: Optimized performance of quantity-based discount rule processing.
+
+= 2.1.9 – 31 August 2025 =
+* Fix: Resolved console warning to improve frontend stability.
+* Improvement: Made the registration required field translatable for better localization support.
+
+= 2.1.8 – 21 August 2025 =
+* Fix: Resolved display issue with WowStore Woo-Builder.
+* Fix: Resolved translation issue on the login page.
+
+= 2.1.7 – 10 August 2025 =
+* Improvement: Enhanced product handling in dynamic rules; resolved search issue for attributes on simple products.
+
+= 2.1.6 - 06 August 2025 =
+* Fix: Improved compatibility with YayMail for email display in the WooCommerce Emails list.
+
+= 2.1.5 - 05 August 2025 =
+* Fix: Translation Issues on Role Switching Option is fixed.
+
+= 2.1.4 - 20 July 2025 =
+* Fix: Resolved display issue with Addons card content.
+* Fix: Lock status issue fixed.
+
+= 2.1.3 - 17 July 2025 =
+* Fix: License Activation issue fixed.
+
+= 2.1.2 - 14 July 2025 =
+* Fix: Fixed retail price display issue with role-based pricing.
+* Improvement: Updated the License page for better usability.
+* Improvement: Added a new Our Product page.
+
+= 2.1.1 - 26 June 2025 =
+* Fix: Updated reCaptcha v2 validation with registration form.
+* Improvement: Optimized category-based product count calculation in dynamic rules.
+* Improvement: Added Compatibility with product extra addons plugin.
+
+= 2.1.0 - 19 June 2025 =
+* Fix: Fixed User Role Issue in Overview.
+
+= 2.0.20 - 17 June 2025 =
+* New: Added reCAPTCHA v2 in wholesalex login.
+* Fix: Fixed reCAPTCHA validation in wordpress login.
+
+= 2.0.19 - 16 June 2025 =
+* New: Integrated reCAPTCHA v2 support for enhanced spam protection.
+* Improvement: Wholesalex role is now available in Elementor's display conditions.
+* Improvement: Added filter to customize registration form with select options.
+* Fix: Fixed tax exemption not applying correctly with reduced tax rate settings in dynamic rules.
+
+= 2.0.18 - 02 June 2025 =
+* Improvement: Added compatibility with Aelia Currency Switcher.
+* Improvement: Tiered pricing table now properly highlights on quantity change when using the WowStore Single template.
+* Fix: Checkout button not displaying in block-based cart when checkout restrictions are enabled.
+* Fix: Allow tax total settings is not working with restrict checkout and cart discount issue fixed.
+
+= 2.0.17 - 27 May 2025 =
+* Fix: Wholesalex Registration form option in woocommerce gets auto required.
+* improvement: Bulk activation free and pro from plugin list.
+* improvement: Scroll bar is not showing for the tier price in Mobile View.
+* improvement: Made user role request section translatable.
+
+= 2.0.16 - 13 May 2025 =
+* New: Added Page Visibility By Group.
+* New: Added an option to hide stock levels for B2C users.
+* Improvement: Added Compatibility With Woocommerce Bookings.
+* Improvement: User role switching.
+
+= 2.0.15 - 7 May 2025 =
+* New: Added User role switching options.
+* New: Chat Support Integration.
+* Fix: Fixed tax exemption not working for Shipping costs.
+* Improvement: Added Compatibility With Bookings For WooCommerce.
+
+= 2.0.14 - 29 April 2025 =
+* Improvement: Default product showing in bulkorder search.
+* Fix: Fixed Dynamic rules saving issue in wcfm and dokan.
+
+= 2.0.13 - 22 April 2025 =
+* Improvement: Allow Multiple form validation in one page.
+* Improvement: Tier pricing table updates dynamically based on the Quantity field.
+* Improvement: Compatible with Tax blocks for the tax exemption on Cart page.
+* Fix: Fixed Woocommerce Schedule Sale is not working issue.
+* Fix: Fixed issue with user email sending.
+* Fix: Fixed Tier price table text length.
+
+= 2.0.12 - 16 April 2025 =
+* Improvement: Added a filter hook to allow Admin to enable or disable the use of Dynamic Rules in the backend.
+* Improvement: Made dynamic rules products and categories clickable for easier navigation.
+* Fix : Resolved the issue where the minimum quantity and step counter were not resetting for variation products.
+* Fix : Fixed translation warning with WordPress version 6.8.
+
+= 2.0.11 - 10 April 2025 =
+* Improvement: Resolved price conflict between WooCommerce and WholesaleX role-based pricing.
+* Improvement: Added Compatibility With YITH product bundles.
+* Improvement: Compatibility With woocommerce Product addons.
+* Improvement: Saving pagination state in dynamic rules page.
+* Fix : Fixed dynamic rules display issue.
+* Fix : Fixed an issue with saving addons.
+
+= 2.0.10 - 20 March 2025 =
+* Fix: reCAPTCHA Issue Fixed.
+* Fix: Dynamic Rules Export Issue Fixed.
+
+= 2.0.9 - 10 March 2025 =
+* Improvement: Compatibility With FOX – Currency Switcher Professional for WooCommerce.
+* Improvement: Compatibility With YITH WooCommerce Product Bundles.
+* Improvement: Compatibility With Product Add-Ons for WooCommerce.
+* Improvement: Compatibility With WowStore Shop Manager.
+
+= 2.0.8 - 18 February 2025 =
+* New: Added a Setting to Apply "Tiered Pricing Discount" to Combined Variations.
+* Improvement: Optimized Dynamic Checkout Restriction Rule for WowStore Compatibility.
+* Improvement: Improved Design Support for Commonly Used Themes.
+* Improvement: WooCommerce Default Registration Form Now Fully Syncs With User Roles.
+* Fix: Fixed an Issue Where the Tier Price Table Was Not Displaying Correctly.
+* Fix: Specific Categories Filter Now Works as Expected With Dynamic Rules.
+* Fix: Resolved Language Translation Issue for Better Localization.
+
+= 2.0.7 - 09 February 2025 =
+* Fix: User Role Shipping Methods Showing Issue Fixed.
+
+= 2.0.6 - 05 February 2025 =
+* Fix: Registration User Name, Email, Password Field Name Edit Access Issue Fixed.
+
+= 2.0.5 - 29 January 2025 =
+* New: Regular Price or Sale Price Product Discount Feature Added in General Setting.
+* New: Added "Quantity Step" Feature To Min/Max Order Quantity Dynamic Rules.
+* Fix: WholesaleX Registration Now Works Seamlessly with WooCommerce Default Registration Form
+
+= 2.0.4 - 16 January 2025 =
+* Improvement: Compatibility With Dokan and WCFM New UI Design.
+* Fix: User Import Issue Fixed
+* Fix: Select Condition in Registration Form Issue Fixed
+
+= 2.0.3 - 09 January 2024 =
+* Improvement: Custom Price 'Product Add-Ons for WooCommerce' Plugin Compatibility in Variable Product
+* Improvement: RTL Design Support With New UI Design.
+* Update: Access to Edit B2C and Guest User Role Title.
+* Update: Add Hook to Modify Request Quote Message Content.
+* Fix: Resolved the Saving Issue of Discount Price.
+* Fix: Resolved the Maximum and Minimum Quantity Step in Variable Product.
+
+* Fix: Resolved the Saving Issue of Discount Price.
+
+= 2.0.2 - 30 December 2024 =
+* Fix: Resolved the issue of the product popup button not displaying correctly on the product page.
+
+= 2.0.1 - 25 December 2024 =
+* Improvement: Enhancements to the User Interface
+
+= 2.0.0 - 24 December 2024 =
+* New: Added Last Week Sales Data to the Dashboard.
+* New: Introduced an Individual Addon Settings Popup on the Addon Page.
+* New: User Rules now support Bulk Actions, Pagination, Role Searching, and Optimized.
+* New: Dynamic Rules now include Bulk Actions, Pagination, Sorting (Ascending/Descending), Rule Searching, and Optimized.
+* Improvement: Added functionality to save User Filter Queries in the database.
+* Improvement: Enhanced the Tier Pricing Table Editor with a new UI and additional features.
+* Improvement: Added the WholesaleX Migration Tool as an Addon.
+
+= 1.5.10 - 03 December 2024 =
+* New: Dynamic Rules Discounts Are Now Supported in Backend Order Processing.
+* New: Added "Quantity Step" Feature To Minimum Order Quantity Dynamic Rules.
+* Update: Enhanced "Request A Quote" Feature To Dynamically Show Or Hide Prices.
+* Fix: Corrected Issue With The "Select Role" Field Appearing In Registration Form Specific B2B Shortcodes.
+* Fix: Addressed Backend Issue Causing The Registration Form Block Loading.
+
+[See changelog for all versions](https://bitbucket.org/wpstabon/wholesalex/raw/release/changelog.txt).

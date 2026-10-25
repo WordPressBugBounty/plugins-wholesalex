@@ -143,8 +143,14 @@ class WHOLESALEX_Role {
 		$deleted_roles = array();
 		foreach ( $roles_to_delete as $role_id ) {
 			$role_id = sanitize_key( $role_id );
-			if ( isset( $roles_option[ $role_id ] ) && wholesalex()->delete_role( $role_id ) ) {
-				$deleted_roles[] = $role_id;
+			if ( isset( $roles_option[ $role_id ] ) ) {
+				$deleted = wholesalex()->delete_role( $role_id );
+				if ( is_wp_error( $deleted ) ) {
+					return $deleted;
+				}
+				if ( $deleted ) {
+					$deleted_roles[] = $role_id;
+				}
 			}
 		}
 
@@ -208,7 +214,10 @@ class WHOLESALEX_Role {
 			$_id   = sanitize_text_field( $post['id'] );
 			$_role = wp_unslash( $post['role'] );
 			$_role = json_decode( $_role, true );
-			$_role = wholesalex()->sanitize( $_role );
+			if ( ! is_array( $_role ) ) {
+				wp_send_json_error( array( 'message' => __( 'Invalid role data.', 'wholesalex' ) ), 400 );
+				return;
+			}
 			// Untouched settings default to enabled gateways; preserve explicit selections, including none.
 			if ( is_array( $_role ) && ! array_key_exists( '_payment_methods', $_role ) ) {
 				$_role['_payment_methods'] = array_keys( self::get_enabled_payment_gateway_options() );
@@ -229,7 +238,11 @@ class WHOLESALEX_Role {
 				);
 			}
 
-			$_saved = $_flag && wholesalex()->set_roles( $_id, $_role, $is_delete ? 'delete' : '' );
+			$_saved = $_flag ? wholesalex()->set_roles( $_id, $_role, $is_delete ? 'delete' : '' ) : false;
+			if ( is_wp_error( $_saved ) ) {
+				wp_send_json_error( array( 'message' => $_saved->get_error_message() ), 409 );
+				return;
+			}
 			if ( $is_delete && ! $_saved ) {
 				wp_send_json_error(
 					array(
@@ -582,7 +595,7 @@ class WHOLESALEX_Role {
 							'label' => __( 'Registration Form', 'wholesalex' ),
 							'type'  => 'role_setting',
 							'attr'  => array(
-								'user_status'          => array(
+								'user_status' => array(
 									'type'     => 'radio',
 									'label'    => __( 'Registration Approval Method', 'wholesalex' ),
 									'options'  => array(
@@ -846,7 +859,7 @@ class WHOLESALEX_Role {
 			? $role_content['_restrictions']
 			: array();
 
-		foreach ( array( '_disable_coupon', '_restrict_subaccount', '_exclude_users' ) as $key ) {
+		foreach ( array( '_disable_coupon', '_exclude_users' ) as $key ) {
 			if ( ! array_key_exists( $key, $restrictions ) && array_key_exists( $key, $role_content ) ) {
 				$restrictions[ $key ] = $role_content[ $key ];
 			}

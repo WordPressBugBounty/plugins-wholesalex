@@ -211,8 +211,7 @@ class WHOLESALEX_Role_CSV_Importer extends WHOLESALEX_Role_Importer {
 	 * @return string
 	 */
 	public function parse_auto_role_migration_field( $value ) {
-
-		return $value;
+		return $this->parse_disable_coupon_field( $value );
 	}
 
 	/**
@@ -342,7 +341,7 @@ class WHOLESALEX_Role_CSV_Importer extends WHOLESALEX_Role_Importer {
 			'_shipping_methods'    => array( $this, 'parse_comma_field' ),
 			'_payment_methods'     => array( $this, 'parse_comma_field' ),
 			'_disable_coupon'      => array( $this, 'parse_disable_coupon_field' ),
-			'_auto_role_migration' => array( $this, 'parse_float_field' ),
+			'_auto_role_migration' => array( $this, 'parse_auto_role_migration_field' ),
 		);
 
 		$callbacks = array();

@@ -151,41 +151,9 @@ class Wholesale_Pricing {
 			$rules = is_array( $rules ) ? $rules : array();
 		}
 
-		$rules = self::migrate_tier_pricing_rule_types( $rules );
+		$rules = apply_filters( 'wholesalex_wholesale_pricing_records', $rules );
 
 		$GLOBALS[ self::GLOBAL_KEY ] = $rules; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- GLOBAL_KEY contains the WholesaleX-prefixed cache key.
-		return $rules;
-	}
-
-	/**
-	 * Reclassify legacy tiered Wholesale Pricing records without reshaping them.
-	 *
-	 * The tier processor still consumes discount_type, tiers, design and
-	 * restrictions in their original locations. Changing only rule_type keeps
-	 * existing calculations compatible and makes the migration safe to repeat
-	 * after interrupted upgrades or imports from older versions.
-	 *
-	 * @param array<string, array> $rules Stored pricing rules.
-	 * @return array<string, array>
-	 */
-	private static function migrate_tier_pricing_rule_types( array $rules ): array {
-		$changed = false;
-
-		foreach ( $rules as $id => $rule ) {
-			if (
-				is_array( $rule ) &&
-				'wholesale_pricing' === ( $rule['rule_type'] ?? '' ) &&
-				'tiered' === ( $rule['discount_type'] ?? '' )
-			) {
-				$rules[ $id ]['rule_type'] = 'tier_pricing';
-				$changed                    = true;
-			}
-		}
-
-		if ( $changed ) {
-			update_option( self::OPTION_KEY, $rules, false );
-		}
-
 		return $rules;
 	}
 
@@ -221,16 +189,43 @@ class Wholesale_Pricing {
 	 * @param array  $data Sanitised rule data.
 	 * @return array The stored rule.
 	 */
-	public static function save_rule( string $id, array $data ): array {
-		if ( 'wholesale_pricing' === ( $data['rule_type'] ?? '' ) && 'tiered' === ( $data['discount_type'] ?? '' ) ) {
-			$data['rule_type'] = 'tier_pricing';
-		}
+	public static function save_rule( string $id, array $data ) {
+		$existing = self::get_rule( $id );
+		$provider = self::provider_operation( 'save', $id, $data, $existing );
+		if ( null !== $provider ) {
+			return $provider; }
+		$saved  = null;
+		$result = wholesalex()->mutate_rule_option(
+			self::OPTION_KEY,
+			self::GLOBAL_KEY,
+			static function ( $rules ) use ( $id, $data, &$saved ) {
+				$existing = $rules[ $id ] ?? null;
+				if ( is_array( $existing ) && ( ! self::current_manager_owns_rule( $existing ) || ( self::has_provider_record( $existing ) && ! empty( array_diff( array_keys( $data ), array( 'title' ) ) ) ) ) ) {
+					return new \WP_Error( 'wholesalex_rule_conflict', __( 'This rule changed. Reload it before saving.', 'wholesalex' ), array( 'status' => 409 ) );
+				}
+				$validation = self::validate_provider_write( $data, $existing );
+				if ( is_wp_error( $validation ) ) {
+					return $validation;
+				}
+				$owned = array( 'id', 'title', 'status', 'rule_type', 'discount_type', 'product_filter', 'products', 'categories', 'exclude_products', 'user_role_filter', 'user_roles', 'specific_users', 'regular', 'product_discount', 'cart', 'bogo', 'conditions', 'schedule', 'owner_id', 'owner_type', 'created_by' );
+				$owned = (array) apply_filters( 'wholesalex_pricing_owned_fields', $owned );
+				$data  = array_intersect_key( $data, array_flip( $owned ) );
+				foreach ( $data as $key => $value ) {
+					if ( is_array( $value ) && is_array( $existing[ $key ] ?? null ) && ( in_array( $key, array( 'cart', 'conditions' ), true ) || ( array() !== $value && array_keys( $value ) !== range( 0, count( $value ) - 1 ) ) ) ) {
+						$data[ $key ] = array_replace( $existing[ $key ], $value );
+					}
+				}
+				$data       = array_replace( is_array( $existing ) ? $existing : array(), $data );
+				$data['id'] = $id;
 
-		$rules        = self::get_all_rules();
-		$rules[ $id ] = $data;
-
-		update_option( self::OPTION_KEY, $rules, false );
-		$GLOBALS[ self::GLOBAL_KEY ] = $rules; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- GLOBAL_KEY contains the WholesaleX-prefixed cache key.
+				$rules[ $id ] = $data;
+				$saved        = $data;
+				return $rules;
+			}
+		);
+		if ( is_wp_error( $result ) ) {
+			return $result; }
+		$data = $saved;
 
 		/**
 		 * Fires after a wholesale-pricing rule is saved.
@@ -244,22 +239,64 @@ class Wholesale_Pricing {
 	}
 
 	/**
+	 * Validate ownership before a direct or preflight storage operation.
+	 *
+	 * @param array      $data Submitted fields.
+	 * @param array|null $existing Authoritative stored record.
+	 * @return true|WP_Error
+	 */
+	public static function validate_provider_write( array $data, $existing = null ) {
+		foreach ( array(
+			'conditions' => 'tiers',
+			'cart'       => 'conditions',
+		) as $container => $field ) {
+			if ( ! array_key_exists( $container, $data ) || ( is_array( $data[ $container ] ) && ! array_key_exists( $field, $data[ $container ] ) ) ) {
+				continue;
+			}
+			$stored_rows    = is_array( $existing[ $container ][ $field ] ?? null ) ? $existing[ $container ][ $field ] : array();
+			$submitted_rows = is_array( $data[ $container ][ $field ] ?? null ) ? $data[ $container ][ $field ] : array();
+			if ( Wholesale_Pricing_Rule_Registry::unavailable_condition_rows( $stored_rows ) !== Wholesale_Pricing_Rule_Registry::unavailable_condition_rows( $submitted_rows ) ) {
+				return new \WP_Error( 'wholesalex_provider_unavailable', __( 'The provider for this pricing operation is unavailable.', 'wholesalex' ), array( 'status' => 409 ) );
+			}
+		}
+		$candidate = array_replace( is_array( $existing ) ? $existing : array(), $data );
+		if ( '' !== Wholesale_Pricing_Rule_Registry::unavailable_feature( $candidate ) ) {
+			$base_fields = array( 'id', 'title', 'status', 'regular', 'product_discount', 'cart', 'bogo', 'products', 'categories', 'exclude_products', 'user_role_filter', 'user_roles', 'specific_users', 'schedule', 'owner_id', 'owner_type', 'created_by' );
+			foreach ( $data as $key => $value ) {
+				if ( ! in_array( $key, $base_fields, true ) && ( ! is_array( $existing ) || ! array_key_exists( $key, $existing ) || $existing[ $key ] !== $value ) ) {
+					return new \WP_Error( 'wholesalex_provider_unavailable', __( 'The provider for this pricing operation is unavailable.', 'wholesalex' ) );
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Delete a rule by ID.
 	 *
 	 * @param string $id Rule ID.
 	 * @return bool True when deleted, false when the rule did not exist.
 	 */
-	public static function delete_rule( string $id ): bool {
-		$rules = self::get_all_rules();
-
-		if ( ! isset( $rules[ $id ] ) ) {
-			return false;
-		}
-
-		unset( $rules[ $id ] );
-
-		update_option( self::OPTION_KEY, $rules, false );
-		$GLOBALS[ self::GLOBAL_KEY ] = $rules; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- GLOBAL_KEY contains the WholesaleX-prefixed cache key.
+	public static function delete_rule( string $id ) {
+		$existing = self::get_rule( $id );
+		if ( ! $existing ) {
+			return false; }
+		$provider = self::provider_operation( 'delete', $id, array(), $existing );
+		if ( null !== $provider ) {
+			return $provider; }
+		$result = wholesalex()->mutate_rule_option(
+			self::OPTION_KEY,
+			self::GLOBAL_KEY,
+			static function ( $rules ) use ( $id ) {
+				if ( isset( $rules[ $id ] ) && ( self::has_provider_record( $rules[ $id ] ) || ! self::current_manager_owns_rule( $rules[ $id ] ) ) ) {
+					return new \WP_Error( 'wholesalex_rule_conflict', __( 'This rule changed. Reload it before deleting.', 'wholesalex' ), array( 'status' => 409 ) );
+				}
+				unset( $rules[ $id ] );
+				return $rules;
+			}
+		);
+		if ( is_wp_error( $result ) ) {
+			return $result; }
 
 		/**
 		 * Fires after a wholesale-pricing rule is deleted.
@@ -269,5 +306,48 @@ class Wholesale_Pricing {
 		do_action( 'wholesalex_wholesale_pricing_rule_deleted', $id );
 
 		return true;
+	}
+	/**
+	 * Detect provider data without validating or executing it.
+	 *
+	 * @param array $rule Stored or submitted rule.
+	 * @return bool
+	 */
+	public static function has_provider_record( array $rule ): bool {
+		return 'tier_pricing' === ( $rule['rule_type'] ?? '' ) || 'tiered' === ( $rule['discount_type'] ?? '' );
+	}
+
+	/**
+	 * Dispatch an operation to its owner before any storage mutation.
+	 *
+	 * @param string     $operation Command name.
+	 * @param string     $id Rule identifier.
+	 * @param array      $payload Submitted values.
+	 * @param array|null $authoritative Authoritative stored rule.
+	 * @return mixed Canonical result, error, or null for a Free-owned operation.
+	 */
+	public static function provider_operation( string $operation, string $id, array $payload, $authoritative = null ) {
+		$is_provider = self::has_provider_record( $payload ) || ( is_array( $authoritative ) && self::has_provider_record( $authoritative ) );
+		if ( ! $is_provider && ! array_key_exists( 'tiers', $payload ) ) {
+			return null;
+		}
+		if ( 'save' === $operation && is_array( $authoritative ) && self::has_provider_record( $authoritative ) ) {
+			$changed = array();
+			foreach ( $payload as $key => $value ) {
+				if ( ! array_key_exists( $key, $authoritative ) || $value !== $authoritative[ $key ] ) {
+					$changed[] = $key; }
+			}
+			if ( empty( array_diff( $changed, array( 'title' ) ) ) ) {
+				return null; }
+		}
+		if ( ! $is_provider && is_array( $authoritative ) && array_key_exists( 'tiers', $payload ) && array_key_exists( 'tiers', $authoritative ) && $payload['tiers'] === $authoritative['tiers'] ) {
+			return null;
+		}
+		// A narrow Free patch may update the title without touching owned data.
+		if ( 'save' === $operation && is_array( $authoritative ) && empty( array_diff( array_keys( $payload ), array( 'title' ) ) ) ) {
+			return null;
+		}
+		$result = apply_filters( 'wholesalex_wholesale_pricing_provider_result', null, $operation, $id, $payload, $authoritative );
+		return null !== $result ? $result : new \WP_Error( 'wholesalex_provider_unavailable', __( 'The provider for this pricing operation is unavailable.', 'wholesalex' ), array( 'status' => 409 ) );
 	}
 }

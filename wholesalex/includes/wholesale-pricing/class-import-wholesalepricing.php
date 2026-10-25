@@ -2,9 +2,8 @@
 /**
  * Wholesale pricing CSV importer.
  *
- * Handles CSV uploads and imports for the six Wholesale Pricing rule types:
- * wholesale_pricing, tier_pricing, product_discount, cart_discount,
- * bogo_discount, and buy_x_get_y.
+ * Handles generic CSV uploads and imports. Extension providers supply
+ * their own columns, mapped row handlers, and serializers.
  *
  * @package WHOLESALEX
  */
@@ -108,7 +107,17 @@ class Import_Wholesale_Pricing {
 
 		$this->file = $file;
 		$rows       = $this->read_csv_rows( $file, 1 );
-		$headers    = isset( $rows['headers'] ) ? $rows['headers'] : array();
+		if ( is_wp_error( $rows ) ) {
+			( new Dynamic_Rule_Import_Jobs() )->delete( $file );
+			wp_send_json(
+				array(
+					'status'  => false,
+					'message' => $rows->get_error_message(),
+				),
+				400
+			);
+		}
+		$headers = isset( $rows['headers'] ) ? $rows['headers'] : array();
 
 		wp_send_json(
 			array(
@@ -132,53 +141,15 @@ class Import_Wholesale_Pricing {
 		if ( ! isset( $_POST['nonce'] ) || ! is_string( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), 'wholesalex-registration' ) ) {
 			return new WP_Error( 'wholesalex_wholesale_pricing_import_nonce', __( 'Security check failed.', 'wholesalex' ) );
 		}
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above.
-		if ( ! isset( $_FILES['import'] ) ) {
-			return new WP_Error( 'wholesalex_wholesale_pricing_import_empty', __( 'File is empty. Please upload a CSV file.', 'wholesalex' ) );
+		if ( ! current_user_can( 'manage_options' ) || ! isset( $_FILES['import'] ) || ! is_array( $_FILES['import'] ) ) {
+			return new WP_Error( 'invalid_upload', __( 'Please upload a CSV file.', 'wholesalex' ) );
 		}
-
-		$file_name = isset( $_FILES['import']['name'] ) && is_string( $_FILES['import']['name'] ) ? sanitize_file_name( $_FILES['import']['name'] ) : '';
-		if ( ! $this->is_valid_csv( $file_name ) ) {
-			return new WP_Error( 'wholesalex_wholesale_pricing_import_invalid', __( 'Invalid file type. The importer supports CSV and TXT file formats.', 'wholesalex' ) );
+		$upload = $_FILES['import']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Validate PHP upload identity, type and size before reading bytes.
+		if ( ! isset( $upload['name'], $upload['tmp_name'], $upload['error'], $upload['size'] ) || ! is_string( $upload['name'] ) || ! is_string( $upload['tmp_name'] ) || UPLOAD_ERR_OK !== $upload['error'] || ! is_uploaded_file( $upload['tmp_name'] ) || ! $this->is_valid_csv( $upload['name'] ) || $upload['size'] > Dynamic_Rule_Import_Jobs::MAX_BYTES ) {
+			return new WP_Error( 'invalid_upload', __( 'Please upload a valid CSV file of at most 5 MB.', 'wholesalex' ) );
 		}
-
-		$upload_file = array(
-			'name'     => $file_name,
-			'type'     => isset( $_FILES['import']['type'] ) ? sanitize_mime_type( wp_unslash( $_FILES['import']['type'] ) ) : '',
-			'tmp_name' => isset( $_FILES['import']['tmp_name'] ) ? sanitize_text_field( $_FILES['import']['tmp_name'] ) : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Temporary upload path is only passed to wp_handle_upload().
-			'error'    => isset( $_FILES['import']['error'] ) ? absint( $_FILES['import']['error'] ) : 0,
-			'size'     => isset( $_FILES['import']['size'] ) ? absint( $_FILES['import']['size'] ) : 0,
-		);
-		$upload      = wp_handle_upload(
-			$upload_file,
-			array(
-				'test_form' => false,
-				'test_type' => false,
-				'mimes'     => array(
-					'csv' => 'text/csv',
-					'txt' => 'text/plain',
-				),
-			)
-		);
-
-		if ( isset( $upload['error'] ) ) {
-			return new WP_Error( 'wholesalex_wholesale_pricing_import_upload_error', $upload['error'] );
-		}
-
-		$attachment = array(
-			'post_title'     => basename( $upload['file'] ),
-			'post_content'   => $upload['url'],
-			'post_mime_type' => $upload['type'],
-			'guid'           => $upload['url'],
-			'context'        => 'import',
-			'post_status'    => 'private',
-		);
-
-		$id = wp_insert_attachment( $attachment, $upload['file'] );
-		wp_schedule_single_event( time() + DAY_IN_SECONDS, 'importer_scheduled_cleanup', array( $id ) );
-
-		// phpcs:enable WordPress.Security.NonceVerification.Missing
-		return $upload['file'];
+		$csv = file_get_contents( $upload['tmp_name'], false, null, 0, Dynamic_Rule_Import_Jobs::MAX_BYTES + 1 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Read only the verified PHP upload with a strict byte limit.
+		return ( new Dynamic_Rule_Import_Jobs() )->create( $csv, 'pricing' );
 	}
 
 	/**
@@ -193,7 +164,6 @@ class Import_Wholesale_Pricing {
 				'product_discount' => __( 'Dynamic Rule Product Discount Data', 'wholesalex' ),
 				'cart_discount'    => __( 'Dynamic Rule Cart Discount Data', 'wholesalex' ),
 				'buy_x_get_one'    => __( 'Dynamic Rule BOGO Discount Data', 'wholesalex' ),
-				'buy_x_get_y'      => __( 'Dynamic Rule Buy X Get Y Data', 'wholesalex' ),
 			)
 		);
 	}
@@ -207,78 +177,46 @@ class Import_Wholesale_Pricing {
 	 * @return array
 	 */
 	public static function get_csv_columns() {
-		return array(
-			'id'                                     => __( 'ID', 'wholesalex' ),
-			'status'                                 => __( 'Status', 'wholesalex' ),
-			'title'                                  => __( 'Title', 'wholesalex' ),
-			'rule_type'                              => __( 'Rule Type', 'wholesalex' ),
-			'product_filter'                         => __( 'Product Filter', 'wholesalex' ),
-			'products'                               => __( 'Products', 'wholesalex' ),
-			'categories'                             => __( 'Categories', 'wholesalex' ),
-			'brands'                                 => __( 'Brands', 'wholesalex' ),
-			'attributes'                             => __( 'Attributes', 'wholesalex' ),
-			'skus'                                   => __( 'SKUs', 'wholesalex' ),
-			'user_role_filter'                       => __( 'User Role Filter', 'wholesalex' ),
-			'user_roles'                             => __( 'User Roles', 'wholesalex' ),
-			'specific_users'                         => __( 'Specific Users', 'wholesalex' ),
-			'discount_type'                          => __( 'Discount Type', 'wholesalex' ),
-			'regular_amount'                         => __( 'Regular Discount Amount', 'wholesalex' ),
-			'regular_amount_type'                    => __( 'Regular Discount Amount Type', 'wholesalex' ),
-			'regular_label'                          => __( 'Regular Discount Label', 'wholesalex' ),
-			'tiers'                                  => __( 'Tiered Pricing Data', 'wholesalex' ),
-			'cart_discount_type'                     => __( 'Cart Discount Type', 'wholesalex' ),
-			'cart_discount_amount'                   => __( 'Cart Discount Amount', 'wholesalex' ),
-			'cart_discount_name'                     => __( 'Cart Discount Name', 'wholesalex' ),
-			'bogo_buy_x_qty'                         => __( 'BOGO Buy Quantity', 'wholesalex' ),
-			'bogo_heading_text'                      => __( 'BOGO Heading Text', 'wholesalex' ),
-			'bogo_per_cart_once'                     => __( 'BOGO Once Per Cart', 'wholesalex' ),
-			'bogo_show_badge'                        => __( 'BOGO Show Badge', 'wholesalex' ),
-			'bogo_badge_label'                       => __( 'BOGO Badge Label', 'wholesalex' ),
-			'bogo_badge_style'                       => __( 'BOGO Badge Style', 'wholesalex' ),
-			'bogo_badge_position'                    => __( 'BOGO Badge Position', 'wholesalex' ),
-			'bogo_badge_bg_color'                    => __( 'BOGO Badge Background Color', 'wholesalex' ),
-			'bogo_badge_text_color'                  => __( 'BOGO Badge Text Color', 'wholesalex' ),
-			'bxgy_min_qty'                           => __( 'Buy X Get Y Minimum Quantity', 'wholesalex' ),
-			'bxgy_free_products'                     => __( 'Buy X Get Y Free Products', 'wholesalex' ),
-			'bxgy_free_item_count'                   => __( 'Buy X Get Y Free Item Count', 'wholesalex' ),
-			'bxgy_per_cart_once'                     => __( 'Buy X Get Y Once Per Cart', 'wholesalex' ),
-			'bxgy_show_free_item'                    => __( 'Buy X Get Y Show Free Item', 'wholesalex' ),
-			'bxgy_show_badge'                        => __( 'Buy X Get Y Show Badge', 'wholesalex' ),
-			'bxgy_badge_label'                       => __( 'Buy X Get Y Badge Label', 'wholesalex' ),
-			'bxgy_badge_style'                       => __( 'Buy X Get Y Badge Style', 'wholesalex' ),
-			'bxgy_badge_position'                    => __( 'Buy X Get Y Badge Position', 'wholesalex' ),
-			'bxgy_badge_bg_color'                    => __( 'Buy X Get Y Badge Background Color', 'wholesalex' ),
-			'bxgy_badge_text_color'                  => __( 'Buy X Get Y Badge Text Color', 'wholesalex' ),
-			'restriction_enable_quantity_limits'     => __( 'Enable Quantity Limits', 'wholesalex' ),
-			'restriction_min_quantity'               => __( 'Minimum Quantity', 'wholesalex' ),
-			'restriction_max_quantity'               => __( 'Maximum Quantity', 'wholesalex' ),
-			'restriction_min_quantity_message'       => __( 'Minimum Quantity Message', 'wholesalex' ),
-			'restriction_max_quantity_message'       => __( 'Maximum Quantity Message', 'wholesalex' ),
-			'restriction_enable_quantity_step'       => __( 'Enable Quantity Step', 'wholesalex' ),
-			'restriction_quantity_step'              => __( 'Quantity Step', 'wholesalex' ),
-			'restriction_enable_value_limits'        => __( 'Enable Value Limits', 'wholesalex' ),
-			'restriction_min_amount'                 => __( 'Minimum Amount', 'wholesalex' ),
-			'restriction_max_amount'                 => __( 'Maximum Amount', 'wholesalex' ),
-			'restriction_min_amount_message'         => __( 'Minimum Amount Message', 'wholesalex' ),
-			'restriction_max_amount_message'         => __( 'Maximum Amount Message', 'wholesalex' ),
-			'restriction_tiered_combined_variations' => __( 'Tiered Combined Variations', 'wholesalex' ),
-			'design_table_style'                     => __( 'Design Table Style', 'wholesalex' ),
-			'design_vertical_style'                  => __( 'Design Vertical Style', 'wholesalex' ),
-			'design_border_radius'                   => __( 'Design Border Radius', 'wholesalex' ),
-			'design_table_heading'                   => __( 'Design Table Heading', 'wholesalex' ),
-			'design_header_bg_color'                 => __( 'Design Header Background Color', 'wholesalex' ),
-			'design_header_text_color'               => __( 'Design Header Text Color', 'wholesalex' ),
-			'design_border_color'                    => __( 'Design Border Color', 'wholesalex' ),
-			'design_active_row_bg_color'             => __( 'Design Active Row Background Color', 'wholesalex' ),
-			'design_active_row_text_color'           => __( 'Design Active Row Text Color', 'wholesalex' ),
-			'design_text_color'                      => __( 'Design Text Color', 'wholesalex' ),
-			'design_font_size'                       => __( 'Design Font Size', 'wholesalex' ),
-			'design_price_display'                   => __( 'Design Price Display', 'wholesalex' ),
-			'design_discount_text_color'             => __( 'Design Discount Text Color', 'wholesalex' ),
-			'design_discount_bg_color'               => __( 'Design Discount Background Color', 'wholesalex' ),
-			'conditions'                             => __( 'Conditions Data', 'wholesalex' ),
-			'start_date'                             => __( 'Start Date', 'wholesalex' ),
-			'end_date'                               => __( 'End Date', 'wholesalex' ),
+		return apply_filters(
+			'wholesalex_wholesale_pricing_csv_columns',
+			array(
+				'schema_version'        => __( 'CSV Schema Version', 'wholesalex' ),
+				'exclude_products'      => __( 'Excluded Products', 'wholesalex' ),
+				'owner_id'              => __( 'Owner ID', 'wholesalex' ),
+				'owner_type'            => __( 'Owner Type', 'wholesalex' ),
+				'created_by'            => __( 'Created By', 'wholesalex' ),
+				'cart_presentation'     => __( 'Cart Presentation Data', 'wholesalex' ),
+				'bogo_presentation'     => __( 'BOGO Presentation Data', 'wholesalex' ),
+				'id'                    => __( 'ID', 'wholesalex' ),
+				'status'                => __( 'Status', 'wholesalex' ),
+				'title'                 => __( 'Title', 'wholesalex' ),
+				'rule_type'             => __( 'Rule Type', 'wholesalex' ),
+				'product_filter'        => __( 'Product Filter', 'wholesalex' ),
+				'products'              => __( 'Products', 'wholesalex' ),
+				'categories'            => __( 'Categories', 'wholesalex' ),
+				'user_role_filter'      => __( 'User Role Filter', 'wholesalex' ),
+				'user_roles'            => __( 'User Roles', 'wholesalex' ),
+				'specific_users'        => __( 'Specific Users', 'wholesalex' ),
+				'discount_type'         => __( 'Discount Type', 'wholesalex' ),
+				'regular_amount'        => __( 'Regular Discount Amount', 'wholesalex' ),
+				'regular_amount_type'   => __( 'Regular Discount Amount Type', 'wholesalex' ),
+				'regular_label'         => __( 'Regular Discount Label', 'wholesalex' ),
+				'cart_discount_type'    => __( 'Cart Discount Type', 'wholesalex' ),
+				'cart_discount_amount'  => __( 'Cart Discount Amount', 'wholesalex' ),
+				'cart_discount_name'    => __( 'Cart Discount Name', 'wholesalex' ),
+				'bogo_buy_x_qty'        => __( 'BOGO Buy Quantity', 'wholesalex' ),
+				'bogo_heading_text'     => __( 'BOGO Heading Text', 'wholesalex' ),
+				'bogo_per_cart_once'    => __( 'BOGO Once Per Cart', 'wholesalex' ),
+				'bogo_show_badge'       => __( 'BOGO Show Badge', 'wholesalex' ),
+				'bogo_badge_label'      => __( 'BOGO Badge Label', 'wholesalex' ),
+				'bogo_badge_style'      => __( 'BOGO Badge Style', 'wholesalex' ),
+				'bogo_badge_position'   => __( 'BOGO Badge Position', 'wholesalex' ),
+				'bogo_badge_bg_color'   => __( 'BOGO Badge Background Color', 'wholesalex' ),
+				'bogo_badge_text_color' => __( 'BOGO Badge Text Color', 'wholesalex' ),
+				'conditions'            => __( 'Conditions Data', 'wholesalex' ),
+				'start_date'            => __( 'Start Date', 'wholesalex' ),
+				'end_date'              => __( 'End Date', 'wholesalex' ),
+			)
 		);
 	}
 
@@ -305,6 +243,14 @@ class Import_Wholesale_Pricing {
 		$export_all   = isset( $_GET['export_all'] ) && 'yes' === sanitize_text_field( wp_unslash( $_GET['export_all'] ) );
 		$rules        = Wholesale_Pricing::get_all_rules();
 		$columns      = self::get_csv_columns();
+
+		foreach ( $rules as $id => $rule ) {
+			if ( ! $export_all && ! isset( $selected[ (string) $id ] ) ) {
+				continue; }
+			$check = Wholesale_Pricing::provider_operation( 'validate_export', (string) $id, array(), $rule );
+			if ( is_wp_error( $check ) ) {
+				wp_die( esc_html( $check->get_error_message() ), esc_html__( 'Pricing export unavailable', 'wholesalex' ), array( 'response' => 409 ) ); }
+		}
 
 		nocache_headers();
 		header( 'Content-Type: text/csv; charset=utf-8' );
@@ -336,7 +282,9 @@ class Import_Wholesale_Pricing {
 	protected function generate_export_row( $rule, $column_keys ) {
 		$row = array();
 		foreach ( $column_keys as $column_key ) {
-			$row[] = $this->get_export_column_value( $rule, $column_key );
+			$value = (string) $this->get_export_column_value( $rule, $column_key );
+			// A leading apostrophe is escaped too, making schema v2 decoding unambiguous.
+			$row[] = preg_match( '/^[\x00-\x20]*[=+@\-]|^[\x00-\x20\']/', $value ) ? "'" . $value : $value;
 		}
 		return $row;
 	}
@@ -349,7 +297,24 @@ class Import_Wholesale_Pricing {
 	 * @return string
 	 */
 	protected function get_export_column_value( $rule, $column_key ) {
+		$value = apply_filters( 'wholesalex_wholesale_pricing_csv_value', null, $rule, $column_key );
+		if ( null !== $value ) {
+			return $value; }
 		switch ( $column_key ) {
+			case 'schema_version':
+				return '2';
+			case 'owner_id':
+			case 'owner_type':
+			case 'created_by':
+				return isset( $rule[ $column_key ] ) ? (string) $rule[ $column_key ] : '';
+			case 'exclude_products':
+				return wp_json_encode( $rule['exclude_products'] ?? array() );
+			case 'cart_presentation':
+			case 'bogo_presentation':
+				$bucket = 'cart_presentation' === $column_key ? 'cart' : 'bogo';
+				$fields = self::presentation_fields( $bucket );
+				return wp_json_encode( array_intersect_key( $rule[ $bucket ] ?? array(), array_flip( $fields ) ) );
+
 			case 'bogo_heading_text':
 				return 'bogo_discount' === ( $rule['rule_type'] ?? '' )
 					? (string) ( $rule['bogo']['heading_text'] ?? __( 'Buy X Get 1 Discounted', 'wholesalex' ) )
@@ -365,14 +330,9 @@ class Import_Wholesale_Pricing {
 				return isset( $rule[ $column_key ] ) ? (string) $rule[ $column_key ] : '';
 
 			case 'products':
-			case 'brands':
-			case 'attributes':
 			case 'user_roles':
 			case 'specific_users':
 				return $this->serialize_select_items( isset( $rule[ $column_key ] ) ? $rule[ $column_key ] : array() );
-
-			case 'skus':
-				return $this->serialize_skus( isset( $rule['skus'] ) ? $rule['skus'] : array() );
 
 			case 'categories':
 				return $this->serialize_categories( isset( $rule['categories'] ) ? $rule['categories'] : array() );
@@ -391,9 +351,6 @@ class Import_Wholesale_Pricing {
 				return isset( $rule['product_discount']['label'] )
 					? (string) $rule['product_discount']['label']
 					: ( isset( $rule['regular']['label'] ) ? (string) $rule['regular']['label'] : '' );
-
-			case 'tiers':
-				return $this->serialize_tiers( isset( $rule['tiers'] ) ? $rule['tiers'] : array() );
 
 			case 'cart_discount_type':
 				return isset( $rule['cart']['discount_type'] ) ? (string) $rule['cart']['discount_type'] : '';
@@ -414,24 +371,8 @@ class Import_Wholesale_Pricing {
 				return isset( $rule['schedule']['end_date'] ) ? (string) $rule['schedule']['end_date'] : '';
 		}
 
-		if ( 0 === strpos( $column_key, 'restriction_' ) ) {
-			$key   = substr( $column_key, strlen( 'restriction_' ) );
-			$value = isset( $rule['restrictions'][ $key ] ) ? $rule['restrictions'][ $key ] : '';
-			return is_bool( $value ) ? $this->export_bool( $value ) : (string) $value;
-		}
-
-		if ( 0 === strpos( $column_key, 'design_' ) ) {
-			$key   = substr( $column_key, strlen( 'design_' ) );
-			$value = isset( $rule['design'][ $key ] ) ? $rule['design'][ $key ] : '';
-			return is_bool( $value ) ? $this->export_bool( $value ) : (string) $value;
-		}
-
 		if ( 0 === strpos( $column_key, 'bogo_' ) ) {
 			return $this->get_nested_export_value( $rule, 'bogo', substr( $column_key, strlen( 'bogo_' ) ) );
-		}
-
-		if ( 0 === strpos( $column_key, 'bxgy_' ) ) {
-			return $this->get_nested_export_value( $rule, 'bxgy', substr( $column_key, strlen( 'bxgy_' ) ) );
 		}
 
 		return '';
@@ -493,9 +434,9 @@ class Import_Wholesale_Pricing {
 			if ( ! $id ) {
 				continue;
 			}
-			$name = is_array( $item ) ? (string) ( $item['name'] ?? '' ) : '';
-			$name = html_entity_decode( $name, ENT_QUOTES, 'UTF-8' );
-			$name = str_replace( array( ',', ';' ), array( '\\,', '\\;' ), $name );
+			$name         = is_array( $item ) ? (string) ( $item['name'] ?? '' ) : '';
+			$name         = html_entity_decode( $name, ENT_QUOTES, 'UTF-8' );
+			$name         = str_replace( array( ',', ';' ), array( '\\,', '\\;' ), $name );
 			$categories[] = trim( $name . ' (ID: ' . $id . ')' );
 		}
 		return implode( ', ', $categories );
@@ -507,47 +448,7 @@ class Import_Wholesale_Pricing {
 	 * @param array $items Selected SKUs.
 	 * @return string
 	 */
-	protected function serialize_skus( $items ) {
-		$skus = array();
-		foreach ( (array) $items as $item ) {
-			$sku = is_array( $item ) ? (string) ( $item['value'] ?? '' ) : (string) $item;
-			$sku = 0 === strpos( $sku, 'sku:' ) ? substr( $sku, 4 ) : $sku;
-			if ( '' !== $sku ) {
-				$skus[] = str_replace( array( ',', ';' ), array( '\\,', '\\;' ), $sku );
-			}
-		}
-		return implode( ', ', $skus );
-	}
 
-	/**
-	 * Serialize pricing tiers.
-	 *
-	 * @param array $tiers Configured tier records.
-	 * @return string
-	 */
-	protected function serialize_tiers( $tiers ) {
-		if ( ! is_array( $tiers ) ) {
-			return '';
-		}
-
-		$out = array();
-		foreach ( $tiers as $tier ) {
-			if ( ! is_array( $tier ) ) {
-				continue;
-			}
-			$out[] = implode(
-				',',
-				array(
-					'id:' . ( isset( $tier['id'] ) ? $tier['id'] : '' ),
-					'min_qty:' . ( isset( $tier['min_qty'] ) ? $tier['min_qty'] : '' ),
-					'max_qty:' . ( isset( $tier['max_qty'] ) && null !== $tier['max_qty'] ? $tier['max_qty'] : '' ),
-					'amount:' . ( isset( $tier['amount'] ) ? $tier['amount'] : '' ),
-					'amount_type:' . ( isset( $tier['amount_type'] ) ? $tier['amount_type'] : 'percentage' ),
-				)
-			);
-		}
-		return implode( ';', $out );
-	}
 
 	/**
 	 * Serialize advanced conditions.
@@ -556,25 +457,7 @@ class Import_Wholesale_Pricing {
 	 * @return string
 	 */
 	protected function serialize_conditions( $conditions ) {
-		if ( ! is_array( $conditions ) ) {
-			return '';
-		}
-
-		$out = array();
-		foreach ( $conditions as $condition ) {
-			if ( ! is_array( $condition ) ) {
-				continue;
-			}
-			$out[] = implode(
-				',',
-				array(
-					'_conditions_for:' . ( isset( $condition['_conditions_for'] ) ? $condition['_conditions_for'] : '' ),
-					'_conditions_operator:' . ( isset( $condition['_conditions_operator'] ) ? $condition['_conditions_operator'] : '' ),
-					'_conditions_value:' . ( isset( $condition['_conditions_value'] ) ? $condition['_conditions_value'] : '' ),
-				)
-			);
-		}
-		return implode( ';', $out );
+		return is_array( $conditions ) ? 'json:' . wp_json_encode( array( 'tiers' => $conditions ) ) : '';
 	}
 
 	/**
@@ -608,14 +491,6 @@ class Import_Wholesale_Pricing {
 			'productinlists'      => 'products',
 			'categories'          => 'categories',
 			'categoriesinlists'   => 'categories',
-			'brands'              => 'brands',
-			'brandinlists'        => 'brands',
-			'variations'          => 'attributes',
-			'variationinlists'    => 'attributes',
-			'attributes'          => 'attributes',
-			'sku'                 => 'skus',
-			'skus'                => 'skus',
-			'skuinlists'          => 'skus',
 			'applicablefor'       => 'user_role_filter',
 			'userrolefilter'      => 'user_role_filter',
 			'applicableroles'     => 'user_roles',
@@ -628,12 +503,12 @@ class Import_Wholesale_Pricing {
 			'cartdiscountdata'    => 'cart_discount',
 			'bogodiscountdata'    => 'buy_x_get_one',
 			'buyxgetonedata'      => 'buy_x_get_one',
-			'buyxgetydata'        => 'buy_x_get_y',
 			'conditionsdata'      => 'conditions',
 			'startdate'           => 'start_date',
 			'enddate'             => 'end_date',
 		);
 
+		$defaults = apply_filters( 'wholesalex_pricing_csv_aliases', $defaults );
 		foreach ( $this->get_mapping_options() as $field_key => $field_label ) {
 			$defaults[ $this->normalize_key( $field_key ) ]   = $field_key;
 			$defaults[ $this->normalize_key( $field_label ) ] = $field_key;
@@ -680,7 +555,8 @@ class Import_Wholesale_Pricing {
 		}
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above.
 		$this->file = isset( $_POST['file'] ) ? sanitize_text_field( wp_unslash( $_POST['file'] ) ) : '';
-		if ( ! is_file( $this->file ) || ! $this->is_valid_csv( $this->file ) ) {
+		$rows       = $this->read_csv_rows( $this->file, 1 );
+		if ( is_wp_error( $rows ) ) {
 			wp_send_json(
 				array(
 					'status'  => false,
@@ -689,7 +565,7 @@ class Import_Wholesale_Pricing {
 			);
 		}
 
-		if ( empty( $_POST['map_from'] ) || empty( $_POST['map_to'] ) ) {
+		if ( empty( $_POST['map_from'] ) || empty( $_POST['map_to'] ) || ! is_array( $_POST['map_from'] ) || ! is_array( $_POST['map_to'] ) || count( $_POST['map_from'] ) !== count( $_POST['map_to'] ) ) {
 			wp_send_json(
 				array(
 					'status'  => false,
@@ -701,6 +577,16 @@ class Import_Wholesale_Pricing {
 		$mapping_from = map_deep( wp_unslash( $_POST['map_from'] ), 'sanitize_text_field' );
 		$mapping_to   = map_deep( wp_unslash( $_POST['map_to'] ), 'sanitize_text_field' );
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		if ( ! $this->valid_mapping( $mapping_from, $mapping_to ) ) {
+			wp_send_json(
+				array(
+					'status'  => false,
+					'message' => __( 'Invalid CSV column mapping.', 'wholesalex' ),
+				),
+				400
+			);
+		}
 
 		update_user_option( get_current_user_id(), self::MAPPING_OPTION, $mapping_to );
 
@@ -745,7 +631,8 @@ class Import_Wholesale_Pricing {
 		}
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above.
 		$file = isset( $_POST['file'] ) && is_string( $_POST['file'] ) ? sanitize_text_field( wp_unslash( $_POST['file'] ) ) : '';
-		if ( ! is_file( $file ) || ! $this->is_valid_csv( $file ) ) {
+		$rows = $this->read_csv_rows( $file );
+		if ( is_wp_error( $rows ) ) {
 			wp_send_json(
 				array(
 					'status'  => false,
@@ -759,9 +646,9 @@ class Import_Wholesale_Pricing {
 		$from = isset( $mapping['from'] ) && is_array( $mapping['from'] ) ? array_values( $mapping['from'] ) : array();
 		$to   = isset( $mapping['to'] ) && is_array( $mapping['to'] ) ? array_values( $mapping['to'] ) : array();
 
-		$rows    = $this->read_csv_rows( $file );
 		$results = $this->import_rows( $rows, $from, $to );
-		$errors  = array();
+		( new Dynamic_Rule_Import_Jobs() )->delete( $file );
+		$errors = array();
 
 		foreach ( array_merge( $results['failed'], $results['skipped'] ) as $error ) {
 			if ( is_wp_error( $error ) ) {
@@ -798,17 +685,19 @@ class Import_Wholesale_Pricing {
 	protected function read_csv_rows( $file, $limit = -1 ) {
 		$headers = array();
 		$rows    = array();
-		$handle  = fopen( $file, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- fgetcsv needs a readable stream for the uploaded CSV.
+		$handle  = ( new Dynamic_Rule_Import_Jobs() )->open( $file, 'pricing' );
 
-		if ( false === $handle ) {
-			return array(
-				'headers' => $headers,
-				'rows'    => $rows,
-			);
+		if ( is_wp_error( $handle ) ) {
+			return $handle;
 		}
 
 		$headers = fgetcsv( $handle, 0, ',', '"', "\0" );
 		$headers = is_array( $headers ) ? array_map( array( $this, 'clean_csv_cell' ), $headers ) : array();
+
+		if ( ! count( array_filter( $headers ) ) ) {
+			fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Release the private memory stream.
+			return new WP_Error( 'invalid_csv', __( 'CSV header is missing.', 'wholesalex' ) );
+		}
 
 		if ( isset( $headers[0] ) ) {
 			$headers[0] = $this->remove_utf8_bom( $headers[0] );
@@ -817,6 +706,10 @@ class Import_Wholesale_Pricing {
 		while ( false !== ( $row = fgetcsv( $handle, 0, ',', '"', "\0" ) ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Read each CSV row once and stop at end of file.
 			if ( ! count( array_filter( $row ) ) ) {
 				continue;
+			}
+			if ( count( $headers ) !== count( $row ) ) {
+				fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Release the private memory stream.
+				return new WP_Error( 'invalid_csv', __( 'CSV row does not match its header.', 'wholesalex' ) );
 			}
 			$rows[] = array_map( array( $this, 'clean_csv_cell' ), $row );
 			if ( $limit > 0 && count( $rows ) >= $limit ) {
@@ -830,6 +723,31 @@ class Import_Wholesale_Pricing {
 			'headers' => $headers,
 			'rows'    => $rows,
 		);
+	}
+
+	/**
+	 * Require scalar, matching mapping arrays and known target fields.
+	 *
+	 * @param array $from Source headings.
+	 * @param array $to Target fields.
+	 * @return bool
+	 */
+	private function valid_mapping( $from, $to ) {
+		if ( ! is_array( $from ) || ! is_array( $to ) || count( $from ) !== count( $to ) || empty( $to ) ) {
+			return false;
+		}
+		$allowed = array_keys( $this->get_mapping_options() );
+		foreach ( $from as $value ) {
+			if ( ! is_string( $value ) ) {
+				return false;
+			}
+		}
+		foreach ( $to as $value ) {
+			if ( ! is_string( $value ) || ( '' !== $value && ! in_array( $value, $allowed, true ) ) ) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -848,6 +766,18 @@ class Import_Wholesale_Pricing {
 			'skipped'  => array(),
 			'aborted'  => false,
 		);
+
+		if ( is_wp_error( $csv ) ) {
+			$results['aborted']  = true;
+			$results['failed'][] = $csv;
+			return $results;
+		}
+
+		if ( ! $this->valid_mapping( $from, $to ) ) {
+			$results['aborted']  = true;
+			$results['failed'][] = new WP_Error( 'invalid_csv_mapping', __( 'Invalid CSV column mapping.', 'wholesalex' ) );
+			return $results;
+		}
 
 		$headers = isset( $csv['headers'] ) ? $csv['headers'] : array();
 		$rows    = isset( $csv['rows'] ) ? $csv['rows'] : array();
@@ -882,7 +812,9 @@ class Import_Wholesale_Pricing {
 
 			$result = $this->process_row( $raw, $row_index + 2 );
 			if ( is_wp_error( $result ) ) {
+				$results['aborted']  = true;
 				$results['failed'][] = $result;
+				return $results;
 			} elseif ( isset( $result['skipped'] ) && $result['skipped'] ) {
 				$results['skipped'][] = new WP_Error(
 					'wholesalex_wholesale_pricing_import_skipped',
@@ -911,10 +843,26 @@ class Import_Wholesale_Pricing {
 	 * @return array|WP_Error
 	 */
 	protected function process_row( $raw, $line, $dry_run = false ) {
+		$id       = isset( $raw['id'] ) ? sanitize_text_field( $raw['id'] ) : '';
+		$existing = '' !== $id ? Wholesale_Pricing::get_rule( $id ) : null;
+		$provided = apply_filters( 'wholesalex_wholesale_pricing_csv_import', null, $raw, $line, $dry_run, $this, $existing );
+		if ( null !== $provided ) {
+			return $provided; }
+		if ( ! empty( $raw['tiers'] ) || 'tiered' === ( $raw['discount_type'] ?? '' ) || in_array( $this->normalize_key( $raw['rule_type'] ?? '' ), array( 'tierpricing', 'quantitybaseddiscount', 'tierpricingquantitybaseddiscount', 'tiered' ), true ) || ( is_array( $existing ) && Wholesale_Pricing::has_provider_record( $existing ) ) ) {
+			return new WP_Error( 'wholesalex_provider_unavailable', __( 'The provider for this pricing import is unavailable.', 'wholesalex' ) );
+		}
+
+		$known = array_merge( array_keys( $this->get_mapping_options() ), array( 'tiers' ) );
+		foreach ( $raw as $key => $value ) {
+			if ( '' !== $value && ! in_array( $key, $known, true ) ) {
+				return new WP_Error( 'wholesalex_provider_unavailable', __( 'The provider for this pricing import is unavailable.', 'wholesalex' ) );
+			}
+		}
+
 		$rule_type = $this->parse_rule_type( isset( $raw['rule_type'] ) ? $raw['rule_type'] : '' );
 
 		if ( empty( $rule_type ) ) {
-			foreach ( array( 'product_discount', 'cart_discount', 'buy_x_get_one', 'buy_x_get_y' ) as $legacy_key ) {
+			foreach ( array( 'product_discount', 'cart_discount', 'buy_x_get_one' ) as $legacy_key ) {
 				if ( ! empty( $raw[ $legacy_key ] ) ) {
 					$rule_type = $this->legacy_rule_type_from_key( $legacy_key );
 					break;
@@ -922,6 +870,7 @@ class Import_Wholesale_Pricing {
 			}
 		}
 
+		$rule_type = apply_filters( 'wholesalex_pricing_csv_legacy_type', $rule_type, $raw );
 		if ( empty( $rule_type ) ) {
 			return new WP_Error(
 				'wholesalex_wholesale_pricing_import_invalid_rule_type',
@@ -953,20 +902,104 @@ class Import_Wholesale_Pricing {
 			);
 		}
 
-		$base              = $exists ? Wholesale_Pricing::get_rule( $id ) : $this->get_default_rule( $id, $rule_type );
-		$rule              = $this->merge_row_into_rule( $base, $raw, $rule_type );
+		$base     = $exists ? Wholesale_Pricing::get_rule( $id ) : $this->get_default_rule( $id, $rule_type );
+		$settings = $this->validate_import_settings( $raw, $base );
+		if ( is_wp_error( $settings ) ) {
+			return $settings;
+		}
+
+		$rule = $this->merge_row_into_rule( $base, $raw, $rule_type );
+		if ( '' === ( $rule['product_filter'] ?? '' ) ) {
+			return new WP_Error( 'wholesalex_provider_unavailable', __( 'The provider for this pricing import is unavailable.', 'wholesalex' ) );
+		}
 		$rule['id']        = $id;
 		$rule['rule_type'] = $rule_type;
 		$updating          = $exists;
 
+		$input_validation = ( new Wholesale_Pricing_Rest_Api( false ) )->validate_input( $rule, $exists ? $base : array() );
+		if ( is_wp_error( $input_validation ) ) {
+			return $input_validation;
+		}
+
+		$validation = Wholesale_Pricing::validate_provider_write( $rule, $exists ? $base : null );
+		if ( is_wp_error( $validation ) ) {
+			return $validation; }
+
 		if ( ! $dry_run ) {
-			Wholesale_Pricing::save_rule( $id, $rule );
+			$saved = Wholesale_Pricing::save_rule( $id, $rule );
+			if ( is_wp_error( $saved ) ) {
+				return $saved; }
 		}
 
 		return array(
 			'id'      => $id,
 			'updated' => $updating,
 		);
+	}
+
+	/**
+	 * Shared strict calendar-date schedule validation for CSV and REST.
+	 *
+	 * @param array $schedule Schedule to validate.
+	 * @return true|WP_Error
+	 */
+	public static function validate_schedule( $schedule ) {
+		if ( ! is_array( $schedule ) ) {
+			return new WP_Error( 'invalid_schedule', __( 'Invalid rule schedule.', 'wholesalex' ), array( 'status' => 400 ) );
+		}
+		foreach ( array( 'start_date', 'end_date' ) as $key ) {
+			$value = $schedule[ $key ] ?? '';
+			if ( '' === $value ) {
+				continue;
+			}
+			if ( ! is_string( $value ) || ! preg_match( '/^(\d{4})-(\d{2})-(\d{2})$/D', $value, $parts ) || ! checkdate( (int) $parts[2], (int) $parts[3], (int) $parts[1] ) ) {
+				return new WP_Error( 'invalid_schedule', __( 'Schedule dates must be valid YYYY-MM-DD dates.', 'wholesalex' ), array( 'status' => 400 ) );
+			}
+		}
+		if ( ! empty( $schedule['start_date'] ) && ! empty( $schedule['end_date'] ) && $schedule['start_date'] > $schedule['end_date'] ) {
+			return new WP_Error( 'invalid_schedule', __( 'The schedule end date must not precede its start date.', 'wholesalex' ), array( 'status' => 400 ) );
+		}
+		return true;
+	}
+
+	/**
+	 * Presentation fields supported by the Free CSV schema.
+	 *
+	 * @param string $bucket Rule bucket.
+	 * @return array
+	 */
+	private static function presentation_fields( $bucket ) {
+		return 'cart' === $bucket ? array( 'show_cart_discount_conditions', 'show_label_before_promo', 'label_text', 'promo_desc_text', 'condition_texts' ) : array( 'show_promo_text', 'offer_text', 'promo_text_popup', 'promo_text_cart' );
+	}
+
+	/**
+	 * Reject invalid scopes and schedules before any row is persisted.
+	 *
+	 * @param array $raw Mapped cells.
+	 * @param array $base Existing rule.
+	 * @return true|WP_Error
+	 */
+	private function validate_import_settings( $raw, $base ) {
+		if ( isset( $raw['schema_version'] ) && '' !== $raw['schema_version'] && ! in_array( $raw['schema_version'], array( '1', '2' ), true ) ) {
+			return new WP_Error( 'invalid_csv_schema', __( 'Unsupported CSV schema version.', 'wholesalex' ) );
+		}
+		foreach ( array( 'exclude_products', 'cart_presentation', 'bogo_presentation' ) as $field ) {
+			if ( ! empty( $raw[ $field ] ) && ! is_array( json_decode( $raw[ $field ], true ) ) ) {
+				return new WP_Error( 'invalid_csv_data', __( 'Invalid structured CSV data.', 'wholesalex' ) );
+			}
+		}
+		$owner = isset( $raw['owner_id'] ) && '' !== $raw['owner_id'] ? $raw['owner_id'] : ( $base['owner_id'] ?? 0 );
+		$type  = isset( $raw['owner_type'] ) && '' !== $raw['owner_type'] ? $raw['owner_type'] : ( $base['owner_type'] ?? 'admin' );
+		if ( '' !== (string) $owner && ( ! ctype_digit( (string) $owner ) || ( (int) $owner > 0 && ( ! current_user_can( 'manage_options' ) || ! get_userdata( (int) $owner ) || '' === $type || 'admin' === $type ) ) || ( 0 === (int) $owner && ! in_array( $type, array( '', 'admin' ), true ) ) ) ) {
+			return new WP_Error( 'invalid_csv_owner', __( 'The CSV owner is invalid. Rebind the rule to an existing vendor before importing.', 'wholesalex' ) );
+		}
+		$schedule = is_array( $base['schedule'] ?? null ) ? $base['schedule'] : array();
+		foreach ( array( 'start_date', 'end_date' ) as $key ) {
+			if ( isset( $raw[ $key ] ) && '' !== $raw[ $key ] ) {
+				$schedule[ $key ] = $raw[ $key ];
+			}
+		}
+		return self::validate_schedule( $schedule );
 	}
 
 	/**
@@ -977,7 +1010,34 @@ class Import_Wholesale_Pricing {
 	 * @param string $rule_type Rule type.
 	 * @return array
 	 */
-	protected function merge_row_into_rule( $rule, $raw, $rule_type ) {
+	public function merge_row_into_rule( $rule, $raw, $rule_type ) {
+		if ( '2' === ( $raw['schema_version'] ?? '' ) ) {
+			foreach ( $raw as $key => $value ) {
+				if ( is_string( $value ) && 0 === strpos( $value, "'" ) ) {
+					$raw[ $key ] = substr( $value, 1 );
+				}
+			}
+		}
+		foreach ( array( 'owner_id', 'created_by' ) as $key ) {
+			if ( isset( $raw[ $key ] ) && '' !== $raw[ $key ] ) {
+				$rule[ $key ] = absint( $raw[ $key ] );
+			}
+		}
+		if ( ! empty( $raw['owner_type'] ) ) {
+			$rule['owner_type'] = sanitize_key( $raw['owner_type'] );
+		}
+		if ( isset( $raw['exclude_products'] ) && '' !== $raw['exclude_products'] ) {
+			$rule['exclude_products'] = json_decode( $raw['exclude_products'], true );
+		}
+		foreach ( array( 'cart', 'bogo' ) as $bucket ) {
+			if ( ! empty( $raw[ $bucket . '_presentation' ] ) ) {
+				$presentation = json_decode( $raw[ $bucket . '_presentation' ], true );
+				foreach ( array_intersect_key( $presentation, array_flip( self::presentation_fields( $bucket ) ) ) as $key => $value ) {
+					$rule[ $bucket ][ $key ] = is_array( $value ) ? map_deep( $value, 'sanitize_text_field' ) : ( is_bool( $value ) ? $value : sanitize_text_field( $value ) );
+				}
+			}
+		}
+
 		if ( isset( $raw['title'] ) && '' !== $raw['title'] ) {
 			$rule['title'] = sanitize_text_field( $raw['title'] );
 		}
@@ -986,25 +1046,20 @@ class Import_Wholesale_Pricing {
 		}
 
 		$rule = $this->merge_targeting( $rule, $raw );
-		$rule = $this->merge_restrictions( $rule, $raw );
 		$rule = $this->merge_schedule_and_conditions( $rule, $raw );
 
-		if ( in_array( $rule_type, array( 'wholesale_pricing', 'tier_pricing' ), true ) ) {
+		if ( in_array( $rule_type, array( 'wholesale_pricing' ), true ) ) {
 			$rule = $this->merge_pricing_rule( $rule, $raw );
-			if ( 'tier_pricing' === $rule_type ) {
-				$rule['discount_type'] = 'tiered';
-			}
+
 		} elseif ( 'product_discount' === $rule_type ) {
 			$rule = $this->merge_product_discount_rule( $rule, $raw );
 		} elseif ( 'cart_discount' === $rule_type ) {
 			$rule = $this->merge_cart_rule( $rule, $raw );
 		} elseif ( 'bogo_discount' === $rule_type ) {
 			$rule = $this->merge_bogo_rule( $rule, $raw );
-		} elseif ( 'buy_x_get_y' === $rule_type ) {
-			$rule = $this->merge_bxgy_rule( $rule, $raw );
 		}
 
-		return $rule;
+		return apply_filters( 'wholesalex_pricing_csv_merge', $rule, $raw, $rule_type );
 	}
 
 	/**
@@ -1019,7 +1074,7 @@ class Import_Wholesale_Pricing {
 			$rule['product_filter'] = $this->parse_product_filter( $raw['product_filter'] );
 		}
 
-		foreach ( array( 'products', 'categories', 'brands', 'attributes', 'skus' ) as $field ) {
+		foreach ( array( 'products', 'categories' ) as $field ) {
 			if ( isset( $raw[ $field ] ) && '' !== $raw[ $field ] ) {
 				$rule[ $field ] = $this->parse_select_items( $raw[ $field ], $field );
 			}
@@ -1047,34 +1102,6 @@ class Import_Wholesale_Pricing {
 	 * @param array $raw Raw row.
 	 * @return array
 	 */
-	protected function merge_restrictions( $rule, $raw ) {
-		$map = array(
-			'restriction_enable_quantity_limits'     => 'enable_quantity_limits',
-			'restriction_min_quantity'               => 'min_quantity',
-			'restriction_max_quantity'               => 'max_quantity',
-			'restriction_min_quantity_message'       => 'min_quantity_message',
-			'restriction_max_quantity_message'       => 'max_quantity_message',
-			'restriction_enable_quantity_step'       => 'enable_quantity_step',
-			'restriction_quantity_step'              => 'quantity_step',
-			'restriction_enable_value_limits'        => 'enable_value_limits',
-			'restriction_min_amount'                 => 'min_amount',
-			'restriction_max_amount'                 => 'max_amount',
-			'restriction_min_amount_message'         => 'min_amount_message',
-			'restriction_max_amount_message'         => 'max_amount_message',
-			'restriction_tiered_combined_variations' => 'tiered_combined_variations',
-		);
-
-		foreach ( $map as $csv_key => $restriction_key ) {
-			if ( ! isset( $raw[ $csv_key ] ) || '' === $raw[ $csv_key ] ) {
-				continue;
-			}
-			$is_bool                                  = in_array( $restriction_key, array( 'enable_quantity_limits', 'enable_quantity_step', 'enable_value_limits', 'tiered_combined_variations' ), true );
-			$rule['restrictions'][ $restriction_key ] = $is_bool ? $this->parse_bool( $raw[ $csv_key ] ) : sanitize_text_field( $raw[ $csv_key ] );
-		}
-
-		return $rule;
-	}
-
 	/**
 	 * Merge schedule and condition data.
 	 *
@@ -1118,7 +1145,7 @@ class Import_Wholesale_Pricing {
 
 		if ( isset( $raw['discount_type'] ) && '' !== $raw['discount_type'] ) {
 			$discount_type         = $this->normalize_key( $raw['discount_type'] );
-			$rule['discount_type'] = 'tiered' === $discount_type ? 'tiered' : 'regular';
+			$rule['discount_type'] = 'regular';
 		}
 		if ( isset( $raw['regular_amount'] ) && '' !== $raw['regular_amount'] ) {
 			$rule['regular']['amount'] = sanitize_text_field( $raw['regular_amount'] );
@@ -1128,34 +1155,6 @@ class Import_Wholesale_Pricing {
 		}
 		if ( isset( $raw['regular_label'] ) && '' !== $raw['regular_label'] ) {
 			$rule['regular']['label'] = sanitize_text_field( $raw['regular_label'] );
-		}
-		if ( isset( $raw['tiers'] ) && '' !== $raw['tiers'] ) {
-			$rule['discount_type'] = 'tiered';
-			$rule['tiers']         = $this->parse_tiers( $raw['tiers'] );
-		}
-
-		$design_map = array(
-			'design_table_style'           => 'table_style',
-			'design_vertical_style'        => 'vertical_style',
-			'design_border_radius'         => 'border_radius',
-			'design_table_heading'         => 'table_heading',
-			'design_header_bg_color'       => 'header_bg_color',
-			'design_header_text_color'     => 'header_text_color',
-			'design_border_color'          => 'border_color',
-			'design_active_row_bg_color'   => 'active_row_bg_color',
-			'design_active_row_text_color' => 'active_row_text_color',
-			'design_text_color'            => 'text_color',
-			'design_font_size'             => 'font_size',
-			'design_price_display'         => 'price_display',
-			'design_discount_text_color'   => 'discount_text_color',
-			'design_discount_bg_color'     => 'discount_bg_color',
-		);
-
-		foreach ( $design_map as $csv_key => $design_key ) {
-			if ( ! isset( $raw[ $csv_key ] ) || '' === $raw[ $csv_key ] ) {
-				continue;
-			}
-			$rule['design'][ $design_key ] = $this->sanitize_design_value( $design_key, $raw[ $csv_key ] );
 		}
 
 		return $rule;
@@ -1191,7 +1190,6 @@ class Import_Wholesale_Pricing {
 			$rule['product_discount']['label'] = sanitize_text_field( $raw['regular_label'] );
 		}
 
-		$rule['restrictions'] = array();
 		return $rule;
 	}
 
@@ -1268,38 +1266,6 @@ class Import_Wholesale_Pricing {
 	 * @param array $raw Raw row.
 	 * @return array
 	 */
-	protected function merge_bxgy_rule( $rule, $raw ) {
-		if ( isset( $raw['buy_x_get_y'] ) && '' !== $raw['buy_x_get_y'] ) {
-			$legacy = $this->parse_key_value_list( $raw['buy_x_get_y'] );
-			$raw    = array_merge(
-				$raw,
-				array(
-					'bxgy_min_qty'         => isset( $legacy['_minimum_purchase_count'] ) ? $legacy['_minimum_purchase_count'] : '',
-					'bxgy_free_products'   => isset( $legacy['_free_item'] ) ? $legacy['_free_item'] : '',
-					'bxgy_free_item_count' => isset( $legacy['_free_item_quantity'] ) ? $legacy['_free_item_quantity'] : '',
-				)
-			);
-		}
-
-		if ( isset( $raw['bxgy_min_qty'] ) && '' !== $raw['bxgy_min_qty'] ) {
-			$rule['bxgy']['min_qty'] = absint( $raw['bxgy_min_qty'] );
-		}
-		if ( isset( $raw['bxgy_free_products'] ) && '' !== $raw['bxgy_free_products'] ) {
-			$rule['bxgy']['free_products'] = $this->parse_select_items( $raw['bxgy_free_products'], 'products' );
-		}
-		if ( isset( $raw['bxgy_free_item_count'] ) && '' !== $raw['bxgy_free_item_count'] ) {
-			$rule['bxgy']['free_item_count'] = absint( $raw['bxgy_free_item_count'] );
-		}
-		if ( isset( $raw['bxgy_per_cart_once'] ) && '' !== $raw['bxgy_per_cart_once'] ) {
-			$rule['bxgy']['per_cart_once'] = $this->parse_bool( $raw['bxgy_per_cart_once'] );
-		}
-		if ( isset( $raw['bxgy_show_free_item'] ) && '' !== $raw['bxgy_show_free_item'] ) {
-			$rule['bxgy']['show_free_item'] = $this->parse_bool( $raw['bxgy_show_free_item'] );
-		}
-
-		return $this->merge_badge_fields( $rule, $raw, 'bxgy' );
-	}
-
 	/**
 	 * Merge badge fields for BOGO/BXGY.
 	 *
@@ -1348,7 +1314,7 @@ class Import_Wholesale_Pricing {
 	 * @param string $rule_type Rule type.
 	 * @return array
 	 */
-	protected function get_default_rule( $id, $rule_type ) {
+	public function get_default_rule( $id, $rule_type ) {
 		$rule = array(
 			'id'               => $id,
 			'title'            => '',
@@ -1357,27 +1323,9 @@ class Import_Wholesale_Pricing {
 			'product_filter'   => 'all_products',
 			'products'         => array(),
 			'categories'       => array(),
-			'brands'           => array(),
-			'attributes'       => array(),
-			'skus'             => array(),
 			'user_role_filter' => 'all_b2b',
 			'user_roles'       => array(),
 			'specific_users'   => array(),
-			'restrictions'     => array(
-				'enable_quantity_limits'     => false,
-				'min_quantity'               => '',
-				'max_quantity'               => '',
-				'min_quantity_message'       => '',
-				'max_quantity_message'       => '',
-				'enable_quantity_step'       => false,
-				'quantity_step'              => '',
-				'enable_value_limits'        => false,
-				'min_amount'                 => '',
-				'max_amount'                 => '',
-				'min_amount_message'         => '',
-				'max_amount_message'         => '',
-				'tiered_combined_variations' => false,
-			),
 			'schedule'         => array(
 				'start_date' => '',
 				'end_date'   => '',
@@ -1389,7 +1337,6 @@ class Import_Wholesale_Pricing {
 
 		if ( 'product_discount' === $rule_type ) {
 			$rule['discount_type']    = 'regular';
-			$rule['restrictions']     = array();
 			$rule['product_discount'] = array(
 				'amount'      => '',
 				'amount_type' => 'percentage',
@@ -1422,64 +1369,17 @@ class Import_Wholesale_Pricing {
 				'badge_bg_color'   => '#5a40e8',
 				'badge_text_color' => '#ffffff',
 			);
-		} elseif ( 'buy_x_get_y' === $rule_type ) {
-			$rule['bxgy'] = array(
-				'min_qty'          => '',
-				'free_products'    => array(),
-				'free_item_count'  => '',
-				'per_cart_once'    => false,
-				'badge_label'      => 'Buy X Get Y Free',
-				'show_free_item'   => true,
-				'show_badge'       => true,
-				'badge_style'      => 'style_one',
-				'badge_position'   => '',
-				'badge_bg_color'   => '#5a40e8',
-				'badge_text_color' => '#ffffff',
-			);
 		} else {
-			$rule['discount_type'] = 'tier_pricing' === $rule_type ? 'tiered' : 'regular';
+			$rule['discount_type'] = 'regular';
 			$rule['regular']       = array(
 				'amount'      => '',
 				'amount_type' => 'percentage',
 				'label'       => '',
 			);
-			$rule['tiers']         = array();
-			$rule['design']        = array(
-				'table_style'           => 'table_style',
-				'vertical_style'        => false,
-				'border_radius'         => false,
-				'table_heading'         => 'Buy More, Save More',
-				'header_bg_color'       => '#F7F7F7',
-				'header_text_color'     => '#3A3A3A',
-				'border_color'          => '#E5E5E5',
-				'active_row_bg_color'   => '#6C6CFF',
-				'active_row_text_color' => '#FFFFFF',
-				'text_color'            => '#494949',
-				'font_size'             => 14,
-				'price_display'         => 'fixed',
-				'discount_text_color'   => '#ffffff',
-				'discount_bg_color'     => '#070707',
-				'column_priority'       => array(
-					array(
-						'label'  => 'Quantity_Range',
-						'value'  => 'Quantity Range',
-						'status' => true,
-					),
-					array(
-						'label'  => 'Discount',
-						'value'  => 'Discount',
-						'status' => true,
-					),
-					array(
-						'label'  => 'Price_Per_Unit',
-						'value'  => 'Price Per Unit',
-						'status' => true,
-					),
-				),
-			);
+
 		}
 
-		return $rule;
+		return apply_filters( 'wholesalex_pricing_csv_defaults', $rule, $rule_type );
 	}
 
 	/**
@@ -1525,27 +1425,21 @@ class Import_Wholesale_Pricing {
 	protected function parse_rule_type( $value ) {
 		$normalized = $this->normalize_key( $value );
 		$map        = array(
-			'wholesalepricing'                   => 'wholesale_pricing',
-			'tierpricing'                        => 'tier_pricing',
-			'quantitybaseddiscount'              => 'tier_pricing',
-			'tierpricingquantitybaseddiscount' => 'tier_pricing',
-			'productdiscount'                    => 'product_discount',
-			'regular'                            => 'wholesale_pricing',
-			'tiered'                             => 'tier_pricing',
-			'cartdiscount'                       => 'cart_discount',
-			'bogo'                               => 'bogo_discount',
-			'bogodiscount'                       => 'bogo_discount',
-			'buyxgetone'                         => 'bogo_discount',
-			'buyxgetonefree'                     => 'bogo_discount',
-			'buyxgety'                           => 'buy_x_get_y',
-			'buyxgetydiscount'                   => 'buy_x_get_y',
+			'wholesalepricing' => 'wholesale_pricing',
+			'productdiscount'  => 'product_discount',
+			'regular'          => 'wholesale_pricing',
+			'cartdiscount'     => 'cart_discount',
+			'bogo'             => 'bogo_discount',
+			'bogodiscount'     => 'bogo_discount',
+			'buyxgetone'       => 'bogo_discount',
+			'buyxgetonefree'   => 'bogo_discount',
 		);
 
-		if ( in_array( $value, array( 'wholesale_pricing', 'tier_pricing', 'product_discount', 'cart_discount', 'bogo_discount', 'buy_x_get_y' ), true ) ) {
+		if ( in_array( $value, array( 'wholesale_pricing', 'product_discount', 'cart_discount', 'bogo_discount' ), true ) ) {
 			return $value;
 		}
 
-		return isset( $map[ $normalized ] ) ? $map[ $normalized ] : '';
+		return apply_filters( 'wholesalex_pricing_csv_rule_type', isset( $map[ $normalized ] ) ? $map[ $normalized ] : '', $value );
 	}
 
 	/**
@@ -1559,7 +1453,6 @@ class Import_Wholesale_Pricing {
 			'product_discount' => 'product_discount',
 			'cart_discount'    => 'cart_discount',
 			'buy_x_get_one'    => 'bogo_discount',
-			'buy_x_get_y'      => 'buy_x_get_y',
 		);
 		return isset( $map[ $key ] ) ? $map[ $key ] : '';
 	}
@@ -1583,22 +1476,13 @@ class Import_Wholesale_Pricing {
 			'categories'         => 'specific_categories',
 			'catinlist'          => 'specific_categories',
 			'categoriesinlist'   => 'specific_categories',
-			'brands'             => 'brands',
-			'brandinlist'        => 'brands',
-			'attributes'         => 'attributes',
-			'variations'         => 'attributes',
-			'attributeinlist'    => 'attributes',
-			'variationinlist'    => 'attributes',
-			'sku'                => 'sku',
-			'skus'               => 'sku',
-			'skuinlist'          => 'sku',
 		);
 
-		if ( in_array( $value, array( 'all_products', 'specific_products', 'specific_variations', 'specific_categories', 'brands', 'attributes', 'sku' ), true ) ) {
+		if ( in_array( $value, array( 'all_products', 'specific_products', 'specific_variations', 'specific_categories' ), true ) ) {
 			return $value;
 		}
 
-		return isset( $map[ $normalized ] ) ? $map[ $normalized ] : 'all_products';
+		return apply_filters( 'wholesalex_pricing_csv_product_filter', isset( $map[ $normalized ] ) ? $map[ $normalized ] : '', $value );
 	}
 
 	/**
@@ -1685,48 +1569,18 @@ class Import_Wholesale_Pricing {
 	 * @return array
 	 */
 	protected function parse_select_items( $value, $type ) {
-		$out = array();
-		// Plain SKU lists contain literal values. Also accept the previous shared
-		// prefix and the legacy per-item sku:value(name) format.
-		$sku_list = 'skus' === $type && ( preg_match( '/^sku:\s+/i', trim( (string) $value ) ) || ! preg_match( '/^sku:/i', trim( (string) $value ) ) );
+		$provided = apply_filters( 'wholesalex_pricing_csv_selection', null, $value, $type );
+		if ( null !== $provided ) {
+			return $provided; }
+		$out           = array();
 		$category_list = 'categories' === $type && ( preg_match( '/^categories:\s*/i', trim( (string) $value ) ) || preg_match( '/\(ID:\s*\d+\)$/i', trim( (string) $value ) ) );
 		if ( $category_list ) {
 			$value = preg_replace( '/^categories:\s*/i', '', trim( (string) $value ), 1 );
-			$items = $this->split_list( $value, ',' );
-		} elseif ( $sku_list ) {
-			$value = preg_replace( '/^sku:\s+/i', '', trim( (string) $value ), 1 );
 			$items = $this->split_list( $value, ',' );
 		} else {
 			$items = $this->split_multi_value_list( $value );
 		}
 		foreach ( $items as $item ) {
-			if ( 'skus' === $type ) {
-				$sku = trim( (string) $item );
-				$sku = $sku_list ? $sku : preg_replace( '/^sku:\s*/i', '', $sku, 1 );
-
-				// Exported selections use value(name). The SKU is also the name,
-				// so find a suffix that exactly repeats the preceding value. This
-				// remains safe when the SKU itself contains parentheses.
-				$position = strpos( $sku, '(' );
-				while ( ! $sku_list && false !== $position ) {
-					$candidate = substr( $sku, 0, $position );
-					if ( substr( $sku, $position ) === '(' . $candidate . ')' ) {
-						$sku = $candidate;
-						break;
-					}
-					$position = strpos( $sku, '(', $position + 1 );
-				}
-
-				$sku = sanitize_text_field( $sku );
-				if ( '' !== $sku ) {
-					$out[] = array(
-						'name'  => esc_attr( $sku ),
-						'value' => 'sku:' . $sku,
-					);
-				}
-				continue;
-			}
-
 			if ( $category_list ) {
 				if ( ! preg_match( '/\(ID:\s*(\d+)\)$/i', $item, $match ) ) {
 					continue;
@@ -1735,25 +1589,17 @@ class Import_Wholesale_Pricing {
 			} else {
 				$item_id = $this->extract_id( $item );
 			}
-			$label   = '';
+			$label = '';
 
 			if ( 'products' === $type ) {
 				$product = wc_get_product( $item_id );
 				$label   = $product ? $product->get_title() : '';
 				if ( $product && $product->is_type( 'variation' ) ) {
-					$label = $product->get_name() . ' (' . $product->get_id() . ')';
+					$label = '#' . $product->get_id() . ' ' . $product->get_name();
 				}
 			} elseif ( 'categories' === $type ) {
 				$term  = get_term_by( 'id', $item_id, 'product_cat' );
 				$label = $term ? $term->name : '';
-			} elseif ( 'brands' === $type ) {
-				foreach ( array( 'product_brand', 'pwb-brand', 'yith_product_brand' ) as $taxonomy ) {
-					$term = get_term_by( 'id', $item_id, $taxonomy );
-					if ( $term ) {
-						$label = $term->name;
-						break;
-					}
-				}
 			} else {
 				$label = sanitize_text_field( preg_replace( '/\\(.*\\)/', '', $item ) );
 			}
@@ -1761,7 +1607,7 @@ class Import_Wholesale_Pricing {
 			if ( '' !== $label ) {
 				$out[] = array(
 					'name'  => esc_attr( $label ),
-					'value' => 'attributes' === $type ? sanitize_text_field( $item_id ) : absint( $item_id ),
+					'value' => absint( $item_id ),
 				);
 			}
 		}
@@ -1774,7 +1620,7 @@ class Import_Wholesale_Pricing {
 	 * @param string $value Raw value.
 	 * @return array
 	 */
-	protected function parse_key_value_list( $value ) {
+	public function parse_key_value_list( $value ) {
 		$out = array();
 		foreach ( $this->split_list( $value, ';' ) as $part ) {
 			$bits = explode( ':', $part, 2 );
@@ -1785,26 +1631,7 @@ class Import_Wholesale_Pricing {
 		return $out;
 	}
 
-	/**
-	 * Parse tier rows.
-	 *
-	 * @param string $value Raw value.
-	 * @return array
-	 */
-	protected function parse_tiers( $value ) {
-		$tiers = array();
-		foreach ( $this->split_list( $value, ';' ) as $tier_data ) {
-			$data    = $this->parse_key_value_list( str_replace( ',', ';', $tier_data ) );
-			$tiers[] = array(
-				'id'          => isset( $data['id'] ) ? sanitize_text_field( $data['id'] ) : (string) floor( microtime( true ) * 1000 ) . count( $tiers ),
-				'min_qty'     => isset( $data['min_qty'] ) ? absint( $data['min_qty'] ) : absint( isset( $data['min'] ) ? $data['min'] : 1 ),
-				'max_qty'     => isset( $data['max_qty'] ) && '' !== $data['max_qty'] ? absint( $data['max_qty'] ) : ( isset( $data['max'] ) && '' !== $data['max'] ? absint( $data['max'] ) : null ),
-				'amount'      => isset( $data['amount'] ) ? sanitize_text_field( $data['amount'] ) : sanitize_text_field( isset( $data['discount'] ) ? $data['discount'] : '' ),
-				'amount_type' => $this->parse_discount_amount_type( isset( $data['amount_type'] ) ? $data['amount_type'] : ( isset( $data['discount_type'] ) ? $data['discount_type'] : 'percentage' ) ),
-			);
-		}
-		return $tiers;
-	}
+
 
 	/**
 	 * Parse conditions into rule shape.
@@ -1813,6 +1640,10 @@ class Import_Wholesale_Pricing {
 	 * @return array
 	 */
 	protected function parse_conditions( $value ) {
+		if ( 0 === strpos( $value, 'json:' ) ) {
+			$decoded = json_decode( substr( $value, 5 ), true );
+			return is_array( $decoded ) && isset( $decoded['tiers'] ) && is_array( $decoded['tiers'] ) ? $decoded : new WP_Error( 'invalid_csv_conditions', __( 'Invalid CSV conditions.', 'wholesalex' ) );
+		}
 		$tiers = array();
 		foreach ( $this->split_list( $value, ';' ) as $condition_data ) {
 			$data     = $this->parse_key_value_list( str_replace( ',', ';', $condition_data ) );
@@ -1820,7 +1651,7 @@ class Import_Wholesale_Pricing {
 			$operator = isset( $data['_conditions_operator'] ) ? $data['_conditions_operator'] : ( isset( $data['operator'] ) ? $data['operator'] : '' );
 			$amount   = isset( $data['_conditions_value'] ) ? $data['_conditions_value'] : ( isset( $data['value'] ) ? $data['value'] : '' );
 			if ( '' === $field || '' === $operator || '' === $amount ) {
-				continue;
+				return new WP_Error( 'invalid_csv_conditions', __( 'Invalid CSV conditions.', 'wholesalex' ) );
 			}
 			$tiers[] = array(
 				'_conditions_for'      => sanitize_text_field( $field ),
@@ -1838,7 +1669,7 @@ class Import_Wholesale_Pricing {
 	 * @param string $value Raw value.
 	 * @return string
 	 */
-	protected function parse_discount_amount_type( $value ) {
+	public function parse_discount_amount_type( $value ) {
 		$normalized = $this->normalize_key( $value );
 		if ( in_array( $normalized, array( 'amount', 'fixed' ), true ) ) {
 			return $normalized;
@@ -1874,31 +1705,7 @@ class Import_Wholesale_Pricing {
 		return '';
 	}
 
-	/**
-	 * Sanitize a design value by design key.
-	 *
-	 * @param string $key Design key.
-	 * @param string $value Raw value.
-	 * @return mixed
-	 */
-	protected function sanitize_design_value( $key, $value ) {
-		if ( in_array( $key, array( 'vertical_style', 'border_radius' ), true ) ) {
-			return $this->parse_bool( $value );
-		}
-		if ( in_array( $key, array( 'header_bg_color', 'header_text_color', 'border_color', 'active_row_bg_color', 'active_row_text_color', 'text_color', 'discount_text_color', 'discount_bg_color' ), true ) ) {
-			return sanitize_hex_color( $value ) ? sanitize_hex_color( $value ) : '';
-		}
-		if ( 'font_size' === $key ) {
-			return absint( $value );
-		}
-		if ( 'table_style' === $key ) {
-			return 'classicstyle' === $this->normalize_key( $value ) || 'classic_style' === $value ? 'classic_style' : 'table_style';
-		}
-		if ( 'price_display' === $key ) {
-			return 'discount' === $this->normalize_key( $value ) ? 'discount' : 'fixed';
-		}
-		return sanitize_text_field( $value );
-	}
+
 
 	/**
 	 * Parse status.
@@ -1916,7 +1723,7 @@ class Import_Wholesale_Pricing {
 	 * @param string $value Raw value.
 	 * @return bool
 	 */
-	protected function parse_bool( $value ) {
+	public function parse_bool( $value ) {
 		return in_array( strtolower( trim( (string) $value ) ), array( '1', 'yes', 'true', 'active', 'enabled', 'enable', 'on' ), true );
 	}
 
@@ -1938,7 +1745,7 @@ class Import_Wholesale_Pricing {
 	 * @param string $separator Separator.
 	 * @return array
 	 */
-	protected function split_list( $value, $separator = ';' ) {
+	public function split_list( $value, $separator = ';' ) {
 		$value = str_replace( '\\,', '::comma::', (string) $value );
 		$value = str_replace( '\\;', '::semicolon::', $value );
 		$parts = explode( $separator, $value );
@@ -1983,7 +1790,8 @@ class Import_Wholesale_Pricing {
 	 * @return string
 	 */
 	protected function clean_csv_cell( $value ) {
-		return wc_clean( wp_unslash( (string) $value ) );
+		// CSV stream bytes are not slashed request data. Individual field parsers sanitize them.
+		return trim( (string) $value );
 	}
 
 	/**
@@ -1992,8 +1800,8 @@ class Import_Wholesale_Pricing {
 	 * @param string $value Raw value.
 	 * @return string
 	 */
-	protected function normalize_key( $value ) {
-		return strtolower( preg_replace( '/[^a-z0-9]/', '', (string) $value ) );
+	public function normalize_key( $value ) {
+		return preg_replace( '/[^a-z0-9]/', '', strtolower( (string) $value ) );
 	}
 
 	/**
@@ -2008,4 +1816,7 @@ class Import_Wholesale_Pricing {
 		}
 		return $value;
 	}
+	/** Whether the generic import is in update mode. */
+	public function updates_existing(): bool {
+		return (bool) $this->update_existing; }
 }

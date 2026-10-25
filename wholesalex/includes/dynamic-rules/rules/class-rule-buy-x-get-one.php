@@ -56,16 +56,31 @@ class Rule_Buy_X_Get_One {
 			$min_qty    = isset( $rule['rule']['_minimum_purchase_count'] ) ? (int) $rule['rule']['_minimum_purchase_count'] : 99999999;
 			$apply_once = isset( $rule['rule']['_per_cart_once'] ) && 'yes' === $rule['rule']['_per_cart_once'] ? true : false;
 
-			$cart_item_count = 0;
+			// Compute entitlement once per parent, then allocate across its cart lines.
+			$remaining = array();
+			$once_used = false;
+			foreach ( WC()->cart->get_cart() as $item ) {
+				if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $item['product_id'], $item['variation_id'], $rule['filter'] ) ) {
+					$remaining[ $item['product_id'] ] = ( $remaining[ $item['product_id'] ] ?? 0 ) + max( 0, (int) $item['quantity'] );
+				}
+			}
+			foreach ( $remaining as $parent => $count ) {
+				$remaining[ $parent ] = $min_qty > 1 ? (int) floor( $count / $min_qty ) : 0;
+			}
 			foreach ( WC()->cart->get_cart() as $cart_item ) {
 				if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $cart_item['product_id'], $cart_item['variation_id'], $rule['filter'] ) ) {
-					$cart_item_count = wholesalex()->cart_count( $cart_item['product_id'] );
-					if ( $min_qty > 1 && $cart_item_count >= $min_qty ) {
-						$free_quantity = (int) ( $cart_item_count / $min_qty ) * 1;
+					$entitlement = $remaining[ $cart_item['product_id'] ] ?? 0;
+					if ( $entitlement > 0 && ! ( $apply_once && $once_used ) ) {
+						$free_quantity = min( $entitlement, (int) $cart_item['quantity'] );
 						if ( $apply_once ) {
 							$free_quantity = 1;
 						}
-						$free_quantity = apply_filters( 'wholesalex_dr_buy_x_get_one_free_quantity', $free_quantity );
+						$free_quantity = min( $free_quantity, max( 0, (int) apply_filters( 'wholesalex_dr_buy_x_get_one_free_quantity', $free_quantity ) ) );
+						if ( ! $free_quantity ) {
+							continue; }
+						$remaining[ $cart_item['product_id'] ] -= $free_quantity;
+						$once_used                              = true;
+						wholesalex()->set_usages_dynamic_rule_id( $rule['id'] );
 
 						$price = '';
 						if ( $cart_item['data']->get_sale_price() ) {
@@ -164,9 +179,11 @@ class Rule_Buy_X_Get_One {
 			$badge_roles            = $badge_dynamic_rule['rule'];
 			$text_color             = $badge_roles['_product_badge_text_color'] ?? '';
 			$background_color       = $badge_roles['_product_badge_bg_color'] ?? '';
-			$badge_label_text_color = sanitize_hex_color( is_string( $text_color ) ? $text_color : '' ) ?: '#ffffff';
+			$badge_label_text_color = sanitize_hex_color( is_string( $text_color ) ? $text_color : '' );
+			$badge_label_text_color = $badge_label_text_color ? $badge_label_text_color : '#ffffff';
 			$badge_style            = isset( $badge_roles['_product_badge_styles'] ) ? $badge_roles['_product_badge_styles'] : 'style_one';
-			$badge_label_bg_color   = sanitize_hex_color( is_string( $background_color ) ? $background_color : '' ) ?: '#5a40e8';
+			$badge_label_bg_color   = sanitize_hex_color( is_string( $background_color ) ? $background_color : '' );
+			$badge_label_bg_color   = $badge_label_bg_color ? $badge_label_bg_color : '#5a40e8';
 			$badge_position         = 'left' === ( $badge_roles['_product_badge_position'] ?? '' ) ? 'left' : 'right';
 
 			?>
@@ -271,8 +288,10 @@ class Rule_Buy_X_Get_One {
 				$badge_label            = isset( $bogo_badge_type['_product_badge_label'] ) ? $bogo_badge_type['_product_badge_label'] : __( 'BOGO Free', 'wholesalex' );
 				$background_color       = $bogo_badge_type['_product_badge_bg_color'] ?? '';
 				$text_color             = $bogo_badge_type['_product_badge_text_color'] ?? '';
-				$badge_label_bg_color   = sanitize_hex_color( is_string( $background_color ) ? $background_color : '' ) ?: '#5a40e8';
-				$badge_label_text_color = sanitize_hex_color( is_string( $text_color ) ? $text_color : '' ) ?: '#ffffff';
+				$badge_label_bg_color   = sanitize_hex_color( is_string( $background_color ) ? $background_color : '' );
+				$badge_label_bg_color   = $badge_label_bg_color ? $badge_label_bg_color : '#5a40e8';
+				$badge_label_text_color = sanitize_hex_color( is_string( $text_color ) ? $text_color : '' );
+				$badge_label_text_color = $badge_label_text_color ? $badge_label_text_color : '#ffffff';
 				$badge_id               = sanitize_html_class( is_scalar( $badge_dynamic_rule['id'] ?? null ) ? (string) $badge_dynamic_rule['id'] : '' );
 				if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $product->get_parent_id() ? $product->get_parent_id() : $product->get_id(), $product->get_id(), $bogo_badge_filter ) ) {
 					if ( isset( $badge_label ) ) :

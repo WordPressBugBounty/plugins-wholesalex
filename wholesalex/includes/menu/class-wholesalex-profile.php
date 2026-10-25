@@ -94,10 +94,9 @@ class WHOLESALEX_Profile {
 	 * @return bool
 	 */
 	public function profile_action_permission( $request ) {
-		$capability = apply_filters( 'wholesalex_capability_access', 'manage_options' );
-		$user_id    = absint( $request->get_param( 'user_id' ) );
+		$user_id = absint( $request->get_param( 'user_id' ) );
 
-		return $user_id && current_user_can( $capability ) && current_user_can( 'edit_user', $user_id );
+		return $user_id && ! is_wp_error( User_Operation_Policy::authorize( 'read', get_current_user_id(), $user_id ) );
 	}
 
 	/**
@@ -115,9 +114,32 @@ class WHOLESALEX_Profile {
 		$type    = isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
 		$user_id = isset( $post['user_id'] ) ? sanitize_text_field( $post['user_id'] ) : '';
 
+		$operations = array(
+			'approve_user'  => 'approve',
+			'active_user'   => 'approve',
+			'reject_user'   => 'reject',
+			'delete_user'   => 'delete',
+			'deactive_user' => 'reject',
+		);
+		$action     = isset( $post['user_action'] ) ? sanitize_text_field( $post['user_action'] ) : '';
+		$context    = array();
+		if ( 'get' === $type ) {
+			$operation = 'read';
+		} elseif ( 'post' === $type && isset( $operations[ $action ] ) ) {
+			$operation = $operations[ $action ];
+			if ( 'approve' === $operation && ! empty( $post['user_role'] ) ) {
+				$context['role'] = sanitize_text_field( $post['user_role'] );
+			}
+		} else {
+			return new \WP_Error( 'wholesalex_invalid_user_action', __( 'Invalid user action.', 'wholesalex' ), array( 'status' => 400 ) );
+		}
+		$error = User_Operation_Policy::authorize( $operation, get_current_user_id(), $user_id, $context );
+		if ( is_wp_error( $error ) ) {
+			return $error;
+		}
+
 		if ( 'get' === $type ) {
 
-			$__tiers         = apply_filters( 'wholesalex_profile_discounts', array(), $user_id );
 			$__user_settings = get_user_meta( $user_id, '__wholesalex_profile_settings', true );
 			if ( empty( $__user_settings ) ) {
 				$__user_settings = array();
@@ -134,14 +156,17 @@ class WHOLESALEX_Profile {
 				'_wholesalex_role'               => $__role ? $__role : ( $__registration_role_id ? $__registration_role_id : '' ),
 			);
 			wp_send_json_success(
-				array(
-					'default'         => $this->get_profile_fields(),
-					'tiers'           => $__tiers,
-					'has_saved_tiers' => wholesalex()->has_saved_page_tiers( 'profile', $user_id ),
-					'settings'        => array_merge(
-						is_array( $__user_settings ) ? $__user_settings : array(),
-						is_array( $__role_settings ) ? $__role_settings : array()
+				apply_filters(
+					'wholesalex_profile_response',
+					array(
+						'default'         => $this->get_profile_fields(),
+						'has_saved_tiers' => wholesalex()->has_saved_page_tiers( 'profile', $user_id ),
+						'settings'        => array_merge(
+							is_array( $__user_settings ) ? $__user_settings : array(),
+							is_array( $__role_settings ) ? $__role_settings : array()
+						),
 					),
+					$user_id
 				)
 			);
 		} elseif ( 'post' === $type ) {
@@ -150,20 +175,27 @@ class WHOLESALEX_Profile {
 			switch ( $__user_action ) {
 				case 'approve_user':
 				case 'active_user':
-					update_user_meta( $user_id, '__wholesalex_status', 'active' );
+					require_once dirname( __DIR__ ) . '/registration/class-confirmation-service.php';
+					$result = Confirmation_Service::set_status( $user_id, 'active' );
+					if ( is_wp_error( $result ) ) {
+						wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+						return;
+					}
 					if ( $this->is_assignable_profile_role( $__user_role ) ) {
 						wholesalex()->change_role( $user_id, $__user_role );
 					}
 					do_action( 'wholesalex_set_status_active', $user_id, '' );
 					break;
 				case 'reject_user':
-					update_user_meta( $user_id, '__wholesalex_status', 'reject' );
+					require_once dirname( __DIR__ ) . '/registration/class-confirmation-service.php';
+					$result = Confirmation_Service::set_status( $user_id, 'reject' );
+					if ( is_wp_error( $result ) ) {
+						wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+						return;
+					}
 					do_action( 'wholesalex_set_status_reject', $user_id );
 					break;
 				case 'delete_user':
-					if ( ! current_user_can( 'delete_users' ) ) {
-						die( 'You cannot delete an user!' );
-					}
 					require_once ABSPATH . 'wp-admin/includes/user.php';
 					wp_delete_user( $user_id, 0 );
 					do_action( 'wholesalex_delete_user', $user_id );
@@ -175,7 +207,12 @@ class WHOLESALEX_Profile {
 					);
 					break;
 				case 'deactive_user':
-					update_user_meta( $user_id, '__wholesalex_status', 'inactive' );
+					require_once dirname( __DIR__ ) . '/registration/class-confirmation-service.php';
+					$result = Confirmation_Service::set_status( $user_id, 'inactive' );
+					if ( is_wp_error( $result ) ) {
+						wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+						return;
+					}
 					do_action( 'wholesalex_set_status_inactive', $user_id );
 					break;
 
@@ -264,10 +301,38 @@ class WHOLESALEX_Profile {
 			return false;
 		}
 
-		do_action( 'wholesalex_save_profile_data', $user_id, wholesalex()->sanitize( $_POST ) );
+		$error = User_Operation_Policy::authorize( 'edit', get_current_user_id(), $user_id, array( 'self_service' => true ) );
+		if ( is_wp_error( $error ) ) {
+			return false;
+		}
 
 		// Editing one's own profile does not authorize wholesale roles or pricing overrides.
-		$can_manage_settings = current_user_can( apply_filters( 'wholesalex_capability_access', 'manage_options' ) );
+		$operation = $is_create_user ? 'create' : 'edit';
+		$context   = array();
+		if ( $is_create_user && isset( $_POST['action'] ) && 'createuser' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) {
+			$context['status'] = 'active';
+		}
+		$can_manage_settings = ! is_wp_error( User_Operation_Policy::authorize( $operation, get_current_user_id(), $user_id, $context ) );
+		if ( $is_create_user && ! $can_manage_settings ) {
+			return false;
+		}
+		if ( $can_manage_settings && ! empty( $_POST['wholesalex_profile_settings'] ) ) {
+			$settings = wholesalex()->sanitize_json_input( wp_unslash( $_POST['wholesalex_profile_settings'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The helper recursively sanitizes decoded JSON.
+			if ( is_array( $settings ) && isset( $settings['_wholesalex_role'] ) && '' !== $settings['_wholesalex_role'] ) {
+				$error = User_Operation_Policy::authorize( 'promote', get_current_user_id(), $user_id, array( 'role' => $settings['_wholesalex_role'] ) );
+				if ( is_wp_error( $error ) ) {
+					return false;
+				}
+			}
+		}
+		if ( $can_manage_settings && $is_create_user && isset( $_POST['action'] ) && 'createuser' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) {
+			require_once dirname( __DIR__ ) . '/registration/class-confirmation-service.php';
+			$result = Confirmation_Service::set_status( $user_id, 'active' );
+			if ( is_wp_error( $result ) ) {
+				return $result;
+			}
+		}
+		do_action( 'wholesalex_save_profile_data', $user_id, wholesalex()->sanitize( $_POST ) );
 		if ( $can_manage_settings && isset( $_POST['wholesalex_profile_settings'] ) && ! empty( $_POST['wholesalex_profile_settings'] ) ) {
 
 			$__settings = wholesalex()->sanitize_json_input( wp_unslash( $_POST['wholesalex_profile_settings'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitize_json_input() decodes the payload and recursively sanitizes every value; sanitizing the raw JSON string first corrupts it.
@@ -384,9 +449,7 @@ class WHOLESALEX_Profile {
 			}
 		}
 
-		if ( $can_manage_settings && $is_create_user && isset( $_POST['action'] ) && 'createuser' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) {
-			update_user_meta( $user_id, '__wholesalex_status', 'active' );
-		} else {
+		if ( ! ( $can_manage_settings && $is_create_user && isset( $_POST['action'] ) && 'createuser' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) ) {
 			$updated_fields = array();
 			if ( $can_manage_settings && isset( $_POST['wholesalex_profile_settings'] ) && ! empty( $_POST['wholesalex_profile_settings'] ) ) {
 				$updated_fields[] = __( 'Profile Settings', 'wholesalex' );
@@ -429,7 +492,7 @@ class WHOLESALEX_Profile {
 			$__role_id      = get_user_meta( $user_id, '__wholesalex_role', true );
 			$__role_content = wholesalex()->get_roles( 'by_id', $__role_id );
 			$__title        = isset( $__role_content['_role_title'] ) ? $__role_content['_role_title'] : '';
-			return $__title;
+			return esc_html( $__title );
 		}
 		if ( 'wholesalex_status' === $column_name ) {
 			$_wholesalex_status = get_user_meta( $user_id, '__wholesalex_status', true );
@@ -591,8 +654,11 @@ class WHOLESALEX_Profile {
 
 	/**
 	 * Wolesalex Add Custom Columns Sortable.
+	 *
+	 * @param array $columns Existing sortable columns.
+	 * @return array
 	 */
-	public function wholesalex_add_custom_columns_sortable() {
+	public function wholesalex_add_custom_columns_sortable( $columns = array() ) {
 		$columns['wholesalex_role']   = 'wholesalex_role';
 		$columns['wholesalex_status'] = 'wholesalex_status';
 		return $columns;
@@ -613,7 +679,7 @@ class WHOLESALEX_Profile {
 
 		switch ( $orderby ) {
 			case 'wholesalex_role':
-				$query->set( 'meta_key', '_wholesalex_role' );
+				$query->set( 'meta_key', '__wholesalex_role' );
 				$query->set( 'orderby', 'meta_value' );
 				break;
 			case 'wholesalex_status':
@@ -1109,7 +1175,7 @@ class WHOLESALEX_Profile {
 
 		$role_id = sanitize_key( $role_id );
 
-		return 'wholesalex_guest' !== $role_id && in_array( $role_id, wholesalex()->get_roles( 'ids' ), true );
+		return User_Operation_Policy::is_editable_wholesale_role( $role_id );
 	}
 
 	/**
@@ -1133,5 +1199,6 @@ class WHOLESALEX_Profile {
 	 * @since 1.2.4
 	 */
 	public function add_custom_field_on_wc_myaccount() {
+		_deprecated_function( __METHOD__, '3.1.6' );
 	}
 }

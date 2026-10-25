@@ -21,11 +21,10 @@ class Activator {
 	 */
 	public function __construct() {
 		// Initialize new installations without resetting completed onboarding on reactivation.
-		wholesalex()->get_dynamic_rules_access();
 		wholesalex()->get_onboarding_status();
 		$this->init_set_data();
-		$had_roles            = (bool) get_option( '_wholesalex_roles' );
-		$created_roles        = $this->init_roles();
+		$had_roles     = (bool) get_option( '_wholesalex_roles' );
+		$created_roles = $this->init_roles();
 		require_once WHOLESALEX_PATH . 'includes/class-registration-page.php';
 		Registration_Page::install();
 		$default_b2b_role_id  = apply_filters( 'wholesalex_default_b2b_role_id', 'wholesalex_b2b_wholesale' );
@@ -80,7 +79,6 @@ class Activator {
 			// Price.
 			'_settings_price_text'                        => __( 'Wholesale Price:', 'wholesalex' ),
 			'_settings_price_text_product_list_page'      => __( 'Wholesale Price:', 'wholesalex' ),
-			'_settings_price_product_list_page'           => 'pricing_range',
 			'_settings_primary_color'                     => '#2FC4A7',
 			'settings_primary_hover_color'                => '#24A88F',
 			'_settings_text_color'                        => '#272727',

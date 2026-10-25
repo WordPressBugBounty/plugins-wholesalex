@@ -20,6 +20,13 @@ use WP_Error;
 class WHOLESALEX_Registration {
 
 	/**
+	 * Failure from built-in registration status action callbacks.
+	 *
+	 * @var WP_Error|null
+	 */
+	private $registration_state_error = null;
+
+	/**
 	 * Custom Fields
 	 *
 	 * @var array
@@ -46,6 +53,9 @@ class WHOLESALEX_Registration {
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'registration_form_builder_restapi_callback' ) );
 		add_filter( 'wp_authenticate_user', array( $this, 'check_status' ), 10, 2 );
+		add_filter( 'determine_current_user', array( $this, 'check_session_status' ), 99 );
+		add_filter( 'woocommerce_new_customer_data', array( $this, 'mark_registration_initialization' ), 20 );
+		add_filter( 'woocommerce_registration_auth_new_customer', array( $this, 'allow_new_customer_authentication' ), 20, 2 );
 		add_filter( 'wholesalex_registration_form_user_login_option', array( $this, 'user_login_option' ) );
 		add_filter( 'wholesalex_registration_form_user_status_option', array( $this, 'user_status_option' ), 10, 3 );
 
@@ -70,20 +80,73 @@ class WHOLESALEX_Registration {
 
 
 	/**
+	 * Keep Woo's direct cookie boundary behind the account authentication policy.
+	 *
+	 * @param bool $allowed Earlier authentication decision.
+	 * @param int  $user_id Created customer ID.
+	 * @return bool
+	 */
+	public function allow_new_customer_authentication( $allowed, $user_id ) {
+		if ( ! $allowed ) {
+			return false;
+		}
+		$user = get_userdata( $user_id );
+		return $user && ! is_wp_error( $this->check_status( $user ) );
+	}
+
+	/**
+	 * Mark the authorised Woo form before its customer/provenance hooks run.
+	 *
+	 * @param array $data Customer creation data.
+	 * @return array
+	 */
+	public function mark_registration_initialization( $data ) {
+		$nonce = null;
+		if ( isset( $_POST['woocommerce-register-nonce'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified below to identify the actual Woo form.
+			$nonce = is_string( $_POST['woocommerce-register-nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['woocommerce-register-nonce'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified below before use.
+		} elseif ( isset( $_POST['_wpnonce'] ) && is_string( $_POST['_wpnonce'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified below before use.
+			$nonce = sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified below before use.
+		}
+		$role = isset( $_POST['wholesalex_registration_role'] ) && is_string( $_POST['wholesalex_registration_role'] ) ? filter_var(
+			wp_unslash( $_POST['wholesalex_registration_role'] ),
+			FILTER_CALLBACK,
+			array(
+				'options' => static function ( $value ) {
+					return in_array( $value, Registration_Context::woo_roles(), true ) ? $value : false;
+				},
+			)
+		) : null; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified nonce plus exact saved role allowlist below.
+		if ( ! is_string( $nonce ) || ! wp_verify_nonce( $nonce, 'woocommerce-register' ) || ! is_string( $role ) || ! in_array( $role, Registration_Context::woo_roles(), true ) ) {
+			return $data;
+		}
+		require_once dirname( __DIR__ ) . '/registration/class-confirmation-service.php';
+		$data['meta_input'][ Confirmation_Service::INITIALIZATION ] = 'required';
+		return $data;
+	}
+
+	/**
 	 * Enqueue Block Editor Assets
 	 *
 	 * @since 1.0.0
 	 */
 	public function enqueue_block_editor_assets() {
-		$slug = apply_filters( 'wholesalex_registration_form_builder_submenu_slug', 'wholesalex-registration' );
-
-		wp_enqueue_script( 'wholesalex_forms_block', WHOLESALEX_URL . 'assets/js/wholesalex_forms_block.js', array( 'wp-i18n', 'wp-element', 'wp-blocks', 'wp-components' ), WHOLESALEX_VER, true );
+		$slug = wholesalex()->get_setting( 'registration_form_buidler_submenu_slug', 'wholesalex-registration' );
+		if ( ! is_string( $slug ) || '' === $slug ) {
+			$slug = 'wholesalex-registration';
+		}
+		$manifest     = WHOLESALEX_PATH . 'assets/js/wholesalex_forms_block.asset.php';
+		$asset        = file_exists( $manifest ) ? require $manifest : array();
+		$dependencies = array_unique( array_merge( array( 'wp-blocks', 'wp-components', 'wp-block-editor', 'wp-api', 'wp-api-fetch' ), $asset['dependencies'] ?? array( 'wp-i18n', 'wp-element' ) ) );
+		wp_enqueue_script( 'wholesalex_forms_block', WHOLESALEX_URL . 'assets/js/wholesalex_forms_block.js', $dependencies, $asset['version'] ?? WHOLESALEX_VER, true );
 		wp_enqueue_style( 'wholesalex_forms_block', WHOLESALEX_URL . 'assets/js/wholesalex_forms_block.css', array(), WHOLESALEX_VER );
+		if ( file_exists( WHOLESALEX_PATH . 'assets/js/wholesalex_forms_block-rtl.css' ) ) {
+			wp_style_add_data( 'wholesalex_forms_block', 'rtl', 'replace' );
+		}
 		wp_localize_script(
 			'wholesalex_forms_block',
 			'wholesalex_block_data',
 			array(
-				'form_builder_url' => admin_url( 'admin.php?page=wholesalex-registration' ),
+				'form_builder_url' => admin_url( 'admin.php?page=' . rawurlencode( $slug ) ),
 				'url'              => WHOLESALEX_URL,
 			)
 		);
@@ -250,47 +313,49 @@ class WHOLESALEX_Registration {
 	public function builder_action_callback( $server ) {
 		$post = $server->get_params();
 		if ( ! isset( $post['nonce'] ) || ! is_string( $post['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $post['nonce'] ) ), 'wholesalex-registration' ) ) {
-			return;
+			return new WP_Error( 'wholesalex_invalid_builder_nonce', __( 'Your session has expired. Please reload the page and try again.', 'wholesalex' ), array( 'status' => 403 ) );
 		}
 
 		$type = isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
 
 		if ( 'post' === $type ) {
-
-			if ( isset( $post['data'] ) ) {
-				$form_data = $this->sanitize_form_builder_payload( $post['data'] );
-
-				if ( is_wp_error( $form_data ) ) {
-					wp_send_json_error(
-						array(
-							'message' => $form_data->get_error_message(),
-						)
-					);
-				}
-
-				update_option( 'wholesalex_registration_form', $form_data );
-
-				$GLOBALS['wholesalex_registration_fields'] = WholesaleX_CommonUtils::get_form_fields();
-
-				wp_send_json_success(
-					array(
-						'form_data' => $form_data,
-					)
+			if ( ! isset( $post['data'] ) || ! is_string( $post['data'] ) ) {
+				return array(
+					'success' => false,
+					'data'    => array( 'message' => __( 'Invalid registration form data.', 'wholesalex' ) ),
 				);
-			} else {
-				wp_send_json_error();
 			}
-		} elseif ( 'get' === $type ) {
-			$__roles_options = wholesalex()->get_roles( 'store_mode_roles_option' );
+			$form_data = $this->sanitize_form_builder_payload( $post['data'] );
+			if ( is_wp_error( $form_data ) ) {
+				return array(
+					'success' => false,
+					'data'    => array( 'message' => $form_data->get_error_message() ),
+				);
+			}
 
-			wp_send_json_success(
-				array(
-					'roles'     => $__roles_options,
+			update_option( 'wholesalex_registration_form', $form_data );
+			$GLOBALS['wholesalex_registration_fields'] = WholesaleX_CommonUtils::get_form_fields();
+
+			return array(
+				'success' => true,
+				'data'    => array( 'form_data' => $form_data ),
+			);
+		} elseif ( 'get' === $type ) {
+			return array(
+				'success' => true,
+				'data'    => array(
+					'roles'     => wholesalex()->get_roles( 'store_mode_roles_option' ),
 					'form_data' => get_option( 'wholesalex_registration_form' ),
-				)
+				),
 			);
 		}
+
+		return array(
+			'success' => false,
+			'data'    => array( 'message' => __( 'Invalid registration form action.', 'wholesalex' ) ),
+		);
 	}
+
 
 	/**
 	 * Sanitize form builder payload before saving.
@@ -305,8 +370,37 @@ class WHOLESALEX_Registration {
 			return new WP_Error( 'invalid_form_builder_payload', __( 'Invalid registration form data.', 'wholesalex' ) );
 		}
 
-		$decoded = $this->sanitize_form_builder_value( $decoded );
-		$decoded = WholesaleX_CommonUtils::normalize_default_registration_template( $decoded );
+		$saved   = json_decode( get_option( 'wholesalex_registration_form', '' ), true );
+		$saved   = is_array( $saved ) ? $saved : array();
+		$decoded = Registration_Provider::preserve_form( $decoded, $saved );
+		if ( is_wp_error( $decoded ) ) {
+			return $decoded;
+		}
+		$preserved = $decoded;
+		$decoded   = $this->sanitize_form_builder_value( $decoded );
+		// Provider-owned records have their own validator; preserve their exact stored shape.
+		foreach ( $preserved['registrationFields'] ?? array() as $row_index => $row ) {
+			foreach ( $row as $key => $value ) {
+				if ( ! in_array( $key, Registration_Provider::standard_row_keys(), true ) ) {
+					$decoded['registrationFields'][ $row_index ][ $key ] = $value;
+				}
+			}
+			foreach ( $row['columns'] ?? array() as $index => $field ) {
+				if ( ! WholesaleX_CommonUtils::is_standard_registration_field( $field ) ) {
+					$decoded['registrationFields'][ $row_index ]['columns'][ $index ] = $field;
+				} else {
+					foreach ( $field as $key => $value ) {
+						if ( ! in_array( $key, Registration_Provider::standard_field_keys(), true ) ) {
+							$decoded['registrationFields'][ $row_index ]['columns'][ $index ][ $key ] = $value;
+						}
+					}
+				}
+			}
+		}
+		foreach ( array_diff( array_keys( $preserved ), array_keys( WholesaleX_CommonUtils::get_empty_form() ) ) as $key ) {
+			$decoded[ $key ] = $preserved[ $key ];
+		}
+		$decoded = Registration_Provider::preserve_unknown( $decoded, $saved, Registration_Provider::base_form_shape() );
 
 		return wp_json_encode( $decoded );
 	}
@@ -340,19 +434,41 @@ class WHOLESALEX_Registration {
 
 
 	/**
+	 * Persist status and retain action-callback failure for the public handler.
+	 *
+	 * @param int    $user_id User ID.
+	 * @param string $status Requested status.
+	 * @return true|WP_Error
+	 */
+	private function set_registration_status( $user_id, $status ) {
+		require_once dirname( __DIR__ ) . '/registration/class-confirmation-service.php';
+		$result = Confirmation_Service::set_status( $user_id, $status );
+		if ( is_wp_error( $result ) ) {
+			$this->registration_state_error = $result;
+		}
+		return $result;
+	}
+
+	/**
 	 * Email Confirmation After Registration
 	 *
 	 * @param int|string $user_id User ID.
 	 * @param string     $registration_role Registration Role.
-	 * @return void
+	 * @return WP_Error|null
 	 */
 	public function confirmation_email_after_registration( $user_id, $registration_role ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Preserve the existing callback or public method signature.
-		update_user_meta( $user_id, '__wholesalex_status', 'pending' );
+		$result = $this->set_registration_status( $user_id, 'pending' );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
 
-		$confirmation_code = bin2hex( random_bytes( 16 ) );
-		update_user_meta( $user_id, '__wholesalex_email_confirmation_code', $confirmation_code );
-		update_user_meta( $user_id, '__wholesalex_email_confirmation_code_time', time() );
+		require_once dirname( __DIR__ ) . '/registration/class-confirmation-service.php';
 		update_user_meta( $user_id, '__wholesalex_account_confirmed', false );
+		$confirmation_code = Confirmation_Service::issue( (int) $user_id );
+		if ( is_wp_error( $confirmation_code ) ) {
+			$this->registration_state_error = $confirmation_code;
+			return $confirmation_code;
+		}
 		do_action( 'wholesalex_user_email_confirmation', $user_id, $confirmation_code );
 	}
 
@@ -363,16 +479,18 @@ class WHOLESALEX_Registration {
 	 * @param int|string $user_id User ID.
 	 * @param string     $registration_role Registration Role.
 	 * @param string     $password Password.
-	 * @return void
+	 * @return WP_Error|null
 	 */
 	public function auto_approve_after_registration( $user_id, $registration_role, $password = '' ) {
 		$error = Registration_Context::approval_error( $user_id, $registration_role );
 		if ( is_wp_error( $error ) ) {
-			update_user_meta( $user_id, '__wholesalex_status', 'pending' );
-			return;
+			return $this->set_registration_status( $user_id, 'pending' );
+		}
+		$result = $this->set_registration_status( $user_id, 'active' );
+		if ( is_wp_error( $result ) ) {
+			return $result;
 		}
 		wholesalex()->change_role( $user_id, $registration_role );
-		update_user_meta( $user_id, '__wholesalex_status', 'active' );
 		do_action( 'wholesalex_set_status_active', $user_id, $password );
 		do_action( 'wholesalex_user_auto_approval', $user_id );
 	}
@@ -405,6 +523,11 @@ class WHOLESALEX_Registration {
 		if ( 'active' !== $__user_status ) {
 			return new WP_Error( 'admin_approval_pending', esc_html__( 'Your account is not active. Please contact the site administrator.', 'wholesalex' ) );
 		}
+		require_once dirname( __DIR__ ) . '/registration/class-confirmation-service.php';
+		$initialization = get_user_meta( $user_id, Confirmation_Service::INITIALIZATION, true );
+		if ( '' !== $initialization && 'complete' !== $initialization && ! user_can( $user_id, 'manage_options' ) ) {
+			return new WP_Error( 'admin_approval_pending', esc_html__( 'Your account is awaiting approval. Please contact the site administrator.', 'wholesalex' ) );
+		}
 		wc_set_customer_auth_cookie( $user_id );
 		do_action( 'wholesalex_user_auto_login', $user_id );
 	}
@@ -416,6 +539,7 @@ class WHOLESALEX_Registration {
 	 * @throws Exception If the generated string does not meet the criteria.
 	 */
 	public function generate_confirmation_code( $len ) {
+		_deprecated_function( __METHOD__, '3.1.6' );
 		$characters        = '0123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-[]{}!@$';
 		$characters_length = strlen( $characters );
 		$random_string     = '';
@@ -429,6 +553,20 @@ class WHOLESALEX_Registration {
 		} else {
 			return call_user_func( array( $this, 'generate_confirmation_code' ), $len );
 		}
+	}
+
+	/**
+	 * Apply account status to existing cookies as well as fresh logins.
+	 *
+	 * @param int|false $user_id Resolved session user.
+	 * @return int|false
+	 */
+	public function check_session_status( $user_id ) {
+		if ( ! $user_id ) {
+			return $user_id;
+		}
+		$user = get_userdata( $user_id );
+		return $user && ! is_wp_error( $this->check_status( $user ) ) ? $user_id : 0;
 	}
 
 	/**
@@ -451,6 +589,19 @@ class WHOLESALEX_Registration {
 		$registration_role = get_user_meta( $user->ID, '__wholesalex_registration_role', true );
 		$user_login_option = apply_filters( 'wholesalex_registration_form_user_status_option', 'admin_approve', $user->ID, $registration_role );
 		$status            = get_the_author_meta( '__wholesalex_status', $user->ID );
+		require_once dirname( __DIR__ ) . '/registration/class-confirmation-service.php';
+		$initialization  = get_user_meta( $user->ID, Confirmation_Service::INITIALIZATION, true );
+		$context         = get_user_meta( $user->ID, '__wholesalex_registration_context', true );
+		$assigned        = get_user_meta( $user->ID, '__wholesalex_role', true );
+		$confirmed       = get_user_meta( $user->ID, '__wholesalex_account_confirmed', true );
+		$legacy_approved = in_array( $confirmed, array( true, '1' ), true ) || ( is_string( $assigned ) && '' !== $assigned && ! in_array( $assigned, array( 'wholesalex_guest', 'wholesalex_b2c_users' ), true ) );
+		if ( ( '' !== $initialization && 'complete' !== $initialization ) || ( '' === $status && ( '' !== $registration_role || is_array( $context ) ) && ! $legacy_approved ) ) {
+			return new WP_Error( 'admin_approval_pending', esc_html__( 'Your account is awaiting approval. Please contact the site administrator.', 'wholesalex' ) );
+		}
+
+		if ( in_array( $status, array( 'reject', 'inactive' ), true ) ) {
+			return new WP_Error( 'admin_approval_pending', esc_html__( 'Your account is not active. Please contact the site administrator.', 'wholesalex' ) );
+		}
 
 		if ( 'admin_approve' === $user_login_option ) {
 			$message = '';
@@ -478,6 +629,8 @@ class WHOLESALEX_Registration {
 		} elseif ( 'email_confirmation_require' === $user_login_option && 'pending' === $status ) {
 			$message = esc_html__( 'Please confirm your account by clicking the confirmation link, that already sent your registered email.', 'wholesalex' );
 			return new WP_Error( 'email_confirmation_require', $message );
+		} elseif ( 'pending' === $status ) {
+			return new WP_Error( 'admin_approval_pending', esc_html__( 'Your account is awaiting approval. Please contact the site administrator.', 'wholesalex' ) );
 		}
 		return $user;
 	}
@@ -490,12 +643,11 @@ class WHOLESALEX_Registration {
 	 * @return string Redirect URL.
 	 * @since 1.2.4 login to view prices redirect url check added
 	 */
-	public function login_redirect( $redirect, $user ) {
-		$view_price_product_list   = wholesalex()->get_setting( '_settings_login_to_view_price_product_list', 'no' );
-		$view_price_product_single = wholesalex()->get_setting( '_settings_login_to_view_price_product_page', 'no' );
-		$url                       = esc_url_raw( wholesalex()->get_setting( '_settings_redirect_url_login', get_permalink( get_option( 'woocommerce_shop_page_id' ) ) ) );
+	public function login_redirect( $redirect, $user ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- WooCommerce's login redirect callback contract includes the user argument.
+		$login_to_view_price = wholesalex()->get_setting( '_settings_login_to_view_price', 'no' );
+		$url                 = esc_url_raw( wholesalex()->get_setting( '_settings_redirect_url_login', get_permalink( get_option( 'woocommerce_shop_page_id' ) ) ) );
 
-		if ( 'yes' === $view_price_product_list || 'yes' === $view_price_product_single ) {
+		if ( 'yes' === $login_to_view_price ) {
 			// Only trust the submitted redirect when the login form's own nonce verifies.
 			$login_nonce_verified = false;
 			if ( isset( $_POST['woocommerce-login-nonce'] ) && is_string( $_POST['woocommerce-login-nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['woocommerce-login-nonce'] ) ), 'woocommerce-login' ) ) {
@@ -579,7 +731,7 @@ class WHOLESALEX_Registration {
 	 * @param string $registration_role Registration Role.
 	 * @since 1.0.0 Reposition on v1.0..7
 	 */
-	public function after_registration_redirect( $redirect_url, $user_id, $registration_role ) {
+	public function after_registration_redirect( $redirect_url, $user_id, $registration_role ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Preserve the public registration redirect callback's user and role arguments for integrations.
 		$__redirect_url = wholesalex()->get_setting( '_settings_redirect_url_registration', get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
 
 		if ( ! empty( $__redirect_url ) ) {
@@ -610,12 +762,15 @@ class WHOLESALEX_Registration {
 	 * Process User Registration Admin Approval Need Settings
 	 *
 	 * @param string $user_id User ID.
-	 * @return void
+	 * @return WP_Error|null
 	 * @since 1.1.6
 	 */
 	public function user_registration_admin_approval_need( $user_id ) {
 		// Replace any status initialized by customer-creation hooks before applying role approval.
-		update_user_meta( $user_id, '__wholesalex_status', 'pending' );
+		$result = $this->set_registration_status( $user_id, 'pending' );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
 		set_transient( 'wholesalex_registration_approval_required_email_status_' . $user_id, true );
 		do_action( 'wholesalex_set_user_approval_needed', $user_id );
 	}
@@ -627,6 +782,7 @@ class WHOLESALEX_Registration {
 	 * @since 1.1.6
 	 */
 	public function disable_woocommerce_new_user_email() {
+		_deprecated_function( __METHOD__, '3.1.6' );
 		$is_disable = wholesalex()->get_setting( '_settings_disable_woocommerce_new_user_email' );
 		if ( 'yes' === $is_disable ) {
 			add_filter( 'woocommerce_email_enabled_customer_new_account', '__return_false' );
@@ -667,29 +823,6 @@ class WHOLESALEX_Registration {
 		$this->registration_fields                 = $GLOBALS['wholesalex_registration_fields']['wholesalex_fields'];
 	}
 
-	/**
-	 * Get existing public registration role IDs from role select options.
-	 *
-	 * @param array $options Role select options.
-	 * @return array
-	 */
-	protected function get_registration_role_ids_from_options( $options ) {
-		$role_ids       = array();
-		$existing_roles = array_column( wholesalex()->get_roles( 'store_mode_roles_option' ), 'value' );
-
-		foreach ( (array) $options as $option ) {
-			if ( empty( $option['value'] ) || 'wholesalex_guest' === $option['value'] ) {
-				continue;
-			}
-
-			$role_id = sanitize_text_field( $option['value'] );
-			if ( in_array( $role_id, $existing_roles, true ) ) {
-				$role_ids[] = $role_id;
-			}
-		}
-
-		return array_values( array_unique( $role_ids ) );
-	}
 
 	/**
 	 * Load allowed roles from the submitted form's saved server configuration.
@@ -785,14 +918,18 @@ class WHOLESALEX_Registration {
 
 					$registration_context = $this->authorized_registration_context;
 
-					if ( isset( $_POST['user_pass'] ) && isset( $_POST['user_confirm_pass'] ) && ! ( sanitize_text_field( wp_unslash( $_POST['user_pass'] ) ) === sanitize_text_field( wp_unslash( $_POST['user_confirm_pass'] ) ) ) ) {
-						$data['error_messages']['user_pass'] = __( 'Password and Confirm password does not match!', 'wholesalex' );
+					require_once dirname( __DIR__ ) . '/registration/class-registration-validator.php';
+					// Validate one snapshot; later hooks must not replace validated credentials.
+					$registration_post = wp_unslash( $_POST );
+					$validation        = Registration_Validator::validate( $registration_post, $this->registration_fields, $__registration_role );
+					if ( is_wp_error( $validation ) ) {
+						$data['error_messages'] = 'registration_validation' === $validation->get_error_code() ? $validation->get_error_data() : array( 'recaptcha' => $validation->get_error_message() );
 						wp_send_json_error( $data );
 					}
 					do_action( 'wholesalex_before_process_user_registration' );
 
-					$user_email = isset( $_POST['user_email'] ) && is_string( $_POST['user_email'] ) ? sanitize_email( wp_unslash( $_POST['user_email'] ) ) : '';
-					$password   = isset( $_POST['user_pass'] ) && is_string( $_POST['user_pass'] ) ? sanitize_text_field( wp_unslash( $_POST['user_pass'] ) ) : '';
+					$user_email = isset( $registration_post['user_email'] ) && is_string( $registration_post['user_email'] ) ? sanitize_email( $registration_post['user_email'] ) : '';
+					$password   = isset( $registration_post['user_pass'] ) && is_string( $registration_post['user_pass'] ) ? $registration_post['user_pass'] : '';
 					$user_name  = '';
 
 					if ( ! is_email( $user_email ) ) {
@@ -802,8 +939,8 @@ class WHOLESALEX_Registration {
 						if ( 'termCondition' === ( $field['type'] ?? '' ) && WholesaleX_CommonUtils::is_standard_registration_field( $field ) && ! empty( $field['required'] ) ) {
 							$excluded_roles = isset( $field['excludeRoles'] ) && is_array( $field['excludeRoles'] ) ? array_column( $field['excludeRoles'], 'value' ) : array();
 							if ( ! in_array( $__registration_role, $excluded_roles, true ) ) {
-								$consent = $_POST[ $field['name'] ] ?? null;
-								if ( ! is_string( $consent ) || $field['name'] !== wp_unslash( $consent ) ) {
+								$consent = isset( $registration_post[ $field['name'] ] ) && is_string( $registration_post[ $field['name'] ] ) ? $registration_post[ $field['name'] ] : null;
+								if ( ! is_string( $consent ) || $field['name'] !== $consent ) {
 									$data['error_messages'][ $field['name'] ] = __( 'Please accept the terms and conditions.', 'wholesalex' );
 								}
 							}
@@ -841,15 +978,22 @@ class WHOLESALEX_Registration {
 					}
 					do_action( 'wholesalex_before_create_registered_customer' );
 
-					$userdata   = array();
-					$submission = apply_filters(
-						'wholesalex_registration_submission',
-						array(
-							'meta'   => array(),
-							'errors' => array(),
-						),
-						$this->registration_fields
+					$userdata         = array();
+					$provider_context = array(
+						'surface' => 'registration',
+						'role'    => $__registration_role,
+						'form'    => $registration_context,
 					);
+					$submission       = Registration_Provider::submission(
+						Registration_Provider::fields( WholesaleX_CommonUtils::get_new_form_builder_data(), true ),
+						$registration_post, // Only authoritative custom-field names reach the owning provider's validation.
+						$_FILES, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Upload descriptors are normalized by the owning provider before any write.
+						$provider_context
+					);
+					if ( is_wp_error( $submission ) ) {
+						$data['error_messages']['other_error'] = $submission->get_error_message();
+						throw new \Exception();
+					}
 					if ( ! empty( $submission['errors'] ) ) {
 						$data['error_messages'] = array_merge( $data['error_messages'], $submission['errors'] );
 						throw new \Exception();
@@ -859,22 +1003,24 @@ class WHOLESALEX_Registration {
 					foreach ( $this->registration_fields as $field ) {
 						if ( ! WholesaleX_CommonUtils::is_standard_registration_field( $field ) ) {
 							continue; }
-						if ( isset( $_POST[ $field['name'] ] ) && ! empty( $_POST[ $field['name'] ] ) ) {
+						if ( isset( $registration_post[ $field['name'] ] ) && ! empty( $registration_post[ $field['name'] ] ) ) {
 							$value = '';
 							switch ( $field['type'] ) {
-								case 'text':
 								case 'password':
+									$value = $registration_post[ $field['name'] ];
+									break;
+								case 'text':
 								case 'select':
-									$value = sanitize_text_field( wp_unslash( $_POST[ $field['name'] ] ) );
+									$value = sanitize_text_field( $registration_post[ $field['name'] ] );
 									break;
 								case 'textarea':
-									$value = sanitize_textarea_field( wp_unslash( $_POST[ $field['name'] ] ) );
+									$value = sanitize_textarea_field( $registration_post[ $field['name'] ] );
 									break;
 								case 'url':
-									$value = sanitize_url( wp_unslash( $_POST[ $field['name'] ] ) );
+									$value = sanitize_url( $registration_post[ $field['name'] ] );
 									break;
 								case 'email':
-									$value = sanitize_email( wp_unslash( $_POST[ $field['name'] ] ) );
+									$value = sanitize_email( $registration_post[ $field['name'] ] );
 									break;
 
 								default:
@@ -924,6 +1070,9 @@ class WHOLESALEX_Registration {
 					// Set protected provenance after custom fields, before any approval action.
 					$usermeta['__wholesalex_registration_context'] = $registration_context;
 
+					require_once dirname( __DIR__ ) . '/registration/class-confirmation-service.php';
+					// The neutral marker is part of creation data, before lock-guarded provenance hooks.
+					$userdata['meta_input'][ Confirmation_Service::INITIALIZATION ] = 'required';
 					$registered_user_id = wc_create_new_customer( $user_email, $user_name, $password, $userdata );
 					if ( is_wp_error( $registered_user_id ) ) {
 
@@ -959,11 +1108,21 @@ class WHOLESALEX_Registration {
 							}
 						}
 
+						$provider = Registration_Provider::get();
+						if ( null !== $provider && isset( $provider['after_create'] ) ) {
+							call_user_func( $provider['after_create'], $registered_user_id, $submission, $provider_context );
+						}
+
 						do_action( 'wholesalex_registration_customer_created', $registered_user_id, $submission );
 
 						$__user_status_option = apply_filters( 'wholesalex_registration_form_user_status_option', 'admin_approve', $registered_user_id, $__registration_role );
 
+						$this->registration_state_error = null;
 						do_action( 'wholesalex_registration_form_user_status_' . $__user_status_option, $registered_user_id, $__registration_role );
+						if ( is_wp_error( $this->registration_state_error ) ) {
+							$data['error_messages']['other_error'] = $this->registration_state_error->get_error_message();
+							wp_send_json_error( $data );
+						}
 
 						$__user_login_option = apply_filters( 'wholesalex_registration_form_user_login_option', 'manual_login' );
 						do_action( 'wholesalex_registration_form_user_' . $__user_login_option, $registered_user_id, $__registration_role );
@@ -1026,6 +1185,7 @@ class WHOLESALEX_Registration {
 	 * @return array
 	 */
 	public function get_multiselect_values( $data ) {
+		_deprecated_function( __METHOD__, '3.1.6' );
 		$allowed_methods = array();
 		foreach ( $data as $method ) {
 			$allowed_methods[] = $method['value'];

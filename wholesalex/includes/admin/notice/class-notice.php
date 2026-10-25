@@ -1,7 +1,11 @@
-<?php //phpcs:ignore
-namespace WHOLESALEX\Includes\Admin\Notice;
+<?php
+/**
+ * Campaign notice registration, display, and dismissal.
+ *
+ * @package WholesaleX
+ */
 
-use WHOLESALEX\Xpo;
+namespace WHOLESALEX\Includes\Admin\Notice;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -108,7 +112,7 @@ class Notice {
 
 	/** Return the first eligible dashboard hello bar, or null. */
 	public static function get_hellobar_config() {
-		if ( ! current_user_can( 'manage_options' ) || ! apply_filters( 'wsx_show_upsell', apply_filters( 'wholesalex_show_upgrade_menu', true ) ) ) {
+		if ( ! wholesalex()->is_wholesalex_page( wholesalex()->get_current_admin_page_slug() ) || ! current_user_can( 'manage_options' ) || ! apply_filters( 'wsx_show_upsell', apply_filters( 'wholesalex_show_upgrade_menu', true ) ) ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing Pro integrations use the wsx_show_upsell hook to hide licensed upsells.
 			return null;
 		}
 		try {
@@ -117,7 +121,7 @@ class Notice {
 			foreach ( Campaigns::hellobars() as $promo ) {
 				$start = strtotime( $promo['start'] );
 				$end   = strtotime( $promo['end'] );
-				if ( false === $start || false === $end || $now < $start || $now > $end || 'hide' === Xpo::get_transient_without_cache( $promo['id'] ) ) {
+				if ( false === $start || false === $end || $now < $start || $now > $end || 'hide' === wholesalex()->get_transient_without_cache( $promo['id'] ) || 'off' === wholesalex()->get_transient_without_cache( Abstract_Campaign_Notice::DISMISS_PREFIX . $promo['id'] ) ) {
 					continue;
 				}
 				return $promo;
@@ -131,7 +135,7 @@ class Notice {
 	/**
 	 * Hello bar ids the dashboard may dismiss, from Campaigns::hellobar_keys().
 	 *
-	 * class-campaigns.php is edited for every sale, so it is loaded inside a try: a mistake in it
+	 * The class-campaigns.php file is edited for every sale, so it is loaded inside a try: a mistake in it
 	 * empties this list (hello bars can't be closed until it's fixed) instead of breaking wp-admin.
 	 *
 	 * @return string[]
@@ -160,7 +164,7 @@ class Notice {
 		if ( 'hello_bar' !== $type || ! is_string( $id ) || ! in_array( $id, self::get_hellobar_keys(), true ) ) {
 			return new \WP_Error( 'wsx_invalid_hellobar', __( 'Unknown hello bar.', 'wholesalex' ), array( 'status' => 400 ) );
 		}
-		Xpo::set_transient_without_cache( $id, 'hide', 15 * DAY_IN_SECONDS );
+		wholesalex()->set_transient_without_cache( $id, 'hide', 0 );
 
 		return new \WP_REST_Response(
 			array(
@@ -192,7 +196,7 @@ class Notice {
 			foreach ( Campaigns::all() as $campaign ) {
 				if ( $campaign instanceof Abstract_Campaign_Notice && $campaign->get_key() === $notice_key ) {
 					// Duration belongs to the campaign, never to the query string.
-					Xpo::set_transient_without_cache( Abstract_Campaign_Notice::DISMISS_PREFIX . $notice_key, 'off', max( 0, (int) $campaign->get( 'repeat_interval' ) ) );
+					wholesalex()->set_transient_without_cache( Abstract_Campaign_Notice::DISMISS_PREFIX . $notice_key, 'off', max( 0, (int) $campaign->get( 'repeat_interval' ) ) );
 					$this->active_campaigns = null;
 					break;
 				}
@@ -290,7 +294,7 @@ class Notice {
 	 * @return bool
 	 */
 	public function is_available_for_notice() {
-		$active_notices = apply_filters( 'xpo_active_notice_lists', array() );
+		$active_notices = apply_filters( 'xpo_active_notice_lists', array() ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Shared WPXPO plugins coordinate notice priority through this existing cross-plugin hook.
 		if ( empty( $active_notices ) ) {
 			return true;
 		}
@@ -322,8 +326,13 @@ class Notice {
 			return array();
 		}
 
-		// WholesaleX pages already show the dashboard hello bar.
-		if ( wholesalex()->is_wholesalex_page( wholesalex()->get_current_admin_page_slug() ) ) {
+		// Promotional notices belong only on WholesaleX screens.
+		if ( ! wholesalex()->is_wholesalex_page( wholesalex()->get_current_admin_page_slug() ) ) {
+			return array();
+		}
+
+		// The dashboard already receives the same campaign through its hello bar.
+		if ( null !== self::get_hellobar_config() ) {
 			return array();
 		}
 

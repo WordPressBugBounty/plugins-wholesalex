@@ -79,6 +79,15 @@ class Functions {
 			$settings = get_option( 'wholesalex_settings', array() );
 			$settings = is_array( $settings ) ? $settings : array();
 
+			// Upgrade B2C-only stores before any role or pricing settings are read.
+			$normalized_settings = self::normalize_store_mode( $settings );
+			if ( $normalized_settings !== $settings ) {
+				// Option-update callbacks may call wholesalex() again.
+				$GLOBALS['wholesalex_settings'] = $normalized_settings;
+				update_option( 'wholesalex_settings', $normalized_settings );
+				$settings = $normalized_settings;
+			}
+
 			// The reCAPTCHA settings UI has always displayed v3 as its default.
 			// Keep the runtime value in sync so an untouched radio does not fall
 			// through to the v2 branches before the first explicit selection.
@@ -118,48 +127,32 @@ class Functions {
 	}
 
 	/**
-	 * Persist installation eligibility before activation creates default options.
-	 * Existing stores retain full access, even after deleting their last rule.
+	 * Backward compatibility only; will be removed after users migrate.
+	 *
+	 * WordPress.org feedback: 2026-09-16 rejected locked rule creation; the
+	 * 2026-10-10 review reference rejected legacy-only access under Guideline 5.
+	 * Free rule availability must stay unconditional; entry points enforce authorization.
 	 *
 	 * @param array|null $rules Optional scoped rules for integration metadata.
 	 * @return array
 	 */
 	public function get_dynamic_rules_access( $rules = null ) {
-		$enabled = get_option( 'wholesalex_legacy_dynamic_rules_access', null );
-		if ( null === $enabled ) {
-			$enabled = 'no';
-			foreach ( array( 'wholesalex_settings', 'wholesalex_installation_date', '_wholesalex_roles', '__wholesalex_initial_setup', '__wholesalex_dynamic_rules', '__wholesalex_pricing_rules' ) as $option ) {
-				if ( null !== get_option( $option, null ) ) {
-					$enabled = 'yes';
-					break;
-				}
-			}
-			add_option( 'wholesalex_legacy_dynamic_rules_access', $enabled, '', false );
-			$enabled = get_option( 'wholesalex_legacy_dynamic_rules_access', 'no' );
-		}
-
-		$rules   = is_array( $rules ) ? $rules : $this->get_dynamic_rules();
-		$allowed = 'yes' === $enabled;
-		return apply_filters(
-			'wholesalex_dynamic_rules_access',
-			array(
-				'has_rules'  => ! empty( $rules ),
-				'can_view'   => $allowed,
-				'can_create' => $allowed,
-				'mode'       => $allowed ? 'full' : 'hidden',
-			),
-			$rules
+		$rules = is_array( $rules ) ? $rules : $this->get_dynamic_rules();
+		return array(
+			'has_rules'  => ! empty( $rules ),
+			'can_view'   => true,
+			'can_create' => true,
+			'mode'       => 'full',
 		);
 	}
 
 	/**
-	 * Whether this installation can create Dynamic Rules.
+	 * Compatibility adapter; Dynamic Rules have no installation access policy.
 	 *
 	 * @return bool
 	 */
 	public function can_create_dynamic_rules() {
-		$access = $this->get_dynamic_rules_access();
-		return ! empty( $access['can_create'] );
+		return true;
 	}
 
 	/**
@@ -273,8 +266,7 @@ class Functions {
 					}
 					$is_b2c_role = in_array( $role['id'], array( 'wholesalex_b2c_users', 'wholesalex_guest' ), true );
 					$is_visible  = 'b2b_n_b2c' === $__plugin_status
-						|| ( 'b2b' === $__plugin_status && ! $is_b2c_role )
-						|| ( 'b2c' === $__plugin_status && $is_b2c_role );
+						|| ( 'b2b' === $__plugin_status && ! $is_b2c_role );
 
 					if ( $is_visible && ( 'wholesalex_guest' !== $role['id'] || $__enable_guest ) ) {
 						$store_mode_roles[ $role['id'] ]        = $role;
@@ -331,13 +323,13 @@ class Functions {
 							return array();
 						}
 					case 'b2c_roles_option':
-						if ( 'b2c' === $__plugin_status || 'b2b_n_b2c' === $__plugin_status ) {
+						if ( 'b2b_n_b2c' === $__plugin_status ) {
 							return $b2c_roles_option;
 						} else {
 							return array( $guest_role_option );
 						}
 					case 'b2c_mapped_roles':
-						if ( 'b2c' === $__plugin_status || 'b2b_n_b2c' === $__plugin_status ) {
+						if ( 'b2b_n_b2c' === $__plugin_status ) {
 							return $b2c_mapped_roles;
 						} else {
 							return array();
@@ -470,7 +462,7 @@ class Functions {
 		}
 
 		if ( $updated ) {
-			update_option( '_wholesalex_roles', wholesalex()->sanitize( $roles ) );
+			update_option( '_wholesalex_roles', $roles );
 			$GLOBALS['wholesalex_roles'] = get_option( '_wholesalex_roles', array() );
 		} else {
 			$GLOBALS['wholesalex_roles'] = $roles;
@@ -567,13 +559,16 @@ class Functions {
 		foreach ( $admin_users as $admin ) {
 			$existing_role = get_user_meta( $admin->ID, '__wholesalex_role', true );
 			if ( empty( $existing_role ) ) {
-				wholesalex()->change_role( $admin->ID, $role_id );
-
 				// Default admin assignment does not require registration approval.
 				if ( '' === get_user_meta( $admin->ID, '__wholesalex_status', true ) &&
 					'' === get_user_meta( $admin->ID, '__wholesalex_registration_role', true ) ) {
-					update_user_meta( $admin->ID, '__wholesalex_status', 'active' );
+					require_once __DIR__ . '/registration/class-confirmation-service.php';
+					$result = Confirmation_Service::set_status( $admin->ID, 'active' );
+					if ( is_wp_error( $result ) ) {
+						return $result;
+					}
 				}
+				wholesalex()->change_role( $admin->ID, $role_id );
 			}
 		}
 
@@ -612,8 +607,8 @@ class Functions {
 			$wp_user = new WP_User( $user_id );
 			$wp_user->remove_role( $role_id );
 			$wp_user->remove_cap( $role_id );
-			delete_user_meta( $user_id, '__wholesalex_role' );
-			delete_user_meta( $user_id, '__wholesalex_registration_role' );
+			delete_user_meta( $user_id, '__wholesalex_role', $role_id );
+			delete_user_meta( $user_id, '__wholesalex_registration_role', $role_id );
 		}
 	}
 
@@ -621,7 +616,7 @@ class Functions {
 	 * Delete a B2B WholesaleX role and clean related user assignments.
 	 *
 	 * @param string $role_id Role ID.
-	 * @return bool
+	 * @return bool|\WP_Error
 	 */
 	public function delete_role( $role_id ) {
 		$role_id = sanitize_key( $role_id );
@@ -633,6 +628,12 @@ class Functions {
 		$roles = is_array( $roles ) ? $roles : array();
 		if ( empty( $roles[ $role_id ] ) ) {
 			return false;
+		}
+
+		require_once __DIR__ . '/roles/class-role-data-boundary.php';
+		$prepared = Role_Data_Boundary::prepare( array(), $roles[ $role_id ], 'delete' );
+		if ( is_wp_error( $prepared ) ) {
+			return $prepared;
 		}
 
 		unset( $roles[ $role_id ] );
@@ -679,7 +680,11 @@ class Functions {
 	 * @since 1.2.4 Add Default Option
 	 */
 	public function get_setting( $key = '', $new_default = '' ) {
-		$data = $GLOBALS['wholesalex_settings'];
+		$data = self::normalize_store_mode( $GLOBALS['wholesalex_settings'] );
+		// Merge legacy page-specific settings until the unified toggle is saved.
+		if ( is_array( $data ) && ! isset( $data['_settings_login_to_view_price'] ) ) {
+			$data['_settings_login_to_view_price'] = ( 'yes' === ( $data['_settings_login_to_view_price_product_page'] ?? 'no' ) || 'yes' === ( $data['_settings_login_to_view_price_product_list'] ?? 'no' ) ) ? 'yes' : 'no';
+		}
 		if ( '' !== $key ) {
 			return isset( $data[ $key ] ) ? $data[ $key ] : $new_default;
 		} else {
@@ -687,6 +692,20 @@ class Functions {
 		}
 	}
 
+
+	/**
+	 * Map the retired B2C-only store mode to hybrid without changing other data.
+	 * Also used by the option sanitizer for legacy imports and direct updates.
+	 *
+	 * @param mixed $settings Settings option value.
+	 * @return mixed
+	 */
+	public static function normalize_store_mode( $settings ) {
+		if ( is_array( $settings ) && isset( $settings['_settings_status'] ) && 'b2c' === $settings['_settings_status'] ) {
+			$settings['_settings_status'] = 'b2b_n_b2c';
+		}
+		return $settings;
+	}
 
 	/**
 	 * Set Option Settings
@@ -699,6 +718,7 @@ class Functions {
 		if ( '' !== $key ) {
 			$data         = $GLOBALS['wholesalex_settings'];
 			$data[ $key ] = $val;
+			$data         = self::normalize_store_mode( $data );
 			update_option( 'wholesalex_settings', $data );
 			$GLOBALS['wholesalex_settings'] = $data;
 		}
@@ -713,6 +733,18 @@ class Functions {
 	 * @since 1.1.5 Add rolewise price on product meta.
 	 */
 	public function save_single_product_discount( $id = '', $discounts = array() ) {
+		foreach ( $discounts as $values ) {
+			if ( ! is_array( $values ) ) {
+				return new \WP_Error( 'wholesalex_invalid_record', __( 'Invalid price record.', 'wholesalex' ) );
+			}
+			$unknown = array_diff( array_keys( $values ), array( 'wholesalex_base_price', 'wholesalex_sale_price' ) );
+			if ( $unknown ) {
+				// A provider owns the entire command, including its non-tier values.
+				// It must validate and persist together before any Free write occurs.
+				$result = apply_filters( 'wholesalex_product_discount_write_result', null, $id, $discounts );
+				return null !== $result ? $result : new \WP_Error( 'wholesalex_provider_unavailable', __( 'The provider for these values is unavailable.', 'wholesalex' ) );
+			}
+		}
 		if ( '' !== $id && ! empty( $discounts ) ) {
 			foreach ( $discounts as $role_name => $value ) {
 				$base_price_meta_name = $role_name . '_base_price';
@@ -754,7 +786,6 @@ class Functions {
 			$base_price                                = get_post_meta( $id, $role_id . '_base_price', true );
 			$data[ $role_id ]['wholesalex_sale_price'] = $sale_price ? $sale_price : '';
 			$data[ $role_id ]['wholesalex_base_price'] = $base_price ? $base_price : '';
-			$data[ $role_id ]['tiers']                 = array();
 		}
 		/**
 		 * Filter a product's role-based prices.
@@ -818,16 +849,11 @@ class Functions {
 	 *
 	 * @param mixed $id Category ID.
 	 * @param array $discounts Category WholesaleX Discounts Data.
-	 * @return void
+	 * @return mixed Provider result or WP_Error when unavailable.
 	 */
 	public function save_category_discounts( $id = '', $discounts = array() ) {
-		/**
-		 * Fires when category role discounts are submitted.
-		 *
-		 * @param int|string $id        Category ID.
-		 * @param array      $discounts Submitted discounts keyed by role ID.
-		 */
-		do_action( 'wholesalex_save_category_discounts', $id, $discounts );
+		$result = apply_filters( 'wholesalex_save_category_discount_provider', null, $id, $discounts );
+		return null !== $result ? $result : new \WP_Error( 'wholesalex_provider_unavailable', __( 'The provider for these values is unavailable.', 'wholesalex' ) );
 	}
 
 	/**
@@ -893,7 +919,7 @@ class Functions {
 		$all_deactivated = true;
 
 		foreach ( $__rules as $rule ) {
-			if ( ! empty( $rule['_rule_status'] ) ) {
+			if ( in_array( $rule['_rule_status'] ?? '', array( true, 1, '1', 'yes' ), true ) ) {
 				$all_deactivated = false;
 				break;
 			}
@@ -928,6 +954,68 @@ class Functions {
 	}
 
 	/**
+	 * Serialize rule-option mutations against authoritative persisted data.
+	 *
+	 * @param string   $option_key Option name.
+	 * @param string   $global_key Request cache name.
+	 * @param callable $callback Receives the current array; returns its replacement or WP_Error.
+	 * @return true|\WP_Error
+	 */
+	public function mutate_rule_option( $option_key, $global_key, callable $callback ) {
+		global $wpdb;
+		$error = new \WP_Error( 'wholesalex_rule_write_failed', __( 'The rules could not be saved. Please try again.', 'wholesalex' ), array( 'status' => 503 ) );
+		if ( ! $wpdb || ! is_callable( array( $wpdb, 'get_var' ) ) || ! is_callable( array( $wpdb, 'prepare' ) ) ) {
+			return $error;
+		}
+		$lock = 'wsx-rules:' . substr( hash( 'sha256', $wpdb->options . ':' . $option_key ), 0, 40 );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Connection-owned mutation lock.
+		if ( '1' !== (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 3)', $lock ) ) ) {
+			return $error;
+		}
+		try {
+			$current = $this->get_option_without_cache( $option_key, array() );
+			$current = is_array( $current ) ? $current : array();
+			$next    = $callback( $current );
+			if ( is_wp_error( $next ) ) {
+				return $next;
+			}
+			if ( ! is_array( $next ) ) {
+				return $error;
+			}
+			if ( $next !== $current ) {
+				// update_option reads these caches before deciding whether a write is needed.
+				wp_cache_delete( $option_key, 'options' );
+				wp_cache_delete( 'alloptions', 'options' );
+				wp_cache_delete( 'notoptions', 'options' );
+				update_option( $option_key, $next );
+				if ( $next !== $this->get_option_without_cache( $option_key, array() ) ) {
+					return $error;
+				}
+			}
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Callers provide the established WholesaleX request-cache key.
+			$GLOBALS[ $global_key ] = $next;
+			return true;
+		} finally {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Release this connection's lock.
+			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock ) );
+		}
+	}
+
+	/**
+	 * Atomically mutate the legacy dynamic rule store.
+	 *
+	 * @param callable $callback Rule mutation.
+	 * @return true|\WP_Error
+	 */
+	public function mutate_dynamic_rules( callable $callback ) {
+		$result = $this->mutate_rule_option( '__wholesalex_dynamic_rules', 'wholesalex_dynamic_rules', $callback );
+		if ( ! is_wp_error( $result ) ) {
+			delete_transient( 'wholesalex_available_dynamic_rules' );
+		}
+		return $result;
+	}
+
+	/**
 	 * Set Dynamic Rules
 	 *
 	 * @param string  $_id Rule ID.
@@ -942,41 +1030,54 @@ class Functions {
 	public function set_dynamic_rules( $_id = '', $_rule = array(), $_type = '', $is_frontend = false ) {
 		if ( '' !== $_id && ! empty( $_rule ) ) {
 
-			if ( 'delete' !== $_type && ! $this->can_create_dynamic_rules() ) {
-				return false;
+			try {
+				$result = $this->mutate_dynamic_rules(
+					function ( $__rules ) use ( $_id, $_rule, $_type, $is_frontend ) {
+						$existing = isset( $__rules[ $_id ] ) && is_array( $__rules[ $_id ] ) ? $__rules[ $_id ] : array();
+						require_once __DIR__ . '/dynamic-rules/class-dynamic-rule-record.php';
+						$authority = apply_filters( 'wholesalex_dynamic_rule_import_authority', $existing, $_id );
+						$authority = empty( $existing ) && is_array( $authority ) ? $authority : $existing;
+						$canonical = 'delete' === $_type ? $existing : Dynamic_Rule_Record::merge( $authority, $_rule, $_id );
+						if ( is_wp_error( $canonical ) ) {
+								return $canonical;
+						}
+						if ( isset( $existing['limit']['usages_count'] ) ) {
+							$canonical['limit']['usages_count'] = $existing['limit']['usages_count'];
+						}
+						$canonical = 'delete' === $_type ? $canonical : apply_filters( 'wholesalex_save_dynamic_rules', $canonical, $is_frontend );
+						/**
+						 * Providers return canonical owned fragments, never a raw submitted object.
+						 * The optional fifth argument supplies the canonical generic record.
+						 */
+						$provider = apply_filters( 'wholesalex_dynamic_rule_provider_result', null, $_type, $_rule, $existing, $canonical );
+						if ( is_wp_error( $provider ) ) {
+							return $provider;
+						}
+						$provider_owned = 'quantity_based' === ( $canonical['_rule_type'] ?? '' ) || 'quantity_based' === ( $existing['_rule_type'] ?? '' );
+						if ( $provider_owned && ! is_array( $provider ) ) {
+							return new \WP_Error( 'wholesalex_provider_unavailable', __( 'The saved rule requires its pricing provider.', 'wholesalex' ), array( 'status' => 409 ) );
+						}
+						if ( is_array( $provider ) ) {
+							$canonical = array_replace( $canonical, $provider );
+						}
+
+						$__rules[ $_id ] = $canonical;
+						if ( 'delete' === $_type ) {
+							unset( $__rules[ $_id ] );
+						}
+						return $__rules;
+					}
+				);
+				if ( is_wp_error( $result ) ) {
+					return $result;
+				}
+				delete_transient( 'wholesalex_available_dynamic_rules' );
+
+				do_action( 'wholesalex_dynamic_rules_updated', $_id );
+				return true;
+			} finally {
+				do_action( 'wholesalex_dynamic_rule_write_finished', $_id );
 			}
-
-			$__rules          = wholesalex()->get_dynamic_rules();
-			$__for_all        = ( ( 'all_users' === $_rule['_rule_for'] ) || ( 'all_roles' === $_rule['_rule_for'] ) ) ? true : false;
-			$__previous_count = ( isset( $__rules[ $_id ]['limit']['usages_count'] ) && ! empty( $__rules[ $_id ]['limit']['usages_count'] ) ) ? $__rules[ $_id ]['limit']['usages_count'] : '';
-			$__usages_count   = isset( $_rule['limit']['usages_count'] ) ? (int) $_rule['limit']['usages_count'] : ( $__previous_count ? $__previous_count : '' );
-			$__formated_rule  = array(
-				'id'                      => $_id,
-				'_rule_status'            => isset( $_rule['_rule_status'] ) ? $_rule['_rule_status'] : '',
-				'_rule_title'             => isset( $_rule['_rule_title'] ) ? $_rule['_rule_title'] : '',
-				'limit'                   => isset( $_rule['limit'] ) && is_array( $_rule['limit'] ) ? array_merge( $_rule['limit'], array( 'usages_count' => $__usages_count ) ) : array(),
-				'_rule_type'              => isset( $_rule['_rule_type'] ) ? $_rule['_rule_type'] : '',
-				$_rule['_rule_type']      => isset( $_rule[ $_rule['_rule_type'] ] ) ? $_rule[ $_rule['_rule_type'] ] : array(),
-				'_rule_for'               => isset( $_rule['_rule_for'] ) ? $_rule['_rule_for'] : '',
-				$_rule['_rule_for']       => $__for_all ? '' : ( isset( $_rule[ $_rule['_rule_for'] ] ) ? $_rule[ $_rule['_rule_for'] ] : '' ),
-				'_product_filter'         => isset( $_rule['_product_filter'] ) ? $_rule['_product_filter'] : '',
-				$_rule['_product_filter'] => 'all_products' === $_rule['_product_filter'] ? '' : ( isset( $_rule[ $_rule['_product_filter'] ] ) ? $_rule[ $_rule['_product_filter'] ] : '' ),
-				'conditions'              => isset( $_rule['conditions'] ) ? $_rule['conditions'] : '',
-				'created_by'              => get_current_user_id(),
-			);
-
-			$__formated_rule = apply_filters( 'wholesalex_save_dynamic_rules', $__formated_rule, $is_frontend );
-
-			$__rules[ $_id ] = wholesalex()->sanitize( $__formated_rule );
-			if ( 'delete' === $_type ) {
-				unset( $__rules[ $_id ] );
-			}
-			update_option( '__wholesalex_dynamic_rules', $__rules );
-			delete_transient( 'wholesalex_available_dynamic_rules' );
-			$GLOBALS['wholesalex_dynamic_rules'] = $__rules;
-
-			do_action( 'wholesalex_dynamic_rules_updated', $_id );
-			return true;
 		}
 	}
 	/**
@@ -985,15 +1086,24 @@ class Functions {
 	 * @param string $_id Role ID.
 	 * @param array  $_role Role.
 	 * @param string $_type Type.
-	 * @return bool|null
+	 * @return bool|null|\WP_Error
 	 */
 	public function set_roles( $_id = '', $_role = array(), $_type = '' ) {
+		if ( ! is_array( $_role ) ) {
+			return new \WP_Error( 'wholesalex_invalid_role', __( 'Invalid role data.', 'wholesalex' ), array( 'status' => 400 ) );
+		}
 		if ( '' !== $_id && ! empty( $_role ) ) {
 			if ( 'delete' === $_type ) {
 				return $this->delete_role( $_id );
 			}
-
-			$__roles = $GLOBALS['wholesalex_roles'];
+			require_once __DIR__ . '/roles/class-role-data-boundary.php';
+			$__roles = get_option( '_wholesalex_roles', array() );
+			$__roles = is_array( $__roles ) ? $__roles : array();
+			$stored  = isset( $__roles[ $_id ] ) && is_array( $__roles[ $_id ] ) ? $__roles[ $_id ] : array();
+			$_role   = Role_Data_Boundary::prepare( $_role, $stored );
+			if ( is_wp_error( $_role ) ) {
+				return $_role;
+			}
 
 			// System role names are identifiers in the UI and must not be renamed,
 			// including by requests that bypass the disabled admin field.
@@ -1008,10 +1118,10 @@ class Functions {
 
 			if ( isset( $__roles[ $_id ] ) && ! empty( $__roles[ $_id ] ) ) {
 				// update.
-				$__roles[ $_id ] = wholesalex()->sanitize( $_role );
+				$__roles[ $_id ] = $_role;
 
 			} else {
-				$__roles[ $_id ] = wholesalex()->sanitize( $_role );
+				$__roles[ $_id ] = $_role;
 				add_role( $_id, $_role['_role_title'], array( 'read' => true ) );
 			}
 
@@ -1157,6 +1267,20 @@ class Functions {
 
 
 	/**
+	 * Persist a complete settings snapshot after an authorized admin patch.
+	 * The caller holds the backing-option lock and has merged owned leaves.
+	 *
+	 * @param array $settings Complete saved-domain settings.
+	 * @return void
+	 */
+	public function save_admin_settings_data( array $settings ) {
+		$settings = self::normalize_store_mode( $settings );
+		update_option( 'wholesalex_settings', $settings );
+		$GLOBALS['wholesalex_settings'] = $settings;
+	}
+
+
+	/**
 	 * Set Option Settings Multiple
 	 *
 	 * @since 1.0.0
@@ -1169,6 +1293,7 @@ class Functions {
 				$data[ $key ] = $val;
 			}
 		}
+		$data = self::normalize_store_mode( $data );
 		update_option( 'wholesalex_settings', $data );
 		$GLOBALS['wholesalex_settings'] = $data;
 	}
@@ -1202,10 +1327,6 @@ class Functions {
 		$priorities = wholesalex()->get_setting( '_settings_quantity_based_discount_priority', $default_priorities );
 		$priorities = is_array( $priorities ) ? array_values( array_unique( $priorities ) ) : array();
 		$allowed    = $default_priorities;
-		$access     = $this->get_dynamic_rules_access();
-		if ( empty( $access['can_view'] ) ) {
-			$allowed = array_values( array_diff( $allowed, array( 'dynamic_rule' ) ) );
-		}
 
 		$priorities = array_values( array_intersect( $priorities, $allowed ) );
 
@@ -1234,6 +1355,9 @@ class Functions {
 	 * @return array $data Sanitized Array
 	 */
 	public function sanitize( $data ) {
+		if ( ! is_array( $data ) ) {
+			return is_scalar( $data ) ? sanitize_text_field( $data ) : '';
+		}
 		foreach ( $data as $key => $value ) {
 			if ( is_array( $value ) ) {
 				$data[ $key ] = $this->sanitize( $value );
@@ -1538,35 +1662,39 @@ class Functions {
 	 * @param array $tiers Discounts Tier.
 	 * @return array Updated Tiers.
 	 */
-	public function filter_empty_tier( $tiers ) {
-		$__tiers = array();
-		if ( ! ( is_array( $tiers ) && ! empty( $tiers ) ) ) {
-			return array();
-		}
-		foreach ( $tiers as $tier ) {
-			if ( isset( $tier['_discount_type'] ) && ! empty( $tier['_discount_type'] ) && isset( $tier['_discount_amount'] ) && ! empty( $tier['_discount_amount'] ) && isset( $tier['_min_quantity'] ) && ! empty( $tier['_min_quantity'] ) ) {
-				array_push( $__tiers, $tier );
-			}
-		}
-		return $__tiers;
-	}
-	/**
-	 * Filter Empty Tiers
-	 *
-	 * @param array $tiers Discounts Tier.
-	 * @return array Updated Tiers.
-	 */
 	public function filter_empty_conditions( $tiers ) {
-		$__tiers = array();
-		if ( ! ( is_array( $tiers ) && ! empty( $tiers ) ) ) {
-			return array();
-		}
+		if ( null === $tiers || '' === $tiers ) {
+			return array(); }
+		if ( ! is_array( $tiers ) ) {
+			return array( array( '_invalid' => true ) ); }
+		$result = array();
 		foreach ( $tiers as $tier ) {
-			if ( isset( $tier['_conditions_for'] ) && ! empty( $tier['_conditions_for'] ) && isset( $tier['_conditions_operator'] ) && ! empty( $tier['_conditions_operator'] ) && isset( $tier['_conditions_value'] ) && ! empty( $tier['_conditions_value'] ) ) {
-				array_push( $__tiers, $tier );
-			}
+			if ( ! is_array( $tier ) ) {
+				$result[] = array( '_invalid' => true );
+				continue; }
+			$field    = $tier['_conditions_for'] ?? $tier['field'] ?? '';
+			$operator = $tier['_conditions_operator'] ?? $tier['operator'] ?? '';
+			$value    = $tier['_conditions_value'] ?? $tier['value'] ?? '';
+			if ( '' === $field && '' === $operator && '' === $value ) {
+				continue; }
+			$fields    = array(
+				'item_count' => 'cart_total_qty',
+				'cart_total' => 'cart_total_value',
+			);
+			$operators = array(
+				'<' => 'less',
+				'>' => 'greater',
+				'=' => 'equal',
+			);
+			if ( ! is_string( $field ) || ! is_string( $operator ) ) {
+				$result[] = array( '_invalid' => true );
+				continue; }
+			$tier['_conditions_for']      = $fields[ $field ] ?? $field;
+			$tier['_conditions_operator'] = $operators[ $operator ] ?? $operator;
+			$tier['_conditions_value']    = $value;
+			$result[]                     = $tier;
 		}
-		return $__tiers;
+		return $result;
 	}
 	/**
 	 * Get Discounts For Current User
@@ -1598,31 +1726,7 @@ class Functions {
 
 			switch ( $type ) {
 				case 'category':
-					$__cat_ids           = wc_get_product_term_ids( $product_id, 'product_cat' );
-					$__discounted_cat_id = '';
-					// If product associated with multiple categories, take the first one which has discounts.
-					foreach ( $__cat_ids as $cat_id ) {
-						$__discounts = wholesalex()->get_category_discounts( $cat_id );
-						if ( isset( $__discounts[ $__role ] ) && ! empty( $__discounts[ $__role ] ) ) {
-							$__discounts         = $__discounts[ $__role ];
-							$__discounted_cat_id = $cat_id;
-							break;
-						}
-					}
-
-					// Remove Empty Tiers.
-					$__tiers = isset( $__discounts['tiers'] ) ? $this->filter_empty_tier( $__discounts['tiers'] ) : array();
-
-					if ( isset( $__tiers['_min_quantity'] ) ) {
-						// Sort tiers by Min Quantity.
-						$__sort_column = array_column( $__tiers, '_min_quantity' );
-						array_multisort( $__sort_column, SORT_ASC, $__tiers );
-					}
-
-					return array(
-						'cat_id' => $__eligible_for_discounts ? $__discounted_cat_id : 0,
-						'tiers'  => $__eligible_for_discounts ? $__tiers : array(),
-					);
+					return apply_filters( 'wholesalex_resolved_page_discounts', array(), $type, $product_id, $__eligible_for_discounts, $__role );
 				case 'product':
 					$__discounts = wholesalex()->get_single_product_discount( $product_id );
 					if ( ! isset( $__discounts[ $__role ] ) ) {
@@ -1634,18 +1738,16 @@ class Functions {
 
 					$__sale_price = isset( $__discounts['wholesalex_sale_price'] ) ? $__discounts['wholesalex_sale_price'] : '';
 
-					$__tiers = isset( $__discounts['tiers'] ) ? $this->filter_empty_tier( $__discounts['tiers'] ) : array();
-
-					if ( isset( $__tiers['_min_quantity'] ) ) {
-						// Sort tiers by Min Quantity.
-						$__sort_colum = array_column( $__tiers, '_min_quantity' );
-						array_multisort( $__sort_colum, SORT_ASC, $__tiers );
-					}
-
-					return array(
-						'regular_price' => $__eligible_for_discounts ? $__regular_price : '',
-						'sale_price'    => $__eligible_for_discounts ? $__sale_price : '',
-						'tiers'         => $__eligible_for_discounts ? $__tiers : array(),
+					return apply_filters(
+						'wholesalex_resolved_page_discounts',
+						array(
+							'regular_price' => $__eligible_for_discounts ? $__regular_price : '',
+							'sale_price'    => $__eligible_for_discounts ? $__sale_price : '',
+						),
+						$type,
+						$product_id,
+						$__eligible_for_discounts,
+						$__role
 					);
 
 				default:
@@ -1987,24 +2089,6 @@ class Functions {
 
 
 	/**
-	 * Check is ppop plugin active or not
-	 *
-	 * @return boolean
-	 * @since 1.1.7
-	 */
-	public function is_ppop_active() {
-		$active_plugins = get_option( 'active_plugins', array() );
-		if ( is_multisite() ) {
-			$active_plugins = array_merge( $active_plugins, array_keys( get_site_option( 'active_sitewide_plugins', array() ) ) );
-		}
-		if ( in_array( 'woocommerce-product-addon/woocommerce-product-addon.php', $active_plugins, true ) ) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
 	 * Check is wholesalex page
 	 *
 	 * @param string $page Page Name.
@@ -2156,22 +2240,6 @@ class Functions {
 		$logger->log( $level, $message, $context );
 	}
 
-	/**
-	 * Is Valid User
-	 *
-	 * @return string
-	 */
-	public function is_valid_user() {
-		$user_id        = get_current_user_id();
-		$plugins_status = wholesalex()->get_setting( '_settings_status', 'b2b' );
-		$status         = true;
-		if ( 'b2b' === $plugins_status ) {
-			$status = 'active' === $this->get_user_status( $user_id );
-
-		}
-		return $status;
-	}
-
 
 	/**
 	 * Get Plugin Name
@@ -2184,13 +2252,48 @@ class Functions {
 	}
 
 	/**
-	 * Get Menu Slug
+	 * Whether plugin promotions may be displayed to the current user.
 	 *
-	 * @return string
+	 * @return bool
 	 */
+	public function can_show_promotions() {
+		// Providers may suppress promotions; installation permission is always required.
+		return current_user_can( 'install_plugins' ) && (bool) apply_filters( 'wholesalex_can_show_promotions', true );
+	}
+
+	/** Get the filtered admin menu slug. */
 	public function get_menu_slug() {
 		$menu_slug = apply_filters( 'wholesalex_plugin_menu_slug', 'wholesalex' );
 		return $menu_slug;
+	}
+
+	/**
+	 * Run an option operation against fresh database values.
+	 *
+	 * WordPress may populate its caches during the operation. Clear them again
+	 * afterwards, including when a filter throws. Leave the cache backend and
+	 * independent external-cache transients unchanged.
+	 *
+	 * @param string[] $options Option names involved in the operation.
+	 * @param callable $callback WordPress API operation.
+	 * @return mixed
+	 */
+	private function without_option_cache( $options, $callback ) {
+		$clear = static function () use ( $options ) {
+			foreach ( $options as $option ) {
+				wp_cache_delete( $option, 'options' );
+			}
+			wp_cache_delete( 'alloptions', 'options' );
+			wp_cache_delete( 'notoptions', 'options' );
+		};
+
+		$clear();
+
+		try {
+			return $callback();
+		} finally {
+			$clear();
+		}
 	}
 
 	/**
@@ -2202,27 +2305,38 @@ class Functions {
 	 * @return mixed
 	 */
 	public function get_option_without_cache( $option, $default_value = false ) {
-		global $wpdb;
-
 		if ( is_scalar( $option ) ) {
-			$option = trim( $option );
+			$option = trim( (string) $option );
 		}
 
-		if ( empty( $option ) ) {
+		if ( ! is_string( $option ) || '' === $option ) {
 			return false;
 		}
 
-		$value = $default_value;
+		return $this->without_option_cache(
+			array( $option ),
+			function () use ( $option, $default_value ) {
+				$found        = true;
+				$mark_missing = static function ( $value ) use ( &$found ) {
+					$found = false;
+					return $value;
+				};
 
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s LIMIT 1", $option ) ); // @codingStandardsIgnoreLine.
+				add_filter( "default_option_{$option}", $mark_missing, PHP_INT_MAX );
 
-		if ( is_object( $row ) ) {
-			$value = $row->option_value;
-		} else {
-			return apply_filters( "wholesalex_default_option_{$option}", $default_value, $option );
-		}
+				try {
+					$value = get_option( $option, $default_value );
+				} finally {
+					remove_filter( "default_option_{$option}", $mark_missing, PHP_INT_MAX );
+				}
 
-		return apply_filters( "wholesalex_option_{$option}", maybe_unserialize( $value ), $option );
+				if ( ! $found ) {
+					return apply_filters( "wholesalex_default_option_{$option}", $value, $option );
+				}
+
+				return apply_filters( "wholesalex_option_{$option}", $value, $option );
+			}
+		);
 	}
 
 	/**
@@ -2253,21 +2367,26 @@ class Functions {
 	 * @return mixed
 	 */
 	public function get_transient_without_cache( $transient ) {
-		$transient_option  = '_transient_' . $transient;
-		$transient_timeout = '_transient_timeout_' . $transient;
-		$timeout           = $this->get_option_without_cache( $transient_timeout );
+		return $this->without_option_cache(
+			array( '_transient_' . $transient, '_transient_timeout_' . $transient ),
+			function () use ( $transient ) {
+				$transient_option  = '_transient_' . $transient;
+				$transient_timeout = '_transient_timeout_' . $transient;
+				$timeout           = $this->get_option_without_cache( $transient_timeout );
 
-		if ( false !== $timeout && $timeout < time() ) {
-			delete_option( $transient_option );
-			delete_option( $transient_timeout );
-			$value = false;
-		}
+				if ( false !== $timeout && $timeout < time() ) {
+					delete_option( $transient_option );
+					delete_option( $transient_timeout );
+					$value = false;
+				}
 
-		if ( ! isset( $value ) ) {
-			$value = $this->get_option_without_cache( $transient_option );
-		}
+				if ( ! isset( $value ) ) {
+					$value = $this->get_option_without_cache( $transient_option );
+				}
 
-		return apply_filters( "wholesalex_transient_{$transient}", $value, $transient );
+				return apply_filters( "wholesalex_transient_{$transient}", $value, $transient );
+			}
+		);
 	}
 
 	/**
@@ -2280,44 +2399,49 @@ class Functions {
 	 * @return bool
 	 */
 	public function set_transient_without_cache( $transient, $value, $expiration = 0 ) {
-		$expiration = (int) $expiration;
+		return $this->without_option_cache(
+			array( '_transient_' . $transient, '_transient_timeout_' . $transient ),
+			function () use ( $transient, $value, $expiration ) {
+				$expiration = (int) $expiration;
 
-		$transient_timeout = '_transient_timeout_' . $transient;
-		$transient_option  = '_transient_' . $transient;
+				$transient_timeout = '_transient_timeout_' . $transient;
+				$transient_option  = '_transient_' . $transient;
 
-		$result = false;
+				$result = false;
 
-		if ( false === $this->get_option_without_cache( $transient_option ) ) {
-			$autoload = 'yes';
-			if ( $expiration ) {
-				$autoload = 'no';
-				$this->add_option_without_cache( $transient_timeout, time() + $expiration, 'no' );
-			}
-			$result = $this->add_option_without_cache( $transient_option, $value, $autoload );
-		} else {
-			/*
-			 * If expiration is requested, but the transient has no timeout option,
-			 * delete, then re-create transient rather than update.
-			 */
-			$update = true;
-
-			if ( $expiration ) {
-				if ( false === $this->get_option_without_cache( $transient_timeout ) ) {
-					delete_option( $transient_option );
-					$this->add_option_without_cache( $transient_timeout, time() + $expiration, 'no' );
-					$result = $this->add_option_without_cache( $transient_option, $value, 'no' );
-					$update = false;
+				if ( false === $this->get_option_without_cache( $transient_option ) ) {
+					$autoload = 'yes';
+					if ( $expiration ) {
+						$autoload = 'no';
+						$this->add_option_without_cache( $transient_timeout, time() + $expiration, 'no' );
+					}
+					$result = $this->add_option_without_cache( $transient_option, $value, $autoload );
 				} else {
-					update_option( $transient_timeout, time() + $expiration );
+					/*
+					 * If expiration is requested, but the transient has no timeout option,
+					 * delete, then re-create transient rather than update.
+					 */
+					$update = true;
+
+					if ( $expiration ) {
+						if ( false === $this->get_option_without_cache( $transient_timeout ) ) {
+							delete_option( $transient_option );
+							$this->add_option_without_cache( $transient_timeout, time() + $expiration, 'no' );
+							$result = $this->add_option_without_cache( $transient_option, $value, 'no' );
+							$update = false;
+						} else {
+							update_option( $transient_timeout, time() + $expiration );
+						}
+					}
+
+					if ( $update ) {
+						$result = update_option( $transient_option, $value );
+					}
 				}
-			}
 
-			if ( $update ) {
-				$result = update_option( $transient_option, $value );
+				return $result;
 			}
-		}
-
-		return $result;
+		);
 	}
 
 	/**
@@ -2330,41 +2454,27 @@ class Functions {
 	 * @return bool
 	 */
 	public function add_option_without_cache( $option, $value = '', $autoload = 'yes' ) {
-		global $wpdb;
-
 		if ( is_scalar( $option ) ) {
-			$option = trim( $option );
+			$option = trim( (string) $option );
 		}
 
-		if ( empty( $option ) ) {
+		if ( ! is_string( $option ) || '' === $option ) {
 			return false;
 		}
 
-		wp_protect_special_option( $option );
+		return $this->without_option_cache(
+			array( $option ),
+			function () use ( $option, $value, $autoload ) {
+				/*
+				 * Make sure the option doesn't already exist.
+				 */
+				if ( apply_filters( "wholesalex_default_option_{$option}", false, $option, false ) !== $this->get_option_without_cache( $option ) ) {
+					return false;
+				}
 
-		if ( is_object( $value ) ) {
-			$value = clone $value;
-		}
-
-		$value = sanitize_option( $option, $value );
-
-		/*
-		 * Make sure the option doesn't already exist.
-		 */
-
-		if ( apply_filters( "wholesalex_default_option_{$option}", false, $option, false ) !== $this->get_option_without_cache( $option ) ) {
-			return false;
-		}
-
-		$serialized_value = maybe_serialize( $value );
-		$autoload         = ( 'no' === $autoload || false === $autoload ) ? 'no' : 'yes';
-
-		$result = $wpdb->query( $wpdb->prepare( "INSERT INTO `$wpdb->options` (`option_name`, `option_value`, `autoload`) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`)", $option, $serialized_value, $autoload ) ); // @codingStandardsIgnoreLine.
-		if ( ! $result ) {
-			return false;
-		}
-
-		return true;
+				return add_option( $option, $value, '', $autoload );
+			}
+		);
 	}
 
 	/**
@@ -2375,13 +2485,12 @@ class Functions {
 	 * @since 1.1.3
 	 */
 	public function is_active_b2b_user( $user_id = '' ) {
-		$account_role = wholesalex()->get_current_user_role();
-		if ( ! $user_id ) {
-			$user_id = get_current_user_id();
+		$user_id = '' === $user_id ? get_current_user_id() : (int) $user_id;
+		if ( $user_id <= 0 ) {
+			return false;
 		}
-		$__current_user_id = apply_filters( 'wholesalex_set_current_user', $user_id );
-		$__account_status  = get_user_meta( $__current_user_id, '__wholesalex_status', true );
-		return ( ! ( ( 'wholesalex_guest' === $account_role ) || ( 'wholesalex_b2c_users' === $account_role ) ) && 'active' === $__account_status ) || current_user_can( 'manage_options' );
+		$account_role = get_user_meta( $user_id, '__wholesalex_role', true );
+		return is_string( $account_role ) && '' !== $account_role && ! in_array( $account_role, array( 'wholesalex_guest', 'wholesalex_b2c_users' ), true ) && 'active' === get_user_meta( $user_id, '__wholesalex_status', true );
 	}
 
 

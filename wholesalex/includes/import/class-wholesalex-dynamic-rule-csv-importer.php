@@ -46,6 +46,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 	 *
 	 * @param string $file   File to read.
 	 * @param array  $params Arguments for the parser.
+	 * @throws \InvalidArgumentException When CSV input is malformed.
 	 */
 	public function __construct( $file, $params = array() ) {
 		$default_args = array(
@@ -64,9 +65,38 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 		$this->params = wp_parse_args( $params, $default_args );
 
 		$this->file = $file;
+		foreach ( array( 'delimiter', 'enclosure', 'escape' ) as $parameter ) {
+			if ( ! is_string( $this->params[ $parameter ] ) || 1 !== strlen( $this->params[ $parameter ] ) ) {
+				throw new \InvalidArgumentException( 'CSV delimiters must be single-byte characters.' );
+			}
+		}
+		if ( ! is_array( $this->params['mapping'] ) ) {
+			throw new \InvalidArgumentException( 'Invalid CSV column mapping.' );
+		}
+		if ( isset( $this->params['mapping']['from'] ) || isset( $this->params['mapping']['to'] ) ) {
+			$mapping = $this->params['mapping'];
+			if ( ! isset( $mapping['from'], $mapping['to'] ) || ! is_array( $mapping['from'] ) || ! is_array( $mapping['to'] ) || count( $mapping['from'] ) !== count( $mapping['to'] ) ) {
+				throw new \InvalidArgumentException( 'Invalid CSV column mapping.' );
+			}
+			foreach ( array_merge( $mapping['from'], $mapping['to'] ) as $column ) {
+				if ( ! is_string( $column ) ) {
+					throw new \InvalidArgumentException( 'Invalid CSV column mapping.' );
+				}
+			}
+		}
+		if ( ! empty( $this->params['character_encoding'] ) && 'UTF-8' !== $this->params['character_encoding'] && ( ! is_string( $this->params['character_encoding'] ) || ! function_exists( 'mb_list_encodings' ) || ! in_array( strtolower( $this->params['character_encoding'] ), array_map( 'strtolower', mb_list_encodings() ), true ) ) ) {
+			throw new \InvalidArgumentException( 'Invalid CSV character encoding.' );
+		}
 
 		if ( isset( $this->params['mapping']['from'], $this->params['mapping']['to'] ) ) {
 			$this->params['mapping'] = array_combine( $this->params['mapping']['from'], $this->params['mapping']['to'] );
+		}
+
+		$allowed_columns = apply_filters( 'wholesalex_dynamic_rule_csv_allowed_columns', array( 'id', '_rule_status', '_rule_title', '_rule_type', '_rule_for', 'specific_users', 'specific_roles', '_product_filter', 'products_in_list', 'products_not_in_list', 'cat_in_list', 'cat_not_in_list', 'attribute_in_list', 'attribute_not_in_list', 'product_discount', 'cart_discount', 'payment_discount', 'payment_order_qty', 'buy_x_get_one', 'shipping_rule', 'min_order_qty', 'max_order_qty', 'tax_rule', 'extra_charge', 'buy_x_get_y', 'restrict_product_visibility', 'conditions', '_usage_limit', '_start_date', '_end_date' ) );
+		foreach ( $this->params['mapping'] as $column ) {
+			if ( ! is_string( $column ) || ( '' !== $column && ! in_array( $column, $allowed_columns, true ) ) ) {
+				throw new \InvalidArgumentException( 'Invalid CSV column mapping.' );
+			}
 		}
 
 		$this->read_file();
@@ -85,16 +115,25 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 
 	/**
 	 * Read file.
+	 *
+	 * @throws \InvalidArgumentException When CSV input is malformed.
 	 */
 	protected function read_file() {
-		if ( ! WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller::is_file_valid_csv( $this->file ) ) {
+		if ( ! is_resource( $this->file ) && ! WHOLESALEX_Dynamic_Rule_CSV_Importer_Controller::is_file_valid_csv( $this->file ) ) {
 			wp_die( esc_html__( 'Invalid file type. The importer supports CSV and TXT file formats.', 'wholesalex' ) );
 		}
 
-		$handle = fopen( $this->file, 'r' ); // @codingStandardsIgnoreLine.
+		$handle = is_resource( $this->file ) ? $this->file : fopen( $this->file, 'r' ); // @codingStandardsIgnoreLine.
 
 		if ( false !== $handle ) {
-			$this->raw_keys = array_map( 'trim', fgetcsv( $handle, 0, $this->params['delimiter'], $this->params['enclosure'], $this->params['escape'] ) ); // @codingStandardsIgnoreLine
+			$header = fgetcsv( $handle, 0, $this->params['delimiter'], $this->params['enclosure'], $this->params['escape'] );
+			if ( ! is_array( $header ) || ! count( array_filter( $header ) ) ) {
+				if ( ! is_resource( $this->file ) ) {
+					fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Close the local CSV stream opened by this importer.
+				}
+				throw new \InvalidArgumentException( 'CSV header is missing.' );
+			}
+			$this->raw_keys = array_map( 'trim', $header ); // @codingStandardsIgnoreLine
 
 			if ( isset( $this->params['character_encoding'] ) && $this->params['character_encoding'] ) {
 				$this->raw_keys = array_map( array( $this, 'adjust_character_encoding' ), $this->raw_keys );
@@ -132,6 +171,11 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			}
 
 			$this->file_position = ftell( $handle );
+			if ( ! is_resource( $this->file ) ) {
+				fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Close the local CSV stream opened by this importer.
+			}
+		} else {
+			throw new \InvalidArgumentException( 'CSV file cannot be read.' );
 		}
 
 		if ( ! empty( $this->params['mapping'] ) ) {
@@ -334,7 +378,9 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 		$value = sanitize_text_field( $value );
 
 		// Use flexible matching to handle variations.
-		return $this->flexible_field_matcher( $value, array_keys( $rule_types ) );
+		// Preserve identifiers so unsupported imports reach provider validation.
+		$matched = $this->flexible_field_matcher( $value, array_keys( $rule_types ) );
+		return $matched ? $matched : $value;
 	}
 
 
@@ -454,12 +500,10 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			$values = array_map( array( $this, 'explode_values_formatter' ), $values );
 
 			foreach ( $values as $user ) {
-				if ( ! is_numeric( $user ) ) {
-					$id = explode( '_', $user );
-					if ( isset( $id[1] ) ) {
-						$id = $id[1];
-					}
+				if ( ! preg_match( '/^(?:user_)?([1-9][0-9]*)(?:\(.*\))?$/', trim( $user ), $matches ) ) {
+					continue;
 				}
+				$id       = $matches[1];
 				$user_obj = get_user_by( 'id', $id );
 				if ( $user_obj ) {
 					$data[] = array(
@@ -647,8 +691,17 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 	 *
 	 * @param string $value Discount String.
 	 * @return array
+	 * @throws \InvalidArgumentException When CSV input is malformed.
 	 */
 	public function parse_discount_field( $value ) {
+		if ( 0 === strpos( $value, 'json:' ) ) {
+			$decoded = json_decode( substr( $value, 5 ), true );
+			if ( ! is_array( $decoded ) || JSON_ERROR_NONE !== json_last_error() ) {
+				throw new \InvalidArgumentException( 'Invalid structured CSV cell.' );
+			}
+			return $decoded;
+		}
+
 		// _discount_type:percentage;_discount_amount:5;_discount_name:test
 		$data = array();
 		if ( ! empty( $value ) && $value ) {
@@ -657,7 +710,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			$values = array_map( array( $this, 'explode_values_formatter' ), $values );
 
 			foreach ( $values as $discount ) {
-				$temp_data = explode( ':', $discount );
+				$temp_data = explode( ':', $discount, 2 );
 				if ( isset( $temp_data[0], $temp_data[1] ) ) {
 					$data[ $temp_data[0] ] = $temp_data[1];
 				}
@@ -672,8 +725,17 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 	 *
 	 * @param string $value Payment Discount String.
 	 * @return array
+	 * @throws \InvalidArgumentException When CSV input is malformed.
 	 */
 	public function parse_payment_discount_field( $value ) {
+		if ( 0 === strpos( $value, 'json:' ) ) {
+			$decoded = json_decode( substr( $value, 5 ), true );
+			if ( ! is_array( $decoded ) || JSON_ERROR_NONE !== json_last_error() ) {
+				throw new \InvalidArgumentException( 'Invalid structured CSV cell.' );
+			}
+			return $decoded;
+		}
+
 		// _payment_gateways:cod(Cash on delivery),bacs(Direct bank transfer);_discount_type:amount;_discount_amount:40;_discount_name:fdasfefaf
 		$data = array();
 		if ( ! empty( $value ) && $value ) {
@@ -682,7 +744,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			$values = array_map( array( $this, 'explode_values_formatter' ), $values );
 
 			foreach ( $values as $discount ) {
-				$temp_data = explode( ':', $discount );
+				$temp_data = explode( ':', $discount, 2 );
 
 				if ( isset( $temp_data[0], $temp_data[1] ) ) {
 					$data[ $temp_data[0] ] = $temp_data[1];
@@ -690,7 +752,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 					if ( '_payment_gateways' === $temp_data[0] ) {
 						$gateways = $temp_data[1];
 
-						$gateways = explode( ';', $gateways );
+						$gateways = preg_split( '/,(?=[^,()]+(?:\(|$))/', $gateways );
 						$gateways = array_map( array( $this, 'explode_values_formatter' ), $gateways );
 
 						$wc_gateways = new WC_Payment_Gateways();
@@ -728,8 +790,17 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 	 *
 	 * @param string $value Payment Gateway String.
 	 * @return array
+	 * @throws \InvalidArgumentException When CSV input is malformed.
 	 */
 	public function parse_payment_gateway_field( $value ) {
+		if ( 0 === strpos( $value, 'json:' ) ) {
+			$decoded = json_decode( substr( $value, 5 ), true );
+			if ( ! is_array( $decoded ) || JSON_ERROR_NONE !== json_last_error() ) {
+				throw new \InvalidArgumentException( 'Invalid structured CSV cell.' );
+			}
+			return $decoded;
+		}
+
 		// _payment_gateways:cod(Cash on delivery);_order_quantity:10
 		$data = array();
 		if ( ! empty( $value ) && $value ) {
@@ -738,7 +809,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			$values = array_map( array( $this, 'explode_values_formatter' ), $values );
 
 			foreach ( $values as $discount ) {
-				$temp_data = explode( ':', $discount );
+				$temp_data = explode( ':', $discount, 2 );
 
 				if ( isset( $temp_data[0], $temp_data[1] ) ) {
 					$data[ $temp_data[0] ] = $temp_data[1];
@@ -784,8 +855,17 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 	 *
 	 * @param string $value Single Rule String.
 	 * @return array
+	 * @throws \InvalidArgumentException When CSV input is malformed.
 	 */
 	public function parse_single_rule_field( $value ) {
+		if ( 0 === strpos( $value, 'json:' ) ) {
+			$decoded = json_decode( substr( $value, 5 ), true );
+			if ( ! is_array( $decoded ) || JSON_ERROR_NONE !== json_last_error() ) {
+				throw new \InvalidArgumentException( 'Invalid structured CSV cell.' );
+			}
+			return $decoded;
+		}
+
 		// _minimum_purchase_count:12
 		$data = array();
 		if ( ! empty( $value ) && $value ) {
@@ -805,7 +885,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 	 * @param string $value Single Tier String.
 	 * @return array
 	 */
-	public function parse_single_tier_field( $value ) {
+	public function parse_single_condition_field( $value ) {
 		$data = array();
 		if ( ! empty( $value ) && $value ) {
 			$value  = str_replace( '\\,', '::separator::', $value );
@@ -828,8 +908,17 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 	 *
 	 * @param string $value Shipping Rule String.
 	 * @return array
+	 * @throws \InvalidArgumentException When CSV input is malformed.
 	 */
 	public function parse_shipping_rule_field( $value ) {
+		if ( 0 === strpos( $value, 'json:' ) ) {
+			$decoded = json_decode( substr( $value, 5 ), true );
+			if ( ! is_array( $decoded ) || JSON_ERROR_NONE !== json_last_error() ) {
+				throw new \InvalidArgumentException( 'Invalid structured CSV cell.' );
+			}
+			return $decoded;
+		}
+
 		// __shipping_zone:1;_shipping_zone_methods:3(Free shipping)
 
 		$data = array();
@@ -839,7 +928,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			$values = array_map( array( $this, 'explode_values_formatter' ), $values );
 
 			foreach ( $values as $discount ) {
-				$temp_data = explode( ':', $discount );
+				$temp_data = explode( ':', $discount, 2 );
 
 				if ( isset( $temp_data[0], $temp_data[1] ) ) {
 					$data[ $temp_data[0] ] = $temp_data[1];
@@ -882,45 +971,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 	 * @return array
 	 */
 	public function parse_buy_x_get_y_field( $value ) {
-		// _minimum_purchase_count:2
-		// _free_item:32
-		$data = array();
-		if ( ! empty( $value ) && $value ) {
-			$value  = str_replace( '\\,', '::separator::', $value );
-			$values = explode( ';', $value );
-			$values = array_map( array( $this, 'explode_values_formatter' ), $values );
-
-			foreach ( $values as $discount ) {
-				$temp_data = explode( ':', $discount );
-
-				if ( isset( $temp_data[0], $temp_data[1] ) ) {
-					$data[ $temp_data[0] ] = $temp_data[1];
-
-					if ( '_free_item' === $temp_data[0] ) {
-						$products = $temp_data[1];
-
-						$products = explode( ',', $products );
-						$products = array_map( array( $this, 'explode_values_formatter' ), $products );
-
-						$free_products_data = array();
-
-						foreach ( $products as $product_id ) {
-
-							$product = wc_get_product( $product_id );
-							if ( $product ) {
-								$free_products_data[] = array(
-									'name'  => esc_attr( $product->get_title() ),
-									'value' => $product_id,
-								);
-							}
-						}
-
-						$data[ $temp_data[0] ] = $free_products_data;
-					}
-				}
-			}
-		}
-		return $data;
+		return apply_filters( 'wholesalex_legacy_csv_field_parsed', array(), 'buy_x_get_y', $value, $this );
 	}
 
 	/**
@@ -928,15 +979,24 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 	 *
 	 * @param string $value Tier String.
 	 * @return array
+	 * @throws \InvalidArgumentException When CSV input is malformed.
 	 */
-	public function parse_tier_field( $value ) {
+	public function parse_condition_rows( $value ) {
+		if ( 0 === strpos( $value, 'json:' ) ) {
+			$decoded = json_decode( substr( $value, 5 ), true );
+			if ( ! is_array( $decoded ) || JSON_ERROR_NONE !== json_last_error() ) {
+				throw new \InvalidArgumentException( 'Invalid structured CSV cell.' );
+			}
+			return $decoded;
+		}
+
 		$data = array();
 		if ( ! empty( $value ) && $value ) {
 			$value  = str_replace( '\\,', '::separator::', $value );
 			$values = explode( ';', $value );
 			$values = array_map( array( $this, 'explode_values_formatter' ), $values );
 			foreach ( $values as $tier ) {
-				$data[] = $this->parse_single_tier_field( $tier );
+				$data[] = $this->parse_single_condition_field( $tier );
 			}
 		}
 		if ( empty( $data ) ) {
@@ -1014,8 +1074,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			'tax_rule'              => array( $this, 'parse_discount_field' ),
 			'extra_charge'          => array( $this, 'parse_payment_gateway_field' ),
 			'buy_x_get_y'           => array( $this, 'parse_buy_x_get_y_field' ),
-			'quantity_based'        => array( $this, 'parse_tier_field' ),
-			'conditions'            => array( $this, 'parse_tier_field' ),
+			'conditions'            => array( $this, 'parse_condition_rows' ),
 			'_start_date'           => array( $this, 'parse_date_field' ),
 			'_end_date'             => array( $this, 'parse_date_field' ),
 		);
@@ -1037,6 +1096,8 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 
 	/**
 	 * Map and format raw data to known fields.
+	 *
+	 * @throws \InvalidArgumentException When CSV input is malformed.
 	 */
 	protected function set_parsed_data() {
 
@@ -1051,6 +1112,9 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 				continue;
 			}
 
+			if ( count( $row ) !== count( $mapped_keys ) ) {
+				throw new \InvalidArgumentException( 'CSV row does not match the header.' );
+			}
 			$this->parsing_raw_data_index = $row_index;
 
 			$data = array();
@@ -1086,7 +1150,7 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 			 *
 			 * @since
 			 */
-			$this->parsed_data[] = apply_filters( 'wholesalex_dynamic_rule_importer_parsed_data', $data, $this );
+			$this->parsed_data[ $row_index ] = apply_filters( 'wholesalex_dynamic_rule_importer_parsed_data', $data, $this );
 		}
 	}
 
@@ -1154,6 +1218,9 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 						'row' => $this->get_row_id( $parsed_data ),
 					)
 				);
+				if ( $this->advance_import_position( $parsed_data_key ) ) {
+					break;
+				}
 				continue;
 			}
 
@@ -1166,6 +1233,9 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 						'row' => $this->get_row_id( $parsed_data ),
 					)
 				);
+				if ( $this->advance_import_position( $parsed_data_key ) ) {
+					break;
+				}
 				continue;
 			}
 
@@ -1185,15 +1255,23 @@ class WHOLESALEX_Dynamic_Rule_CSV_Importer extends WHOLESALEX_Dynamic_Rule_Impor
 				$data['imported'][] = $result['id'];
 			}
 
-			++$index;
-
-			if ( $this->params['prevent_timeouts'] && ( $this->time_exceeded() || $this->memory_exceeded() ) ) {
-				$this->file_position = $this->file_positions[ $index ];
+			if ( $this->advance_import_position( $parsed_data_key ) ) {
 				break;
 			}
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Advance using the raw CSV row, including skipped records and blank lines.
+	 *
+	 * @param int $row_index Raw row index.
+	 * @return bool Whether this batch must stop.
+	 */
+	private function advance_import_position( $row_index ) {
+		$this->file_position = $this->file_positions[ $row_index + 1 ];
+		return $this->params['prevent_timeouts'] && ( $this->time_exceeded() || $this->memory_exceeded() );
 	}
 
 	/**

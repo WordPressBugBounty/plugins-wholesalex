@@ -153,30 +153,25 @@ class WHOLESALEX_Overview {
 			),
 		);
 
-		if ( ! function_exists( 'wholesalex_pro' ) || ! wholesalex_pro()->is_active() ) {
-			$submenus[] = array(
-				'title'      => __( 'Pro Features', 'wholesalex' ),
-				'menu_title' => __( 'Pro Features', 'wholesalex' ),
-				'capability' => $manage_options_cap,
-				'slug'       => '/pro-features',
-				'menu_slug'  => 'wholesalex-pro-features',
-				'callback'   => array( $this, 'output' ),
-				'identifier' => 'pro_features',
-			);
-		}
+		$submenus[] = array(
+			'title'      => __( 'Pro Features', 'wholesalex' ),
+			'menu_title' => __( 'Pro Features', 'wholesalex' ),
+			'capability' => $manage_options_cap,
+			'slug'       => '/pro-features',
+			'menu_slug'  => 'wholesalex-pro-features',
+			'callback'   => array( $this, 'output' ),
+			'identifier' => 'pro_features',
+		);
 
-		$dynamic_rules_access = wholesalex()->get_dynamic_rules_access();
-		if ( ! empty( $dynamic_rules_access['can_view'] ) ) {
-			$submenus[] = array(
-				'title'      => __( 'Dynamic Rules', 'wholesalex' ),
-				'menu_title' => __( 'Dynamic Rules', 'wholesalex' ),
-				'capability' => $manage_options_cap,
-				'slug'       => '/dynamic-rules',
-				'menu_slug'  => apply_filters( 'wholesalex_dynamic_rules_submenu_slug', 'wholesalex_dynamic_rules' ),
-				'callback'   => array( $this, 'output' ),
-				'identifier' => 'dynamic_rules',
-			);
-		}
+		$submenus[] = array(
+			'title'      => __( 'Dynamic Rules', 'wholesalex' ),
+			'menu_title' => __( 'Dynamic Rules', 'wholesalex' ),
+			'capability' => $manage_options_cap,
+			'slug'       => '/dynamic-rules',
+			'menu_slug'  => apply_filters( 'wholesalex_dynamic_rules_submenu_slug', 'wholesalex_dynamic_rules' ),
+			'callback'   => array( $this, 'output' ),
+			'identifier' => 'dynamic_rules',
+		);
 
 		if ( 'yes' === $is_role_switcher_option_enable ) {
 			$submenus[] = array(
@@ -202,7 +197,7 @@ class WHOLESALEX_Overview {
 					'menu_title' => __( 'Wholesale Pricing', 'wholesalex' ),
 					'capability' => $manage_options_cap,
 					'slug'       => '/wholesale-pricing',
-					'menu_slug'  => 'wholesalex_wholesale_pricing',
+					'menu_slug'  => apply_filters( 'wholesalex_wholesale_pricing_submenu_slug', 'wholesalex_wholesale_pricing' ),
 					'callback'   => array( $this, 'output' ),
 					'identifier' => 'wholesale_pricing',
 				),
@@ -210,11 +205,14 @@ class WHOLESALEX_Overview {
 		);
 
 		foreach ( $submenus as $submenu ) {
+			if ( ! wholesalex()->can_show_promotions() && 'pro_features' === ( $submenu['identifier'] ?? '' ) ) {
+				continue;
+			}
 			$submenu_slug = isset( $submenu['menu_slug'] ) ? $submenu['menu_slug'] : $submenu['slug'];
 			if ( isset( $submenu['identifier'] ) && 'users' === $submenu['identifier'] && current_user_can( $submenu['capability'] ) ) {
 				$pending_count = (int) $this->get_new_registrations_count();
 				if ( $pending_count > 0 ) {
-					$formatted_count = number_format_i18n( $pending_count );
+					$formatted_count        = number_format_i18n( $pending_count );
 					$submenu['menu_title'] .= sprintf(
 						' <span class="update-plugins count-%1$d"><span class="plugin-count" aria-hidden="true">%2$s</span><span class="screen-reader-text">%3$s</span></span>',
 						$pending_count,
@@ -600,7 +598,7 @@ class WHOLESALEX_Overview {
 						'type'     => 'string',
 						'enum'     => array( 'overview_complete_steps', 'overview_steps_collapsed' ),
 					),
-					'value' => array(
+					'value'      => array(
 						'required' => true,
 						'type'     => 'string',
 						'enum'     => array( 'yes', 'no' ),
@@ -610,7 +608,7 @@ class WHOLESALEX_Overview {
 					$key   = $request->get_param( 'preference' );
 					$value = $request->get_param( 'value' );
 					update_option( $key, $value, false );
-					if ( $value !== get_option( $key, 'no' ) ) {
+					if ( get_option( $key, 'no' ) !== $value ) {
 						return new \WP_Error( 'overview_save_failed', __( 'Could not save overview preferences. Please try again.', 'wholesalex' ), array( 'status' => 500 ) );
 					}
 					return array( $key => $value );
@@ -811,8 +809,11 @@ class WHOLESALEX_Overview {
 	 * @return int
 	 */
 	public function get_b2b_customer_count( $start_date = '', $end_date = '' ) {
-		$start_date = gmdate( 'Y-m-d H:i:s', strtotime( $start_date ) );
-		$end_date   = gmdate( 'Y-m-d H:i:s', strtotime( '+1 DAY', strtotime( $end_date ) ) );
+		$has_dates = '' !== $start_date || '' !== $end_date;
+		if ( $has_dates && ( ! is_string( $start_date ) || ! is_string( $end_date ) || false === strtotime( $start_date ) || false === strtotime( $end_date ) || strtotime( $start_date ) > strtotime( $end_date ) ) ) {
+			return 0;
+		}
+		$date_query = array();
 
 		// Meta key and excluded values.
 		$meta_key       = '__wholesalex_role';
@@ -830,23 +831,23 @@ class WHOLESALEX_Overview {
 
 		// Date query if both start and end dates are provided.
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$date_query   = array(
+			$date_query = array(
 				array(
 					'column'    => 'user_registered',
-					'after'     => $start_date,
-					'before'    => $end_date,
+					'after'     => gmdate( 'Y-m-d 00:00:00', strtotime( $start_date ) ),
+					'before'    => gmdate( 'Y-m-d 23:59:59', strtotime( $end_date ) ),
 					'inclusive' => true,
 					'compare'   => 'BETWEEN',
 					'type'      => 'DATETIME',
 				),
 			);
-			$meta_query[] = $date_query; // Adding date query to existing meta query.
 		}
 
 		// User query arguments.
 		$args = array(
 			'meta_query'  => $meta_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- B2B customer classification is stored as user metadata.
 			'count_total' => true, // Only retrieve the count.
+			'date_query'  => $date_query,
 		);
 
 		// Run the user query.
@@ -1038,57 +1039,6 @@ class WHOLESALEX_Overview {
 		// regis start.
 		$is_woo_username = get_option( 'woocommerce_registration_generate_username' );
 		wp_enqueue_script( 'wholesalex_form_builder' );
-		// Added Password Condition.
-		$password_condition_options = array(
-			array(
-				'value' => 'uppercase_condition',
-				'name'  => 'Uppercase',
-			),
-			array(
-				'value' => 'lowercase_condition',
-				'name'  => 'Lowercase',
-			),
-			array(
-				'value' => 'special_character_condition',
-				'name'  => 'Special Character',
-			),
-			array(
-				'value' => 'min_length_condition',
-				'name'  => 'Min 8 Length',
-			),
-		);
-
-		// Add File Support Type Array.
-		$file_condition_options = array(
-			array(
-				'value' => 'jpg',
-				'name'  => 'JPG',
-			),
-			array(
-				'value' => 'jpeg',
-				'name'  => 'JPEG',
-			),
-			array(
-				'value' => 'png',
-				'name'  => 'PNG',
-			),
-			array(
-				'value' => 'txt',
-				'name'  => 'TXT',
-			),
-			array(
-				'value' => 'pdf',
-				'name'  => 'PDF',
-			),
-			array(
-				'value' => 'doc',
-				'name'  => 'DOC',
-			),
-			array(
-				'value' => 'docx',
-				'name'  => 'DOCX',
-			),
-		);
 
 		$form_data         = WholesaleX_CommonUtils::get_new_form_builder_data();
 		$default_form_data = WholesaleX_CommonUtils::get_empty_form();
@@ -1188,23 +1138,7 @@ class WHOLESALEX_Overview {
 						'whx_store_mode'                   => wholesalex()->get_setting( '_settings_status', 'b2b' ),
 						'whx_form_builder_slug'            => wholesalex()->get_setting( 'registration_form_buidler_submenu_slug' ),
 						'whx_form_builder_privacy_policy_text' => wc_get_privacy_policy_text( 'registration' ),
-						'whx_form_builder_password_condition_options' => $password_condition_options,
-						'whx_form_builder_file_condition_options' => $file_condition_options,
-						'whx_form_builder_billing_fields'  => array(
-							'' => __( 'No Mapping', 'wholesalex' ),
-							'whx_form_builder_billing_first_name' => __( 'Billing First Name', 'wholesalex' ),
-							'whx_form_builder_billing_last_name' => __( 'Billing Last Name', 'wholesalex' ),
-							'whx_form_builder_billing_company' => __( 'Billing Company', 'wholesalex' ),
-							'whx_form_builder_billing_address_1' => __( 'Billing Address 1', 'wholesalex' ),
-							'whx_form_builder_billing_address_2' => __( 'Billing Address 2', 'wholesalex' ),
-							'whx_form_builder_billing_city' => __( 'Billing City', 'wholesalex' ),
-							'whx_form_builder_billing_postcode' => __( 'Billing Post Code', 'wholesalex' ),
-							'whx_form_builder_billing_country' => __( 'Billing Country', 'wholesalex' ),
-							'whx_form_builder_billing_state' => __( 'Billing State', 'wholesalex' ),
-							'whx_form_builder_billing_email' => __( 'Billing Email', 'wholesalex' ),
-							'whx_form_builder_billing_phone' => __( 'Billing Phone', 'wholesalex' ),
-							'whx_form_builder_custom_user_meta_mapping' => __( 'Custom User Meta Mapping', 'wholesalex' ),
-						),
+
 						/**
 						 * Registration From Translation Stop
 						 */
@@ -1345,7 +1279,7 @@ class WHOLESALEX_Overview {
 	 * @since 1.1.2
 	 */
 	public function go_pro_menu_page() {
-		if ( apply_filters( 'wholesalex_show_upgrade_menu', true ) ) {
+		if ( wholesalex()->can_show_promotions() && apply_filters( 'wholesalex_show_upgrade_menu', true ) ) {
 
 			$button_text = \WHOLESALEX\Includes\Admin\Notice\Promo_Links::menu_label( __( 'Upgrade to Pro', 'wholesalex' ) );
 
@@ -1458,11 +1392,11 @@ class WHOLESALEX_Overview {
 					array(
 						'key'     => '__wholesalex_role',
 						'value'   => array( '', 'wholesalex_guest', 'wholesalex_b2c_users' ),
-						'compare' => '!=',
+						'compare' => 'NOT IN',
 					),
 
 				),
-				'number'     => $limit,
+				'number'     => -1,
 
 			)
 		);
@@ -1471,7 +1405,7 @@ class WHOLESALEX_Overview {
 
 		foreach ( $active_users_data as $key => $value ) {
 			$__temp                    = (array) $value;
-			$__id                      = $__temp['id'];
+			$__id                      = $__temp['ID'];
 			$__temp['avatar_url']      = get_avatar_url( $__id );
 			$__temp['total_purchase']  = wc_get_customer_total_spent( $__id );
 			$__temp['wholesalex_role'] = wholesalex()->get_role_name_by_role_id( get_user_meta( $__id, '__wholesalex_role', true ) );
@@ -1481,7 +1415,7 @@ class WHOLESALEX_Overview {
 		$__sort_colum = array_column( $active_users_data, 'total_purchase' );
 		array_multisort( $__sort_colum, SORT_DESC, $active_users_data );
 
-		return $active_users_data;
+		return array_slice( $active_users_data, 0, max( 0, (int) $limit ) );
 	}
 
 	/**
@@ -1658,8 +1592,11 @@ class WHOLESALEX_Overview {
 	public function get_b2b_order_data( $start_date = '', $end_date = '', $period = '' ) {
 		global $wpdb;
 
-		$start_date = gmdate( 'Y-m-d H:i:s', strtotime( $start_date ) );
-		$end_date   = gmdate( 'Y-m-d H:i:s', strtotime( '+1 DAY', strtotime( $end_date ) ) );
+		$has_dates = '' !== $start_date || '' !== $end_date;
+		if ( $has_dates && ( ! is_string( $start_date ) || ! is_string( $end_date ) || false === strtotime( $start_date ) || false === strtotime( $end_date ) || strtotime( $start_date ) > strtotime( $end_date ) ) ) {
+			return 0;
+		}
+		$date_query = array();
 
 		$period = $this->determine_period( $start_date, $end_date );
 

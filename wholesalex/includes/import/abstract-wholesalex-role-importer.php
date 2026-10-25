@@ -205,7 +205,10 @@ abstract class WHOLESALEX_Role_Importer implements WHOLESALEX_Importer_Interface
 			$role = apply_filters( 'wholesalex_role_import_pre_insert_role_data', $role, $data );
 
 			// Role Inserted/Updated.
-			wholesalex()->set_roles( $role['id'], $role );
+			$saved = wholesalex()->set_roles( $role['id'], $role );
+			if ( is_wp_error( $saved ) ) {
+				return $saved;
+			}
 
 			do_action( 'wholesalex_role_import_inserted_role', $role, $data );
 

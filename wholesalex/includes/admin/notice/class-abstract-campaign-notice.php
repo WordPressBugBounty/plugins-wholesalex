@@ -7,8 +7,6 @@
 
 namespace WHOLESALEX\Includes\Admin\Notice;
 
-use WHOLESALEX\Xpo;
-
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -56,8 +54,7 @@ abstract class Abstract_Campaign_Notice implements Notice_Type {
 			'key'             => '',
 			'start'           => '',   // e.g. '2026-05-18 00:00 Asia/Dhaka'.
 			'end'             => '',   // e.g. '2026-05-21 23:59 Asia/Dhaka'.
-			'url'             => '',   // Full link. Leave empty to build one from `utm_key`.
-			'utm_key'         => '',   // Key passed to Xpo::generate_utm_link().
+			'url'             => 'https://getwholesalex.com/pricing/',
 			'visibility'      => null, // null shows the notice only while no Pro licence is active.
 			'repeat_interval' => 0,    // Seconds before a dismissed notice may return. 0 hides it for good.
 		);
@@ -102,7 +99,7 @@ abstract class Abstract_Campaign_Notice implements Notice_Type {
 	 * @return bool
 	 */
 	public function is_running() {
-		$now = time();
+		$now   = time();
 		$start = is_string( $this->args['start'] ) ? strtotime( $this->args['start'] ) : false;
 		$end   = is_string( $this->args['end'] ) ? strtotime( $this->args['end'] ) : false;
 		if ( false === $start || false === $end ) {
@@ -118,7 +115,7 @@ abstract class Abstract_Campaign_Notice implements Notice_Type {
 	 */
 	protected function is_visible() {
 		if ( null === $this->args['visibility'] ) {
-			return (bool) apply_filters( 'wsx_show_upsell', apply_filters( 'wholesalex_show_upgrade_menu', true ) ); // Pro returns false while the licence is valid.
+			return (bool) apply_filters( 'wsx_show_upsell', apply_filters( 'wholesalex_show_upgrade_menu', true ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing Pro integrations return false on this hook while the licence is valid.
 		}
 		return (bool) $this->args['visibility'];
 	}
@@ -129,7 +126,7 @@ abstract class Abstract_Campaign_Notice implements Notice_Type {
 	 * @return bool
 	 */
 	protected function is_dismissed() {
-		return 'off' === Xpo::get_transient_without_cache( self::DISMISS_PREFIX . $this->get_key() );
+		return 'off' === wholesalex()->get_transient_without_cache( self::DISMISS_PREFIX . $this->get_key() ) || 'hide' === wholesalex()->get_transient_without_cache( $this->get_key() );
 	}
 
 	/**
@@ -149,7 +146,7 @@ abstract class Abstract_Campaign_Notice implements Notice_Type {
 	public function get_dismiss_url() {
 		$query_args = array(
 			'wsx_notice' => $this->get_key(),
-			'wpnonce'     => wp_create_nonce( 'wsx-nonce' ),
+			'wpnonce'    => wp_create_nonce( 'wsx-nonce' ),
 		);
 		return add_query_arg( $query_args );
 	}
@@ -163,7 +160,7 @@ abstract class Abstract_Campaign_Notice implements Notice_Type {
 		if ( ! empty( $this->args['url'] ) ) {
 			return $this->args['url'];
 		}
-		return Xpo::generate_utm_link( array( 'utmKey' => $this->args['utm_key'] ) );
+		return 'https://getwholesalex.com/pricing/';
 	}
 
 	/**

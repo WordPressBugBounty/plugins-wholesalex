@@ -83,13 +83,15 @@ class WHOLESALEX_Category {
 		if ( 'get' === $type ) {
 
 			$__visibility_settings = wholesalex()->get_category_visibility_settings( $term_id );
-			$__tiers               = wholesalex()->get_category_discounts( $term_id );
 
 			wp_send_json_success(
-				array(
-					'default'    => $this->get_category_fields(),
-					'tiers'      => $__tiers,
-					'visibility' => $__visibility_settings,
+				apply_filters(
+					'wholesalex_category_response',
+					array(
+						'default'    => $this->get_category_fields(),
+						'visibility' => $__visibility_settings,
+					),
+					$term_id
 				)
 			);
 		}

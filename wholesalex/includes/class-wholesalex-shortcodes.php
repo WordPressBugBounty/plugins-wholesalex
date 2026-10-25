@@ -65,6 +65,9 @@ class WHOLESALEX_Shortcodes {
 		add_action( 'wp_ajax_nopriv_wholesalex_process_login', array( $this, 'process_login' ) );
 		add_action( 'wp_ajax_wholesalex_process_login', array( $this, 'process_login' ) );
 
+		add_action( 'wp_ajax_nopriv_wholesalex_refresh_form_nonces', array( $this, 'refresh_form_nonces' ) );
+		add_action( 'wp_ajax_wholesalex_refresh_form_nonces', array( $this, 'refresh_form_nonces' ) );
+
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 		add_action(
@@ -85,13 +88,14 @@ class WHOLESALEX_Shortcodes {
 	 * @return string
 	 */
 	public function wholesalex_forgot_password_form() {
+		ob_start();
 		if ( isset( $_GET['reset'], $_GET['_wpnonce'] ) && is_string( $_GET['reset'] ) && is_string( $_GET['_wpnonce'] ) && 'true' === $_GET['reset'] && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wholesalex_reset_password' ) ) {
 			echo '<div class="woocommerce-message">' . esc_html__( 'A password reset email has been sent. Please check your inbox.', 'wholesalex' ) . '</div>';
 		}
 
-		ob_start();
 		?>
 			<form method="post" class="wsx-lost-password-form">
+				<?php wp_nonce_field( 'wholesalex_reset_password_action', 'wholesalex_reset_password_nonce' ); ?>
 				<p><?php esc_html_e( 'Lost your password? Please enter your email address. You will receive a link to create a new password via email.', 'wholesalex' ); ?></p>
 				<p>
 					<input class="wsx-input" type="email" name="user_email" id="user_email" placeholder="<?php esc_attr_e( 'Your email address', 'wholesalex' ); ?>" required>
@@ -139,7 +143,15 @@ class WHOLESALEX_Shortcodes {
 			}
 			$reset_link = network_site_url( "wp-login.php?action=rp&key=$key&login=" . rawurlencode( $user->user_login ), 'login' );
 			$this->wholesalex_send_password_reset_email( $user->user_login, $user->user_email, $reset_link );
-			wp_safe_redirect( add_query_arg( 'reset', 'true', get_permalink() ) );
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'reset'    => 'true',
+						'_wpnonce' => wp_create_nonce( 'wholesalex_reset_password' ),
+					),
+					get_permalink()
+				)
+			);
 			exit;
 		}
 	}
@@ -290,6 +302,52 @@ class WHOLESALEX_Shortcodes {
 	}
 
 	/**
+	 * Replace the nonces of cached registration and login forms with fresh ones.
+	 *
+	 * Logged-out nonces are embedded in the page and expire after 12-24 hours, so a
+	 * full-page cache serves forms that are rejected as expired. The refreshed
+	 * values authorize nothing new: they are the same public form nonces.
+	 *
+	 * @return void
+	 */
+	private function enqueue_form_nonce_refresh() {
+		if ( wp_script_is( 'wholesalex-form-nonce-refresh', 'enqueued' ) ) {
+			return;
+		}
+		wp_register_script( 'wholesalex-form-nonce-refresh', '', array(), WHOLESALEX_VER, true );
+		wp_enqueue_script( 'wholesalex-form-nonce-refresh' );
+		$url = wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT );
+		wp_add_inline_script(
+			'wholesalex-form-nonce-refresh',
+			'(function(){var u=' . $url . ',m={"wholesalex-registration-nonce":"registration","wholesalex-login-nonce":"login","wholesalex_registration_form_nonce":"registration_form"};' .
+			'function f(form){var id=form.querySelector("input[name=wholesalex_registration_form]");' .
+			'fetch(u+"?action=wholesalex_refresh_form_nonces&_="+Date.now()+(id?"&form="+encodeURIComponent(id.value):""),{credentials:"same-origin",cache:"no-store"})' .
+			'.then(function(r){return r.json();}).then(function(r){if(!r||!r.success||!r.data){return;}' .
+			'Object.keys(m).forEach(function(n){var i=form.querySelector("input[name=\'"+n+"\']");if(i&&r.data[m[n]]){i.value=r.data[m[n]];}});}).catch(function(){});}' .
+			'function run(){if(!window.fetch){return;}var s=[];document.querySelectorAll("input[name=wholesalex-registration-nonce],input[name=wholesalex-login-nonce]").forEach(function(i){if(i.form&&s.indexOf(i.form)<0){s.push(i.form);f(i.form);}});}' .
+			'if("loading"===document.readyState){document.addEventListener("DOMContentLoaded",run);}else{run();}})();'
+		);
+	}
+
+	/**
+	 * Return fresh form nonces for the current visitor.
+	 *
+	 * @return void
+	 */
+	public function refresh_form_nonces() {
+		nocache_headers();
+		$form_id = isset( $_GET['form'] ) && is_string( $_GET['form'] ) ? sanitize_text_field( wp_unslash( $_GET['form'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Issues the same public nonces the page embeds; nothing is read or changed.
+		$data    = array(
+			'registration' => wp_create_nonce( 'wholesalex-registration' ),
+			'login'        => wp_create_nonce( 'wholesalex-login' ),
+		);
+		if ( '' !== $form_id && strlen( $form_id ) <= 128 ) {
+			$data['registration_form'] = wp_create_nonce( 'wholesalex-registration-form|' . $form_id );
+		}
+		wp_send_json_success( $data );
+	}
+
+	/**
 	 * Generate Form Field
 	 *
 	 * @param mixed $row row.
@@ -390,6 +448,14 @@ class WHOLESALEX_Shortcodes {
 	<form class="wholesalex-<?php echo esc_attr( $type ); ?>-form" enctype="<?php echo esc_attr( $enctype ); ?>">
 		<div class="wsx-form-field-warning-message other_error" role="alert" aria-live="polite"></div>
 		<?php
+		if ( 'registration' === $type ) {
+			foreach ( Registration_Provider::fields( $form_data, true ) as $definition ) {
+				if ( ! WholesaleX_CommonUtils::is_standard_registration_field( $definition ) && ! Registration_Provider::supports( $definition, array( 'surface' => 'registration' ) ) ) {
+					echo '<p class="wsx-registration-provider-unavailable" role="status">' . esc_html( Registration_Provider::unavailable()->get_error_message() ) . '</p>';
+					break;
+				}
+			}
+		}
 		if ( isset( $form_data['settings']['isShowFormTitle'] ) && $form_data['settings']['isShowFormTitle'] ) {
 			$output  = '<div class="%s">';
 			$output .= '<div class="%s">%s</div>';
@@ -437,6 +503,7 @@ class WHOLESALEX_Shortcodes {
 		<?php
 		do_action( 'wholesalex_' . $type . '_form' );
 		wp_nonce_field( 'wholesalex-' . $type, 'wholesalex-' . $type . '-nonce' );
+		$this->enqueue_form_nonce_refresh();
 		$align_class   = isset( $form_data['styles']['layout']['button']['align'] ) ? sanitize_html_class( $form_data['styles']['layout']['button']['align'] ) : '';
 		$button_class .= ' ' . $align_class;
 
@@ -472,7 +539,7 @@ class WHOLESALEX_Shortcodes {
 	 */
 	private function render_registration_shortcode( $atts = array() ) {
 		$atts            = array_change_key_case( (array) $atts, CASE_LOWER );
-		$form_data       = WholesaleX_CommonUtils::get_new_form_builder_data();
+		$form_data       = WholesaleX_CommonUtils::get_registration_display_data( WholesaleX_CommonUtils::get_new_form_builder_data() );
 		$input_variation = $form_data['settings']['inputStyle'] ?? 'variation_1';
 		$is_role_wise    = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' !== $atts['registration_role'] && 'global' !== $atts['registration_role'] ? $atts['registration_role'] : false;
 		$is_only_b2b     = isset( $atts['registration_role'] ) && ! empty( $atts['registration_role'] ) && 'all_b2b' === $atts['registration_role'] ? $atts['registration_role'] : false;
@@ -515,7 +582,7 @@ class WHOLESALEX_Shortcodes {
 	 * @return array
 	 */
 	private function render_login_registration_shortcode( $atts = array() ) {
-		$form_data = WholesaleX_CommonUtils::get_new_form_builder_data();
+		$form_data = WholesaleX_CommonUtils::get_registration_display_data( WholesaleX_CommonUtils::get_new_form_builder_data() );
 
 		if ( ! $this->is_login_form_enabled( $form_data ) ) {
 			return $this->render_registration_shortcode( $atts );
@@ -578,7 +645,7 @@ class WHOLESALEX_Shortcodes {
 	 * @return array
 	 */
 	private function render_login_shortcode() {
-		$form_data       = WholesaleX_CommonUtils::get_new_form_builder_data();
+		$form_data       = WholesaleX_CommonUtils::get_registration_display_data( WholesaleX_CommonUtils::get_new_form_builder_data() );
 		$input_variation = $form_data['settings']['inputStyle'] ?? 'variation_1';
 
 		$wrapper = wp_unique_id( 'whx_wrapper' );
@@ -685,8 +752,6 @@ class WHOLESALEX_Shortcodes {
 			return $this->render_login_registration_shortcode( $atts );
 		} elseif ( 'true' === $atts['lost_password'] ) {
 				return $this->wholesalex_forgot_password_form();
-		} elseif ( 'true' === $atts['lost_password'] ) {
-				return $this->wholesalex_forgot_password_form();
 		} else {
 			return '';
 		}
@@ -722,8 +787,6 @@ class WHOLESALEX_Shortcodes {
 		}
 		if ( $this->check_current_page_is_lost_password() ) {
 			return $this->render_login_shortcode( $atts );
-		} elseif ( 'true' === $atts['lost_password'] ) {
-				return $this->wholesalex_forgot_password_form();
 		} elseif ( 'true' === $atts['lost_password'] ) {
 				return $this->wholesalex_forgot_password_form();
 		} else {
@@ -940,18 +1003,7 @@ class WHOLESALEX_Shortcodes {
 							}
 						});
 
-						// Validate at least one checkbox is checked in each checkbox group
-						wrapper.find(".wsx-field-required .wsx-form-checkbox").each(function () {
-							let checkboxes = $(this).find("input[type='checkbox']");
-							let checkboxGroupName = $(this).find("input[type='checkbox']").attr("name").replace(/\[\]/g, '');
-
-							if (checkboxes.length > 0 && checkboxes.filter(":checked").length === 0) {
-								isValid = false;
-							} else {
-								// Clear warning message for the checkbox group
-								wrapper.find(".wsx-form-field-warning-message." + checkboxGroupName).text("");
-							}
-						});
+						validateProviderFields();
 
 
 					}
@@ -983,7 +1035,7 @@ class WHOLESALEX_Shortcodes {
 					//Check Password Validation
 					const checkPassWordRequiredFields = ()=> {
 						let isPasswordValid = true;
-						wrapper.find(".wsx-field-required input, .wsx-field-required select, .wsx-field-required textarea, .wsx-field-required radio").each(function() {
+						wrapper.find(".wsx-field-required input, .wsx-field-required select, .wsx-field-required textarea").each(function() {
 						let fieldName = $(this).attr("name");
 								if(fieldName) {
 									fieldName = fieldName.replace(/\[\]/g, '');
@@ -1014,7 +1066,7 @@ class WHOLESALEX_Shortcodes {
 						let isValid = true;
 
 
-						wrapper.find(".wsx-field-required input, .wsx-field-required select, .wsx-field-required textarea, .wsx-field-required radio").each(function() {
+						wrapper.find(".wsx-field-required input, .wsx-field-required select, .wsx-field-required textarea").each(function() {
 							if ($(this).val().trim() === "") {
 								let fieldName = $(this).attr("name");
 								if(fieldName) {
@@ -1032,60 +1084,13 @@ class WHOLESALEX_Shortcodes {
 							}
 						});
 
-						// Validate at least one checkbox is checked in each checkbox group
-						wrapper.find(".wsx-field-required .wsx-form-checkbox").each(function () {
-							let checkboxes = $(this).find("input[type='checkbox']");
-							let fieldName = '';
-							if(checkboxes.length) {
-								fieldName = checkboxes[0].name;
-								fieldName = fieldName.replace(/\[\]/g, '');
+						wrapper.find('.wsx-field-required input[name="wholesalex_term_condition"]').each(function () {
+							if (!this.checked && $(this).is(':visible')) {
+								isValid = false;
 							}
-
-							if(wrapper.find(`.wsx-field-${fieldName}`).css('display') !== 'none') {
-
-								if (checkboxes.length > 0 && checkboxes.filter(":checked").length === 0) {
-									isValid = false;
-
-									wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')}${wholesalex.is_required}!`);
-									wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
-
-								} else {
-									wrapper.find(this).closest('.wsx-form-field').find('.wsx-form-field-warning-message').text("");
-									wrapper.find(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').removeClass('wsx-field-warning');
-
-								}
-
-							}
-
-						});
-						// Validate at least one checkbox is checked in each checkbox group
-						wrapper.find(".wsx-field-required .wsx-field-radio").each(function () {
-							let checkboxes = $(this).find("input[type='radio']");
-							let fieldName = '';
-							if(checkboxes.length) {
-								fieldName = checkboxes[0].name;
-								fieldName = fieldName.replace(/\[\]/g, '');
-							}
-
-							if(wrapper.find(`.wsx-field-${fieldName}`).css('display') !== 'none') {
-
-								if (checkboxes.length > 0 && checkboxes.filter(":checked").length === 0) {
-									isValid = false;
-
-									$(`.wsx-form-field-warning-message.${fieldName}`).text(`${fieldName.replace('_', ' ')} ${wholesalex.is_required}!`);
-									$(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').addClass('wsx-field-warning');
-
-								} else {
-									$(this).closest('.wsx-form-field').find('.wsx-form-field-warning-message').text("");
-									$(`.wsx-form-field-warning-message.${fieldName}`).parent().find('.wsx-form-field').removeClass('wsx-field-warning');
-
-								}
-
-							}
-
 						});
 
-						return isValid;
+						return validateProviderFields() && isValid;
 
 					}
 					const checkLoginRequiredFields = ()=> {
@@ -1138,6 +1143,7 @@ class WHOLESALEX_Shortcodes {
 					}
 
 
+					let validateProviderFields = () => true;
 		<?php do_action( 'wholesalex_registration_inline_script', $registration_fields ); ?>
 					const checkRecaptchaV2 = (form) => {
 						const $form = $(form);
@@ -1217,7 +1223,7 @@ class WHOLESALEX_Shortcodes {
 					wrapper.trigger('wholesalex:field-change');
 					handleHiddenRow();
 
-					wrapper.find('.wsx-field input, .wsx-field textarea, .wsx-field radio, .wsx-field select').on('change input',function(e){
+					wrapper.find('.wsx-field input, .wsx-field textarea, .wsx-field select').on('change input',function(e){
 						checkConfirmPassword();
 						checkConfirmEmail();
 						controlRegistrationForm();
@@ -1803,7 +1809,19 @@ class WHOLESALEX_Shortcodes {
 	 * @return array Role Field.
 	 */
 	public function generate_form_field( $field, $is_role_wise = false, $input_variation = '', $is_only_b2b = false ) {
-		if ( ! apply_filters( 'wholesalex_registration_field_available', WholesaleX_CommonUtils::is_standard_form_field( $field ), $field ) ) {
+		if ( ! WholesaleX_CommonUtils::is_standard_form_field( $field ) ) {
+			$output = Registration_Provider::render(
+				$field,
+				array(
+					'surface'         => 'registration',
+					'input_variation' => $input_variation,
+					'is_role_wise'    => $is_role_wise,
+					'is_only_b2b'     => $is_only_b2b,
+				)
+			);
+			if ( ! is_wp_error( $output ) ) {
+				echo wp_kses( $output, $this->get_form_field_allowed_html() );
+			}
 			return;
 		}
 		if ( ! isset( $field['name'] ) ) {
@@ -1830,7 +1848,7 @@ class WHOLESALEX_Shortcodes {
 		switch ( $input_variation ) {
 			case 'variation_1':
 			case 'variation_3':
-				switch ( apply_filters( 'wholesalex_registration_render_type', $field['type'], $input_variation ) ) {
+				switch ( $field['type'] ) {
 					case 'text':
 					case 'email':
 						?>
@@ -1943,9 +1961,16 @@ class WHOLESALEX_Shortcodes {
 							?>
 
 							<div class="wsx-field-content">
-								<?php foreach ( $field['option'] as $option ) : ?>
+								<?php
+								foreach ( array(
+									array(
+										'value' => 'rememberme',
+										'name'  => __( 'Remember me', 'wholesalex' ),
+									),
+								) as $option ) :
+									?>
 									<div class="wholesalex-field-wrap">
-										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $field['name'] . '_' . $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $field['name'] . '_' . $option['value'] ); ?>" name="rememberme" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<label class="wsx-label wsx-label" for="<?php echo esc_attr( $field['name'] . '_' . $option['value'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 									</div>
 								<?php endforeach; ?>
@@ -1959,46 +1984,6 @@ class WHOLESALEX_Shortcodes {
 						break;
 					case 'termCondition':
 						$this->render_term_condition_field( $field, $is_label_hide );
-						break;
-
-					case 'tel':
-						?>
-						<div class="wsx-form-field">
-							<?php
-							if ( ! $is_label_hide ) {
-								?>
-									<div class="wsx-field-heading">
-										<?php
-										if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) :
-											?>
-											<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>">
-												<?php echo esc_html( $field['label'] ); ?>
-												<?php
-												if ( isset( $field['required'] ) && $field['required'] ) {
-													?>
-														<span aria-label="required">*</span>
-													<?php
-												}
-												?>
-											</label>
-										<?php endif; ?>
-									</div>
-								<?php
-							}
-
-							?>
-
-							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type='tel' name="<?php echo esc_attr( $field['name'] ); ?>"   placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
-						</div>
-						<?php
-						if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) :
-							?>
-							<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
-							<?php
-						endif;
-						?>
-						<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
-						<?php
 						break;
 
 					case 'url':
@@ -2111,11 +2096,10 @@ class WHOLESALEX_Shortcodes {
 				}
 				break;
 			case 'variation_2':
-				switch ( apply_filters( 'wholesalex_registration_render_type', $field['type'], $input_variation ) ) {
+				switch ( $field['type'] ) {
 					case 'text':
 					case 'email':
 					case 'url':
-					case 'tel':
 						?>
 						<div class="wsx-form-field wsx-outline-focus">
 							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>"  placeholder="<?php echo esc_attr( isset( $field['placeholder'] ) ? $field['placeholder'] : '' ); ?>" />
@@ -2281,9 +2265,16 @@ class WHOLESALEX_Shortcodes {
 							}
 							?>
 							<div class="wsx-field-content">
-							<?php foreach ( $field['option'] as $option ) : ?>
+							<?php
+							foreach ( array(
+								array(
+									'value' => 'rememberme',
+									'name'  => __( 'Remember me', 'wholesalex' ),
+								),
+							) as $option ) :
+								?>
 									<label class="wsx-label wholesalex-field-wrap" for="<?php echo esc_attr( $field['name'] ); ?>">
-										<input type="checkbox" class="wsx-checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input type="checkbox" class="wsx-checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="rememberme" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<div><?php echo esc_html( $option['name'] ); ?></div>
 									</label>
 								<?php endforeach; ?>
@@ -2305,11 +2296,10 @@ class WHOLESALEX_Shortcodes {
 				}
 				break;
 			case 'variation_4':
-				switch ( apply_filters( 'wholesalex_registration_render_type', $field['type'], $input_variation ) ) {
+				switch ( $field['type'] ) {
 					case 'text':
 					case 'email':
 					case 'url':
-					case 'tel':
 						?>
 						<!-- wsx-form-field--focused -->
 
@@ -2445,9 +2435,16 @@ class WHOLESALEX_Shortcodes {
 						?>
 
 							<div class="wsx-field-content">
-							<?php foreach ( $field['option'] as $option ) : ?>
+							<?php
+							foreach ( array(
+								array(
+									'value' => 'rememberme',
+									'name'  => __( 'Remember me', 'wholesalex' ),
+								),
+							) as $option ) :
+								?>
 									<label class="wsx-label wholesalex-field-wrap" for="<?php echo esc_attr( $field['name'] ); ?>">
-										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="rememberme" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<label class="wsx-label" for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 									</label>
 								<?php endforeach; ?>
@@ -2471,11 +2468,10 @@ class WHOLESALEX_Shortcodes {
 				}
 				break;
 			case 'variation_5':
-				switch ( apply_filters( 'wholesalex_registration_render_type', $field['type'], $input_variation ) ) {
+				switch ( $field['type'] ) {
 					case 'text':
 					case 'email':
 					case 'url':
-					case 'tel':
 						?>
 						<!-- wsx-form-field--focused -->
 
@@ -2614,9 +2610,16 @@ class WHOLESALEX_Shortcodes {
 						?>
 
 							<div class="wsx-field-content">
-						<?php foreach ( $field['option'] as $option ) : ?>
+						<?php
+						foreach ( array(
+							array(
+								'value' => 'rememberme',
+								'name'  => __( 'Remember me', 'wholesalex' ),
+							),
+						) as $option ) :
+							?>
 									<label class="wsx-label wholesalex-field-wrap" for="<?php echo esc_attr( $field['name'] ); ?>">
-										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="rememberme" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<div for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></div>
 									</label>
 								<?php endforeach; ?>
@@ -2643,11 +2646,10 @@ class WHOLESALEX_Shortcodes {
 				$variation_6_placeholder  = isset( $field['label'] ) ? (string) $field['label'] : '';
 				$variation_6_placeholder .= isset( $field['required'] ) && $field['required'] ? '*' : '';
 
-				switch ( apply_filters( 'wholesalex_registration_render_type', $field['type'], $input_variation ) ) {
+				switch ( $field['type'] ) {
 					case 'text':
 					case 'email':
 					case 'url':
-					case 'tel':
 						?>
 						<!-- wsx-form-field--focused -->
 
@@ -2764,9 +2766,16 @@ class WHOLESALEX_Shortcodes {
 								?>
 
 							<div class="wsx-field-content">
-						<?php foreach ( $field['option'] as $option ) : ?>
+						<?php
+						foreach ( array(
+							array(
+								'value' => 'rememberme',
+								'name'  => __( 'Remember me', 'wholesalex' ),
+							),
+						) as $option ) :
+							?>
 									<label class="wsx-label wholesalex-field-wrap" for="<?php echo esc_attr( $field['name'] ); ?>">
-										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="rememberme" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<div for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></div>
 									</label>
 								<?php endforeach; ?>
@@ -2790,11 +2799,10 @@ class WHOLESALEX_Shortcodes {
 				}
 				break;
 			case 'variation_7':
-				switch ( apply_filters( 'wholesalex_registration_render_type', $field['type'], $input_variation ) ) {
+				switch ( $field['type'] ) {
 					case 'text':
 					case 'email':
 					case 'url':
-					case 'tel':
 						?>
 						<div class="wsx-form-field wsx-outline-focus wsx-formBuilder-input-width">
 							<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type="<?php echo esc_attr( $field['type'] ); ?>"  name="<?php echo esc_attr( $field['name'] ); ?>" placeholder=" " />
@@ -2944,9 +2952,16 @@ class WHOLESALEX_Shortcodes {
 
 						?>
 							<div class="wsx-field-content">
-						<?php foreach ( $field['option'] as $option ) : ?>
+						<?php
+						foreach ( array(
+							array(
+								'value' => 'rememberme',
+								'name'  => __( 'Remember me', 'wholesalex' ),
+							),
+						) as $option ) :
+							?>
 									<label class="wsx-label wholesalex-field-wrap" for="<?php echo esc_attr( $field['name'] ); ?>">
-										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+										<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="rememberme" value="<?php echo esc_attr( $option['value'] ); ?>" />
 										<div for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></div>
 									</label>
 								<?php endforeach; ?>
@@ -2971,7 +2986,7 @@ class WHOLESALEX_Shortcodes {
 				break;
 			case 'variation_9':
 			case 'variation_8':
-				switch ( apply_filters( 'wholesalex_registration_render_type', $field['type'], $input_variation ) ) {
+				switch ( $field['type'] ) {
 					case 'text':
 					case 'email':
 						?>
@@ -3054,9 +3069,16 @@ class WHOLESALEX_Shortcodes {
 						}
 						?>
 								<div class="wsx-field-content">
-							<?php foreach ( $field['option'] as $option ) : ?>
+							<?php
+							foreach ( array(
+								array(
+									'value' => 'rememberme',
+									'name'  => __( 'Remember me', 'wholesalex' ),
+								),
+							) as $option ) :
+								?>
 										<div class="wholesalex-field-wrap">
-											<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="<?php echo esc_attr( $field['name'] ); ?>[]" value="<?php echo esc_attr( $option['value'] ); ?>" />
+											<input class="wsx-checkbox" type="checkbox" id="<?php echo esc_attr( $option['value'] ); ?>" name="rememberme" value="<?php echo esc_attr( $option['value'] ); ?>" />
 											<label class="wsx-label" for="<?php echo esc_attr( $option['name'] ); ?>"><?php echo esc_html( $option['name'] ); ?></label>
 										</div>
 									<?php endforeach; ?>
@@ -3073,41 +3095,6 @@ class WHOLESALEX_Shortcodes {
 
 					case 'termCondition':
 						$this->render_term_condition_field( $field, $is_label_hide );
-						break;
-
-					case 'tel':
-						?>
-							<!-- wsx-form-field--focused -->
-							<div class="wsx-form-field">
-								<?php
-								if ( ! $is_label_hide ) {
-									?>
-										<div class="wsx-field-heading">
-									<?php if ( ! isset( $field['isLabelHide'] ) || ! $field['isLabelHide'] ) : ?>
-												<label class='wsx-label wsx-form-label' for="<?php echo esc_attr( $field['name'] ); ?>"><?php echo esc_html( $field['label'] ); ?>
-												<?php
-												if ( isset( $field['required'] ) && $field['required'] ) {
-													?>
-														<span aria-label="required">*</span>
-													<?php
-												}
-												?>
-												</label>
-											<?php endif; ?>
-
-										</div>
-										<?php
-								}
-								?>
-								<input class="wsx-input" id="<?php echo esc_attr( $field['name'] ); ?>" type='tel' name="<?php echo esc_attr( $field['name'] ); ?>"   />
-							</div>
-							<?php if ( isset( $field['help_message'] ) && ! empty( $field['help_message'] ) ) : ?>
-								<span class='wsx-form-field-help-message'><?php echo esc_html( $field['help_message'] ); ?></span>
-								<?php
-							endif;
-							?>
-							<span class='wsx-form-field-warning-message <?php echo esc_attr( $field['name'] ); ?>'></span>
-							<?php
 						break;
 
 					case 'url':
@@ -3214,65 +3201,6 @@ class WHOLESALEX_Shortcodes {
 
 
 	/**
-	 * Sanitize Form Data
-	 *
-	 * @param array $form_data Form Data.
-	 */
-	public function sanitize_form_data( $form_data ) {
-		$data = array();
-		foreach ( $form_data as $key => $value ) {
-			$key = sanitize_key( $key );
-			switch ( $key ) {
-				case 'description':
-					$data[ $key ] = sanitize_textarea_field( $value );
-					break;
-				case ( preg_match( '#^textarea(.*)$#i', $key ) ? true : false ):
-					$data[ $key ] = sanitize_textarea_field( $value );
-					break;
-				case 'user_pass':
-				case 'display_name':
-				case 'nickname':
-				case 'first_name':
-				case 'last_name':
-				case ( preg_match( '#^text(.*)$#i', $key ) ? true : false ):
-						$data[ $key ] = sanitize_text_field( $value );
-					break;
-				case 'url':
-					$data[ $key ] = sanitize_url( $value );
-					break;
-				case ( preg_match( '#^email(.*)$#i', $key ) ? true : false ):
-				case 'user_email':
-					$data[ $key ] = sanitize_email( $value );
-					break;
-				case ( preg_match( '#^select(.*)$#i', $key ) ? true : false ):
-				case ( preg_match( '#^checkbox(.*)$#i', $key ) ? true : false ):
-				case ( preg_match( '#^number(.*)$#i', $key ) ? true : false ):
-				case ( preg_match( '#^radio(.*)$#i', $key ) ? true : false ):
-				case ( preg_match( '#^date(.*)$#i', $key ) ? true : false ):
-					if ( is_array( $value ) ) {
-						$data[ $key ] = wholesalex()->sanitize( $value );
-					} else {
-						$data[ $key ] = sanitize_text_field( $value );
-					}
-					break;
-				case 'user_login':
-					$data[ $key ] = sanitize_user( $value );
-					break;
-
-				default:
-					if ( is_array( $value ) ) {
-						$data[ $key ] = wholesalex()->sanitize( $value );
-					} else {
-						$data[ $key ] = sanitize_text_field( $value );
-					}
-					break;
-			}
-		}
-
-		return $data;
-	}
-
-	/**
 	 * Enqueue WooCommerce Passowrd Meter For wholesalex registration form
 	 *
 	 * @return void
@@ -3332,15 +3260,6 @@ class WHOLESALEX_Shortcodes {
 					throw new \Exception();
 				}
 
-				// On multisite, ensure user exists on current site, if not add them before allowing login.
-				if ( is_multisite() ) {
-					$user_data = get_user_by( is_email( $creds['user_login'] ) ? 'email' : 'login', $creds['user_login'] );
-
-					if ( $user_data && ! is_user_member_of_blog( $user_data->ID, get_current_blog_id() ) ) {
-						add_user_to_blog( get_current_blog_id(), $user_data->ID, 'customer' );
-					}
-				}
-
 				// Peform the login.
 				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Invoke the existing WooCommerce extension hook.
 				$user = wp_signon( apply_filters( 'woocommerce_login_credentials', $creds ), is_ssl() );
@@ -3368,6 +3287,17 @@ class WHOLESALEX_Shortcodes {
 
 					throw new \Exception();
 				} else {
+
+					// Joining a site is an explicit site policy, evaluated only for the
+					// authenticated identity. Never change a network administrator's role.
+					$blog_id = get_current_blog_id();
+					if ( is_multisite() && ! is_super_admin( $user->ID ) && ! is_user_member_of_blog( $user->ID, $blog_id ) && true === apply_filters( 'wholesalex_allow_authenticated_site_join', false, $user, $blog_id ) ) {
+						$joined = add_user_to_blog( $blog_id, $user->ID, 'customer' );
+						if ( is_wp_error( $joined ) ) {
+							$data['error_messages']['site_membership'] = $joined->get_error_message();
+							throw new \Exception();
+						}
+					}
 
 					// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Invoke the existing WooCommerce extension hook.
 					$data['redirect'] = wp_validate_redirect( apply_filters( 'woocommerce_login_redirect', wc_get_page_permalink( 'myaccount' ), $user ), wc_get_page_permalink( 'myaccount' ) );

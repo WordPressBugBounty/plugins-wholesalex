@@ -33,8 +33,6 @@
 
 namespace WHOLESALEX;
 
-defined( 'ABSPATH' ) || exit;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -48,9 +46,13 @@ class Wholesale_Pricing_Rest_Api {
 	// ── Constructor ───────────────────────────────────────────────────────────
 
 	/**
-	 * Initialize handlers and register hooks.
+	 * Initialize handlers and optionally register routes.
+	 *
+	 * @param bool $register_hooks Whether to attach REST registration.
 	 */
-	public function __construct() {
+	public function __construct( bool $register_hooks = true ) {
+		if ( ! $register_hooks ) {
+			return; }
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
@@ -114,6 +116,10 @@ class Wholesale_Pricing_Rest_Api {
 		$resource = sanitize_key( (string) $request->get_param( 'resource' ) );
 		$search   = sanitize_text_field( (string) $request->get_param( 'search' ) );
 
+		if ( 'pricing' === $resource ) {
+			return $this->get_builder_pricing( $request );
+		}
+
 		if ( 'users' === $resource ) {
 			$user_ids = $this->normalize_preview_ids( $request->get_param( 'user_ids' ) );
 			return rest_ensure_response(
@@ -125,7 +131,7 @@ class Wholesale_Pricing_Rest_Api {
 		}
 
 		$filter          = sanitize_key( (string) $request->get_param( 'product_filter' ) );
-		$allowed_filters = array( 'all_products', 'specific_products', 'specific_variations', 'specific_categories', 'brands', 'attributes', 'sku' );
+		$allowed_filters = apply_filters( 'wholesalex_pricing_product_filters', array( 'all_products', 'specific_products', 'specific_variations', 'specific_categories' ) );
 		if ( ! in_array( $filter, $allowed_filters, true ) ) {
 			return new \WP_Error( 'rest_invalid_param', __( 'Unknown product target.', 'wholesalex' ), array( 'status' => 400 ) );
 		}
@@ -165,6 +171,73 @@ class Wholesale_Pricing_Rest_Api {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Resolve saved rules plus the unsaved edit without changing customer/session data.
+	 *
+	 * @param \WP_REST_Request $request Preview request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	private function get_builder_pricing( \WP_REST_Request $request ) {
+		$raw     = $request->get_param( 'rule' );
+		$product = wc_get_product( absint( $request->get_param( 'product_id' ) ) );
+		if ( ! is_array( $raw ) || ! $product ) {
+			return new \WP_Error( 'rest_invalid_param', __( 'Select a product and pricing rule to preview.', 'wholesalex' ), array( 'status' => 400 ) );
+		}
+		$input_error = $this->validate_input( $raw );
+		if ( is_wp_error( $input_error ) ) {
+			return $input_error; }
+		$draft   = $this->sanitize_rule( $raw );
+		$context = Wholesale_Pricing::get_manager_context();
+		if ( $context['is_vendor'] ) {
+			$parent_id = $product->get_parent_id();
+			$parent_id = $parent_id ? $parent_id : $product->get_id();
+			if ( absint( get_post_field( 'post_author', $parent_id ) ) !== $context['vendor_id'] ) {
+				return new \WP_Error( 'wholesalex_forbidden', __( 'You cannot preview another vendor’s product.', 'wholesalex' ), array( 'status' => 403 ) );
+			}
+			$draft['owner_id']   = $context['vendor_id'];
+			$draft['owner_type'] = $context['owner_type'];
+		}
+		$rules       = Wholesale_Pricing::get_rules_for_current_manager();
+		$user_id     = absint( $request->get_param( 'user_id' ) );
+		$role_id     = $user_id ? wholesalex()->get_user_role( $user_id ) : sanitize_key( (string) $request->get_param( 'role_id' ) );
+		$user_filter = static function () use ( $user_id ) {
+			return $user_id;
+		};
+		$role_filter = static function () use ( $role_id ) {
+			return $role_id;
+		};
+		add_filter( 'wholesalex_set_current_user', $user_filter, PHP_INT_MAX );
+		add_filter( 'wholesalex_user_role', $role_filter, PHP_INT_MAX );
+		try {
+			$engine = new Wholesale_Pricing_Rule_Engine( false );
+			$engine->prepare_builder_rules( $rules, $draft, $role_id, $user_id );
+			$products = array();
+			if ( $product->is_type( 'variable' ) ) {
+				$ids = $product->get_visible_children();
+			} elseif ( $product->is_type( 'grouped' ) ) {
+				$ids = $product->get_children();
+			} else {
+				$ids = array( $product->get_id() );
+			}
+			foreach ( $ids as $id ) {
+				$child = wc_get_product( $id );
+				if ( ! $child || $child->is_type( 'grouped' ) || ! $child->is_visible() || '' === $child->get_price( 'edit' ) ) {
+					continue;
+				}
+				$products[] = $engine->get_builder_product_pricing( $child );
+			}
+			return rest_ensure_response(
+				array(
+					'success' => true,
+					'data'    => array( 'products' => $products ),
+				)
+			);
+		} finally {
+			remove_filter( 'wholesalex_set_current_user', $user_filter, PHP_INT_MAX );
+			remove_filter( 'wholesalex_user_role', $role_filter, PHP_INT_MAX );
+		}
 	}
 
 	/**
@@ -331,25 +404,6 @@ class Wholesale_Pricing_Rest_Api {
 	}
 
 	/**
-	 * Append unique product IDs without exceeding the preview result limit.
-	 *
-	 * @param array<int> $target Product IDs collected so far.
-	 * @param array<int> $source Product IDs returned by a scoped query.
-	 * @return void
-	 */
-	private function append_preview_product_ids( array &$target, array $source ): void {
-		foreach ( $source as $product_id ) {
-			$product_id = absint( $product_id );
-			if ( $product_id && ! in_array( $product_id, $target, true ) ) {
-				$target[] = $product_id;
-			}
-			if ( count( $target ) >= 20 ) {
-				return;
-			}
-		}
-	}
-
-	/**
 	 * Format one WooCommerce product for the preview UI.
 	 *
 	 * @param int    $product_id Product ID.
@@ -360,6 +414,17 @@ class Wholesale_Pricing_Rest_Api {
 		$product = wc_get_product( absint( $product_id ) );
 		if ( ! $product ) {
 			return null;
+		}
+
+		$grouped_children = array();
+		if ( $product->is_type( 'grouped' ) ) {
+			foreach ( $product->get_children() as $child_id ) {
+				$child = wc_get_product( $child_id );
+				if ( ! $child || $child->is_type( 'grouped' ) || ! $child->is_visible() || '' === $child->get_price( 'edit' ) ) {
+					continue;
+				}
+				$grouped_children[] = $this->format_preview_product( $child_id, $role_id );
+			}
 		}
 
 		$regular_price = $product->is_type( 'variable' )
@@ -400,6 +465,8 @@ class Wholesale_Pricing_Rest_Api {
 
 		return array(
 			'value'              => $product->get_id(),
+			'type'               => $product->get_type(),
+			'grouped_children'   => $grouped_children,
 			'name'               => $product->get_name(),
 			'permalink'          => esc_url_raw( $product->get_permalink() ),
 			'description'        => wp_trim_words( wp_strip_all_tags( $description ), 24, '&hellip;' ),
@@ -598,7 +665,7 @@ class Wholesale_Pricing_Rest_Api {
 			);
 		}
 
-		$rule = json_decode( $rule_json, true );
+		$rule = is_array( $rule_json ) ? $rule_json : ( is_string( $rule_json ) ? json_decode( $rule_json, true ) : null );
 
 		if ( ! is_array( $rule ) ) {
 			return rest_ensure_response(
@@ -614,27 +681,68 @@ class Wholesale_Pricing_Rest_Api {
 			return $this->forbidden_rule_response();
 		}
 
-		// Settings of features this plugin does not handle are kept as saved, so
-		// editing a rule never discards them. Such rules are skipped at runtime.
-		$preserve_unavailable = is_array( $existing ) && '' !== Wholesale_Pricing_Rule_Registry::unavailable_feature( $existing );
-		$keep_unhandled       = ! $preserve_unavailable && '' !== Wholesale_Pricing_Rule_Registry::unavailable_feature( $rule );
-		$premium_keys         = array( 'rule_type', 'discount_type', 'product_filter', 'brands', 'attributes', 'skus', 'tiers', 'bxgy', 'conditions', 'restrictions' );
-		if ( $preserve_unavailable ) {
-			foreach ( $premium_keys as $key ) {
-				if ( array_key_exists( $key, $existing ) ) {
-					$rule[ $key ] = $existing[ $key ];
+		$provider = Wholesale_Pricing::provider_operation( 'save', $id, $rule, $existing );
+		if ( null !== $provider ) {
+			return is_wp_error( $provider ) ? $provider : rest_ensure_response(
+				array(
+					'success' => true,
+					'data'    => $provider,
+				)
+			);
+		}
+		if ( is_array( $existing ) && Wholesale_Pricing::has_provider_record( $existing ) ) {
+			$saved = Wholesale_Pricing::save_rule( $id, array( 'title' => sanitize_text_field( $rule['title'] ?? $existing['title'] ?? '' ) ) );
+			return is_wp_error( $saved ) ? $saved : rest_ensure_response(
+				array(
+					'success' => true,
+					'data'    => $saved,
+				)
+			);
+		}
+		$ownership = Wholesale_Pricing::validate_provider_write( $rule, $existing );
+		if ( is_wp_error( $ownership ) ) {
+			return $ownership;
+		}
+		$input_error = $this->validate_input( $rule, is_array( $existing ) ? $existing : array() );
+		if ( is_wp_error( $input_error ) ) {
+			return $input_error; }
+		$candidate   = array_replace( is_array( $existing ) ? $existing : array(), $rule );
+		$unavailable = Wholesale_Pricing_Rule_Registry::unavailable_feature( $candidate );
+		if ( '' !== $unavailable ) {
+			$free_fields     = array( 'id', 'title', 'status', 'regular', 'product_discount', 'cart', 'bogo', 'products', 'categories', 'exclude_products', 'user_role_filter', 'user_roles', 'specific_users', 'schedule' );
+			$provider_fields = array_diff_key( $rule, array_flip( $free_fields ) );
+			$unchanged       = is_array( $existing );
+			foreach ( $provider_fields as $key => $value ) {
+				if ( ! is_array( $existing ) || ! array_key_exists( $key, $existing ) || $value !== $existing[ $key ] ) {
+					$unchanged = false;
+					break;
+				}
+			}
+			if ( ! $unchanged ) {
+				return new \WP_Error(
+					'wholesalex_provider_unavailable',
+					__( 'The provider for this pricing operation is unavailable.', 'wholesalex' ),
+					array(
+						'status'  => 409,
+						'feature' => $unavailable,
+					)
+				);
+			}
+		}
+		$sanitized = $this->sanitize_rule( $candidate, is_array( $existing ) ? $existing : array() );
+		if ( '' !== $unavailable && is_array( $existing ) ) {
+			foreach ( array( 'rule_type', 'product_filter', 'discount_type', 'conditions' ) as $key ) {
+				if ( array_key_exists( $key, $existing ) && ( ! array_key_exists( $key, $rule ) || $rule[ $key ] === $existing[ $key ] ) ) {
+					$sanitized[ $key ] = $existing[ $key ];
 				}
 			}
 		}
 
-		$sanitized = $this->sanitize_rule( $rule );
-		foreach ( $premium_keys as $key ) {
-			if ( $preserve_unavailable && array_key_exists( $key, $existing ) ) {
-				$sanitized[ $key ] = $existing[ $key ];
-			} elseif ( $keep_unhandled && isset( $rule[ $key ] ) && empty( $sanitized[ $key ] ) ) {
-				$sanitized[ $key ] = is_array( $rule[ $key ] ) ? wholesalex()->sanitize( $rule[ $key ] ) : sanitize_text_field( (string) $rule[ $key ] );
-			}
+		// Only authoritative unknown fields survive a Free save.
+		if ( is_array( $existing ) ) {
+			$sanitized = array_replace( $existing, $sanitized );
 		}
+
 		$context = Wholesale_Pricing::get_manager_context();
 
 		if ( $context['is_vendor'] ) {
@@ -699,6 +807,8 @@ class Wholesale_Pricing_Rest_Api {
 		}
 
 		$saved = Wholesale_Pricing::save_rule( $id, $sanitized );
+		if ( is_wp_error( $saved ) ) {
+			return $saved; }
 
 		return rest_ensure_response(
 			array(
@@ -713,6 +823,7 @@ class Wholesale_Pricing_Rest_Api {
 	 * Delete a single rule, optionally retaining a recoverable trash copy.
 	 *
 	 * @param array $params Raw request params.
+	 * @param bool  $trash Whether to archive the record first.
 	 * @return \WP_REST_Response
 	 */
 	private function handle_delete( array $params, bool $trash = false ) {
@@ -732,16 +843,29 @@ class Wholesale_Pricing_Rest_Api {
 			return $this->forbidden_rule_response();
 		}
 
+		$check = Wholesale_Pricing::provider_operation( 'validate_delete', $id, array(), $rule );
+		if ( is_wp_error( $check ) ) {
+			return $check; }
 		if ( $trash ) {
 			// Keep a recoverable copy outside the rules used for storefront pricing.
 			$trash_key = '__wholesalex_trashed_pricing_rule_' . $id;
-			$archived  = array( 'rule' => $rule, 'trashed_at' => time() );
+			$archived  = array(
+				'rule'       => $rule,
+				'trashed_at' => time(),
+			);
 			if ( ! update_option( $trash_key, $archived, false ) && get_option( $trash_key ) !== $archived ) {
-				return rest_ensure_response( array( 'success' => false, 'message' => __( 'Failed to move pricing rule to trash.', 'wholesalex' ) ) );
+				return rest_ensure_response(
+					array(
+						'success' => false,
+						'message' => __( 'Failed to move pricing rule to trash.', 'wholesalex' ),
+					)
+				);
 			}
 		}
 
-		Wholesale_Pricing::delete_rule( $id );
+		$deleted = Wholesale_Pricing::delete_rule( $id );
+		if ( is_wp_error( $deleted ) ) {
+			return $deleted; }
 
 		return rest_ensure_response(
 			array(
@@ -774,10 +898,15 @@ class Wholesale_Pricing_Rest_Api {
 			if ( ! is_array( $rule ) || ! Wholesale_Pricing::current_manager_owns_rule( $rule ) ) {
 				return $this->forbidden_rule_response();
 			}
+			$check = Wholesale_Pricing::provider_operation( 'validate_delete', $id, array(), $rule );
+			if ( is_wp_error( $check ) ) {
+				return $check; }
 		}
 
 		foreach ( $ids as $id ) {
-			Wholesale_Pricing::delete_rule( $id );
+			$deleted = Wholesale_Pricing::delete_rule( $id );
+			if ( is_wp_error( $deleted ) ) {
+				return $deleted; }
 		}
 
 		return rest_ensure_response(
@@ -821,13 +950,18 @@ class Wholesale_Pricing_Rest_Api {
 			if ( ! is_array( $rule ) || ! Wholesale_Pricing::current_manager_owns_rule( $rule ) ) {
 				return $this->forbidden_rule_response();
 			}
+			$check = Wholesale_Pricing::provider_operation( 'validate_status', $id, array(), $rule );
+			if ( is_wp_error( $check ) ) {
+				return $check; }
 		}
 
 		foreach ( $ids as $id ) {
 			$rule = Wholesale_Pricing::get_rule( $id );
 			if ( is_array( $rule ) && Wholesale_Pricing::current_manager_owns_rule( $rule ) ) {
 				$rule['status'] = $next_status;
-				Wholesale_Pricing::save_rule( $id, $rule );
+				$saved          = Wholesale_Pricing::save_rule( $id, $rule );
+				if ( is_wp_error( $saved ) ) {
+					return $saved; }
 			}
 		}
 
@@ -847,9 +981,9 @@ class Wholesale_Pricing_Rest_Api {
 	 */
 	private function decode_ids_param( array $params ) {
 		$ids_raw = isset( $params['ids'] ) ? wp_unslash( $params['ids'] ) : '[]';
-		$ids     = json_decode( $ids_raw, true );
+		$ids     = is_array( $ids_raw ) ? $ids_raw : ( is_string( $ids_raw ) ? json_decode( $ids_raw, true ) : null );
 
-		if ( ! is_array( $ids ) ) {
+		if ( ! is_array( $ids ) || count( array_filter( $ids, 'is_scalar' ) ) !== count( $ids ) ) {
 			return new \WP_Error( 'invalid_ids', __( 'Invalid IDs parameter.', 'wholesalex' ) );
 		}
 
@@ -897,9 +1031,7 @@ class Wholesale_Pricing_Rest_Api {
 	private function validate_vendor_product_ownership( array $rule, int $vendor_id ) {
 		$product_fields = array( 'products', 'exclude_products' );
 
-		if ( isset( $rule['bxgy']['free_products'] ) ) {
-			$product_fields[] = array( 'bxgy', 'free_products' );
-		}
+		$product_fields = apply_filters( 'wholesalex_pricing_vendor_product_fields', $product_fields, $rule );
 
 		foreach ( $product_fields as $field ) {
 			$items = is_array( $field )
@@ -928,15 +1060,68 @@ class Wholesale_Pricing_Rest_Api {
 
 	// ── Sanitisation ──────────────────────────────────────────────────────────
 
+	/** Reject malformed submitted fields before normalization can discard restrictions.
+	 *
+	 * @param array $rule Submitted rule.
+	 * @param array $authoritative Stored provider metadata.
+	 * @return true|\WP_Error
+	 */
+	public function validate_input( array $rule, array $authoritative = array() ) {
+		$error = new \WP_Error( 'rest_invalid_param', __( 'Invalid pricing rule fields or conditions.', 'wholesalex' ), array( 'status' => 400 ) );
+		foreach ( array( 'products', 'categories', 'exclude_products', 'user_roles', 'specific_users', 'regular', 'product_discount', 'cart', 'bogo', 'schedule', 'conditions' ) as $key ) {
+			if ( array_key_exists( $key, $rule ) && ! is_array( $rule[ $key ] ) ) {
+				return $error; }
+		}
+		foreach ( array( 'id', 'title', 'status', 'rule_type', 'discount_type', 'product_filter', 'user_role_filter' ) as $key ) {
+			if ( isset( $rule[ $key ] ) && ! is_scalar( $rule[ $key ] ) ) {
+				return $error; }
+		}
+		foreach ( array( 'products', 'categories', 'exclude_products', 'user_roles', 'specific_users' ) as $key ) {
+			foreach ( $rule[ $key ] ?? array() as $row ) {
+				if ( ! is_array( $row ) || ! is_scalar( $row['value'] ?? null ) || ( isset( $row['name'] ) && ! is_scalar( $row['name'] ) ) ) {
+					return $error; }
+			}
+		}
+		$generic_rows = $rule['conditions']['tiers'] ?? array();
+		$cart_rows    = $rule['cart']['conditions'] ?? array();
+		if ( ! is_array( $generic_rows ) || ! is_array( $cart_rows ) ) {
+			return $error; }
+		$rows           = array_merge( $generic_rows, $cart_rows );
+		$allowed_fields = apply_filters( 'wholesalex_condition_fields', array( 'cart_total_qty', 'cart_total_value', 'cart_total_weight' ) );
+		$aliases        = apply_filters(
+			'wholesalex_condition_field_aliases',
+			array(
+				'cart_total' => 'cart_total_value',
+				'item_count' => 'cart_total_qty',
+			)
+		);
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				return $error; }
+			if ( '' === ( $row['_conditions_for'] ?? $row['field'] ?? '' ) && '' === ( $row['_conditions_operator'] ?? $row['operator'] ?? '' ) && '' === ( $row['_conditions_value'] ?? $row['value'] ?? '' ) ) {
+				continue; }
+			$stored_rows = array_merge( (array) ( $authoritative['conditions']['tiers'] ?? array() ), (array) ( $authoritative['cart']['conditions'] ?? array() ) );
+			$field       = $row['_conditions_for'] ?? $row['field'] ?? '';
+			$operator    = $row['_conditions_operator'] ?? $row['operator'] ?? '';
+			$value       = $row['_conditions_value'] ?? $row['value'] ?? null;
+			if ( is_string( $field ) && ! in_array( $aliases[ $field ] ?? $field, $allowed_fields, true ) && in_array( $row, $stored_rows, true ) ) {
+				continue; }
+			if ( ! is_string( $field ) || ! in_array( $aliases[ $field ] ?? $field, $allowed_fields, true ) || ! in_array( $operator, array( 'less', 'less_equal', 'greater', 'greater_equal', 'equal', 'not_equal', '<', '>', '=' ), true ) || ! is_numeric( $value ) || ! is_finite( (float) $value ) || (float) $value < 0 ) {
+				return $error; }
+		}
+		return Import_Wholesale_Pricing::validate_schedule( $rule['schedule'] ?? array() );
+	}
+
 	/**
 	 * Deeply sanitise an incoming rule array.
 	 *
 	 * Every field is validated/cast so only clean data ever reaches wp_options.
 	 *
 	 * @param array $rule Raw rule from the JS client.
+	 * @param array $authoritative Authoritative stored rule.
 	 * @return array Sanitised rule.
 	 */
-	private function sanitize_rule( array $rule ): array {
+	public function sanitize_rule( array $rule, array $authoritative = array() ): array {
 		$out = array();
 
 		// ── Shared scalars ─────────────────────────────────────────
@@ -946,13 +1131,13 @@ class Wholesale_Pricing_Rest_Api {
 			? $rule['status']
 			: 'inactive';
 
-		$allowed_rule_types = array( 'wholesale_pricing', 'tier_pricing', 'product_discount', 'cart_discount', 'bogo_discount', 'buy_x_get_y' );
+		$allowed_rule_types = apply_filters( 'wholesalex_pricing_rule_types', array( 'wholesale_pricing', 'product_discount', 'cart_discount', 'bogo_discount' ) );
 		$out['rule_type']   = in_array( $rule['rule_type'] ?? '', $allowed_rule_types, true )
 			? $rule['rule_type']
 			: 'wholesale_pricing';
 
 		// ── Shared targeting ───────────────────────────────────────
-		$allowed_product_filters = array( 'all_products', 'specific_products', 'specific_variations', 'specific_categories', 'brands', 'attributes', 'sku' );
+		$allowed_product_filters = apply_filters( 'wholesalex_pricing_product_filters', array( 'all_products', 'specific_products', 'specific_variations', 'specific_categories' ) );
 		$out['product_filter']   = in_array( $rule['product_filter'] ?? '', $allowed_product_filters, true )
 			? $rule['product_filter']
 			: 'all_products';
@@ -961,9 +1146,6 @@ class Wholesale_Pricing_Rest_Api {
 		// component can re-render the labels correctly on reload.
 		$out['products']         = is_array( $rule['products'] ?? null ) ? $this->sanitize_select_items( $rule['products'], 'int' ) : array();
 		$out['categories']       = isset( $rule['categories'] ) ? $this->sanitize_select_items( $rule['categories'], 'int' ) : array();
-		$out['brands']           = isset( $rule['brands'] ) ? $this->sanitize_select_items( $rule['brands'], 'int' ) : array();
-		$out['attributes']       = isset( $rule['attributes'] ) ? $this->sanitize_select_items( $rule['attributes'], 'string' ) : array();
-		$out['skus']             = isset( $rule['skus'] ) ? $this->sanitize_select_items( $rule['skus'], 'string' ) : array();
 		$out['exclude_products'] = isset( $rule['exclude_products'] ) ? $this->sanitize_select_items( $rule['exclude_products'], 'int' ) : array();
 
 		$allowed_user_filters    = array( 'all', 'all_users', 'all_b2b', 'specific_users', 'specific_roles' );
@@ -980,29 +1162,6 @@ class Wholesale_Pricing_Rest_Api {
 			? $this->sanitize_select_items( $rule['specific_users'], 'string' )
 			: array();
 
-		// ── Wholesale pricing restrictions ─────────────────────────
-		// Cart discount has no restriction panel. BOGO/BxGy restriction flags
-		// live in their own type-specific objects.
-		$r                   = (
-			in_array( $out['rule_type'], array( 'wholesale_pricing', 'tier_pricing' ), true ) &&
-			is_array( $rule['restrictions'] ?? null )
-		) ? $rule['restrictions'] : array();
-		$out['restrictions'] = array(
-			'enable_quantity_limits'     => ! empty( $r['enable_quantity_limits'] ),
-			'min_quantity'               => isset( $r['min_quantity'] ) ? sanitize_text_field( $r['min_quantity'] ) : '',
-			'max_quantity'               => isset( $r['max_quantity'] ) ? sanitize_text_field( $r['max_quantity'] ) : '',
-			'min_quantity_message'       => isset( $r['min_quantity_message'] ) ? sanitize_text_field( $r['min_quantity_message'] ) : '',
-			'max_quantity_message'       => isset( $r['max_quantity_message'] ) ? sanitize_text_field( $r['max_quantity_message'] ) : '',
-			'enable_quantity_step'       => ! empty( $r['enable_quantity_step'] ),
-			'quantity_step'              => isset( $r['quantity_step'] ) ? sanitize_text_field( $r['quantity_step'] ) : '',
-			'enable_value_limits'        => ! empty( $r['enable_value_limits'] ),
-			'min_amount'                 => isset( $r['min_amount'] ) ? sanitize_text_field( $r['min_amount'] ) : '',
-			'max_amount'                 => isset( $r['max_amount'] ) ? sanitize_text_field( $r['max_amount'] ) : '',
-			'min_amount_message'         => isset( $r['min_amount_message'] ) ? sanitize_text_field( $r['min_amount_message'] ) : '',
-			'max_amount_message'         => isset( $r['max_amount_message'] ) ? sanitize_text_field( $r['max_amount_message'] ) : '',
-			'tiered_combined_variations' => ! empty( $r['tiered_combined_variations'] ),
-		);
-
 		// ── Shared schedule ────────────────────────────────────────
 		$s               = is_array( $rule['schedule'] ?? null ) ? $rule['schedule'] : array();
 		$out['schedule'] = array(
@@ -1010,19 +1169,14 @@ class Wholesale_Pricing_Rest_Api {
 			'end_date'   => isset( $s['end_date'] ) ? $this->sanitize_schedule_date( $s['end_date'] ) : '',
 		);
 
-		$out['conditions'] = $this->sanitize_conditions( $rule );
+		$out['conditions'] = $this->sanitize_conditions( $rule, $authoritative );
 
 		// ── Type-specific fields ───────────────────────────────────
 		switch ( $out['rule_type'] ) {
-			case 'tier_pricing':
-				$out                 = array_merge( $out, $this->sanitize_pricing_rule( $rule, true ) );
-				$out['restrictions'] = apply_filters( 'wholesalex_premium_pricing_restrictions', $out['restrictions'], $out );
-				break;
 			case 'product_discount':
 				$out = array_merge( $out, $this->sanitize_product_discount_rule( $rule ) );
 				// Product discounts never accept pricing restrictions, even
 				// when an older client submits a stale restrictions object.
-				$out['restrictions'] = array();
 				break;
 			case 'cart_discount':
 				$out = array_merge( $out, $this->sanitize_cart_rule( $rule ) );
@@ -1030,16 +1184,12 @@ class Wholesale_Pricing_Rest_Api {
 			case 'bogo_discount':
 				$out = array_merge( $out, $this->sanitize_bogo_rule( $rule ) );
 				break;
-			case 'buy_x_get_y':
-				$out = array_merge( $out, (array) apply_filters( 'wholesalex_premium_rule_sanitized', array(), 'buy_x_get_y', $rule ) );
-				break;
 			default:
-				$out                 = array_merge( $out, $this->sanitize_pricing_rule( $rule ) );
-				$out['restrictions'] = apply_filters( 'wholesalex_premium_pricing_restrictions', $out['restrictions'], $out );
+				$out = array_merge( $out, $this->sanitize_pricing_rule( $rule ) );
 				break;
 		}
 
-		return $out;
+		return (array) apply_filters( 'wholesalex_pricing_rule_sanitized', $out, $rule );
 	}
 
 	/**
@@ -1087,7 +1237,7 @@ class Wholesale_Pricing_Rest_Api {
 	 * @param array $sanitized Sanitized rule data.
 	 * @return true|\WP_Error
 	 */
-	private function validate_schedule( array $raw_rule, array $sanitized ) {
+	public function validate_schedule( array $raw_rule, array $sanitized ) {
 		$raw_schedule = is_array( $raw_rule['schedule'] ?? null ) ? $raw_rule['schedule'] : array();
 		$schedule     = $sanitized['schedule'];
 
@@ -1120,14 +1270,11 @@ class Wholesale_Pricing_Rest_Api {
 	 * Sanitise wholesale_pricing specific fields.
 	 *
 	 * @param array $rule Rule configuration.
-	 * @param bool  $force_tiered Whether this is a dedicated tier-pricing rule.
 	 */
-	private function sanitize_pricing_rule( array $rule, bool $force_tiered = false ): array {
+	private function sanitize_pricing_rule( array $rule ): array {
 		$out = array();
 
-		$out['discount_type'] = $force_tiered ? 'tiered' : ( in_array( $rule['discount_type'] ?? '', array( 'regular', 'tiered' ), true )
-			? $rule['discount_type']
-			: 'regular' );
+		$out['discount_type'] = 'regular';
 
 		$regular        = is_array( $rule['regular'] ?? null ) ? $rule['regular'] : array();
 		$out['regular'] = array(
@@ -1136,12 +1283,6 @@ class Wholesale_Pricing_Rest_Api {
 				? $regular['amount_type']
 				: 'percentage',
 			'label'       => isset( $regular['label'] ) ? sanitize_text_field( $regular['label'] ) : '',
-		);
-
-		$out['tiers'] = (array) apply_filters( 'wholesalex_premium_tiers_sanitized', array(), $rule );
-
-		$out['design'] = $this->sanitize_design(
-			is_array( $rule['design'] ?? null ) ? $rule['design'] : array()
 		);
 
 		return $out;
@@ -1278,9 +1419,10 @@ class Wholesale_Pricing_Rest_Api {
 	 * Sanitise advanced condition tiers using the dynamic-rules condition shape.
 	 *
 	 * @param array $rule Raw rule from the JS client.
+	 * @param array $authoritative Authoritative stored rule.
 	 * @return array{tiers: array<int, array<string, string>>}
 	 */
-	private function sanitize_conditions( array $rule ): array {
+	private function sanitize_conditions( array $rule, array $authoritative = array() ): array {
 		$conditions = is_array( $rule['conditions'] ?? null ) ? $rule['conditions'] : array();
 		$tiers      = is_array( $conditions['tiers'] ?? null ) ? $conditions['tiers'] : array();
 
@@ -1307,8 +1449,9 @@ class Wholesale_Pricing_Rest_Api {
 			'=' => 'equal',
 		);
 
-		$out = array();
-		foreach ( $tiers as $tier ) {
+		$out          = array();
+		$stored_tiers = $authoritative['conditions']['tiers'] ?? $authoritative['cart']['conditions'] ?? array();
+		foreach ( $tiers as $index => $tier ) {
 			if ( ! is_array( $tier ) ) {
 				continue;
 			}
@@ -1331,10 +1474,27 @@ class Wholesale_Pricing_Rest_Api {
 				continue;
 			}
 
-			$out[] = array(
-				'_conditions_for'      => $field,
-				'_conditions_operator' => $operator,
-				'_conditions_value'    => $value,
+			// Metadata comes only from the authoritative row, never from client values.
+			$stored   = array();
+			$identity = $tier['id'] ?? $tier['_id'] ?? null;
+			if ( null !== $identity ) {
+				foreach ( (array) $stored_tiers as $stored_tier ) {
+					if ( is_array( $stored_tier ) && ( $stored_tier['id'] ?? $stored_tier['_id'] ?? null ) === $identity ) {
+						$stored = $stored_tier;
+						break;
+					}
+				}
+			} elseif ( is_array( $stored_tiers[ $index ] ?? null ) ) {
+				$stored = $stored_tiers[ $index ];
+			}
+			unset( $stored['field'], $stored['operator'], $stored['value'] );
+			$out[] = array_replace(
+				$stored,
+				array(
+					'_conditions_for'      => $field,
+					'_conditions_operator' => $operator,
+					'_conditions_value'    => $value,
+				)
 			);
 		}
 
@@ -1447,61 +1607,6 @@ class Wholesale_Pricing_Rest_Api {
 			'cart_total_weight_max_conditions_text'     => array( 'cart_total_weight_less_conditions_text', 'cart_total_weight_less_equal_conditions_text' ),
 			'cart_total_weight_min_conditions_text'     => array( 'cart_total_weight_greater_conditions_text', 'cart_total_weight_greater_equal_conditions_text' ),
 			'cart_total_weight_min_max_conditions_text' => array( 'cart_total_weight_greater_less_conditions_text', 'cart_total_weight_greater_equal_less_equal_conditions_text', 'cart_total_weight_greater_less_equal_conditions_text', 'cart_total_weight_greater_equal_less_conditions_text' ),
-		);
-	}
-
-	/**
-	 * Sanitise the design sub-object.
-	 *
-	 * @param array $design Raw design from the JS client.
-	 * @return array
-	 */
-	private function sanitize_design( array $design ): array {
-		return array(
-			'table_style'           => in_array( $design['table_style'] ?? '', array( 'table_style', 'classic_style' ), true )
-				? $design['table_style']
-				: 'table_style',
-			'vertical_style'        => ! empty( $design['vertical_style'] ),
-			'border_radius'         => ! empty( $design['border_radius'] ),
-			'table_heading'         => isset( $design['table_heading'] )
-				? sanitize_text_field( $design['table_heading'] )
-				: 'Buy More, Save More',
-			'header_bg_color'       => sanitize_hex_color( $design['header_bg_color'] ?? '' ) ?? '#F7F7F7',
-			'header_text_color'     => sanitize_hex_color( $design['header_text_color'] ?? '' ) ?? '#3A3A3A',
-			'border_color'          => sanitize_hex_color( $design['border_color'] ?? '' ) ?? '#E5E5E5',
-			'active_row_bg_color'   => sanitize_hex_color( $design['active_row_bg_color'] ?? '' ) ?? '#6C6CFF',
-			'active_row_text_color' => sanitize_hex_color( $design['active_row_text_color'] ?? '' ) ?? '#FFFFFF',
-			'text_color'            => sanitize_hex_color( $design['text_color'] ?? '' ) ?? '#494949',
-			'font_size'             => isset( $design['font_size'] ) ? absint( $design['font_size'] ) : 14,
-			'price_display'         => in_array( $design['price_display'] ?? '', array( 'fixed', 'discount' ), true )
-				? $design['price_display']
-				: 'fixed',
-			'discount_text_color'   => sanitize_hex_color( $design['discount_text_color'] ?? '' ) ?? '#ffffff',
-			'discount_bg_color'     => sanitize_hex_color( $design['discount_bg_color'] ?? '' ) ?? '#070707',
-			'column_priority'       => isset( $design['column_priority'] ) && is_array( $design['column_priority'] )
-				? array_map( array( $this, 'sanitize_column_item' ), $design['column_priority'] )
-				: array(),
-		);
-	}
-
-	/**
-	 * Sanitise a single column-priority item.
-	 *
-	 * @param mixed $item Raw item.
-	 * @return array
-	 */
-	private function sanitize_column_item( $item ): array {
-		if ( ! is_array( $item ) ) {
-			return array(
-				'label'  => '',
-				'value'  => '',
-				'status' => true,
-			);
-		}
-		return array(
-			'label'  => isset( $item['label'] ) ? sanitize_text_field( $item['label'] ) : '',
-			'value'  => isset( $item['value'] ) ? sanitize_text_field( $item['value'] ) : '',
-			'status' => isset( $item['status'] ) ? (bool) $item['status'] : true,
 		);
 	}
 }

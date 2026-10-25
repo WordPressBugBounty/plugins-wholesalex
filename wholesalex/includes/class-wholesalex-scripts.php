@@ -64,6 +64,8 @@ class Scripts {
 	 * Register all scripts
 	 */
 	public static function register_backend_scripts() {
+		$host_asset = self::read_asset_file( WHOLESALEX_PATH . 'assets/js/wholesalex_editor_api.asset.php' );
+		wp_register_script( 'wholesalex_editor_api', WHOLESALEX_URL . 'assets/js/wholesalex_editor_api.js', array_values( array_unique( array_merge( array( 'wholesalex' ), $host_asset['dependencies'] ) ) ), $host_asset['version'], true );
 		$register_scripts = apply_filters(
 			'wholesalex_register_backend_scripts',
 			array(
@@ -124,6 +126,7 @@ class Scripts {
 			$deps = array_values( array_unique( array_merge( $asset['dependencies'], $deps ) ) );
 			if ( 'wholesalex' !== $handle ) {
 				$deps[] = 'wholesalex';
+				$deps[] = 'wholesalex_editor_api';
 				$deps   = array_values( array_unique( $deps ) );
 			}
 
@@ -190,7 +193,7 @@ class Scripts {
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => true,
 				),
-				'wholesalex_profile'     => array(
+				'wholesalex_profile'  => array(
 					'src'       => WHOLESALEX_URL . 'assets/js/whx_profile.js',
 					'asset'     => WHOLESALEX_PATH . 'assets/js/whx_profile.asset.php',
 					'deps'      => array(),
@@ -241,7 +244,8 @@ class Scripts {
 				}
 			}
 
-			if ( '' !== $css_src ) {
+			// Public CSS is owned by register_fronend_style(), including its legacy alias.
+			if ( 'wholesalex' !== $handle && '' !== $css_src ) {
 				wp_register_style( $handle, $css_src, array(), $ver );
 				$rtl_css_path = preg_replace( '/\\.css$/', '-rtl.css', $css_path );
 				if ( is_string( $rtl_css_path ) && file_exists( $rtl_css_path ) ) {
@@ -290,9 +294,16 @@ class Scripts {
 		$register_scripts = apply_filters(
 			'wholesalex_register_frontend_styles',
 			array(
-				'wholesalex' => array(
+				'wholesalex_public' => array(
 					'src'       => WHOLESALEX_URL . 'assets/css/wholesalex-public.css',
 					'deps'      => array(),
+					'ver'       => WHOLESALEX_VER,
+					'in_footer' => false,
+				),
+				// Alias handle: keeps the legacy 'wholesalex' handle working without loading the stylesheet twice.
+				'wholesalex'        => array(
+					'src'       => false,
+					'deps'      => array( 'wholesalex_public' ),
 					'ver'       => WHOLESALEX_VER,
 					'in_footer' => false,
 				),

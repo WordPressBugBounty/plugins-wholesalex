@@ -118,7 +118,15 @@ if ( ! class_exists( 'WHOLESALEX\WholesaleX_New_User_Verification_Email' ) ) {
 				$this->user_email       = stripslashes( $this->object->user_email );
 				$this->recipient        = $this->user_email;
 				$confirmation_code      = get_user_meta( $user_id, '__wholesalex_email_confirmation_code', true );
-				$this->confirmation_url = esc_url( get_site_url() . '/my-account/?user_id=' . $user_id . '&confirmation_code=' . rawurlencode( $confirmation_code ) );
+				$this->confirmation_url = esc_url(
+					add_query_arg(
+						array(
+							'user_id'           => $user_id,
+							'confirmation_code' => $confirmation_code,
+						),
+						wc_get_page_permalink( 'myaccount' )
+					)
+				);
 			}
 
 			if ( $this->is_enabled() && $this->get_recipient() ) {

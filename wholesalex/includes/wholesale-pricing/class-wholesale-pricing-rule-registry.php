@@ -84,23 +84,48 @@ class Wholesale_Pricing_Rule_Registry {
 				return $target;
 			}
 		}
-		foreach ( (array) ( $rule['conditions']['tiers'] ?? array() ) as $condition ) {
-			$field = (string) ( $condition['_conditions_for'] ?? '' );
-			if ( '' === $field || in_array( $field, array( 'cart_total_qty', 'cart_total_value', 'cart_total_weight' ), true ) ) {
-				continue;
-			}
-			$handlers = self::condition_handlers();
-			if ( ! isset( $handlers[ $field ] ) || ! is_callable( $handlers[ $field ] ) ) {
-				return $field;
-			}
+		$unavailable_rows = self::unavailable_condition_rows( array_merge( (array) ( $rule['conditions']['tiers'] ?? array() ), (array) ( $rule['cart']['conditions'] ?? array() ) ) );
+		if ( array() !== $unavailable_rows ) {
+			$condition = reset( $unavailable_rows );
+			return (string) ( $condition['_conditions_for'] ?? $condition['field'] ?? '' );
 		}
-		$handlers = self::restriction_handlers();
+
+		$handlers         = self::restriction_handlers();
+		$runtime_versions = (array) apply_filters( 'wholesalex_restriction_runtime_versions', array() );
 		foreach ( (array) ( $rule['restrictions'] ?? array() ) as $flag => $enabled ) {
 			// Persisted boolean switches enable features; other values are their parameters.
-			if ( ( true === $enabled || ( preg_match( '/(^enable_|_combined_variations$)/', (string) $flag ) && ! empty( $enabled ) ) ) && ( ! isset( $handlers[ $flag ] ) || ! is_callable( $handlers[ $flag ] ) ) ) {
+			if ( ( true === $enabled || ( preg_match( '/(^enable_|_combined_variations$)/', (string) $flag ) && ! empty( $enabled ) ) ) && ( ! isset( $handlers[ $flag ] ) || ! is_callable( $handlers[ $flag ] ) || 1 !== (int) ( $runtime_versions[ $flag ] ?? 0 ) ) ) {
 				return (string) $flag;
 			}
 		}
 		return '';
+	}
+	/**
+	 * Select exact condition rows whose actual implementation is unavailable.
+	 *
+	 * @param array $conditions Submitted or authoritative condition rows.
+	 * @return array Ordered unavailable rows without normalization.
+	 */
+	public static function unavailable_condition_rows( array $conditions ): array {
+		$rows     = array();
+		$aliases  = (array) apply_filters(
+			'wholesalex_condition_field_aliases',
+			array(
+				'cart_total' => 'cart_total_value',
+				'item_count' => 'cart_total_qty',
+			)
+		);
+		$handlers = self::condition_handlers();
+		foreach ( $conditions as $condition ) {
+			if ( ! is_array( $condition ) ) {
+				continue;
+			}
+			$field = (string) ( $condition['_conditions_for'] ?? $condition['field'] ?? '' );
+			$field = $aliases[ $field ] ?? $field;
+			if ( '' !== $field && ! in_array( $field, array( 'cart_total_qty', 'cart_total_value', 'cart_total_weight' ), true ) && ( ! isset( $handlers[ $field ] ) || ! is_callable( $handlers[ $field ] ) ) ) {
+				$rows[] = $condition;
+			}
+		}
+		return $rows;
 	}
 }

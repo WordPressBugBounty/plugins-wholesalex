@@ -159,7 +159,7 @@ abstract class WHOLESALEX_Dynamic_Rule_Importer implements WHOLESALEX_Importer_I
 	 * @return int
 	 */
 	public function get_percent_complete() {
-		$size = filesize( $this->file );
+		$size = is_resource( $this->file ) ? fstat( $this->file )['size'] : filesize( $this->file );
 		if ( ! $size ) {
 			return 0;
 		}

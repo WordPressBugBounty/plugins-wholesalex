@@ -39,14 +39,13 @@ class Banner_Notice extends Abstract_Campaign_Notice {
 		return array_merge(
 			parent::get_defaults(),
 			array(
-				'image_dir'          => '', // Folder under assets/img/dashboard_banner/ holding offer.png, btn.png and bg.png.
-				'left_image'         => '', // Overrides image_dir/offer.png.
-				'right_image'        => '', // Overrides image_dir/btn.png.
-				'bg_image'           => '', // Overrides image_dir/bg.png.
-				'text'               => '',
-				'brand_color'        => '#6c3bff',
-				'countdown_duration' => 259200, // Seconds; 3 days.
-				'countdown_color'    => '#3CF357',
+				'image_dir'       => '', // Folder under assets/img/dashboard_banner/ holding offer.png, btn.png and bg.png.
+				'left_image'      => '', // Overrides image_dir/offer.png.
+				'right_image'     => '', // Overrides image_dir/btn.png.
+				'bg_image'        => '', // Overrides image_dir/bg.png.
+				'text'            => '',
+				'brand_color'     => '#6c3bff',
+				'countdown_color' => '#3CF357',
 			)
 		);
 	}

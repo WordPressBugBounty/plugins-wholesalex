@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$url = $notice->get_url();
+$wholesalex_notice_url = $notice->get_url();
 ?>
 <div class="wsx-content-notice-wrapper wsx-notice notice"
 style="border-left: 3px solid <?php echo esc_attr( $notice->get( 'border_color' ) ); ?>;"
@@ -33,11 +33,11 @@ style="border-left: 3px solid <?php echo esc_attr( $notice->get( 'border_color' 
 		</div>
 		<div class="wsx-content-notice-buttons">
 	<?php if ( $notice->get( 'is_discount_logo' ) ) : ?>
-				<a class="wsx-content-discount_btn" href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener noreferrer">
+				<a class="wsx-content-discount_btn" href="<?php echo esc_url( $wholesalex_notice_url ); ?>" target="_blank" rel="noopener noreferrer">
 					<?php echo esc_html( $notice->get( 'button_text' ) ); ?>
 				</a>
 			<?php else : ?>
-				<a class="wsx-content-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener noreferrer" style="background-color: <?php echo ! empty( $notice->get( 'background_color' ) ) ? esc_attr( $notice->get( 'background_color' ) ) : '#6c3bff'; ?>;">
+				<a class="wsx-content-notice-btn button button-primary" href="<?php echo esc_url( $wholesalex_notice_url ); ?>" target="_blank" rel="noopener noreferrer" style="background-color: <?php echo ! empty( $notice->get( 'background_color' ) ) ? esc_attr( $notice->get( 'background_color' ) ) : '#6c3bff'; ?>;">
 				<?php echo esc_html( $notice->get( 'button_text' ) ); ?>
 
 				</a>

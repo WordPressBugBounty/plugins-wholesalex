@@ -31,19 +31,35 @@ class WholesaleX_Initialization {
 		// Frontend Assets.
 		add_action( 'wp_enqueue_scripts', array( $this, 'frontend_enqueue_scripts' ) );
 
-		// Preserve notices from WordPress and other plugins.
-		add_action( 'in_admin_header', array( $this, 'remove_notices' ) );
-
 		add_filter( 'admin_body_class', array( $this, 'add_wholesalex_class_on_backend' ) );
+	}
+
+	/**
+	 * Load shared class dependencies before their consumers are declared.
+	 *
+	 * Also available to isolated integrations that load individual core classes.
+	 *
+	 * @return void
+	 */
+	public static function load_shared_dependencies() {
+		require_once __DIR__ . '/security/class-user-operation-policy.php';
+		require_once __DIR__ . '/class-registration-provider.php';
+		require_once __DIR__ . '/import/class-customer-import-jobs.php';
+		require_once __DIR__ . '/import/class-customer-import-cleanup.php';
+		require_once __DIR__ . '/import/class-dynamic-rule-import-jobs.php';
+		require_once __DIR__ . '/admin/rest/class-admin-resource-repository.php';
 	}
 
 	/**
 	 * Load All Required Dependencies
 	 */
 	private function load_dependencies() {
+		self::load_shared_dependencies();
+
 		require_once WHOLESALEX_PATH . 'includes/class-wholesalex-role-preview.php';
-		require_once WHOLESALEX_PATH . 'includes/pricing/class-tier-pricing-calculator.php';
 		require_once WHOLESALEX_PATH . 'includes/class-registration-context.php';
+		require_once WHOLESALEX_PATH . 'includes/registration/class-confirmation-service.php';
+		\WHOLESALEX\Confirmation_Service::register();
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-overview.php';
 		require_once WHOLESALEX_PATH . 'includes/menu/class-wholesalex-role.php';
 		require_once WHOLESALEX_PATH . 'includes/class-wholesalex-menu.php';
@@ -85,7 +101,9 @@ class WholesaleX_Initialization {
 		require_once WHOLESALEX_PATH . 'includes/admin/notice/class-notice.php';
 		require_once WHOLESALEX_PATH . 'includes/class-wholesalex-common-utils.php';
 
-		/** Register extensions after shared classes load and before runtime objects are created. */
+		/**
+		 * Register extensions after shared classes load and before runtime objects are created.
+		 */
 		do_action( 'wholesalex_register_extensions' );
 
 		do_action( 'wholesalex_after_core_loaded' );
@@ -107,6 +125,9 @@ class WholesaleX_Initialization {
 		new \WHOLESALEX\Addons();
 		new \WHOLESALEX\WHOLESALEX_Users();
 		new \WHOLESALEX\WHOLESALEX_Email();
+		require_once WHOLESALEX_PATH . 'includes/admin/rest/class-admin-resource-controller.php';
+		$admin_resources = new \WHOLESALEX\Admin\Rest\Admin_Resource_Controller();
+		add_action( 'rest_api_init', array( $admin_resources, 'register_routes' ) );
 		new \WHOLESALEX\Settings();
 		new \WHOLESALEX\WHOLESALEX_Category();
 		new \WHOLESALEX\WHOLESALEX_Menu();
@@ -124,6 +145,7 @@ class WholesaleX_Initialization {
 		new \WHOLESALEX\Includes\Admin\Notice\Notice();
 
 		add_action( 'template_redirect', array( $this, 'wholesalex_process_user_email_confirmation' ) );
+		add_action( 'woocommerce_before_customer_login_form', array( $this, 'confirmation_resend_form' ) );
 	}
 
 
@@ -164,6 +186,7 @@ class WholesaleX_Initialization {
 			'pro_link'             => wholesalex()->get_premium_link(),
 			'ver'                  => WHOLESALEX_VER,
 			'settings'             => wholesalex()->get_setting(),
+			'show_promotions'      => wholesalex()->can_show_promotions(),
 			'logo_url'             => apply_filters( 'wholesalex_logo_url', WHOLESALEX_URL . 'assets/icons/wholesalex-logo.svg' ),
 			'plugin_name'          => wholesalex()->get_plugin_name(),
 			'dynamic_rules_access' => wholesalex()->get_dynamic_rules_access(),
@@ -182,6 +205,22 @@ class WholesaleX_Initialization {
 		// Strip credentials after filters because integrations can replace the settings payload.
 		if ( isset( $localize_data['settings'] ) && is_array( $localize_data['settings'] ) ) {
 			unset( $localize_data['settings']['_settings_google_recaptcha_v3_secret_key'] );
+		}
+		// Product/profile editors need display settings, not the global admin configuration.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			$setting_keys              = array(
+				'recaptcha_version',
+				'_settings_google_recaptcha_v3_site_key',
+				'wsx_addon_recaptcha',
+				'_settings_primary_button_color',
+				'_settings_primary_color',
+				'_settings_primary_hover_color',
+				'_settings_text_color',
+				'_settings_border_color',
+				'dynamic_rule_per_page',
+			);
+			$settings                  = isset( $localize_data['settings'] ) && is_array( $localize_data['settings'] ) ? $localize_data['settings'] : array();
+			$localize_data['settings'] = array_filter( array_intersect_key( $settings, array_flip( $setting_keys ) ), 'is_scalar' );
 		}
 		wp_localize_script( 'wholesalex', 'wholesalex', $localize_data );
 		do_action( 'wholesalex_script_data_ready', 'wholesalex', 'admin' );
@@ -224,10 +263,19 @@ class WholesaleX_Initialization {
 
 			)
 		);
-		// Strip credentials after filters because integrations can replace the settings payload.
-		if ( isset( $frontend_localize_data['settings'] ) && is_array( $frontend_localize_data['settings'] ) ) {
-			unset( $frontend_localize_data['settings']['_settings_google_recaptcha_v3_secret_key'] );
-		}
+		// Public settings are an explicit scalar contract, enforced after provider filters.
+		$public_setting_keys                = array(
+			'recaptcha_version',
+			'_settings_google_recaptcha_v3_site_key',
+			'wsx_addon_recaptcha',
+			'_settings_primary_button_color',
+			'_settings_primary_color',
+			'_settings_primary_hover_color',
+			'_settings_text_color',
+			'_settings_border_color',
+		);
+		$frontend_settings                  = isset( $frontend_localize_data['settings'] ) && is_array( $frontend_localize_data['settings'] ) ? $frontend_localize_data['settings'] : array();
+		$frontend_localize_data['settings'] = array_filter( array_intersect_key( $frontend_settings, array_flip( $public_setting_keys ) ), 'is_scalar' );
 		wp_localize_script( 'wholesalex', 'wholesalex', $frontend_localize_data );
 		do_action( 'wholesalex_script_data_ready', 'wholesalex', 'frontend' );
 	}
@@ -236,49 +284,40 @@ class WholesaleX_Initialization {
 	 * Process WholesaleX User Email Confirmation
 	 */
 	public function wholesalex_process_user_email_confirmation() {
-
-		if ( isset( $_REQUEST['confirmation_code'], $_REQUEST['user_id'] ) && is_string( $_REQUEST['confirmation_code'] ) && is_scalar( $_REQUEST['user_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The per-user confirmation secret is verified below.
-			$__user_id                   = absint( wp_unslash( $_REQUEST['user_id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Emailed confirmation link; authorised by the secret code.
-			$__confirmation_code         = get_user_meta( $__user_id, '__wholesalex_email_confirmation_code', true );
-			$confirmation_status         = get_user_meta( $__user_id, '__wholesalex_account_confirmed', true );
-			$requested_confirmation_code = sanitize_text_field( wp_unslash( $_REQUEST['confirmation_code'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Emailed confirmation link; authorised by the secret code.
-
-			if ( $confirmation_status ) {
-				wc_add_notice( __( ' Your account is already confirmed!. ', 'wholesalex' ), 'notice' );
-			} elseif ( is_string( $__confirmation_code ) && '' !== $__confirmation_code && hash_equals( $__confirmation_code, $requested_confirmation_code ) ) {
-				/**
-				 * Filter how long a confirmation link stays valid.
-				 *
-				 * @param int $ttl Lifetime in seconds.
-				 */
-				$link_ttl  = (int) apply_filters( 'wholesalex_email_confirmation_link_ttl', 2 * DAY_IN_SECONDS );
-				$issued_at = (int) get_user_meta( $__user_id, '__wholesalex_email_confirmation_code_time', true );
-
-				// Links issued before this meta existed keep working; new ones expire.
-				if ( $issued_at > 0 && $link_ttl > 0 && ( time() - $issued_at ) > $link_ttl ) {
-					wc_add_notice( __( 'This confirmation link has expired. Please request a new confirmation email.', 'wholesalex' ), 'error' );
-					return;
-				}
-
-				$__registration_role = get_user_meta( $__user_id, '__wholesalex_registration_role', true );
-				$assigned_role       = get_user_meta( $__user_id, '__wholesalex_role', true );
-				$scope_error         = $assigned_role ? null : \WHOLESALEX\Registration_Context::approval_error( $__user_id, $__registration_role );
-				if ( is_wp_error( $scope_error ) ) {
-					wc_add_notice( $scope_error->get_error_message(), 'error' );
-					return;
-				}
-				update_user_meta( $__user_id, '__wholesalex_account_confirmed', true );
-				update_user_meta( $__user_id, '__wholesalex_status', 'active' );
-
-				// The secret is single use: drop it once the account is confirmed.
-				delete_user_meta( $__user_id, '__wholesalex_email_confirmation_code' );
-				delete_user_meta( $__user_id, '__wholesalex_email_confirmation_code_time' );
-
-				wholesalex()->change_role( $__user_id, $assigned_role ? $assigned_role : $__registration_role );
-				wc_add_notice( __( '<strong>Success:</strong> Your account is successfully confirmed. ', 'wholesalex' ) );
-				do_action( 'wholesalex_user_email_verified', $__user_id );
-			}
+		require_once __DIR__ . '/registration/class-confirmation-service.php';
+		if ( isset( $_POST['wholesalex_resend_confirmation'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- The context-bound nonce is verified in the service.
+			$id    = isset( $_POST['user_id'] ) && is_string( $_POST['user_id'] ) && ctype_digit( (string) filter_var( wp_unslash( $_POST['user_id'] ), FILTER_VALIDATE_REGEXP, array( 'options' => array( 'regexp' => '/^[0-9]+$/D' ) ) ) ) ? absint( filter_var( wp_unslash( $_POST['user_id'] ), FILTER_VALIDATE_REGEXP, array( 'options' => array( 'regexp' => '/^[0-9]+$/D' ) ) ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified in the service.
+			$token = isset( $_POST['confirmation_code'] ) && is_string( $_POST['confirmation_code'] ) ? filter_var( wp_unslash( $_POST['confirmation_code'] ), FILTER_VALIDATE_REGEXP, array( 'options' => array( 'regexp' => '/^(?:[a-f0-9]{32}|[a-f0-9]{64})$/D' ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified in the service.
+			$nonce = isset( $_POST['wholesalex-resend-nonce'] ) && is_string( $_POST['wholesalex-resend-nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['wholesalex-resend-nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified in the service.
+			\WHOLESALEX\Confirmation_Service::resend( $id, $token, $nonce );
+			wc_add_notice( __( 'If this account is eligible, a new confirmation email has been sent. Please check your inbox.', 'wholesalex' ), 'notice' );
+			return;
 		}
+		if ( isset( $_REQUEST['confirmation_code'], $_REQUEST['user_id'] ) && is_string( $_REQUEST['confirmation_code'] ) && is_string( $_REQUEST['user_id'] ) && ctype_digit( (string) filter_var( wp_unslash( $_REQUEST['user_id'] ), FILTER_VALIDATE_REGEXP, array( 'options' => array( 'regexp' => '/^[0-9]+$/D' ) ) ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Authorised by the identity-bound emailed bearer.
+			$result = \WHOLESALEX\Confirmation_Service::confirm( absint( filter_var( wp_unslash( $_REQUEST['user_id'] ), FILTER_VALIDATE_REGEXP, array( 'options' => array( 'regexp' => '/^[0-9]+$/D' ) ) ) ), filter_var( wp_unslash( $_REQUEST['confirmation_code'] ), FILTER_VALIDATE_REGEXP, array( 'options' => array( 'regexp' => '/^(?:[a-f0-9]{32}|[a-f0-9]{64})$/D' ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Authorised by the identity-bound emailed bearer.
+			wc_add_notice( is_wp_error( $result ) ? $result->get_error_message() : __( 'Your account is successfully confirmed.', 'wholesalex' ), is_wp_error( $result ) ? 'error' : 'success' );
+		}
+	}
+
+	/**
+	 * Render bearer-bound recovery on the configured account page.
+	 *
+	 * @return void
+	 */
+	public function confirmation_resend_form() {
+		if ( ! isset( $_REQUEST['confirmation_code'], $_REQUEST['user_id'] ) || ! is_string( $_REQUEST['confirmation_code'] ) || ! is_string( $_REQUEST['user_id'] ) || ! ctype_digit( (string) filter_var( wp_unslash( $_REQUEST['user_id'] ), FILTER_VALIDATE_REGEXP, array( 'options' => array( 'regexp' => '/^[0-9]+$/D' ) ) ) ) || ! preg_match( '/^(?:[a-f0-9]{32}|[a-f0-9]{64})$/D', filter_var( wp_unslash( $_REQUEST['confirmation_code'] ), FILTER_VALIDATE_REGEXP, array( 'options' => array( 'regexp' => '/^(?:[a-f0-9]{32}|[a-f0-9]{64})$/D' ) ) ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Rendering a form grants no account authority.
+			return;
+		}
+		$id    = absint( filter_var( wp_unslash( $_REQUEST['user_id'] ), FILTER_VALIDATE_REGEXP, array( 'options' => array( 'regexp' => '/^[0-9]+$/D' ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Rendering only.
+		$token = filter_var( wp_unslash( $_REQUEST['confirmation_code'] ), FILTER_VALIDATE_REGEXP, array( 'options' => array( 'regexp' => '/^(?:[a-f0-9]{32}|[a-f0-9]{64})$/D' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Rendering only.
+		?>
+		<form method="post" action="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>">
+			<input type="hidden" name="user_id" value="<?php echo esc_attr( $id ); ?>">
+			<input type="hidden" name="confirmation_code" value="<?php echo esc_attr( $token ); ?>">
+			<?php wp_nonce_field( \WHOLESALEX\Confirmation_Service::nonce_action( $id, $token ), 'wholesalex-resend-nonce' ); ?>
+			<button type="submit" name="wholesalex_resend_confirmation" value="1"><?php esc_html_e( 'Resend confirmation email', 'wholesalex' ); ?></button>
+		</form>
+		<?php
 	}
 
 	/**
@@ -297,23 +336,5 @@ class WholesaleX_Initialization {
 			$classes .= ' wholesalex_backend_body';
 		}
 		return $classes;
-	}
-
-	/**
-	 * Visually hide unrelated notices on WholesaleX admin pages.
-	 *
-	 * The notice hooks are left intact so WordPress and third-party notices can
-	 * continue to run. Error notices, update nags, and WholesaleX notices remain
-	 * visible.
-	 *
-	 * @return void
-	 */
-	public function remove_notices() {
-		$page = wholesalex()->get_current_admin_page_slug();
-		if ( '' === $page || ! wholesalex()->is_wholesalex_page( $page ) ) {
-			return;
-		}
-
-		echo '<style id="wholesalex-hide-admin-notices">#wpbody-content > .notice:not(.notice-error):not(.error):not(.update-nag):not(.wsx-notice), #wpbody-content > .updated:not(.notice-error):not(.wsx-notice) { display: none !important; }</style>';
 	}
 }

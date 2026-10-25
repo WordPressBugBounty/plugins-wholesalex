@@ -187,44 +187,38 @@ class Rule_Shipping {
 				}
 
 				if ( ! empty( $data['rules'] ) ) {
-					$allowed_rates = array();
+					$allowed_rates       = array();
+					$has_applicable_rule = false;
 					foreach ( $data['rules'] as $rule ) {
 						if ( isset( $rule['conditions'] ) && ! Dynamic_Rules_Condition_Engine::check_rule_conditions( $rule['conditions'], $rule['filter'] ) ) {
 							continue;
 						}
-
-						$available_methods = array();
-
-						$temp_available_methods = $data['roles'];
-
-						if ( ! empty( $rule['rule']['_shipping_zone_methods'] ) ) {
-							$available_methods = $this->normalize_method_ids( $rule['rule']['_shipping_zone_methods'] );
-						}
-
-						if ( isset( $rule['filter']['is_all_products'] ) && $rule['filter']['is_all_products'] ) {
-							$temp_available_methods = array_intersect( $temp_available_methods, $available_methods );
-							wholesalex()->set_usages_dynamic_rule_id( $rule['id'] );
-						} elseif ( isset( $package['contents'] ) ) {
-							foreach ( $package['contents'] as $item ) {
-								if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $item['product_id'], $item['variation_id'], $rule['filter'] ) ) {
-									$temp_available_methods = array_intersect( $temp_available_methods, $available_methods );
-									wholesalex()->set_usages_dynamic_rule_id( $rule['id'] );
-								} elseif ( apply_filters( 'wholesalex_shipping_rule_merged_all_methods', false ) ) {
-										$temp_available_methods = array_merge( $temp_available_methods, $data['roles'] );
-								} else {
-									$temp_available_methods = array_diff( $data['roles'], $temp_available_methods );
-								}
+						$eligible        = ! empty( $rule['filter']['is_all_products'] );
+						$has_other_items = false;
+						foreach ( $package['contents'] ?? array() as $item ) {
+							if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $item['product_id'], $item['variation_id'], $rule['filter'] ) ) {
+								$eligible = true;
+							} else {
+								$has_other_items = true;
 							}
 						}
-
+						if ( ! $eligible ) {
+							continue;
+						}
+						$has_applicable_rule = true;
+						$methods             = $this->normalize_method_ids( $rule['rule']['_shipping_zone_methods'] ?? array() );
+						$methods             = array_intersect( $data['roles'], $methods );
+						if ( $has_other_items && apply_filters( 'wholesalex_shipping_rule_merged_all_methods', false ) ) {
+							$methods = $data['roles'];
+						}
+						wholesalex()->set_usages_dynamic_rule_id( $rule['id'] );
 						foreach ( $package_rates as $rate_key => $rate ) {
-							if ( $this->is_rate_allowed( $rate, $temp_available_methods ) ) {
-								$allowed_rates[ $rate_key ] = $package_rates[ $rate_key ];
+							if ( $this->is_rate_allowed( $rate, $methods ) ) {
+								$allowed_rates[ $rate_key ] = $rate;
 							}
 						}
 					}
-
-					if ( ! empty( $allowed_rates ) ) {
+					if ( $has_applicable_rule ) {
 						return apply_filters( 'wholesalex_available_shipping_methods', $allowed_rates, $package_rates, $package, $data );
 					}
 				}

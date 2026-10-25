@@ -3,7 +3,7 @@
  * WholesaleX Wholesale Pricing - Rule Engine
  *
  * Loads active wholesale-pricing rules, evaluates targeting/schedule/restrictions,
- * and delegates price calculation to regular and tiered rule handlers.
+ * and delegates additional computed results to extension providers.
  *
  * @package WHOLESALEX
  * @since   1.0.0
@@ -19,6 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Frontend rule engine for wholesale_pricing rules.
  */
 class Wholesale_Pricing_Rule_Engine {
+	/**
+	 * Whether shared pricing hooks have already been attached.
+	 *
+	 * @var bool
+	 */
+	private $pricing_hooks_registered = false;
 
 	/**
 	 * Active wholesale-pricing rules for the current request.
@@ -41,12 +47,6 @@ class Wholesale_Pricing_Rule_Engine {
 	 */
 	private $valid_bogo_discount_rules = array();
 
-	/**
-	 * Active Buy X Get Y discount rules for the current request.
-	 *
-	 * @var array
-	 */
-	private $valid_bxgy_discount_rules = array();
 
 	/**
 	 * Regular discount handler.
@@ -62,12 +62,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 */
 	private $product_discount;
 
-	/**
-	 * Tiered discount handler.
-	 *
-	 * @var Wholesale_Pricing_Tiered_Discount
-	 */
-	private $tiered_discount;
+
 
 	/**
 	 * Cart discount handler.
@@ -83,12 +78,6 @@ class Wholesale_Pricing_Rule_Engine {
 	 */
 	private $bogo_discount;
 
-	/**
-	 * Buy X Get Y discount handler.
-	 *
-	 * @var Wholesale_Pricing_Bxgy_Discount
-	 */
-	private $bxgy_discount;
 
 	/**
 	 * Cache calculated prices by product/quantity to avoid repeated work.
@@ -105,77 +94,36 @@ class Wholesale_Pricing_Rule_Engine {
 	private $rules_loaded = false;
 
 	/**
-	 * Product IDs whose cart tier price has been set on the product object.
-	 * The filter_price hook defers to set_price() for these to avoid
-	 * overwriting the tier-adjusted value during calculate_totals().
+	 * Isolated builder requests never use the administrator's live cart.
 	 *
-	 * @var array<int, float>
+	 * @var bool
 	 */
-	private $cart_tier_prices = array();
+	private $builder_preview = false;
 
-	/**
-	 * Per-request wholesale base prices used as the tier calculation base.
-	 * Keyed by product ID. Populated from the live product price (set by
-	 * Dynamic Rules) on the first woocommerce_before_calculate_totals call
-	 * and reused on subsequent same-request recalculations to prevent
-	 * compounding. Never stored in WC session so stale values cannot
-	 * survive across page loads when rules change.
-	 *
-	 * @var array<int, float>
-	 */
-	private $cart_tier_base_prices = array();
+
+
 
 	/**
 	 * Constructor.
+	 *
+	 * @param bool $register_hooks Whether to register storefront hooks.
 	 */
-	public function __construct() {
+	public function __construct( bool $register_hooks = true ) {
 		$this->regular_discount = Wholesale_Pricing_Rule_Registry::processor( 'regular' );
 		$this->product_discount = Wholesale_Pricing_Rule_Registry::processor( 'product_discount' );
-		$this->tiered_discount  = Wholesale_Pricing_Rule_Registry::processor( 'tiered' );
 		$this->cart_discount    = Wholesale_Pricing_Rule_Registry::processor( 'cart_discount' );
 		$this->bogo_discount    = Wholesale_Pricing_Rule_Registry::processor( 'bogo_discount' );
-		$this->bxgy_discount    = Wholesale_Pricing_Rule_Registry::processor( 'buy_x_get_y' );
+
+		if ( ! $register_hooks ) {
+			return;
+		}
 
 		add_action( 'wp_loaded', array( $this, 'load_valid_rules' ) );
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'update_cart_item_prices' ), 999 );
-		add_action( 'woocommerce_before_calculate_totals', array( $this, 'sync_bxgy_free_cart_items' ), 1000 );
-		add_action( 'woocommerce_before_calculate_totals', array( $this, 'set_bxgy_free_cart_item_prices' ), 1001 );
-		add_filter( 'wholesalex_wholesale_pricing_tier_result', array( $this, 'provide_priority_tier_result' ), 10, 6 );
+		do_action( 'wholesalex_wholesale_pricing_engine_ready', $this );
 	}
 
-	/**
-	 * Supply Wholesale Pricing tiers to the shared legacy priority resolver.
-	 *
-	 * @param array $result Existing priority result.
-	 * @param int   $product_id Product or variation ID.
-	 * @param int   $parent_id Parent product ID.
-	 * @param float $base_price Tier calculation base price.
-	 * @param int   $quantity Current cart quantity.
-	 * @param bool  $first_tier Whether inactive tiers should be exposed for display.
-	 * @return array
-	 */
-	public function provide_priority_tier_result( $result, $product_id, $parent_id, $base_price, $quantity, $first_tier = false ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Retain the established callback signature for compatibility.
-		$product = wc_get_product( $product_id );
 
-		if ( ! $product instanceof \WC_Product ) {
-			return is_array( $result ) ? $result : array();
-		}
-
-		$tier_data = $this->get_tier_price_data( $product, max( 0, absint( $quantity ) ), (float) $base_price );
-
-		if ( false === $tier_data ) {
-			return is_array( $result ) ? $result : array();
-		}
-
-		return array(
-			'src'               => 'wholesale_pricing_tier',
-			'price'             => $tier_data['price'],
-			'tiers'             => $tier_data['tiers'],
-			'id'                => ! empty( $tier_data['tier']['_id'] ) ? $tier_data['tier']['_id'] : '',
-			'base_price'        => $tier_data['base_price'],
-			'wholesale_rule_id' => $tier_data['rule']['id'],
-		);
-	}
 
 	/**
 	 * Build the valid-rule list and register WooCommerce hooks.
@@ -195,7 +143,6 @@ class Wholesale_Pricing_Rule_Engine {
 		$this->valid_rules               = array();
 		$this->valid_cart_discount_rules = array();
 		$this->valid_bogo_discount_rules = array();
-		$this->valid_bxgy_discount_rules = array();
 
 		$user_id = apply_filters( 'wholesalex_set_current_user', get_current_user_id() );
 		$role_id = wholesalex()->get_user_role( $user_id );
@@ -204,6 +151,14 @@ class Wholesale_Pricing_Rule_Engine {
 
 		foreach ( $rules as $rule ) {
 			if ( ! is_array( $rule ) ) {
+				continue;
+			}
+			if ( isset( $rule['conditions'] ) && ( ! is_array( $rule['conditions'] ) || ( isset( $rule['conditions']['tiers'] ) && ! is_array( $rule['conditions']['tiers'] ) ) ) ) {
+				continue; }
+			if ( isset( $rule['cart']['conditions'] ) && ! is_array( $rule['cart']['conditions'] ) ) {
+				continue; }
+
+			if ( Wholesale_Pricing::has_provider_record( $rule ) ) {
 				continue;
 			}
 
@@ -231,16 +186,7 @@ class Wholesale_Pricing_Rule_Engine {
 				continue;
 			}
 
-			if ( 'buy_x_get_y' === ( $rule['rule_type'] ?? '' ) ) {
-				if ( ! $this->bxgy_discount ) {
-					continue;
-				}
-
-				if ( ! $this->is_bxgy_discount_rule_available_for_user( $rule, $role_id, $user_id ) ) {
-					continue;
-				}
-
-				$this->valid_bxgy_discount_rules[] = $this->normalize_bxgy_discount_rule_for_runtime( $rule, $role_id );
+			if ( ! in_array( $rule['rule_type'] ?? '', array( 'wholesale_pricing', 'product_discount' ), true ) ) {
 				continue;
 			}
 
@@ -254,12 +200,9 @@ class Wholesale_Pricing_Rule_Engine {
 		usort( $this->valid_rules, array( $this, 'compare_by_priority' ) );
 		usort( $this->valid_cart_discount_rules, array( $this, 'compare_by_priority' ) );
 		usort( $this->valid_bogo_discount_rules, array( $this, 'compare_by_priority' ) );
-		usort( $this->valid_bxgy_discount_rules, array( $this, 'compare_by_priority' ) );
 
 		if ( ! empty( $this->valid_rules ) ) {
 			$this->register_pricing_hooks();
-			$this->register_restriction_hooks();
-			$this->register_tier_table_hooks();
 		}
 
 		if ( ! empty( $this->valid_cart_discount_rules ) ) {
@@ -269,10 +212,6 @@ class Wholesale_Pricing_Rule_Engine {
 		if ( ! empty( $this->valid_bogo_discount_rules ) ) {
 			$this->register_bogo_discount_hooks();
 		}
-
-		if ( ! empty( $this->valid_bxgy_discount_rules ) ) {
-			$this->register_bxgy_discount_hooks();
-		}
 	}
 
 	/**
@@ -280,7 +219,10 @@ class Wholesale_Pricing_Rule_Engine {
 	 *
 	 * @return void
 	 */
-	private function register_pricing_hooks(): void {
+	public function register_pricing_hooks(): void {
+		if ( $this->pricing_hooks_registered ) {
+			return; }
+		$this->pricing_hooks_registered = true;
 		add_filter( 'woocommerce_product_get_price', array( $this, 'filter_price' ), 8, 2 );
 		add_filter( 'woocommerce_product_variation_get_price', array( $this, 'filter_price' ), 8, 2 );
 		add_filter( 'woocommerce_product_get_sale_price', array( $this, 'filter_sale_price' ), 8, 2 );
@@ -289,7 +231,6 @@ class Wholesale_Pricing_Rule_Engine {
 		add_filter( 'woocommerce_variation_prices_price', array( $this, 'filter_variation_price' ), 8, 2 );
 		add_filter( 'woocommerce_get_variation_prices_hash', array( $this, 'variation_price_hash' ), 8, 3 );
 		add_filter( 'woocommerce_get_price_html', array( $this, 'filter_price_html' ), 20, 2 );
-		add_filter( 'woocommerce_cart_item_price', array( $this, 'filter_cart_item_price_html' ), 99, 2 );
 	}
 
 	/**
@@ -308,47 +249,12 @@ class Wholesale_Pricing_Rule_Engine {
 			return $price;
 		}
 
-		$active_tier_data = apply_filters( 'wholesalex_active_tier_data', array(), $product );
-		if ( ! empty( $active_tier_data['src'] ) && 'wholesale_pricing_tier' !== $active_tier_data['src'] ) {
-			return $price;
-		}
-
-		// During cart total calculation the tier engine has already called
-		// set_price() with the correct quantity-based tier price. Do not
-		// overwrite it with a quantity-agnostic cached value.
-		if ( isset( $this->cart_tier_prices[ $product->get_id() ] ) ) {
-			return $this->cart_tier_prices[ $product->get_id() ];
-		}
-
 		$price_data = $this->get_product_price_data( $product );
 
-		return false === $price_data ? $price : $price_data['price'];
+		return apply_filters( 'wholesalex_wholesale_pricing_price', false === $price_data ? $price : $price_data['price'], $product, $price );
 	}
 
-	/**
-	 * Register quantity/value restriction hooks.
-	 *
-	 * @return void
-	 */
-	private function register_restriction_hooks(): void {
-		add_filter( 'woocommerce_quantity_input_args', array( $this, 'filter_quantity_input_args' ), 10, 2 );
-		add_filter( 'woocommerce_available_variation', array( $this, 'filter_variation_quantity_limits' ), 10, 3 );
-		add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'render_simple_quantity_restriction_data' ) );
-		add_filter( 'woocommerce_loop_add_to_cart_args', array( $this, 'filter_loop_add_to_cart_args' ), 10, 2 );
-		add_filter( 'woocommerce_add_to_cart_validation', array( $this, 'validate_add_to_cart_quantity' ), 10, 5 );
-		add_filter( 'woocommerce_update_cart_validation', array( $this, 'validate_cart_update_quantity' ), 10, 4 );
-		add_action( 'woocommerce_check_cart_items', array( $this, 'validate_cart_items' ) );
-	}
 
-	/**
-	 * Register single-product tier table hooks.
-	 *
-	 * @return void
-	 */
-	private function register_tier_table_hooks(): void {
-		add_action( 'woocommerce_before_add_to_cart_form', array( $this, 'render_simple_product_tier_table' ), 10 );
-		add_filter( 'woocommerce_available_variation', array( $this, 'append_variation_tier_table' ), 20, 3 );
-	}
 
 	/**
 	 * Register cart discount hooks for cart and checkout totals.
@@ -384,25 +290,6 @@ class Wholesale_Pricing_Rule_Engine {
 			add_action( 'woocommerce_before_shop_loop_item_title', array( $this, 'render_bogo_discount_badge' ), 10 );
 			add_action( 'wholesalex_after_frontend_enqueue_scripts', array( $this, 'enqueue_single_product_bogo_discount_badge' ), 10 );
 			add_action( 'wp_head', array( $this, 'add_bogo_discount_badge_css' ), 7 );
-		}
-	}
-
-	/**
-	 * Register Buy X Get Y promo and badge hooks.
-	 *
-	 * @return void
-	 */
-	private function register_bxgy_discount_hooks(): void {
-		if ( $this->bxgy_discount && $this->bxgy_discount->has_promo_rules( $this->valid_bxgy_discount_rules ) ) {
-			add_action( 'woocommerce_before_add_to_cart_form', array( $this, 'render_simple_product_bxgy_discount_promo' ), 10 );
-			add_filter( 'woocommerce_available_variation', array( $this, 'append_variation_bxgy_discount_promo' ), 20, 3 );
-		}
-
-		if ( $this->bxgy_discount && $this->bxgy_discount->has_badge_rules( $this->valid_bxgy_discount_rules ) ) {
-			add_filter( 'wopb_after_loop_image', array( $this, 'wopb_render_bxgy_discount_badge' ), 10 );
-			add_action( 'woocommerce_before_shop_loop_item_title', array( $this, 'render_bxgy_discount_badge' ), 10 );
-			add_action( 'wholesalex_after_frontend_enqueue_scripts', array( $this, 'enqueue_single_product_bxgy_discount_badge' ), 10 );
-			add_action( 'wp_head', array( $this, 'add_bxgy_discount_badge_css' ), 7 );
 		}
 	}
 
@@ -571,156 +458,6 @@ class Wholesale_Pricing_Rule_Engine {
 	}
 
 	/**
-	 * Render wholesale-pricing Buy X Get Y free-product promo on simple product pages.
-	 *
-	 * @return void
-	 */
-	public function render_simple_product_bxgy_discount_promo(): void {
-		global $product;
-
-		if ( ! $product instanceof \WC_Product || ! $product->is_type( 'simple' ) ) {
-			return;
-		}
-
-		$this->load_valid_rules();
-
-		if ( ! $this->bxgy_discount || empty( $this->valid_bxgy_discount_rules ) ) {
-			return;
-		}
-
-		$this->bxgy_discount->render_promo_html( $product, $this->valid_bxgy_discount_rules );
-	}
-
-	/**
-	 * Append wholesale-pricing Buy X Get Y promo to variation availability.
-	 *
-	 * @param array       $variation_array Variation data.
-	 * @param \WC_Product $product         Parent variable product.
-	 * @param \WC_Product $variation       Variation product.
-	 * @return array
-	 */
-	public function append_variation_bxgy_discount_promo( $variation_array, $product, $variation ): array {
-		if ( ! $variation instanceof \WC_Product ) {
-			return $variation_array;
-		}
-
-		$this->load_valid_rules();
-
-		if ( ! $this->bxgy_discount || empty( $this->valid_bxgy_discount_rules ) ) {
-			return $variation_array;
-		}
-
-		$variation_array['availability_html'] = ( $variation_array['availability_html'] ?? '' ) . $this->bxgy_discount->get_promo_html( $variation, $this->valid_bxgy_discount_rules );
-
-		return $variation_array;
-	}
-
-	/**
-	 * Render wholesale-pricing Buy X Get Y badges on shop/archive product cards.
-	 *
-	 * @return void
-	 */
-	public function render_bxgy_discount_badge(): void {
-		if ( ! $this->bxgy_discount ) {
-			return; }
-			echo wp_kses_post( $this->bxgy_discount->get_badge_markup( $this->valid_bxgy_discount_rules, false ) );
-	}
-
-	/**
-	 * Render wholesale-pricing Buy X Get Y badges for WowStore loop images.
-	 *
-	 * @return string
-	 */
-	public function wopb_render_bxgy_discount_badge(): string {
-		return $this->bxgy_discount ? $this->bxgy_discount->get_badge_markup( $this->valid_bxgy_discount_rules, false ) : '';
-	}
-
-	/**
-	 * Queue single-product Buy X Get Y badge insertion.
-	 *
-	 * @return void
-	 */
-	public function enqueue_single_product_bxgy_discount_badge(): void {
-		if ( ! is_product() ) {
-			return;
-		}
-
-		$product = wc_get_product( get_queried_object_id() );
-
-		if ( ! $product instanceof \WC_Product ) {
-			return;
-		}
-
-		if ( ! $this->bxgy_discount ) {
-			return; }
-		$this->bxgy_discount->enqueue_single_badge_script( $this->valid_bxgy_discount_rules, $product );
-	}
-
-	/**
-	 * Add per-rule Buy X Get Y badge CSS.
-	 *
-	 * @return void
-	 */
-	public function add_bxgy_discount_badge_css(): void {
-		if ( ! is_shop() && ! is_product() && ! is_product_category() && ! is_product_tag() ) {
-			return;
-		}
-
-		if ( ! $this->bxgy_discount ) {
-			return; }
-		$css = $this->bxgy_discount->get_badge_css( $this->valid_bxgy_discount_rules );
-
-		if ( '' !== trim( $css ) ) {
-			wp_add_inline_style( 'wholesalex', wholesalex()->sanitize_inline_css( $css ) );
-		}
-	}
-
-	/**
-	 * Sync Buy X Get Y free cart lines when cart totals are calculated.
-	 *
-	 * @param \WC_Cart $cart Cart object.
-	 * @return void
-	 */
-	public function sync_bxgy_free_cart_items( $cart ): void {
-		if ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-			return;
-		}
-
-		if ( ! $cart instanceof \WC_Cart ) {
-			return;
-		}
-
-		$this->load_valid_rules();
-
-		if ( ! $this->bxgy_discount ) {
-			// Remove previously granted gifts before restored products are charged at their regular prices.
-			foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
-				if ( ! empty( $cart_item['_wholesalex_wp_bxgy_free_item'] ) ) {
-					$cart->remove_cart_item( $cart_item_key );
-				}
-			}
-			return;
-		}
-		$this->bxgy_discount->sync_free_cart_items( $cart, $this->valid_bxgy_discount_rules );
-	}
-
-	/**
-	 * Keep Buy X Get Y free cart lines at zero price.
-	 *
-	 * @param \WC_Cart $cart Cart object.
-	 * @return void
-	 */
-	public function set_bxgy_free_cart_item_prices( $cart ): void {
-		if ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-			return;
-		}
-
-		if ( ! $this->bxgy_discount ) {
-			return; }
-		$this->bxgy_discount->set_free_cart_item_prices( $cart );
-	}
-
-	/**
 	 * Apply wholesale pricing to product sale price.
 	 *
 	 * @param string|float $sale_price Current sale price.
@@ -732,18 +469,9 @@ class Wholesale_Pricing_Rule_Engine {
 			return $sale_price;
 		}
 
-		$active_tier_data = apply_filters( 'wholesalex_active_tier_data', array(), $product );
-		if ( ! empty( $active_tier_data['src'] ) && 'wholesale_pricing_tier' !== $active_tier_data['src'] ) {
-			return $sale_price;
-		}
-
-		if ( isset( $this->cart_tier_prices[ $product->get_id() ] ) ) {
-			return $this->cart_tier_prices[ $product->get_id() ];
-		}
-
 		$price_data = $this->get_product_price_data( $product );
 
-		return false === $price_data ? $sale_price : $price_data['price'];
+		return apply_filters( 'wholesalex_wholesale_pricing_price', false === $price_data ? $sale_price : $price_data['price'], $product, $sale_price );
 	}
 
 	/**
@@ -758,26 +486,15 @@ class Wholesale_Pricing_Rule_Engine {
 			return $price;
 		}
 
-		$active_tier_data = apply_filters( 'wholesalex_active_tier_data', array(), $product );
-		if ( ! empty( $active_tier_data['src'] ) && 'wholesale_pricing_tier' !== $active_tier_data['src'] ) {
-			return $price;
-		}
-
-		if ( isset( $this->cart_tier_prices[ $product->get_id() ] ) ) {
-			return $this->cart_tier_prices[ $product->get_id() ];
-		}
-
 		$price_data = $this->get_product_price_data( $product );
 
-		return false === $price_data ? $price : $price_data['price'];
+		return apply_filters( 'wholesalex_wholesale_pricing_price', false === $price_data ? $price : $price_data['price'], $product, $price );
 	}
 
 	/**
 	 * Render wholesale-pricing price HTML.
 	 *
 	 * Regular discounts use the rule label as the visible wholesale-price text.
-	 * Tiered discounts keep the compact sale/regular format used by the existing
-	 * tiered-pricing design.
 	 *
 	 * @param string      $price_html Existing price HTML.
 	 * @param \WC_Product $product    Product object.
@@ -792,10 +509,11 @@ class Wholesale_Pricing_Rule_Engine {
 			return $price_html;
 		}
 
-		$active_tier_data = apply_filters( 'wholesalex_active_tier_data', array(), $product );
-		if ( ! empty( $active_tier_data['src'] ) && 'wholesale_pricing_tier' !== $active_tier_data['src'] ) {
+		if ( ! is_user_logged_in() && 'yes' === wholesalex()->get_setting( '_settings_login_to_view_price', 'no' ) ) {
 			return $price_html;
 		}
+		if ( 'yes' === wholesalex()->get_setting( '_settings_hide_retail_price' ) && 'yes' === wholesalex()->get_setting( '_settings_hide_wholesalex_price' ) ) {
+			return ''; }
 
 		if ( $product->is_type( 'variable' ) ) {
 			$range_data = $this->get_variable_price_range_data( $product );
@@ -807,7 +525,11 @@ class Wholesale_Pricing_Rule_Engine {
 			return $price_html;
 		}
 
-		$price_data = $this->get_product_price_data( $product );
+		$price_data    = $this->get_product_price_data( $product );
+		$provided_html = apply_filters( 'wholesalex_wholesale_pricing_price_html', null, $product, $price_data, $price_html, $this );
+		if ( null !== $provided_html ) {
+			return $provided_html;
+		}
 
 		if ( false === $price_data || empty( $price_data['rule'] ) ) {
 			return $price_html;
@@ -816,17 +538,13 @@ class Wholesale_Pricing_Rule_Engine {
 		$base_price      = $this->get_base_price( $product );
 		$wholesale_price = (float) $price_data['price'];
 
-		if ( $base_price <= 0 || $wholesale_price <= 0 || $wholesale_price >= $base_price ) {
+		if ( $base_price <= 0 || $wholesale_price < 0 || $wholesale_price >= $base_price ) {
 			return $price_html;
 		}
 
 		$base_html      = wc_price( wc_get_price_to_display( $product, array( 'price' => $base_price ) ) );
 		$wholesale_html = wc_price( wc_get_price_to_display( $product, array( 'price' => $wholesale_price ) ) );
 		$rule           = $price_data['rule'];
-
-		if ( 'tiered' === $rule['discount_type'] ) {
-			return $this->tiered_discount->format_product_price_html( $product, $base_price, $wholesale_price );
-		}
 
 		if ( 'regular' === $rule['discount_type'] ) {
 			$label                 = $this->get_discount_label( $rule );
@@ -889,26 +607,29 @@ class Wholesale_Pricing_Rule_Engine {
 				continue;
 			}
 
-			$price_data = $this->get_product_price_data( $variation );
-
-			if ( false === $price_data ) {
-				continue;
-			}
-
-			$base_price       = $this->get_base_price( $variation );
-			$wholesale_price  = (float) $price_data['price'];
 			$variation_active = $variation->is_purchasable() && ( ! method_exists( $variation, 'variation_is_visible' ) || $variation->variation_is_visible() );
-
-			if ( ! $variation_active || $base_price <= 0 || $wholesale_price <= 0 || $wholesale_price >= $base_price ) {
+			if ( ! $variation_active ) {
 				continue;
 			}
 
+			$price_data      = $this->get_product_price_data( $variation );
+			$base_price      = $this->get_base_price( $variation );
+			$has_discount    = false !== $price_data && $price_data['price'] > 0 && $price_data['price'] < $base_price;
+			$effective_price = $has_discount ? $price_data['price'] : $variation->get_price();
+
+			if ( ! is_numeric( $effective_price ) ) {
+				continue;
+			}
+
+			// Unmatched variations still contribute their actual price to the range.
 			$base_prices[]      = wc_get_price_to_display( $variation, array( 'price' => $base_price ) );
-			$wholesale_prices[] = wc_get_price_to_display( $variation, array( 'price' => $wholesale_price ) );
-			$applied_rule       = false === $applied_rule ? $price_data['rule'] : $applied_rule;
+			$wholesale_prices[] = wc_get_price_to_display( $variation, array( 'price' => $effective_price ) );
+			if ( $has_discount && false === $applied_rule ) {
+				$applied_rule = $price_data['rule'];
+			}
 		}
 
-		if ( empty( $wholesale_prices ) ) {
+		if ( false === $applied_rule || empty( $wholesale_prices ) ) {
 			return false;
 		}
 
@@ -938,24 +659,14 @@ class Wholesale_Pricing_Rule_Engine {
 			$wholesale_html = wc_format_price_range( $min, $max );
 		}
 
-		if ( is_shop() || is_product_category() ) {
-			switch ( wholesalex()->get_setting( '_settings_price_product_list_page', 'pricing_range' ) ) {
-				case 'minimum_pricing':
-					$wholesale_html = wc_price( $min );
-					break;
-				case 'maximum_pricing':
-					$wholesale_html = wc_price( $max );
-					break;
-			}
-		}
-
 		$base_min  = (float) $range_data['base_min'];
 		$base_max  = (float) $range_data['base_max'];
 		$base_html = $base_min === $base_max ? wc_price( $base_min ) : wc_format_price_range( $base_min, $base_max );
 		$rule      = isset( $range_data['rule'] ) && is_array( $range_data['rule'] ) ? $range_data['rule'] : array();
 
-		if ( isset( $rule['discount_type'] ) && 'tiered' === $rule['discount_type'] ) {
-			return $this->tiered_discount->format_display_price_html( $product, $base_html, $wholesale_html );
+		$provided_html = apply_filters( 'wholesalex_wholesale_pricing_range_html', null, $product, $range_data, $base_html, $wholesale_html );
+		if ( null !== $provided_html ) {
+			return $provided_html;
 		}
 
 		if ( isset( $rule['discount_type'] ) && 'regular' === $rule['discount_type'] ) {
@@ -1063,7 +774,7 @@ class Wholesale_Pricing_Rule_Engine {
 			$suffix = wc_price( wc_get_price_excluding_tax( $product ) );
 		}
 
-		return '<small class="woocommerce-price-suffix">' . wp_kses_post( $suffix ) . '</small>';
+		return ' <small class="woocommerce-price-suffix">' . wp_kses_post( $suffix ) . '</small>';
 	}
 
 	/**
@@ -1134,142 +845,9 @@ class Wholesale_Pricing_Rule_Engine {
 		return md5( wp_json_encode( $cart_items ) );
 	}
 
-	/**
-	 * Set cart item product prices before WooCommerce calculates totals.
-	 *
-	 * @param \WC_Cart $cart Cart object.
-	 * @return void
-	 */
-	public function update_cart_item_prices( $cart ): void {
-		if ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-			return;
-		}
 
-		if ( ! $cart instanceof \WC_Cart ) {
-			return;
-		}
 
-		$this->load_valid_rules();
 
-		if ( empty( $this->valid_rules ) ) {
-			return;
-		}
-
-		// Flush the price cache so quantity-aware tier prices are recalculated
-		// from cart quantities rather than returning stale catalog-display values.
-		$this->price_cache      = array();
-		$this->cart_tier_prices = array();
-
-		foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
-			if ( empty( $cart_item['data'] ) || ! $cart_item['data'] instanceof \WC_Product ) {
-				continue;
-			}
-
-			$active_tier_data = apply_filters( 'wholesalex_active_tier_data', array(), $cart_item['data'] );
-			if ( ! empty( $active_tier_data['src'] ) && 'wholesale_pricing_tier' !== $active_tier_data['src'] ) {
-				continue;
-			}
-
-			// Remove any legacy session value so stale base prices from previous
-			// requests can never influence tier calculation.
-			if ( isset( $cart->cart_contents[ $cart_item_key ]['_wsx_wholesale_pricing_tier_base_price'] ) ) {
-				unset( $cart->cart_contents[ $cart_item_key ]['_wsx_wholesale_pricing_tier_base_price'] );
-			}
-
-			// The shared priority resolver has already calculated this source's
-			// quantity-aware price from its stable pre-tier base. Recalculating from
-			// the mutated cart product would compound the tier on every pricing pass
-			// (for example 8.64 -> 6.91 -> 5.53 for a 20% tier).
-			if (
-				'wholesale_pricing_tier' === ( $active_tier_data['src'] ?? '' ) &&
-				array_key_exists( 'price', $active_tier_data ) &&
-				false !== $active_tier_data['price'] &&
-				is_numeric( $active_tier_data['price'] )
-			) {
-				$resolved_tier_price = max( 0, (float) $active_tier_data['price'] );
-				$cart_item['data']->set_price( $resolved_tier_price );
-				$this->cart_tier_prices[ $cart_item['data']->get_id() ]                       = $resolved_tier_price;
-				$cart->cart_contents[ $cart_item_key ]['_wsx_wholesale_pricing_tier_applied'] = true;
-				$this->set_discounted_product( $cart_item['data']->get_id() );
-				continue;
-			}
-
-			$tier_base_price = $this->get_cart_item_tier_base_price( $cart_item );
-			$price_data      = $this->get_product_price_data( $cart_item['data'], absint( $cart_item['quantity'] ), $tier_base_price );
-
-			if ( false !== $price_data ) {
-				if ( null !== $tier_base_price ) {
-					// Store in the request-scoped property only — never in WC
-					// session, so stale base prices cannot persist across page
-					// loads when rules are updated.
-					$this->cart_tier_base_prices[ $cart_item['data']->get_id() ] = $tier_base_price;
-				}
-
-				$cart_item['data']->set_price( $price_data['price'] );
-
-				// Remember the tier-adjusted price so filter_price() does not
-				// overwrite it with the quantity-agnostic cached value when
-				// WooCommerce reads get_price() during calculate_totals().
-				$this->cart_tier_prices[ $cart_item['data']->get_id() ] = (float) $price_data['price'];
-
-				if ( ! empty( $price_data['tier'] ) ) {
-					$cart->cart_contents[ $cart_item_key ]['_wsx_wholesale_pricing_tier_applied'] = true;
-				} else {
-					unset( $cart->cart_contents[ $cart_item_key ]['_wsx_wholesale_pricing_tier_applied'] );
-				}
-
-				$this->set_discounted_product( $cart_item['data']->get_id() );
-			} else {
-				foreach ( $this->valid_rules as $rule ) {
-					if (
-						'tiered' !== ( $rule['discount_type'] ?? '' ) ||
-						! $this->can_rule_price_product( $rule, $cart_item['data'], absint( $cart_item['quantity'] ) ) ||
-						empty( $this->tiered_discount->get_tiers( $rule ) )
-					) {
-						continue;
-					}
-
-					// No tier (or regular wholesale rule) priced this quantity. The
-					// cart product may still carry a previous tier's price, so read
-					// the role-aware fallback (including sale) and protect it from catalog filters.
-					$product        = $cart_item['data'];
-					$fallback_price = $this->tiered_discount->get_fallback_price( $product, $this->get_base_price( $product ) );
-					if ( '' !== $fallback_price && is_numeric( $fallback_price ) ) {
-						$product->set_price( $fallback_price );
-						$this->cart_tier_prices[ $product->get_id() ] = (float) $fallback_price;
-					}
-					unset( $cart->cart_contents[ $cart_item_key ]['_wsx_wholesale_pricing_tier_applied'] );
-					break;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Display the final cart-item unit price after wholesale-pricing tiers run.
-	 *
-	 * @param string $price_html Existing cart item price HTML.
-	 * @param array  $cart_item  WooCommerce cart item.
-	 * @return string
-	 */
-	public function filter_cart_item_price_html( $price_html, $cart_item ): string {
-		if ( empty( $cart_item['data'] ) || ! $cart_item['data'] instanceof \WC_Product ) {
-			return $price_html;
-		}
-
-		if ( empty( $cart_item['_wsx_wholesale_pricing_tier_applied'] ) ) {
-			return $price_html;
-		}
-
-		return wc_price(
-			wc_get_price_to_display(
-				$cart_item['data'],
-				array(
-					'price' => $cart_item['data']->get_price( 'edit' ),
-				)
-			)
-		);
-	}
 
 	/**
 	 * Apply eligible cart discount rules as WooCommerce negative fees.
@@ -1371,383 +949,23 @@ class Wholesale_Pricing_Rule_Engine {
 		}
 	}
 
-	/**
-	 * Return the stable base price that cart tier discounts should use.
-	 *
-	 * Dynamic Rules runs just before this engine and may already set the cart
-	 * product object price to a wholesale/product-discount value such as 3.60.
-	 * Store that value as the tier base so a 20% tier becomes 2.88, while later
-	 * cart recalculations do not compound from 2.88.
-	 *
-	 * @param array $cart_item WooCommerce cart item.
-	 * @return float|null
-	 */
-	private function get_cart_item_tier_base_price( array $cart_item ): ?float {
-		$product = $cart_item['data'] ?? null;
 
-		if ( ! $product instanceof \WC_Product ) {
-			return null;
-		}
 
-		// Use the request-scoped value if already captured this request.
-		// This prevents compounding when WooCommerce recalculates totals
-		// more than once within a single PHP request.
-		if ( isset( $this->cart_tier_base_prices[ $product->get_id() ] ) ) {
-			return $this->cart_tier_base_prices[ $product->get_id() ];
-		}
 
-		// On the first calculation of the request, Dynamic Rules (priority 5)
-		// has already called set_price() with the current wholesale price.
-		// Capture that as the tier base, but do not mistake WooCommerce's
-		// native sale price for a wholesale base when discounts are configured
-		// to apply on the regular price.
-		$current_price = (float) $product->get_price( 'edit' );
-		$base_price    = $this->get_base_price( $product );
 
-		if ( $this->is_sale_price_base_for_regular_discount( $product, $current_price ) ) {
-			return null;
-		}
 
-		if ( $current_price > 0 && $base_price > 0 && $current_price < $base_price ) {
-			return $current_price;
-		}
 
-		return null;
-	}
 
-	/**
-	 * Set product quantity min/max values on simple product forms.
-	 *
-	 * @param array       $args    Quantity input args.
-	 * @param \WC_Product $product Product object.
-	 * @return array
-	 */
-	public function filter_quantity_input_args( $args, $product ): array {
-		if ( ! $product instanceof \WC_Product ) {
-			return $args;
-		}
-
-		$restriction = $this->get_product_quantity_restriction( $product );
-
-		if ( empty( $restriction ) ) {
-			return $args;
-		}
-
-		if ( $restriction['min'] > 0 ) {
-			$args['min_value'] = $restriction['min'];
-		}
-		if ( $restriction['max'] > 0 ) {
-			$args['max_value'] = $restriction['max'];
-		}
-		if ( $restriction['step'] > 0 ) {
-			$args['step'] = $restriction['step'];
-		}
-
-		return $args;
-	}
-
-	/**
-	 * Set min/max values for variation quantity inputs.
-	 *
-	 * @param array       $variation_data Variation data.
-	 * @param \WC_Product $product        Parent product.
-	 * @param \WC_Product $variation      Variation product.
-	 * @return array
-	 */
-	public function filter_variation_quantity_limits( $variation_data, $product, $variation ): array {
-		if ( ! $variation instanceof \WC_Product ) {
-			return $variation_data;
-		}
-
-		$restriction = $this->get_product_quantity_restriction( $variation );
-
-		if ( empty( $restriction ) ) {
-			return $variation_data;
-		}
-
-		if ( $restriction['min'] > 0 ) {
-			$variation_data['min_qty'] = $restriction['min'];
-		}
-		if ( $restriction['max'] > 0 ) {
-			$variation_data['max_qty'] = $restriction['max'];
-		}
-		if ( $restriction['step'] > 0 ) {
-			$variation_data['step'] = $restriction['step'];
-		}
-
-		$variation_data['wholesalex_quantity_restriction'] = $this->get_frontend_quantity_restriction( $variation, $restriction );
-
-		return $variation_data;
-	}
-
-	/**
-	 * Print simple-product restriction data for accessible frontend validation.
-	 *
-	 * WooCommerce's quantity template does not support custom data attributes.
-	 * A hidden element keeps the rule beside the form without changing the
-	 * native min/max attributes used by themes and assistive technology.
-	 *
-	 * @return void
-	 */
-	public function render_simple_quantity_restriction_data(): void {
-		global $product;
-
-		if ( ! $product instanceof \WC_Product || ! $product->is_type( 'simple' ) ) {
-			return;
-		}
-
-		$restriction = $this->get_product_quantity_restriction( $product );
-
-		if ( empty( $restriction ) ) {
-			return;
-		}
-
-		$data = $this->get_frontend_quantity_restriction( $product, $restriction );
-		?>
-		<span
-			class="wholesalex-quantity-restriction-data"
-			hidden
-			data-min="<?php echo esc_attr( $data['min'] ); ?>"
-			data-max="<?php echo esc_attr( $data['max'] ); ?>"
-			data-min-message="<?php echo esc_attr( $data['min_message'] ); ?>"
-			data-max-message="<?php echo esc_attr( $data['max_message'] ); ?>"
-		></span>
-		<?php
-	}
-
-	/**
-	 * Prepare quantity limits and resolved warning messages for product forms.
-	 *
-	 * @param \WC_Product $product     Product object.
-	 * @param array       $restriction Restriction data.
-	 * @return array
-	 */
-	private function get_frontend_quantity_restriction( \WC_Product $product, array $restriction ): array {
-		$min_message = isset( $restriction['message']['min'] ) ? trim( wp_strip_all_tags( $restriction['message']['min'] ) ) : '';
-		$max_message = isset( $restriction['message']['max'] ) ? trim( wp_strip_all_tags( $restriction['message']['max'] ) ) : '';
-
-		return array(
-			'min'         => $restriction['min'],
-			'max'         => $restriction['max'],
-			'min_message' => $restriction['min'] > 0 && '' !== $min_message ? wp_strip_all_tags( $this->get_quantity_notice( $product, $restriction, 'min' ) ) : '',
-			'max_message' => $restriction['max'] > 0 && '' !== $max_message ? wp_strip_all_tags( $this->get_quantity_notice( $product, $restriction, 'max' ) ) : '',
-		);
-	}
-
-	/**
-	 * Use the minimum quantity as loop add-to-cart quantity where applicable.
-	 *
-	 * @param array       $args    Loop button args.
-	 * @param \WC_Product $product Product object.
-	 * @return array
-	 */
-	public function filter_loop_add_to_cart_args( $args, $product ): array {
-		if ( ! $product instanceof \WC_Product || ! $product->is_type( 'simple' ) ) {
-			return $args;
-		}
-
-		$restriction = $this->get_product_quantity_restriction( $product );
-
-		if ( ! empty( $restriction['min'] ) ) {
-			$args['quantity'] = $restriction['min'];
-		}
-
-		return $args;
-	}
-
-	/**
-	 * Validate add-to-cart quantity and product-value restrictions.
-	 *
-	 * @param bool $passed       Current validation status.
-	 * @param int  $product_id   Product ID.
-	 * @param int  $quantity     Quantity being added.
-	 * @param int  $variation_id Variation ID.
-	 * @return bool
-	 */
-	public function validate_add_to_cart_quantity( $passed, $product_id, $quantity, $variation_id = 0 ) {
-		if ( ! $passed ) {
-			return $passed;
-		}
-
-		$product = wc_get_product( $variation_id ? $variation_id : $product_id );
-
-		if ( ! $product ) {
-			return $passed;
-		}
-
-		$requested_quantity = absint( $quantity );
-		$restriction        = $this->get_product_quantity_restriction( $product );
-
-		if ( ! empty( $restriction ) ) {
-			$new_quantity = $this->get_cart_quantity( $product, $restriction['rule'] ) + $requested_quantity;
-			$passed       = $this->validate_quantity_against_restriction( $passed, $product, $restriction, $new_quantity );
-		}
-
-		if ( ! $passed ) {
-			return false;
-		}
-
-		$value_quantity    = $this->get_cart_quantity( $product, array( 'restrictions' => array() ) ) + $requested_quantity;
-		$value_restriction = $this->get_product_value_restriction( $product, $value_quantity );
-
-		if ( empty( $value_restriction ) ) {
-			return $passed;
-		}
-
-		return $this->validate_value_against_restriction( $passed, $product, $value_restriction, $value_quantity );
-	}
-
-	/**
-	 * Validate cart quantity update restrictions.
-	 *
-	 * @param bool   $passed        Current validation status.
-	 * @param string $cart_item_key Cart item key.
-	 * @param array  $values        Cart item data.
-	 * @param int    $quantity      New quantity.
-	 * @return bool
-	 */
-	public function validate_cart_update_quantity( $passed, $cart_item_key, $values, $quantity ) {
-		if ( ! $passed || empty( $values['data'] ) || ! $values['data'] instanceof \WC_Product ) {
-			return $passed;
-		}
-
-		$requested_quantity = absint( $quantity );
-		$restriction        = $this->get_product_quantity_restriction( $values['data'] );
-
-		if ( ! empty( $restriction ) ) {
-			$rule             = isset( $restriction['rule'] ) ? $restriction['rule'] : array();
-			$updated_quantity = $this->get_cart_quantity_for_update( $values['data'], $rule, $cart_item_key, $requested_quantity );
-			$passed           = $this->validate_quantity_against_restriction( $passed, $values['data'], $restriction, $updated_quantity );
-		}
-
-		if ( ! $passed ) {
-			return false;
-		}
-
-		$value_quantity    = $this->get_cart_quantity_for_update( $values['data'], array( 'restrictions' => array() ), $cart_item_key, $requested_quantity );
-		$value_restriction = $this->get_product_value_restriction( $values['data'], $value_quantity );
-
-		if ( empty( $value_restriction ) ) {
-			return $passed;
-		}
-
-		return $this->validate_value_against_restriction( $passed, $values['data'], $value_restriction, $value_quantity );
-	}
-
-	/**
-	 * Validate product-level quantity and order value restrictions before checkout.
-	 *
-	 * @return void
-	 */
-	public function validate_cart_items(): void {
-		if ( ! WC()->cart ) {
-			return;
-		}
-
-		$shown_notices = array();
-
-		foreach ( $this->valid_rules as $rule ) {
-			if ( ! $this->conditions_pass( $rule ) ) {
-				continue;
-			}
-
-			if ( ! $this->rule_uses_quantity_limits( $rule ) && ! $this->rule_uses_value_limits( $rule ) ) {
-				continue;
-			}
-
-			foreach ( WC()->cart->get_cart() as $cart_item ) {
-				if ( empty( $cart_item['data'] ) || ! $cart_item['data'] instanceof \WC_Product ) {
-					continue;
-				}
-
-				$product = $cart_item['data'];
-
-				if ( ! $this->is_product_eligible_for_rule( $product, $rule ) ) {
-					continue;
-				}
-
-				$quantity = $this->get_cart_quantity( $product, $rule );
-
-				if ( $this->rule_uses_value_limits( $rule ) ) {
-					$this->maybe_add_amount_notice( $shown_notices, $rule, $product, $quantity );
-				}
-
-				if ( $this->rule_uses_quantity_limits( $rule ) ) {
-					$this->maybe_add_quantity_notice( $shown_notices, $rule, $product, $quantity );
-				}
-			}
-		}
-	}
-
-	/**
-	 * Render the tier table for simple products.
-	 *
-	 * @return void
-	 */
-	public function render_simple_product_tier_table(): void {
-		global $product;
-
-		if ( ! $product instanceof \WC_Product || ! $product->is_type( 'simple' ) ) {
-			return;
-		}
-
-		echo $this->sanitize_tier_table_markup( $this->get_tier_table_markup( $product ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Sanitized by sanitize_tier_table_markup().
-	}
-
-	/**
-	 * Append tier table markup to variation availability HTML.
-	 *
-	 * @param array       $variation_data Variation data.
-	 * @param \WC_Product $product        Parent product.
-	 * @param \WC_Product $variation      Variation product.
-	 * @return array
-	 */
-	public function append_variation_tier_table( $variation_data, $product, $variation ): array {
-		if ( $variation instanceof \WC_Product ) {
-			$variation_data['availability_html'] .= $this->sanitize_tier_table_markup( $this->get_tier_table_markup( $variation ) );
-		}
-
-		return $variation_data;
-	}
-
-	/**
-	 * Sanitize generated tier-table markup without stripping its scoped CSS.
-	 *
-	 * wp_kses_post() removes style elements but leaves their text content behind,
-	 * which prints the generated CSS on product pages. The tier renderer builds
-	 * this CSS only from validated rule design values, so permit the style wrapper
-	 * while retaining the normal post allowlist for all table markup.
-	 *
-	 * @param string $markup Generated tier table HTML and scoped CSS.
-	 * @return string
-	 */
-	private function sanitize_tier_table_markup( string $markup ): string {
-		$allowed_html          = wp_kses_allowed_html( 'post' );
-		$allowed_html['style'] = array(
-			'id'   => true,
-			'type' => true,
-		);
-
-		return wp_kses(
-			$markup,
-			apply_filters( 'wholesalex_wholesale_pricing_tier_allowed_html', $allowed_html )
-		);
-	}
 
 	/**
 	 * Return calculated wholesale-pricing data for a product.
 	 *
 	 * @param \WC_Product $product  Product object.
 	 * @param int|null    $quantity Optional quantity context.
-	 * @param float|null  $tier_base_price Optional pre-tier cart base price.
 	 * @return array|false
 	 */
-	private function get_product_price_data( \WC_Product $product, ?int $quantity = null, ?float $tier_base_price = null ) {
+	private function get_product_price_data( \WC_Product $product, ?int $quantity = null ) {
 		$cache_key = $product->get_id() . ':' . ( null === $quantity ? 'auto' : $quantity );
-
-		if ( null !== $tier_base_price ) {
-			$cache_key .= ':tier_base_' . number_format( $tier_base_price, 6, '.', '' );
-		}
 
 		if ( isset( $this->price_cache[ $cache_key ] ) ) {
 			return $this->price_cache[ $cache_key ];
@@ -1776,27 +994,12 @@ class Wholesale_Pricing_Rule_Engine {
 
 			$candidate = false;
 
-			if ( 'tiered' === $rule['discount_type'] ) {
-				$effective_tier_base_price = $this->get_tier_base_price( $product, $rule, $base_price, $rule_quantity, $tier_base_price );
-				$result                    = $this->tiered_discount->calculate( $rule, $product, $effective_tier_base_price, $rule_quantity );
-
-				if ( false !== $result['price'] ) {
-					$candidate = array(
-						'price' => $result['price'],
-						'rule'  => $rule,
-						'tier'  => $result['tier'],
-					);
-				}
-			} else {
-				$price = $this->calculate_regular_price( $rule, $product, $base_price );
-
-				if ( false !== $price ) {
-					$candidate = array(
-						'price' => $price,
-						'rule'  => $rule,
-						'tier'  => false,
-					);
-				}
+			$price = $this->calculate_regular_price( $rule, $product, $base_price );
+			if ( false !== $price ) {
+				$candidate = array(
+					'price' => $price,
+					'rule'  => $rule,
+				);
 			}
 
 			if ( false === $candidate ) {
@@ -1808,75 +1011,108 @@ class Wholesale_Pricing_Rule_Engine {
 			}
 		}
 
-		$this->price_cache[ $cache_key ] = $best_price_data;
+		$this->price_cache[ $cache_key ] = apply_filters( 'wholesalex_wholesale_pricing_price_data', $best_price_data, $product, $quantity, $base_price, $this );
 		return $this->price_cache[ $cache_key ];
 	}
 
 	/**
-	 * Return the winning Wholesale Pricing tier candidate for a product.
+	 * Prepare an isolated, read-only builder rule set for an explicit audience.
 	 *
-	 * Active tier prices retain the new engine's existing lowest-price behavior.
-	 * When no tier is active yet, the first eligible rule supplies the preview
-	 * table so the shared source priority can still select one table.
-	 *
-	 * @param \WC_Product $product Product object.
-	 * @param int         $quantity Quantity context.
-	 * @param float|null  $preferred_base_price Base selected by the legacy resolver.
-	 * @return array|false
+	 * @param array  $rules Saved rules visible to the manager.
+	 * @param array  $draft Current sanitized edit.
+	 * @param string $role_id Selected role.
+	 * @param int    $user_id Selected user, or zero for role-only preview.
+	 * @return void
 	 */
-	private function get_tier_price_data( \WC_Product $product, int $quantity, ?float $preferred_base_price = null ) {
-		$this->load_valid_rules();
-
-		$base_price = $this->get_base_price( $product );
-		if ( $base_price <= 0 ) {
-			return false;
-		}
-
-		$preview    = false;
-		$best_price = false;
-
-		foreach ( $this->valid_rules as $rule ) {
-			if ( 'tiered' !== ( $rule['discount_type'] ?? '' ) ) {
-				continue;
-			}
-
-			$can_preview = $this->is_product_eligible_for_rule( $product, $rule ) && $this->conditions_pass( $rule );
-			$can_price   = $this->can_rule_price_product( $rule, $product, max( 1, $quantity ) );
-			if ( ! $can_preview && ! $can_price ) {
-				continue;
-			}
-
-			$tiers = $this->tiered_discount->get_tiers( $rule );
-			if ( empty( $tiers ) ) {
-				continue;
-			}
-
-			$effective_base = $this->get_tier_base_price( $product, $rule, $base_price, max( 1, $quantity ), $preferred_base_price );
-			$calculation    = $can_price
-				? $this->tiered_discount->calculate( $rule, $product, $effective_base, $quantity )
-				: array(
-					'price' => false,
-					'tier'  => false,
-				);
-			$candidate      = array(
-				'price'      => $calculation['price'],
-				'tier'       => $calculation['tier'],
-				'tiers'      => $tiers,
-				'rule'       => $rule,
-				'base_price' => $effective_base,
-			);
-
-			if ( false === $preview && $can_preview ) {
-				$preview = $candidate;
-			}
-
-			if ( false !== $calculation['price'] && ( false === $best_price || (float) $calculation['price'] < (float) $best_price['price'] ) ) {
-				$best_price = $candidate;
+	public function prepare_builder_rules( array $rules, array $draft, string $role_id, int $user_id ): void {
+		$this->builder_preview = true;
+		$this->rules_loaded    = true;
+		$this->valid_rules     = array();
+		$this->price_cache     = array();
+		foreach ( $rules as $rule ) {
+			if ( is_array( $rule ) && (string) ( $rule['id'] ?? '' ) !== (string) ( $draft['id'] ?? '' ) ) {
+				$this->append_builder_rule( $rule, $role_id, $user_id, false );
 			}
 		}
-
-		return false !== $best_price ? $best_price : $preview;
+		// Preview the current edit as enabled, without saving or activating it.
+		$draft['status'] = 'active';
+		$this->append_builder_rule( $draft, $role_id, $user_id, true );
+		usort( $this->valid_rules, array( $this, 'compare_by_priority' ) );
 	}
+
+	/**
+	 * Retain storefront availability, schedules, targeting, and extension checks.
+	 *
+	 * @param array  $rule Saved or sanitized draft rule.
+	 * @param string $role_id Selected role.
+	 * @param int    $user_id Selected user.
+	 * @param bool   $draft Whether this is the current edit.
+	 * @return void
+	 */
+	private function append_builder_rule( array $rule, string $role_id, int $user_id, bool $draft ): void {
+		if ( Wholesale_Pricing::has_provider_record( $rule ) || '' !== Wholesale_Pricing_Rule_Registry::unavailable_feature( $rule ) ) {
+			return;
+		}
+		if ( ! $this->is_rule_available_for_user( $rule, $role_id, $user_id ) ) {
+			return;
+		}
+		$runtime             = $this->normalize_rule_for_runtime( $rule, $role_id );
+		$runtime['is_draft'] = $draft;
+		$this->valid_rules[] = $runtime;
+	}
+
+	/**
+	 * Return matching pricing rules and the lowest price for a builder product.
+	 *
+	 * @param \WC_Product $product Product or variation being previewed.
+	 * @return array
+	 */
+	public function get_builder_product_pricing( \WC_Product $product ): array {
+		$base       = $this->get_base_price( $product );
+		$candidates = array();
+		$winner     = null;
+		foreach ( $this->valid_rules as $rule ) {
+			$quantity = $this->get_display_quantity_for_rule( $product, $rule );
+			if ( $base <= 0 || ! $this->can_rule_price_product( $rule, $product, $quantity, true ) ) {
+				continue;
+			}
+			$price = $this->calculate_regular_price( $rule, $product, $base );
+			if ( false === $price ) {
+				continue;
+			}
+			$discount     = $rule['rule'];
+			$price        = (float) $price;
+			$candidates[] = array(
+				'id'          => $rule['id'],
+				'title'       => $rule['title'],
+				'rule_type'   => $rule['rule_type'],
+				'is_draft'    => $rule['is_draft'],
+				'price'       => $price,
+				'discount'    => max( 0, $base - $price ),
+				'amount'      => $discount['_discount_amount'] ?? $discount['amount'] ?? 0,
+				'amount_type' => $discount['_discount_type'] ?? $discount['amount_type'] ?? 'percentage',
+				'quantity'    => $quantity,
+				'label'       => $this->get_discount_label( $rule ),
+				'applied'     => false,
+			);
+			if ( null !== $price && ( null === $winner || $price < $candidates[ $winner ]['price'] ) ) {
+				$winner = count( $candidates ) - 1;
+			}
+		}
+		if ( null !== $winner ) {
+			$candidates[ $winner ]['applied'] = true;
+		}
+		return array(
+			'product_id' => $product->get_id(),
+			'name'       => $product->get_name(),
+			'base_price' => $base,
+			'price'      => null === $winner ? $base : $candidates[ $winner ]['price'],
+			'label'      => null === $winner ? '' : $candidates[ $winner ]['label'],
+			'rules'      => $candidates,
+		);
+	}
+
+
 
 	/**
 	 * Calculate a non-tiered price with its dedicated rule handler.
@@ -1886,7 +1122,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param float       $base_price Price before the discount.
 	 * @return float|false
 	 */
-	private function calculate_regular_price( array $rule, \WC_Product $product, float $base_price ) {
+	public function calculate_regular_price( array $rule, \WC_Product $product, float $base_price ) {
 		if ( 'product_discount' === ( $rule['rule_type'] ?? '' ) ) {
 			return $this->product_discount->calculate( $rule, $product, $base_price );
 		}
@@ -1908,179 +1144,13 @@ class Wholesale_Pricing_Rule_Engine {
 		return $this->regular_discount->get_label( $rule );
 	}
 
-	/**
-	 * Return the effective base price for a tiered rule.
-	 *
-	 * Tiered wholesale-pricing discounts should stack on top of an applicable
-	 * regular wholesale price. For example, when a product has a regular
-	 * wholesale price of 3.60 and a tier rule gives 20% off, the tier should
-	 * calculate from 3.60 instead of the catalog price.
-	 *
-	 * @param \WC_Product $product    Product object.
-	 * @param array       $tier_rule  Tiered runtime rule.
-	 * @param float       $base_price Original base price.
-	 * @param int         $quantity   Quantity context.
-	 * @param float|null  $preferred_base_price Preferred pre-discount base price.
-	 * @return float
-	 */
-	private function get_tier_base_price( \WC_Product $product, array $tier_rule, float $base_price, int $quantity, ?float $preferred_base_price = null ): float {
-		$base_candidates = array( $base_price );
 
-		foreach ( $this->valid_rules as $rule ) {
-			if ( 'regular' !== ( $rule['discount_type'] ?? '' ) ) {
-				continue;
-			}
 
-			if ( ! $this->can_rule_price_product( $rule, $product, $quantity ) ) {
-				continue;
-			}
 
-			// Product discounts are a separate campaign type and do not become
-			// the base for a wholesale tier campaign.
-			if ( 'product_discount' === ( $rule['rule_type'] ?? '' ) ) {
-				continue;
-			}
 
-			$regular_price = $this->regular_discount->calculate( $rule, $product, $base_price );
 
-			if ( false === $regular_price ) {
-				continue;
-			}
 
-			$regular_price = (float) $regular_price;
 
-			if ( $regular_price > 0 ) {
-				$base_candidates[] = $regular_price;
-			}
-		}
-
-		if (
-			null !== $preferred_base_price &&
-			$preferred_base_price > 0 &&
-			! $this->is_sale_price_base_for_regular_discount( $product, $preferred_base_price ) &&
-			! $this->price_matches_rule_tier( $tier_rule, $base_candidates, $preferred_base_price )
-		) {
-			$base_candidates[] = $preferred_base_price;
-		}
-
-		$existing_price = $this->get_existing_wholesale_price( $product );
-
-		if (
-			$existing_price > 0 &&
-			! $this->is_sale_price_base_for_regular_discount( $product, $existing_price ) &&
-			! $this->price_matches_rule_tier( $tier_rule, $base_candidates, $existing_price )
-		) {
-			$base_candidates[] = $existing_price;
-		}
-
-		$tier_base_price = min( $base_candidates );
-
-		return apply_filters(
-			'wholesalex_wholesale_pricing_tier_base_price',
-			$tier_base_price,
-			$product,
-			$tier_rule,
-			$base_price,
-			$quantity
-		);
-	}
-
-	/**
-	 * Check whether a candidate base is already a tier result for this rule.
-	 *
-	 * @param array $tier_rule       Tiered runtime rule.
-	 * @param array $base_prices     Valid pre-tier base-price candidates.
-	 * @param float $candidate_price Candidate tier base price.
-	 * @return bool
-	 */
-	private function price_matches_rule_tier( array $tier_rule, array $base_prices, float $candidate_price ): bool {
-		if ( $candidate_price <= 0 ) {
-			return false;
-		}
-
-		$tiers = $this->tiered_discount->get_tiers( $tier_rule );
-
-		foreach ( $base_prices as $base_price ) {
-			if ( ! is_numeric( $base_price ) || (float) $base_price <= 0 ) {
-				continue;
-			}
-
-			foreach ( $tiers as $tier ) {
-				$tier_price = self::calculate_discounted_price( $tier, (float) $base_price );
-
-				if ( false !== $tier_price && abs( (float) $tier_price - $candidate_price ) < 0.0001 ) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Return an already calculated WholesaleX price for this product.
-	 *
-	 * Dynamic Rules stores product-discount wholesale prices in the shared
-	 * WholesaleX price map before tier table rendering/cart totals. Using it
-	 * here keeps new wholesale-pricing tiers consistent with the legacy
-	 * quantity-based discount behavior.
-	 *
-	 * @param \WC_Product $product Product object.
-	 * @return float
-	 */
-	private function get_existing_wholesale_price( \WC_Product $product ): float {
-		$product_ids = array( $product->get_id() );
-
-		if ( $product->get_parent_id() ) {
-			$product_ids[] = $product->get_parent_id();
-		}
-
-		foreach ( array_unique( array_map( 'absint', $product_ids ) ) as $product_id ) {
-			$price = wholesalex()->get_wholesalex_wholesale_prices( $product_id );
-
-			if ( false !== $price && is_numeric( $price ) && (float) $price > 0 ) {
-				return (float) $price;
-			}
-		}
-
-		return 0.0;
-	}
-
-	/**
-	 * Return the first applicable tier table markup for a product.
-	 *
-	 * @param \WC_Product $product Product object.
-	 * @return string
-	 */
-	private function get_tier_table_markup( \WC_Product $product ): string {
-		$active_tier_data = apply_filters( 'wholesalex_active_tier_data', array(), $product );
-		if ( ! empty( $active_tier_data['src'] ) && 'wholesale_pricing_tier' !== $active_tier_data['src'] ) {
-			return '';
-		}
-
-		$base_price = $this->get_base_price( $product );
-		if ( $base_price <= 0 ) {
-			return '';
-		}
-
-		$cart_quantity = 0;
-		foreach ( $this->valid_rules as $rule ) {
-			if ( 'tiered' === ( $rule['discount_type'] ?? '' ) ) {
-				$cart_quantity = max( $cart_quantity, $this->get_cart_quantity( $product, $rule ) );
-			}
-		}
-
-		$preferred_base = ! empty( $active_tier_data['base_price'] ) ? (float) $active_tier_data['base_price'] : $base_price;
-		$tier_data      = $this->get_tier_price_data( $product, $cart_quantity, $preferred_base );
-		if ( false === $tier_data ) {
-			return '';
-		}
-
-		$rule   = $tier_data['rule'];
-		$markup = $this->tiered_discount->render_table( $rule, $product, $tier_data['base_price'], $cart_quantity );
-
-		return '' === $markup ? '' : '<div class="wsx-wholesale-pricing-rule-' . esc_attr( $rule['id'] ) . '">' . $markup . '</div>';
-	}
 
 	/**
 	 * Check whether a rule can price a product in the current context.
@@ -2091,7 +1161,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param bool        $preview_conditions Whether display pricing may preview cart conditions.
 	 * @return bool
 	 */
-	private function can_rule_price_product( array $rule, \WC_Product $product, ?int $quantity = null, bool $preview_conditions = false ): bool {
+	public function can_rule_price_product( array $rule, \WC_Product $product, ?int $quantity = null, bool $preview_conditions = false ): bool {
 		if ( ! $this->is_product_eligible_for_rule( $product, $rule ) ) {
 			return false;
 		}
@@ -2104,7 +1174,7 @@ class Wholesale_Pricing_Rule_Engine {
 			return true;
 		}
 
-		return $this->restrictions_pass_for_pricing( $rule, $product, $quantity );
+		return (bool) apply_filters( 'wholesalex_wholesale_pricing_rule_eligible', true, $rule, $product, $quantity, $this );
 	}
 
 	/**
@@ -2118,12 +1188,8 @@ class Wholesale_Pricing_Rule_Engine {
 	private function is_rule_available_for_user( array $rule, string $role_id, int $user_id ): bool {
 		if (
 			'active' !== ( $rule['status'] ?? '' ) ||
-			! in_array( $rule['rule_type'] ?? '', array( 'wholesale_pricing', 'tier_pricing', 'product_discount' ), true )
+			! in_array( $rule['rule_type'] ?? '', array( 'wholesale_pricing', 'product_discount' ), true )
 		) {
-			return false;
-		}
-
-		if ( 'tiered' === ( $rule['discount_type'] ?? '' ) && ! $this->tiered_discount ) {
 			return false;
 		}
 
@@ -2131,7 +1197,7 @@ class Wholesale_Pricing_Rule_Engine {
 			return false;
 		}
 
-		if ( ! Wholesale_Pricing_Condition_Engine::user_role_matches( $rule, $role_id, $user_id ) ) {
+		if ( ! Wholesale_Pricing_Condition_Engine::user_role_matches( $rule, $role_id, $user_id, $this->builder_preview ) ) {
 			return false;
 		}
 
@@ -2205,38 +1271,6 @@ class Wholesale_Pricing_Rule_Engine {
 	}
 
 	/**
-	 * Check Buy X Get Y rule availability before product/cart-specific checks.
-	 *
-	 * @param array  $rule    Raw saved rule.
-	 * @param string $role_id Current WholesaleX role ID.
-	 * @param int    $user_id Current user ID.
-	 * @return bool
-	 */
-	private function is_bxgy_discount_rule_available_for_user( array $rule, string $role_id, int $user_id ): bool {
-		if ( 'active' !== ( $rule['status'] ?? '' ) || 'buy_x_get_y' !== ( $rule['rule_type'] ?? '' ) ) {
-			return false;
-		}
-
-		if ( ! $this->schedule_is_active( isset( $rule['schedule'] ) && is_array( $rule['schedule'] ) ? $rule['schedule'] : array() ) ) {
-			return false;
-		}
-
-		if ( ! Wholesale_Pricing_Condition_Engine::user_role_matches( $rule, $role_id, $user_id ) ) {
-			return false;
-		}
-
-		if ( isset( $rule['conditions']['tiers'] ) && ! empty( $rule['conditions']['tiers'] ) ) {
-			if ( ! Wholesale_Pricing_Condition_Engine::is_user_order_count_purchase_amount_condition_passed( $rule['conditions']['tiers'] ) ) {
-				return false;
-			}
-		}
-
-		$bxgy = isset( $rule['bxgy'] ) && is_array( $rule['bxgy'] ) ? $rule['bxgy'] : array();
-
-		return ! empty( $bxgy['min_qty'] ) && ! empty( $bxgy['free_products'] ) && ! empty( $bxgy['free_item_count'] );
-	}
-
-	/**
 	 * Get runtime restrictions.
 	 *
 	 * @param array $restrictions Configured rule restrictions.
@@ -2252,7 +1286,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param string $role_id Current role.
 	 * @return array
 	 */
-	private function normalize_rule_for_runtime( array $rule, string $role_id ): array {
+	public function normalize_rule_for_runtime( array $rule, string $role_id ): array {
 		$filter_data = Wholesale_Pricing_Condition_Engine::get_runtime_product_filter( $rule );
 
 		$restrictions = isset( $rule['restrictions'] ) && is_array( $rule['restrictions'] ) ? $rule['restrictions'] : array();
@@ -2262,17 +1296,12 @@ class Wholesale_Pricing_Rule_Engine {
 			'title'               => isset( $rule['title'] ) ? $rule['title'] : '',
 			'owner_id'            => absint( $rule['owner_id'] ?? 0 ),
 			'owner_type'          => sanitize_key( $rule['owner_type'] ?? 'admin' ),
-			// Keep the established runtime contract: the dedicated stored type is
-			// still a wholesale-pricing tier for processors and integrations.
 			'rule_type'           => 'product_discount' === ( $rule['rule_type'] ?? '' ) ? 'product_discount' : 'wholesale_pricing',
-			'discount_type'       => 'tier_pricing' === ( $rule['rule_type'] ?? '' ) || ( isset( $rule['discount_type'] ) && 'tiered' === $rule['discount_type'] ) ? 'tiered' : 'regular',
-			'rule'                => 'product_discount' === ( $rule['rule_type'] ?? '' )
-				? ( isset( $rule['product_discount'] ) ? $rule['product_discount'] : array() )
-				: ( 'tiered' === ( $rule['discount_type'] ?? '' ) ? array( 'tiers' => isset( $rule['tiers'] ) ? $rule['tiers'] : array() ) : ( isset( $rule['regular'] ) ? $rule['regular'] : array() ) ),
+			'discount_type'       => 'regular',
+			'rule'                => 'product_discount' === ( $rule['rule_type'] ?? '' ) ? ( $rule['product_discount'] ?? array() ) : ( $rule['regular'] ?? array() ),
 			'filter'              => $filter_data['filter'],
 			'conditions'          => array( 'tiers' => isset( $rule['conditions']['tiers'] ) ? wholesalex()->filter_empty_conditions( $rule['conditions']['tiers'] ) : array() ),
 			'restrictions'        => 'product_discount' === ( $rule['rule_type'] ?? '' ) ? array() : $this->get_runtime_restrictions( $restrictions ),
-			'design'              => isset( $rule['design'] ) && is_array( $rule['design'] ) ? $rule['design'] : array(),
 			'schedule'            => isset( $rule['schedule'] ) && is_array( $rule['schedule'] ) ? $rule['schedule'] : array(),
 			'who_priority'        => Wholesale_Pricing_Condition_Engine::get_user_targeting_priority( $rule ),
 			'applied_on_priority' => $filter_data['priority'],
@@ -2341,50 +1370,13 @@ class Wholesale_Pricing_Rule_Engine {
 	}
 
 	/**
-	 * Normalize a saved Buy X Get Y discount rule into a runtime entry.
-	 *
-	 * @param array  $rule    Raw saved Buy X Get Y discount rule.
-	 * @param string $role_id Current role.
-	 * @return array
-	 */
-	private function normalize_bxgy_discount_rule_for_runtime( array $rule, string $role_id ): array {
-		$filter_data = Wholesale_Pricing_Condition_Engine::get_runtime_product_filter( $rule );
-		$bxgy        = isset( $rule['bxgy'] ) && is_array( $rule['bxgy'] ) ? $rule['bxgy'] : array();
-
-		return array(
-			'id'                  => isset( $rule['id'] ) ? sanitize_text_field( $rule['id'] ) : '',
-			'title'               => isset( $rule['title'] ) ? $rule['title'] : '',
-			'rule_type'           => 'buy_x_get_y',
-			'rule'                => array(
-				'_minimum_purchase_count'         => isset( $bxgy['min_qty'] ) ? absint( $bxgy['min_qty'] ) : 1,
-				'_free_item'                      => isset( $bxgy['free_products'] ) && is_array( $bxgy['free_products'] ) ? $bxgy['free_products'] : array(),
-				'_free_item_count'                => isset( $bxgy['free_item_count'] ) ? absint( $bxgy['free_item_count'] ) : 1,
-				'_per_cart_once'                  => ! empty( $bxgy['per_cart_once'] ),
-				'_buy_x_get_product_badge_enable' => ! empty( $bxgy['show_badge'] ) ? 'yes' : 'no',
-				'_product_badge_label'            => isset( $bxgy['badge_label'] ) ? $bxgy['badge_label'] : '',
-				'_product_badge_styles'           => isset( $bxgy['badge_style'] ) ? $bxgy['badge_style'] : 'style_one',
-				'_product_badge_position'         => isset( $bxgy['badge_position'] ) ? $bxgy['badge_position'] : '',
-				'_product_badge_bg_color'         => isset( $bxgy['badge_bg_color'] ) ? $bxgy['badge_bg_color'] : '#5a40e8',
-				'_product_badge_text_color'       => isset( $bxgy['badge_text_color'] ) ? $bxgy['badge_text_color'] : '#ffffff',
-			),
-			'bxgy'                => $bxgy,
-			'filter'              => $filter_data['filter'],
-			'conditions'          => array( 'tiers' => isset( $rule['conditions']['tiers'] ) ? wholesalex()->filter_empty_conditions( $rule['conditions']['tiers'] ) : array() ),
-			'schedule'            => isset( $rule['schedule'] ) && is_array( $rule['schedule'] ) ? $rule['schedule'] : array(),
-			'who_priority'        => Wholesale_Pricing_Condition_Engine::get_user_targeting_priority( $rule ),
-			'applied_on_priority' => $filter_data['priority'],
-			'role_id'             => $role_id,
-		);
-	}
-
-	/**
 	 * Check whether the current product matches a rule's product targeting.
 	 *
 	 * @param \WC_Product $product Product object.
 	 * @param array       $rule    Normalized rule.
 	 * @return bool
 	 */
-	private function is_product_eligible_for_rule( \WC_Product $product, array $rule ): bool {
+	public function is_product_eligible_for_rule( \WC_Product $product, array $rule ): bool {
 		return Wholesale_Pricing_Condition_Engine::is_product_eligible_for_rule( $product, $rule );
 	}
 
@@ -2397,8 +1389,12 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param bool             $preview_conditions Whether display pricing may preview cart conditions.
 	 * @return bool
 	 */
-	private function conditions_pass( array $rule, ?\WC_Product $product = null, ?int $quantity = null, bool $preview_conditions = false ): bool {
-		return Wholesale_Pricing_Condition_Engine::check_rule_conditions( $rule['conditions'], $rule['filter'], $this->get_condition_preview_context( $rule, $product, $quantity, $preview_conditions ) );
+	public function conditions_pass( array $rule, ?\WC_Product $product = null, ?int $quantity = null, bool $preview_conditions = false ): bool {
+		$context = (array) apply_filters( 'wholesalex_wholesale_pricing_condition_context', array(), $rule, $product, $quantity, $preview_conditions, $this );
+		if ( $this->builder_preview ) {
+			$context['ignore_live_cart'] = true;
+		}
+		return Wholesale_Pricing_Condition_Engine::check_rule_conditions( $rule['conditions'], $rule['filter'], $context );
 	}
 
 	/**
@@ -2406,74 +1402,9 @@ class Wholesale_Pricing_Rule_Engine {
 	 *
 	 * @return bool
 	 */
-	private function can_preview_conditions_for_request(): bool {
+	public function can_preview_conditions_for_request(): bool {
 		if ( ( function_exists( 'is_cart' ) && is_cart() ) || ( function_exists( 'is_checkout' ) && is_checkout() ) ) {
 			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Build a temporary cart context for product-page price previews.
-	 *
-	 * Regular min/max rules are evaluated before add-to-cart. In that display
-	 * context, cart conditions can use the quantity required by a quantity or
-	 * product-value limit instead of an empty cart. Cart totals pass an explicit
-	 * quantity and do not use this preview context.
-	 *
-	 * @param array            $rule               Normalized rule.
-	 * @param \WC_Product|null $product            Product object.
-	 * @param int|null         $quantity           Preview quantity.
-	 * @param bool             $preview_conditions Whether preview context is allowed.
-	 * @return array
-	 */
-	private function get_condition_preview_context( array $rule, ?\WC_Product $product, ?int $quantity, bool $preview_conditions ): array {
-		if ( ! $preview_conditions || ! $product instanceof \WC_Product || null === $quantity || ( ! $this->rule_uses_quantity_limits( $rule ) && ! $this->rule_uses_value_limits( $rule ) ) ) {
-			return array();
-		}
-
-		if ( ! $this->quantity_is_inside_limits( $rule['restrictions'], $quantity ) ) {
-			return array();
-		}
-
-		$product_id    = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
-		$variation_id  = $product->get_parent_id() ? $product->get_id() : 0;
-		$product_value = $this->get_product_value( $product, $quantity, $rule );
-
-		return array(
-			'preview_cart_item' => array(
-				'product_id'    => $product_id,
-				'variation_id'  => $variation_id,
-				'quantity'      => $quantity,
-				'line_subtotal' => $product_value,
-				'data'          => $product,
-			),
-		);
-	}
-
-	/**
-	 * Check quantity/value restrictions before applying a price.
-	 *
-	 * @param array       $rule     Normalized rule.
-	 * @param \WC_Product $product  Product object.
-	 * @param int|null    $quantity Optional quantity context.
-	 * @return bool
-	 */
-	private function restrictions_pass_for_pricing( array $rule, \WC_Product $product, ?int $quantity ): bool {
-		$restrictions = $rule['restrictions'];
-		$qty          = null === $quantity ? $this->get_cart_quantity( $product, $rule ) : $quantity;
-
-		if ( $this->rule_uses_quantity_limits( $rule ) ) {
-			if ( ! $this->quantity_is_inside_limits( $restrictions, $qty ) ) {
-				return false;
-			}
-		}
-
-		if ( $this->rule_uses_value_limits( $rule ) ) {
-			if ( ! $this->amount_is_inside_limits( $restrictions, $this->get_product_value( $product, $qty, $rule ) ) ) {
-				return false;
-			}
 		}
 
 		return true;
@@ -2485,7 +1416,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param \WC_Product $product Product object.
 	 * @return float
 	 */
-	private function get_base_price( \WC_Product $product ): float {
+	public function get_base_price( \WC_Product $product ): float {
 		$current_role = wholesalex()->get_current_user_role();
 		$role_regular = (float) get_post_meta( $product->get_id(), $current_role . '_base_price', true );
 		$role_sale    = (float) get_post_meta( $product->get_id(), $current_role . '_sale_price', true );
@@ -2512,7 +1443,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param \WC_Product $product Product object.
 	 * @return bool
 	 */
-	private function product_sale_is_active( \WC_Product $product ): bool {
+	public function product_sale_is_active( \WC_Product $product ): bool {
 		$sale_price = $product->get_sale_price( 'edit' );
 
 		if ( '' === $sale_price || null === $sale_price ) {
@@ -2520,7 +1451,7 @@ class Wholesale_Pricing_Rule_Engine {
 		}
 
 		// phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- Preserve the existing local-time comparison contract for saved schedules.
-		$now  = current_time( 'timestamp' );
+		$now  = time();
 		$from = get_post_meta( $product->get_id(), '_sale_price_dates_from', true );
 		$to   = get_post_meta( $product->get_id(), '_sale_price_dates_to', true );
 
@@ -2534,34 +1465,7 @@ class Wholesale_Pricing_Rule_Engine {
 		return true;
 	}
 
-	/**
-	 * Check whether a captured lower price is only the sale price.
-	 *
-	 * When product discounts are configured to apply on the regular price,
-	 * cart-tier discounts must ignore native/role sale prices as calculation
-	 * bases. Otherwise a 20 amount tier on a 65 regular / 55 sale product
-	 * incorrectly becomes 35 instead of 45.
-	 *
-	 * @param \WC_Product $product Product object.
-	 * @param float       $price   Candidate lower base price.
-	 * @return bool
-	 */
-	private function is_sale_price_base_for_regular_discount( \WC_Product $product, float $price ): bool {
-		if ( $price <= 0 || 'is_regular_price' !== wholesalex()->get_setting( '_is_sale_or_regular_Price', 'is_regular_price' ) ) {
-			return false;
-		}
 
-		$role_sale_price = (float) get_post_meta( $product->get_id(), wholesalex()->get_current_user_role() . '_sale_price', true );
-		$sale_price      = $this->product_sale_is_active( $product ) ? (float) $product->get_sale_price( 'edit' ) : 0.0;
-
-		return (
-			$sale_price > 0 &&
-			abs( $price - $sale_price ) < 0.000001
-		) || (
-			$role_sale_price > 0 &&
-			abs( $price - $role_sale_price ) < 0.000001
-		);
-	}
 
 	/**
 	 * Check a wholesale-pricing schedule. End date is inclusive for the saved date.
@@ -2569,7 +1473,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param array $schedule Schedule data.
 	 * @return bool
 	 */
-	private function schedule_is_active( array $schedule ): bool {
+	public function schedule_is_active( array $schedule ): bool {
 		$timezone = wp_timezone();
 		$now      = new \DateTimeImmutable( 'now', $timezone );
 		$start    = false;
@@ -2660,21 +1564,17 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param array       $rule    Normalized rule.
 	 * @return int
 	 */
-	private function get_cart_quantity( \WC_Product $product, array $rule ): int {
+	public function get_cart_quantity( \WC_Product $product, array $rule ): int {
+		if ( $this->builder_preview ) {
+			return 1;
+		}
 		if ( ! WC()->cart ) {
 			return 0;
 		}
 
-		$quantity           = 0;
-		$product_id         = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
-		$variation_id       = $product->get_parent_id() ? $product->get_id() : 0;
-		$combine_variations = (bool) apply_filters( 'wholesalex_premium_combine_variations', false, $rule );
+		$quantity = 0;
 
 		foreach ( WC()->cart->get_cart() as $cart_item ) {
-			if ( $combine_variations && $variation_id && (int) $cart_item['product_id'] === (int) $product_id ) {
-				$quantity += absint( $cart_item['quantity'] );
-				continue;
-			}
 
 			$cart_product_id = ! empty( $cart_item['variation_id'] ) ? $cart_item['variation_id'] : $cart_item['product_id'];
 
@@ -2683,7 +1583,8 @@ class Wholesale_Pricing_Rule_Engine {
 			}
 		}
 
-		return $quantity;
+		$provided = apply_filters( 'wholesalex_wholesale_pricing_cart_quantity', $quantity, $product, $rule, null );
+		return is_numeric( $provided ) && is_finite( (float) $provided ) && (float) $provided >= 0 && floor( (float) $provided ) === (float) $provided && (float) $provided <= PHP_INT_MAX && (int) $provided >= 0 ? (int) $provided : $quantity;
 	}
 
 	/**
@@ -2695,23 +1596,15 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param int         $new_quantity  New quantity for that cart item.
 	 * @return int
 	 */
-	private function get_cart_quantity_for_update( \WC_Product $product, array $rule, string $cart_item_key, int $new_quantity ): int {
+	public function get_cart_quantity_for_update( \WC_Product $product, array $rule, string $cart_item_key, int $new_quantity ): int {
 		if ( ! WC()->cart ) {
 			return $new_quantity;
 		}
 
-		$quantity           = 0;
-		$product_id         = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
-		$variation_id       = $product->get_parent_id() ? $product->get_id() : 0;
-		$combine_variations = (bool) apply_filters( 'wholesalex_premium_combine_variations', false, $rule );
+		$quantity = 0;
 
 		foreach ( WC()->cart->get_cart() as $key => $cart_item ) {
 			$item_quantity = $key === $cart_item_key ? $new_quantity : absint( $cart_item['quantity'] );
-
-			if ( $combine_variations && $variation_id && (int) $cart_item['product_id'] === (int) $product_id ) {
-				$quantity += $item_quantity;
-				continue;
-			}
 
 			$cart_product_id = ! empty( $cart_item['variation_id'] ) ? $cart_item['variation_id'] : $cart_item['product_id'];
 
@@ -2720,94 +1613,17 @@ class Wholesale_Pricing_Rule_Engine {
 			}
 		}
 
-		return $quantity;
-	}
-
-	/**
-	 * Get a product line's value at the rule's wholesale price.
-	 *
-	 * Calculate the regular discount directly instead of reading get_price().
-	 * The latter is filtered by this engine and would recursively re-enter the
-	 * restriction check. If a rule cannot produce a valid wholesale price, fall
-	 * back to its base price so malformed rules do not make products unbuyable.
-	 *
-	 * @param \WC_Product $product  Product object.
-	 * @param int         $quantity Product quantity.
-	 * @param array       $rule     Normalized wholesale-pricing rule.
-	 * @return float
-	 */
-	private function get_product_value( \WC_Product $product, int $quantity, array $rule ): float {
-		$base_price      = $this->get_base_price( $product );
-		$wholesale_price = $this->calculate_regular_price( $rule, $product, $base_price );
-		$unit_price      = false === $wholesale_price ? $base_price : (float) $wholesale_price;
-
-		return $unit_price * max( 0, $quantity );
-	}
-
-	/**
-	 * Find the highest-priority quantity restriction for a product.
-	 *
-	 * @param \WC_Product $product Product object.
-	 * @return array|false
-	 */
-	private function get_product_quantity_restriction( \WC_Product $product ) {
-		foreach ( $this->valid_rules as $rule ) {
-			$restrictions       = $rule['restrictions'];
-			$preview_conditions = $this->can_preview_conditions_for_request();
-			$quantity           = $preview_conditions ? $this->get_display_quantity_for_rule( $product, $rule ) : null;
-
-			if ( ! $this->rule_uses_quantity_limits( $rule ) || ! $this->is_product_eligible_for_rule( $product, $rule ) || ! $this->conditions_pass( $rule, $product, $quantity, $preview_conditions ) ) {
-				continue;
-			}
-
-			return apply_filters( 'wholesalex_premium_quantity_data', false, $rule );
-		}
-
-		return false;
-	}
-
-	/**
-	 * Find the highest-priority order-value restriction for a product.
-	 *
-	 * @param \WC_Product $product  Product object.
-	 * @param int         $quantity Resulting product quantity.
-	 * @return array|false
-	 */
-	private function get_product_value_restriction( \WC_Product $product, int $quantity ) {
-		foreach ( $this->valid_rules as $rule ) {
-			if (
-				! $this->rule_uses_value_limits( $rule ) ||
-				! $this->is_product_eligible_for_rule( $product, $rule ) ||
-				! $this->conditions_pass( $rule, $product, $quantity, $this->can_preview_conditions_for_request() )
-			) {
-				continue;
-			}
-
-			return apply_filters( 'wholesalex_premium_value_data', false, $rule );
-		}
-
-		return false;
-	}
-
-	/**
-	 * Tiered pricing owns its quantity ranges through tiers, so rule-level
-	 * min/max quantity restrictions only apply to regular wholesale discounts.
-	 *
-	 * @param array $rule Normalized rule.
-	 * @return bool
-	 */
-	private function rule_uses_quantity_limits( array $rule ): bool {
-		return (bool) apply_filters( 'wholesalex_premium_restriction_uses', false, 'quantity', $rule );
-	}
-
-	/**
-	 * Order-value restrictions are available only for regular wholesale pricing.
-	 *
-	 * @param array $rule Normalized rule.
-	 * @return bool
-	 */
-	private function rule_uses_value_limits( array $rule ): bool {
-		return (bool) apply_filters( 'wholesalex_premium_restriction_uses', false, 'value', $rule );
+		$provided = apply_filters(
+			'wholesalex_wholesale_pricing_cart_quantity',
+			$quantity,
+			$product,
+			$rule,
+			array(
+				'cart_item_key' => $cart_item_key,
+				'new_quantity'  => $new_quantity,
+			)
+		);
+		return is_numeric( $provided ) && is_finite( (float) $provided ) && (float) $provided >= 0 && floor( (float) $provided ) === (float) $provided && (float) $provided <= PHP_INT_MAX && (int) $provided >= 0 ? (int) $provided : $quantity;
 	}
 
 	/**
@@ -2820,191 +1636,10 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param array       $rule    Normalized rule.
 	 * @return int
 	 */
-	private function get_display_quantity_for_rule( \WC_Product $product, array $rule ): int {
+	public function get_display_quantity_for_rule( \WC_Product $product, array $rule ): int {
 		$quantity = max( 1, $this->get_cart_quantity( $product, $rule ) );
-		if ( ! has_filter( 'wholesalex_premium_display_quantity' ) ) {
-			return $quantity; }
-		$unit_price = $this->get_product_value( $product, 1, $rule );
-		return (int) apply_filters( 'wholesalex_premium_display_quantity', $quantity, $rule, $unit_price );
-	}
-
-	/**
-	 * Validate a quantity against min/max restrictions and add a notice if needed.
-	 *
-	 * @param bool        $passed      Current validation state.
-	 * @param \WC_Product $product     Product object.
-	 * @param array       $restriction Restriction data.
-	 * @param int         $quantity    Quantity to validate.
-	 * @return bool
-	 */
-	private function validate_quantity_against_restriction( bool $passed, \WC_Product $product, array $restriction, int $quantity ): bool {
-		$type = apply_filters( 'wholesalex_premium_quantity_notice_type', '', $restriction, $quantity );
-		if ( '' !== $type ) {
-			wc_add_notice( $this->get_quantity_notice( $product, $restriction, $type ), 'error' );
-			return false;
-		}
-		return $passed;
-	}
-
-	/**
-	 * Validate a product's base-price value against min/max restrictions.
-	 *
-	 * @param bool        $passed      Current validation state.
-	 * @param \WC_Product $product     Product object.
-	 * @param array       $restriction Restriction data.
-	 * @param int         $quantity    Resulting product quantity.
-	 * @return bool
-	 */
-	private function validate_value_against_restriction( bool $passed, \WC_Product $product, array $restriction, int $quantity ): bool {
-		$product_value = $this->get_product_value( $product, $quantity, $restriction['rule'] );
-
-		if ( ! $this->amount_is_inside_limits( $restriction, $product_value ) ) {
-			$type = apply_filters( 'wholesalex_premium_amount_notice_type', '', $restriction, $product_value );
-			wc_add_notice( $this->get_amount_notice( $product, $restriction, $type, $product_value ), 'error' );
-			return false;
-		}
-
-		return $passed;
-	}
-
-	/**
-	 * Add cart item quantity notices when restrictions fail.
-	 *
-	 * @param array       $shown_notices Notice de-duplication map.
-	 * @param array       $rule          Normalized rule.
-	 * @param \WC_Product $product       Product object.
-	 * @param int         $quantity      Cart item quantity.
-	 * @return void
-	 */
-	private function maybe_add_quantity_notice( array &$shown_notices, array $rule, \WC_Product $product, int $quantity ): void {
-		$restriction = apply_filters( 'wholesalex_premium_quantity_data', false, $rule );
-		if ( ! is_array( $restriction ) ) {
-			return; }
-		$type = apply_filters( 'wholesalex_premium_quantity_notice_type', '', $restriction, $quantity );
-		if ( '' === $type ) {
-			return; }
-		$key = $rule['id'] . ':' . $type . ':' . $product->get_id();
-		if ( empty( $shown_notices[ $key ] ) ) {
-			wc_add_notice( $this->get_quantity_notice( $product, $restriction, $type ), 'error' );
-			$shown_notices[ $key ] = true;
-		}
-	}
-
-	/**
-	 * Add order amount notices when restrictions fail.
-	 *
-	 * @param array       $shown_notices Notice de-duplication map.
-	 * @param array       $rule          Normalized rule.
-	 * @param \WC_Product $product       Product object.
-	 * @param int         $quantity      Product quantity.
-	 * @return void
-	 */
-	private function maybe_add_amount_notice( array &$shown_notices, array $rule, \WC_Product $product, int $quantity ): void {
-		$restriction = apply_filters( 'wholesalex_premium_value_data', false, $rule );
-		if ( ! is_array( $restriction ) ) {
-			return; }
-		$product_value = $this->get_product_value( $product, $quantity, $rule );
-		$type          = apply_filters( 'wholesalex_premium_amount_notice_type', '', $restriction, $product_value );
-		if ( '' === $type ) {
-			return; }
-		$key = $rule['id'] . ':amount_' . $type . ':' . $product->get_id();
-		if ( empty( $shown_notices[ $key ] ) ) {
-			wc_add_notice( $this->get_amount_notice( $product, $restriction, $type, $product_value ), 'error' );
-			$shown_notices[ $key ] = true;
-		}
-	}
-
-	/**
-	 * Build an order-value restriction notice.
-	 *
-	 * @param \WC_Product $product       Product object.
-	 * @param array       $restriction   Restriction data.
-	 * @param string      $type          min|max.
-	 * @param float       $product_value Current product value.
-	 * @return string
-	 */
-	private function get_amount_notice( \WC_Product $product, array $restriction, string $type, float $product_value ): string {
-		if ( 'min' === $type ) {
-			$message = ! empty( $restriction['message']['min'] ) ? $restriction['message']['min'] : __( 'You must spend at least {minimum_amount} on this product to add it to your cart.', 'wholesalex' );
-		} else {
-			$message = ! empty( $restriction['message']['max'] ) ? $restriction['message']['max'] : __( 'You can spend up to {maximum_amount} on this product.', 'wholesalex' );
-		}
-
-		return $this->replace_smart_tags(
-			$message,
-			array(
-				'{minimum_amount}' => wc_price( $restriction['min'] ),
-				'{maximum_amount}' => wc_price( $restriction['max'] ),
-				'{product_value}'  => wc_price( $product_value ),
-				'{product_title}'  => $product->get_name(),
-			)
-		);
-	}
-
-	/**
-	 * Build a quantity restriction notice.
-	 *
-	 * @param \WC_Product $product     Product object.
-	 * @param array       $restriction Restriction data.
-	 * @param string      $type        min|max.
-	 * @return string
-	 */
-	private function get_quantity_notice( \WC_Product $product, array $restriction, string $type ): string {
-		if ( 'min' === $type ) {
-			$message = ! empty( $restriction['message']['min'] ) ? $restriction['message']['min'] : __( 'You have to add minimum {minimum_qty} quantity of {product_title}.', 'wholesalex' );
-			return $this->replace_smart_tags(
-				$message,
-				array(
-					'{minimum_qty}'   => $restriction['min'],
-					'{product_title}' => $product->get_name(),
-				)
-			);
-		}
-
-		$message = ! empty( $restriction['message']['max'] ) ? $restriction['message']['max'] : __( 'You can add maximum {maximum_qty} quantity of {product_title}.', 'wholesalex' );
-		return $this->replace_smart_tags(
-			$message,
-			array(
-				'{maximum_qty}'   => $restriction['max'],
-				'{product_title}' => $product->get_name(),
-			)
-		);
-	}
-
-	/**
-	 * Replace simple smart tags in a message.
-	 *
-	 * @param string $message Message template.
-	 * @param array  $tags    Tag replacements.
-	 * @return string
-	 */
-	private function replace_smart_tags( string $message, array $tags ): string {
-		foreach ( $tags as $tag => $value ) {
-			$message = str_replace( $tag, (string) $value, $message );
-		}
-
-		return $message;
-	}
-
-	/**
-	 * Check quantity min/max.
-	 *
-	 * @param array $restrictions Rule restrictions.
-	 * @param int   $quantity     Quantity used to evaluate tier eligibility.
-	 * @return bool
-	 */
-	private function quantity_is_inside_limits( array $restrictions, int $quantity ): bool {
-		return (bool) apply_filters( 'wholesalex_premium_quantity_inside', false, $restrictions, $quantity );
-	}
-
-	/**
-	 * Amount is inside limits.
-	 *
-	 * @param array $restrictions Configured rule restrictions.
-	 * @param float $amount Amount.
-	 */
-	private function amount_is_inside_limits( array $restrictions, float $amount ): bool {
-		return (bool) apply_filters( 'wholesalex_premium_amount_inside', false, $restrictions, $amount );
+		$result   = apply_filters( 'wholesalex_wholesale_pricing_display_quantity', $quantity, $product, $rule, $this );
+		return is_numeric( $result ) && is_finite( (float) $result ) && (float) $result >= 1 && (float) $result < PHP_INT_MAX ? max( 1, (int) $result ) : $quantity;
 	}
 
 	/**
@@ -3014,7 +1649,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param array $b Second rule.
 	 * @return int
 	 */
-	private function compare_by_priority( array $a, array $b ): int {
+	public function compare_by_priority( array $a, array $b ): int {
 		if ( $a['applied_on_priority'] === $b['applied_on_priority'] ) {
 			return $b['who_priority'] <=> $a['who_priority'];
 		}
@@ -3028,7 +1663,7 @@ class Wholesale_Pricing_Rule_Engine {
 	 * @param int $product_id Product ID.
 	 * @return void
 	 */
-	private function set_discounted_product( int $product_id ): void {
+	public function set_discounted_product( int $product_id ): void {
 		if ( is_admin() || ! WC()->session ) {
 			return;
 		}
@@ -3106,5 +1741,36 @@ class Wholesale_Pricing_Rule_Engine {
 		}
 
 		return number_format( (float) $price, 2, '.', '' );
+	}
+	/**
+	 * Apply non-tier and computed provider prices to cart lines.
+	 *
+	 * @param \WC_Cart $cart Current cart.
+	 * @return void
+	 */
+	public function update_cart_item_prices( $cart ): void {
+		if ( ! $cart instanceof \WC_Cart || ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) ) {
+			return;
+		}
+		$this->load_valid_rules();
+		$this->price_cache = array();
+		do_action( 'wholesalex_wholesale_pricing_cart_start', $cart );
+		foreach ( $cart->get_cart() as $key => $item ) {
+			if ( empty( $item['data'] ) || ! $item['data'] instanceof \WC_Product ) {
+				continue;
+			}
+			$data = $this->get_product_price_data( $item['data'], absint( $item['quantity'] ) );
+			$data = apply_filters( 'wholesalex_wholesale_pricing_cart_price_data', $data, $item, $key, $cart, $this );
+			if ( is_array( $data ) && isset( $data['price'] ) && is_numeric( $data['price'] ) ) {
+				$item['data']->set_price( $data['price'] );
+				$this->set_discounted_product( $item['data']->get_id() );
+			}
+		}
+	}
+
+	/** Return canonical non-tier rules for computed providers. */
+	public function get_runtime_rules(): array {
+		$this->load_valid_rules();
+		return $this->valid_rules;
 	}
 }

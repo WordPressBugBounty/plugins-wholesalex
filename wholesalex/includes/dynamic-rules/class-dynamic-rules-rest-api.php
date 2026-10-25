@@ -142,8 +142,7 @@ class Dynamic_Rules_Rest_Api {
 			$allowed = $context['is_vendor'] && $context['can_manage'];
 		}
 
-		$access = wholesalex()->get_dynamic_rules_access();
-		return $allowed && ! empty( $access['can_view'] );
+		return $allowed;
 	}
 
 	// ─── Main Handler: /dynamic_rule_action ──────────────────────
@@ -164,6 +163,8 @@ class Dynamic_Rules_Rest_Api {
 	public function dynamic_rule_restapi_action( $server ) {
 		$post = $server->get_params();
 		$type = isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
+		if ( 'post' === $type && 'POST' !== $server->get_method() ) {
+			return new \WP_Error( 'rest_invalid_method', __( 'Use POST to change rules.', 'wholesalex' ), array( 'status' => 405 ) ); }
 
 		// ── AJAX data search (MultiSelect component) ─────────────
 		// Frontend sends: type=get, ajax_action=users|products|…, query=…
@@ -179,7 +180,7 @@ class Dynamic_Rules_Rest_Api {
 				'success'  => true,
 				'data'     => array(
 					'default' => Dynamic_Rules_Data_Provider::get_dynamic_rules_field(),
-					'value'   => Dynamic_Rules::dynamic_rules_get(),
+					'value'   => array_values( array_filter( Dynamic_Rules::dynamic_rules_get(), array( $this, 'owns_rule' ) ) ),
 				),
 				'per_page' => $per_page,
 			);
@@ -211,9 +212,12 @@ class Dynamic_Rules_Rest_Api {
 	 */
 	private function handle_ajax_action( $post ) {
 		$ajax_action = sanitize_text_field( $post['ajax_action'] );
-		$query       = isset( $post['query'] ) ? sanitize_text_field( $post['query'] ) : '';
-		$depends     = isset( $post['depends'] ) ? $post['depends'] : '';
-		$limit       = isset( $post['limit'] ) ? absint( $post['limit'] ) : 20;
+		$context     = Wholesale_Pricing::get_manager_context();
+		if ( $context['is_vendor'] ) {
+			return new \WP_Error( 'wholesalex_forbidden', __( 'Use the scoped pricing product selector for vendor rules.', 'wholesalex' ), array( 'status' => 403 ) ); }
+		$query   = isset( $post['query'] ) ? sanitize_text_field( $post['query'] ) : '';
+		$depends = isset( $post['depends'] ) ? $post['depends'] : '';
+		$limit   = isset( $post['limit'] ) ? absint( $post['limit'] ) : 20;
 
 		$data = array();
 
@@ -305,7 +309,10 @@ class Dynamic_Rules_Rest_Api {
 	 * @return array
 	 */
 	private function handle_post_action( $post ) {
-		$rule_id = isset( $post['id'] ) ? sanitize_text_field( $post['id'] ) : '';
+		$rule_id       = isset( $post['id'] ) ? sanitize_text_field( $post['id'] ) : '';
+		$existing_rule = wholesalex()->get_dynamic_rules( $rule_id );
+		if ( $existing_rule && ! $this->owns_rule( $existing_rule ) ) {
+			return $this->forbidden(); }
 
 		if ( empty( $rule_id ) ) {
 			return array(
@@ -340,13 +347,17 @@ class Dynamic_Rules_Rest_Api {
 			);
 		}
 
-		$data = json_decode( wp_unslash( $rule_json ), true );
+		$data = is_array( $rule_json ) ? $rule_json : ( is_string( $rule_json ) ? json_decode( wp_unslash( $rule_json ), true ) : null );
 		if ( ! is_array( $data ) ) {
 			return array(
 				'success' => false,
 				'data'    => array( 'message' => __( 'Invalid rule data.', 'wholesalex' ) ),
 			);
 		}
+
+		$check = $this->validate_vendor_rule( array_replace( is_array( $existing_rule ) ? $existing_rule : array(), $data ) );
+		if ( is_wp_error( $check ) ) {
+			return $check; }
 
 		// Status toggle only – just flip _rule_status and save.
 		if ( isset( $post['check'] ) && '_rule_status' === $post['check'] ) {
@@ -358,7 +369,7 @@ class Dynamic_Rules_Rest_Api {
 					return $result;
 				}
 			}
-			$status_label = ! empty( $data['_rule_status'] ) ? __( 'Rule activated successfully.', 'wholesalex' ) : __( 'Rule deactivated successfully.', 'wholesalex' );
+			$status_label = in_array( $data['_rule_status'] ?? '', array( true, 1, '1', 'yes' ), true ) ? __( 'Rule activated successfully.', 'wholesalex' ) : __( 'Rule deactivated successfully.', 'wholesalex' );
 			return array(
 				'success' => true,
 				'data'    => array( 'message' => $status_label ),
@@ -391,15 +402,44 @@ class Dynamic_Rules_Rest_Api {
 	 * @return array|\WP_REST_Response
 	 */
 	public function handle_bulk_action( $server ) {
-		$post     = $server->get_params();
-		$action   = isset( $post['action'] ) ? sanitize_text_field( $post['action'] ) : '';
-		$rule_ids = isset( $post['ruleIds'] ) ? array_map( 'sanitize_text_field', $post['ruleIds'] ) : array();
+		$post    = $server->get_params();
+		$action  = isset( $post['action'] ) ? sanitize_text_field( $post['action'] ) : '';
+		$raw_ids = $post['ruleIds'] ?? array();
+		if ( ! is_array( $raw_ids ) || count( array_filter( $raw_ids, 'is_scalar' ) ) !== count( $raw_ids ) ) {
+			return new \WP_Error( 'rest_invalid_param', __( 'Invalid rule IDs.', 'wholesalex' ), array( 'status' => 400 ) ); }
+		$rule_ids = array_map( 'sanitize_text_field', $raw_ids );
 
 		if ( empty( $rule_ids ) || ! in_array( $action, array( 'enable', 'disable', 'delete', 'export' ), true ) ) {
 			return array(
 				'status'  => false,
 				'message' => __( 'Invalid data.', 'wholesalex' ),
 			);
+		}
+
+		foreach ( $rule_ids as $rid ) {
+			$record = wholesalex()->get_dynamic_rules( $rid );
+			if ( ! $record || ! $this->owns_rule( $record ) ) {
+				return $this->forbidden(); }
+			if ( 'enable' === $action ) {
+				$scope = $this->validate_vendor_rule( $record );
+				if ( is_wp_error( $scope ) ) {
+					return $scope; }
+			}
+		}
+
+		// Validate the complete operation before changing any selected record.
+		foreach ( $rule_ids as $rid ) {
+			$existing = wholesalex()->get_dynamic_rules( $rid );
+			if ( 'quantity_based' !== ( $existing['_rule_type'] ?? '' ) ) {
+				continue;
+			}
+			$provided = apply_filters( 'wholesalex_dynamic_rule_provider_result', null, $action, $existing, $existing );
+			if ( is_wp_error( $provided ) ) {
+				return $provided;
+			}
+			if ( ! is_array( $provided ) ) {
+				return new \WP_Error( 'wholesalex_provider_unavailable', __( 'The saved rule requires its pricing provider.', 'wholesalex' ), array( 'status' => 409 ) );
+			}
 		}
 
 		if ( 'export' === $action ) {
@@ -441,6 +481,45 @@ class Dynamic_Rules_Rest_Api {
 			'status'  => true,
 			'message' => __( 'Done', 'wholesalex' ),
 		);
+	}
+
+	/** Check a legacy record against the authenticated manager.
+	 *
+	 * @param array $rule Stored rule.
+	 * @return bool
+	 */
+	public function owns_rule( $rule ): bool {
+		$context = Wholesale_Pricing::get_manager_context();
+		return is_array( $rule ) && ( ! $context['is_vendor'] || ( $context['can_manage'] && $context['vendor_id'] > 0 && (int) ( $rule['created_by'] ?? 0 ) === $context['vendor_id'] ) );
+	}
+
+	/**
+	 * Return an authorization failure.
+	 *
+	 * @return \WP_Error
+	 */
+	private function forbidden() {
+		return new \WP_Error( 'wholesalex_forbidden_rule', __( 'You cannot manage this rule.', 'wholesalex' ), array( 'status' => 403 ) );
+	}
+
+	/** Restrict vendor changes to explicitly owned products.
+	 *
+	 * @param array $rule Candidate rule.
+	 * @return true|\WP_Error
+	 */
+	private function validate_vendor_rule( array $rule ) {
+		$context = Wholesale_Pricing::get_manager_context();
+		if ( ! $context['is_vendor'] ) {
+			return true; }
+		if ( ! in_array( $rule['_rule_type'] ?? '', array( 'product_discount', 'min_order_qty', 'buy_x_get_one' ), true ) || 'products_in_list' !== ( $rule['_product_filter'] ?? '' ) || empty( $rule['products_in_list'] ) || ! is_array( $rule['products_in_list'] ) ) {
+			return $this->forbidden(); }
+		foreach ( $rule['products_in_list'] as $item ) {
+			$id      = is_array( $item ) && is_scalar( $item['value'] ?? null ) ? absint( $item['value'] ) : 0;
+			$product = $id ? wc_get_product( $id ) : false;
+			if ( ! $product || (int) get_post_field( 'post_author', $product->get_parent_id() ? $product->get_parent_id() : $id ) !== $context['vendor_id'] ) {
+				return $this->forbidden(); }
+		}
+		return true;
 	}
 
 	// ─── Pagination: /dynamic_rule_per_page_action ───────────────

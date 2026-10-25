@@ -13,7 +13,10 @@ defined( 'ABSPATH' ) || exit;
 	class="wsx-notice-wrapper wsx-banner-notice wsx-notice notice"
 	style="
 		border-left: 3px solid <?php echo esc_attr( $notice->get( 'brand_color' ) ); ?>;
-		<?php if ( $notice->get_image( 'bg' ) ) : ?>background-image: url('<?php echo esc_url( $notice->get_image( 'bg' ) ); ?>');<?php endif; ?>
+		<?php
+		if ( $notice->get_image( 'bg' ) ) :
+			?>
+			background-image: url('<?php echo esc_url( $notice->get_image( 'bg' ) ); ?>');<?php endif; ?>
 ">
 	<a
 		class="wc-dismiss-notice dashicons dashicons-no-alt"
@@ -46,7 +49,7 @@ defined( 'ABSPATH' ) || exit;
 						color: <?php echo esc_attr( $notice->get( 'countdown_color' ) ); ?>;
 					"
 					data-notice-key="<?php echo esc_attr( $notice->get_key() . '-countdown' ); ?>"
-					data-duration="<?php echo esc_attr( $notice->get( 'countdown_duration' ) ); ?>">
+					data-end-at="<?php echo esc_attr( strtotime( $notice->get( 'end' ) ) ); ?>">
 					00:00:00:00
 				</div>
 			</div>

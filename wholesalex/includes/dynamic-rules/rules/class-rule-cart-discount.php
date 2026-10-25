@@ -199,8 +199,10 @@ class Rule_Cart_Discount {
 					return $hash;
 				}
 				$rule_total_amount = 0;
+				$has_eligible_item = false;
 				foreach ( WC()->cart->get_cart() as $cart_item ) {
 					if ( Dynamic_Rules_Condition_Engine::is_eligible_for_rule( $cart_item['product_id'], $cart_item['variation_id'], $rule['filter'] ) ) {
+						$has_eligible_item  = true;
 						$rule_total_amount += $cart_item['line_total'];
 						if ( apply_filters( 'wholesalex_dr_cart_discount_on_tax', false ) ) {
 							$rule_total_amount += $cart_item['line_tax'];
@@ -208,6 +210,9 @@ class Rule_Cart_Discount {
 					}
 				}
 
+				if ( ! $has_eligible_item ) {
+					continue;
+				}
 				$discount_amount = ( 'percentage' === $discount_type ) ? ( $rule_total_amount * floatval( $rule['rule']['_discount_amount'] ) ) / 100 : floatval( $rule['rule']['_discount_amount'] );
 				$discount_name   = apply_filters( 'wholesalex_cart_discount_title', isset( $rule['rule']['_discount_name'] ) ? $rule['rule']['_discount_name'] : __( 'Cart Discounts', 'wholesalex' ) );
 				if ( isset( $hash[ $hash_key ] ) && is_array( $hash[ $hash_key ] ) ) {

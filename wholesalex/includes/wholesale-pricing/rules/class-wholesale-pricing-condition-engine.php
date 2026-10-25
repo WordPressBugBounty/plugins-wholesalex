@@ -96,9 +96,10 @@ class Wholesale_Pricing_Condition_Engine {
 	 * @param array  $rule    Saved wholesale-pricing rule.
 	 * @param string $role_id Current WholesaleX role ID.
 	 * @param int    $user_id Current user ID, or zero for a guest.
+	 * @param bool   $role_preview Whether a registered role is being previewed without a user.
 	 * @return bool
 	 */
-	public static function user_role_matches( array $rule, string $role_id, int $user_id = 0 ): bool {
+	public static function user_role_matches( array $rule, string $role_id, int $user_id = 0, bool $role_preview = false ): bool {
 		$role_filter = isset( $rule['user_role_filter'] ) ? $rule['user_role_filter'] : 'all_b2b';
 
 		if ( 'all' === $role_filter ) {
@@ -106,6 +107,9 @@ class Wholesale_Pricing_Condition_Engine {
 		}
 
 		if ( 'all_users' === $role_filter ) {
+			if ( $role_preview && 0 === $user_id ) {
+				return '' !== $role_id && 'wholesalex_guest' !== $role_id;
+			}
 			if ( 0 === $user_id ) {
 				return false;
 			}
@@ -207,6 +211,16 @@ class Wholesale_Pricing_Condition_Engine {
 	 * @return bool
 	 */
 	public static function product_ids_match_filter( int $product_id, int $variation_id, array $filter ): bool {
+		// Grouped products are purchased as independent child cart lines.
+		foreach ( array( 'include_products', 'exclude_products' ) as $key ) {
+			foreach ( $filter[ $key ] ?? array() as $selected_id ) {
+				$selected = wc_get_product( $selected_id );
+				if ( $selected instanceof \WC_Product && $selected->is_type( 'grouped' ) ) {
+					$filter[ $key ] = array_values( array_unique( array_merge( $filter[ $key ], array_map( 'intval', $selected->get_children() ) ) ) );
+				}
+			}
+		}
+
 		$product_ids = array();
 
 		if ( ! empty( $filter['exclude_products'] ) ) {
@@ -300,9 +314,10 @@ class Wholesale_Pricing_Condition_Engine {
 	 * @return bool
 	 */
 	public static function check_rule_conditions( array $conditions, array $rule_filter = array(), array $context = array() ): bool {
-		if ( empty( $conditions['tiers'] ) || ! is_array( $conditions['tiers'] ) ) {
-			return true;
-		}
+		if ( isset( $conditions['tiers'] ) && ! is_array( $conditions['tiers'] ) ) {
+			return false; }
+		if ( empty( $conditions['tiers'] ) ) {
+			return true; }
 
 		return self::are_conditions_fulfilled( $conditions['tiers'], $rule_filter, $context );
 	}
@@ -313,11 +328,18 @@ class Wholesale_Pricing_Condition_Engine {
 	 * @param array $tiers Condition tiers.
 	 * @return bool
 	 */
-	public static function is_user_order_count_purchase_amount_condition_passed( array $tiers ): bool {
+	public static function is_user_order_count_purchase_amount_condition_passed( $tiers ): bool {
+		if ( ! is_array( $tiers ) ) {
+			return false; }
 		foreach ( $tiers as $tier ) {
-			if ( ! isset( $tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'] ) ) {
-				continue;
-			}
+			if ( ! is_array( $tier ) ) {
+				return false; }
+			$tier = wholesalex()->filter_empty_conditions( array( $tier ) );
+			if ( empty( $tier ) ) {
+				continue; }
+			$tier = $tier[0];
+			if ( ! isset( $tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'] ) || ! is_string( $tier['_conditions_for'] ) || ! is_string( $tier['_conditions_operator'] ) || ! is_numeric( $tier['_conditions_value'] ) || ! is_finite( (float) $tier['_conditions_value'] ) ) {
+				return false; }
 
 			$field = self::normalize_condition_field( (string) $tier['_conditions_for'] );
 			if ( in_array( $field, array( 'cart_total_qty', 'cart_total_value', 'cart_total_weight' ), true ) ) {
@@ -346,9 +368,14 @@ class Wholesale_Pricing_Condition_Engine {
 		$cart_data = self::get_filtered_cart_data( $rule_filter, $context );
 
 		foreach ( $tiers as $tier ) {
-			if ( ! isset( $tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'] ) ) {
-				continue;
-			}
+			if ( ! is_array( $tier ) ) {
+				return false; }
+			$tier = wholesalex()->filter_empty_conditions( array( $tier ) );
+			if ( empty( $tier ) ) {
+				continue; }
+			$tier = $tier[0];
+			if ( ! isset( $tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'] ) || ! is_string( $tier['_conditions_for'] ) || ! is_string( $tier['_conditions_operator'] ) || ! is_numeric( $tier['_conditions_value'] ) || ! is_finite( (float) $tier['_conditions_value'] ) ) {
+				return false; }
 
 			$field    = self::normalize_condition_field( (string) $tier['_conditions_for'] );
 			$operator = $tier['_conditions_operator'];
@@ -437,7 +464,7 @@ class Wholesale_Pricing_Condition_Engine {
 			'weight' => 0.0,
 		);
 
-		if ( function_exists( 'WC' ) && WC()->cart ) {
+		if ( empty( $context['ignore_live_cart'] ) && function_exists( 'WC' ) && WC()->cart ) {
 			foreach ( WC()->cart->get_cart() as $cart_item ) {
 				if ( ! self::cart_item_matches_filter( $cart_item, $rule_filter ) ) {
 					continue;

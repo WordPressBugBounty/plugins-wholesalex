@@ -119,11 +119,11 @@ class WHOLESALEX_Product {
 					if ( $product->has_child() ) {
 						$childrens = $product->get_children();
 						foreach ( $childrens as $key => $child_id ) {
-							$discounts[ $child_id ] = wholesalex()->get_single_product_discount( $child_id );
+							$discounts[ $child_id ] = self::project_role_prices( wholesalex()->get_single_product_discount( $child_id ) );
 						}
 					}
 				} else {
-					$discounts[ $post_id ] = wholesalex()->get_single_product_discount( $post_id );
+					$discounts[ $post_id ] = self::project_role_prices( wholesalex()->get_single_product_discount( $post_id ) );
 				}
 			}
 		}
@@ -188,6 +188,7 @@ class WHOLESALEX_Product {
 
 		add_action( 'woocommerce_order_status_cancelled', array( $this, 'maybe_increase_stock_levels' ) );
 		add_action( 'woocommerce_order_status_pending', array( $this, 'maybe_increase_stock_levels' ) );
+		add_filter( 'woocommerce_can_restock_refunded_items', array( $this, 'restock_order_refund' ), 20, 3 );
 	}
 
 	/**
@@ -663,7 +664,7 @@ class WHOLESALEX_Product {
 		}
 
 		if ( wholesalex()->is_active_b2b_user() ) {
-			$b2b_status = get_post_meta( $product->get_id(), 'wholesalex_b2b_stock_status', true );
+			$b2b_status   = get_post_meta( $product->get_id(), 'wholesalex_b2b_stock_status', true );
 			$stock_status = ! empty( $b2b_status ) ? $b2b_status : 'instock';
 		}
 
@@ -719,7 +720,7 @@ class WHOLESALEX_Product {
 	public function b2b_get_backorders( $status, $product ) {
 
 		if ( wholesalex()->is_active_b2b_user() ) {
-			$product_id = $product->get_id();
+			$product_id     = $product->get_id();
 			$b2b_backorders = get_post_meta( $product_id, 'wholesalex_b2b_backorders', true );
 			if ( in_array( $b2b_backorders, array( 'no', 'yes', 'notify' ), true ) ) {
 				$status = $b2b_backorders;
@@ -838,7 +839,8 @@ class WHOLESALEX_Product {
 			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Invoke the existing WooCommerce extension hook.
 			$qty       = apply_filters( 'woocommerce_order_item_quantity', $item->get_quantity(), $order, $item );
 			$item_name = $product->get_formatted_name();
-			$new_stock = $this->b2b_update_product_stock( $product, $qty, 'decrease', false, $customer_id );
+			$pool      = $this->order_item_stock_pool( $item, $order );
+			$new_stock = '_stock' === $pool ? wc_update_product_stock( $product, $qty, 'decrease' ) : $this->b2b_update_product_stock( $product, $qty, 'decrease', false, $pool );
 
 			if ( is_wp_error( $new_stock ) ) {
 				/* translators: %s item name. */
@@ -847,6 +849,7 @@ class WHOLESALEX_Product {
 			}
 
 			$item->add_meta_data( '_reduced_stock', $qty, true );
+			$item->add_meta_data( '_wholesalex_stock_pool', $pool, true );
 			$item->save();
 
 			$change    = array(
@@ -892,27 +895,38 @@ class WHOLESALEX_Product {
 		foreach ( $changes as $change ) {
 			$order_notes[]    = $change['product']->get_formatted_name() . ' ' . $change['from'] . '&rarr;' . $change['to'];
 			$low_stock_amount = absint( wc_get_low_stock_amount( wc_get_product( $change['product']->get_id() ) ) );
-			if ( $change['to'] <= $no_stock_amount ) {
-				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Invoke the existing WooCommerce extension hook.
-				do_action( 'woocommerce_no_stock', wc_get_product( $change['product']->get_id() ) );
-			} elseif ( $change['to'] <= $low_stock_amount ) {
-				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Invoke the existing WooCommerce extension hook.
-				do_action( 'woocommerce_low_stock', wc_get_product( $change['product']->get_id() ) );
-			}
+			// Notification callbacks can fetch a fresh product; scope the getter to this pool.
+			$pool_quantity = static function ( $quantity, $product ) use ( $change ) {
+				return $product->get_id() === $change['product']->get_id() ? $change['to'] : $quantity;
+			};
+			add_filter( 'woocommerce_product_get_stock_quantity', $pool_quantity, PHP_INT_MAX, 2 );
+			add_filter( 'woocommerce_product_variation_get_stock_quantity', $pool_quantity, PHP_INT_MAX, 2 );
+			try {
+				if ( $change['to'] <= $no_stock_amount ) {
+					// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Invoke the existing WooCommerce extension hook.
+					do_action( 'woocommerce_no_stock', wc_get_product( $change['product']->get_id() ) );
+				} elseif ( $change['to'] <= $low_stock_amount ) {
+					// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Invoke the existing WooCommerce extension hook.
+					do_action( 'woocommerce_low_stock', wc_get_product( $change['product']->get_id() ) );
+				}
 
-			if ( $change['to'] < 0 ) {
-				do_action(
-					'woocommerce_product_on_backorder', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Invoke the existing WooCommerce extension hook.
-					array(
-						'product'  => wc_get_product( $change['product']->get_id() ),
-						'order_id' => $order->get_id(),
-						'quantity' => abs( $change['from'] - $change['to'] ),
-					)
-				);
+				if ( $change['to'] < 0 ) {
+					do_action(
+						'woocommerce_product_on_backorder', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Invoke the existing WooCommerce extension hook.
+						array(
+							'product'  => wc_get_product( $change['product']->get_id() ),
+							'order_id' => $order->get_id(),
+							'quantity' => abs( $change['from'] - $change['to'] ),
+						)
+					);
+				}
+			} finally {
+				remove_filter( 'woocommerce_product_get_stock_quantity', $pool_quantity, PHP_INT_MAX );
+				remove_filter( 'woocommerce_product_variation_get_stock_quantity', $pool_quantity, PHP_INT_MAX );
 			}
 		}
 
-		$order->add_order_note( __( 'Stock levels reduced:', 'wholesalex' ) . ' ' . implode( ', ', $order_notes ) . ' ' . __( 'Wholesale Customer', 'wholesalex' ) );
+		$order->add_order_note( __( 'Stock levels reduced:', 'wholesalex' ) . ' ' . implode( ', ', $order_notes ) );
 	}
 
 	/**
@@ -926,9 +940,10 @@ class WHOLESALEX_Product {
 	 * @param  int            $product_id_with_stock Product ID.
 	 * @param  int|float|null $stock_quantity Stock quantity.
 	 * @param  string         $operation Set, increase and decrease.
-	 * @return int|float New stock level.
+	 * @param string         $stock_pool Saved stock metadata key, if restoring.
+	 * @return int|float|\WP_Error New stock level or write failure.
 	 */
-	public function update_product_stock( $product_id_with_stock, $stock_quantity = null, $operation = 'set' ) {
+	public function update_product_stock( $product_id_with_stock, $stock_quantity = null, $operation = 'set', $stock_pool = '' ) {
 		global $wpdb;
 
 		$stock_meta_key = '_stock';
@@ -946,6 +961,10 @@ class WHOLESALEX_Product {
 			if ( 'yes' === $separate_b2b_stock_status ) {
 				$stock_meta_key = 'wholesalex_b2b_variable_stock';
 			}
+		}
+
+		if ( in_array( $stock_pool, array( '_stock', 'wholesalex_b2b_stock', 'wholesalex_b2b_variable_stock' ), true ) ) {
+			$stock_meta_key = $stock_pool;
 		}
 
 		// Ensures a row exists to update.
@@ -997,7 +1016,11 @@ class WHOLESALEX_Product {
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Invoke the existing WooCommerce extension hook.
 		$sql = apply_filters( 'woocommerce_update_product_stock_query', $sql, $product_id_with_stock, $new_stock, $operation );
 
-		$wpdb->query( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- SQL is prepared above, then intentionally passed through WooCommerce's trusted stock-query filter.
+		$written = $wpdb->query( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- SQL is prepared above, then intentionally passed through WooCommerce's trusted stock-query filter.
+
+		if ( false === $written ) {
+			return new \WP_Error( 'wholesalex_stock_write_failed', __( 'The stock could not be updated.', 'wholesalex' ) );
+		}
 
 		// Cache delete is required (not only) to set correct data for lookup table (which reads from cache).
 		// Sometimes I wonder if it shouldn't be part of update_lookup_table.
@@ -1027,9 +1050,10 @@ class WHOLESALEX_Product {
 	 * @param  int|null       $stock_quantity Stock quantity.
 	 * @param  string         $operation      Type of operation, allows 'set', 'increase' and 'decrease'.
 	 * @param  bool           $updating       If true, the product object won't be saved here as it will be updated later.
-	 * @return bool|int|null
+	 * @param string         $stock_pool Saved stock metadata key, if restoring.
+	 * @return bool|int|null|\WP_Error
 	 */
-	public function b2b_update_product_stock( $product, $stock_quantity = null, $operation = 'set', $updating = false ) {
+	public function b2b_update_product_stock( $product, $stock_quantity = null, $operation = 'set', $updating = false, $stock_pool = '' ) {
 		if ( ! is_a( $product, 'WC_Product' ) ) {
 			$product = wc_get_product( $product );
 		}
@@ -1054,7 +1078,10 @@ class WHOLESALEX_Product {
 			}
 
 			// Update the database.
-			$new_stock = $this->update_product_stock( $product_id_with_stock, $stock_quantity, $operation );
+			$new_stock = $this->update_product_stock( $product_id_with_stock, $stock_quantity, $operation, $stock_pool );
+			if ( is_wp_error( $new_stock ) ) {
+				return $new_stock;
+			}
 
 			// Only sync the product object's native stock_quantity when the native _stock meta was
 			// actually updated. When separate B2B stock is enabled, update_product_stock writes to
@@ -1066,6 +1093,9 @@ class WHOLESALEX_Product {
 				$is_separate_b2b_stock = 'yes' === get_post_meta( $product_id_with_stock, 'wholesalex_b2b_separate_stock_status', true );
 			}
 
+			if ( in_array( $stock_pool, array( 'wholesalex_b2b_stock', 'wholesalex_b2b_variable_stock' ), true ) ) {
+				$is_separate_b2b_stock = true;
+			}
 			if ( ! $is_separate_b2b_stock ) {
 				// Update the product object with the new native stock quantity.
 				$data_store->read_stock_quantity( $product_with_stock, $new_stock );
@@ -1085,9 +1115,79 @@ class WHOLESALEX_Product {
 				do_action( 'woocommerce_product_set_stock', $product_with_stock );
 			}
 
-			return $product_with_stock->get_stock_quantity();
+			return $new_stock;
 		}
 		return $product->get_stock_quantity();
+	}
+
+	/**
+	 * Route refund restocks through the inventory pool saved at reduction time.
+	 *
+	 * @param bool      $allowed Upstream restock permission.
+	 * @param \WC_Order $order Refunded order.
+	 * @param array     $refunded_items Requested item quantities.
+	 * @return bool Whether WooCommerce should perform its native-only restock.
+	 */
+	public function restock_order_refund( $allowed, $order, $refunded_items ) {
+		if ( ! $allowed ) {
+			return false;
+		}
+		$items              = $order->get_items();
+		$has_wholesale_pool = false;
+		foreach ( $items as $item ) {
+			if ( $item->get_product() && '_stock' !== $this->order_item_stock_pool( $item, $order ) ) {
+				$has_wholesale_pool = true;
+				break;
+			}
+		}
+		if ( ! $has_wholesale_pool ) {
+			return true;
+		}
+		foreach ( $items as $item_id => $item ) {
+			$product  = $item->get_product();
+			$reduced  = (float) $item->get_meta( '_reduced_stock', true );
+			$quantity = isset( $refunded_items[ $item_id ]['qty'] ) ? (float) $refunded_items[ $item_id ]['qty'] : 0;
+			if ( ! $product || ! $product->managing_stock() || $quantity <= 0 || $reduced <= 0 ) {
+				continue;
+			}
+			$quantity  = min( $quantity, $reduced );
+			$pool      = $this->order_item_stock_pool( $item, $order );
+			$new_stock = '_stock' === $pool ? wc_update_product_stock( $product, $quantity, 'increase' ) : $this->b2b_update_product_stock( $product, $quantity, 'increase', false, $pool );
+			if ( is_wp_error( $new_stock ) || false === $new_stock ) {
+				continue;
+			}
+			$item->update_meta_data( '_reduced_stock', $reduced - $quantity );
+			$item->update_meta_data( '_restock_refunded_items', (float) $item->get_meta( '_restock_refunded_items', true ) + $quantity );
+			$item->save();
+			/* translators: 1: product ID, 2: previous stock, 3: new stock. */
+			$note = sprintf( __( 'Item #%1$s stock increased from %2$s to %3$s.', 'wholesalex' ), $product->get_id(), $new_stock - $quantity, $new_stock );
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Preserve the WooCommerce refund note extension hook.
+			$order->add_order_note( apply_filters( 'woocommerce_refund_restock_note', $note, $new_stock - $quantity, $new_stock, $order, $product ) );
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Preserve the WooCommerce refund stock lifecycle hook.
+			do_action( 'woocommerce_restock_refunded_item', $product->get_id(), $new_stock - $quantity, $new_stock, $order, $product );
+		}
+		return false;
+	}
+
+	/**
+	 * Restore the exact pool originally reduced, even after role or product changes.
+	 *
+	 * @param \WC_Order_Item_Product $item Order item.
+	 * @param \WC_Order              $order Order.
+	 * @return string Stock metadata key.
+	 */
+	private function order_item_stock_pool( $item, $order ) {
+		$pool = $item->get_meta( '_wholesalex_stock_pool', true );
+		if ( in_array( $pool, array( '_stock', 'wholesalex_b2b_stock', 'wholesalex_b2b_variable_stock' ), true ) ) {
+			return $pool;
+		}
+		if ( ! wholesalex()->is_active_b2b_user( $order->get_customer_id() ) ) {
+			return '_stock';
+		}
+		$product = $item->get_product();
+		$product = wc_get_product( $product->get_stock_managed_by_id() );
+		$prefix  = $product->is_type( 'variation' ) ? 'wholesalex_b2b_variable' : 'wholesalex_b2b';
+		return 'yes' === get_post_meta( $product->get_id(), $prefix . '_separate_stock_status', true ) ? $prefix . '_stock' : '_stock';
 	}
 
 	/**
@@ -1101,13 +1201,6 @@ class WHOLESALEX_Product {
 		$order = wc_get_order( $order_id );
 
 		if ( ! $order ) {
-			return;
-		}
-
-		$customer_id = $order->get_customer_id();
-
-		if ( ! wholesalex()->is_active_b2b_user( $customer_id ) ) {
-			wc_maybe_reduce_stock_levels( $order_id );
 			return;
 		}
 
@@ -1136,13 +1229,6 @@ class WHOLESALEX_Product {
 		$order = wc_get_order( $order_id );
 
 		if ( ! $order ) {
-			return;
-		}
-
-		$customer_id = $order->get_customer_id();
-
-		if ( ! wholesalex()->is_active_b2b_user( $customer_id ) ) {
-			wc_maybe_increase_stock_levels( $order_id );
 			return;
 		}
 
@@ -1197,7 +1283,8 @@ class WHOLESALEX_Product {
 			}
 
 			$item_name = $product->get_formatted_name();
-			$new_stock = $this->b2b_update_product_stock( $product, $item_stock_reduced, 'increase' );
+			$pool      = $this->order_item_stock_pool( $item, $order );
+			$new_stock = '_stock' === $pool ? wc_update_product_stock( $product, $item_stock_reduced, 'increase' ) : $this->b2b_update_product_stock( $product, $item_stock_reduced, 'increase', false, $pool );
 
 			if ( is_wp_error( $new_stock ) ) {
 				/* translators: %s item name. */
@@ -1206,13 +1293,14 @@ class WHOLESALEX_Product {
 			}
 
 			$item->delete_meta_data( '_reduced_stock' );
+			$item->delete_meta_data( '_wholesalex_stock_pool' );
 			$item->save();
 
 			$changes[] = $item_name . ' ' . ( $new_stock - $item_stock_reduced ) . '&rarr;' . $new_stock;
 		}
 
 		if ( $changes ) {
-			$order->add_order_note( __( 'Stock levels increased:', 'wholesalex' ) . ' ' . implode( ', ', $changes ) . ' ' . __( 'Wholesale Customer', 'wholesalex' ) );
+			$order->add_order_note( __( 'Stock levels increased:', 'wholesalex' ) . ' ' . implode( ', ', $changes ) );
 		}
 
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Invoke the existing WooCommerce extension hook.
@@ -1365,6 +1453,21 @@ class WHOLESALEX_Product {
 	}
 
 	/**
+	 * Project ordinary role prices for the Free product form.
+	 *
+	 * Provider records are fetched independently by their own editor resources.
+	 *
+	 * @param array $records Role keyed domain records.
+	 * @return array
+	 */
+	public static function project_role_prices( array $records ): array {
+		foreach ( $records as $role => $record ) {
+			$records[ $role ] = array_intersect_key( (array) $record, array_flip( array( 'wholesalex_base_price', 'wholesalex_sale_price' ) ) );
+		}
+		return $records;
+	}
+
+	/**
 	 * Merge submitted product settings over stored ones.
 	 *
 	 * Keys the submitting form does not render are kept as stored.
@@ -1428,11 +1531,11 @@ class WHOLESALEX_Product {
 					if ( $product->has_child() ) {
 						$childrens = $product->get_children();
 						foreach ( $childrens as $key => $child_id ) {
-							$discounts[ $child_id ] = wholesalex()->get_single_product_discount( $child_id );
+							$discounts[ $child_id ] = self::project_role_prices( wholesalex()->get_single_product_discount( $child_id ) );
 						}
 					}
 				} else {
-					$discounts[ $post_id ] = wholesalex()->get_single_product_discount( $post_id );
+					$discounts[ $post_id ] = self::project_role_prices( wholesalex()->get_single_product_discount( $post_id ) );
 				}
 			}
 		}
@@ -1489,8 +1592,9 @@ class WHOLESALEX_Product {
 			}
 		}
 
-		if ( $is_nonce_verify && isset( $_POST[ 'wholesalex_single_product_tiers_' . $post_id . '_simple' ] ) ) {
-			$product_discounts = wholesalex()->sanitize_json_input( wp_unslash( $_POST[ 'wholesalex_single_product_tiers_' . $post_id . '_simple' ] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitize_json_input() decodes the payload and recursively sanitizes every value; sanitizing the raw JSON string first corrupts it.
+		$price_field = isset( $_POST[ 'wholesalex_single_product_tiers_' . $post_id . '_variation' ] ) ? 'variation' : 'simple';
+		if ( $is_nonce_verify && isset( $_POST[ 'wholesalex_single_product_tiers_' . $post_id . '_' . $price_field ] ) ) {
+			$product_discounts = wholesalex()->sanitize_json_input( wp_unslash( $_POST[ 'wholesalex_single_product_tiers_' . $post_id . '_' . $price_field ] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitize_json_input() decodes the payload and recursively sanitizes every value; sanitizing the raw JSON string first corrupts it.
 
 			$filtered_products_data = is_array( $product_discounts ) ? $product_discounts : array();
 
@@ -1510,7 +1614,17 @@ class WHOLESALEX_Product {
 			}
 			unset( $role );
 
-			wholesalex()->save_single_product_discount( $post_id, $filtered_products_data );
+			$result = wholesalex()->save_single_product_discount( $post_id, $filtered_products_data );
+			if ( is_wp_error( $result ) ) {
+				wp_die(
+					esc_html( $result->get_error_message() ),
+					'',
+					array(
+						'response'  => 422,
+						'back_link' => true,
+					)
+				);
+			}
 		}
 
 		$product      = wc_get_product( $post_id );
@@ -1518,7 +1632,17 @@ class WHOLESALEX_Product {
 		if ( 'yith_bundle' === $product_type && $is_nonce_verify && isset( $_POST[ 'wholesalex_single_product_tiers_' . $post_id . '_yith' ] ) ) {
 			$product_discounts      = wholesalex()->sanitize_json_input( wp_unslash( $_POST[ 'wholesalex_single_product_tiers_' . $post_id . '_yith' ] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitize_json_input() decodes the payload and recursively sanitizes every value; sanitizing the raw JSON string first corrupts it.
 			$filtered_products_data = is_array( $product_discounts ) ? $product_discounts : array();
-			wholesalex()->save_single_product_discount( $post_id, $filtered_products_data );
+			$result                 = wholesalex()->save_single_product_discount( $post_id, $filtered_products_data );
+			if ( is_wp_error( $result ) ) {
+				wp_die(
+					esc_html( $result->get_error_message() ),
+					'',
+					array(
+						'response'  => 422,
+						'back_link' => true,
+					)
+				);
+			}
 		}
 	}
 
@@ -1727,7 +1851,7 @@ class WHOLESALEX_Product {
 			}
 			$__b2b_roles[ $role['value'] ] = array(
 				'label' => $role['name'],
-				'type'  => 'tiers',
+				'type'  => 'role-prices',
 				'attr'  => array(
 					'_prices' => array(
 						'type' => 'prices',
@@ -1913,7 +2037,7 @@ class WHOLESALEX_Product {
 				$__for           = '';
 				$__src_id        = '';
 
-				if ( isset( $discount['_rule_status'] ) && ! empty( $discount['_rule_status'] ) && isset( $discount['_product_filter'] ) ) {
+				if ( in_array( $discount['_rule_status'] ?? '', array( true, 1, '1', 'yes' ), true ) && isset( $discount['_product_filter'] ) ) {
 					switch ( $discount['_product_filter'] ) {
 						case 'all_products':
 							$__has_discount = true;
@@ -2144,14 +2268,6 @@ class WHOLESALEX_Product {
 						$__rule_type = 'Product Discount';
 
 						break;
-					case 'quantity_based':
-						if ( ! isset( $discount['quantity_based']['tiers'] ) ) {
-							break;
-						}
-						$__rule_type = 'Quantity Based';
-
-						break;
-
 					case 'payment_discount':
 						$__rule_type = 'Payment Discount';
 						break;
@@ -2177,6 +2293,8 @@ class WHOLESALEX_Product {
 						$__rule_type = __( 'BOGO Discounts (Buy X Get One Free)', 'wholesalex' );
 						break;
 				}
+
+				$__rule_type = apply_filters( 'wholesalex_product_rule_type_label', $__rule_type, $discount );
 
 				if ( ! isset( $discount['_rule_for'] ) ) {
 					continue;
@@ -2277,67 +2395,23 @@ class WHOLESALEX_Product {
 	public function wholesalex_rule_on( $__discounts, $product_id, $rule_src, $cat_id = '' ) {
 		$has_rule = false;
 		foreach ( $__discounts as $role_id => $discount ) {
-
-			$_temp          = $discount;
-			$_temp['tiers'] = wholesalex()->filter_empty_tier( isset( $_temp['tiers'] ) ? $_temp['tiers'] : array() );
-
-			if ( ! empty( $_temp['wholesalex_base_price'] ) || ! empty( $_temp['wholesalex_sale_price'] ) || ! empty( $_temp['tiers'] ) ) {
-				$product        = wc_get_product( $product_id );
-				$parent_id      = $product->get_parent_id();
-				$variation_name = '';
-				if ( $parent_id ) {
-					$variation_name = $product->get_name();
-				}
-				$_role_name = wholesalex()->get_role_name_by_role_id( $role_id );
-				if ( $product && $product->is_type( 'variation' ) ) {
-					if ( ( ( isset( $_temp['wholesalex_base_price'] ) && ! empty( $_temp['wholesalex_base_price'] ) ) || ( isset( $_temp['wholesalex_sale_price'] ) && ! empty( $_temp['wholesalex_sale_price'] ) ) ) && ( isset( $_temp['tiers'] ) && ! empty( $_temp['tiers'] ) ) ) {
-						if ( 'Singles' === $rule_src ) {
-							$this->rule_on_message( $cat_id, $rule_src, $_role_name, 'Product Discount & Quantity Based Discount kk', $product_id, $variation_name );
-						} else {
-							$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Product Discount & Quantity Based Discount', $product_id );
-						}
-					} elseif ( ( ( isset( $_temp['wholesalex_base_price'] ) && ! empty( $_temp['wholesalex_base_price'] ) ) || ( isset( $_temp['wholesalex_sale_price'] ) && ! empty( $_temp['wholesalex_sale_price'] ) ) ) ) {
-						if ( 'Singles' === $rule_src ) {
-							$this->rule_on_message( $cat_id, $rule_src, $_role_name, 'Product Discount kk', $product_id, $variation_name );
-						} else {
-							$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Product Discount', $product_id );
-						}
-					} elseif ( 'Category' === $rule_src ) {
-						$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Quantity Based Discount', $cat_id );
-					} elseif ( 'Singles' === $rule_src ) {
-						$this->rule_on_message( $cat_id, $rule_src, $_role_name, 'Quantity Based Discount kk', $product_id, $variation_name );
-					} else {
-						$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Quantity Based Discount', $product_id );
-					}
-				} elseif ( ( ( isset( $_temp['wholesalex_base_price'] ) && ! empty( $_temp['wholesalex_base_price'] ) ) ||
-					( isset( $_temp['wholesalex_sale_price'] ) && ! empty( $_temp['wholesalex_sale_price'] ) ) )
-					&& ( isset( $_temp['tiers'] ) && ! empty( $_temp['tiers'] ) ) ) {
-
-					if ( 'Singles' === $rule_src ) {
-						$this->rule_on_message( $cat_id, $rule_src, $_role_name, 'Product Discount & Quantity Based Discount kk', $product_id, $variation_name );
-					} else {
-						$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Product Discount & Quantity Based Discount', $product_id );
-					}
-				} elseif ( ( ( isset( $_temp['wholesalex_base_price'] ) && ! empty( $_temp['wholesalex_base_price'] ) ) ||
-						( isset( $_temp['wholesalex_sale_price'] ) && ! empty( $_temp['wholesalex_sale_price'] ) ) ) ) {
-					if ( 'Singles' === $rule_src ) {
-						$this->rule_on_message( $cat_id, $rule_src, $_role_name, 'Product Discount kk', $product_id, $variation_name );
-					} else {
-						$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Product Discount', $product_id );
-					}
-				} elseif ( 'Category' === $rule_src ) {
-					$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Quantity Based Discount', $cat_id );
-				} elseif ( 'Category' === $rule_src ) {
-					$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Quantity Based Discount', $product_id );
-				} elseif ( 'Singles' === $rule_src ) {
-					$this->rule_on_message( $cat_id, $rule_src, $_role_name, 'Quantity Based Discount kk', $product_id, $variation_name );
-				} else {
-					$this->rule_on_message( $product_id, $rule_src, $_role_name, 'Quantity Based Discount', $product_id );
-				}
-				$has_rule = true;
+			$label = ! empty( $discount['wholesalex_base_price'] ) || ! empty( $discount['wholesalex_sale_price'] ) ? 'Product Discount' : '';
+			$label = apply_filters( 'wholesalex_product_discount_label', $label, $discount );
+			if ( ! is_string( $label ) || '' === $label ) {
+				continue;
 			}
+			$product = wc_get_product( $product_id );
+			if ( ! $product ) {
+				continue;
+			}
+			$role_name = wholesalex()->get_role_name_by_role_id( $role_id );
+			if ( 'Singles' === $rule_src ) {
+				$this->rule_on_message( $cat_id, $rule_src, $role_name, $label, $product_id, $product->get_parent_id() ? $product->get_name() : '' );
+			} else {
+				$this->rule_on_message( $product_id, $rule_src, $role_name, $label, 'Category' === $rule_src ? $cat_id : $product_id );
+			}
+			$has_rule = true;
 		}
-
 		return $has_rule;
 	}
 

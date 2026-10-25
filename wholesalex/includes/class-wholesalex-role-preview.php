@@ -65,10 +65,11 @@ class Wholesalex_Role_Preview {
 			return wp_doing_ajax() && in_array( $action, array( 'woocommerce_get_variation', 'woocommerce_get_refreshed_fragments', 'woocommerce_add_to_cart', 'woocommerce_update_order_review', 'woocommerce_checkout' ), true );
 		}
 		// Pricing initializes on wp_loaded, before REST_REQUEST is defined.
-		$route = isset( $_GET['rest_route'] ) && is_string( $_GET['rest_route'] ) ? wp_unslash( $_GET['rest_route'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only request classification.
+		$route = isset( $_GET['rest_route'] ) && is_string( $_GET['rest_route'] ) ? wp_unslash( $_GET['rest_route'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- String-guarded routing classification only; normalization could change the detected route.
 		if ( isset( $GLOBALS['wp']->query_vars['rest_route'] ) ) {
 			$route = $GLOBALS['wp']->query_vars['rest_route'];
 		}
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Parse only the path for routing classification; no request value is rendered or stored.
 		$path = isset( $_SERVER['REQUEST_URI'] ) && is_string( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) : '';
 		// Settings can resolve a role during plugins_loaded, before WP_Rewrite exists.
 		// Keep REST classification available then without calling get_rest_url().
@@ -123,12 +124,11 @@ class Wholesalex_Role_Preview {
 		if ( is_admin() || wp_doing_ajax() || ! isset( $_GET[ self::QUERY_KEY ] ) || ! current_user_can( self::CAPABILITY ) ) {
 			return;
 		}
-		$role  = $_GET[ self::QUERY_KEY ]; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Verified below before use.
-		$nonce = isset( $_GET['_wpnonce'] ) ? $_GET['_wpnonce'] : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Verified immediately below.
-		if ( ! is_string( $role ) || ! is_string( $nonce ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $nonce ) ), self::NONCE_ACTION ) ) {
+		$role  = is_string( $_GET[ self::QUERY_KEY ] ) ? sanitize_key( wp_unslash( $_GET[ self::QUERY_KEY ] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Verified below before use.
+		$nonce = isset( $_GET['_wpnonce'] ) ? ( is_string( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : null ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Verified immediately below.
+		if ( ! is_string( $role ) || ! is_string( $nonce ) || ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
 			return;
 		}
-		$role = sanitize_key( wp_unslash( $role ) );
 		if ( 'none' === $role ) {
 			delete_user_meta( get_current_user_id(), self::META_KEY );
 		} elseif ( isset( $this->get_roles()[ $role ] ) ) {

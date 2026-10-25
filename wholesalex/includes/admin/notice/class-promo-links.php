@@ -4,12 +4,14 @@
  *
  * @package WholesaleX
  */
-namespace WHOLESALEX\Includes\Admin\Notice;
 
-use WHOLESALEX\Xpo;
+namespace WHOLESALEX\Includes\Admin\Notice;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Add current campaign offers to the plugin's existing upgrade links.
+ */
 class Promo_Links {
 	/** Register links without adding a duplicate submenu. */
 	public function __construct() {
@@ -17,30 +19,51 @@ class Promo_Links {
 		add_filter( 'plugin_row_meta', array( $this, 'add_plugin_row_meta' ), 10, 2 );
 	}
 
-	/** Add the upgrade or renewal link, respecting Pro's existing filters. */
+	/**
+	 * Add the upgrade or renewal link, respecting Pro's existing filters.
+	 *
+	 * @param string[] $links Existing plugin action links.
+	 * @return string[]
+	 */
 	public function add_plugin_action_link( $links ) {
 		if ( ! apply_filters( 'wholesalex_show_upgrade_menu', true ) ) {
 			return $links;
 		}
-		$offer = self::live_offer( 'plugin_link_offers' );
-		$text  = apply_filters( 'wholesalex_upgrade_menu_label', $offer ? $offer['text'] : __( 'Upgrade to Pro', 'wholesalex' ) );
-		$url   = apply_filters( 'wholesalex_upgrade_menu_url', ! empty( $offer['url'] ) ? $offer['url'] : Xpo::generate_utm_link( array( 'utmKey' => $offer['utm_key'] ?? 'plugin_meta' ) ) );
+		$offer            = self::live_offer( 'plugin_link_offers' );
+		$text             = apply_filters( 'wholesalex_upgrade_menu_label', $offer ? $offer['text'] : __( 'Upgrade to Pro', 'wholesalex' ) );
+		$url              = apply_filters( 'wholesalex_upgrade_menu_url', ! empty( $offer['url'] ) ? $offer['url'] : 'https://getwholesalex.com/pricing/' );
 		$links['wsx_pro'] = '<a style="color: #6c3bff; font-weight: bold;" target="_blank" rel="noopener noreferrer" href="' . esc_url( $url ) . '">' . esc_html( $text ) . '</a>';
 		return $links;
 	}
 
-	/** Show the same offer beneath this plugin's description, never another plugin's row. */
+	/**
+	 * Show the same offer beneath this plugin's description, never another plugin's row.
+	 *
+	 * @param string[] $links Existing plugin row links.
+	 * @param string   $file Plugin basename for the current row.
+	 * @return string[]
+	 */
 	public function add_plugin_row_meta( $links, $file ) {
 		return WHOLESALEX_BASE === $file ? $this->add_plugin_action_link( $links ) : $links;
 	}
 
-	/** Supply seasonal copy for the existing menu. */
+	/**
+	 * Supply seasonal copy for the existing menu.
+	 *
+	 * @param string $label Existing upgrade menu label.
+	 * @return string
+	 */
 	public static function menu_label( $label ) {
 		$offer = self::live_offer( 'menu_offers' );
 		return $offer ? $offer['text'] : $label;
 	}
 
-	/** Return the first current offer, safely ignoring malformed campaign data. */
+	/**
+	 * Return the first current offer, safely ignoring malformed campaign data.
+	 *
+	 * @param string $method Campaign provider method name.
+	 * @return array|null
+	 */
 	private static function live_offer( $method ) {
 		try {
 			require_once __DIR__ . '/class-campaigns.php';

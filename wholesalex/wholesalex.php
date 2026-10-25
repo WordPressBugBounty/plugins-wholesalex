@@ -8,8 +8,8 @@
  *
  * Plugin Name:             WholesaleX – All-in-One B2B Solution with Wholesale Pricing
  * Plugin URI:              https://getwholesalex.com/
- * Description:             The WholesaleX plugin is a brand-new, highly-promising WooCommerce B2B solution to set up a conversion-focused B2B store for selling wholesale products. It offers everything required to operate an effective B2B store.
- * Version:                 3.1.4
+ * Description:             Wholesale pricing, B2B customer roles, registration forms and private-store controls for WooCommerce.
+ * Version:                 3.1.5
  * Author:                  Wholesale Team
  * Author URI:              https://getwholesalex.com/
  * License:                 GPLv3
@@ -17,6 +17,8 @@
  * Text Domain:             wholesalex
  * Domain Path:             /languages
  * Requires Plugins:        woocommerce
+ * Requires at least:       6.8
+ * Requires PHP:            7.4
  * WC requires at least:    4.0
  */
 
@@ -26,7 +28,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin Defined.
-define( 'WHOLESALEX_VER', '3.1.4' );
+define( 'WHOLESALEX_VER', '3.1.5' );
+// Public host protocol; feature results still require actual registered providers.
+define( 'WHOLESALEX_PROVIDER_API', 1 );
 define( 'WHOLESALEX_URL', plugin_dir_url( __FILE__ ) );
 define( 'WHOLESALEX_BASE', plugin_basename( __FILE__ ) );
 define( 'WHOLESALEX_PATH', plugin_dir_path( __FILE__ ) );
@@ -70,6 +74,16 @@ if ( ! function_exists( 'wholesalex' ) ) {
 }
 
 /**
+ * Register provider compatibility before the main plugin initialization.
+ */
+function wholesalex_register_compatibility() {
+	require_once WHOLESALEX_PATH . 'includes/compatibility/class-provider-contract.php';
+	\WHOLESALEX\Compatibility\Provider_Contract::protect();
+	add_filter( 'woocommerce_get_variation_prices_hash', array( '\WHOLESALEX\Compatibility\Provider_Contract', 'price_cache_context' ) );
+}
+add_action( 'plugins_loaded', 'wholesalex_register_compatibility', 1 );
+
+/**
  * Begins Execution of the Plugin.
  */
 function wholesalex_run() {
@@ -79,8 +93,8 @@ function wholesalex_run() {
 	}
 	$initialized = true;
 	// Migrate active installations on updates, before any defaults are created.
-	wholesalex()->get_dynamic_rules_access();
 	wholesalex()->get_onboarding_status();
+	add_filter( 'sanitize_option_wholesalex_settings', array( '\WHOLESALEX\Functions', 'normalize_store_mode' ) );
 
 	require_once WHOLESALEX_PATH . 'includes/class-registration-page.php';
 	add_action( 'rest_api_init', array( '\WHOLESALEX\Registration_Page', 'register_routes' ) );

@@ -87,6 +87,10 @@ class Addons {
 					return $response;
 				}
 
+				if ( isset( $addons[ $addon ]['is_pro'] ) && $addons[ $addon ]['is_pro'] ) {
+					$response['data'] = __( 'Paid addon settings belong to their provider.', 'wholesalex' );
+					return $response;
+				}
 				$addon_name  = isset( $addons[ $addon ] ) ? $addon : '';
 				$addon_value = isset( $post['status'] ) && is_string( $post['status'] ) ? sanitize_key( $post['status'] ) : '';
 				if ( ! current_user_can( apply_filters( 'wholesalex_capability_access', 'manage_options' ) ) || ! $addon_name || ! in_array( $addon_value, array( 'yes', 'no' ), true ) ) {
@@ -95,9 +99,12 @@ class Addons {
 				}
 
 				// $addon_name is validated above against the known addons config, so it is safe to use in the dynamic hook names below.
-				do_action( 'wholesalex_' . $addon_name . '_before_status_update', $addon_value );
 				$error = apply_filters( 'wholesalex_' . $addon_name . '_error', '', $addon_value );
+				if ( is_wp_error( $error ) ) {
+					return $error;
+				}
 				if ( '' === $error ) {
+					do_action( 'wholesalex_' . $addon_name . '_before_status_update', $addon_value );
 					$addon_data                                    = wholesalex()->get_setting();
 					$addon_data[ $addon_name ]                     = $addon_value;
 					$GLOBALS['wholesalex_settings'][ $addon_name ] = $addon_value;
@@ -195,12 +202,8 @@ class Addons {
 			'live'                => '',
 			'is_pro'              => true,
 			'is_different_plugin' => false,
-			'eligible_price_ids'  => array( '1', '2', '3', '4', '5', '6', '7' ),
 			'moreFeature'         => 'https://getwholesalex.com/bulk-order/',
 			'video'               => 'https://www.youtube.com/embed/uwHojBY0lZk',
-			'status'              => wholesalex()->get_setting( 'wsx_addon_bulkorder' ),
-			'setting_id'          => '#bulkorder',
-			'lock_status'         => true,
 		);
 
 		$config['wsx_addon_subaccount'] = array(
@@ -211,30 +214,20 @@ class Addons {
 			'live'                => '',
 			'is_pro'              => true,
 			'is_different_plugin' => false,
-			'eligible_price_ids'  => array( '1', '2', '3', '4', '5', '6', '7' ),
 			'moreFeature'         => 'https://getwholesalex.com/subaccounts-in-woocommerce-b2b-stores/',
 			'video'               => 'https://www.youtube.com/embed/cO4AYwkXyco',
-			'status'              => wholesalex()->get_setting( 'wsx_addon_subaccount' ),
-			'setting_id'          => '#subaccounts',
-			'lock_status'         => true,
 		);
 
 		$config['wsx_addon_raq'] = array(
-			'name'                   => __( 'Request a Quote', 'wholesalex' ),
-			'desc'                   => __( 'Allow buyers to request custom quotes for the products they want. You can set personalized pricing, negotiate, and finalize purchase terms with ease.', 'wholesalex' ),
-			'img'                    => WHOLESALEX_URL . 'assets/img/addons/raq.svg',
-			'docs'                   => 'https://getwholesalex.com/docs/request-a-quote/',
-			'live'                   => '',
-			'is_pro'                 => true,
-			'is_different_plugin'    => false,
-			'depends_on'             => apply_filters( 'wholesalex_addon_raq_depends_on', array( 'wsx_addon_conversation' => __( 'Conversation', 'wholesalex' ) ) ),
-			'eligible_price_ids'     => array( '1', '2', '3', '4', '5', '6', '7' ),
-			'moreFeature'            => 'https://getwholesalex.com/request-a-quote/',
-			'video'                  => 'https://www.youtube.com/embed/jOIdNj18OEI',
-			'status'                 => wholesalex()->get_setting( 'wsx_addon_raq' ),
-			'setting_id'             => '#raq',
-			'lock_status'            => true,
-			'is_conversation_active' => wholesalex()->get_setting( 'wsx_addon_conversation' ),
+			'name'                => __( 'Request a Quote', 'wholesalex' ),
+			'desc'                => __( 'Allow buyers to request custom quotes for the products they want. You can set personalized pricing, negotiate, and finalize purchase terms with ease.', 'wholesalex' ),
+			'img'                 => WHOLESALEX_URL . 'assets/img/addons/raq.svg',
+			'docs'                => 'https://getwholesalex.com/docs/request-a-quote/',
+			'live'                => '',
+			'is_pro'              => true,
+			'is_different_plugin' => false,
+			'moreFeature'         => 'https://getwholesalex.com/request-a-quote/',
+			'video'               => 'https://www.youtube.com/embed/jOIdNj18OEI',
 		);
 
 		$config['wsx_addon_conversation'] = array(
@@ -245,12 +238,8 @@ class Addons {
 			'live'                => '',
 			'is_pro'              => true,
 			'is_different_plugin' => false,
-			'eligible_price_ids'  => array( '1', '2', '3', '4', '5', '6', '7' ),
 			'moreFeature'         => 'https://getwholesalex.com/conversation/',
 			'video'               => 'https://www.youtube.com/embed/-g9t44AhSRw?si=LO4EmZX87MaNyFjl',
-			'status'              => wholesalex()->get_setting( 'wsx_addon_conversation' ),
-			'setting_id'          => '#conversation',
-			'lock_status'         => true,
 		);
 
 		$config['wsx_addon_wallet'] = array(
@@ -261,12 +250,8 @@ class Addons {
 			'live'                => '',
 			'is_pro'              => true,
 			'is_different_plugin' => false,
-			'eligible_price_ids'  => array( '1', '2', '3', '4', '5', '6', '7' ),
 			'moreFeature'         => 'https://getwholesalex.com/wallet/',
 			'video'               => 'https://www.youtube.com/embed/r4_V2ZW4p4I?si=ZO3-iZaffU8s7Cfw',
-			'status'              => wholesalex()->get_setting( 'wsx_addon_wallet' ),
-			'setting_id'          => '#wallet',
-			'lock_status'         => true,
 		);
 
 		$config['wsx_addon_whitelabel'] = array(
@@ -277,10 +262,6 @@ class Addons {
 			'live'                => '',
 			'is_pro'              => true,
 			'is_different_plugin' => false,
-			'eligible_price_ids'  => array( '1', '2', '3', '4', '5', '6', '7' ),
-			'status'              => wholesalex()->get_setting( 'wsx_addon_whitelabel' ),
-			'lock_status'         => true,
-			'setting_id'          => '#whitelabel',
 			'video'               => 'https://www.youtube.com/embed/xMTJYQFbWEw',
 		);
 

@@ -144,6 +144,8 @@ class Settings {
 			}
 			// Completion is managed by onboarding, not stale settings forms.
 			unset( $post['settings']['_settings_onboarding_completed'], $post['settings']['isOnboarding'] );
+			require_once dirname( __DIR__ ) . '/admin/class-provider-settings-preservation.php';
+			$post['settings'] = \WHOLESALEX\Admin\Provider_Settings_Preservation::prepare( $post['settings'] );
 			wholesalex()->set_setting_multiple( $post['settings'] );
 			wp_send_json_success( __( 'Successfully Saved.', 'wholesalex' ) );
 		} elseif ( 'get' === $type ) {
@@ -198,12 +200,8 @@ class Settings {
 		}
 		$my_account_id = get_option( 'woocommerce_myaccount_page_id' );
 
-		$weight_unit          = get_option( 'woocommerce_weight_unit' );
-		$pricing_priorities   = array( 'profile', 'single_product', 'category', 'wholesale_pricing', 'dynamic_rule' );
-		$dynamic_rules_access = wholesalex()->get_dynamic_rules_access();
-		if ( empty( $dynamic_rules_access['can_view'] ) ) {
-			$pricing_priorities = array_values( array_diff( $pricing_priorities, array( 'dynamic_rule' ) ) );
-		}
+		$weight_unit        = get_option( 'woocommerce_weight_unit' );
+		$pricing_priorities = array( 'profile', 'single_product', 'category', 'wholesale_pricing', 'dynamic_rule' );
 		$settings_fields    = apply_filters(
 			'wholesalex_setting_fields',
 			array(
@@ -216,7 +214,6 @@ class Settings {
 							'label'   => __( 'Plugin Status', 'wholesalex' ),
 							'options' => array(
 								'b2b'       => __( 'B2B (Wholesale Only)', 'wholesalex' ),
-								'b2c'       => __( 'B2C (Public Only)', 'wholesalex' ),
 								'b2b_n_b2c' => __( 'B2B & B2C Hybrid (Wholesale and Public)', 'wholesalex' ),
 							),
 							'default' => 'b2b',
@@ -643,26 +640,6 @@ class Settings {
 								),
 							),
 						),
-						'bxgy_discounts_promo_section'     => array(
-							'label' => __( 'Buy X Get Y ', 'wholesalex' ),
-							'type'  => 'dynamic_rule_promo_section',
-							'attr'  => array(
-								'_settings_show_bxgy_free_products_on_single_product_page' => array(
-									'type'    => 'slider',
-									'label'   => __( 'Buy X Get Y (Show free item on Product Page)', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box, if you want to showcase the free product(s) on the single product page.', 'wholesalex' ),
-									'help'    => '',
-									'default' => '',
-								),
-								'_settings_show_bxgy_free_products_badge' => array(
-									'type'    => 'slider',
-									'label'   => __( 'Show Badge on Shop & Product Page)', 'wholesalex' ),
-									'desc'    => __( 'Click on the check box, if you want to show BADGE  on the shop & single product page.', 'wholesalex' ),
-									'help'    => '',
-									'default' => 'yes',
-								),
-							),
-						),
 						'restrict_checkout_promo_section'  => array(
 							'label' => __( 'Checkout Restriction', 'wholesalex' ),
 							'type'  => 'dynamic_rule_promo_section',
@@ -1064,35 +1041,34 @@ class Settings {
 						'type'                           => 'price_zero',
 						'_settings_price_text'           => array(
 							'type'        => 'text',
-							'label'       => __( 'Wholesale Price Text for Product Pages', 'wholesalex' ),
+							'label'       => __( 'Text Before Wholesale Prices on Product Pages', 'wholesalex' ),
 							'placeholder' => __( 'Wholesale Price:', 'wholesalex' ),
-							'help'        => __( 'The text is shown immediately before the wholesale price in product single page. The default text is “Wholesale Price:”', 'wholesalex' ),
+							'help'        => __( 'Shown before wholesale prices on product pages. Leave blank to hide the label.', 'wholesalex' ),
 							'default'     => __( 'Wholesale Price:', 'wholesalex' ),
 						),
 						'_settings_price_text_product_list_page' => array(
 							'type'        => 'text',
-							'label'       => __( 'Wholesale Price Text for Product Listing Pages', 'wholesalex' ),
+							'label'       => __( 'Text Before Wholesale Prices on Shop and Category Pages', 'wholesalex' ),
 							'placeholder' => __( 'Wholesale Price:', 'wholesalex' ),
-							'help'        => __( 'The text is shown immediately before the wholesale price in product listing page. The default text is “Wholesale Price:”.', 'wholesalex' ),
+							'help'        => __( 'Shown before wholesale prices on shop and category pages. Leave blank to hide the label.', 'wholesalex' ),
 							'default'     => __( 'Wholesale Price:', 'wholesalex' ),
 						),
 						'_settings_regular_price_suffix' => array(
 							'type'        => 'text',
-							'label'       => __( 'Override Regular Price Suffix', 'wholesalex' ),
+							'label'       => __( 'Text After Regular Prices', 'wholesalex' ),
 							'placeholder' => '',
-							'help'        => __( 'Display desired text after regular prices on shop and single products pages.', 'wholesalex' ),
+							'help'        => __( 'Shown after regular prices on shop and product pages, e.g., “per item”.', 'wholesalex' ),
 							'default'     => '',
-							'tooltip'     => 'Add your custom text to replace the default one, which will be displayed just after the wholesale prices of the products of the shop and single product pages',
+							'tooltip'     => __( 'For example, “per item” displays as “$25.00 per item”. This setting does not override sale-price suffixes. Leave blank to avoid setting a custom regular-price suffix.', 'wholesalex' ),
 							'doc'         => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
 						),
 						'_settings_wholesalex_price_suffix' => array(
 							'type'        => 'text',
-							/* translators: %s - Plugin Name */
-							'label'       => sprintf( __( '%s Price Suffix', 'wholesalex' ), wholesalex()->get_plugin_name() ),
+							'label'       => __( 'Text After Wholesale Prices', 'wholesalex' ),
 							'placeholder' => '',
-							'help'        => __( 'Display desired text after wholesale prices on shop and single products pages.', 'wholesalex' ),
+							'help'        => __( 'Shown after wholesale prices on shop and product pages, e.g., “per item”.', 'wholesalex' ),
 							'default'     => '',
-							'tooltip'     => 'Add the custom text that you want to display just after the wholesale prices of the products of the shop and single product pages.',
+							'tooltip'     => __( 'For example, “per item” displays as “$25.00 per item”. Leave blank to avoid setting a custom wholesale-price suffix. Any other applicable price suffix may still appear.', 'wholesalex' ),
 							'doc'         => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
 						),
 					),
@@ -1111,18 +1087,6 @@ class Settings {
 							'tooltip' => 'Decide and select whether the product prices on the shop page will be with or without taxes.',
 							'doc'     => 'https://getwholesalex.com/docs/wholesalex/wholesalex-how-to-guide/change-store-mode-b2b-b2c-b2bb2c/',
 
-						),
-						'_settings_price_product_list_page' => array(
-							'type'        => 'radio',
-							'label'       => __( 'Wholesale Price On Product Listing Page', 'wholesalex' ),
-							'options'     => array(
-								'pricing_range'   => __( 'Pricing Range', 'wholesalex' ),
-								'minimum_pricing' => __( 'Minimum Pricing', 'wholesalex' ),
-								'maximum_pricing' => __( 'Maximum Pricing', 'wholesalex' ),
-							),
-							'placeholder' => __( 'Pricing Range, Minimum Pricing, Maximum Pricing', 'wholesalex' ),
-							'help'        => __( 'Choose the wholesale price range, lowest price, or highest price for variable products on shop and category pages.', 'wholesalex' ),
-							'default'     => 'pricing_range',
 						),
 					),
 					'attrGroupTwo'  => array(
@@ -1196,17 +1160,17 @@ class Settings {
 									'value' => 'yes',
 								),
 							),
-							'help'       => __( 'Enter Comma Separated URLs to make these whitelist on private store', 'wholesalex' ),
+							'help'       => __( 'Enter URLs separated by commas to allow logged-out users to access these pages when Private Store is enabled.', 'wholesalex' ),
 							'default'    => '',
 						),
 					),
 					'attrGroupTwo' => array(
 						'type'                          => 'general_two',
-						'_settings_login_to_view_price_product_page' => array(
+						'_settings_login_to_view_price' => array(
 							'type'    => 'slider',
-							'label'   => __( 'Show Login to view price on Single Product Page', 'wholesalex' ),
+							'label'   => __( 'Show Login to View Price on Single Product and Product Listing Pages', 'wholesalex' ),
 							'desc'    => __( 'Login to view price', 'wholesalex' ),
-							'help'    => __( 'Display logging option on single product pages to view price.', 'wholesalex' ),
+							'help'    => __( 'Hide prices and display a login link on single product and product listing pages for logged-out users.', 'wholesalex' ),
 							'default' => 'no',
 						),
 						'_settings_login_to_view_price_login_url' => array(
@@ -1223,13 +1187,7 @@ class Settings {
 							'help'        => '',
 							'default'     => __( 'Login to see prices', 'wholesalex' ),
 						),
-						'_settings_login_to_view_price_product_list' => array(
-							'type'    => 'slider',
-							'label'   => __( 'Show Login to view price on Product Listing Page', 'wholesalex' ),
-							'desc'    => __( 'Login to view price', 'wholesalex' ),
-							'help'    => __( 'Display logging option on the product listing page to view price.', 'wholesalex' ),
-							'default' => 'no',
-						),
+
 					),
 				),
 				'registration_n_login' => array(
@@ -1388,10 +1346,6 @@ class Settings {
 			),
 		);
 
-		if ( empty( $dynamic_rules_access['can_view'] ) ) {
-			unset( $settings_fields['dynamic_rules'], $settings_fields['design'] );
-		}
-
 		return $settings_fields;
 	}
 
@@ -1449,14 +1403,14 @@ class Settings {
 			} elseif ( '{price_excluding_tax}' === $wholesalex_price_suffix ) {
 				$wholesalex_price_suffix = wc_price( wc_get_price_excluding_tax( $product ) );
 			}
-			return '<small class="woocommerce-price-suffix">' . $wholesalex_price_suffix . '</small>';
+			return ' <small class="woocommerce-price-suffix">' . $wholesalex_price_suffix . '</small>';
 		} elseif ( isset( $wholesalex_regular_price_suffix ) && ! empty( $wholesalex_regular_price_suffix ) && ! $product->is_on_sale() ) {
 			if ( '{price_including_tax}' === $wholesalex_regular_price_suffix ) {
 				$wholesalex_regular_price_suffix = wc_price( wc_get_price_including_tax( $product ) );
 			} elseif ( '{price_excluding_tax}' === $wholesalex_regular_price_suffix ) {
 				$wholesalex_regular_price_suffix = wc_price( wc_get_price_excluding_tax( $product ) );
 			}
-			return '<small class="woocommerce-price-suffix">' . $wholesalex_regular_price_suffix . '</small>';
+			return ' <small class="woocommerce-price-suffix">' . $wholesalex_regular_price_suffix . '</small>';
 		}
 		return $price_suffix;
 	}
@@ -1674,16 +1628,6 @@ class Settings {
 		return $is_allow;
 	}
 
-
-	/**
-	 * Unlock Options
-	 *
-	 * @param array $options Options.
-	 * @return array
-	 */
-	public function unlock_option( $options ) {
-		return wholesalex()->unlock_options( $options );
-	}
 
 	/**
 	 * Conditionally hides stock display for B2C users based on plugin settings.

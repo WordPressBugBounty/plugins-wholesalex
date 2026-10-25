@@ -69,9 +69,7 @@ class Rule_Payment_Gateway {
 						}
 					}
 
-					if ( ! empty( $allowed_gateways ) ) {
-						return $this->preserve_workflow_gateways( $allowed_gateways, $gateways );
-					}
+					return $this->preserve_workflow_gateways( $allowed_gateways, $gateways );
 				}
 
 				if ( empty( $data['roles'] ) && empty( $data['has_role_payment_method_setting'] ) ) {
@@ -96,10 +94,6 @@ class Rule_Payment_Gateway {
 									$rule_allowed_gateways = array_diff( $rule_allowed_gateways, $rule_gateway );
 								}
 							}
-						}
-
-						if ( empty( $rule_allowed_gateways ) ) {
-							$rule_allowed_gateways = $data['roles'];
 						}
 					}
 

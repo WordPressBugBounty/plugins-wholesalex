@@ -183,20 +183,7 @@ class WHOLESALEX_Email {
 	 * @return bool
 	 */
 	private static function is_template_addon_enabled( $template_name ) {
-		$addons = array(
-			'wholesalex_raq_'          => 'wsx_addon_raq',
-			'wholesalex_subaccount_'   => 'wsx_addon_subaccount',
-			'wholesalex_conversation_' => 'wsx_addon_conversation',
-			'wholesalex_wallet_'       => 'wsx_addon_wallet',
-		);
-
-		foreach ( $addons as $prefix => $addon_id ) {
-			if ( 0 === strpos( $template_name, $prefix ) ) {
-				return 'yes' === wholesalex()->get_setting( $addon_id );
-			}
-		}
-
-		return true;
+		return 0 === strpos( $template_name, 'wholesalex_new_user_' ) || 0 === strpos( $template_name, 'wholesalex_registration_' ) || 0 === strpos( $template_name, 'wholesalex_user_profile_' );
 	}
 
 	/**
@@ -344,6 +331,9 @@ class WHOLESALEX_Email {
 		}
 
 		foreach ( $templates_ids as $template_id => $template ) {
+			if ( ! self::is_template_addon_enabled( $template_id ) ) {
+				continue;
+			}
 			$template_key_name = 'woocommerce_' . $template_id . '_settings';
 			$template_settings = get_option( $template_key_name, $template );
 
@@ -351,7 +341,7 @@ class WHOLESALEX_Email {
 				$template['recipient'] = get_option( 'admin_email' );
 			}
 
-			$templates_data[ $template_id ] = wp_parse_args( $template_settings, $template );
+			$templates_data[ $template_id ]             = wp_parse_args( $template_settings, $template );
 			$templates_data[ $template_id ]['edit_url'] = admin_url(
 				'admin.php?page=wc-settings&tab=email' .
 				( isset( $email_sections[ $template_id ] ) ? '&section=' . rawurlencode( $email_sections[ $template_id ] ) : '' )

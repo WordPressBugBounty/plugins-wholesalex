@@ -28,25 +28,22 @@ class Dynamic_Rules_Condition_Engine {
 	 * @return bool
 	 */
 	public static function has_limit( $limit, $rule_id ) {
-		// phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- Preserve the existing local-time comparison contract for saved schedules.
-		$current_date = current_time( 'timestamp' );
-
-		if ( isset( $limit['_start_date'] ) && ! empty( $limit['_start_date'] ) ) {
-			$start_date = strtotime( $limit['_start_date'] );
-			if ( $current_date < $start_date ) {
-				return false;
-			}
+		require_once __DIR__ . '/class-dynamic-rule-record.php';
+		$current_date = time();
+		if ( ! empty( $limit['_start_date'] ) ) {
+			$start_date = Dynamic_Rule_Record::parse_schedule_date( $limit['_start_date'] );
+			if ( ! $start_date || $current_date < $start_date->getTimestamp() ) {
+				return false; }
 		}
-
-		if ( isset( $limit['_end_date'] ) && ! empty( $limit['_end_date'] ) ) {
-			$end_date = strtotime( $limit['_end_date'] . ' +1 day' );
-			if ( $current_date > $end_date ) {
-				return false;
-			}
+		if ( ! empty( $limit['_end_date'] ) ) {
+			$end_date = Dynamic_Rule_Record::parse_schedule_date( $limit['_end_date'] );
+			if ( ! $end_date || $current_date >= $end_date->modify( '+1 day' )->getTimestamp() ) {
+				return false; }
 		}
 
 		if ( isset( $limit['_usage_limit'] ) && ! empty( $limit['_usage_limit'] ) ) {
-			$usage = get_option( 'wholesalex_dynamic_rule_' . $rule_id . '_usage', 0 );
+			$record = wholesalex()->get_dynamic_rules( $rule_id );
+			$usage  = (int) ( $record['limit']['usages_count'] ?? $limit['usages_count'] ?? 0 );
 			if ( $usage >= $limit['_usage_limit'] ) {
 				return false;
 			}
@@ -129,9 +126,9 @@ class Dynamic_Rules_Condition_Engine {
 
 		$all_passed = true;
 
-		foreach ( $tiers as $tier ) {
-			if ( ! isset( $tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'] ) ) {
-				continue;
+		foreach ( wholesalex()->filter_empty_conditions( $tiers ) as $tier ) {
+			if ( ! isset( $tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'] ) || ! is_numeric( $tier['_conditions_value'] ) ) {
+				return false;
 			}
 
 			$condition_for   = $tier['_conditions_for'];
@@ -177,9 +174,9 @@ class Dynamic_Rules_Condition_Engine {
 	public static function is_user_order_count_purchase_amount_condition_passed( $tiers ) {
 		$all_passed = true;
 
-		foreach ( $tiers as $tier ) {
-			if ( ! isset( $tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'] ) ) {
-				continue;
+		foreach ( wholesalex()->filter_empty_conditions( $tiers ) as $tier ) {
+			if ( ! isset( $tier['_conditions_for'], $tier['_conditions_operator'], $tier['_conditions_value'] ) || ! is_numeric( $tier['_conditions_value'] ) ) {
+				return false;
 			}
 
 			$condition_for   = $tier['_conditions_for'];
@@ -208,6 +205,8 @@ class Dynamic_Rules_Condition_Engine {
 	 * @return bool
 	 */
 	public static function check_rule_conditions( $conditions, $rule_filter = array() ) {
+		if ( ! is_array( $conditions ) || ( isset( $conditions['tiers'] ) && ! is_array( $conditions['tiers'] ) ) ) {
+			return false; }
 		if ( isset( $conditions, $conditions['tiers'] ) && ! empty( $conditions['tiers'] ) ) {
 			if ( ! self::is_conditions_fullfiled( $conditions['tiers'], $rule_filter ) ) {
 				return false;

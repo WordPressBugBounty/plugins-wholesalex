@@ -11,7 +11,6 @@ namespace WHOLESALEX;
 
 defined( 'ABSPATH' ) || exit;
 
-
 /**
  * WholesaleX_Initialization Class
  */
@@ -130,7 +129,7 @@ class WholesaleX_CommonUtils {
 	 * @return array
 	 */
 	public static function get_form_builder_default_appearance_colors() {
-		$template = json_decode( file_get_contents( __DIR__ . '/data/registration-template-1.json' ), true );
+		$template = json_decode( file_get_contents( __DIR__ . '/data/registration-template-1.json' ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reads a bundled local JSON template at a fixed plugin path, not a remote URL.
 		return $template['style']['appearance']['defaultAdvancedColors'];
 	}
 
@@ -492,32 +491,11 @@ class WholesaleX_CommonUtils {
 		$default_form = self::get_empty_form();
 		if ( ! $new_form && $old_form ) {
 			$old_form = json_decode( $old_form, true );
-			foreach ( $old_form as $field ) {
+			foreach ( $old_form as $index => $field ) {
 				$field['columnPosition'] = 'left';
-				$field['parent']         = wp_unique_id( 'whx_form' );
+				$field['parent']         = 'legacy_field_' . $index;
 				$field['label']          = $field['title'];
 				$field['status']         = true;
-				$field['conditions']     = array(
-					'status'   => 'show',
-					'relation' => 'all',
-					'tiers'    => array(
-						array(
-							'_id'       => '1',
-							'condition' => '',
-							'value'     => '',
-							'field'     => '',
-							'src'       => 'registration_form',
-						),
-					),
-				);
-				if ( ! isset( $field['option'] ) ) {
-					$field['option'] = array(
-						array(
-							'name'  => __( 'Select Option', 'wholesalex' ),
-							'value' => '',
-						),
-					);
-				}
 				unset( $field['title'] );
 				$field['migratedFromOldBuilder']      = true;
 				$default_form['registrationFields'][] =
@@ -537,52 +515,37 @@ class WholesaleX_CommonUtils {
 		}
 
 		$form_data = is_array( $form_data ) ? $form_data : $default_form;
-		$original_form_data = $form_data;
-		$form_data = self::normalize_default_registration_template( $form_data );
-		if ( ( $new_form && is_array( json_decode( $new_form, true ) ) && $original_form_data !== $form_data ) || ( ! $new_form && is_array( $old_form ) ) ) {
-			update_option( 'wholesalex_registration_form', wp_json_encode( $form_data ) );
-		}
 
 		return $form_data;
 	}
 
 	/**
-	 * Convert legacy template designs while preserving form content and settings.
+	 * Compatibility helper: saved template domains are preserved without migration.
 	 *
 	 * @param array $form_data Form builder configuration.
 	 * @return array
 	 */
 	public static function normalize_default_registration_template( $form_data ) {
-		$form_data['settings'] = isset( $form_data['settings'] ) && is_array( $form_data['settings'] ) ? $form_data['settings'] : array();
-		if ( 'premade_1' !== ( $form_data['settings']['premadeTemplate'] ?? '' ) ) {
-			$template = json_decode( file_get_contents( __DIR__ . '/data/registration-template-1.json' ), true );
-			foreach ( array_keys( $form_data['settings'] ) as $key ) {
-				if ( 0 === strpos( $key, 'appearance_' ) ) {
-					unset( $form_data['settings'][ $key ] );
-				}
-			}
-			$form_data['settings'] = array_merge( $form_data['settings'], $template['settings'] );
-			$form_data['style'] = $template['style'];
-			foreach ( array( 'registrationFormHeader', 'loginFormHeader' ) as $key ) {
-				$form_data[ $key ] = isset( $form_data[ $key ] ) && is_array( $form_data[ $key ] ) ? $form_data[ $key ] : array();
-				$form_data[ $key ]['styles'] = $template[ $key ]['styles'];
-			}
-		}
-		if ( 3 !== ( $form_data['settings']['appearance_colorDefaultsVersion'] ?? null ) || isset( $form_data['settings']['appearance_colorTheme'] ) ) {
-			$template = json_decode( file_get_contents( __DIR__ . '/data/registration-template-1.json' ), true );
-			// Existing Classic forms keep their custom colors; retired palettes receive Classic defaults once.
-			if ( 'classic' !== ( $form_data['settings']['appearance_colorTheme'] ?? '' ) ) {
-				$form_data['style']['color'] = $template['style']['color'];
-				$form_data['style']['appearance']['advancedColors'] = $template['style']['appearance']['advancedColors'];
-				$form_data['style']['appearance']['container']['color'] = $template['style']['appearance']['container']['color'];
-			}
-			$form_data['style']['appearance']['defaultAdvancedColors'] = $template['style']['appearance']['defaultAdvancedColors'];
-			$form_data['settings']['appearance_colorDefaultsVersion'] = 3;
-		}
-		unset( $form_data['settings']['appearance_colorTheme'] );
-		$form_data['settings']['inputStyle'] = 'variation_1';
-		$form_data['settings']['inputVariation'] = 'variation_1';
 		return $form_data;
+	}
+
+	/**
+	 * Derive frontend scaffolding without changing or persisting saved form data.
+	 *
+	 * @param array $form_data Saved registration domain.
+	 * @return array
+	 */
+	public static function get_registration_display_data( $form_data ) {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Bundled local static appearance data, never a remote URL.
+		$designs = json_decode( file_get_contents( dirname( __DIR__ ) . '/assets/data/registration-designs.json' ), true );
+		$name    = $form_data['settings']['premadeTemplate'] ?? 'premade_1';
+		$design  = $designs[ $name ] ?? $designs['premade_1'];
+		$default = self::get_empty_form();
+		$display = array_replace( $default, $form_data );
+		foreach ( array( 'settings', 'style', 'registrationFormHeader', 'loginFormHeader' ) as $key ) {
+			$display[ $key ] = array_replace_recursive( $default[ $key ] ?? array(), $design[ $key ] ?? array(), is_array( $form_data[ $key ] ?? null ) ? $form_data[ $key ] : array() );
+		}
+		return $display;
 	}
 
 	/**
@@ -606,19 +569,7 @@ class WholesaleX_CommonUtils {
 							'columnPosition' => 'left',
 							'parent'         => 'regi_3',
 							'required'       => true,
-							'conditions'     => array(
-								'status'   => 'show',
-								'relation' => 'all',
-								'tiers'    => array(
-									array(
-										'_id'       => strval( time() ),
-										'condition' => '',
-										'field'     => '',
-										'value'     => '',
-										'src'       => 'registration_form',
-									),
-								),
-							),
+
 						),
 					),
 					'isMultiColumn' => false,
@@ -638,19 +589,7 @@ class WholesaleX_CommonUtils {
 						'columnPosition' => 'left',
 						'parent'         => 'regi_1',
 						'required'       => true,
-						'conditions'     => array(
-							'status'   => 'show',
-							'relation' => 'all',
-							'tiers'    => array(
-								array(
-									'_id'       => strval( time() ),
-									'condition' => '',
-									'field'     => '',
-									'value'     => '',
-									'src'       => 'registration_form',
-								),
-							),
-						),
+
 					),
 				),
 				'isMultiColumn' => false,
@@ -669,19 +608,7 @@ class WholesaleX_CommonUtils {
 						'columnPosition' => 'left',
 						'parent'         => 'regi_2',
 						'required'       => true,
-						'conditions'     => array(
-							'status'   => 'show',
-							'relation' => 'all',
-							'tiers'    => array(
-								array(
-									'_id'       => strval( time() ),
-									'condition' => '',
-									'field'     => '',
-									'value'     => '',
-									'src'       => 'registration_form',
-								),
-							),
-						),
+
 					),
 				),
 				'isMultiColumn' => false,
@@ -751,7 +678,7 @@ class WholesaleX_CommonUtils {
 						if ( ( isset( $field['status'] ) && $field['status'] ) ) {
 							$field = self::translate_form_builder_field( $field );
 
-							if ( apply_filters( 'wholesalex_registration_field_available', self::is_standard_registration_field( $field ), $field ) ) {
+							if ( self::is_standard_registration_field( $field ) || Registration_Provider::supports( $field, array( 'surface' => 'registration' ) ) ) {
 								$registration_fields[] = $field;
 							}
 						}

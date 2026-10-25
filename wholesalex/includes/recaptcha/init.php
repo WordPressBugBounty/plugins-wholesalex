@@ -18,12 +18,10 @@ add_action( 'init', 'wholesalex_recaptcha_init' );
  * @since 1.0.0
  */
 function wholesalex_recaptcha_init() {
-	$is_enable  = 'yes' === wholesalex()->get_setting( 'wsx_addon_recaptcha' );
-	$site_key   = wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' );
-	$secret_key = wholesalex()->get_setting( '_settings_google_recaptcha_v3_secret_key' );
-	if ( $is_enable && $site_key && $secret_key ) {
+	$is_enable = 'yes' === wholesalex()->get_setting( 'wsx_addon_recaptcha' );
+	if ( $is_enable ) {
 		require_once WHOLESALEX_PATH . 'includes/recaptcha/class-recaptcha.php';
-		new \WHOLESALEX\Recaptcha();
+		\WHOLESALEX\Recaptcha::instance();
 	}
 }
 
