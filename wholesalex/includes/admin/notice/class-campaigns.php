@@ -28,6 +28,11 @@ final class Campaigns {
 	const FLASH_SALE_START = '2026-10-04 00:00:00 Asia/Dhaka';
 	const FLASH_SALE_END   = '2026-10-16 23:59:59 Asia/Dhaka';
 	const FLASH_SALE_URL   = 'https://getwholesalex.com/pricing/';
+	const HALLOWEEN_KEY    = 'wsx_helloBar_halloween_2026';
+	const HALLOWEEN_START  = '2026-10-27 00:00:00 Asia/Dhaka';
+	const HALLOWEEN_END    = '2026-11-03 23:59:59 Asia/Dhaka';
+	const HALLOWEEN_HELLOBAR_URL = 'https://getwholesalex.com/pricing/?utm_source=db-wholesalex&utm_medium=halloween-hellobar&utm_campaign=wholesalex-dashboard';
+	const HALLOWEEN_PLUGIN_META_URL = 'https://getwholesalex.com/pricing/?utm_source=db-wholesalex&utm_medium=halloween-plugin-meta&utm_campaign=wholesalex-dashboard';
 
 	/**
 	 * All campaigns, in display order.
@@ -41,6 +46,16 @@ final class Campaigns {
 	/** Dashboard hello bars, using the same sale window and URL as admin notices. */
 	public static function hellobars() {
 		return array(
+			array(
+				'id'         => self::HALLOWEEN_KEY,
+				'start'      => self::HALLOWEEN_START,
+				'end'        => self::HALLOWEEN_END,
+				'heading'    => __( 'Halloween Offer:', 'wholesalex' ),
+				'text'       => __( 'Enjoy up to 60% Off on', 'wholesalex' ),
+				'highlight'  => __( 'WholesaleX Pro', 'wholesalex' ),
+				'buttonText' => __( 'Upgrade Now', 'wholesalex' ),
+				'url'        => self::HALLOWEEN_HELLOBAR_URL,
+			),
 			array(
 				'id'         => self::FLASH_SALE_KEY,
 				'start'      => self::FLASH_SALE_START,
@@ -59,6 +74,27 @@ final class Campaigns {
 		return array_column( self::hellobars(), 'id' );
 	}
 
+	/** Return seasonal sidebar copy only during the Halloween campaign. */
+	public static function sidebar_offer() {
+		$now = time();
+		if ( $now < strtotime( self::HALLOWEEN_START ) || $now > strtotime( self::HALLOWEEN_END ) ) {
+			return null;
+		}
+		return array(
+			'heading'    => __( 'WholesaleX Pro Halloween Sale - Up to 60% Off', 'wholesalex' ),
+			'text'       => __( 'Upgrade to WholesaleX Pro and unlock all premium features at a special Halloween discount.', 'wholesalex' ),
+			'benefits'   => array(
+				__( 'Quantity Based Tiered Pricing', 'wholesalex' ),
+				__( 'Custom Registration Fields', 'wholesalex' ),
+				__( 'Order value and quantity restrictions', 'wholesalex' ),
+				__( 'Bulk Order Form/Table', 'wholesalex' ),
+				__( 'Request a Quote', 'wholesalex' ),
+			),
+			'buttonText' => __( 'Upgrade Now', 'wholesalex' ),
+			'url'        => 'https://getwholesalex.com/pricing/?utm_source=db-wholesalex&utm_medium=halloween-sidebar&utm_campaign=wholesalex-dashboard',
+		);
+	}
+
 	/**
 	 * Sales for the "Upgrade to Pro" link on the Plugins page. The first live one replaces the link's
 	 * text and destination; outside them it reads "Upgrade to Pro". Dates as for campaigns.
@@ -67,6 +103,12 @@ final class Campaigns {
 	 */
 	public static function plugin_link_offers() {
 		return array(
+			array(
+				'start' => self::HALLOWEEN_START,
+				'end'   => self::HALLOWEEN_END,
+				'text'  => __( 'Upgrade to Pro - Up to 60% Off', 'wholesalex' ),
+				'url'   => self::HALLOWEEN_PLUGIN_META_URL,
+			),
 			array(
 				'start' => '2026-07-06 00:00 Asia/Dhaka',
 				'end'   => '2026-08-01 23:59 Asia/Dhaka',

@@ -110,6 +110,17 @@ class Notice {
 		}
 	}
 
+	/** Sidebar campaigns are independent of hello-bar dismissal. */
+	public static function get_sidebar_config() {
+		try {
+			require_once __DIR__ . '/class-campaigns.php';
+			return Campaigns::sidebar_offer();
+		} catch ( \Throwable $e ) {
+			self::log_error( $e );
+			return null;
+		}
+	}
+
 	/** Return the first eligible dashboard hello bar, or null. */
 	public static function get_hellobar_config() {
 		if ( ! wholesalex()->is_wholesalex_page( wholesalex()->get_current_admin_page_slug() ) || ! current_user_can( 'manage_options' ) || ! apply_filters( 'wsx_show_upsell', apply_filters( 'wholesalex_show_upgrade_menu', true ) ) ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing Pro integrations use the wsx_show_upsell hook to hide licensed upsells.

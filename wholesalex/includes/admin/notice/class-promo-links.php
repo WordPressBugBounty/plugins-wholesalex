@@ -16,7 +16,6 @@ class Promo_Links {
 	/** Register links without adding a duplicate submenu. */
 	public function __construct() {
 		add_filter( 'plugin_action_links_' . WHOLESALEX_BASE, array( $this, 'add_plugin_action_link' ) );
-		add_filter( 'plugin_row_meta', array( $this, 'add_plugin_row_meta' ), 10, 2 );
 	}
 
 	/**
@@ -32,19 +31,8 @@ class Promo_Links {
 		$offer            = self::live_offer( 'plugin_link_offers' );
 		$text             = apply_filters( 'wholesalex_upgrade_menu_label', $offer ? $offer['text'] : __( 'Upgrade to Pro', 'wholesalex' ) );
 		$url              = apply_filters( 'wholesalex_upgrade_menu_url', ! empty( $offer['url'] ) ? $offer['url'] : 'https://getwholesalex.com/pricing/' );
-		$links['wsx_pro'] = '<a style="color: #6c3bff; font-weight: bold;" target="_blank" rel="noopener noreferrer" href="' . esc_url( $url ) . '">' . esc_html( $text ) . '</a>';
+		$links['wsx_pro'] = '<a style="color: #FF2400; font-weight: bold;" target="_blank" rel="noopener noreferrer" href="' . esc_url( $url ) . '">' . esc_html( $text ) . '</a>';
 		return $links;
-	}
-
-	/**
-	 * Show the same offer beneath this plugin's description, never another plugin's row.
-	 *
-	 * @param string[] $links Existing plugin row links.
-	 * @param string   $file Plugin basename for the current row.
-	 * @return string[]
-	 */
-	public function add_plugin_row_meta( $links, $file ) {
-		return WHOLESALEX_BASE === $file ? $this->add_plugin_action_link( $links ) : $links;
 	}
 
 	/**

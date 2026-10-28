@@ -1,6 +1,6 @@
 <?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName -- Preserve existing include paths and template overrides.
 /**
- * Compatibility with woocommerce Booking product and woocommerce booking.
+ * Compatibility with product bundle and composite pricing.
  *
  * @package WHOLESALEX
  * @since 2.0.14
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WholesaleX Dynamic Rules Class
+ * Preserve prices managed by product bundle plugins.
  */
 class WHOLESALEX_WooProduct_Bundles {
 
@@ -21,6 +21,8 @@ class WHOLESALEX_WooProduct_Bundles {
 	 * Constructor
 	 */
 	public function __construct() {
+		add_filter( 'wholesalex_ignore_dynamic_price', array( $this, 'preserve_bundle_price' ), 10, 4 );
+		add_filter( 'wholesalex_ignore_wholesale_pricing', array( $this, 'preserve_bundle_price' ), 10, 4 );
 		// Use the same filter name the main plugin applies: wholesalex_ignore_dynamic_price
 		// It passes ( $ignore, $p_product, $context ) so we accept three args and
 		// detect bundle cart items so the dynamic pricing engine can skip them.
@@ -28,15 +30,56 @@ class WHOLESALEX_WooProduct_Bundles {
 	}
 
 	/**
-	 * Check if the given product is a booking product of type 'mwb_booking'.
+	 * Leave bundle parent and child prices to the bundle's pricing engine.
 	 *
-	 * This function checks whether the passed product object is of the custom type 'mwb_booking'.
+	 * Cart product objects carry prices for the selected variations and bundle
+	 * discounts. Replacing them with catalog prices restores the initial bundle
+	 * price. Match objects rather than IDs so a standalone copy of a bundled
+	 * variation can still receive wholesale pricing in the same cart.
 	 *
-	 * @param float      $price     The price of the product (not used in this check, but included for compatibility).
-	 * @param WC_Product $cart_item An instance of the WooCommerce product object.
-	 *
-	 * @return bool Returns true if the product is of type 'mwb_booking', false otherwise.
+	 * @param bool        $ignore    Existing exclusion.
+	 * @param \WC_Product $product   Product being priced.
+	 * @param string      $context   Pricing context.
+	 * @param array|null  $cart_item Current cart line, when available.
+	 * @return bool
 	 */
+	public function preserve_bundle_price( $ignore, $product, $context = '', $cart_item = null ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Shared pricing filter signature.
+		if ( $ignore || ! $product instanceof \WC_Product ) {
+			return $ignore;
+		}
+
+		if ( $product->is_type( array( 'yith_bundle', 'woosb', 'bundle', 'composite' ) ) ) {
+			return true;
+		}
+
+		if ( null !== $cart_item ) {
+			return $this->has_bundle_cart_data( $cart_item );
+		}
+
+		// Read contents directly: get_cart() can trigger session loading while
+		// product price filters are already running during session restoration.
+		if ( function_exists( 'WC' ) && WC()->cart ) {
+			foreach ( WC()->cart->cart_contents as $item ) {
+				if ( isset( $item['data'] ) && $item['data'] === $product && $this->has_bundle_cart_data( $item ) ) {
+					return true;
+				}
+			}
+		}
+
+		return $ignore;
+	}
+
+	/**
+	 * Identify bundle lines, including WPC Composite parents and components.
+	 *
+	 * @param array $item Cart line.
+	 * @return bool
+	 */
+	private function has_bundle_cart_data( $item ) {
+		return isset( $item['bundled_by'] ) || isset( $item['woosb_parent_id'] ) ||
+			isset( $item['wooco_ids'] ) || isset( $item['wooco_parent_id'] ) || isset( $item['wooco_parent_key'] );
+	}
+
 	/**
 	 * Determine whether we should ignore dynamic pricing for a product because
 	 * it is part of a WPC Product Bundle.
@@ -76,15 +119,10 @@ class WHOLESALEX_WooProduct_Bundles {
 
 		// Check if this is a bundled child product in cart context.
 		if ( function_exists( 'WC' ) && WC()->cart ) {
-			$variation_id = isset( $p_product->variation_id ) ? (int) $p_product->variation_id : 0;
-
-			foreach ( WC()->cart->get_cart() as $cart_item ) {
+			foreach ( WC()->cart->cart_contents as $cart_item ) {
 				// Check if cart item is part of a bundle (has parent or is parent).
 				if ( isset( $cart_item['woosb_ids'] ) || isset( $cart_item['woosb_parent_id'] ) ) {
-					$item_product_id   = isset( $cart_item['product_id'] ) ? (int) $cart_item['product_id'] : 0;
-					$item_variation_id = isset( $cart_item['variation_id'] ) ? (int) $cart_item['variation_id'] : 0;
-
-					if ( $item_product_id === $p_product_id || $item_variation_id === $p_product_id || ( $variation_id && $item_variation_id === $variation_id ) ) {
+					if ( isset( $cart_item['data'] ) && $cart_item['data'] === $p_product ) {
 						return true;
 					}
 				}

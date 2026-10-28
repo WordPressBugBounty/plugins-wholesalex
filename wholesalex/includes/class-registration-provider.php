@@ -127,7 +127,8 @@ final class Registration_Provider {
 				return self::unavailable();
 			}
 			$name = $field['name'] ?? '';
-			if ( ! is_string( $name ) || ! preg_match( '/^[a-zA-Z0-9_]{1,128}$/D', $name ) ) {
+			// Older builders generated hyphenated names; retain their saved persistence keys.
+			if ( ! is_string( $name ) || ! preg_match( '/^[a-zA-Z0-9_-]{1,128}$/D', $name ) ) {
 				return self::unavailable();
 			}
 			$key = ! empty( $field['migratedFromOldBuilder'] ) ? $name : 'wholesalex_cf_' . $name;

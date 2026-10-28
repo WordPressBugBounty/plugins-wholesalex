@@ -589,6 +589,15 @@ class WHOLESALEX_Users {
 
 					default:
 						$user_data[ $column_id ] = apply_filters( 'wholesalex_users_column_value', $column_id, (array) $user, $column_name );
+						if ( 'account_type' === $column_id ) {
+							$user_data[ $column_id ] = wp_kses(
+								(string) $user_data[ $column_id ],
+								array(
+									'div'  => array( 'class' => true ),
+									'span' => array( 'class' => true ),
+								)
+							);
+						}
 						break;
 				}
 			}

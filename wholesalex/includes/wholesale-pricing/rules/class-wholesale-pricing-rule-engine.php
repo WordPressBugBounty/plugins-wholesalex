@@ -1759,6 +1759,9 @@ class Wholesale_Pricing_Rule_Engine {
 			if ( empty( $item['data'] ) || ! $item['data'] instanceof \WC_Product ) {
 				continue;
 			}
+			if ( apply_filters( 'wholesalex_ignore_wholesale_pricing', false, $item['data'], 'cart_totals', $item ) ) {
+				continue;
+			}
 			$data = $this->get_product_price_data( $item['data'], absint( $item['quantity'] ) );
 			$data = apply_filters( 'wholesalex_wholesale_pricing_cart_price_data', $data, $item, $key, $cart, $this );
 			if ( is_array( $data ) && isset( $data['price'] ) && is_numeric( $data['price'] ) ) {

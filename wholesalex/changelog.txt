@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 3.1.6 – 28 October 2026 =
+* Fix: Preserved WPC Composite Products and supported bundle parent/component prices during cart recalculation, while keeping wholesale discounts on standalone copies of the same products.
+* Fix: Accepted hyphenated custom registration field names supplied by the separate Pro add-on during form submission.
+* Fix: Cleared the previous record's editor state when opening a new pricing rule or switching records through browser navigation.
+* Fix: Prevented blank dashboard screens for routes containing trailing slashes or query parameters and kept navigation aligned with the WordPress admin page.
+* Fix: Prevented the Wholesale Pricing page header and action button from overflowing on mobile screens.
+* Fix: Passed the currency formatter to extension settings panels so price previews display correctly.
+
 = 3.1.5 – 22 October 2026 =
 * Security: Restricted public script settings to approved values and removed unsafe HTML rendering from generic admin tables.
 * Security: Strengthened rule ownership checks, bulk-operation authorization and private CSV import handling.

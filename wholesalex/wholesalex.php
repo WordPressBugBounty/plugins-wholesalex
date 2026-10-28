@@ -6,10 +6,10 @@
  * @since   1.0.0
  * @package WholesaleX
  *
- * Plugin Name:             WholesaleX – All-in-One B2B Solution with Wholesale Pricing
+ * Plugin Name:             WholesaleX – Wholesale Pricing & B2B Solution
  * Plugin URI:              https://getwholesalex.com/
  * Description:             Wholesale pricing, B2B customer roles, registration forms and private-store controls for WooCommerce.
- * Version:                 3.1.5
+ * Version:                 3.1.6
  * Author:                  Wholesale Team
  * Author URI:              https://getwholesalex.com/
  * License:                 GPLv3
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin Defined.
-define( 'WHOLESALEX_VER', '3.1.5' );
+define( 'WHOLESALEX_VER', '3.1.6' );
 // Public host protocol; feature results still require actual registered providers.
 define( 'WHOLESALEX_PROVIDER_API', 1 );
 define( 'WHOLESALEX_URL', plugin_dir_url( __FILE__ ) );

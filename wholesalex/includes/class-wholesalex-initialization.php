@@ -192,6 +192,7 @@ class WholesaleX_Initialization {
 			'dynamic_rules_access' => wholesalex()->get_dynamic_rules_access(),
 			'is_admin_interface'   => is_admin(),
 			'helloBar'             => \WHOLESALEX\Includes\Admin\Notice\Notice::get_hellobar_config(),
+			'sidebarOffer'         => \WHOLESALEX\Includes\Admin\Notice\Notice::get_sidebar_config(),
 			'i18n'                 => array(
 				'smart_tags' => __( 'Available Smart Tags: ', 'wholesalex' ),
 			),

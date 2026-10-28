@@ -2510,6 +2510,9 @@ class Dynamic_Rules {
 	 */
 	public function set_cart_item_price_to_display( $price, $cart_item ) {
 		$product = $cart_item['data'];
+		if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'cart_item_price', $cart_item ) ) {
+			return $price;
+		}
 		if ( wholesalex()->is_plugin_installed_and_activated( 'woocommerce-product-addons/woocommerce-product-addons.php' ) && isset( $cart_item['addons'] ) && is_array( $cart_item['addons'] ) ) {
 			$price = $product->is_on_sale() ? wc_price( $product->get_sale_price() ) : wc_price( $product->get_regular_price() );
 		}
@@ -2604,7 +2607,7 @@ class Dynamic_Rules {
 				$product->set_price( 0 );
 				continue;
 			}
-			if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'cart_totals' ) ) {
+			if ( apply_filters( 'wholesalex_ignore_dynamic_price', false, $product, 'cart_totals', $cart_item ) ) {
 				continue; }
 			if ( $this->is_product_in_bundle( $product_id ) ) {
 				continue; }
