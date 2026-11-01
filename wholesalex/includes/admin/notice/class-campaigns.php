@@ -24,14 +24,14 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Campaigns {
 
-	const FLASH_SALE_KEY   = 'wsx_helloBar_flash_sale_2026_october1';
-	const FLASH_SALE_START = '2026-10-04 00:00:00 Asia/Dhaka';
-	const FLASH_SALE_END   = '2026-10-16 23:59:59 Asia/Dhaka';
-	const FLASH_SALE_URL   = 'https://getwholesalex.com/pricing/';
-	const HALLOWEEN_KEY    = 'wsx_helloBar_halloween_2026';
-	const HALLOWEEN_START  = '2026-10-27 00:00:00 Asia/Dhaka';
-	const HALLOWEEN_END    = '2026-11-03 23:59:59 Asia/Dhaka';
-	const HALLOWEEN_HELLOBAR_URL = 'https://getwholesalex.com/pricing/?utm_source=db-wholesalex&utm_medium=halloween-hellobar&utm_campaign=wholesalex-dashboard';
+	const FLASH_SALE_KEY            = 'wsx_helloBar_flash_sale_2026_october1';
+	const FLASH_SALE_START          = '2026-10-04 00:00:00 Asia/Dhaka';
+	const FLASH_SALE_END            = '2026-10-16 23:59:59 Asia/Dhaka';
+	const FLASH_SALE_URL            = 'https://getwholesalex.com/pricing/';
+	const HALLOWEEN_KEY             = 'wsx_helloBar_halloween_2026';
+	const HALLOWEEN_START           = '2026-10-27 00:00:00 Asia/Dhaka';
+	const HALLOWEEN_END             = '2026-11-03 23:59:59 Asia/Dhaka';
+	const HALLOWEEN_HELLOBAR_URL    = 'https://getwholesalex.com/pricing/?utm_source=db-wholesalex&utm_medium=halloween-hellobar&utm_campaign=wholesalex-dashboard';
 	const HALLOWEEN_PLUGIN_META_URL = 'https://getwholesalex.com/pricing/?utm_source=db-wholesalex&utm_medium=halloween-plugin-meta&utm_campaign=wholesalex-dashboard';
 
 	/**

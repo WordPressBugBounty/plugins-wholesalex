@@ -27,6 +27,13 @@ class WHOLESALEX_Registration {
 	private $registration_state_error = null;
 
 	/**
+	 * Whether the session account status is currently being checked.
+	 *
+	 * @var bool
+	 */
+	private $checking_session_status = false;
+
+	/**
 	 * Custom Fields
 	 *
 	 * @var array
@@ -54,6 +61,7 @@ class WHOLESALEX_Registration {
 		add_action( 'rest_api_init', array( $this, 'registration_form_builder_restapi_callback' ) );
 		add_filter( 'wp_authenticate_user', array( $this, 'check_status' ), 10, 2 );
 		add_filter( 'determine_current_user', array( $this, 'check_session_status' ), 99 );
+		add_filter( 'rest_authentication_errors', array( $this, 'check_rest_session_status' ), 110 );
 		add_filter( 'woocommerce_new_customer_data', array( $this, 'mark_registration_initialization' ), 20 );
 		add_filter( 'woocommerce_registration_auth_new_customer', array( $this, 'allow_new_customer_authentication' ), 20, 2 );
 		add_filter( 'wholesalex_registration_form_user_login_option', array( $this, 'user_login_option' ) );
@@ -565,8 +573,55 @@ class WHOLESALEX_Registration {
 		if ( ! $user_id ) {
 			return $user_id;
 		}
-		$user = get_userdata( $user_id );
-		return $user && ! is_wp_error( $this->check_status( $user ) ) ? $user_id : 0;
+
+		// Capability filters can resolve the current user before this check finishes.
+		if ( $this->checking_session_status ) {
+			return 0;
+		}
+
+		$had_current_user              = array_key_exists( 'current_user', $GLOBALS );
+		$previous_current_user         = $GLOBALS['current_user'] ?? null;
+		$this->checking_session_status = true;
+		try {
+			$user = get_userdata( $user_id );
+			return $user && ! is_wp_error( $this->check_status( $user ) ) ? $user_id : 0;
+		} finally {
+			// A nested lookup may have set an anonymous user. Let the outer lookup
+			// commit the final, status-checked identity instead of retaining that user.
+			if ( $had_current_user ) {
+				$GLOBALS['current_user'] = $previous_current_user; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Restore the pre-filter identity without firing authentication hooks.
+			} else {
+				unset( $GLOBALS['current_user'] );
+			}
+			$this->checking_session_status = false;
+		}
+	}
+
+	/**
+	 * Enforce account status after REST authentication fallbacks resolve a user.
+	 *
+	 * WooCommerce can set the current user directly after determine_current_user.
+	 *
+	 * @param WP_Error|null|bool $result Earlier REST authentication result.
+	 * @return WP_Error|null|bool
+	 */
+	public function check_rest_session_status( $result ) {
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		$user = wp_get_current_user();
+		if ( ! $user->ID ) {
+			return $result;
+		}
+
+		$status = $this->check_status( $user );
+		if ( is_wp_error( $status ) ) {
+			$status->add_data( array( 'status' => 403 ) );
+			return $status;
+		}
+
+		return $result;
 	}
 
 	/**

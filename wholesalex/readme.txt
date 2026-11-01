@@ -4,7 +4,7 @@ Tags: b2b, wholesale prices, wholesale pricing, woocommerce wholesale, woocommer
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.1.6
+Stable tag: 3.1.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -277,7 +277,12 @@ WholesaleX Free does not automatically send customer or order records to WPXPO a
 
 == Changelog ==
 
-= 3.1.6 – 28 October 2026 = 
+= 3.1.7 – 1 November 2026 =
+* Fix: Prevented recursive user checks with Yoast SEO that could cause HTTP 500 errors on REST API requests.
+* Fix: Enforced account approval restrictions after WooCommerce REST fallback authentication.
+* Fix: Improved accessibility of rule status toggles. 
+
+= 3.1.6 – 28 October 2026 =
 * Fix: Preserved WPC Composite Products and supported bundle parent/component prices during cart recalculation, while keeping wholesale discounts on standalone copies of the same products.
 * Fix: Accepted hyphenated custom registration field names supplied by the separate Pro add-on during form submission.
 * Fix: Cleared the previous record's editor state when opening a new pricing rule or switching records through browser navigation.
