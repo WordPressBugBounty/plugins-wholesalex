@@ -11,6 +11,21 @@ defined( 'ABSPATH' ) || exit;
 
 /** Authorize an operation before reading account data or changing it. */
 class User_Operation_Policy {
+	/**
+	 * Whether editable roles are being read for wholesale assignment.
+	 *
+	 * @var bool
+	 */
+	private static $validating_wholesale_role = false;
+
+	/**
+	 * Distinguish wholesale assignment checks from the native role dropdown.
+	 *
+	 * @return bool
+	 */
+	public static function is_validating_wholesale_role() {
+		return self::$validating_wholesale_role;
+	}
 
 	/**
 	 * Check the actor, current site, operation capabilities and requested role.
@@ -111,7 +126,15 @@ class User_Operation_Policy {
 		if ( ! function_exists( 'get_editable_roles' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/user.php';
 		}
-		$editable_roles = get_editable_roles();
+		// Our native-dropdown filter hides wholesale roles for presentation only.
+		// Keep every other editable_roles restriction in force during validation.
+		$previous                        = self::$validating_wholesale_role;
+		self::$validating_wholesale_role = true;
+		try {
+			$editable_roles = get_editable_roles();
+		} finally {
+			self::$validating_wholesale_role = $previous;
+		}
 		return in_array( $role_id, array_map( 'strval', wholesalex()->get_roles( 'ids' ) ), true ) && isset( $editable_roles[ $role_id ] );
 	}
 

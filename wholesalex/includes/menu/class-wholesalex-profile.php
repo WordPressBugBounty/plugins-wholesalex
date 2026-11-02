@@ -306,7 +306,12 @@ class WHOLESALEX_Profile {
 			return false;
 		}
 
-		// Editing one's own profile does not authorize wholesale roles or pricing overrides.
+		if ( ! $is_create_user && ! empty( $_POST['wholesalex_profile_settings'] ) ) {
+			$own_settings = wholesalex()->sanitize_json_input( wp_unslash( $_POST['wholesalex_profile_settings'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The helper decodes and recursively sanitizes the submitted JSON.
+			$this->save_administrator_own_role( $user_id, $own_settings );
+		}
+
+		// Self-service alone does not authorize pricing overrides or account status changes.
 		$operation = $is_create_user ? 'create' : 'edit';
 		$context   = array();
 		if ( $is_create_user && isset( $_POST['action'] ) && 'createuser' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) {
@@ -398,6 +403,16 @@ class WHOLESALEX_Profile {
 					unset( $_POST['role'] );
 				}
 				wholesalex()->change_role( $user_id, $updated_role, $previous_role ? $previous_role : '' );
+				if ( $previous_role !== $updated_role && get_user_meta( $user_id, '__wholesalex_role', true ) === $updated_role ) {
+					update_user_meta(
+						$user_id,
+						'__wholesalex_manual_role_selection',
+						array(
+							'role'  => $updated_role,
+							'spent' => wc_get_customer_total_spent( $user_id ),
+						)
+					);
+				}
 			}
 			update_user_meta( $user_id, '__wholesalex_profile_settings', $__settings );
 		}
@@ -1176,6 +1191,49 @@ class WHOLESALEX_Profile {
 		$role_id = sanitize_key( $role_id );
 
 		return User_Operation_Policy::is_editable_wholesale_role( $role_id );
+	}
+
+	/**
+	 * Save an administrator's own wholesale membership while retaining admin access.
+	 *
+	 * The caller has already checked the native profile nonce and edit_user cap.
+	 * Use the same authorization as accepting one's own wholesale role request;
+	 * this does not grant permission to change protected account status/settings.
+	 *
+	 * @param int        $user_id Profile user ID.
+	 * @param array|null $settings Sanitized profile settings.
+	 * @return void
+	 */
+	private function save_administrator_own_role( $user_id, $settings ) {
+		if ( get_current_user_id() !== (int) $user_id || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		if ( ! is_array( $settings ) || empty( $settings['_wholesalex_role'] ) ) {
+			return;
+		}
+		$role  = $settings['_wholesalex_role'];
+		$error = User_Operation_Policy::authorize( 'accept_role_request', get_current_user_id(), $user_id, array( 'role' => $role ) );
+		if ( is_wp_error( $error ) ) {
+			return;
+		}
+		$previous_role = get_user_meta( $user_id, '__wholesalex_role', true );
+		if ( $previous_role !== $role ) {
+			wholesalex()->change_role( $user_id, $role, $previous_role ? $previous_role : '' );
+			if ( get_user_meta( $user_id, '__wholesalex_role', true ) === $role ) {
+				update_user_meta(
+					$user_id,
+					'__wholesalex_manual_role_selection',
+					array(
+						'role'  => $role,
+						'spent' => wc_get_customer_total_spent( $user_id ),
+					)
+				);
+			}
+		}
+		$saved                     = get_user_meta( $user_id, '__wholesalex_profile_settings', true );
+		$saved                     = is_array( $saved ) ? $saved : array();
+		$saved['_wholesalex_role'] = $role;
+		update_user_meta( $user_id, '__wholesalex_profile_settings', $saved );
 	}
 
 	/**

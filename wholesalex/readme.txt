@@ -4,7 +4,7 @@ Tags: b2b, wholesale prices, wholesale pricing, woocommerce wholesale, woocommer
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.1.7
+Stable tag: 3.1.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -276,6 +276,10 @@ WholesaleX Free does not automatically send customer or order records to WPXPO a
 4. Registration Form Builder
 
 == Changelog ==
+
+= 3.1.8 – 2 November 2026 =
+* Fix: Saved authorized WholesaleX role changes from user profiles, including administrators editing their own wholesale role.
+* Fix: Preserved manual profile role selections until purchase spending increases, while retaining automatic role migration and its configured thresholds.
 
 = 3.1.7 – 1 November 2026 =
 * Fix: Prevented recursive user checks with Yoast SEO that could cause HTTP 500 errors on REST API requests.

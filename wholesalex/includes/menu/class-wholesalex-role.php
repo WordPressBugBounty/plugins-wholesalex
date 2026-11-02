@@ -908,6 +908,13 @@ class WHOLESALEX_Role {
 	 * @since 1.0.4
 	 */
 	public function auto_wholesalex_role_migration( $user_id ) {
+		$__current_user_role = get_user_meta( $user_id, '__wholesalex_role', true );
+		$manual_selection    = get_user_meta( $user_id, '__wholesalex_manual_role_selection', true );
+		// A profile selection wins over rules already satisfied at save time.
+		// Re-evaluate migration when purchase spending subsequently increases.
+		if ( is_array( $manual_selection ) && isset( $manual_selection['role'], $manual_selection['spent'] ) && $manual_selection['role'] === $__current_user_role && is_numeric( $manual_selection['spent'] ) && (float) WHOLESALEX_Dynamic_Rules::$cu_total_spent <= (float) $manual_selection['spent'] ) {
+			return;
+		}
 		$__roles = array_values( wholesalex()->get_roles() );
 		if ( empty( $__roles ) ) {
 			$__roles = array(
@@ -917,8 +924,6 @@ class WHOLESALEX_Role {
 				),
 			);
 		}
-		$__current_user_role = wholesalex()->get_current_user_role();
-
 		foreach ( $__roles as $role ) {
 			if ( isset( $role['id'] ) && $__current_user_role === $role['id'] ) {
 				continue;
@@ -998,6 +1003,9 @@ class WHOLESALEX_Role {
 	 * @since 1.0.10
 	 */
 	public function make_wholesalex_roles_not_editable( $roles ) {
+		if ( User_Operation_Policy::is_validating_wholesale_role() ) {
+			return $roles;
+		}
 		foreach ( $roles as $key => $value ) {
 			// Remove WholesaleX Roles.
 			if ( is_numeric( $key ) || preg_match( '/^wholesalex_/', $key ) ) {
