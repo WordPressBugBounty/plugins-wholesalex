@@ -1,5 +1,11 @@
 == Changelog ==
 
+= 3.1.9 – 10 November 2026 =
+* Fix: Enabled manual customer approval for accounts created through external registration forms or older registrations while preserving role and permission checks.
+* Fix: Restored missing WordPress role entries when saving existing WholesaleX roles.
+* Fix: Allowed authorized administrators to approve and update wholesale membership for administrator accounts while preserving administrator access.
+* Improvement: Added administrator-only diagnostics for unavailable wholesale roles and denied customer management actions.
+
 = 3.1.8 – 2 November 2026 =
 * Fix: Saved authorized WholesaleX role changes from user profiles, including administrators editing their own wholesale role.
 * Fix: Preserved manual profile role selections until purchase spending increases, while retaining automatic role migration and its configured thresholds.

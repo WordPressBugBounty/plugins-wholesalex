@@ -4,7 +4,7 @@ Tags: b2b, wholesale prices, wholesale pricing, woocommerce wholesale, woocommer
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.1.8
+Stable tag: 3.1.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -276,6 +276,12 @@ WholesaleX Free does not automatically send customer or order records to WPXPO a
 4. Registration Form Builder
 
 == Changelog ==
+
+= 3.1.9 – 10 November 2026 =
+* Fix: Enabled manual customer approval for accounts created through external registration forms or older registrations while preserving role and permission checks.
+* Fix: Restored missing WordPress role entries when saving existing WholesaleX roles.
+* Fix: Allowed authorized administrators to approve and update wholesale membership for administrator accounts while preserving administrator access.
+* Improvement: Added administrator-only diagnostics for unavailable wholesale roles and denied customer management actions.
 
 = 3.1.8 – 2 November 2026 =
 * Fix: Saved authorized WholesaleX role changes from user profiles, including administrators editing their own wholesale role.

@@ -301,14 +301,14 @@ class WHOLESALEX_Profile {
 			return false;
 		}
 
+		if ( ! $is_create_user && ! empty( $_POST['wholesalex_profile_settings'] ) ) {
+			$role_settings = wholesalex()->sanitize_json_input( wp_unslash( $_POST['wholesalex_profile_settings'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The helper decodes and recursively sanitizes the submitted JSON.
+			$this->save_administrator_role( $user_id, $role_settings );
+		}
+
 		$error = User_Operation_Policy::authorize( 'edit', get_current_user_id(), $user_id, array( 'self_service' => true ) );
 		if ( is_wp_error( $error ) ) {
 			return false;
-		}
-
-		if ( ! $is_create_user && ! empty( $_POST['wholesalex_profile_settings'] ) ) {
-			$own_settings = wholesalex()->sanitize_json_input( wp_unslash( $_POST['wholesalex_profile_settings'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The helper decodes and recursively sanitizes the submitted JSON.
-			$this->save_administrator_own_role( $user_id, $own_settings );
 		}
 
 		// Self-service alone does not authorize pricing overrides or account status changes.
@@ -1194,18 +1194,22 @@ class WHOLESALEX_Profile {
 	}
 
 	/**
-	 * Save an administrator's own wholesale membership while retaining admin access.
+	 * Save wholesale membership for administrator profiles while retaining admin access.
 	 *
 	 * The caller has already checked the native profile nonce and edit_user cap.
-	 * Use the same authorization as accepting one's own wholesale role request;
+	 * Use the same authorization as accepting a wholesale role request;
 	 * this does not grant permission to change protected account status/settings.
 	 *
 	 * @param int        $user_id Profile user ID.
 	 * @param array|null $settings Sanitized profile settings.
 	 * @return void
 	 */
-	private function save_administrator_own_role( $user_id, $settings ) {
-		if ( get_current_user_id() !== (int) $user_id || ! current_user_can( 'manage_options' ) ) {
+	private function save_administrator_role( $user_id, $settings ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		$target = get_userdata( $user_id );
+		if ( get_current_user_id() !== (int) $user_id && ( ! $target || ( ! in_array( 'administrator', (array) $target->roles, true ) && ! user_can( $user_id, 'manage_options' ) ) ) ) {
 			return;
 		}
 		if ( ! is_array( $settings ) || empty( $settings['_wholesalex_role'] ) ) {
@@ -1218,7 +1222,9 @@ class WHOLESALEX_Profile {
 		}
 		$previous_role = get_user_meta( $user_id, '__wholesalex_role', true );
 		if ( $previous_role !== $role ) {
-			wholesalex()->change_role( $user_id, $role, $previous_role ? $previous_role : '' );
+			// Legacy metadata must never cause removal of the WordPress admin role.
+			$role_to_remove = $this->is_assignable_profile_role( $previous_role ) ? $previous_role : '';
+			wholesalex()->change_role( $user_id, $role, $role_to_remove );
 			if ( get_user_meta( $user_id, '__wholesalex_role', true ) === $role ) {
 				update_user_meta(
 					$user_id,

@@ -1122,8 +1122,11 @@ class Functions {
 
 			} else {
 				$__roles[ $_id ] = $_role;
-				add_role( $_id, $_role['_role_title'], array( 'read' => true ) );
 			}
+
+			// Restore a missing WordPress entry when an existing WholesaleX role
+			// is saved. add_role() leaves existing roles and their caps untouched.
+			add_role( $_id, $_role['_role_title'], array( 'read' => true ) );
 
 			$deleted_roles = get_option( '_wholesalex_deleted_default_roles', array() );
 			$deleted_roles = is_array( $deleted_roles ) ? $deleted_roles : array();

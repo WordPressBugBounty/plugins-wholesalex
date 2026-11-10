@@ -28,11 +28,14 @@ final class Campaigns {
 	const FLASH_SALE_START          = '2026-10-04 00:00:00 Asia/Dhaka';
 	const FLASH_SALE_END            = '2026-10-16 23:59:59 Asia/Dhaka';
 	const FLASH_SALE_URL            = 'https://getwholesalex.com/pricing/';
-	const HALLOWEEN_KEY             = 'wsx_helloBar_halloween_2026';
-	const HALLOWEEN_START           = '2026-10-27 00:00:00 Asia/Dhaka';
-	const HALLOWEEN_END             = '2026-11-03 23:59:59 Asia/Dhaka';
-	const HALLOWEEN_HELLOBAR_URL    = 'https://getwholesalex.com/pricing/?utm_source=db-wholesalex&utm_medium=halloween-hellobar&utm_campaign=wholesalex-dashboard';
-	const HALLOWEEN_PLUGIN_META_URL = 'https://getwholesalex.com/pricing/?utm_source=db-wholesalex&utm_medium=halloween-plugin-meta&utm_campaign=wholesalex-dashboard';
+
+	// Black Friday / Cyber Monday 2026. Dhaka time, so the last day runs through 23:59:59.
+	const BLACK_FRIDAY_KEY             = 'wsx_helloBar_black_friday_2026';
+	const BLACK_FRIDAY_START           = '2026-11-12 00:00:00 Asia/Dhaka';
+	const BLACK_FRIDAY_END             = '2026-12-06 23:59:59 Asia/Dhaka';
+	const BLACK_FRIDAY_HELLOBAR_URL    = 'https://getwholesalex.com/pricing/?utm_source=db-wholesalex&utm_medium=bfcm-plugin-topbar&utm_campaign=wholesalex-dashboard';
+	const BLACK_FRIDAY_PLUGIN_META_URL = 'https://getwholesalex.com/pricing/?utm_source=db-wholesalex&utm_medium=bfcm-plugin-meta&utm_campaign=wholesalex-dashboard';
+	const BLACK_FRIDAY_SIDEBAR_URL     = 'https://getwholesalex.com/pricing/?utm_source=db-wholesalex&utm_medium=bfcm-plugin-sidebar&utm_campaign=wholesalex-dashboard';
 
 	/**
 	 * All campaigns, in display order.
@@ -47,14 +50,14 @@ final class Campaigns {
 	public static function hellobars() {
 		return array(
 			array(
-				'id'         => self::HALLOWEEN_KEY,
-				'start'      => self::HALLOWEEN_START,
-				'end'        => self::HALLOWEEN_END,
-				'heading'    => __( 'Halloween Offer:', 'wholesalex' ),
-				'text'       => __( 'Enjoy up to 60% Off on', 'wholesalex' ),
+				'id'         => self::BLACK_FRIDAY_KEY,
+				'start'      => self::BLACK_FRIDAY_START,
+				'end'        => self::BLACK_FRIDAY_END,
+				'heading'    => __( 'Black Friday Offer:', 'wholesalex' ),
+				'text'       => __( 'Enjoy up to 65% Off on', 'wholesalex' ),
 				'highlight'  => __( 'WholesaleX Pro', 'wholesalex' ),
 				'buttonText' => __( 'Upgrade Now', 'wholesalex' ),
-				'url'        => self::HALLOWEEN_HELLOBAR_URL,
+				'url'        => self::BLACK_FRIDAY_HELLOBAR_URL,
 			),
 			array(
 				'id'         => self::FLASH_SALE_KEY,
@@ -74,25 +77,39 @@ final class Campaigns {
 		return array_column( self::hellobars(), 'id' );
 	}
 
-	/** Return seasonal sidebar copy only during the Halloween campaign. */
+	/**
+	 * Dashboard sidebar offers. Each one only shows between its `start` and `end` (dates as for campaigns).
+	 *
+	 * An offer with an `image` is shown as that picture alone, linked to its `url`: put the file in
+	 * assets/img/banners/. Without one it is shown as a card with `heading`, `text`, `benefits` and `buttonText`.
+	 *
+	 * @return array[]
+	 */
+	public static function sidebar_offers() {
+		return array(
+			array(
+				'start' => self::BLACK_FRIDAY_START,
+				'end'   => self::BLACK_FRIDAY_END,
+				'image' => WHOLESALEX_URL . 'assets/img/banners/black-friday-sidebar.png',
+				'alt'   => __( 'Black Friday: Upgrade to WholesaleX Pro and save up to 65% off', 'wholesalex' ),
+				'url'   => self::BLACK_FRIDAY_SIDEBAR_URL,
+			),
+		);
+	}
+
+	/** The first sidebar offer whose dates include now, without its dates, or null when none is live. */
 	public static function sidebar_offer() {
 		$now = time();
-		if ( $now < strtotime( self::HALLOWEEN_START ) || $now > strtotime( self::HALLOWEEN_END ) ) {
-			return null;
+		foreach ( self::sidebar_offers() as $offer ) {
+			$start = strtotime( $offer['start'] );
+			$end   = strtotime( $offer['end'] );
+			if ( false === $start || false === $end || $now < $start || $now > $end ) {
+				continue;
+			}
+			unset( $offer['start'], $offer['end'] );
+			return $offer;
 		}
-		return array(
-			'heading'    => __( 'WholesaleX Pro Halloween Sale - Up to 60% Off', 'wholesalex' ),
-			'text'       => __( 'Upgrade to WholesaleX Pro and unlock all premium features at a special Halloween discount.', 'wholesalex' ),
-			'benefits'   => array(
-				__( 'Quantity Based Tiered Pricing', 'wholesalex' ),
-				__( 'Custom Registration Fields', 'wholesalex' ),
-				__( 'Order value and quantity restrictions', 'wholesalex' ),
-				__( 'Bulk Order Form/Table', 'wholesalex' ),
-				__( 'Request a Quote', 'wholesalex' ),
-			),
-			'buttonText' => __( 'Upgrade Now', 'wholesalex' ),
-			'url'        => 'https://getwholesalex.com/pricing/?utm_source=db-wholesalex&utm_medium=halloween-sidebar&utm_campaign=wholesalex-dashboard',
-		);
+		return null;
 	}
 
 	/**
@@ -104,10 +121,10 @@ final class Campaigns {
 	public static function plugin_link_offers() {
 		return array(
 			array(
-				'start' => self::HALLOWEEN_START,
-				'end'   => self::HALLOWEEN_END,
-				'text'  => __( 'Upgrade to Pro - Up to 60% Off', 'wholesalex' ),
-				'url'   => self::HALLOWEEN_PLUGIN_META_URL,
+				'start' => self::BLACK_FRIDAY_START,
+				'end'   => self::BLACK_FRIDAY_END,
+				'text'  => __( 'Upgrade to Pro & Save Up to 65% This Black Friday!', 'wholesalex' ),
+				'url'   => self::BLACK_FRIDAY_PLUGIN_META_URL,
 			),
 			array(
 				'start' => '2026-07-06 00:00 Asia/Dhaka',

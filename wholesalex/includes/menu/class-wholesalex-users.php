@@ -744,6 +744,9 @@ class WHOLESALEX_Users {
 			return $error;
 		}
 		if ( 'active' === $action && ! get_user_meta( $user_id, '__wholesalex_role', true ) ) {
+			// Manual approval is an authorized admin decision, including accounts
+			// created by external forms or before registration provenance existed.
+			// Validate the role being assigned rather than the original public form.
 			$registration_role = get_user_meta( $user_id, '__wholesalex_registration_role', true );
 			if ( '' !== $registration_role ) {
 				$context['role'] = $registration_role;
@@ -752,24 +755,7 @@ class WHOLESALEX_Users {
 					return $error;
 				}
 			}
-			$error = $this->registration_approval_error( $user_id );
-			if ( is_wp_error( $error ) ) {
-				return $error;
-			}
 		}
 		return true;
-	}
-
-	/**
-	 * Explicitly assigned roles are admin decisions, not pending role requests.
-	 *
-	 * @param int $user_id Registrant.
-	 * @return \WP_Error|null
-	 */
-	private function registration_approval_error( $user_id ) {
-		if ( get_user_meta( $user_id, '__wholesalex_role', true ) ) {
-			return null;
-		}
-		return Registration_Context::approval_error( $user_id, get_user_meta( $user_id, '__wholesalex_registration_role', true ) );
 	}
 }

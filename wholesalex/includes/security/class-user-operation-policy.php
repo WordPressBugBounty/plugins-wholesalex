@@ -45,70 +45,87 @@ class User_Operation_Policy {
 		$target_id = absint( $target_id );
 		$actor     = get_userdata( $actor_id );
 		if ( ! $actor || ! in_array( $operation, array( 'create', 'edit', 'promote', 'delete', 'approve', 'reject', 'read', 'request', 'accept_role_request', 'reject_role_request' ), true ) ) {
-			return self::denied();
+			return self::denied( 'invalid_actor_or_operation' );
 		}
 
 		$self_service = 'edit' === $operation && ! empty( $context['self_service'] ) && $actor_id === $target_id;
 		if ( 'request' !== $operation && ! $self_service && ! user_can( $actor_id, apply_filters( 'wholesalex_capability_access', 'manage_options' ) ) ) {
-			return self::denied();
+			return self::denied( 'missing_management_capability' );
 		}
 		if ( isset( $context['role'] ) && ! self::is_editable_wholesale_role( $context['role'] ) ) {
-			return new \WP_Error( 'wholesalex_invalid_user_role', __( 'This wholesale role cannot be assigned.', 'wholesalex' ), array( 'status' => 400 ) );
+			$data    = array( 'status' => 400 );
+			$message = __( 'This wholesale role cannot be assigned.', 'wholesalex' );
+			if ( current_user_can( 'manage_options' ) && is_string( $context['role'] ) ) {
+				$role = $context['role'];
+				if ( '' === $role || sanitize_key( $role ) !== $role || in_array( $role, array( 'administrator', 'wholesalex_guest' ), true ) ) {
+					$data['reason'] = 'invalid_role_id';
+				} elseif ( ! in_array( $role, array_map( 'strval', wholesalex()->get_roles( 'ids' ) ), true ) ) {
+					$data['reason'] = 'unconfigured_wholesale_role';
+					$message        = __( 'The selected role is not configured in WholesaleX. Select a role from WholesaleX User Roles.', 'wholesalex' );
+				} else {
+					$data['reason'] = 'role_not_editable';
+					$message        = __( 'The selected WholesaleX role is unavailable in WordPress editable roles. Check that the role exists and your role-management settings allow assigning it.', 'wholesalex' );
+				}
+			}
+			return new \WP_Error( 'wholesalex_invalid_user_role', $message, $data );
 		}
 		if ( 'create' === $operation ) {
 			if ( ! user_can( $actor_id, 'create_users' ) || ( ( isset( $context['role'] ) || ( isset( $context['status'] ) && 'active' === $context['status'] ) ) && ! user_can( $actor_id, 'promote_users' ) ) ) {
-				return self::denied();
+				return self::denied( 'missing_creation_capability' );
 			}
 			if ( ! $target_id ) {
 				return true;
 			}
 		}
 		if ( 'read' === $operation && ! $target_id ) {
-			return user_can( $actor_id, 'list_users' ) ? true : self::denied();
+			return user_can( $actor_id, 'list_users' ) ? true : self::denied( 'missing_list_capability' );
 		}
 
 		$target = get_userdata( $target_id );
 		if ( ! $target || ! is_user_member_of_blog( $target_id, get_current_blog_id() ) ) {
-			return self::denied();
+			return self::denied( 'invalid_site_target' );
 		}
 		if ( 'read' === $operation ) {
-			return user_can( $actor_id, 'list_users' ) && user_can( $actor_id, 'edit_user', $target_id ) ? true : self::denied();
+			return user_can( $actor_id, 'list_users' ) && user_can( $actor_id, 'edit_user', $target_id ) ? true : self::denied( 'missing_read_capability' );
 		}
 		if ( $self_service ) {
-			return user_can( $actor_id, 'edit_user', $target_id ) ? true : self::denied();
+			return user_can( $actor_id, 'edit_user', $target_id ) ? true : self::denied( 'missing_edit_capability' );
 		}
 		// Submitting a request records intent only; approval still enforces protected targets.
 		if ( 'request' === $operation ) {
-			return $actor_id === $target_id && isset( $context['role'] ) ? true : self::denied();
+			return $actor_id === $target_id && isset( $context['role'] ) ? true : self::denied( 'invalid_role_request' );
 		}
 		// Role requests change wholesale membership only, never account status or administrator roles.
 		if ( in_array( $operation, array( 'accept_role_request', 'reject_role_request' ), true ) ) {
 			if ( ! user_can( $actor_id, 'edit_users' ) || ! user_can( $actor_id, 'edit_user', $target_id ) ) {
-				return self::denied();
+				return self::denied( 'missing_edit_capability' );
 			}
 			if ( ( is_multisite() && is_super_admin( $target_id ) && ! is_super_admin( $actor_id ) ) || ( ( in_array( 'administrator', (array) $target->roles, true ) || user_can( $target_id, 'manage_options' ) ) && ! user_can( $actor_id, 'manage_options' ) ) ) {
-				return self::denied();
+				return self::denied( 'protected_target' );
 			}
 			if ( 'accept_role_request' === $operation && ( ! user_can( $actor_id, 'promote_users' ) || ! user_can( $actor_id, 'promote_user', $target_id ) ) ) {
-				return self::denied();
+				return self::denied( 'missing_promotion_capability' );
 			}
 			return true;
 		}
-		// Network administrators and site administrators are never wholesale targets.
-		if ( ( is_multisite() && is_super_admin( $target_id ) ) || in_array( 'administrator', (array) $target->roles, true ) || user_can( $target_id, 'manage_options' ) ) {
-			return self::denied();
+		// Administrators may approve wholesale membership without removing admin access.
+		// Network targets still require a network administrator; destructive actions
+		// and general wholesale overrides remain blocked for protected accounts.
+		$admin_approval = 'approve' === $operation && user_can( $actor_id, 'manage_options' ) && ( ! is_multisite() || ! is_super_admin( $target_id ) || is_super_admin( $actor_id ) );
+		if ( ! $admin_approval && ( ( is_multisite() && is_super_admin( $target_id ) ) || in_array( 'administrator', (array) $target->roles, true ) || user_can( $target_id, 'manage_options' ) ) ) {
+			return self::denied( 'protected_target' );
 		}
-		if ( $actor_id === $target_id && in_array( $operation, array( 'create', 'promote', 'delete', 'approve', 'reject' ), true ) ) {
-			return self::denied();
+		if ( ! $admin_approval && $actor_id === $target_id && in_array( $operation, array( 'create', 'promote', 'delete', 'approve', 'reject' ), true ) ) {
+			return self::denied( 'self_operation' );
 		}
 		if ( 'delete' === $operation ) {
-			return user_can( $actor_id, 'delete_users' ) && user_can( $actor_id, 'delete_user', $target_id ) ? true : self::denied();
+			return user_can( $actor_id, 'delete_users' ) && user_can( $actor_id, 'delete_user', $target_id ) ? true : self::denied( 'missing_delete_capability' );
 		}
 		if ( ! user_can( $actor_id, 'edit_users' ) || ! user_can( $actor_id, 'edit_user', $target_id ) ) {
-			return self::denied();
+			return self::denied( 'missing_edit_capability' );
 		}
 		if ( in_array( $operation, array( 'promote', 'approve' ), true ) && ( ! user_can( $actor_id, 'promote_users' ) || ! user_can( $actor_id, 'promote_user', $target_id ) ) ) {
-			return self::denied();
+			return self::denied( 'missing_promotion_capability' );
 		}
 		return true;
 	}
@@ -139,11 +156,16 @@ class User_Operation_Policy {
 	}
 
 	/**
-	 * Return a consistent denial without disclosing target details.
+	 * Return a consistent denial with diagnostics restricted to administrators.
 	 *
+	 * @param string $reason Failed authorization check.
 	 * @return \WP_Error
 	 */
-	private static function denied() {
-		return new \WP_Error( 'wholesalex_user_operation_forbidden', __( 'You are not allowed to perform this user operation.', 'wholesalex' ), array( 'status' => 403 ) );
+	private static function denied( $reason ) {
+		$data = array( 'status' => 403 );
+		if ( current_user_can( 'manage_options' ) ) {
+			$data['reason'] = $reason;
+		}
+		return new \WP_Error( 'wholesalex_user_operation_forbidden', __( 'You are not allowed to perform this user operation.', 'wholesalex' ), $data );
 	}
 }
