@@ -144,6 +144,10 @@ class WholesaleX_Initialization {
 		new \WHOLESALEX\WHOLESALEX_WooProduct_Bundles();
 		new \WHOLESALEX\Includes\Admin\Notice\Notice();
 
+		// AI tools (MCP): off until an administrator turns them on.
+		require_once WHOLESALEX_PATH . 'includes/mcp/class-mcp.php';
+		\WHOLESALEX\MCP\MCP::init();
+
 		add_action( 'template_redirect', array( $this, 'wholesalex_process_user_email_confirmation' ) );
 		add_action( 'woocommerce_before_customer_login_form', array( $this, 'confirmation_resend_form' ) );
 	}

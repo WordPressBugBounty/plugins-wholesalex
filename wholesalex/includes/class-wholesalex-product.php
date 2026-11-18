@@ -53,8 +53,12 @@ class WHOLESALEX_Product {
 		 *
 		 * @since 1.0.2
 		 */
-		add_filter( 'pre_get_posts', array( $this, 'control_single_product_visibility' ) );
-		add_filter( 'woocommerce_product_query', array( $this, 'control_single_product_visibility' ) );
+		// Preserve visibility restrictions after extensions adjust product selections.
+		add_filter( 'pre_get_posts', array( $this, 'control_single_product_visibility' ), PHP_INT_MAX );
+		add_filter( 'woocommerce_product_query', array( $this, 'control_single_product_visibility' ), PHP_INT_MAX );
+		add_filter( 'woocommerce_shortcode_products_query', array( $this, 'filter_product_query_args' ), PHP_INT_MAX );
+		add_filter( 'woocommerce_product_data_store_cpt_get_products_query', array( $this, 'filter_product_query_args' ), PHP_INT_MAX );
+		add_filter( 'woocommerce_product_is_visible', array( $this, 'filter_product_visibility' ), PHP_INT_MAX, 2 );
 		add_action( 'template_redirect', array( $this, 'redirect_from_hidden_products' ) );
 		add_action( 'woocommerce_check_cart_items', array( $this, 'prevent_checkout_hidden_products' ) );
 		/**
@@ -490,7 +494,7 @@ class WHOLESALEX_Product {
 			return;
 		}
 
-		$nonce = isset( $_POST['meta-box-order-nonce'] ) ? sanitize_key( $_POST['meta-box-order-nonce'] ) : '';
+		$nonce = isset( $_POST['meta-box-order-nonce'] ) ? sanitize_key( wp_unslash( $_POST['meta-box-order-nonce'] ) ) : '';
 
 		if ( ! wp_verify_nonce( $nonce, 'meta-box-order' ) ) {
 			return;
@@ -610,9 +614,9 @@ class WHOLESALEX_Product {
 			return;
 		}
 
-		$nonce = isset( $_POST['security'] ) ? sanitize_key( $_POST['security'] ) : '';
+		$nonce = isset( $_POST['security'] ) ? sanitize_key( wp_unslash( $_POST['security'] ) ) : '';
 		if ( empty( $nonce ) ) {
-			$nonce = isset( $_POST['meta-box-order-nonce'] ) ? sanitize_key( $_POST['meta-box-order-nonce'] ) : '';
+			$nonce = isset( $_POST['meta-box-order-nonce'] ) ? sanitize_key( wp_unslash( $_POST['meta-box-order-nonce'] ) ) : '';
 		}
 		$is_nonce_verify = false;
 		if ( wp_verify_nonce( $nonce, 'save-variations' ) || wp_verify_nonce( $nonce, 'meta-box-order' ) ) {
@@ -1425,7 +1429,7 @@ class WHOLESALEX_Product {
 
 		$is_nonce_verify = false;
 
-		$nonce = isset( $_POST['meta-box-order-nonce'] ) ? sanitize_key( $_POST['meta-box-order-nonce'] ) : '';
+		$nonce = isset( $_POST['meta-box-order-nonce'] ) ? sanitize_key( wp_unslash( $_POST['meta-box-order-nonce'] ) ) : '';
 		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'meta-box-order' ) ) {
 			$is_nonce_verify = true;
 		}
@@ -1433,7 +1437,7 @@ class WHOLESALEX_Product {
 		// Fallback: verify using the standard WooCommerce product meta nonce.
 		// This resolves conflicts with plugins (e.g. WooCommerce Gift Cards) that override the 'security' POST field.
 		if ( ! $is_nonce_verify ) {
-			$nonce = isset( $_POST['woocommerce_meta_nonce'] ) ? sanitize_key( $_POST['woocommerce_meta_nonce'] ) : '';
+			$nonce = isset( $_POST['woocommerce_meta_nonce'] ) ? sanitize_key( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ) : '';
 			if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'woocommerce_save_data' ) ) {
 				$is_nonce_verify = true;
 			}
@@ -1570,14 +1574,14 @@ class WHOLESALEX_Product {
 		$is_nonce_verify = false;
 
 		// Check variation save nonce.
-		$nonce = isset( $_POST['security'] ) ? sanitize_key( $_POST['security'] ) : '';
+		$nonce = isset( $_POST['security'] ) ? sanitize_key( wp_unslash( $_POST['security'] ) ) : '';
 		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'save-variations' ) ) {
 			$is_nonce_verify = true;
 		}
 
 		// Check meta-box-order nonce.
 		if ( ! $is_nonce_verify ) {
-			$nonce = isset( $_POST['meta-box-order-nonce'] ) ? sanitize_key( $_POST['meta-box-order-nonce'] ) : '';
+			$nonce = isset( $_POST['meta-box-order-nonce'] ) ? sanitize_key( wp_unslash( $_POST['meta-box-order-nonce'] ) ) : '';
 			if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'meta-box-order' ) ) {
 				$is_nonce_verify = true;
 			}
@@ -1586,7 +1590,7 @@ class WHOLESALEX_Product {
 		// Fallback: verify using the standard WooCommerce product meta nonce (always present on product edit pages).
 		// This resolves conflicts with plugins (e.g. WooCommerce Gift Cards) that override the 'security' POST field.
 		if ( ! $is_nonce_verify ) {
-			$nonce = isset( $_POST['woocommerce_meta_nonce'] ) ? sanitize_key( $_POST['woocommerce_meta_nonce'] ) : '';
+			$nonce = isset( $_POST['woocommerce_meta_nonce'] ) ? sanitize_key( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ) : '';
 			if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'woocommerce_save_data' ) ) {
 				$is_nonce_verify = true;
 			}
@@ -1659,20 +1663,77 @@ class WHOLESALEX_Product {
 		if ( $is_admin_dashboard ) {
 			return $q;
 		}
-		$post_type = $q->get( 'post_type' );
+		$post_type        = $q->get( 'post_type' );
+		$product_cat      = $q->get( 'product_cat' );
+		$is_product_query = 'product' === $post_type || ( is_array( $post_type ) && in_array( 'product', $post_type, true ) );
+		// Brand, tag and attribute archives can leave post_type empty until SQL is built.
+		$is_product_query = $is_product_query || 'product_query' === $q->get( 'wc_query' ) || $q->is_tax( get_object_taxonomies( 'product' ) );
 
-		$product_cat = $q->get( 'product_cat' );
-
-		if ( 'product' === $post_type || ( '' !== $product_cat && ! $is_admin_dashboard ) ) {
-			if ( $this->hide_all_products_for_current_role() ) {
-				$q->set( 'post__in', (array) array( '9999999' ) );
+		if ( $is_product_query || ! empty( $product_cat ) ) {
+			$query_args = $this->filter_product_query_args(
+				array(
+					'post__in'     => $q->get( 'post__in' ),
+					'post__not_in' => $q->get( 'post__not_in' ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Preserve existing visibility exclusions when filtering the current query; this does not execute a new query.
+				)
+			);
+			foreach ( $query_args as $key => $value ) {
+				$q->set( $key, $value );
 			}
-			$existing_ids = isset( $q->query['post__not_in'] ) ? (array) $q->query['post__not_in'] : array();
-			$hidden_ids   = (array) wholesalex()->hidden_product_ids();
-			$q->set( 'post__not_in', array_merge( $existing_ids, $hidden_ids ) ); // Exclude "$q->query['post__not_in']" WowStore Product with WholesaleX.
-
 		}
 		return $q;
+	}
+
+	/**
+	 * Exclude hidden products before product queries and shortcode caches are built.
+	 *
+	 * @param array $query_args Product query arguments.
+	 * @return array
+	 */
+	public function filter_product_query_args( $query_args ) {
+		if ( apply_filters( 'wholesalex_is_admin_dashboard', is_admin() ) || ! is_array( $query_args ) ) {
+			return $query_args;
+		}
+
+		if ( $this->hide_all_products_for_current_role() ) {
+			$query_args['post__in'] = array( 0 );
+			return $query_args;
+		}
+
+		$hidden_ids = (array) wholesalex()->hidden_product_ids();
+		if ( empty( $hidden_ids ) ) {
+			return $query_args;
+		}
+
+		$existing_ids               = isset( $query_args['post__not_in'] ) ? (array) $query_args['post__not_in'] : array();
+		$excluded_ids               = array_values( array_unique( array_map( 'absint', array_merge( $existing_ids, $hidden_ids ) ) ) );
+		$query_args['post__not_in'] = $excluded_ids; // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Product visibility requires audience-specific exclusions.
+
+		// WordPress ignores post__not_in when post__in is populated.
+		if ( ! empty( $query_args['post__in'] ) ) {
+			$included_ids           = array_values( array_diff( array_map( 'absint', (array) $query_args['post__in'] ), $excluded_ids ) );
+			$query_args['post__in'] = $included_ids ? $included_ids : array( 0 );
+		}
+
+		return $query_args;
+	}
+
+	/**
+	 * Prevent hidden products from rendering in WooCommerce product loops.
+	 *
+	 * @param bool $visible    Product visibility from WooCommerce and other filters.
+	 * @param int  $product_id Product ID.
+	 * @return bool
+	 */
+	public function filter_product_visibility( $visible, $product_id ) {
+		if ( ! $visible || apply_filters( 'wholesalex_is_admin_dashboard', is_admin() ) ) {
+			return $visible;
+		}
+
+		if ( $this->hide_all_products_for_current_role() || in_array( absint( $product_id ), array_map( 'absint', (array) wholesalex()->hidden_product_ids() ), true ) ) {
+			return false;
+		}
+
+		return $visible;
 	}
 
 	/**

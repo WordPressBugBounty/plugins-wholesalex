@@ -1,0 +1,35 @@
+/* WholesaleX AI tools OAuth consent screen. Colors follow the WholesaleX brand tokens. */
+:root { --wsx-primary: #6c6cff; --wsx-primary-dark: #4d4dff; --wsx-soft: #f4f4ff; --wsx-tint: #e7e7ff; --wsx-line: #d5d5fa; --wsx-indigo: #292461; --wsx-text: #07050b; --wsx-muted: #6b677a; --wsx-border: #e2e4e9; --wsx-warning: #ff6f00; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; color: var(--wsx-text); background: radial-gradient(circle at 20% 0%, var(--wsx-tint), transparent 50%), var(--wsx-soft); font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; }
+.wsx-card { width: 100%; max-width: 460px; padding: 32px; border: 1px solid var(--wsx-border); border-radius: 16px; background: #fff; box-shadow: 0 24px 48px -24px rgba(78, 46, 206, 0.28); }
+.wsx-logo { display: block; height: 22px; width: auto; margin-bottom: 28px; }
+.wsx-title { margin: 0 0 8px; font-size: 22px; line-height: 1.3; }
+.wsx-lead { margin: 0 0 22px; color: var(--wsx-muted); }
+.wsx-account { display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 16px; border: 1px solid var(--wsx-border); border-radius: 10px; }
+.wsx-avatar { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; color: #fff; background: var(--wsx-primary); font-weight: 700; }
+.wsx-account__text { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.4; }
+.wsx-account__text span { overflow: hidden; color: var(--wsx-muted); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.wsx-link { color: var(--wsx-primary-dark); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.wsx-link:hover { text-decoration: underline; }
+.wsx-access { padding: 14px 16px; margin-bottom: 12px; border: 1px solid var(--wsx-line); border-radius: 10px; background: var(--wsx-soft); }
+.wsx-access p { margin: 0; }
+.wsx-access__label { color: var(--wsx-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.wsx-access__level { color: var(--wsx-primary-dark); font-size: 16px; font-weight: 700; }
+.wsx-access__list { margin: 8px 0 0; padding: 0; list-style: none; font-size: 13px; }
+.wsx-access__list li { position: relative; margin: 4px 0 0; padding-left: 24px; }
+.wsx-access__list li::before { content: ""; position: absolute; top: 3px; left: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--wsx-primary) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.2l2.2 2.2 4.8-4.8' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 16px no-repeat; }
+.wsx-access__list li.is-off { color: var(--wsx-muted); text-decoration: line-through; }
+.wsx-access__list li.is-off::before { background: var(--wsx-border) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5.5 5.5l5 5m0-5l-5 5' fill='none' stroke='%236b677a' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") center / 16px no-repeat; }
+.screen-reader-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.wsx-note { margin: 0 0 22px; color: var(--wsx-muted); font-size: 13px; }
+.wsx-alert { margin: 0 0 22px; padding: 12px 14px; border-left: 3px solid var(--wsx-warning); border-radius: 6px; background: #fff6ee; }
+.wsx-actions { display: flex; gap: 10px; justify-content: flex-end; margin: 0; }
+.wsx-button { min-height: 42px; padding: 0 22px; border: 1px solid var(--wsx-primary); border-radius: 8px; color: #fff; background: var(--wsx-primary); font: inherit; font-weight: 600; cursor: pointer; }
+.wsx-button:hover, .wsx-button:focus { border-color: var(--wsx-primary-dark); background: var(--wsx-primary-dark); }
+.wsx-button:focus-visible, .wsx-link:focus-visible { outline: 2px solid var(--wsx-primary); outline-offset: 2px; }
+.wsx-button--ghost { color: var(--wsx-primary-dark); background: #fff; }
+.wsx-button--ghost:hover, .wsx-button--ghost:focus { color: var(--wsx-primary-dark); background: var(--wsx-soft); }
+.wsx-footer { margin: 22px 0 0; padding-top: 18px; border-top: 1px solid var(--wsx-border); color: var(--wsx-muted); font-size: 12px; text-align: center; }
+
+@media (max-width: 480px) { .wsx-card { padding: 24px 20px; } .wsx-actions { flex-direction: column-reverse; } .wsx-button { width: 100%; } }

@@ -55,6 +55,40 @@ function wholesalex_uninstall_customer_imports() {
 wholesalex_uninstall_customer_imports();
 
 /**
+ * AI tool access is a security setting, not merchant data, so it never
+ * survives an uninstall. A reinstall starts with the AI tools turned off.
+ *
+ * @return void
+ */
+function wholesalex_uninstall_ai_tools() {
+	$remove = static function () {
+		delete_option( 'wholesalex_mcp_settings' );
+		delete_option( 'wholesalex_mcp_activity' );
+		delete_option( 'wholesalex_mcp_oauth_clients' );
+		delete_option( 'wholesalex_mcp_oauth_grants' );
+	};
+	if ( ! is_multisite() ) {
+		$remove();
+		return;
+	}
+	foreach ( get_sites(
+		array(
+			'fields' => 'ids',
+			'number' => 0,
+		)
+	) as $site_id ) {
+		switch_to_blog( (int) $site_id );
+		try {
+			$remove();
+		} finally {
+			restore_current_blog();
+		}
+	}
+}
+
+wholesalex_uninstall_ai_tools();
+
+/**
  * Remove Plugin Data
  *
  * Only runs if user has enabled the data deletion setting.

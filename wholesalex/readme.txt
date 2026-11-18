@@ -4,19 +4,43 @@ Tags: b2b, wholesale prices, wholesale pricing, woocommerce wholesale, woocommer
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.1.9
+Stable tag: 3.2.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-All-in-one WooCommerce wholesale solution with wholesale pricing, B2B user roles, registration form and private store.
+AI-assisted wholesale plugin for WooCommerce with wholesale pricing, B2B user roles, registration forms, private store and MCP support.
 
 == Description ==
 
-WholesaleX is an all-in-one [B2B and wholesale plugin](https://getwholesalex.com/) that helps businesses manage complex wholesale operations with less setup complexity. Set role-based wholesale prices, manage wholesale pricing and discounts, approve customers and restrict store and price access.
+WholesaleX is an all-in-one [B2B and wholesale plugin](https://getwholesalex.com/) for WooCommerce with AI-assisted wholesale management through MCP integration. Set role-based wholesale prices, manage wholesale pricing and discounts, approve customers and restrict store and price access with less setup complexity. 
+
+Manage supported wholesale operations using natural language through compatible AI assistants.
 
 The Free features below do not require a Pro license and do not expire after a trial period or usage quota. Separate add-ons are identified below.
 
 [Documentation](https://getwholesalex.com/docs/wholesalex/getting-started/) | [Support](https://wordpress.org/support/plugin/wholesalex/)
+
+= AI-Assisted Wholesale Management with MCP — Free =
+
+Manage wholesale pricing, discount rules, B2B user roles and wholesale settings using natural-language prompts. WholesaleX integrates with AI assistants like ChatGPT, Claude, Gemini and many more through Model Context Protocol (MCP).
+
+* **Wholesale Pricing and Discounts:** Create, update and manage wholesale price and discount rules.
+* **Wholesale User Roles:** Create and configure B2B customer roles.
+* **Wholesale Registration:** Add and manage wholesale registration fields for B2B user roles.
+* **Wholesale Data:** Retrieve wholesale pricing rules, product information and B2B user roles.
+* **Wholesale Settings:** Manage supported wholesale store configurations.
+
+Control AI permissions with four access levels: Off, Read Only, Read and Write and Full Access.
+
+WholesaleX MCP Tutorial (may show Free and Pro features):
+
+https://www.youtube.com/watch?v=X6xKIR68mSw
+
+MCP integration is available for free. Pro-specific operations require WholesaleX Pro.
+
+Requires WordPress 6.9+, the official [MCP Adapter](https://wordpress.org/plugins/mcp-adapter/) and a compatible AI client.
+
+[Learn how to connect WholesaleX MCP](https://getwholesalex.com/docs/wholesalex/wholesalex-ai-tools/).
 
 = Wholesale Pricing and Price Rules — Free =
 
@@ -188,9 +212,21 @@ YouTube loads only when you open an admin tutorial. YouTube/Google may receive y
 
 [WPXPO video credit](https://www.youtube.com/@wpxpo) | [Original Overview tutorial](https://www.youtube.com/watch?v=ZbQLY21-cMA) | [YouTube Terms](https://www.youtube.com/t/terms) | [Google Privacy](https://policies.google.com/privacy)
 
+= AI Assistants You Connect (MCP) =
+
+The AI tools are off until an administrator turns them on. When you connect an assistant, it requests data through your site's MCP endpoint with the OAuth sign-in you approved or your application password, and the AI provider you chose receives what the assistant reads, such as rule names, product names, customer display names, WholesaleX settings and email template text, including the addresses that receive store notifications. Customer email addresses, passwords and secret keys are not returned. Review your AI provider's terms and privacy policy, and disconnect it in WholesaleX > MCP Tools or revoke its application password in Users > Profile.
+
+[Google Terms](https://policies.google.com/terms) | [Google Privacy](https://policies.google.com/privacy) also apply when you connect Gemini.
+
+= AI App Sign-in (OAuth) =
+
+After an administrator enables the AI tools, OAuth sign-in and client authentication requests may download an app's public sign-in details (its OAuth client metadata document), for example https://chatgpt.com/oauth/client.json or https://claude.ai/oauth/mcp-oauth-client-metadata, to confirm the app's name and return address. This validation can happen before WordPress login or connection approval; reading store data still requires an approved administrator connection. The metadata request contains no store or customer records; the provider receives your server's IP address and WordPress's standard user agent, which contains the WordPress version and your site address. Only chatgpt.com, chat.openai.com, claude.ai, claude.com and vscode.dev are contacted, plus any host a developer adds with the `wholesalex_mcp_oauth_trusted_hosts` filter. Successful results are cached for an hour.
+
+[OpenAI Terms](https://openai.com/policies/terms-of-use) | [OpenAI Privacy](https://openai.com/policies/privacy-policy) | [Anthropic Terms](https://www.anthropic.com/legal/consumer-terms) | [Anthropic Privacy](https://www.anthropic.com/legal/privacy) | [Microsoft Terms](https://www.microsoft.com/legal/terms-of-use) | [Microsoft Privacy](https://privacy.microsoft.com/privacystatement)
+
 = WordPress.org Plugin Installation =
 
-Installing a directory integration through Addons requires administrator action and WordPress permissions. WordPress contacts `api.wordpress.org` and `downloads.wordpress.org`, sharing the plugin slug, server IP, user agent and HTTP metadata. These requests send no customer records, passwords or license keys.
+Installing a directory integration through Addons, or the MCP Adapter plugin from WholesaleX > MCP Tools, requires administrator action and WordPress permissions. WordPress contacts `api.wordpress.org` and `downloads.wordpress.org`, sharing the plugin slug, server IP, user agent and HTTP metadata. These requests send no customer records, passwords or license keys.
 
 [WordPress.org](https://wordpress.org/plugins/) | [Privacy](https://wordpress.org/about/privacy/)
 
@@ -198,7 +234,7 @@ Installing a directory integration through Addons requires administrator action 
 
 = Requirements =
 
-* WordPress 6.8 or later.
+* WordPress 6.8 or later. The AI Assistant Tools (MCP) need WordPress 6.9 or later and the MCP Adapter plugin.
 * PHP 7.4 or later.
 * An active WooCommerce installation and a database supported by your WordPress and WooCommerce versions.
 
@@ -264,7 +300,23 @@ Free preserves saved Pro records without running the unavailable features. Insta
 
 = Does this plugin send customer data to a vendor service? =
 
-WholesaleX Free does not automatically send customer or order records to WPXPO and has no automatic marketing telemetry. When enabled, reCAPTCHA sends verification tokens and technical data to Google. Opening a tutorial contacts YouTube. These services receive information such as IP addresses and browser details, as described in External services.
+WholesaleX Free does not automatically send customer or order records to WPXPO and has no automatic marketing telemetry. When enabled, reCAPTCHA sends verification tokens and technical data to Google. Opening a tutorial contacts YouTube. These services receive information such as IP addresses and browser details, as described in External services. If you connect an AI assistant to the AI tools, that assistant's provider receives the data it reads.
+
+= Can I manage WholesaleX with an AI assistant such as Claude, ChatGPT or Gemini? =
+
+Yes. Install the free MCP Adapter plugin, turn on WholesaleX > MCP Tools and follow the connection steps on that screen. Desktop and command-line assistants, such as Claude Desktop, Claude Code, Cursor, VS Code and Gemini CLI, connect with an application password. ChatGPT, Claude and Gemini connect with the server address and a built-in OAuth sign-in: you approve them once with an administrator account, no extra plugin needed. They connect from the internet, so your site needs a public HTTPS address. Only administrators can use the tools.
+
+= Can I manage wholesale pricing using AI? =
+
+Yes. WholesaleX MCP allows you to create, update and manage supported wholesale pricing and discount rules using natural-language prompts through compatible AI assistants.
+
+= Is AI-assisted wholesale management available for free? =
+
+Yes. WholesaleX provides free MCP tools for managing wholesale pricing rules, B2B user roles, registration fields and supported store settings. Pro-specific operations require WholesaleX Pro.
+
+= Can I control AI access to my wholesale store? =
+
+Yes. WholesaleX provides four MCP access levels: Off, Read Only, Read and Write and Full Access. MCP access is disabled by default.
 
 [More WholesaleX FAQs](https://getwholesalex.com/faq/).
 
@@ -276,6 +328,15 @@ WholesaleX Free does not automatically send customer or order records to WPXPO a
 4. Registration Form Builder
 
 == Changelog ==
+
+= 3.2.0 – 18 November 2026 =
+* New: AI assistant tools through the Model Context Protocol (MCP). Manage roles, wholesale pricing rules, dynamic rules and registration form fields from MCP clients, using the free MCP Adapter plugin. Off by default, administrators only, with an activity log.
+* New: AI tools can read and change WholesaleX settings, the email templates and, with Pro, the add-on settings, through the same checks as the Settings screen. This includes store mode, private store, registration approval, shop manager access and plugin data deletion. Email recipients stay read-only, and sites can lock other settings with the `wholesalex_mcp_read_only_settings` filter.
+* New: ChatGPT, Claude and Gemini can connect to the AI tools with a built-in OAuth sign-in, approved by an administrator on a consent screen. Connected apps are listed in WholesaleX > MCP Tools and can be disconnected at any time.
+* New: When asked about a Pro feature while Pro is inactive, the AI tools tell the assistant to link the WholesaleX pricing page; when asked for a feature that neither Free nor Pro includes, they tell it to link WPXPO custom development.
+* Dev: Shared services for wholesale pricing, dynamic rule, role and registration form writes, used by the admin screens and the AI tools.
+* Fix: Prevented a PHP warning when a Buy X Get One pricing rule is saved without a badge position.
+* Fix: Prevented a memory error on REST API requests signed in with an application password while the Pro subaccount add-on is active.
 
 = 3.1.9 – 10 November 2026 =
 * Fix: Enabled manual customer approval for accounts created through external registration forms or older registrations while preserving role and permission checks.

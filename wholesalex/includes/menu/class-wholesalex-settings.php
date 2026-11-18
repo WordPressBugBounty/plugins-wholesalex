@@ -11,6 +11,8 @@ namespace WHOLESALEX;
 
 defined( 'ABSPATH' ) || exit;
 
+require_once dirname( __DIR__ ) . '/settings/class-settings-service.php';
+
 /**
  * Settings Class.
  */
@@ -126,27 +128,10 @@ class Settings {
 		$type = isset( $post['type'] ) ? sanitize_text_field( $post['type'] ) : '';
 
 		if ( 'set' === $type ) {
-			$post = wholesalex()->sanitize( $post );
-			if ( 'yes' === ( $post['settings']['wsx_addon_recaptcha'] ?? '' ) ) {
-				$site_key   = $post['settings']['_settings_google_recaptcha_v3_site_key'] ?? wholesalex()->get_setting( '_settings_google_recaptcha_v3_site_key' );
-				$secret_key = $post['settings']['_settings_google_recaptcha_v3_secret_key'] ?? wholesalex()->get_setting( '_settings_google_recaptcha_v3_secret_key' );
-				if ( empty( $site_key ) || empty( $secret_key ) ) {
-					wp_send_json_error( __( 'Enter both reCAPTCHA keys in Registration Form > Form Settings before enabling reCAPTCHA.', 'wholesalex' ) );
-				}
+			$saved = Settings_Service::save( isset( $post['settings'] ) && is_array( $post['settings'] ) ? $post['settings'] : array() );
+			if ( is_wp_error( $saved ) ) {
+				wp_send_json_error( $saved->get_error_message() );
 			}
-
-			if ( 'email_confirmation_require' === $post['settings']['_settings_user_status_option'] ) {
-				$__confirmation_email_status = get_option( 'wholesalex_email_verification_email_status' );
-				if ( 'no' === $__confirmation_email_status ) {
-					/* translators: %1s - Plugin Name, %2s - Plugin Name,  */
-					wp_send_json_error( sprintf( __( 'To Active "Email Confirmation" Please Enable %1$s Email Template from "Dashboard > %2$s > Emails".', 'wholesalex' ), wholesalex()->get_plugin_name(), wholesalex()->get_plugin_name() ) );
-				}
-			}
-			// Completion is managed by onboarding, not stale settings forms.
-			unset( $post['settings']['_settings_onboarding_completed'], $post['settings']['isOnboarding'] );
-			require_once dirname( __DIR__ ) . '/admin/class-provider-settings-preservation.php';
-			$post['settings'] = \WHOLESALEX\Admin\Provider_Settings_Preservation::prepare( $post['settings'] );
-			wholesalex()->set_setting_multiple( $post['settings'] );
 			wp_send_json_success( __( 'Successfully Saved.', 'wholesalex' ) );
 		} elseif ( 'get' === $type ) {
 			$data              = array();

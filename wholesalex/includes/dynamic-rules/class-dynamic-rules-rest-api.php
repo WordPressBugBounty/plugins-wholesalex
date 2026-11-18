@@ -20,6 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+require_once __DIR__ . '/class-dynamic-rules-service.php';
+
 /**
  * Dynamic Rules REST API
  */
@@ -323,13 +325,9 @@ class Dynamic_Rules_Rest_Api {
 
 		// HANDLE DELETE DYNAMIC RULES.
 		if ( isset( $post['delete'] ) && $post['delete'] ) {
-
-			$existing_rule = wholesalex()->get_dynamic_rules( $rule_id );
-			if ( ! empty( $existing_rule ) ) {
-				$result = wholesalex()->set_dynamic_rules( $rule_id, $existing_rule, 'delete' );
-				if ( is_wp_error( $result ) ) {
-					return $result;
-				}
+			$result = Dynamic_Rules_Service::delete( $rule_id );
+			if ( is_wp_error( $result ) ) {
+				return $result;
 			}
 
 			return array(
@@ -361,13 +359,9 @@ class Dynamic_Rules_Rest_Api {
 
 		// Status toggle only – just flip _rule_status and save.
 		if ( isset( $post['check'] ) && '_rule_status' === $post['check'] ) {
-			$existing = wholesalex()->get_dynamic_rules( $rule_id );
-			if ( ! empty( $existing ) ) {
-				$existing['_rule_status'] = isset( $data['_rule_status'] ) ? $data['_rule_status'] : '';
-				$result                   = wholesalex()->set_dynamic_rules( $rule_id, $existing );
-				if ( is_wp_error( $result ) ) {
-					return $result;
-				}
+			$result = Dynamic_Rules_Service::set_status( $rule_id, isset( $data['_rule_status'] ) ? $data['_rule_status'] : '' );
+			if ( is_wp_error( $result ) ) {
+				return $result;
 			}
 			$status_label = in_array( $data['_rule_status'] ?? '', array( true, 1, '1', 'yes' ), true ) ? __( 'Rule activated successfully.', 'wholesalex' ) : __( 'Rule deactivated successfully.', 'wholesalex' );
 			return array(
@@ -377,13 +371,11 @@ class Dynamic_Rules_Rest_Api {
 		}
 
 		// Full save.
-		$data        = apply_filters( 'wholesalex_dynamic_rule_data_before_save', $data );
 		$is_frontend = isset( $post['isFrontend'] ) ? (bool) $post['isFrontend'] : false;
-		$result      = wholesalex()->set_dynamic_rules( $rule_id, $data, '', $is_frontend );
+		$result      = Dynamic_Rules_Service::save( $rule_id, $data, $is_frontend );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
-		do_action( 'wholesalex_dynamic_rule_data_after_save', $data );
 
 		return array(
 			'success' => true,
@@ -457,23 +449,11 @@ class Dynamic_Rules_Rest_Api {
 		}
 
 		foreach ( $rule_ids as $rid ) {
-			if ( 'delete' === $action ) {
-				$existing = wholesalex()->get_dynamic_rules( $rid );
-				if ( ! empty( $existing ) ) {
-					$result = wholesalex()->set_dynamic_rules( $rid, $existing, 'delete' );
-					if ( is_wp_error( $result ) ) {
-						return $result;
-					}
-				}
-			} else {
-				$existing = wholesalex()->get_dynamic_rules( $rid );
-				if ( $existing ) {
-					$existing['_rule_status'] = ( 'enable' === $action ) ? 'yes' : 'no';
-					$result                   = wholesalex()->set_dynamic_rules( $rid, $existing );
-					if ( is_wp_error( $result ) ) {
-						return $result;
-					}
-				}
+			$result = 'delete' === $action
+				? Dynamic_Rules_Service::delete( $rid )
+				: Dynamic_Rules_Service::set_status( $rid, 'enable' === $action ? 'yes' : 'no' );
+			if ( is_wp_error( $result ) ) {
+				return $result;
 			}
 		}
 

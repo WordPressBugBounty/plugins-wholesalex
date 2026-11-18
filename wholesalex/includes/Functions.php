@@ -2110,6 +2110,7 @@ class Functions {
 			case 'wholesalex-wholesale-pricing':
 			case 'wholesalex_dynamic_rules':
 			case 'wholesalex-registration':
+			case 'wholesalex-ai-tools':
 			case 'wholesalex':
 			case 'wholesalex-analytics':
 			case 'wholesalex-help':

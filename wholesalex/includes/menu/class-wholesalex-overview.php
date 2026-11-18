@@ -25,6 +25,7 @@ class WHOLESALEX_Overview {
 	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'overview_submenu_page_callback' ), 1 );
+		add_action( 'wholesalex_render_admin_app', array( $this, 'output' ) );
 		add_action( 'rest_api_init', array( $this, 'overview_callback' ) );
 		add_action( 'admin_menu', array( $this, 'go_pro_menu_page' ), 99999 );
 		add_action( 'admin_head', array( $this, 'admin_upgrade_menu_styles' ) );
@@ -132,6 +133,15 @@ class WHOLESALEX_Overview {
 				'menu_slug'  => 'wholesalex-settings',
 				'callback'   => array( $this, 'output' ),
 				'identifier' => 'settings',
+			),
+			array(
+				'title'      => __( 'MCP Tools', 'wholesalex' ),
+				'menu_title' => __( 'MCP Tools', 'wholesalex' ),
+				'capability' => 'manage_options',
+				'slug'       => '/mcp',
+				'menu_slug'  => 'wholesalex-ai-tools',
+				'callback'   => array( '\WHOLESALEX\MCP\Admin_Page', 'render' ),
+				'identifier' => 'mcp',
 			),
 			array(
 				'title'      => __( 'Plugins', 'wholesalex' ),
@@ -255,6 +265,7 @@ class WHOLESALEX_Overview {
 				'wholesalex-pro-features'       => '/pro-features',
 				'wholesalex-users'              => '/customers',
 				'wholesalex-settings'           => '/settings',
+				'wholesalex-ai-tools'           => '/mcp',
 				'wholesalex-our-products'       => '/our-products',
 				'wholesalex-analytics'          => '/analytics',
 				'wholesalex-user-role-requests' => '/user_role_change_requests',
@@ -301,6 +312,7 @@ class WHOLESALEX_Overview {
 				'/pro-features'              => __( 'Pro Features', 'wholesalex' ),
 				'/customers'                 => __( 'Customers', 'wholesalex' ),
 				'/settings'                  => __( 'Settings', 'wholesalex' ),
+				'/mcp'                       => __( 'MCP Tools', 'wholesalex' ),
 				'/our-products'              => __( 'Plugins', 'wholesalex' ),
 				'/analytics'                 => __( 'Analytics', 'wholesalex' ),
 				'/user_role_change_requests' => __( 'User Role Requests', 'wholesalex' ),
@@ -1072,6 +1084,12 @@ class WHOLESALEX_Overview {
 						'wsx_wizard_url'                   => WHOLESALEX_URL,
 						'wsx_wizard_dashboard_url'         => menu_page_url( 'wholesalex', false ) ? menu_page_url( 'wholesalex', false ) : get_dashboard_url(),
 						'spa_route_pages'                  => $this->get_spa_route_pages(),
+						'mcp'                              => array(
+							'canManage' => current_user_can( 'manage_options' ),
+							'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+							'feedback'  => current_user_can( 'manage_options' ) ? \WHOLESALEX\MCP\Admin_Page::feedback() : null,
+							'nonce'     => current_user_can( 'manage_options' ) ? wp_create_nonce( 'wholesalex_mcp_screen' ) : '',
+						),
 						/**
 						* Wizard Translation Stop
 						*/

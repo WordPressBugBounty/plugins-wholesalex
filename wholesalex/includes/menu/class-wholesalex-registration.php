@@ -10,6 +10,8 @@ namespace WHOLESALEX;
 
 defined( 'ABSPATH' ) || exit;
 
+require_once dirname( __DIR__ ) . '/registration/class-registration-form-service.php';
+
 use Exception;
 use WHOLESALEX\WholesaleX_CommonUtils;
 use WP_Error;
@@ -333,16 +335,13 @@ class WHOLESALEX_Registration {
 					'data'    => array( 'message' => __( 'Invalid registration form data.', 'wholesalex' ) ),
 				);
 			}
-			$form_data = $this->sanitize_form_builder_payload( $post['data'] );
+			$form_data = Registration_Form_Service::save_payload( $post['data'] );
 			if ( is_wp_error( $form_data ) ) {
 				return array(
 					'success' => false,
 					'data'    => array( 'message' => $form_data->get_error_message() ),
 				);
 			}
-
-			update_option( 'wholesalex_registration_form', $form_data );
-			$GLOBALS['wholesalex_registration_fields'] = WholesaleX_CommonUtils::get_form_fields();
 
 			return array(
 				'success' => true,
@@ -368,78 +367,14 @@ class WHOLESALEX_Registration {
 	/**
 	 * Sanitize form builder payload before saving.
 	 *
+	 * Kept for existing callers; the logic lives in Registration_Form_Service.
+	 *
 	 * @param string $payload JSON payload.
 	 * @return string|WP_Error
 	 */
 	private function sanitize_form_builder_payload( $payload ) {
-		$decoded = json_decode( wp_unslash( $payload ), true );
-
-		if ( ! is_array( $decoded ) ) {
-			return new WP_Error( 'invalid_form_builder_payload', __( 'Invalid registration form data.', 'wholesalex' ) );
-		}
-
-		$saved   = json_decode( get_option( 'wholesalex_registration_form', '' ), true );
-		$saved   = is_array( $saved ) ? $saved : array();
-		$decoded = Registration_Provider::preserve_form( $decoded, $saved );
-		if ( is_wp_error( $decoded ) ) {
-			return $decoded;
-		}
-		$preserved = $decoded;
-		$decoded   = $this->sanitize_form_builder_value( $decoded );
-		// Provider-owned records have their own validator; preserve their exact stored shape.
-		foreach ( $preserved['registrationFields'] ?? array() as $row_index => $row ) {
-			foreach ( $row as $key => $value ) {
-				if ( ! in_array( $key, Registration_Provider::standard_row_keys(), true ) ) {
-					$decoded['registrationFields'][ $row_index ][ $key ] = $value;
-				}
-			}
-			foreach ( $row['columns'] ?? array() as $index => $field ) {
-				if ( ! WholesaleX_CommonUtils::is_standard_registration_field( $field ) ) {
-					$decoded['registrationFields'][ $row_index ]['columns'][ $index ] = $field;
-				} else {
-					foreach ( $field as $key => $value ) {
-						if ( ! in_array( $key, Registration_Provider::standard_field_keys(), true ) ) {
-							$decoded['registrationFields'][ $row_index ]['columns'][ $index ][ $key ] = $value;
-						}
-					}
-				}
-			}
-		}
-		foreach ( array_diff( array_keys( $preserved ), array_keys( WholesaleX_CommonUtils::get_empty_form() ) ) as $key ) {
-			$decoded[ $key ] = $preserved[ $key ];
-		}
-		$decoded = Registration_Provider::preserve_unknown( $decoded, $saved, Registration_Provider::base_form_shape() );
-
-		return wp_json_encode( $decoded );
+		return Registration_Form_Service::prepare_payload( $payload );
 	}
-
-	/**
-	 * Recursively sanitize form builder values while preserving arrays and scalar types.
-	 *
-	 * @param mixed $value Value.
-	 * @return mixed
-	 */
-	private function sanitize_form_builder_value( $value ) {
-		if ( is_array( $value ) ) {
-			$sanitized = array();
-			foreach ( $value as $key => $item ) {
-				$sanitized_key               = is_string( $key ) ? sanitize_text_field( $key ) : $key;
-				$sanitized[ $sanitized_key ] = $this->sanitize_form_builder_value( $item );
-			}
-
-			return $sanitized;
-		}
-
-		if ( is_bool( $value ) || is_int( $value ) || is_float( $value ) || null === $value ) {
-			return $value;
-		}
-
-		return sanitize_text_field( $value );
-	}
-
-
-
-
 
 	/**
 	 * Persist status and retain action-callback failure for the public handler.

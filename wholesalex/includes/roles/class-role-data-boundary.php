@@ -19,7 +19,8 @@ final class Role_Data_Boundary {
 	 * Prepare a complete canonical record before any storage mutation.
 	 *
 	 * Providers return a complete validated record or WP_Error, never a flag.
-	 * Omissions preserve saved values; deletion is an explicit operation.
+	 * Omissions preserve saved values. A delete removes the whole record, so it
+	 * does not need a provider; a provider can still block it with WP_Error.
 	 *
 	 * @param array  $incoming Submitted record.
 	 * @param array  $stored   Authoritative option record.
@@ -40,7 +41,9 @@ final class Role_Data_Boundary {
 				}
 				$next[ $key ] = isset( $stored[ $key ] ) && is_array( $stored[ $key ] ) ? $stored[ $key ] : array();
 				foreach ( $value as $field => $setting ) {
-					if ( in_array( $field, self::RESTRICTION_FIELDS, true ) ) {
+					if ( '_tax_rule' === $field && is_array( $setting ) ) {
+						$next[ $key ][ $field ] = self::merge_tax_patch( $setting, is_array( $next[ $key ][ $field ] ?? null ) ? $next[ $key ][ $field ] : array() );
+					} elseif ( in_array( $field, self::RESTRICTION_FIELDS, true ) ) {
 						$next[ $key ][ $field ] = wholesalex()->sanitize( $setting );
 					} elseif ( ! array_key_exists( $field, $next[ $key ] ) || $next[ $key ][ $field ] !== $setting ) {
 						$unknown                           = true;
@@ -52,19 +55,6 @@ final class Role_Data_Boundary {
 			} elseif ( ! array_key_exists( $key, $stored ) || $stored[ $key ] !== $value ) {
 				$unknown                 = true;
 				$changes['role'][ $key ] = $value;
-			}
-		}
-		if ( 'delete' === $operation ) {
-			foreach ( $stored as $key => $value ) {
-				if ( '_restrictions' === $key && is_array( $value ) ) {
-					foreach ( array_diff( array_keys( $value ), self::RESTRICTION_FIELDS ) as $field ) {
-						$changes['restrictions'][ $field ] = $value[ $field ];
-						$unknown                           = true;
-					}
-				} elseif ( ! in_array( $key, self::ROLE_FIELDS, true ) && ! is_numeric( $key ) ) {
-					$unknown                 = true;
-					$changes['role'][ $key ] = $value;
-				}
 			}
 		}
 		/**
@@ -86,6 +76,33 @@ final class Role_Data_Boundary {
 		}
 		if ( $unknown ) {
 			return new \WP_Error( 'wholesalex_provider_unavailable', __( 'This role operation requires its settings provider.', 'wholesalex' ), array( 'status' => 409 ) );
+		}
+		return $next;
+	}
+
+	/**
+	 * Preserve omitted tax children; selector lists replace their saved selection.
+	 *
+	 * @param array $patch  Submitted tax fields.
+	 * @param array $stored Authoritative saved tax object.
+	 * @return array
+	 */
+	private static function merge_tax_patch( array $patch, array $stored ): array {
+		$next = $stored;
+		foreach ( $patch as $key => $value ) {
+			if ( array_key_exists( $key, $stored ) && $value === $stored[ $key ] ) {
+				continue;
+			}
+			if ( 'exclude_users' === $key && is_array( $value ) ) {
+				$next[ $key ] = is_array( $stored[ $key ] ?? null ) ? $stored[ $key ] : array();
+				foreach ( $value as $child => $setting ) {
+					if ( ! array_key_exists( $child, $next[ $key ] ) || $setting !== $next[ $key ][ $child ] ) {
+						$next[ $key ][ $child ] = wholesalex()->sanitize( $setting );
+					}
+				}
+			} else {
+				$next[ $key ] = wholesalex()->sanitize( $value );
+			}
 		}
 		return $next;
 	}

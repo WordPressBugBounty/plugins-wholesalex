@@ -10,6 +10,8 @@ namespace WHOLESALEX;
 
 defined( 'ABSPATH' ) || exit;
 
+require_once dirname( __DIR__ ) . '/roles/class-role-service.php';
+
 use WC_Data_Store;
 use WC_Shipping_Zone;
 
@@ -219,9 +221,7 @@ class WHOLESALEX_Role {
 				return;
 			}
 			// Untouched settings default to enabled gateways; preserve explicit selections, including none.
-			if ( is_array( $_role ) && ! array_key_exists( '_payment_methods', $_role ) ) {
-				$_role['_payment_methods'] = array_keys( self::get_enabled_payment_gateway_options() );
-			}
+			$_role = Role_Service::with_default_payment_methods( $_role );
 			$_flag = true;
 			if ( isset( $post['check'] ) ) {
 				if ( empty( wholesalex()->get_roles( 'by_id', $_id ) ) ) {

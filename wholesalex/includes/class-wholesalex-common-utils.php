@@ -516,6 +516,75 @@ class WholesaleX_CommonUtils {
 
 		$form_data = is_array( $form_data ) ? $form_data : $default_form;
 
+		return self::normalize_migrated_registration_fields( $form_data );
+	}
+
+	/**
+	 * Adapt server-stored migration records without writing the form on read.
+	 *
+	 * Never call this with a posted form: migration markers are authoritative only
+	 * when read from storage. The save boundary still validates client changes.
+	 *
+	 * @param array $form_data Stored form or server-converted legacy form.
+	 * @return array
+	 */
+	public static function normalize_migrated_registration_fields( array $form_data ) {
+		if ( ! is_array( $form_data['registrationFields'] ?? null ) ) {
+			return $form_data;
+		}
+		$standard_names = array();
+		foreach ( $form_data['registrationFields'] as $row_index => $row ) {
+			if ( ! is_array( $row ) || ! is_array( $row['columns'] ?? null ) ) {
+				continue;
+			}
+			foreach ( $row['columns'] as $column_index => $field ) {
+				if ( ! is_array( $field ) || ! is_string( $field['name'] ?? null ) || empty( $field['migratedFromOldBuilder'] ) ) {
+					continue;
+				}
+				// Importers sometimes flag standard account fields as custom.
+				$standard_field                 = $field;
+				$standard_field['custom_field'] = false;
+				if ( self::is_standard_registration_field( $standard_field ) ) {
+					$standard_names[ $field['name'] ] = true;
+					if ( ! empty( $field['custom_field'] ) ) {
+						$form_data['registrationFields'][ $row_index ]['columns'][ $column_index ]['custom_field'] = false;
+					}
+				}
+			}
+		}
+		$removed  = false;
+		$defaults = array(
+			'regi_1' => 'user_email',
+			'regi_2' => 'user_pass',
+			'regi_3' => 'user_login',
+		);
+		foreach ( $form_data['registrationFields'] as $row_index => $row ) {
+			if ( ! is_array( $row ) || ! is_string( $row['id'] ?? null ) || ! is_array( $row['columns'] ?? null ) ) {
+				continue;
+			}
+			// Earlier adapters appended migrated account fields after these defaults.
+			// Keep the migrated copy with its original ID, settings and metadata.
+			$name = $defaults[ $row['id'] ?? '' ] ?? '';
+			if (
+				! isset( $standard_names[ $name ] ) || count( $row['columns'] ) !== 1
+				|| array_diff( array_keys( $row ), Registration_Provider::standard_row_keys() )
+			) {
+				continue;
+			}
+			$field = reset( $row['columns'] );
+			if (
+				is_array( $field ) && ( $field['name'] ?? '' ) === $name
+				&& ! isset( $field['id'] ) && empty( $field['migratedFromOldBuilder'] )
+				&& self::is_standard_registration_field( $field )
+				&& ! array_diff( array_keys( $field ), Registration_Provider::standard_field_keys() )
+			) {
+				unset( $form_data['registrationFields'][ $row_index ] );
+				$removed = true;
+			}
+		}
+		if ( $removed ) {
+			$form_data['registrationFields'] = array_values( $form_data['registrationFields'] );
+		}
 		return $form_data;
 	}
 

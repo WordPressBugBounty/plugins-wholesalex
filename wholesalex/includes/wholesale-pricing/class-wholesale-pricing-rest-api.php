@@ -37,6 +37,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+require_once __DIR__ . '/class-wholesale-pricing-service.php';
+
 /**
  * Wholesale_Pricing_Rest_Api
  */
@@ -676,144 +678,31 @@ class Wholesale_Pricing_Rest_Api {
 			);
 		}
 
-		$existing = Wholesale_Pricing::get_rule( $id );
-		if ( is_array( $existing ) && ! Wholesale_Pricing::current_manager_owns_rule( $existing ) ) {
-			return $this->forbidden_rule_response();
-		}
-
-		$provider = Wholesale_Pricing::provider_operation( 'save', $id, $rule, $existing );
-		if ( null !== $provider ) {
-			return is_wp_error( $provider ) ? $provider : rest_ensure_response(
-				array(
-					'success' => true,
-					'data'    => $provider,
-				)
-			);
-		}
-		if ( is_array( $existing ) && Wholesale_Pricing::has_provider_record( $existing ) ) {
-			$saved = Wholesale_Pricing::save_rule( $id, array( 'title' => sanitize_text_field( $rule['title'] ?? $existing['title'] ?? '' ) ) );
-			return is_wp_error( $saved ) ? $saved : rest_ensure_response(
-				array(
-					'success' => true,
-					'data'    => $saved,
-				)
-			);
-		}
-		$ownership = Wholesale_Pricing::validate_provider_write( $rule, $existing );
-		if ( is_wp_error( $ownership ) ) {
-			return $ownership;
-		}
-		$input_error = $this->validate_input( $rule, is_array( $existing ) ? $existing : array() );
-		if ( is_wp_error( $input_error ) ) {
-			return $input_error; }
-		$candidate   = array_replace( is_array( $existing ) ? $existing : array(), $rule );
-		$unavailable = Wholesale_Pricing_Rule_Registry::unavailable_feature( $candidate );
-		if ( '' !== $unavailable ) {
-			$free_fields     = array( 'id', 'title', 'status', 'regular', 'product_discount', 'cart', 'bogo', 'products', 'categories', 'exclude_products', 'user_role_filter', 'user_roles', 'specific_users', 'schedule' );
-			$provider_fields = array_diff_key( $rule, array_flip( $free_fields ) );
-			$unchanged       = is_array( $existing );
-			foreach ( $provider_fields as $key => $value ) {
-				if ( ! is_array( $existing ) || ! array_key_exists( $key, $existing ) || $value !== $existing[ $key ] ) {
-					$unchanged = false;
-					break;
-				}
-			}
-			if ( ! $unchanged ) {
-				return new \WP_Error(
-					'wholesalex_provider_unavailable',
-					__( 'The provider for this pricing operation is unavailable.', 'wholesalex' ),
-					array(
-						'status'  => 409,
-						'feature' => $unavailable,
-					)
-				);
-			}
-		}
-		$sanitized = $this->sanitize_rule( $candidate, is_array( $existing ) ? $existing : array() );
-		if ( '' !== $unavailable && is_array( $existing ) ) {
-			foreach ( array( 'rule_type', 'product_filter', 'discount_type', 'conditions' ) as $key ) {
-				if ( array_key_exists( $key, $existing ) && ( ! array_key_exists( $key, $rule ) || $rule[ $key ] === $existing[ $key ] ) ) {
-					$sanitized[ $key ] = $existing[ $key ];
-				}
-			}
-		}
-
-		// Only authoritative unknown fields survive a Free save.
-		if ( is_array( $existing ) ) {
-			$sanitized = array_replace( $existing, $sanitized );
-		}
-
-		$context = Wholesale_Pricing::get_manager_context();
-
-		if ( $context['is_vendor'] ) {
-			if ( ! $this->vendor_rule_type_is_allowed( $sanitized ) ) {
-				return rest_ensure_response(
-					array(
-						'success' => false,
-						'message' => __( 'Vendors may only create wholesale pricing rules.', 'wholesalex' ),
-					)
-				);
-			}
-
-			$ownership_error = $this->validate_vendor_product_ownership( $sanitized, $context['vendor_id'] );
-			if ( is_wp_error( $ownership_error ) ) {
-				return rest_ensure_response(
-					array(
-						'success' => false,
-						'message' => $ownership_error->get_error_message(),
-					)
-				);
-			}
-
-			$sanitized['owner_id']   = $context['vendor_id'];
-			$sanitized['owner_type'] = $context['owner_type'];
-			$sanitized['created_by'] = $context['vendor_id'];
-		} elseif ( is_array( $existing ) ) {
-			foreach ( array( 'owner_id', 'owner_type', 'created_by' ) as $ownership_key ) {
-				if ( isset( $existing[ $ownership_key ] ) ) {
-					$sanitized[ $ownership_key ] = $existing[ $ownership_key ];
-				}
-			}
-		} else {
-			$sanitized['owner_id']   = 0;
-			$sanitized['owner_type'] = 'admin';
-			$sanitized['created_by'] = get_current_user_id();
-		}
-
-		$schedule_error = $this->validate_schedule( $rule, $sanitized );
-		if ( is_wp_error( $schedule_error ) ) {
+		$result = Wholesale_Pricing_Service::save( $id, $rule );
+		if ( Wholesale_Pricing_Service::is_soft_error( $result ) ) {
 			return rest_ensure_response(
 				array(
 					'success' => false,
-					'message' => $schedule_error->get_error_message(),
+					'message' => $result->get_error_message(),
 				)
 			);
 		}
-
-		if (
-			'active' === $sanitized['status'] &&
-			'product_discount' === ( $sanitized['rule_type'] ?? '' ) &&
-			(
-				! is_numeric( $sanitized['product_discount']['amount'] ?? null ) ||
-				(float) $sanitized['product_discount']['amount'] <= 0
-			)
-		) {
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+		if ( $result['delegated'] ) {
 			return rest_ensure_response(
 				array(
-					'success' => false,
-					'message' => __( 'Please enter a product discount greater than zero before saving.', 'wholesalex' ),
+					'success' => true,
+					'data'    => $result['rule'],
 				)
 			);
 		}
-
-		$saved = Wholesale_Pricing::save_rule( $id, $sanitized );
-		if ( is_wp_error( $saved ) ) {
-			return $saved; }
 
 		return rest_ensure_response(
 			array(
 				'success' => true,
-				'data'    => $saved,
+				'data'    => $result['rule'],
 				'message' => __( 'Rule saved successfully.', 'wholesalex' ),
 			)
 		);
@@ -824,7 +713,7 @@ class Wholesale_Pricing_Rest_Api {
 	 *
 	 * @param array $params Raw request params.
 	 * @param bool  $trash Whether to archive the record first.
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response|\WP_Error
 	 */
 	private function handle_delete( array $params, bool $trash = false ) {
 		$id = isset( $params['id'] ) ? sanitize_text_field( $params['id'] ) : '';
@@ -838,34 +727,18 @@ class Wholesale_Pricing_Rest_Api {
 			);
 		}
 
-		$rule = Wholesale_Pricing::get_rule( $id );
-		if ( ! is_array( $rule ) || ! Wholesale_Pricing::current_manager_owns_rule( $rule ) ) {
-			return $this->forbidden_rule_response();
-		}
-
-		$check = Wholesale_Pricing::provider_operation( 'validate_delete', $id, array(), $rule );
-		if ( is_wp_error( $check ) ) {
-			return $check; }
-		if ( $trash ) {
-			// Keep a recoverable copy outside the rules used for storefront pricing.
-			$trash_key = '__wholesalex_trashed_pricing_rule_' . $id;
-			$archived  = array(
-				'rule'       => $rule,
-				'trashed_at' => time(),
+		$result = Wholesale_Pricing_Service::delete( $id, $trash );
+		if ( Wholesale_Pricing_Service::is_soft_error( $result ) ) {
+			return rest_ensure_response(
+				array(
+					'success' => false,
+					'message' => $result->get_error_message(),
+				)
 			);
-			if ( ! update_option( $trash_key, $archived, false ) && get_option( $trash_key ) !== $archived ) {
-				return rest_ensure_response(
-					array(
-						'success' => false,
-						'message' => __( 'Failed to move pricing rule to trash.', 'wholesalex' ),
-					)
-				);
-			}
 		}
-
-		$deleted = Wholesale_Pricing::delete_rule( $id );
-		if ( is_wp_error( $deleted ) ) {
-			return $deleted; }
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
 
 		return rest_ensure_response(
 			array(
@@ -879,7 +752,7 @@ class Wholesale_Pricing_Rest_Api {
 	 * Delete multiple rules in one request.
 	 *
 	 * @param array $params Raw request params.
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response|\WP_Error
 	 */
 	private function handle_bulk_delete( array $params ) {
 		$ids = $this->decode_ids_param( $params );
@@ -893,20 +766,9 @@ class Wholesale_Pricing_Rest_Api {
 			);
 		}
 
-		foreach ( $ids as $id ) {
-			$rule = Wholesale_Pricing::get_rule( $id );
-			if ( ! is_array( $rule ) || ! Wholesale_Pricing::current_manager_owns_rule( $rule ) ) {
-				return $this->forbidden_rule_response();
-			}
-			$check = Wholesale_Pricing::provider_operation( 'validate_delete', $id, array(), $rule );
-			if ( is_wp_error( $check ) ) {
-				return $check; }
-		}
-
-		foreach ( $ids as $id ) {
-			$deleted = Wholesale_Pricing::delete_rule( $id );
-			if ( is_wp_error( $deleted ) ) {
-				return $deleted; }
+		$result = Wholesale_Pricing_Service::delete_many( $ids );
+		if ( is_wp_error( $result ) ) {
+			return $result;
 		}
 
 		return rest_ensure_response(
@@ -921,7 +783,7 @@ class Wholesale_Pricing_Rest_Api {
 	 * Enable or disable multiple rules at once.
 	 *
 	 * @param array $params Raw request params.
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response|\WP_Error
 	 */
 	private function handle_bulk_set_status( array $params ) {
 		$ids         = $this->decode_ids_param( $params );
@@ -936,33 +798,17 @@ class Wholesale_Pricing_Rest_Api {
 			);
 		}
 
-		if ( ! in_array( $next_status, array( 'active', 'inactive' ), true ) ) {
+		$result = Wholesale_Pricing_Service::set_status( $ids, $next_status );
+		if ( Wholesale_Pricing_Service::is_soft_error( $result ) ) {
 			return rest_ensure_response(
 				array(
 					'success' => false,
-					'message' => __( 'Invalid status value.', 'wholesalex' ),
+					'message' => $result->get_error_message(),
 				)
 			);
 		}
-
-		foreach ( $ids as $id ) {
-			$rule = Wholesale_Pricing::get_rule( $id );
-			if ( ! is_array( $rule ) || ! Wholesale_Pricing::current_manager_owns_rule( $rule ) ) {
-				return $this->forbidden_rule_response();
-			}
-			$check = Wholesale_Pricing::provider_operation( 'validate_status', $id, array(), $rule );
-			if ( is_wp_error( $check ) ) {
-				return $check; }
-		}
-
-		foreach ( $ids as $id ) {
-			$rule = Wholesale_Pricing::get_rule( $id );
-			if ( is_array( $rule ) && Wholesale_Pricing::current_manager_owns_rule( $rule ) ) {
-				$rule['status'] = $next_status;
-				$saved          = Wholesale_Pricing::save_rule( $id, $rule );
-				if ( is_wp_error( $saved ) ) {
-					return $saved; }
-			}
+		if ( is_wp_error( $result ) ) {
+			return $result;
 		}
 
 		return rest_ensure_response(
@@ -988,74 +834,6 @@ class Wholesale_Pricing_Rest_Api {
 		}
 
 		return array_map( 'sanitize_text_field', $ids );
-	}
-
-	/**
-	 * Return a consistent response when a rule is outside the current manager scope.
-	 *
-	 * @return \WP_REST_Response
-	 */
-	private function forbidden_rule_response() {
-		return new \WP_Error(
-			'wholesalex_forbidden_rule',
-			__( 'You do not have permission to manage this pricing rule.', 'wholesalex' ),
-			array( 'status' => 403 )
-		);
-	}
-
-	/**
-	 * Vendors only receive the product-level wholesale pricing rule builder.
-	 *
-	 * Cart-wide campaigns and free-product campaigns can affect products owned
-	 * by other sellers, so they remain administrator-only.
-	 *
-	 * @param array $rule Sanitized rule.
-	 * @return bool
-	 */
-	private function vendor_rule_type_is_allowed( array $rule ): bool {
-		$allowed_types = apply_filters(
-			'wholesalex_vendor_wholesale_pricing_rule_types',
-			array( 'wholesale_pricing' )
-		);
-
-		return in_array( $rule['rule_type'] ?? '', $allowed_types, true );
-	}
-
-	/**
-	 * Ensure explicitly selected products belong to the current vendor.
-	 *
-	 * @param array $rule      Sanitized rule.
-	 * @param int   $vendor_id Vendor user ID.
-	 * @return true|\WP_Error
-	 */
-	private function validate_vendor_product_ownership( array $rule, int $vendor_id ) {
-		$product_fields = array( 'products', 'exclude_products' );
-
-		$product_fields = apply_filters( 'wholesalex_pricing_vendor_product_fields', $product_fields, $rule );
-
-		foreach ( $product_fields as $field ) {
-			$items = is_array( $field )
-				? ( $rule[ $field[0] ][ $field[1] ] ?? array() )
-				: ( $rule[ $field ] ?? array() );
-
-			foreach ( $items as $item ) {
-				$product_id = absint( is_array( $item ) ? ( $item['value'] ?? 0 ) : $item );
-				if ( ! $product_id ) {
-					continue;
-				}
-
-				$parent_id        = wp_get_post_parent_id( $product_id );
-				$owner_product_id = $parent_id ? $parent_id : $product_id;
-				if ( absint( get_post_field( 'post_author', $owner_product_id ) ) !== $vendor_id ) {
-					return new \WP_Error(
-						'wholesalex_invalid_vendor_product',
-						__( 'A selected product does not belong to your store.', 'wholesalex' )
-					);
-				}
-			}
-		}
-
-		return true;
 	}
 
 	// ── Sanitisation ──────────────────────────────────────────────────────────
@@ -1374,7 +1152,7 @@ class Wholesale_Pricing_Rest_Api {
 					? $src['badge_style']
 					: 'style_one',
 				'badge_position'   => in_array( $src['badge_position'] ?? '', $allowed_pos, true )
-					? $src['badge_position']
+					? ( $src['badge_position'] ?? '' )
 					: '',
 				'badge_bg_color'   => sanitize_hex_color( $src['badge_bg_color'] ?? '' ) ?? '#5a40e8',
 				'badge_text_color' => sanitize_hex_color( $src['badge_text_color'] ?? '' ) ?? '#ffffff',

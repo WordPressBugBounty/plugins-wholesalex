@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 3.2.0 – 18 November 2026 =
+* New: AI assistant tools through the Model Context Protocol (MCP). Manage roles, wholesale pricing rules, dynamic rules and registration form fields from MCP clients, using the free MCP Adapter plugin. Off by default, administrators only, with an activity log.
+* New: AI tools can read and change WholesaleX settings, the email templates and, with Pro, the add-on settings, through the same checks as the Settings screen. This includes store mode, private store, registration approval, shop manager access and plugin data deletion. Email recipients stay read-only, and sites can lock other settings with the `wholesalex_mcp_read_only_settings` filter.
+* New: ChatGPT, Claude and Gemini can connect to the AI tools with a built-in OAuth sign-in, approved by an administrator on a consent screen. Connected apps are listed in WholesaleX > MCP Tools and can be disconnected at any time.
+* New: When asked about a Pro feature while Pro is inactive, the AI tools tell the assistant to link the WholesaleX pricing page; when asked for a feature that neither Free nor Pro includes, they tell it to link WPXPO custom development.
+* Dev: Shared services for wholesale pricing, dynamic rule, role and registration form writes, used by the admin screens and the AI tools.
+* Fix: Prevented a PHP warning when a Buy X Get One pricing rule is saved without a badge position.
+* Fix: Prevented a memory error on REST API requests signed in with an application password while the Pro subaccount add-on is active.
+
 = 3.1.9 – 10 November 2026 =
 * Fix: Enabled manual customer approval for accounts created through external registration forms or older registrations while preserving role and permission checks.
 * Fix: Restored missing WordPress role entries when saving existing WholesaleX roles.

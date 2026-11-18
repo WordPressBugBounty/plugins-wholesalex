@@ -1034,8 +1034,10 @@ class Wholesale_Pricing_Rule_Engine {
 				$this->append_builder_rule( $rule, $role_id, $user_id, false );
 			}
 		}
-		// Preview the current edit as enabled, without saving or activating it.
+		// Preview the current edit as enabled now, without saving or activating it.
+		// Its scheduled dates still apply to storefront pricing and other saved rules.
 		$draft['status'] = 'active';
+		$draft['schedule'] = array();
 		$this->append_builder_rule( $draft, $role_id, $user_id, true );
 		usort( $this->valid_rules, array( $this, 'compare_by_priority' ) );
 	}

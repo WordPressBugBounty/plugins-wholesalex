@@ -93,9 +93,84 @@ class WHOLESALEX_Email {
 	 * @return array
 	 */
 	public function sanitize_multiple_email_fields( $emails ) {
-		$recipients = array_map( 'trim', explode( ',', $emails ) );
+		return self::sanitize_recipients( $emails );
+	}
+
+	/**
+	 * Keep only valid addresses from a comma-separated recipient list.
+	 *
+	 * @param mixed $emails Comma-separated email addresses.
+	 * @return string
+	 */
+	public static function sanitize_recipients( $emails ) {
+		$recipients = array_map( 'trim', explode( ',', is_string( $emails ) ? $emails : '' ) );
 		$recipients = array_filter( $recipients, 'is_email' );
 		return implode( ', ', $recipients );
+	}
+
+	/**
+	 * Turn one WholesaleX email on or off. Shared by the Email Templates screen
+	 * and the AI tools.
+	 *
+	 * @param string $template_name Email template ID.
+	 * @param string $status        "yes" or "no".
+	 * @return true|\WP_Error
+	 */
+	public static function set_template_status( string $template_name, string $status ) {
+		$valid = self::validate_template_change( $template_name, array( 'enabled' => $status ) );
+		if ( is_wp_error( $valid ) ) {
+			return $valid;
+		}
+		$template_key_name            = 'woocommerce_' . $template_name . '_settings';
+		$template_settings            = (array) get_option( $template_key_name, array() );
+		$template_settings['enabled'] = $status;
+		update_option( $template_key_name, $template_settings );
+		return true;
+	}
+
+	/**
+	 * Validate an email change without writing, for settings batch preflight.
+	 *
+	 * @param string $template_name Email template ID.
+	 * @param array  $changes       Proposed template parts.
+	 * @return true|\WP_Error
+	 */
+	public static function validate_template_change( string $template_name, array $changes ) {
+		if ( ! self::is_template_addon_enabled( $template_name ) ) {
+			return new \WP_Error( 'wholesalex_email_addon_disabled', __( 'Enable the required add-on before changing this email.', 'wholesalex' ) );
+		}
+		if ( ! isset( self::get_email_templates()[ $template_name ] ) || ( isset( $changes['enabled'] ) && ! in_array( $changes['enabled'], array( 'yes', 'no' ), true ) ) ) {
+			return new \WP_Error( 'wholesalex_email_invalid', __( 'Unknown email or status.', 'wholesalex' ) );
+		}
+		return true;
+	}
+
+	/**
+	 * Save the recipient, subject, heading, additional content or type of one
+	 * WholesaleX email. Only the given parts change. Shared by the Email
+	 * Templates screen and the AI tools.
+	 *
+	 * @param string $template_name Email template ID.
+	 * @param array  $template      Parts to change.
+	 * @return true|\WP_Error
+	 */
+	public static function update_template( string $template_name, array $template ) {
+		$valid = self::validate_template_change( $template_name, $template );
+		if ( is_wp_error( $valid ) ) {
+			return $valid;
+		}
+		$template_key_name = 'woocommerce_' . $template_name . '_settings';
+		$template_settings = (array) get_option( $template_key_name, array() );
+		if ( isset( $template['recipient'] ) ) {
+			$template_settings['recipient'] = self::sanitize_recipients( $template['recipient'] );
+		}
+		foreach ( array( 'subject', 'heading', 'additional_content', 'email_type' ) as $part ) {
+			if ( isset( $template[ $part ] ) ) {
+				$template_settings[ $part ] = wp_kses_post( $template[ $part ] );
+			}
+		}
+		update_option( $template_key_name, $template_settings );
+		return true;
 	}
 
 	/**
@@ -125,14 +200,10 @@ class WHOLESALEX_Email {
 			case 'update_status':
 				$template_name = isset( $post['template_name'] ) && is_string( $post['template_name'] ) ? sanitize_text_field( $post['template_name'] ) : '';
 				$status        = isset( $post['enabled'] ) && is_string( $post['enabled'] ) ? sanitize_text_field( $post['enabled'] ) : '';
-				if ( ! self::is_template_addon_enabled( $template_name ) ) {
-					$response['data'] = __( 'Enable the required add-on before changing this email.', 'wholesalex' );
-				} elseif ( isset( self::get_email_templates()[ $template_name ] ) && in_array( $status, array( 'yes', 'no' ), true ) ) {
-					$template_key_name            = 'woocommerce_' . $template_name . '_settings';
-					$template_settings            = (array) get_option( $template_key_name, array() );
-					$template_settings['enabled'] = $status;
-
-					update_option( $template_key_name, $template_settings );
+				$updated       = self::set_template_status( $template_name, $status );
+				if ( is_wp_error( $updated ) && 'wholesalex_email_addon_disabled' === $updated->get_error_code() ) {
+					$response['data'] = $updated->get_error_message();
+				} elseif ( true === $updated ) {
 					$response['status']       = true;
 					$response['template_key'] = $template_name;
 					$response['enabled']      = $status;
@@ -141,28 +212,10 @@ class WHOLESALEX_Email {
 				break;
 			case 'save_template':
 				$template_name = isset( $post['template_name'] ) && is_string( $post['template_name'] ) ? sanitize_text_field( $post['template_name'] ) : '';
+				$updated       = isset( $post['template'] ) && is_array( $post['template'] ) ? self::update_template( $template_name, $post['template'] ) : null;
 				if ( ! self::is_template_addon_enabled( $template_name ) ) {
 					$response['data'] = __( 'Enable the required add-on before changing this email.', 'wholesalex' );
-				} elseif ( isset( self::get_email_templates()[ $template_name ] ) && isset( $post['template'] ) && is_array( $post['template'] ) ) {
-					$template_key_name = 'woocommerce_' . $template_name . '_settings';
-					$template_settings = (array) get_option( $template_key_name, array() );
-					if ( isset( $post['template']['recipient'] ) ) {
-						$template_settings['recipient'] = $this->sanitize_multiple_email_fields( $post['template']['recipient'] );
-					}
-					if ( isset( $post['template']['subject'] ) ) {
-						$template_settings['subject'] = wp_kses_post( $post['template']['subject'] );
-					}
-					if ( isset( $post['template']['heading'] ) ) {
-						$template_settings['heading'] = wp_kses_post( $post['template']['heading'] );
-					}
-					if ( isset( $post['template']['additional_content'] ) ) {
-						$template_settings['additional_content'] = wp_kses_post( $post['template']['additional_content'] );
-					}
-					if ( isset( $post['template']['email_type'] ) ) {
-						$template_settings['email_type'] = wp_kses_post( $post['template']['email_type'] );
-					}
-
-					update_option( $template_key_name, $template_settings );
+				} elseif ( true === $updated ) {
 					$response['status'] = true;
 					$response['data']   = __( 'Success', 'wholesalex' );
 				}
