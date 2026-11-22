@@ -1,5 +1,10 @@
 == Changelog ==
 
+= 3.2.1 – 22 November 2026 =
+* Fix: Restored registration form shortcode submissions when iubenda script blocking is enabled and displayed validation errors as plain text.
+* Fix: Corrected when product tier pricing controls appear and limited wholesale base and sale price editing to B2B roles.
+* Improvement: Sped up the Customers list and CSV export and reduced requests while typing in customer search.
+
 = 3.2.0 – 18 November 2026 =
 * New: AI assistant tools through the Model Context Protocol (MCP). Manage roles, wholesale pricing rules, dynamic rules and registration form fields from MCP clients, using the free MCP Adapter plugin. Off by default, administrators only, with an activity log.
 * New: AI tools can read and change WholesaleX settings, the email templates and, with Pro, the add-on settings, through the same checks as the Settings screen. This includes store mode, private store, registration approval, shop manager access and plugin data deletion. Email recipients stay read-only, and sites can lock other settings with the `wholesalex_mcp_read_only_settings` filter.

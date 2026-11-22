@@ -1904,13 +1904,32 @@ class WHOLESALEX_Product {
 	 * Single Product Field Return.
 	 */
 	public static function get_product_fields() {
-		$b2b_roles   = wholesalex()->get_roles( 'b2b_roles_option' );
-		$__b2b_roles = array();
-		foreach ( $b2b_roles as $role ) {
+		$plugin_name = wholesalex()->get_plugin_name();
+		$fields      = array(
+			'_b2c_section' => array(
+				/* translators: %s - Plugin Name */
+				'label' => sprintf( __( '%s Guest and B2C Pricing', 'wholesalex' ), $plugin_name ),
+				'attr'  => array(),
+			),
+			'_b2b_section' => array(
+				/* translators: %s - Plugin Name */
+				'label' => sprintf( __( '%s B2B Special', 'wholesalex' ), $plugin_name ),
+				'attr'  => array(),
+			),
+		);
+		foreach ( wholesalex()->get_roles( 'store_mode_roles_option' ) as $role ) {
 			if ( ! isset( $role['value'], $role['name'] ) ) {
 				continue;
 			}
-			$__b2b_roles[ $role['value'] ] = array(
+			if ( in_array( $role['value'], Functions::PRODUCT_TIER_ONLY_ROLES, true ) ) {
+				$fields['_b2c_section']['attr'][ $role['value'] ] = array(
+					'label' => $role['name'],
+					'type'  => 'role-tiers',
+					'attr'  => array(),
+				);
+				continue;
+			}
+			$fields['_b2b_section']['attr'][ $role['value'] ] = array(
 				'label' => $role['name'],
 				'type'  => 'role-prices',
 				'attr'  => array(
@@ -1932,22 +1951,8 @@ class WHOLESALEX_Product {
 				),
 			);
 		}
-		$__b2c_roles = array();
 
-		return apply_filters(
-			'wholesalex_single_product_fields',
-			array(
-				'_b2c_section' => array(
-					'label' => '',
-					'attr'  => $__b2c_roles,
-				),
-				'_b2b_section' => array(
-					/* translators: %s - Plugin Name */
-					'label' => sprintf( __( '%s B2B Special', 'wholesalex' ), wholesalex()->get_plugin_name() ),
-					'attr'  => $__b2b_roles,
-				),
-			),
-		);
+		return apply_filters( 'wholesalex_single_product_fields', $fields );
 	}
 
 	/**

@@ -20,6 +20,9 @@ defined( 'ABSPATH' ) || exit;
  */
 class Functions {
 
+	/** Built-in roles with tier-only pricing controls in the product editor. */
+	const PRODUCT_TIER_ONLY_ROLES = array( 'wholesalex_guest', 'wholesalex_b2c_users' );
+
 	/**
 	 * Whether this admin record has configured, persisted tiers to warn about.
 	 * Returns only a flag; it does not expose or enable premium pricing data.
@@ -733,6 +736,12 @@ class Functions {
 	 * @since 1.1.5 Add rolewise price on product meta.
 	 */
 	public function save_single_product_discount( $id = '', $discounts = array() ) {
+		// Older product editors can still submit these fields alongside tier rows.
+		foreach ( self::PRODUCT_TIER_ONLY_ROLES as $role ) {
+			if ( isset( $discounts[ $role ] ) && is_array( $discounts[ $role ] ) ) {
+				unset( $discounts[ $role ]['wholesalex_base_price'], $discounts[ $role ]['wholesalex_sale_price'] );
+			}
+		}
 		foreach ( $discounts as $values ) {
 			if ( ! is_array( $values ) ) {
 				return new \WP_Error( 'wholesalex_invalid_record', __( 'Invalid price record.', 'wholesalex' ) );

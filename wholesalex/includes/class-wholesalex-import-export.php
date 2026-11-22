@@ -135,17 +135,15 @@ class ImportExport {
 			return array();
 		}
 		$user_fields = array( 'ID', 'user_login', 'display_name', 'user_email', 'user_registered' );
-		$meta_query  = array(
+		// One indexed join on meta_key, as in WHOLESALEX_Users::get_wholesale_users(). The explicit
+		// OR relation keeps WP_User_Query's DISTINCT for users holding both keys.
+		$meta_query = array(
 			'relation' => 'OR',
 			array(
-				'key'     => '__wholesalex_status',
-				'value'   => '',
-				'compare' => '!=',
-			),
-			array(
-				'key'     => '__wholesalex_role',
-				'value'   => '',
-				'compare' => '!=',
+				'key'         => array( '__wholesalex_status', '__wholesalex_role' ),
+				'compare_key' => 'IN',
+				'value'       => '',
+				'compare'     => '!=',
 			),
 		);
 
@@ -191,8 +189,12 @@ class ImportExport {
 			'number'     => $user_per_page,
 			'paged'      => $page,
 			'fields'     => 'all',
-			'search'     => '*' . $search_query . '*',
 		);
+		// An empty term would only add LIKE '%%' clauses that match every user.
+		$search_query = trim( (string) $search_query );
+		if ( '' !== $search_query ) {
+			$args['search'] = '*' . $search_query . '*';
+		}
 
 		// If user IDs are passed, add 'include' to filter by those IDs.
 		if ( ! empty( $user_ids ) ) {

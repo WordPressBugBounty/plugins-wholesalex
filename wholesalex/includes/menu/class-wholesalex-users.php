@@ -481,17 +481,16 @@ class WHOLESALEX_Users {
 		$order                 = ( 'asc' === strtolower( (string) $sort_direction ) ) ? 'ASC' : 'DESC';
 
 		$user_fields = array( 'ID', 'user_login', 'display_name', 'user_email', 'user_registered' );
-		$meta_query  = array(
+		// One indexed join on meta_key. Separate status and role clauses joined by OR pair
+		// every meta row of each user with every other one, which takes seconds on large stores.
+		// The explicit OR relation keeps WP_User_Query's DISTINCT for users holding both keys.
+		$meta_query = array(
 			'relation' => 'OR',
 			array(
-				'key'     => '__wholesalex_status',
-				'value'   => '',
-				'compare' => '!=',
-			),
-			array(
-				'key'     => '__wholesalex_role',
-				'value'   => '',
-				'compare' => '!=',
+				'key'         => array( '__wholesalex_status', '__wholesalex_role' ),
+				'compare_key' => 'IN',
+				'value'       => '',
+				'compare'     => '!=',
 			),
 		);
 
@@ -539,8 +538,12 @@ class WHOLESALEX_Users {
 			'paged'       => $page,
 			'fields'      => 'all',
 			'count_total' => true,
-			'search'      => '*' . $search_query . '*',
 		);
+		// An empty term would only add LIKE '%%' clauses that match every user.
+		$search_query = trim( (string) $search_query );
+		if ( '' !== $search_query ) {
+			$args['search'] = '*' . $search_query . '*';
+		}
 
 		$user_search = new WP_User_Query( $args );
 
