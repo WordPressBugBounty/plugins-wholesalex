@@ -166,8 +166,9 @@ class Dynamic_Rules {
 	 */
 	public function __construct() {
 		add_filter( 'wholesalex_rule_target_matches', array( __CLASS__, 'provider_target_matches' ), 10, 4 );
-		add_filter( 'wholesalex_rule_conditions_match', array( __CLASS__, 'provider_conditions_match' ), 10, 3 );
+		add_filter( 'wholesalex_rule_conditions_match', array( __CLASS__, 'provider_conditions_match' ), 10, 4 );
 		add_filter( 'wholesalex_rule_target_data', array( __CLASS__, 'provider_target_data' ), 10, 2 );
+		add_filter( 'wholesalex_dynamic_rule_builder_data', array( $this, 'get_builder_rule_data' ), 10, 4 );
 
 		$this->instantiate_handlers();
 
@@ -294,13 +295,14 @@ class Dynamic_Rules {
 	/**
 	 * Evaluate generic conditions through the public provider contract.
 	 *
-	 * @param bool|null $matched Previously supplied result.
-	 * @param array     $conditions Condition rows.
-	 * @param array     $filter Parsed targeting data.
+	 * @param bool|null  $matched Previously supplied result.
+	 * @param array      $conditions Condition rows.
+	 * @param array      $filter Parsed targeting data.
+	 * @param array|null $cart_items Simulated cart items, or null for the live cart.
 	 * @return bool
 	 */
-	public static function provider_conditions_match( $matched, $conditions, $filter ) {
-		return is_bool( $matched ) ? $matched : Dynamic_Rules_Condition_Engine::check_rule_conditions( $conditions, $filter );
+	public static function provider_conditions_match( $matched, $conditions, $filter, ?array $cart_items = null ) {
+		return is_bool( $matched ) ? $matched : Dynamic_Rules_Condition_Engine::check_rule_conditions( $conditions, $filter, $cart_items );
 	}
 	/**
 	 * Parse generic target data through the public provider contract.
@@ -1756,52 +1758,35 @@ class Dynamic_Rules {
 		return $quantity_in_cart;
 	}
 
-	// ─── Main Dispatch: get_valid_dynamic_rules ──────────────────
+	/**
+	 * Resolve rule records for a builder customer without dispatching storefront rules.
+	 *
+	 * @param array  $rules Previously prepared pricing data.
+	 * @param string $role_id Selected role.
+	 * @param int    $user_id Selected customer, or 0 for a role preview.
+	 * @param array  $types Rule types requested by the preview provider.
+	 * @return array
+	 */
+	public function get_builder_rule_data( array $rules, string $role_id, int $user_id, array $types ): array {
+		return array_merge( $rules, $this->collect_runtime_rules( $user_id, $role_id, $types ) );
+	}
 
 	/**
-	 * Get valid dynamic rules.
+	 * Build the same audience-scoped rules for live pricing and isolated previews.
 	 *
-	 * @param int|string $user_id User or pricing role identifier.
+	 * @param int|string $user_id Customer ID.
+	 * @param string     $__role Customer's wholesale role.
+	 * @param array      $types Include only these types when supplied.
+	 * @return array
 	 */
-	public function get_valid_dynamic_rules( $user_id = '' ) {
-		if ( is_admin() && ! wp_doing_ajax() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-			return;
-		}
-
-		// REST initialization can reload rules after wp_loaded in the same request.
-		$this->valid_dynamic_rules = array();
-
-		$user_id = ( isset( $user_id ) && ! empty( $user_id ) ) ? $user_id : get_current_user_id();
-		$user_id = apply_filters( 'wholesalex_set_current_user', $user_id );
-
-		if ( ! isset( $GLOBALS['wholesalex_rule_data'] ) ) {
-			$GLOBALS['wholesalex_rule_data'] = array();
-		}
-
-		if ( is_user_logged_in() ) {
-			// Used by automatic role migration.
-			self::$cu_total_spent = wc_get_customer_total_spent( $user_id );
-			// Sync to facade for backward compatibility.
-			WHOLESALEX_Dynamic_Rules::$cu_total_spent = self::$cu_total_spent;
-		}
-
-		self::$total_cart_counts                     = false;
-		WHOLESALEX_Dynamic_Rules::$total_cart_counts = false;
-
-		do_action( 'wholesalex_before_dynamic_rules_loaded', $user_id );
-		$plugins_status = wholesalex()->get_setting( '_settings_status', 'b2b' );
-		$is_eligible    = true;
-
-		if ( 'b2b' === $plugins_status && 'active' !== wholesalex()->get_user_status( $user_id ) ) {
-			$is_eligible = false;
-		}
-
-		$is_eligible = apply_filters( 'wholesalex_pricing_user_eligible', $is_eligible, $user_id );
-
+	private function collect_runtime_rules( $user_id, $__role, array $types = array() ): array {
+		$rules       = array();
 		$__discounts = wholesalex()->get_dynamic_rules();
-		$__role      = wholesalex()->get_user_role( $user_id );
 
 		foreach ( $__discounts as $discount ) {
+			if ( $types && ! in_array( $discount['_rule_type'] ?? '', $types, true ) ) {
+				continue;
+			}
 			$discount = is_array( $discount ) ? $this->scope_rule_to_owner( $discount ) : array();
 			if ( ! $discount ) {
 				continue; }
@@ -1940,8 +1925,8 @@ class Dynamic_Rules {
 				continue;
 			}
 
-			if ( ! ( isset( $this->valid_dynamic_rules[ $discount['_rule_type'] ] ) && is_array( $this->valid_dynamic_rules[ $discount['_rule_type'] ] ) ) ) {
-				$this->valid_dynamic_rules[ $discount['_rule_type'] ] = array();
+			if ( ! ( isset( $rules[ $discount['_rule_type'] ] ) && is_array( $rules[ $discount['_rule_type'] ] ) ) ) {
+				$rules[ $discount['_rule_type'] ] = array();
 			}
 
 			$rule_type = $discount['_rule_type'];
@@ -1968,7 +1953,7 @@ class Dynamic_Rules {
 			$frule = apply_filters( 'wholesalex_dr_rule_payload', $frule, $rule_type, $discount, $this );
 
 			if ( null !== $frule ) {
-				$this->valid_dynamic_rules[ $discount['_rule_type'] ][] = array(
+				$rules[ $discount['_rule_type'] ][] = array(
 					'id'                  => $discount['id'],
 					'filter'              => array(
 						'include_products'   => $include_products,
@@ -1994,9 +1979,58 @@ class Dynamic_Rules {
 			}
 		}
 
-		foreach ( $this->valid_dynamic_rules as $key => $value ) {
-			usort( $this->valid_dynamic_rules[ $key ], array( $this, 'compare_by_priority' ) );
+		foreach ( $rules as &$group ) {
+			usort( $group, array( $this, 'compare_by_priority' ) );
 		}
+		unset( $group );
+
+		return $rules;
+	}
+
+	// ─── Main Dispatch: get_valid_dynamic_rules ──────────────────
+
+	/**
+	 * Get valid dynamic rules.
+	 *
+	 * @param int|string $user_id User or pricing role identifier.
+	 */
+	public function get_valid_dynamic_rules( $user_id = '' ) {
+		if ( is_admin() && ! wp_doing_ajax() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			return;
+		}
+
+		// REST initialization can reload rules after wp_loaded in the same request.
+		$this->valid_dynamic_rules = array();
+
+		$user_id = ( isset( $user_id ) && ! empty( $user_id ) ) ? $user_id : get_current_user_id();
+		$user_id = apply_filters( 'wholesalex_set_current_user', $user_id );
+
+		if ( ! isset( $GLOBALS['wholesalex_rule_data'] ) ) {
+			$GLOBALS['wholesalex_rule_data'] = array();
+		}
+
+		if ( is_user_logged_in() ) {
+			// Used by automatic role migration.
+			self::$cu_total_spent = wc_get_customer_total_spent( $user_id );
+			// Sync to facade for backward compatibility.
+			WHOLESALEX_Dynamic_Rules::$cu_total_spent = self::$cu_total_spent;
+		}
+
+		self::$total_cart_counts                     = false;
+		WHOLESALEX_Dynamic_Rules::$total_cart_counts = false;
+
+		do_action( 'wholesalex_before_dynamic_rules_loaded', $user_id );
+		$plugins_status = wholesalex()->get_setting( '_settings_status', 'b2b' );
+		$is_eligible    = true;
+
+		if ( 'b2b' === $plugins_status && 'active' !== wholesalex()->get_user_status( $user_id ) ) {
+			$is_eligible = false;
+		}
+
+		$is_eligible = apply_filters( 'wholesalex_pricing_user_eligible', $is_eligible, $user_id );
+
+		$__role                     = wholesalex()->get_user_role( $user_id );
+		$this->valid_dynamic_rules = $this->collect_runtime_rules( $user_id, $__role );
 
 		do_action( 'wholesalex_valid_dynamic_rules', $this->valid_dynamic_rules );
 

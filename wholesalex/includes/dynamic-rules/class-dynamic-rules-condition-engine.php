@@ -86,13 +86,17 @@ class Dynamic_Rules_Condition_Engine {
 	 *
 	 * Evaluates cart total qty, value, weight, order count, and total purchase conditions.
 	 *
-	 * @param array $tiers      Array of condition tiers.
-	 * @param array $rule_filter Optional filter for eligible products.
+	 * @param array      $tiers Array of condition tiers.
+	 * @param array      $rule_filter Optional filter for eligible products.
+	 * @param array|null $cart_items Simulated cart items, or null for the live cart.
 	 * @return bool
 	 */
-	public static function is_conditions_fullfiled( $tiers, $rule_filter = array() ) {
-		if ( ! function_exists( 'WC' ) || ! isset( WC()->cart ) || null === WC()->cart ) {
-			return false;
+	public static function is_conditions_fullfiled( $tiers, $rule_filter = array(), ?array $cart_items = null ) {
+		if ( null === $cart_items ) {
+			if ( ! function_exists( 'WC' ) || ! isset( WC()->cart ) || null === WC()->cart ) {
+				return false;
+			}
+			$cart_items = WC()->cart->get_cart();
 		}
 
 		$cart_total_qty    = 0;
@@ -100,7 +104,7 @@ class Dynamic_Rules_Condition_Engine {
 		$cart_total_weight = 0;
 		$has_eligible_item = empty( $rule_filter );
 
-		foreach ( WC()->cart->get_cart() as $cart_item ) {
+		foreach ( $cart_items as $cart_item ) {
 			if ( ! empty( $rule_filter ) ) {
 				if ( ! self::is_eligible_for_rule( $cart_item['product_id'], $cart_item['variation_id'], $rule_filter ) ) {
 					continue;
@@ -112,7 +116,7 @@ class Dynamic_Rules_Condition_Engine {
 			$qty     = (int) $cart_item['quantity'];
 
 			$cart_total_qty   += $qty;
-			$cart_total_value += ( $product->get_price() * $qty );
+			$cart_total_value += ( ( $cart_item['preview_unit_price'] ?? $product->get_price() ) * $qty );
 
 			$weight = $product->get_weight();
 			if ( $weight ) {
@@ -200,15 +204,16 @@ class Dynamic_Rules_Condition_Engine {
 	/**
 	 * Wrapper for is_conditions_fullfiled that unpacks conditions array.
 	 *
-	 * @param mixed $conditions Conditions array with 'tiers' key.
-	 * @param mixed $rule_filter Product targeting filter.
+	 * @param mixed      $conditions Conditions array with 'tiers' key.
+	 * @param mixed      $rule_filter Product targeting filter.
+	 * @param array|null $cart_items Simulated cart items, or null for the live cart.
 	 * @return bool
 	 */
-	public static function check_rule_conditions( $conditions, $rule_filter = array() ) {
+	public static function check_rule_conditions( $conditions, $rule_filter = array(), ?array $cart_items = null ) {
 		if ( ! is_array( $conditions ) || ( isset( $conditions['tiers'] ) && ! is_array( $conditions['tiers'] ) ) ) {
 			return false; }
 		if ( isset( $conditions, $conditions['tiers'] ) && ! empty( $conditions['tiers'] ) ) {
-			if ( ! self::is_conditions_fullfiled( $conditions['tiers'], $rule_filter ) ) {
+			if ( ! self::is_conditions_fullfiled( $conditions['tiers'], $rule_filter, $cart_items ) ) {
 				return false;
 			}
 		}

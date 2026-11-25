@@ -4,7 +4,7 @@ Tags: b2b, wholesale prices, wholesale pricing, woocommerce wholesale, woocommer
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.2.1
+Stable tag: 3.2.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -328,6 +328,11 @@ Yes. WholesaleX provides four MCP access levels: Off, Read Only, Read and Write 
 4. Registration Form Builder
 
 == Changelog ==
+
+= 3.2.2 – 25 November 2026 =
+* New: Added a video tutorial to the MCP Tools page.
+* Improvement: Listed applicable wholesale pricing rules and their applied status in the editor preview.
+* Fix: Kept the wholesale pricing editor open after saving a new rule and showed progress while saving.
 
 = 3.2.1 – 22 November 2026 =
 * Fix: Restored registration form shortcode submissions when iubenda script blocking is enabled and displayed validation errors as plain text.

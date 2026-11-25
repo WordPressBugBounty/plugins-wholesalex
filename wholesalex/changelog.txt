@@ -1,5 +1,10 @@
 == Changelog ==
 
+= 3.2.2 – 25 November 2026 =
+* New: Added a video tutorial to the MCP Tools page.
+* Improvement: Listed applicable wholesale pricing rules and their applied status in the editor preview.
+* Fix: Kept the wholesale pricing editor open after saving a new rule and showed progress while saving.
+
 = 3.2.1 – 22 November 2026 =
 * Fix: Restored registration form shortcode submissions when iubenda script blocking is enabled and displayed validation errors as plain text.
 * Fix: Corrected when product tier pricing controls appear and limited wholesale base and sale price editing to B2B roles.

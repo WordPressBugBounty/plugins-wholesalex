@@ -1029,17 +1029,46 @@ class Wholesale_Pricing_Rule_Engine {
 		$this->rules_loaded    = true;
 		$this->valid_rules     = array();
 		$this->price_cache     = array();
+		// Keep the saved order when an edit replaces a rule with the same priority.
+		$saved_rules = array();
+		$draft_index = null;
 		foreach ( $rules as $rule ) {
-			if ( is_array( $rule ) && (string) ( $rule['id'] ?? '' ) !== (string) ( $draft['id'] ?? '' ) ) {
-				$this->append_builder_rule( $rule, $role_id, $user_id, false );
+			if ( ! is_array( $rule ) ) {
+				continue;
 			}
+			if ( (string) ( $rule['id'] ?? '' ) === (string) ( $draft['id'] ?? '' ) ) {
+				$draft_index = $draft_index ?? count( $saved_rules );
+				continue;
+			}
+			$saved_rules[] = $rule;
 		}
 		// Preview the current edit as enabled now, without saving or activating it.
 		// Its scheduled dates still apply to storefront pricing and other saved rules.
-		$draft['status'] = 'active';
+		$draft['status']   = 'active';
 		$draft['schedule'] = array();
-		$this->append_builder_rule( $draft, $role_id, $user_id, true );
+		$draft_index   = $draft_index ?? count( $saved_rules );
+		$preview_rules = $saved_rules;
+		array_splice( $preview_rules, $draft_index, 0, array( $draft ) );
+		foreach ( $preview_rules as $index => $rule ) {
+			$this->append_builder_rule( $rule, $role_id, $user_id, $index === $draft_index );
+		}
 		usort( $this->valid_rules, array( $this, 'compare_by_priority' ) );
+
+		/**
+		 * Fires when an isolated builder preview has been prepared.
+		 *
+		 * Computed providers resolve the rule types they own for the same audience
+		 * and add them through `wholesalex_wholesale_pricing_builder_candidates`.
+		 * Providers must stay read-only and serve only this engine.
+		 *
+		 * @param Wholesale_Pricing_Rule_Engine $engine      Isolated builder engine.
+		 * @param array                         $saved_rules Saved rules, without the current edit's saved version.
+		 * @param array                         $draft       Current edit, enabled and unscheduled for the preview.
+		 * @param string                        $role_id     Selected role.
+		 * @param int                           $user_id     Selected user, or zero for a role preview.
+		 * @param int                           $draft_index Position of the edit among the saved rules.
+		 */
+		do_action( 'wholesalex_wholesale_pricing_builder_ready', $this, $saved_rules, $draft, $role_id, $user_id, $draft_index );
 	}
 
 	/**
@@ -1064,7 +1093,11 @@ class Wholesale_Pricing_Rule_Engine {
 	}
 
 	/**
-	 * Return matching pricing rules and the lowest price for a builder product.
+	 * Return the resolved price and applicable rules for a builder product.
+	 *
+	 * Rows supplied by computed providers follow the Free rows, and the first
+	 * lowest price is applied by default. A source can then resolve the result
+	 * using the same source precedence as its storefront display.
 	 *
 	 * @param \WC_Product $product Product or variation being previewed.
 	 * @return array
@@ -1072,7 +1105,6 @@ class Wholesale_Pricing_Rule_Engine {
 	public function get_builder_product_pricing( \WC_Product $product ): array {
 		$base       = $this->get_base_price( $product );
 		$candidates = array();
-		$winner     = null;
 		foreach ( $this->valid_rules as $rule ) {
 			$quantity = $this->get_display_quantity_for_rule( $product, $rule );
 			if ( $base <= 0 || ! $this->can_rule_price_product( $rule, $product, $quantity, true ) ) {
@@ -1090,6 +1122,7 @@ class Wholesale_Pricing_Rule_Engine {
 				'rule_type'   => $rule['rule_type'],
 				'is_draft'    => $rule['is_draft'],
 				'price'       => $price,
+				'base_price'  => $base,
 				'discount'    => max( 0, $base - $price ),
 				'amount'      => $discount['_discount_amount'] ?? $discount['amount'] ?? 0,
 				'amount_type' => $discount['_discount_type'] ?? $discount['amount_type'] ?? 'percentage',
@@ -1097,14 +1130,40 @@ class Wholesale_Pricing_Rule_Engine {
 				'label'       => $this->get_discount_label( $rule ),
 				'applied'     => false,
 			);
-			if ( null !== $price && ( null === $winner || $price < $candidates[ $winner ]['price'] ) ) {
-				$winner = count( $candidates ) - 1;
+		}
+
+		/**
+		 * Filters the rows that computed providers add to the builder preview.
+		 *
+		 * Each row describes one provider-owned rule that matches the product:
+		 * `id`, `title`, `rule_type` and `is_draft`; `price` when the rule prices
+		 * the previewed quantity, or null when it does not; the `base_price` that
+		 * the rule discounts; the applied `amount` and `amount_type`; the
+		 * `quantity`; and the storefront price `label`.
+		 *
+		 * @param array                         $rows    Provider rows.
+		 * @param \WC_Product                   $product Product or variation being previewed.
+		 * @param float                         $base    Price before any pricing rule.
+		 * @param Wholesale_Pricing_Rule_Engine $engine  Isolated builder engine.
+		 */
+		$provided = apply_filters( 'wholesalex_wholesale_pricing_builder_candidates', array(), $product, $base, $this );
+		foreach ( is_array( $provided ) ? $provided : array() as $row ) {
+			$row = $this->normalize_builder_candidate( $row, $base );
+			if ( null !== $row ) {
+				$candidates[] = $row;
+			}
+		}
+
+		$winner = null;
+		foreach ( $candidates as $index => $candidate ) {
+			if ( null !== $candidate['price'] && ( null === $winner || $candidate['price'] < $candidates[ $winner ]['price'] ) ) {
+				$winner = $index;
 			}
 		}
 		if ( null !== $winner ) {
 			$candidates[ $winner ]['applied'] = true;
 		}
-		return array(
+		$result = array(
 			'product_id' => $product->get_id(),
 			'name'       => $product->get_name(),
 			'base_price' => $base,
@@ -1112,9 +1171,53 @@ class Wholesale_Pricing_Rule_Engine {
 			'label'      => null === $winner ? '' : $candidates[ $winner ]['label'],
 			'rules'      => $candidates,
 		);
+
+		/**
+		 * Filters resolved builder pricing when a provider owns source precedence.
+		 *
+		 * The price, rule statuses, and provider display data describe the same
+		 * preview. Resolvers use the isolated audience and leave live pricing alone.
+		 *
+		 * @param array                         $result  Resolved preview pricing.
+		 * @param \WC_Product                   $product Product or variation being previewed.
+		 * @param Wholesale_Pricing_Rule_Engine $engine  Isolated builder engine.
+		 */
+		return apply_filters( 'wholesalex_wholesale_pricing_builder_result', $result, $product, $this );
 	}
 
-
+	/**
+	 * Reduce a provider row to the documented builder fields with safe types.
+	 *
+	 * The applied state is never accepted from a provider; it is decided after
+	 * every row has been collected.
+	 *
+	 * @param mixed $row  Provider row.
+	 * @param float $base Price before any pricing rule.
+	 * @return array|null
+	 */
+	private function normalize_builder_candidate( $row, float $base ): ?array {
+		if ( ! is_array( $row ) || ! isset( $row['id'], $row['rule_type'] ) || ! is_scalar( $row['id'] ) || ! is_string( $row['rule_type'] ) ) {
+			return null;
+		}
+		$is_amount = static function ( $value ): bool {
+			return is_numeric( $value ) && is_finite( (float) $value ) && (float) $value >= 0;
+		};
+		$price     = isset( $row['price'] ) && $is_amount( $row['price'] ) ? (float) $row['price'] : null;
+		return array(
+			'id'          => (string) $row['id'],
+			'title'       => isset( $row['title'] ) && is_scalar( $row['title'] ) ? (string) $row['title'] : '',
+			'rule_type'   => sanitize_key( $row['rule_type'] ),
+			'is_draft'    => ! empty( $row['is_draft'] ),
+			'price'       => $price,
+			'base_price'  => isset( $row['base_price'] ) && $is_amount( $row['base_price'] ) ? (float) $row['base_price'] : $base,
+			'discount'    => null === $price ? 0.0 : max( 0, $base - $price ),
+			'amount'      => isset( $row['amount'] ) && $is_amount( $row['amount'] ) ? $row['amount'] : 0,
+			'amount_type' => in_array( $row['amount_type'] ?? '', array( 'percentage', 'amount', 'fixed' ), true ) ? $row['amount_type'] : 'percentage',
+			'quantity'    => isset( $row['quantity'] ) && is_numeric( $row['quantity'] ) ? max( 1, (int) $row['quantity'] ) : 1,
+			'label'       => isset( $row['label'] ) && is_string( $row['label'] ) ? $row['label'] : '',
+			'applied'     => false,
+		);
+	}
 
 	/**
 	 * Calculate a non-tiered price with its dedicated rule handler.

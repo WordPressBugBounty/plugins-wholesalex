@@ -190,7 +190,7 @@ class Wholesale_Pricing_Rest_Api {
 		$input_error = $this->validate_input( $raw );
 		if ( is_wp_error( $input_error ) ) {
 			return $input_error; }
-		$draft   = $this->sanitize_rule( $raw );
+		$draft   = $this->sanitize_builder_draft( $raw );
 		$context = Wholesale_Pricing::get_manager_context();
 		if ( $context['is_vendor'] ) {
 			$parent_id = $product->get_parent_id();
@@ -240,6 +240,36 @@ class Wholesale_Pricing_Rest_Api {
 			remove_filter( 'wholesalex_set_current_user', $user_filter, PHP_INT_MAX );
 			remove_filter( 'wholesalex_user_role', $role_filter, PHP_INT_MAX );
 		}
+	}
+
+	/**
+	 * Sanitize the unsaved edit for an isolated builder preview.
+	 *
+	 * Free sanitization would turn a provider-owned record, such as a tier rule,
+	 * into a regular wholesale rule and drop the fields its provider owns. Those
+	 * drafts are previewed in the canonical form the provider would save, and
+	 * nothing is stored. An edit the provider cannot accept yet keeps only its
+	 * identity: it still stands in for its saved version but prices nothing.
+	 *
+	 * @param array $raw Submitted rule.
+	 * @return array
+	 */
+	private function sanitize_builder_draft( array $raw ): array {
+		if ( ! Wholesale_Pricing::has_provider_record( $raw ) ) {
+			return $this->sanitize_rule( $raw );
+		}
+		$id        = sanitize_text_field( (string) ( $raw['id'] ?? '' ) );
+		$stored    = '' !== $id ? Wholesale_Pricing::get_rule( $id ) : null;
+		$canonical = Wholesale_Pricing::provider_operation( 'validate_save', $id, $raw, $stored );
+		if ( is_array( $canonical ) && Wholesale_Pricing::has_provider_record( $canonical ) ) {
+			return $canonical;
+		}
+		return array(
+			'id'            => $id,
+			'title'         => sanitize_text_field( (string) ( $raw['title'] ?? '' ) ),
+			'rule_type'     => sanitize_key( (string) ( $raw['rule_type'] ?? '' ) ),
+			'discount_type' => sanitize_key( (string) ( $raw['discount_type'] ?? '' ) ),
+		);
 	}
 
 	/**
